@@ -23,5 +23,5 @@ Rules:
   `description` and exactly one tag.
 - Schemas are referenced by relative path into `../components/schemas`,
   never defined inline, so that the bundler can name them.
-- Every operation documents its error responses with the `Error` schema and
-  the `application/problem+json` media type.
+- Every operation documents its error responses with the `Problem` schema
+  and the `application/problem+json` media type.

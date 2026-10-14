@@ -72,6 +72,8 @@ Settled by the founder: apply them as written and do not reopen them.
   `WARN` and `INFO` findings are reported for review, not fatal.
 - Error statuses: `validation_failed` is 400 and `idempotency_key_reuse` is
   409. The status of a code is part of the contract and never changes.
+- Error shape: the RFC 9457 problem-details schema is named `Problem`, not
+  `Error`, so generated SDKs do not shadow a language's built-in error type.
 - SDK generators: Dart with OpenAPI Generator `dart-dio`, Rust with
   `progenitor`; each SDK is generated when it is first needed, not before.
 - Publishing: the TypeScript SDK will be published to GitHub Packages under

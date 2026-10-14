@@ -5,13 +5,53 @@ export type ClientOptions = {
 };
 
 /**
+ * The result of a health check, returned by `GET /v1/health`.
+ */
+export type HealthResponse = {
+    /**
+     * `ok` when every dependency the API needs is reachable, `degraded` when
+     * the API is serving requests but at least one dependency is impaired.
+     * An unreachable service produces no response at all.
+     *
+     */
+    status: 'ok' | 'degraded';
+    /**
+     * The semantic version of the running API.
+     */
+    version: string;
+    /**
+     * The server time at which the check ran, as an RFC 3339 timestamp in UTC.
+     */
+    checked_at: string;
+};
+
+/**
+ * A monetary amount expressed in the minor unit of an ISO 4217 currency, so
+ * that no floating-point arithmetic is ever needed. For a currency with two
+ * decimal places, `minor_units: 1250` with `currency: USD` is 12.50 USD; for
+ * a currency without minor units (for example JPY) the amount is the whole
+ * number of units.
+ *
+ */
+export type Money = {
+    /**
+     * The amount in the currency's minor unit (cents, pence, paise). Negative values represent refunds and credits.
+     */
+    minor_units: number;
+    /**
+     * The ISO 4217 alphabetic currency code, upper case.
+     */
+    currency: string;
+};
+
+/**
  * A problem details document as defined by RFC 9457. Every error response
  * uses the media type `application/problem+json` and this shape. The `code`
  * member is the stable, machine-readable identifier from the error catalog;
  * clients should branch on `code`, not on `title` or `detail`.
  *
  */
-export type Error = {
+export type Problem = {
     /**
      * A URI reference that identifies the problem type. ZippyGo uses
      * `/problems/{code}`, resolved against the API host. `about:blank` is
@@ -54,46 +94,6 @@ export type Error = {
     }>;
 };
 
-/**
- * The result of a health check, returned by `GET /v1/health`.
- */
-export type HealthResponse = {
-    /**
-     * `ok` when every dependency the API needs is reachable, `degraded` when
-     * the API is serving requests but at least one dependency is impaired.
-     * An unreachable service produces no response at all.
-     *
-     */
-    status: 'ok' | 'degraded';
-    /**
-     * The semantic version of the running API.
-     */
-    version: string;
-    /**
-     * The server time at which the check ran, as an RFC 3339 timestamp in UTC.
-     */
-    checked_at: string;
-};
-
-/**
- * A monetary amount expressed in the minor unit of an ISO 4217 currency, so
- * that no floating-point arithmetic is ever needed. For a currency with two
- * decimal places, `minor_units: 1250` with `currency: USD` is 12.50 USD; for
- * a currency without minor units (for example JPY) the amount is the whole
- * number of units.
- *
- */
-export type Money = {
-    /**
-     * The amount in the currency's minor unit (cents, pence, paise). Negative values represent refunds and credits.
-     */
-    minor_units: number;
-    /**
-     * The ISO 4217 alphabetic currency code, upper case.
-     */
-    currency: string;
-};
-
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -105,11 +105,11 @@ export type GetHealthErrors = {
     /**
      * A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
      */
-    '4XX': Error;
+    '4XX': Problem;
     /**
      * An unexpected server error, returned as an RFC 9457 problem details document.
      */
-    default: Error;
+    default: Problem;
 };
 
 export type GetHealthError = GetHealthErrors[keyof GetHealthErrors];

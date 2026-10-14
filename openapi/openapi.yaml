@@ -76,9 +76,9 @@ components:
         identity service, sent as `Authorization: Bearer <token>`.
 
   schemas:
-    Error:
-      $ref: ./components/schemas/common/Error.yaml
     HealthResponse:
       $ref: ./components/schemas/common/HealthResponse.yaml
     Money:
       $ref: ./components/schemas/common/Money.yaml
+    Problem:
+      $ref: ./components/schemas/common/Problem.yaml

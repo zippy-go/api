@@ -11,6 +11,12 @@ the version numbers follow the versioning policy.
 - `info.license` in the OpenAPI document: the contract, the SDKs and the
   portal are released under the MIT licence.
 
+### Changed
+
+- The common schema `Error` is renamed to `Problem`; the RFC 9457 problem
+  details shape is unchanged. The TypeScript SDK exports the type as
+  `Problem` and no longer shadows the global `Error`.
+
 ## [0.1.0] - 2026-10-14
 
 ### Added

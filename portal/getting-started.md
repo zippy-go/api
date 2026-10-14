@@ -42,7 +42,8 @@ curl https://sandbox.api.zippygo.example/v1/health
 ## Errors
 
 Every error response is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)
-problem details document with the media type `application/problem+json`.
+problem details document with the media type `application/problem+json`;
+the [API reference](/reference) describes it as the `Problem` schema.
 Branch on the `code` member, which is stable, rather than on the text:
 
 ```json

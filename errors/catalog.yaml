@@ -1,6 +1,6 @@
 # Catalog of error codes returned by the ZippyGo API.
 #
-# Every error response is an RFC 9457 problem details document (the `Error`
+# Every error response is an RFC 9457 problem details document (the `Problem`
 # schema in the OpenAPI document) whose `code` is one of the entries below.
 # `message` is the template for the `detail` member; placeholders in braces
 # are filled per occurrence. `type` is `/problems/<code>`, resolved against

@@ -22,10 +22,10 @@ get:
       content:
         application/problem+json:
           schema:
-            $ref: ../../components/schemas/common/Error.yaml
+            $ref: ../../components/schemas/common/Problem.yaml
     default:
       description: An unexpected server error, returned as an RFC 9457 problem details document.
       content:
         application/problem+json:
           schema:
-            $ref: ../../components/schemas/common/Error.yaml
+            $ref: ../../components/schemas/common/Problem.yaml

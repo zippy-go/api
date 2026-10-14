@@ -29,7 +29,7 @@ if (error) {
 Every operation is a function named after its `operationId` and returns
 `{ data, error, request, response }`. Pass `throwOnError: true` in the
 options to get exceptions instead. Types for every schema are exported from
-the package root (`HealthResponse`, `Money`, `Error`, ...).
+the package root (`HealthResponse`, `Money`, `Problem`, ...).
 
 ## Layout
 

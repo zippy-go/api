@@ -2,4 +2,4 @@
 
 export { client, type CreateClientConfig } from './client.gen';
 export { getHealth, type Options } from './sdk.gen';
-export type { ClientOptions, Error, GetHealthData, GetHealthError, GetHealthErrors, GetHealthResponse, GetHealthResponses, HealthResponse, Money } from './types.gen';
+export type { ClientOptions, GetHealthData, GetHealthError, GetHealthErrors, GetHealthResponse, GetHealthResponses, HealthResponse, Money, Problem } from './types.gen';
