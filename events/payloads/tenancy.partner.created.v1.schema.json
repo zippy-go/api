@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.partner.created.v1.schema.json",
+  "title": "TenancyPartnerCreatedPayload",
+  "description": "Payload of `tenancy.partner.created` version 1: a partner was created with the status `pending`, and its creator became its first owner (`tenancy.membership.created` is published alongside). The envelope's `partner_id` is the new partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["partner_id", "kind", "created_by"],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner that was created, the same value as the envelope's `partner_id`.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["organisation", "individual"],
+      "description": "Whether the partner is an organisation or an individual.",
+      "examples": ["organisation"]
+    },
+    "created_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The user who created the partner and became its first owner.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20"]
+    }
+  }
+}

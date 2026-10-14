@@ -1,8 +1,8 @@
 # Getting started
 
 The ZippyGo API is a JSON API over HTTPS. This page covers what you need to
-make a first request; the [API reference](/reference) documents every
-endpoint.
+make a first request and the first things to do; the
+[API reference](/reference) documents every endpoint.
 
 ::: info Status
 The API is being built contract first. The hosts below are placeholders
@@ -17,22 +17,23 @@ shape of each released endpoint.
 | Sandbox     | `https://sandbox.api.zippygo.example` |
 | Production  | `https://api.zippygo.example`        |
 
-All paths are prefixed with the major version, currently `/v1`.
+All paths are prefixed with the major version, currently `/v1`, except
+the token signing keys at `/.well-known/jwks.json`.
 
 ## Authentication
 
-Two schemes exist; an operation accepts either unless its reference entry
-says otherwise.
+Requests carry an access token issued by ZippyGo: sign in with a one-time
+code or a password, send `Authorization: Bearer <access_token>` and
+refresh the token before it expires, after 15 minutes.
+[Authentication](/authentication) walks through the flows, the token
+lifetimes, how browsers and native apps handle the refresh token and how
+to verify tokens yourself.
 
-- **API key** for server-to-server integrations: send the key in the
-  `X-Api-Key` header. Keys are scoped to one partner.
-- **Bearer token** for user sessions: send a JWT in the
-  `Authorization: Bearer <token>` header.
-
-During the initial development step, `POST /v1/fleet/location-pings`
-accepts only a temporary development credential sent in the
-`X-Dev-Api-Key` header (`DevApiKey` in the reference). The identity module
-replaces it; the change is announced in the changelog.
+Server-to-server integrations will use partner-scoped API keys in the
+`X-Api-Key` header (`ApiKey` in the reference); the operations that issue
+keys are not released yet. `POST /v1/fleet/location-pings` still takes
+the temporary development credential in the `X-Dev-Api-Key` header
+(`DevApiKey`) until agents' devices get credentials of their own.
 
 Health checks need no credentials:
 
@@ -41,8 +42,63 @@ curl https://sandbox.api.zippygo.example/v1/health
 ```
 
 ```json
-{ "status": "ok", "version": "0.2.0", "checked_at": "2026-10-14T08:00:00Z" }
+{ "status": "ok", "version": "0.3.0", "checked_at": "2026-10-14T08:00:00Z" }
 ```
+
+## First steps
+
+Everything in the API belongs to a partner, so the first thing to do after
+signing in is to create one. The user who creates a partner is its owner.
+
+Sign in with a one-time code and keep the `access_token` from the response
+(the two calls are shown in full under [Authentication](/authentication)):
+
+```sh
+curl -X POST https://sandbox.api.zippygo.example/v1/auth/otp/request \
+  -H "Content-Type: application/json" \
+  -d '{"channel":"email","identifier":"owner@example.com"}'
+curl -X POST https://sandbox.api.zippygo.example/v1/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{"challenge_id":"<challenge_id from the first call>","code":"<code from the email>"}'
+```
+
+Create the partner:
+
+```sh
+curl -X POST https://sandbox.api.zippygo.example/v1/partners \
+  -H "Authorization: Bearer $ZIPPYGO_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"kind":"organisation","name":"Example Partner"}'
+```
+
+```json
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "kind": "organisation",
+  "name": "Example Partner",
+  "legal_name": null,
+  "status": "pending",
+  "contact_email": null,
+  "contact_phone": null,
+  "created_at": "2026-10-14T08:05:00Z",
+  "updated_at": "2026-10-14T08:05:00Z"
+}
+```
+
+A new partner is `pending` until the platform realm activates it.
+`GET /v1/me` now lists the membership with the role `owner`; the access
+token carries it from the next refresh on. From here, as the owner:
+
+- add a location with `POST /v1/partners/{partner_id}/locations` (name,
+  address, coordinates, time zone);
+- switch on a service with
+  `PUT /v1/partners/{partner_id}/services/{kind}`, where `kind` is
+  `product_sales`, `field_service` or `delivery`;
+- invite a teammate with `POST /v1/partners/{partner_id}/invitations`
+  (email address and role); they join by accepting the link in the email.
+
+[Concepts](/concepts) explains the terms; the
+[API reference](/reference) has every field.
 
 ## Errors
 
@@ -57,14 +113,17 @@ Branch on the `code` member, which is stable, rather than on the text:
   "title": "Validation failed",
   "status": 400,
   "detail": "The request body has 1 invalid field.",
-  "instance": "/v1/orders",
+  "instance": "/v1/auth/password",
   "code": "validation_failed",
-  "errors": [{ "pointer": "/items/0/quantity", "message": "must be greater than 0" }]
+  "errors": [
+    { "pointer": "/new_password", "message": "must be at least 12 characters long", "code": "password_weak" }
+  ]
 }
 ```
 
-The full list of codes, with their HTTP status and whether a retry can
-succeed, is the
+An `errors` entry carries a `code` of its own when the catalog defines
+one for the field-level problem, as `password_weak` here. The full list of
+codes, with their HTTP status and whether a retry can succeed, is the
 [error catalog](https://github.com/zippy-go/api/blob/main/errors/catalog.yaml).
 
 ## Live data
@@ -75,6 +134,7 @@ events instead of being polled; see [Live streams](/live-streams).
 ## Conventions
 
 - Timestamps are RFC 3339 strings in UTC.
+- Identifiers are UUIDs.
 - Money is always an object with `minor_units` (integer) and `currency`
   (ISO 4217), never a bare number.
 - Property names are `snake_case`; enumeration values are lowercase.
@@ -85,17 +145,21 @@ events instead of being polled; see [Live streams](/live-streams).
 
 The TypeScript SDK is generated from the OpenAPI document and lives in the
 repository under `sdks/typescript`; it will be published to GitHub Packages
-under the `@zippy-go` scope later and is not published yet:
+under the `@zippy-go` scope later and is not published yet. The client
+sends the access token through its `auth` option:
 
 ```ts
-import { client, getHealth } from '@zippy-go/api';
+import { client, createPartner, getMe } from '@zippy-go/api';
 
 client.setConfig({
   baseUrl: 'https://sandbox.api.zippygo.example',
-  headers: { 'X-Api-Key': process.env.ZIPPYGO_API_KEY },
+  auth: () => accessToken, // from verifyOtp or signInWithPassword
 });
 
-const { data, error } = await getHealth();
+const { data: me } = await getMe();
+const { data: partner, error } = await createPartner({
+  body: { kind: 'organisation', name: 'Example Partner' },
+});
 ```
 
 Dart (OpenAPI Generator `dart-dio`) and Rust (`progenitor`) SDKs follow

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.partner.status_changed.v1.schema.json",
+  "title": "TenancyPartnerStatusChangedPayload",
+  "description": "Payload of `tenancy.partner.status_changed` version 1: the platform realm changed a partner's status. The envelope's `partner_id` is the partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["partner_id", "status"],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner whose status changed, the same value as the envelope's `partner_id`.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "active", "suspended"],
+      "description": "The new status.",
+      "examples": ["active"]
+    }
+  }
+}

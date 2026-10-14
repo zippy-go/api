@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/identity.session.created.v1.schema.json",
+  "title": "IdentitySessionCreatedPayload",
+  "description": "Payload of `identity.session.created` version 1: a user signed in and a session was created; the session id is the `sid` claim of the access tokens issued for it. Refreshing a session does not publish this event. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["user_id", "session_id"],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The user who signed in.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20"]
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The session that was created, the `sid` claim of its access tokens.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22"]
+    }
+  }
+}

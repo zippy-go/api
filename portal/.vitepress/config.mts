@@ -19,6 +19,7 @@ export default defineConfig({
         text: 'Guide',
         items: [
           { text: 'Getting started', link: '/getting-started' },
+          { text: 'Authentication', link: '/authentication' },
           { text: 'Concepts', link: '/concepts' },
         ],
       },

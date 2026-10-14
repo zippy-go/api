@@ -35,3 +35,90 @@ events:
       `partner_id` is the partner the agent is attached to.
     payload_schema: ./payloads/fleet.agent.offline.v1.schema.json
     example: ./examples/fleet.agent.offline.v1.json
+
+  - type: identity.user.registered
+    version: 1
+    domain: identity
+    description: >-
+      A user was created, by the first successful one-time code for an
+      identifier or by accepting an invitation. The envelope's `partner_id`
+      is `null`; the payload carries no email address or phone number.
+    payload_schema: ./payloads/identity.user.registered.v1.schema.json
+    example: ./examples/identity.user.registered.v1.json
+
+  - type: identity.session.created
+    version: 1
+    domain: identity
+    description: >-
+      A user signed in and a session was created; the session id is the
+      `sid` claim of its access tokens. Refreshing a session does not
+      publish this event. The envelope's `partner_id` is `null`.
+    payload_schema: ./payloads/identity.session.created.v1.schema.json
+    example: ./examples/identity.session.created.v1.json
+
+  - type: identity.invitation.sent
+    version: 1
+    domain: identity
+    description: >-
+      An invitation to join a partner was created and its email is being
+      sent. The envelope's `partner_id` is the partner that invited; the
+      payload carries no email address.
+    payload_schema: ./payloads/identity.invitation.sent.v1.schema.json
+    example: ./examples/identity.invitation.sent.v1.json
+
+  - type: identity.invitation.accepted
+    version: 1
+    domain: identity
+    description: >-
+      An invitation was accepted and turned into a membership;
+      `tenancy.membership.created` is published alongside. The envelope's
+      `partner_id` is the partner that invited.
+    payload_schema: ./payloads/identity.invitation.accepted.v1.schema.json
+    example: ./examples/identity.invitation.accepted.v1.json
+
+  - type: tenancy.partner.created
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner was created with the status `pending` and its creator
+      became its first owner (`tenancy.membership.created` is published
+      alongside). The envelope's `partner_id` is the new partner.
+    payload_schema: ./payloads/tenancy.partner.created.v1.schema.json
+    example: ./examples/tenancy.partner.created.v1.json
+
+  - type: tenancy.partner.status_changed
+    version: 1
+    domain: tenancy
+    description: >-
+      The platform realm changed a partner's status. The envelope's
+      `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.partner.status_changed.v1.schema.json
+    example: ./examples/tenancy.partner.status_changed.v1.json
+
+  - type: tenancy.location.created
+    version: 1
+    domain: tenancy
+    description: >-
+      A location was added to a partner. The envelope's `partner_id` is the
+      partner.
+    payload_schema: ./payloads/tenancy.location.created.v1.schema.json
+    example: ./examples/tenancy.location.created.v1.json
+
+  - type: tenancy.membership.created
+    version: 1
+    domain: tenancy
+    description: >-
+      A user became a member of a partner, as its creator and first owner
+      or by accepting an invitation. The envelope's `partner_id` is the
+      partner.
+    payload_schema: ./payloads/tenancy.membership.created.v1.schema.json
+    example: ./examples/tenancy.membership.created.v1.json
+
+  - type: tenancy.service.updated
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner's service of a kind was created or replaced. The envelope's
+      `partner_id` is the partner; the configuration is not in the payload.
+    payload_schema: ./payloads/tenancy.service.updated.v1.schema.json
+    example: ./examples/tenancy.service.updated.v1.json

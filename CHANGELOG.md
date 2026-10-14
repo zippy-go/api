@@ -61,6 +61,19 @@ the version numbers follow the versioning policy.
 - Error code `invitation_invalid` (410).
 - `ServiceKind` gains the values `product_sales` and `field_service` next to
   `delivery`; clients tolerate unknown values by contract.
+- Events, version 1, each with a payload schema and a validated example:
+  `identity.user.registered`, `identity.session.created`,
+  `identity.invitation.sent`, `identity.invitation.accepted`,
+  `tenancy.partner.created`, `tenancy.partner.status_changed`,
+  `tenancy.location.created`, `tenancy.membership.created` and
+  `tenancy.service.updated`. Payloads carry identifiers only, never email
+  addresses or phone numbers; the identity events that are not scoped to a
+  partner have `partner_id: null` in the envelope.
+- Portal: the Authentication guide (one-time codes, passwords, token
+  lifetimes, cookie versus native refresh, verifying tokens with the JWKS,
+  rate limits); Concepts describes users, memberships and their roles,
+  services and their kinds, and the platform realm; Getting started signs
+  in and creates a partner before anything else.
 
 ### Changed
 

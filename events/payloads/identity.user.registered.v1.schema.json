@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/identity.user.registered.v1.schema.json",
+  "title": "IdentityUserRegisteredPayload",
+  "description": "Payload of `identity.user.registered` version 1: a user was created, by the first successful one-time code for an identifier or by accepting an invitation. The envelope's `partner_id` is `null`, because a user is not scoped to a partner. The payload carries no email address or phone number. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["user_id", "channel"],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The user that was created.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20"]
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["email", "phone", "invitation"],
+      "description": "How the user registered: a one-time code by `email` or `phone`, or by accepting an `invitation`.",
+      "examples": ["email"]
+    }
+  }
+}

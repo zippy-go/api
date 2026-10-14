@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.location.created.v1.schema.json",
+  "title": "TenancyLocationCreatedPayload",
+  "description": "Payload of `tenancy.location.created` version 1: a location was added to a partner. The envelope's `partner_id` is the partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["location_id", "partner_id"],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The location that was created.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner the location belongs to, the same value as the envelope's `partner_id`.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+    }
+  }
+}

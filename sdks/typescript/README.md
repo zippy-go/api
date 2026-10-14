@@ -11,20 +11,26 @@ under the `@zippy-go` scope later; it is not published yet.
 ## Usage
 
 ```ts
-import { client, getHealth } from '@zippy-go/api';
+import { client, getMe } from '@zippy-go/api';
 
 client.setConfig({
   baseUrl: 'https://sandbox.api.zippygo.example',
-  headers: { 'X-Api-Key': process.env.ZIPPYGO_API_KEY },
+  auth: () => accessToken, // from verifyOtp or signInWithPassword
 });
 
-const { data, error } = await getHealth();
+const { data, error } = await getMe();
 if (error) {
   console.error(error.code, error.title);
 } else {
-  console.log(data.status, data.version);
+  console.log(data.user.id, data.memberships.length);
 }
 ```
+
+Operations declare the credential they take, so the `auth` callback is
+called only for those that need an access token; operations that accept
+an API key instead take it as a header (`headers: { 'X-Api-Key': key }`).
+The Authentication page of the developer portal walks through signing in
+with `requestOtp`, `verifyOtp` and `signInWithPassword`.
 
 Every operation is a function named after its `operationId` and returns
 `{ data, error, request, response }`. Pass `throwOnError: true` in the

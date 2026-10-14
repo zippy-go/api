@@ -1,0 +1,13 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a72",
+  "type": "identity.invitation.sent",
+  "version": 1,
+  "occurred_at": "2026-10-14T08:15:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "invitation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a31",
+    "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+    "role": "manager"
+  }
+}

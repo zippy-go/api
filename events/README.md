@@ -38,13 +38,24 @@ The envelope is defined by
 Every event type and version is listed in
 [`catalog.yaml`](https://github.com/zippy-go/api/blob/main/events/catalog.yaml)
 with its payload schema and a validated example. Domain events are added
-together with the endpoints that produce them.
+together with the endpoints that produce them. Payloads carry identifiers,
+never email addresses or phone numbers; fetch personal data from the API
+with the identifiers when it is needed.
 
 | Type                  | Version | Description                                                      |
 | --------------------- | ------- | ---------------------------------------------------------------- |
 | `platform.ping`       | 1       | Sent on request to verify that a webhook endpoint receives and acknowledges deliveries. Carries no business data. |
 | `fleet.agent.online`  | 1       | An agent went online in one of the partner's services and is reporting. Payload: `agent_id`, `partner_id`, `at`. |
 | `fleet.agent.offline` | 1       | An agent went offline, by signing off or by not reporting for too long. Payload: `agent_id`, `partner_id`, `last_seen_at`. |
+| `identity.user.registered` | 1 | A user was created, by a first one-time code or by accepting an invitation. Not scoped to a partner. Payload: `user_id`, `channel`. |
+| `identity.session.created` | 1 | A user signed in and a session was created. Not scoped to a partner. Payload: `user_id`, `session_id`. |
+| `identity.invitation.sent` | 1 | An invitation to join a partner was created and its email is being sent. Payload: `invitation_id`, `partner_id`, `role`. |
+| `identity.invitation.accepted` | 1 | An invitation was accepted and became a membership. Payload: `invitation_id`, `partner_id`, `user_id`. |
+| `tenancy.partner.created` | 1 | A partner was created, `pending`, with its creator as first owner. Payload: `partner_id`, `kind`, `created_by`. |
+| `tenancy.partner.status_changed` | 1 | The platform realm changed a partner's status. Payload: `partner_id`, `status`. |
+| `tenancy.location.created` | 1 | A location was added to a partner. Payload: `location_id`, `partner_id`. |
+| `tenancy.membership.created` | 1 | A user became a member of a partner. Payload: `membership_id`, `partner_id`, `user_id`, `role`. |
+| `tenancy.service.updated` | 1 | A partner's service of a kind was created or replaced. Payload: `partner_id`, `kind`, `status`. |
 
 ## Consuming events
 
