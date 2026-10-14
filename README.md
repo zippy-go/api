@@ -50,7 +50,14 @@ build in that order; it is what CI runs. After `pnpm check`, `git status`
 must show no changes under `sdks/typescript/src`, otherwise the committed
 SDK is stale. Pull requests are additionally compared against `main` with
 `oasdiff`; findings of `ERR` severity fail the build, `WARN` and `INFO`
-findings are reported for review.
+findings are reported for review. To run that comparison locally against
+the bundle of another revision (here `dist/base/openapi.yaml`), with the
+same severity configuration as CI (`.oasdiff.yaml`):
+
+```sh
+docker run --rm -v "$PWD:/repo:ro" -w /repo tufin/oasdiff breaking --fail-on ERR \
+  dist/base/openapi.yaml dist/openapi.yaml
+```
 
 ## Working on the contract
 

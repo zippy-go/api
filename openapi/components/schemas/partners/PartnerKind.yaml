@@ -1,0 +1,12 @@
+type: string
+description: |
+  Whether the partner is an `organisation` (a company, a shop, a restaurant
+  chain) or an `individual` (a sole trader, a single person providing fleet
+  capacity). The kind is set when the partner is created and does not
+  change. Clients must tolerate values they do not know, because a new kind
+  is an additive change.
+enum:
+  - organisation
+  - individual
+examples:
+  - organisation

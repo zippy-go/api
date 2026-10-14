@@ -1,0 +1,19 @@
+type: object
+description: The request body of `POST /v1/partners/{partner_id}/invitations`.
+required:
+  - email
+  - role
+properties:
+  email:
+    type: string
+    format: email
+    maxLength: 254
+    description: The email address to send the invitation to. It becomes the email address of the user if the invitation creates one.
+    examples:
+      - manager@example.com
+  role:
+    $ref: ../memberships/MembershipRole.yaml
+    description: The role the membership will have. Only an owner may grant `owner`.
+examples:
+  - email: manager@example.com
+    role: manager

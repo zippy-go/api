@@ -16,6 +16,17 @@ paths/
   auth/refresh.yaml             POST /v1/auth/refresh
   auth/sign-out.yaml            POST /v1/auth/sign-out
   auth/me.yaml                  GET /v1/me
+  partners/partners.yaml        POST, GET /v1/partners
+  partners/partner.yaml         GET, PATCH /v1/partners/{partner_id}
+  locations/locations.yaml      POST, GET /v1/partners/{partner_id}/locations
+  locations/location.yaml       GET, PATCH /v1/partners/{partner_id}/locations/{location_id}
+  memberships/memberships.yaml  GET /v1/partners/{partner_id}/memberships
+  memberships/membership.yaml   DELETE /v1/partners/{partner_id}/memberships/{membership_id}
+  invitations/invitations.yaml  POST, GET /v1/partners/{partner_id}/invitations
+  invitations/invitation.yaml   DELETE /v1/partners/{partner_id}/invitations/{invitation_id}
+  invitations/accept.yaml       POST /v1/invitations/{token}/accept
+  services/services.yaml        GET /v1/partners/{partner_id}/services
+  services/service.yaml         PUT /v1/partners/{partner_id}/services/{kind}
   fleet/agents.yaml             GET /v1/fleet/agents
   fleet/location-pings.yaml     POST /v1/fleet/location-pings
   events/events.yaml            GET /v1/events
@@ -28,11 +39,13 @@ paths/
 Rules:
 
 - Folder names are the lowercase domain, matching the tag in `openapi.yaml`
-  (`platform`, `auth`, `partners`, `catalog`, `orders`, `deliveries`,
-  `fleet`, `live`, `events`, `subscriptions`, `webhooks`).
+  (`platform`, `auth`, `partners`, `locations`, `memberships`,
+  `invitations`, `services`, `catalog`, `orders`, `deliveries`, `fleet`,
+  `live`, `events`, `subscriptions`, `webhooks`). Sub-resources of a
+  partner live in the folder of their own tag, not under `partners/`.
 - The file name is the resource: plural for collections (`orders.yaml`),
   singular for a single resource addressed by id (`order.yaml`), the action
-  for an operation that is neither (`sign-out.yaml`).
+  for an operation that is neither (`sign-out.yaml`, `accept.yaml`).
 - Every operation has an `operationId` (camelCase verb + resource, for
   example `listOrders`, `createOrder`, `getOrder`), a `summary`, a
   `description` and exactly one tag.

@@ -1,0 +1,22 @@
+type: object
+description: A list of a partner's members, the response of `GET /v1/partners/{partner_id}/memberships`.
+required:
+  - items
+properties:
+  items:
+    type: array
+    description: The partner's memberships, oldest first. The list is not paginated.
+    items:
+      $ref: ./Membership.yaml
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        user:
+          id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+          email: owner@example.com
+          phone: null
+          display_name: User 20
+          created_at: 2026-10-14T08:00:00Z
+        role: owner
+        created_at: 2026-10-14T08:05:00Z

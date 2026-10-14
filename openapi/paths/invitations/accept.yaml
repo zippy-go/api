@@ -1,0 +1,83 @@
+# Path item for /v1/invitations/{token}/accept. Referenced from openapi.yaml.
+parameters:
+  - name: token
+    in: path
+    required: true
+    description: The invitation token from the link in the invitation email. It is opaque, single use and never returned by the API.
+    schema:
+      type: string
+      minLength: 1
+    example: c2FtcGxlLWludml0YXRpb24tdG9rZW4
+post:
+  operationId: acceptInvitation
+  summary: Accept an invitation
+  description: |
+    Turns a pending invitation into a membership and signs the invited
+    person in. Possessing the token proves control of the invited email
+    address, so no other credential is needed. When no user exists for the
+    address, one is created with the `display_name` and the optional
+    `password` from the body; an existing user keeps their own, and the
+    body may be empty or absent. The response carries the session, delivered
+    the same way as by the sign-in operations (see the `Auth` tag), and the
+    new membership.
+
+    An unknown token answers `404` (`not_found`). A token whose invitation
+    was revoked, has expired or was already accepted answers `410`
+    (`invitation_invalid`); ask the partner for a new invitation. Publishes
+    `identity.invitation.accepted` and `tenancy.membership.created`, and
+    `identity.user.registered` when a user is created.
+  tags:
+    - Invitations
+  security: []
+  parameters:
+    - $ref: ../../components/parameters/ClientTypeHeader.yaml
+  requestBody:
+    required: false
+    description: The details of the user to create, used only when the address has no user yet.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/invitations/InvitationAcceptRequest.yaml
+  responses:
+    '200':
+      description: The invitation was accepted; the body carries the session and the membership.
+      headers:
+        Set-Cookie:
+          description: >-
+            For browsers (no `X-Client-Type: native` header), the refresh token as `zg_refresh=<token>; Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent for native clients.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invitations/InvitationAccepted.yaml
+    '400':
+      description: The body failed validation (`validation_failed`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: No invitation exists for the token (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '410':
+      description: The invitation was revoked, has expired or was already accepted (`invitation_invalid`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

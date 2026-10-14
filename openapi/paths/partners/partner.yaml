@@ -1,0 +1,110 @@
+# Path item for /v1/partners/{partner_id}. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPartner
+  summary: Get a partner
+  description: |
+    Returns one partner. Members of the partner, in any role, and the
+    platform realm may read it; for everyone else the partner is not
+    visible and the response is `404` (`not_found`), the same as for a
+    partner that does not exist.
+  tags:
+    - Partners
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The partner.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/partners/Partner.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `400` (`validation_failed`) for a `partner_id` that is not a UUID or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updatePartner
+  summary: Update a partner
+  description: |
+    Changes the members of the partner that are present in the body and
+    returns the partner. Owners and managers may change `name`,
+    `legal_name`, `contact_email` and `contact_phone`; `status` may only be
+    changed by the platform realm. A caller without the role for a member
+    in the body receives `403` (`forbidden`) and nothing is changed. A
+    status change publishes `tenancy.partner.status_changed`.
+  tags:
+    - Partners
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The members to change.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/partners/PartnerUpdate.yaml
+  responses:
+    '200':
+      description: The partner after the change.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/partners/Partner.yaml
+    '400':
+      description: The body failed validation (`validation_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller's role does not allow the change (`forbidden`), for example a member who is neither owner nor manager, or a `status` sent by anyone outside the platform realm.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

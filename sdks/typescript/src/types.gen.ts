@@ -99,6 +99,41 @@ export type Problem = {
 };
 
 /**
+ * A postal address. `country` is an ISO 3166-1 alpha-2 code and the other
+ * members follow the conventions of that country, so `state` and
+ * `postal_code` may not apply everywhere. Responses carry every member,
+ * with `null` for the ones that are not set; requests may omit the optional
+ * ones.
+ *
+ */
+export type Address = {
+    /**
+     * The first address line, usually the street and the number or the building.
+     */
+    line1: string;
+    /**
+     * The second address line (floor, unit, landmark), or `null`.
+     */
+    line2?: string | null;
+    /**
+     * The city or town.
+     */
+    city: string;
+    /**
+     * The state, province or region, or `null` where it does not apply.
+     */
+    state?: string | null;
+    /**
+     * The postal code, or `null` where it does not apply.
+     */
+    postal_code?: string | null;
+    /**
+     * The ISO 3166-1 alpha-2 country code, upper case.
+     */
+    country: string;
+};
+
+/**
  * The outcome of a health check. `ok` when the subject is working normally,
  * `degraded` when it works but is impaired (slow, or behind), `down` when it
  * is not working. Clients must tolerate values they do not know.
@@ -413,6 +448,287 @@ export type Me = {
 };
 
 /**
+ * Whether the partner is an `organisation` (a company, a shop, a restaurant
+ * chain) or an `individual` (a sole trader, a single person providing fleet
+ * capacity). The kind is set when the partner is created and does not
+ * change. Clients must tolerate values they do not know, because a new kind
+ * is an additive change.
+ *
+ */
+export type PartnerKind = 'organisation' | 'individual';
+
+/**
+ * The partner's standing on the platform. A partner is `pending` from its
+ * creation until the platform activates it, `active` while it operates and
+ * `suspended` when the platform has stopped it. Only the platform realm
+ * changes the status. Clients must tolerate values they do not know,
+ * because a new status is an additive change.
+ *
+ */
+export type PartnerStatus = 'pending' | 'active' | 'suspended';
+
+/**
+ * A partner, the supply-side tenant: an organisation or an individual that
+ * sells products, sells services or provides fleet capacity. Everything in
+ * the API belongs to exactly one partner. Users work in a partner through
+ * memberships; the user who creates a partner becomes its first owner.
+ *
+ */
+export type Partner = {
+    /**
+     * Unique identifier of the partner.
+     */
+    id: string;
+    /**
+     * Whether the partner is an organisation or an individual.
+     */
+    kind: PartnerKind;
+    /**
+     * The name the partner operates under.
+     */
+    name: string;
+    /**
+     * The registered legal name, or `null` when none was given.
+     */
+    legal_name: string | null;
+    /**
+     * The partner's standing on the platform.
+     */
+    status: PartnerStatus;
+    /**
+     * The email address the platform reaches the partner at, or `null`.
+     */
+    contact_email: string | null;
+    /**
+     * The phone number the platform reaches the partner at, in E.164 format, or `null`.
+     */
+    contact_phone: string | null;
+    /**
+     * When the partner was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * When the partner was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
+     */
+    updated_at: string;
+};
+
+/**
+ * The request body of `POST /v1/partners`. The caller becomes the partner's
+ * first owner and the partner starts with the status `pending`.
+ *
+ */
+export type PartnerCreate = {
+    /**
+     * Whether the partner is an organisation or an individual; it cannot be changed later.
+     */
+    kind: PartnerKind;
+    /**
+     * The name the partner operates under.
+     */
+    name: string;
+    /**
+     * The registered legal name. Omit it, or send `null`, when there is none to give.
+     */
+    legal_name?: string | null;
+    /**
+     * The email address the platform may reach the partner at. Omit it, or send `null`, to leave it unset.
+     */
+    contact_email?: string | null;
+    /**
+     * The phone number the platform may reach the partner at, in E.164 format. Omit it, or send `null`, to leave it unset.
+     */
+    contact_phone?: string | null;
+};
+
+/**
+ * The request body of `PATCH /v1/partners/{partner_id}`. Only the members
+ * present are changed; `null` clears a member that may be `null` in the
+ * resource. Owners and managers may change `name`, `legal_name`,
+ * `contact_email` and `contact_phone`; `status` may only be changed by the
+ * platform realm.
+ *
+ */
+export type PartnerUpdate = {
+    /**
+     * The new name the partner operates under.
+     */
+    name?: string;
+    /**
+     * The new registered legal name, or `null` to clear it.
+     */
+    legal_name?: string | null;
+    /**
+     * The new contact email address, or `null` to clear it.
+     */
+    contact_email?: string | null;
+    /**
+     * The new contact phone number in E.164 format, or `null` to clear it.
+     */
+    contact_phone?: string | null;
+    /**
+     * The new status. Platform realm only; any other caller receives `403` (`forbidden`).
+     */
+    status?: PartnerStatus;
+};
+
+/**
+ * A page of partners, the response of `GET /v1/partners`.
+ */
+export type PartnerList = {
+    /**
+     * The partners on this page, newest first.
+     */
+    items: Array<Partner>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Whether a location takes part in the partner's operations. An `inactive`
+ * location is kept with its history but is not offered for new operations.
+ * Clients must tolerate values they do not know, because a new status is an
+ * additive change.
+ *
+ */
+export type LocationStatus = 'active' | 'inactive';
+
+/**
+ * A physical place that belongs to a partner: a store, a restaurant, a dark
+ * store, a warehouse or a service base. Pickups happen at locations and the
+ * partner's local operations are anchored to them. Coordinates are WGS 84.
+ *
+ */
+export type Location = {
+    /**
+     * Unique identifier of the location.
+     */
+    id: string;
+    /**
+     * The partner the location belongs to.
+     */
+    partner_id: string;
+    /**
+     * The name the location is known by within the partner.
+     */
+    name: string;
+    /**
+     * The postal address.
+     */
+    address: Address;
+    /**
+     * Latitude in decimal degrees (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude in decimal degrees (WGS 84).
+     */
+    lng: number;
+    /**
+     * The IANA time zone the location operates in, for example `Asia/Kolkata`. Opening hours and local times are interpreted in it.
+     */
+    time_zone: string;
+    /**
+     * The phone number of the location in E.164 format, or `null`.
+     */
+    phone: string | null;
+    /**
+     * Whether the location takes part in operations.
+     */
+    status: LocationStatus;
+    /**
+     * When the location was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * When the location was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
+     */
+    updated_at: string;
+};
+
+/**
+ * The request body of `POST /v1/partners/{partner_id}/locations`. A new
+ * location is `active`. Coordinates are required because the platform does
+ * not geocode addresses.
+ *
+ */
+export type LocationCreate = {
+    /**
+     * The name the location is known by within the partner.
+     */
+    name: string;
+    /**
+     * The postal address.
+     */
+    address: Address;
+    /**
+     * Latitude in decimal degrees (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude in decimal degrees (WGS 84).
+     */
+    lng: number;
+    /**
+     * The IANA time zone the location operates in. `Asia/Kolkata` when omitted.
+     */
+    time_zone?: string;
+    /**
+     * The phone number of the location in E.164 format. Omit it, or send `null`, to leave it unset.
+     */
+    phone?: string | null;
+};
+
+/**
+ * The request body of `PATCH /v1/partners/{partner_id}/locations/{location_id}`.
+ * Only the members present are changed; `null` clears a member that may be
+ * `null` in the resource. `address` is replaced as a whole when present.
+ *
+ */
+export type LocationUpdate = {
+    /**
+     * The new name.
+     */
+    name?: string;
+    /**
+     * The new postal address, replacing the previous one as a whole.
+     */
+    address?: Address;
+    /**
+     * The new latitude in decimal degrees (WGS 84).
+     */
+    lat?: number;
+    /**
+     * The new longitude in decimal degrees (WGS 84).
+     */
+    lng?: number;
+    /**
+     * The new IANA time zone.
+     */
+    time_zone?: string;
+    /**
+     * The new phone number in E.164 format, or `null` to clear it.
+     */
+    phone?: string | null;
+    /**
+     * The new status.
+     */
+    status?: LocationStatus;
+};
+
+/**
+ * A list of a partner's locations, the response of `GET /v1/partners/{partner_id}/locations`.
+ */
+export type LocationList = {
+    /**
+     * The partner's locations, oldest first. The list is not paginated.
+     */
+    items: Array<Location>;
+};
+
+/**
  * The role a member holds in a partner. `owner` may do everything,
  * including managing members and the partner record; `manager` manages
  * locations, services and invitations; `dispatcher` works with deliveries
@@ -456,6 +772,211 @@ export type Membership = {
 };
 
 /**
+ * A list of a partner's members, the response of `GET /v1/partners/{partner_id}/memberships`.
+ */
+export type MembershipList = {
+    /**
+     * The partner's memberships, oldest first. The list is not paginated.
+     */
+    items: Array<Membership>;
+};
+
+/**
+ * The state of an invitation. It is `pending` until it is `accepted` by the
+ * invited person, `revoked` by the partner or `expired` by passing
+ * `expires_at`. Clients must tolerate values they do not know, because a
+ * new status is an additive change.
+ *
+ */
+export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
+
+/**
+ * An invitation to join a partner with a given role, sent by email. The
+ * invited person accepts it with the token from the email through
+ * `POST /v1/invitations/{token}/accept`; the token itself is never returned
+ * by the API. The invitation is `pending` until it is accepted, revoked or
+ * past `expires_at`.
+ *
+ */
+export type Invitation = {
+    /**
+     * Unique identifier of the invitation.
+     */
+    id: string;
+    /**
+     * The partner the invitation is for.
+     */
+    partner_id: string;
+    /**
+     * The email address the invitation was sent to.
+     */
+    email: string;
+    /**
+     * The role the membership will have once the invitation is accepted.
+     */
+    role: MembershipRole;
+    /**
+     * The state of the invitation.
+     */
+    status: InvitationStatus;
+    /**
+     * When the invitation stops being acceptable, as an RFC 3339 timestamp in UTC.
+     */
+    expires_at: string;
+    /**
+     * When the invitation was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+};
+
+/**
+ * The request body of `POST /v1/partners/{partner_id}/invitations`.
+ */
+export type InvitationCreate = {
+    /**
+     * The email address to send the invitation to. It becomes the email address of the user if the invitation creates one.
+     */
+    email: string;
+    /**
+     * The role the membership will have. Only an owner may grant `owner`.
+     */
+    role: MembershipRole;
+};
+
+/**
+ * A list of a partner's invitations, the response of `GET /v1/partners/{partner_id}/invitations`.
+ */
+export type InvitationList = {
+    /**
+     * The partner's invitations in every status, newest first. The list is not paginated.
+     */
+    items: Array<Invitation>;
+};
+
+/**
+ * The request body of `POST /v1/invitations/{token}/accept`. Both members
+ * are used only when the call creates the user; a person who already has an
+ * account keeps their name and password, and may send an empty body or
+ * none at all.
+ *
+ */
+export type InvitationAcceptRequest = {
+    /**
+     * The name the new user is shown under.
+     */
+    display_name?: string;
+    /**
+     * A password for the new user, at least 12 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
+     */
+    password?: string;
+};
+
+/**
+ * The response of `POST /v1/invitations/{token}/accept`: the session of the
+ * person who accepted, signed in the same way as after a one-time code, and
+ * the membership the invitation turned into.
+ *
+ */
+export type InvitationAccepted = {
+    /**
+     * The session for the user who accepted; the refresh token is delivered as for the sign-in operations.
+     */
+    token: TokenResponse;
+    /**
+     * The new membership in the partner that sent the invitation.
+     */
+    membership: Membership;
+};
+
+/**
+ * The kind of service a partner runs: `product_sales` sells products from a
+ * catalog for delivery, pickup or dine-in; `field_service` performs services
+ * at the customer's place; `delivery` moves goods with the partner's own
+ * agents. A partner may run several kinds, each configured as a `Service`,
+ * and every agent is attached to one of them. Clients must tolerate values
+ * they do not know, because a new kind is an additive change.
+ *
+ */
+export type ServiceKind = 'product_sales' | 'field_service' | 'delivery';
+
+/**
+ * Whether a partner's service is in operation. A `disabled` service keeps
+ * its configuration but takes no part in operations. Clients must tolerate
+ * values they do not know, because a new status is an additive change.
+ *
+ */
+export type ServiceStatus = 'enabled' | 'disabled';
+
+/**
+ * One kind of service a partner runs, with its status and configuration. A
+ * partner has at most one service per kind; it is created or replaced with
+ * `PUT /v1/partners/{partner_id}/services/{kind}`.
+ *
+ */
+export type Service = {
+    /**
+     * Unique identifier of the service.
+     */
+    id: string;
+    /**
+     * The partner that runs the service.
+     */
+    partner_id: string;
+    /**
+     * The kind of service.
+     */
+    kind: ServiceKind;
+    /**
+     * Whether the service is in operation.
+     */
+    status: ServiceStatus;
+    /**
+     * Settings specific to the kind of service, as last put. The keys of each kind are documented when that kind's features are released; an empty object when nothing is configured.
+     */
+    config: {
+        [key: string]: unknown;
+    };
+    /**
+     * When the service was first put, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * When the service was last put, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
+     */
+    updated_at: string;
+};
+
+/**
+ * The request body of `PUT /v1/partners/{partner_id}/services/{kind}`.
+ * `config` replaces the stored configuration as a whole when present; when
+ * it is omitted the existing configuration is kept, or an empty object is
+ * stored for a new service.
+ *
+ */
+export type ServiceUpsert = {
+    /**
+     * Whether the service is in operation.
+     */
+    status: ServiceStatus;
+    /**
+     * The settings for the kind of service, replacing the stored ones as a whole. The keys of each kind are documented when that kind's features are released.
+     */
+    config?: {
+        [key: string]: unknown;
+    };
+};
+
+/**
+ * A list of the services a partner has configured, the response of `GET /v1/partners/{partner_id}/services`.
+ */
+export type ServiceList = {
+    /**
+     * One entry per kind the partner has put, in any status; a kind that was never put is not listed. The list is not paginated.
+     */
+    items: Array<Service>;
+};
+
+/**
  * The working status of an agent. `online` means the agent is attached to
  * its service and reporting; `offline` means it is not. Clients must
  * tolerate values they do not know, because a new status is an additive
@@ -463,14 +984,6 @@ export type Membership = {
  *
  */
 export type AgentStatus = 'online' | 'offline';
-
-/**
- * The kind of partner service an agent is attached to. `delivery` is the
- * only kind at present. Clients must tolerate values they do not know,
- * because a new kind is an additive change.
- *
- */
-export type ServiceKind = 'delivery';
 
 /**
  * The last known position of an agent: WGS 84 coordinates, the heading and
@@ -724,6 +1237,11 @@ export type PartnerIdQuery = string;
  *
  */
 export type ClientTypeHeader = 'native';
+
+/**
+ * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+ */
+export type PartnerIdPath = string;
 
 export type GetHealthData = {
     body?: never;
@@ -1290,3 +1808,806 @@ export type GetJwksResponses = {
 };
 
 export type GetJwksResponse = GetJwksResponses[keyof GetJwksResponses];
+
+export type ListPartnersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only include partners whose `name` or `legal_name` contains this text, case-insensitively.
+         */
+        q?: string;
+        /**
+         * Only include partners with this status.
+         */
+        status?: PartnerStatus;
+        /**
+         * The maximum number of partners to return per page.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page. Omit it for the first page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners';
+};
+
+export type ListPartnersErrors = {
+    /**
+     * A parameter failed validation (`validation_failed`), for example a `limit` out of range or a `cursor` that is not one this operation issued.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is not in the platform realm (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnersError = ListPartnersErrors[keyof ListPartnersErrors];
+
+export type ListPartnersResponses = {
+    /**
+     * A page of partners.
+     */
+    200: PartnerList;
+};
+
+export type ListPartnersResponse = ListPartnersResponses[keyof ListPartnersResponses];
+
+export type CreatePartnerData = {
+    /**
+     * The kind, the name and the optional details of the partner.
+     */
+    body: PartnerCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/partners';
+};
+
+export type CreatePartnerErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example a missing `name` or a malformed `contact_email`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerError = CreatePartnerErrors[keyof CreatePartnerErrors];
+
+export type CreatePartnerResponses = {
+    /**
+     * The partner was created and the caller is its owner.
+     */
+    201: Partner;
+};
+
+export type CreatePartnerResponse = CreatePartnerResponses[keyof CreatePartnerResponses];
+
+export type GetPartnerData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}';
+};
+
+export type GetPartnerErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `400` (`validation_failed`) for a `partner_id` that is not a UUID or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerError = GetPartnerErrors[keyof GetPartnerErrors];
+
+export type GetPartnerResponses = {
+    /**
+     * The partner.
+     */
+    200: Partner;
+};
+
+export type GetPartnerResponse = GetPartnerResponses[keyof GetPartnerResponses];
+
+export type UpdatePartnerData = {
+    /**
+     * The members to change.
+     */
+    body: PartnerUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}';
+};
+
+export type UpdatePartnerErrors = {
+    /**
+     * The body failed validation (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller's role does not allow the change (`forbidden`), for example a member who is neither owner nor manager, or a `status` sent by anyone outside the platform realm.
+     */
+    403: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePartnerError = UpdatePartnerErrors[keyof UpdatePartnerErrors];
+
+export type UpdatePartnerResponses = {
+    /**
+     * The partner after the change.
+     */
+    200: Partner;
+};
+
+export type UpdatePartnerResponse = UpdatePartnerResponses[keyof UpdatePartnerResponses];
+
+export type ListLocationsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations';
+};
+
+export type ListLocationsErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationsError = ListLocationsErrors[keyof ListLocationsErrors];
+
+export type ListLocationsResponses = {
+    /**
+     * The partner's locations.
+     */
+    200: LocationList;
+};
+
+export type ListLocationsResponse = ListLocationsResponses[keyof ListLocationsResponses];
+
+export type CreateLocationData = {
+    /**
+     * The name, address and coordinates of the location, with the optional time zone and phone number.
+     */
+    body: LocationCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations';
+};
+
+export type CreateLocationErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example a coordinate out of range, a `country` that is not two upper-case letters or an unknown `time_zone`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is a member but neither owner nor manager (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateLocationError = CreateLocationErrors[keyof CreateLocationErrors];
+
+export type CreateLocationResponses = {
+    /**
+     * The location was created.
+     */
+    201: Location;
+};
+
+export type CreateLocationResponse = CreateLocationResponses[keyof CreateLocationResponses];
+
+export type GetLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}';
+};
+
+export type GetLocationErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner is not visible to the caller, or the location does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationError = GetLocationErrors[keyof GetLocationErrors];
+
+export type GetLocationResponses = {
+    /**
+     * The location.
+     */
+    200: Location;
+};
+
+export type GetLocationResponse = GetLocationResponses[keyof GetLocationResponses];
+
+export type UpdateLocationData = {
+    /**
+     * The members to change.
+     */
+    body: LocationUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}';
+};
+
+export type UpdateLocationErrors = {
+    /**
+     * The body failed validation (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is a member but neither owner nor manager (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the location does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateLocationError = UpdateLocationErrors[keyof UpdateLocationErrors];
+
+export type UpdateLocationResponses = {
+    /**
+     * The location after the change.
+     */
+    200: Location;
+};
+
+export type UpdateLocationResponse = UpdateLocationResponses[keyof UpdateLocationResponses];
+
+export type ListMembershipsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/memberships';
+};
+
+export type ListMembershipsErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListMembershipsError = ListMembershipsErrors[keyof ListMembershipsErrors];
+
+export type ListMembershipsResponses = {
+    /**
+     * The partner's memberships.
+     */
+    200: MembershipList;
+};
+
+export type ListMembershipsResponse = ListMembershipsResponses[keyof ListMembershipsResponses];
+
+export type RemoveMembershipData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the partner in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/memberships/{membership_id}';
+};
+
+export type RemoveMembershipErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is not an owner of the partner (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the membership does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The membership is the partner's last owner and cannot be removed (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveMembershipError = RemoveMembershipErrors[keyof RemoveMembershipErrors];
+
+export type RemoveMembershipResponses = {
+    /**
+     * The membership was removed.
+     */
+    204: void;
+};
+
+export type RemoveMembershipResponse = RemoveMembershipResponses[keyof RemoveMembershipResponses];
+
+export type ListInvitationsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invitations';
+};
+
+export type ListInvitationsErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is a member but neither owner nor manager (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListInvitationsError = ListInvitationsErrors[keyof ListInvitationsErrors];
+
+export type ListInvitationsResponses = {
+    /**
+     * The partner's invitations.
+     */
+    200: InvitationList;
+};
+
+export type ListInvitationsResponse = ListInvitationsResponses[keyof ListInvitationsResponses];
+
+export type CreateInvitationData = {
+    /**
+     * The email address to invite and the role to grant.
+     */
+    body: InvitationCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invitations';
+};
+
+export type CreateInvitationErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example an `email` that is not an email address or an unknown `role`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is neither owner nor manager, or is a manager granting `owner` (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateInvitationError = CreateInvitationErrors[keyof CreateInvitationErrors];
+
+export type CreateInvitationResponses = {
+    /**
+     * The invitation was created and the email is being sent.
+     */
+    201: Invitation;
+};
+
+export type CreateInvitationResponse = CreateInvitationResponses[keyof CreateInvitationResponses];
+
+export type RevokeInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The invitation, which must belong to the partner in the path.
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invitations/{invitation_id}';
+};
+
+export type RevokeInvitationErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is a member but neither owner nor manager (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the invitation does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The invitation was already accepted, revoked or has expired (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RevokeInvitationError = RevokeInvitationErrors[keyof RevokeInvitationErrors];
+
+export type RevokeInvitationResponses = {
+    /**
+     * The invitation was revoked.
+     */
+    204: void;
+};
+
+export type RevokeInvitationResponse = RevokeInvitationResponses[keyof RevokeInvitationResponses];
+
+export type AcceptInvitationData = {
+    /**
+     * The details of the user to create, used only when the address has no user yet.
+     */
+    body?: InvitationAcceptRequest;
+    headers?: {
+        /**
+         * How the client keeps its refresh token. Send `native` from a mobile or
+         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
+         * then returned in `refresh_token` in the response body. Without the header
+         * the client is treated as a browser: the refresh token is set in the
+         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
+         *
+         */
+        'X-Client-Type'?: 'native';
+    };
+    path: {
+        /**
+         * The invitation token from the link in the invitation email. It is opaque, single use and never returned by the API.
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/v1/invitations/{token}/accept';
+};
+
+export type AcceptInvitationErrors = {
+    /**
+     * The body failed validation (`validation_failed`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
+     */
+    400: Problem;
+    /**
+     * No invitation exists for the token (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The invitation was revoked, has expired or was already accepted (`invitation_invalid`).
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptInvitationError = AcceptInvitationErrors[keyof AcceptInvitationErrors];
+
+export type AcceptInvitationResponses = {
+    /**
+     * The invitation was accepted; the body carries the session and the membership.
+     */
+    200: InvitationAccepted;
+};
+
+export type AcceptInvitationResponse = AcceptInvitationResponses[keyof AcceptInvitationResponses];
+
+export type ListServicesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services';
+};
+
+export type ListServicesErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServicesError = ListServicesErrors[keyof ListServicesErrors];
+
+export type ListServicesResponses = {
+    /**
+     * The partner's services.
+     */
+    200: ServiceList;
+};
+
+export type ListServicesResponse = ListServicesResponses[keyof ListServicesResponses];
+
+export type UpsertServiceData = {
+    /**
+     * The status and, optionally, the configuration of the service.
+     */
+    body: ServiceUpsert;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The kind of service to create or replace.
+         */
+        kind: ServiceKind;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{kind}';
+};
+
+export type UpsertServiceErrors = {
+    /**
+     * The path or the body failed validation (`validation_failed`), for example a `kind` that is not one of the known kinds or a missing `status`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is a member but neither owner nor manager (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpsertServiceError = UpsertServiceErrors[keyof UpsertServiceErrors];
+
+export type UpsertServiceResponses = {
+    /**
+     * The service as stored, whether it was created or replaced.
+     */
+    200: Service;
+};
+
+export type UpsertServiceResponse = UpsertServiceResponses[keyof UpsertServiceResponses];

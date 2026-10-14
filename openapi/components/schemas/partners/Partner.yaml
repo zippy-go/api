@@ -1,0 +1,82 @@
+type: object
+description: |
+  A partner, the supply-side tenant: an organisation or an individual that
+  sells products, sells services or provides fleet capacity. Everything in
+  the API belongs to exactly one partner. Users work in a partner through
+  memberships; the user who creates a partner becomes its first owner.
+required:
+  - id
+  - kind
+  - name
+  - legal_name
+  - status
+  - contact_email
+  - contact_phone
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  kind:
+    $ref: ./PartnerKind.yaml
+    description: Whether the partner is an organisation or an individual.
+  name:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The name the partner operates under.
+    examples:
+      - Example Partner
+  legal_name:
+    type:
+      - string
+      - 'null'
+    maxLength: 200
+    description: The registered legal name, or `null` when none was given.
+    examples:
+      - Example Partner Ltd
+  status:
+    $ref: ./PartnerStatus.yaml
+    description: The partner's standing on the platform.
+  contact_email:
+    type:
+      - string
+      - 'null'
+    format: email
+    description: The email address the platform reaches the partner at, or `null`.
+    examples:
+      - contact@example.com
+  contact_phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The phone number the platform reaches the partner at, in E.164 format, or `null`.
+    examples:
+      - '+15555550101'
+  created_at:
+    type: string
+    format: date-time
+    description: When the partner was created, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:05:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When the partner was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
+    examples:
+      - 2026-10-14T08:05:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    kind: organisation
+    name: Example Partner
+    legal_name: Example Partner Ltd
+    status: pending
+    contact_email: contact@example.com
+    contact_phone: null
+    created_at: 2026-10-14T08:05:00Z
+    updated_at: 2026-10-14T08:05:00Z

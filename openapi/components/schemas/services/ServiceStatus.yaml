@@ -1,0 +1,10 @@
+type: string
+description: |
+  Whether a partner's service is in operation. A `disabled` service keeps
+  its configuration but takes no part in operations. Clients must tolerate
+  values they do not know, because a new status is an additive change.
+enum:
+  - enabled
+  - disabled
+examples:
+  - enabled

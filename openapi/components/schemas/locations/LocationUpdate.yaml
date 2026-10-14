@@ -1,0 +1,49 @@
+type: object
+description: |
+  The request body of `PATCH /v1/partners/{partner_id}/locations/{location_id}`.
+  Only the members present are changed; `null` clears a member that may be
+  `null` in the resource. `address` is replaced as a whole when present.
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The new name.
+    examples:
+      - Location 40
+  address:
+    $ref: ../common/Address.yaml
+    description: The new postal address, replacing the previous one as a whole.
+  lat:
+    type: number
+    minimum: -90
+    maximum: 90
+    description: The new latitude in decimal degrees (WGS 84).
+    examples:
+      - 12.9716
+  lng:
+    type: number
+    minimum: -180
+    maximum: 180
+    description: The new longitude in decimal degrees (WGS 84).
+    examples:
+      - 77.5946
+  time_zone:
+    type: string
+    minLength: 1
+    description: The new IANA time zone.
+    examples:
+      - Asia/Kolkata
+  phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The new phone number in E.164 format, or `null` to clear it.
+    examples:
+      - '+15555550102'
+  status:
+    $ref: ./LocationStatus.yaml
+    description: The new status.
+examples:
+  - status: inactive

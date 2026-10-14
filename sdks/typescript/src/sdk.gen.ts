@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetMeData, GetMeErrors, GetMeResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListEventsData, ListEventsErrors, ListEventsResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLocationData, GetLocationErrors, GetLocationResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServicesData, ListServicesErrors, ListServicesResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -340,3 +340,286 @@ export const getMe = <ThrowOnError extends boolean = false>(options?: Options<Ge
  *
  */
 export const getJwks = <ThrowOnError extends boolean = false>(options?: Options<GetJwksData, ThrowOnError>): RequestResult<GetJwksResponses, GetJwksErrors, ThrowOnError> => (options?.client ?? client).get<GetJwksResponses, GetJwksErrors, ThrowOnError>({ url: '/.well-known/jwks.json', ...options });
+
+/**
+ * List partners
+ *
+ * Returns partners in pages, newest first, for the platform realm (the
+ * operations side of ZippyGo). Any other caller receives `403`
+ * (`forbidden`); a user finds the partners they belong to under
+ * `GET /v1/me`.
+ *
+ * Filter with `q`, which matches `name` and `legal_name`, and with
+ * `status`. Page with `limit` and `cursor`: pass the `next_cursor` of a
+ * page to get the next one, until it is `null`.
+ *
+ */
+export const listPartners = <ThrowOnError extends boolean = false>(options?: Options<ListPartnersData, ThrowOnError>): RequestResult<ListPartnersResponses, ListPartnersErrors, ThrowOnError> => (options?.client ?? client).get<ListPartnersResponses, ListPartnersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners',
+    ...options
+});
+
+/**
+ * Create a partner
+ *
+ * Creates a partner and makes the caller its first owner: a membership
+ * with the role `owner` is created in the same request. Any signed-in
+ * user may create a partner. The partner starts with the status `pending`
+ * and the platform realm activates it.
+ *
+ * The caller's access token does not carry the new membership until it is
+ * refreshed; `GET /v1/me` reflects it at once. Publishes the events
+ * `tenancy.partner.created` and `tenancy.membership.created`.
+ *
+ */
+export const createPartner = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerData, ThrowOnError>): RequestResult<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get a partner
+ *
+ * Returns one partner. Members of the partner, in any role, and the
+ * platform realm may read it; for everyone else the partner is not
+ * visible and the response is `404` (`not_found`), the same as for a
+ * partner that does not exist.
+ *
+ */
+export const getPartner = <ThrowOnError extends boolean = false>(options: Options<GetPartnerData, ThrowOnError>): RequestResult<GetPartnerResponses, GetPartnerErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerResponses, GetPartnerErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}',
+    ...options
+});
+
+/**
+ * Update a partner
+ *
+ * Changes the members of the partner that are present in the body and
+ * returns the partner. Owners and managers may change `name`,
+ * `legal_name`, `contact_email` and `contact_phone`; `status` may only be
+ * changed by the platform realm. A caller without the role for a member
+ * in the body receives `403` (`forbidden`) and nothing is changed. A
+ * status change publishes `tenancy.partner.status_changed`.
+ *
+ */
+export const updatePartner = <ThrowOnError extends boolean = false>(options: Options<UpdatePartnerData, ThrowOnError>): RequestResult<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List locations
+ *
+ * Returns the partner's locations, oldest first, in every status. Any
+ * member of the partner and the platform realm may read them. The list
+ * is not paginated.
+ *
+ */
+export const listLocations = <ThrowOnError extends boolean = false>(options: Options<ListLocationsData, ThrowOnError>): RequestResult<ListLocationsResponses, ListLocationsErrors, ThrowOnError> => (options.client ?? client).get<ListLocationsResponses, ListLocationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations',
+    ...options
+});
+
+/**
+ * Create a location
+ *
+ * Adds a location to the partner. Owners and managers may create
+ * locations; other members receive `403` (`forbidden`). The location
+ * starts `active`. Publishes `tenancy.location.created`.
+ *
+ */
+export const createLocation = <ThrowOnError extends boolean = false>(options: Options<CreateLocationData, ThrowOnError>): RequestResult<CreateLocationResponses, CreateLocationErrors, ThrowOnError> => (options.client ?? client).post<CreateLocationResponses, CreateLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get a location
+ *
+ * Returns one of the partner's locations. Any member of the partner and the platform realm may read it.
+ */
+export const getLocation = <ThrowOnError extends boolean = false>(options: Options<GetLocationData, ThrowOnError>): RequestResult<GetLocationResponses, GetLocationErrors, ThrowOnError> => (options.client ?? client).get<GetLocationResponses, GetLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}',
+    ...options
+});
+
+/**
+ * Update a location
+ *
+ * Changes the members of the location that are present in the body,
+ * including `status`, and returns the location. Owners and managers may
+ * update locations; other members receive `403` (`forbidden`).
+ *
+ */
+export const updateLocation = <ThrowOnError extends boolean = false>(options: Options<UpdateLocationData, ThrowOnError>): RequestResult<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError> => (options.client ?? client).patch<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List members
+ *
+ * Returns the partner's members with their roles, oldest first. Any
+ * member of the partner and the platform realm may read them. The list
+ * is not paginated. Members join through invitations
+ * (`POST /v1/partners/{partner_id}/invitations`); the user who created
+ * the partner is its first owner.
+ *
+ */
+export const listMemberships = <ThrowOnError extends boolean = false>(options: Options<ListMembershipsData, ThrowOnError>): RequestResult<ListMembershipsResponses, ListMembershipsErrors, ThrowOnError> => (options.client ?? client).get<ListMembershipsResponses, ListMembershipsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/memberships',
+    ...options
+});
+
+/**
+ * Remove a member
+ *
+ * Removes a member from the partner. Only owners may remove members,
+ * including themselves, but the last owner cannot be removed: the request
+ * answers `409` (`conflict`) and the partner keeps its owner. The removed
+ * user's access tokens carry the membership until they expire, at most
+ * 15 minutes; the API stops honouring it at once.
+ *
+ */
+export const removeMembership = <ThrowOnError extends boolean = false>(options: Options<RemoveMembershipData, ThrowOnError>): RequestResult<RemoveMembershipResponses, RemoveMembershipErrors, ThrowOnError> => (options.client ?? client).delete<RemoveMembershipResponses, RemoveMembershipErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/memberships/{membership_id}',
+    ...options
+});
+
+/**
+ * List invitations
+ *
+ * Returns the partner's invitations in every status, newest first.
+ * Owners, managers and the platform realm may read them; other members
+ * receive `403` (`forbidden`), because invitations carry email addresses.
+ * The list is not paginated.
+ *
+ */
+export const listInvitations = <ThrowOnError extends boolean = false>(options: Options<ListInvitationsData, ThrowOnError>): RequestResult<ListInvitationsResponses, ListInvitationsErrors, ThrowOnError> => (options.client ?? client).get<ListInvitationsResponses, ListInvitationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/invitations',
+    ...options
+});
+
+/**
+ * Invite a user
+ *
+ * Creates an invitation to join the partner with the given role and sends
+ * an email to the address with a link that accepts it. Owners and
+ * managers may invite; only an owner may grant the role `owner`, and a
+ * manager who tries receives `403` (`forbidden`). An address that already
+ * belongs to a member, or that has a pending invitation for this partner,
+ * answers `409` (`conflict`). Publishes `identity.invitation.sent`.
+ *
+ */
+export const createInvitation = <ThrowOnError extends boolean = false>(options: Options<CreateInvitationData, ThrowOnError>): RequestResult<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError> => (options.client ?? client).post<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/invitations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Revoke an invitation
+ *
+ * Revokes a pending invitation, so that its link no longer works, and
+ * keeps it in the list with the status `revoked`. Owners and managers may
+ * revoke. An invitation that is not `pending` any more answers `409`
+ * (`conflict`).
+ *
+ */
+export const revokeInvitation = <ThrowOnError extends boolean = false>(options: Options<RevokeInvitationData, ThrowOnError>): RequestResult<RevokeInvitationResponses, RevokeInvitationErrors, ThrowOnError> => (options.client ?? client).delete<RevokeInvitationResponses, RevokeInvitationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/invitations/{invitation_id}',
+    ...options
+});
+
+/**
+ * Accept an invitation
+ *
+ * Turns a pending invitation into a membership and signs the invited
+ * person in. Possessing the token proves control of the invited email
+ * address, so no other credential is needed. When no user exists for the
+ * address, one is created with the `display_name` and the optional
+ * `password` from the body; an existing user keeps their own, and the
+ * body may be empty or absent. The response carries the session, delivered
+ * the same way as by the sign-in operations (see the `Auth` tag), and the
+ * new membership.
+ *
+ * An unknown token answers `404` (`not_found`). A token whose invitation
+ * was revoked, has expired or was already accepted answers `410`
+ * (`invitation_invalid`); ask the partner for a new invitation. Publishes
+ * `identity.invitation.accepted` and `tenancy.membership.created`, and
+ * `identity.user.registered` when a user is created.
+ *
+ */
+export const acceptInvitation = <ThrowOnError extends boolean = false>(options: Options<AcceptInvitationData, ThrowOnError>): RequestResult<AcceptInvitationResponses, AcceptInvitationErrors, ThrowOnError> => (options.client ?? client).post<AcceptInvitationResponses, AcceptInvitationErrors, ThrowOnError>({
+    url: '/v1/invitations/{token}/accept',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List services
+ *
+ * Returns the services the partner has configured, one per kind that was
+ * ever put, in any status. Any member of the partner and the platform
+ * realm may read them. The list is not paginated.
+ *
+ */
+export const listServices = <ThrowOnError extends boolean = false>(options: Options<ListServicesData, ThrowOnError>): RequestResult<ListServicesResponses, ListServicesErrors, ThrowOnError> => (options.client ?? client).get<ListServicesResponses, ListServicesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services',
+    ...options
+});
+
+/**
+ * Create or replace a service
+ *
+ * Creates the partner's service of this kind, or replaces its status and
+ * configuration when it exists, and returns it with `200` in both cases.
+ * Owners and managers may put services; other members receive `403`
+ * (`forbidden`). Publishes `tenancy.service.updated`.
+ *
+ */
+export const upsertService = <ThrowOnError extends boolean = false>(options: Options<UpsertServiceData, ThrowOnError>): RequestResult<UpsertServiceResponses, UpsertServiceErrors, ThrowOnError> => (options.client ?? client).put<UpsertServiceResponses, UpsertServiceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{kind}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});

@@ -1,0 +1,47 @@
+type: object
+description: |
+  The request body of `POST /v1/partners`. The caller becomes the partner's
+  first owner and the partner starts with the status `pending`.
+required:
+  - kind
+  - name
+properties:
+  kind:
+    $ref: ./PartnerKind.yaml
+    description: Whether the partner is an organisation or an individual; it cannot be changed later.
+  name:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The name the partner operates under.
+    examples:
+      - Example Partner
+  legal_name:
+    type:
+      - string
+      - 'null'
+    maxLength: 200
+    description: The registered legal name. Omit it, or send `null`, when there is none to give.
+    examples:
+      - Example Partner Ltd
+  contact_email:
+    type:
+      - string
+      - 'null'
+    format: email
+    description: The email address the platform may reach the partner at. Omit it, or send `null`, to leave it unset.
+    examples:
+      - contact@example.com
+  contact_phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The phone number the platform may reach the partner at, in E.164 format. Omit it, or send `null`, to leave it unset.
+    examples:
+      - '+15555550101'
+examples:
+  - kind: organisation
+    name: Example Partner
+    legal_name: Example Partner Ltd
+    contact_email: contact@example.com

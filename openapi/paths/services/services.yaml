@@ -1,0 +1,45 @@
+# Path item for /v1/partners/{partner_id}/services. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listServices
+  summary: List services
+  description: |
+    Returns the services the partner has configured, one per kind that was
+    ever put, in any status. Any member of the partner and the platform
+    realm may read them. The list is not paginated.
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The partner's services.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/ServiceList.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

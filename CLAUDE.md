@@ -43,7 +43,10 @@ when the shell does not pick up Node 26 by itself.
   no customer or employee data, neutral wording. Hosts in the contract are
   placeholders on the reserved `.example` domain.
 - Changes within a major version are additive only (see VERSIONING.md);
-  CI runs `oasdiff` against `main` and fails on breaking changes.
+  CI runs `oasdiff` against `main` and fails on breaking changes. Its
+  severity overrides live in `oasdiff-severity-levels.txt` via
+  `.oasdiff.yaml` (no comments allowed in the former; explain changes in
+  VERSIONING.md). The README shows the local `docker run` equivalent.
 - Every change to the contract gets a line in `CHANGELOG.md` under
   *Unreleased*.
 - Vocabulary: **partner** is the supply-side tenant (an organisation or an

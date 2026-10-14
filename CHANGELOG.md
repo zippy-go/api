@@ -31,6 +31,36 @@ the version numbers follow the versioning policy.
   (429) and `too_many_attempts` (429); the detail code `password_weak` under
   `validation_failed`, carried in the new optional `code` member of the
   entries of `Problem.errors`.
+- Partners (tag `Partners`): `POST /v1/partners` (`createPartner`, the
+  caller becomes the owner), `GET /v1/partners` (`listPartners`, platform
+  realm only, paginated with `limit` and `cursor`),
+  `GET /v1/partners/{partner_id}` (`getPartner`) and `PATCH` (`updatePartner`,
+  status changes platform-only), with `Partner`, `PartnerKind`,
+  `PartnerStatus`, `PartnerCreate`, `PartnerUpdate` and `PartnerList`, and
+  the shared path parameter `PartnerIdPath`.
+- Locations (tag `Locations`): `POST` and `GET /v1/partners/{partner_id}/locations`
+  (`createLocation`, `listLocations`), `GET` and `PATCH`
+  `/v1/partners/{partner_id}/locations/{location_id}` (`getLocation`,
+  `updateLocation`), with `Location`, `LocationStatus`, `LocationCreate`,
+  `LocationUpdate`, `LocationList` and the common `Address` schema.
+- Memberships (tag `Memberships`): `GET /v1/partners/{partner_id}/memberships`
+  (`listMemberships`) and `DELETE /v1/partners/{partner_id}/memberships/{membership_id}`
+  (`removeMembership`, owners only; the last owner cannot be removed), with
+  `MembershipList`.
+- Invitations (tag `Invitations`): `POST` and `GET /v1/partners/{partner_id}/invitations`
+  (`createInvitation`, `listInvitations`),
+  `DELETE /v1/partners/{partner_id}/invitations/{invitation_id}`
+  (`revokeInvitation`) and `POST /v1/invitations/{token}/accept`
+  (`acceptInvitation`, no credentials, creates the user if needed and signs
+  them in), with `Invitation`, `InvitationStatus`, `InvitationCreate`,
+  `InvitationList`, `InvitationAcceptRequest` and `InvitationAccepted`.
+- Services (tag `Services`): `GET /v1/partners/{partner_id}/services`
+  (`listServices`) and `PUT /v1/partners/{partner_id}/services/{kind}`
+  (`upsertService`), with `Service`, `ServiceStatus`, `ServiceUpsert` and
+  `ServiceList`.
+- Error code `invitation_invalid` (410).
+- `ServiceKind` gains the values `product_sales` and `field_service` next to
+  `delivery`; clients tolerate unknown values by contract.
 
 ### Changed
 

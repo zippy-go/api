@@ -1,0 +1,29 @@
+type: object
+description: A list of a partner's locations, the response of `GET /v1/partners/{partner_id}/locations`.
+required:
+  - items
+properties:
+  items:
+    type: array
+    description: The partner's locations, oldest first. The list is not paginated.
+    items:
+      $ref: ./Location.yaml
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        name: Location 40
+        address:
+          line1: 1 Example Street
+          line2: null
+          city: Bengaluru
+          state: Karnataka
+          postal_code: '560001'
+          country: IN
+        lat: 12.9716
+        lng: 77.5946
+        time_zone: Asia/Kolkata
+        phone: null
+        status: active
+        created_at: 2026-10-14T08:10:00Z
+        updated_at: 2026-10-14T08:10:00Z

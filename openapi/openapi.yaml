@@ -65,7 +65,15 @@ tags:
       when signing in. Refresh tokens rotate on every use; reusing one
       revokes the session.
   - name: Partners
-    description: Partners, the supply-side tenants (organisations or individuals), with their locations and members.
+    description: Partners, the supply-side tenants (organisations or individuals). Their locations, members, invitations and services have tags of their own.
+  - name: Locations
+    description: A partner's physical places, such as stores, restaurants, dark stores, warehouses and service bases.
+  - name: Memberships
+    description: The users who work in a partner and the role each of them holds.
+  - name: Invitations
+    description: Inviting users into a partner by email, and accepting an invitation.
+  - name: Services
+    description: The kinds of service a partner runs (product sales, field service, delivery), with their status and configuration.
   - name: Catalog
     description: Products, modifiers, availability and pricing.
   - name: Orders
@@ -114,6 +122,28 @@ paths:
     $ref: ./paths/auth/me.yaml
   /.well-known/jwks.json:
     $ref: ./paths/platform/jwks.yaml
+  /v1/partners:
+    $ref: ./paths/partners/partners.yaml
+  /v1/partners/{partner_id}:
+    $ref: ./paths/partners/partner.yaml
+  /v1/partners/{partner_id}/locations:
+    $ref: ./paths/locations/locations.yaml
+  /v1/partners/{partner_id}/locations/{location_id}:
+    $ref: ./paths/locations/location.yaml
+  /v1/partners/{partner_id}/memberships:
+    $ref: ./paths/memberships/memberships.yaml
+  /v1/partners/{partner_id}/memberships/{membership_id}:
+    $ref: ./paths/memberships/membership.yaml
+  /v1/partners/{partner_id}/invitations:
+    $ref: ./paths/invitations/invitations.yaml
+  /v1/partners/{partner_id}/invitations/{invitation_id}:
+    $ref: ./paths/invitations/invitation.yaml
+  /v1/invitations/{token}/accept:
+    $ref: ./paths/invitations/accept.yaml
+  /v1/partners/{partner_id}/services:
+    $ref: ./paths/services/services.yaml
+  /v1/partners/{partner_id}/services/{kind}:
+    $ref: ./paths/services/service.yaml
 
 components:
   securitySchemes:
@@ -154,6 +184,8 @@ components:
       $ref: ./components/parameters/PartnerIdQuery.yaml
     ClientTypeHeader:
       $ref: ./components/parameters/ClientTypeHeader.yaml
+    PartnerIdPath:
+      $ref: ./components/parameters/PartnerIdPath.yaml
 
   schemas:
     # Common
@@ -163,6 +195,8 @@ components:
       $ref: ./components/schemas/common/Money.yaml
     Problem:
       $ref: ./components/schemas/common/Problem.yaml
+    Address:
+      $ref: ./components/schemas/common/Address.yaml
     # Platform
     CheckStatus:
       $ref: ./components/schemas/platform/CheckStatus.yaml
@@ -199,16 +233,64 @@ components:
       $ref: ./components/schemas/auth/TokenResponse.yaml
     Me:
       $ref: ./components/schemas/auth/Me.yaml
+    # Partners
+    PartnerKind:
+      $ref: ./components/schemas/partners/PartnerKind.yaml
+    PartnerStatus:
+      $ref: ./components/schemas/partners/PartnerStatus.yaml
+    Partner:
+      $ref: ./components/schemas/partners/Partner.yaml
+    PartnerCreate:
+      $ref: ./components/schemas/partners/PartnerCreate.yaml
+    PartnerUpdate:
+      $ref: ./components/schemas/partners/PartnerUpdate.yaml
+    PartnerList:
+      $ref: ./components/schemas/partners/PartnerList.yaml
+    # Locations
+    LocationStatus:
+      $ref: ./components/schemas/locations/LocationStatus.yaml
+    Location:
+      $ref: ./components/schemas/locations/Location.yaml
+    LocationCreate:
+      $ref: ./components/schemas/locations/LocationCreate.yaml
+    LocationUpdate:
+      $ref: ./components/schemas/locations/LocationUpdate.yaml
+    LocationList:
+      $ref: ./components/schemas/locations/LocationList.yaml
     # Memberships
     MembershipRole:
       $ref: ./components/schemas/memberships/MembershipRole.yaml
     Membership:
       $ref: ./components/schemas/memberships/Membership.yaml
+    MembershipList:
+      $ref: ./components/schemas/memberships/MembershipList.yaml
+    # Invitations
+    InvitationStatus:
+      $ref: ./components/schemas/invitations/InvitationStatus.yaml
+    Invitation:
+      $ref: ./components/schemas/invitations/Invitation.yaml
+    InvitationCreate:
+      $ref: ./components/schemas/invitations/InvitationCreate.yaml
+    InvitationList:
+      $ref: ./components/schemas/invitations/InvitationList.yaml
+    InvitationAcceptRequest:
+      $ref: ./components/schemas/invitations/InvitationAcceptRequest.yaml
+    InvitationAccepted:
+      $ref: ./components/schemas/invitations/InvitationAccepted.yaml
+    # Services
+    ServiceKind:
+      $ref: ./components/schemas/services/ServiceKind.yaml
+    ServiceStatus:
+      $ref: ./components/schemas/services/ServiceStatus.yaml
+    Service:
+      $ref: ./components/schemas/services/Service.yaml
+    ServiceUpsert:
+      $ref: ./components/schemas/services/ServiceUpsert.yaml
+    ServiceList:
+      $ref: ./components/schemas/services/ServiceList.yaml
     # Fleet
     AgentStatus:
       $ref: ./components/schemas/fleet/AgentStatus.yaml
-    ServiceKind:
-      $ref: ./components/schemas/fleet/ServiceKind.yaml
     AgentPosition:
       $ref: ./components/schemas/fleet/AgentPosition.yaml
     Agent:

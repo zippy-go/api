@@ -1,0 +1,58 @@
+type: object
+description: |
+  One kind of service a partner runs, with its status and configuration. A
+  partner has at most one service per kind; it is created or replaced with
+  `PUT /v1/partners/{partner_id}/services/{kind}`.
+required:
+  - id
+  - partner_id
+  - kind
+  - status
+  - config
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner that runs the service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  kind:
+    $ref: ./ServiceKind.yaml
+    description: The kind of service.
+  status:
+    $ref: ./ServiceStatus.yaml
+    description: Whether the service is in operation.
+  config:
+    type: object
+    additionalProperties: true
+    description: Settings specific to the kind of service, as last put. The keys of each kind are documented when that kind's features are released; an empty object when nothing is configured.
+    examples:
+      - {}
+  created_at:
+    type: string
+    format: date-time
+    description: When the service was first put, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:30:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When the service was last put, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
+    examples:
+      - 2026-10-14T08:30:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    kind: delivery
+    status: enabled
+    config: {}
+    created_at: 2026-10-14T08:30:00Z
+    updated_at: 2026-10-14T08:30:00Z

@@ -1,0 +1,21 @@
+type: object
+description: |
+  The request body of `PUT /v1/partners/{partner_id}/services/{kind}`.
+  `config` replaces the stored configuration as a whole when present; when
+  it is omitted the existing configuration is kept, or an empty object is
+  stored for a new service.
+required:
+  - status
+properties:
+  status:
+    $ref: ./ServiceStatus.yaml
+    description: Whether the service is in operation.
+  config:
+    type: object
+    additionalProperties: true
+    description: The settings for the kind of service, replacing the stored ones as a whole. The keys of each kind are documented when that kind's features are released.
+    examples:
+      - {}
+examples:
+  - status: enabled
+    config: {}

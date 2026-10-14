@@ -112,6 +112,17 @@ errors:
       A conditional request (`If-Match`) did not match the current version of
       the resource. Fetch the resource again and retry with the new version.
 
+  - code: invitation_invalid
+    status: 410
+    title: Invitation no longer valid
+    message: "The invitation is no longer valid: {reason}."
+    retryable: false
+    description: >-
+      The invitation token exists but the invitation was revoked, has
+      expired or was already accepted, so it cannot be accepted. Ask the
+      partner for a new invitation. A token that never existed answers
+      `not_found` instead.
+
   - code: unsupported_media_type
     status: 415
     title: Unsupported media type

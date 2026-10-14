@@ -1,0 +1,122 @@
+# Path item for /v1/partners/{partner_id}/invitations. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+post:
+  operationId: createInvitation
+  summary: Invite a user
+  description: |
+    Creates an invitation to join the partner with the given role and sends
+    an email to the address with a link that accepts it. Owners and
+    managers may invite; only an owner may grant the role `owner`, and a
+    manager who tries receives `403` (`forbidden`). An address that already
+    belongs to a member, or that has a pending invitation for this partner,
+    answers `409` (`conflict`). Publishes `identity.invitation.sent`.
+  tags:
+    - Invitations
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The email address to invite and the role to grant.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/invitations/InvitationCreate.yaml
+  responses:
+    '201':
+      description: The invitation was created and the email is being sent.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invitations/Invitation.yaml
+    '400':
+      description: The body failed validation (`validation_failed`), for example an `email` that is not an email address or an unknown `role`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller is neither owner nor manager, or is a manager granting `owner` (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+get:
+  operationId: listInvitations
+  summary: List invitations
+  description: |
+    Returns the partner's invitations in every status, newest first.
+    Owners, managers and the platform realm may read them; other members
+    receive `403` (`forbidden`), because invitations carry email addresses.
+    The list is not paginated.
+  tags:
+    - Invitations
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The partner's invitations.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invitations/InvitationList.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller is a member but neither owner nor manager (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,11 @@
+type: string
+description: |
+  Whether a location takes part in the partner's operations. An `inactive`
+  location is kept with its history but is not offered for new operations.
+  Clients must tolerate values they do not know, because a new status is an
+  additive change.
+enum:
+  - active
+  - inactive
+examples:
+  - active

@@ -1,0 +1,45 @@
+type: object
+description: |
+  The request body of `PATCH /v1/partners/{partner_id}`. Only the members
+  present are changed; `null` clears a member that may be `null` in the
+  resource. Owners and managers may change `name`, `legal_name`,
+  `contact_email` and `contact_phone`; `status` may only be changed by the
+  platform realm.
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The new name the partner operates under.
+    examples:
+      - Example Partner
+  legal_name:
+    type:
+      - string
+      - 'null'
+    maxLength: 200
+    description: The new registered legal name, or `null` to clear it.
+    examples:
+      - Example Partner Ltd
+  contact_email:
+    type:
+      - string
+      - 'null'
+    format: email
+    description: The new contact email address, or `null` to clear it.
+    examples:
+      - contact@example.com
+  contact_phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The new contact phone number in E.164 format, or `null` to clear it.
+    examples:
+      - '+15555550101'
+  status:
+    $ref: ./PartnerStatus.yaml
+    description: The new status. Platform realm only; any other caller receives `403` (`forbidden`).
+examples:
+  - name: Example Partner
+    contact_phone: '+15555550101'

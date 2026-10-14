@@ -1,0 +1,14 @@
+type: string
+description: |
+  The kind of service a partner runs: `product_sales` sells products from a
+  catalog for delivery, pickup or dine-in; `field_service` performs services
+  at the customer's place; `delivery` moves goods with the partner's own
+  agents. A partner may run several kinds, each configured as a `Service`,
+  and every agent is attached to one of them. Clients must tolerate values
+  they do not know, because a new kind is an additive change.
+enum:
+  - product_sales
+  - field_service
+  - delivery
+examples:
+  - delivery

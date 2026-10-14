@@ -32,7 +32,7 @@ properties:
     examples:
       - Agent 10
   service_kind:
-    $ref: ./ServiceKind.yaml
+    $ref: ../services/ServiceKind.yaml
     description: The kind of service the agent is attached to.
   status:
     $ref: ./AgentStatus.yaml

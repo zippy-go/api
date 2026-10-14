@@ -6,19 +6,24 @@ under `components.schemas` by name and points at the file that defines it.
 ```
 components/
   schemas/
-    common/        Shared primitives: Problem, Money, HealthResponse
+    common/        Shared primitives: Problem, Money, HealthResponse, Address
     platform/      Detailed health: HealthDetails, HealthChecks, DependencyCheck, OutboxCheck, CheckStatus;
                    token signing keys: JsonWebKeySet, JsonWebKey
     auth/          Signing in and sessions: OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
                    PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, TokenResponse, User, Me
-    memberships/   A user's place in a partner: Membership, MembershipRole
-    fleet/         Agents and positions: Agent, AgentPosition, AgentStatus, ServiceKind, AgentList,
+    partners/      The tenant record: Partner, PartnerKind, PartnerStatus, PartnerCreate, PartnerUpdate, PartnerList
+    locations/     A partner's places: Location, LocationStatus, LocationCreate, LocationUpdate, LocationList
+    memberships/   A user's place in a partner: Membership, MembershipRole, MembershipList
+    invitations/   Joining a partner: Invitation, InvitationStatus, InvitationCreate, InvitationList,
+                   InvitationAcceptRequest, InvitationAccepted
+    services/      What a partner runs: ServiceKind, ServiceStatus, Service, ServiceUpsert, ServiceList
+    fleet/         Agents and positions: Agent, AgentPosition, AgentStatus, AgentList,
                    LocationPing, LocationPingBatch, LocationPingsAccepted
     events/        The event envelope as the API returns it: Event, EventList
     live/          Server-sent event streams: ServerSentEventStream and the frame data
                    AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate
     <domain>/      One folder per further domain, one file per schema
-  parameters/      Shared query, path and header parameters: PartnerIdQuery, ClientTypeHeader
+  parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath, ClientTypeHeader
   responses/       Shared responses such as the standard error responses (planned)
 ```
 

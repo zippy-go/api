@@ -1,0 +1,8 @@
+# oasdiff configuration, picked up from the working directory by the CLI and
+# by the oasdiff GitHub action (the `breaking-changes` job in ci.yml).
+#
+# `severity-levels` points at a file that overrides the default severity of
+# individual oasdiff checks so that the tool agrees with VERSIONING.md. The
+# file format allows no comments: one `<check-id> <level>` per line. The
+# overrides are explained in VERSIONING.md under "How it is enforced".
+severity-levels: oasdiff-severity-levels.txt

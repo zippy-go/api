@@ -1,0 +1,139 @@
+# Path item for /v1/partners. Referenced from openapi.yaml.
+post:
+  operationId: createPartner
+  summary: Create a partner
+  description: |
+    Creates a partner and makes the caller its first owner: a membership
+    with the role `owner` is created in the same request. Any signed-in
+    user may create a partner. The partner starts with the status `pending`
+    and the platform realm activates it.
+
+    The caller's access token does not carry the new membership until it is
+    refreshed; `GET /v1/me` reflects it at once. Publishes the events
+    `tenancy.partner.created` and `tenancy.membership.created`.
+  tags:
+    - Partners
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The kind, the name and the optional details of the partner.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/partners/PartnerCreate.yaml
+  responses:
+    '201':
+      description: The partner was created and the caller is its owner.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/partners/Partner.yaml
+    '400':
+      description: The body failed validation (`validation_failed`), for example a missing `name` or a malformed `contact_email`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+get:
+  operationId: listPartners
+  summary: List partners
+  description: |
+    Returns partners in pages, newest first, for the platform realm (the
+    operations side of ZippyGo). Any other caller receives `403`
+    (`forbidden`); a user finds the partners they belong to under
+    `GET /v1/me`.
+
+    Filter with `q`, which matches `name` and `legal_name`, and with
+    `status`. Page with `limit` and `cursor`: pass the `next_cursor` of a
+    page to get the next one, until it is `null`.
+  tags:
+    - Partners
+  security:
+    - Bearer: []
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: Only include partners whose `name` or `legal_name` contains this text, case-insensitively.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+    - name: status
+      in: query
+      required: false
+      description: Only include partners with this status.
+      schema:
+        $ref: ../../components/schemas/partners/PartnerStatus.yaml
+    - name: limit
+      in: query
+      required: false
+      description: The maximum number of partners to return per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page. Omit it for the first page.
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    '200':
+      description: A page of partners.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/partners/PartnerList.yaml
+    '400':
+      description: A parameter failed validation (`validation_failed`), for example a `limit` out of range or a `cursor` that is not one this operation issued.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller is not in the platform realm (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

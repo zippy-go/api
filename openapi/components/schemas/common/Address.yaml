@@ -1,0 +1,65 @@
+type: object
+description: |
+  A postal address. `country` is an ISO 3166-1 alpha-2 code and the other
+  members follow the conventions of that country, so `state` and
+  `postal_code` may not apply everywhere. Responses carry every member,
+  with `null` for the ones that are not set; requests may omit the optional
+  ones.
+required:
+  - line1
+  - city
+  - country
+properties:
+  line1:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The first address line, usually the street and the number or the building.
+    examples:
+      - 1 Example Street
+  line2:
+    type:
+      - string
+      - 'null'
+    maxLength: 200
+    description: The second address line (floor, unit, landmark), or `null`.
+    examples:
+      - Floor 2
+  city:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: The city or town.
+    examples:
+      - Bengaluru
+  state:
+    type:
+      - string
+      - 'null'
+    maxLength: 100
+    description: The state, province or region, or `null` where it does not apply.
+    examples:
+      - Karnataka
+  postal_code:
+    type:
+      - string
+      - 'null'
+    maxLength: 20
+    description: The postal code, or `null` where it does not apply.
+    examples:
+      - '560001'
+  country:
+    type: string
+    pattern: ^[A-Z]{2}$
+    minLength: 2
+    maxLength: 2
+    description: The ISO 3166-1 alpha-2 country code, upper case.
+    examples:
+      - IN
+examples:
+  - line1: 1 Example Street
+    line2: null
+    city: Bengaluru
+    state: Karnataka
+    postal_code: '560001'
+    country: IN

@@ -35,6 +35,13 @@ the replacement in the changelog; they are removed in the next major.
 - Every pull request is checked with `oasdiff` against the bundled contract
   on `main`; findings of `ERR` severity fail the build, `WARN` and `INFO`
   findings are reported for review.
+- oasdiff's default severities are adjusted where they disagree with the
+  table above, through `oasdiff-severity-levels.txt` (referenced from
+  `.oasdiff.yaml`, which both the CLI and the CI action read): adding a
+  value to an enumeration in a response is reported as `INFO`, because
+  it is an additive change under this policy and clients must tolerate
+  values they do not know. Removing a value, or adding one to a request
+  enumeration that the server then accepts, keeps oasdiff's default.
 - Every change is recorded in the changelog under *Unreleased* and moved
   under the version number at release.
 - Event payloads follow the same rule with their own `version` field; see

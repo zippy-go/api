@@ -1,0 +1,13 @@
+type: string
+description: |
+  The state of an invitation. It is `pending` until it is `accepted` by the
+  invited person, `revoked` by the partner or `expired` by passing
+  `expires_at`. Clients must tolerate values they do not know, because a
+  new status is an additive change.
+enum:
+  - pending
+  - accepted
+  - expired
+  - revoked
+examples:
+  - pending

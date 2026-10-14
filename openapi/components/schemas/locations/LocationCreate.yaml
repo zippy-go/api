@@ -1,0 +1,61 @@
+type: object
+description: |
+  The request body of `POST /v1/partners/{partner_id}/locations`. A new
+  location is `active`. Coordinates are required because the platform does
+  not geocode addresses.
+required:
+  - name
+  - address
+  - lat
+  - lng
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: The name the location is known by within the partner.
+    examples:
+      - Location 40
+  address:
+    $ref: ../common/Address.yaml
+    description: The postal address.
+  lat:
+    type: number
+    minimum: -90
+    maximum: 90
+    description: Latitude in decimal degrees (WGS 84).
+    examples:
+      - 12.9716
+  lng:
+    type: number
+    minimum: -180
+    maximum: 180
+    description: Longitude in decimal degrees (WGS 84).
+    examples:
+      - 77.5946
+  time_zone:
+    type: string
+    minLength: 1
+    default: Asia/Kolkata
+    description: The IANA time zone the location operates in. `Asia/Kolkata` when omitted.
+    examples:
+      - Asia/Kolkata
+  phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The phone number of the location in E.164 format. Omit it, or send `null`, to leave it unset.
+    examples:
+      - '+15555550102'
+examples:
+  - name: Location 40
+    address:
+      line1: 1 Example Street
+      city: Bengaluru
+      state: Karnataka
+      postal_code: '560001'
+      country: IN
+    lat: 12.9716
+    lng: 77.5946
+    time_zone: Asia/Kolkata

@@ -1,0 +1,19 @@
+type: object
+description: A list of the services a partner has configured, the response of `GET /v1/partners/{partner_id}/services`.
+required:
+  - items
+properties:
+  items:
+    type: array
+    description: One entry per kind the partner has put, in any status; a kind that was never put is not listed. The list is not paginated.
+    items:
+      $ref: ./Service.yaml
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        kind: delivery
+        status: enabled
+        config: {}
+        created_at: 2026-10-14T08:30:00Z
+        updated_at: 2026-10-14T08:30:00Z

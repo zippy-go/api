@@ -1,0 +1,23 @@
+type: object
+description: |
+  The request body of `POST /v1/invitations/{token}/accept`. Both members
+  are used only when the call creates the user; a person who already has an
+  account keeps their name and password, and may send an empty body or
+  none at all.
+properties:
+  display_name:
+    type: string
+    minLength: 1
+    maxLength: 120
+    description: The name the new user is shown under.
+    examples:
+      - User 21
+  password:
+    type: string
+    minLength: 12
+    description: A password for the new user, at least 12 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
+    examples:
+      - example-passphrase-2026
+examples:
+  - display_name: User 21
+    password: example-passphrase-2026

@@ -1,0 +1,11 @@
+# Shared path parameter `partner_id`. Referenced from the path items under
+# /v1/partners/{partner_id} and registered under components.parameters in
+# openapi.yaml.
+name: partner_id
+in: path
+required: true
+description: The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+schema:
+  type: string
+  format: uuid
+example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
