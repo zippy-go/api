@@ -2,7 +2,7 @@
   "name": "@zippy-go/api",
   "version": "0.1.0",
   "description": "TypeScript SDK for the ZippyGo API, generated from the OpenAPI document",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/zippy-go/api.git",

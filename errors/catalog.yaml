@@ -4,7 +4,9 @@
 # schema in the OpenAPI document) whose `code` is one of the entries below.
 # `message` is the template for the `detail` member; placeholders in braces
 # are filled per occurrence. `type` is `/problems/<code>`, resolved against
-# the API host. Codes are stable: a code is never renamed or reused.
+# the API host. Codes are stable: a code is never renamed or reused, and
+# its status is part of the contract (`validation_failed` is 400 and
+# `idempotency_key_reuse` is 409; both are settled, do not reopen them).
 errors:
   - code: validation_failed
     status: 400

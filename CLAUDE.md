@@ -37,10 +37,8 @@ when the shell does not pick up Node 26 by itself.
 ## Rules
 
 - Latest stable versions only, verified against the registry on the day
-  (`npm view <pkg> version`); pin exact versions. Exception recorded here:
-  `typescript` stays on the newest 6.x because `@hey-api/openapi-ts` needs
-  the TypeScript compiler API, which the `typescript` 7 package no longer
-  exports. Re-check when upgrading `@hey-api/openapi-ts`.
+  (`npm view <pkg> version`); pin exact versions. The one exception is
+  `typescript`; see Decisions.
 - This repository is public: no secrets, no internal hostnames or links,
   no customer or employee data, neutral wording. Hosts in the contract are
   placeholders on the reserved `.example` domain.
@@ -56,7 +54,29 @@ when the shell does not pick up Node 26 by itself.
   "agent" means the delivery agent.
 - Keep the portal on the default VitePress theme; add pages to the sidebar
   in `portal/.vitepress/config.mts`.
-- Do not add a licence file, product copy or sample data beyond minimal
-  placeholders; the founder decides those.
+- Do not add product copy or sample data beyond minimal placeholders; the
+  founder decides those.
 - Commit messages end with
   `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+
+## Decisions
+
+Settled by the founder: apply them as written and do not reopen them.
+
+- Licence: MIT. `LICENSE` at the root, `info.license` in the OpenAPI
+  document and `license` in both package.json files say so; keep them in
+  step and keep the `info-license` lint rules on.
+- Deprecation window: at least 180 days from the announcement in the
+  changelog (VERSIONING.md).
+- Breaking-change check: the oasdiff job fails on `ERR` severity only;
+  `WARN` and `INFO` findings are reported for review, not fatal.
+- Error statuses: `validation_failed` is 400 and `idempotency_key_reuse` is
+  409. The status of a code is part of the contract and never changes.
+- SDK generators: Dart with OpenAPI Generator `dart-dio`, Rust with
+  `progenitor`; each SDK is generated when it is first needed, not before.
+- Publishing: the TypeScript SDK will be published to GitHub Packages under
+  the `@zippy-go` scope, later; nothing is published yet.
+- TypeScript stays on the newest 6.x until `@hey-api/openapi-ts` supports
+  TypeScript 7: the generator needs the compiler API that the `typescript` 7
+  package no longer exports, and Dependabot ignores the major. Re-check when
+  upgrading `@hey-api/openapi-ts`.

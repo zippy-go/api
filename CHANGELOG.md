@@ -6,6 +6,11 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+### Added
+
+- `info.license` in the OpenAPI document: the contract, the SDKs and the
+  portal are released under the MIT licence.
+
 ## [0.1.0] - 2026-10-14
 
 ### Added

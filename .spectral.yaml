@@ -22,6 +22,9 @@ rules:
   # Shared primitives (for example Money) are defined before the first
   # resource that uses them, so unused components are allowed.
   oas3-unused-component: off
+  # The licence is MIT and `info.license` must name it. `license-url` stays
+  # off: OpenAPI 3.1 names the licence by SPDX `identifier` instead of `url`.
+  info-license: error
 
   zippygo-operation-id-camel-case:
     description: operationId is camelCase (verb + resource, for example listOrders).

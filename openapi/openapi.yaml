@@ -17,6 +17,9 @@ info:
   contact:
     name: ZippyGo API
     url: https://github.com/zippy-go/api
+  license:
+    name: MIT
+    identifier: MIT
 
 # Placeholder hosts. The `.example` top-level domain is reserved for
 # documentation (RFC 2606) and will be replaced by the real sandbox and

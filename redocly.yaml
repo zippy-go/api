@@ -19,5 +19,7 @@ rules:
   tags-alphabetical: off
   no-unresolved-refs: error
   no-unused-components: off
-  # No licence has been chosen for the API yet.
-  info-license: off
+  # The licence is MIT: `info.license` names it with the SPDX identifier
+  # (OpenAPI 3.1), which `info-license-strict` accepts in place of a URL.
+  info-license: error
+  info-license-strict: error

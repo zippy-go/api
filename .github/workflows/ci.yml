@@ -58,5 +58,6 @@ jobs:
         with:
           base: dist/base/openapi.yaml
           revision: dist/openapi.yaml
+          # Settled: only ERR findings fail; WARN and INFO are reported for review.
           fail-on: ERR
           review: 'false'

@@ -3,11 +3,9 @@
 This folder will hold the Rust crate for the ZippyGo API, generated from
 `dist/openapi.json`.
 
-Status: not generated yet. Candidate generators are `progenitor` and the
-OpenAPI Generator `rust` template (both `reqwest`-based); the deciding
-factor is OpenAPI 3.1 support, which is checked when the first resource
-endpoints land in the contract. Until then nothing in this folder is
-published.
+Status: not generated yet. The generator is `progenitor`, which produces a
+`reqwest`-based client. The crate is generated when it is first needed;
+until then nothing in this folder is published.
 
 Rules once it exists:
 

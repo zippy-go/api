@@ -5,7 +5,8 @@ this repository with [`@hey-api/openapi-ts`](https://heyapi.dev). It uses
 the Fetch API, has no runtime dependencies and works in Node.js 22+ and in
 browsers.
 
-Status: generated and committed, not yet published to npm.
+Status: generated and committed. It will be published to GitHub Packages
+under the `@zippy-go` scope later; it is not published yet.
 
 ## Usage
 

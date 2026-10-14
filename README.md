@@ -20,7 +20,8 @@ dist/           Bundled openapi.json and openapi.yaml (generated, not committed)
 ```
 
 Policies: [VERSIONING.md](VERSIONING.md) (semantic versioning of the
-contract) and [CHANGELOG.md](CHANGELOG.md) (every change, by version).
+contract, deprecation window of at least 180 days) and
+[CHANGELOG.md](CHANGELOG.md) (every change, by version).
 
 ## Run
 
@@ -48,7 +49,8 @@ runs lint, bundle, SDK generation, typecheck, event checks and the portal
 build in that order; it is what CI runs. After `pnpm check`, `git status`
 must show no changes under `sdks/typescript/src`, otherwise the committed
 SDK is stale. Pull requests are additionally compared against `main` with
-`oasdiff`, and breaking changes fail the build.
+`oasdiff`; findings of `ERR` severity fail the build, `WARN` and `INFO`
+findings are reported for review.
 
 ## Working on the contract
 
@@ -65,3 +67,7 @@ SDK is stale. Pull requests are additionally compared against `main` with
 - This repository is public: no credentials, no internal hostnames, no
   internal links. The hosts in the OpenAPI document are placeholders on the
   reserved `.example` domain until the sandbox opens.
+
+## Licence
+
+The contract, the SDKs and the portal are released under the [MIT Licence](LICENSE).

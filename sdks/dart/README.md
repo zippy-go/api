@@ -3,11 +3,10 @@
 This folder will hold the Dart package for the ZippyGo API, generated from
 `dist/openapi.json` for the Flutter apps.
 
-Status: not generated yet. The candidate generator is the OpenAPI Generator
+Status: not generated yet. The generator is the OpenAPI Generator
 `dart-dio` template, which produces a `dio`-based client that fits the
-mobile apps' HTTP stack. The choice is confirmed when the first resource
-endpoints land in the contract; until then nothing in this folder is
-published.
+mobile apps' HTTP stack. The package is generated when it is first needed;
+until then nothing in this folder is published.
 
 Rules once it exists:
 

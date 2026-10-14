@@ -73,7 +73,8 @@ succeed, is the
 ## SDKs
 
 The TypeScript SDK is generated from the OpenAPI document and lives in the
-repository under `sdks/typescript` (not yet published to npm):
+repository under `sdks/typescript`; it will be published to GitHub Packages
+under the `@zippy-go` scope later and is not published yet:
 
 ```ts
 import { client, getHealth } from '@zippy-go/api';
@@ -86,4 +87,5 @@ client.setConfig({
 const { data, error } = await getHealth();
 ```
 
-Dart and Rust SDKs are planned.
+Dart (OpenAPI Generator `dart-dio`) and Rust (`progenitor`) SDKs follow
+when they are first needed.

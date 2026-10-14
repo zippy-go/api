@@ -33,7 +33,8 @@ the replacement in the changelog; they are removed in the next major.
 ## How it is enforced
 
 - Every pull request is checked with `oasdiff` against the bundled contract
-  on `main`; changes it classifies as breaking fail the build.
+  on `main`; findings of `ERR` severity fail the build, `WARN` and `INFO`
+  findings are reported for review.
 - Every change is recorded in the changelog under *Unreleased* and moved
   under the version number at release.
 - Event payloads follow the same rule with their own `version` field; see
