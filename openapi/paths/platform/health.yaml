@@ -1,0 +1,31 @@
+# Path item for GET /v1/health. Referenced from openapi.yaml.
+get:
+  operationId: getHealth
+  summary: Check service health
+  description: |
+    Returns the health of the API together with the running version and the
+    server time. The endpoint is unauthenticated and safe to poll; use it for
+    uptime checks and to verify connectivity before making authenticated
+    calls.
+  tags:
+    - Platform
+  security: []
+  responses:
+    '200':
+      description: The service is reachable and reports its health.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/HealthResponse.yaml
+    '4XX':
+      description: A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml

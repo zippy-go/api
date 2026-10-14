@@ -1,0 +1,81 @@
+openapi: 3.1.0
+
+info:
+  title: ZippyGo API
+  version: 0.1.0
+  summary: On-demand delivery and hyperlocal commerce API.
+  description: |
+    The ZippyGo API covers catalog, ordering, subscriptions, delivery
+    orchestration and fleet management for businesses that sell and deliver
+    locally: partners (organisations or individuals) sell products and
+    services, and agents execute the tasks that fulfil them. This document is
+    the contract: every endpoint, schema and error shape is defined here
+    before it is implemented.
+
+    The API is versioned by URL prefix (`/v1`). Changes within a major version
+    are additive only; see the versioning policy in the repository.
+  contact:
+    name: ZippyGo API
+    url: https://github.com/zippy-go/api
+
+# Placeholder hosts. The `.example` top-level domain is reserved for
+# documentation (RFC 2606) and will be replaced by the real sandbox and
+# production hosts before the first release.
+servers:
+  - url: https://sandbox.api.zippygo.example
+    description: Sandbox (placeholder host, test data only)
+  - url: https://api.zippygo.example
+    description: Production (placeholder host)
+
+# Operations without their own `security` accept either scheme.
+security:
+  - ApiKey: []
+  - Bearer: []
+
+tags:
+  - name: Platform
+    description: Service health and platform-level utilities.
+  - name: Partners
+    description: Partners, the supply-side tenants (organisations or individuals), with their locations and members.
+  - name: Catalog
+    description: Products, modifiers, availability and pricing.
+  - name: Orders
+    description: Commercial purchases placed by customers.
+  - name: Deliveries
+    description: Fulfilment of orders from pickup to dropoff, including tasks and trips.
+  - name: Fleet
+    description: Providers, agents, vehicles and capacity.
+  - name: Subscriptions
+    description: Plans and schedules that generate recurring orders.
+  - name: Webhooks
+    description: Webhook endpoints and event delivery.
+
+paths:
+  /v1/health:
+    $ref: ./paths/platform/health.yaml
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: |
+        Server-to-server authentication with a partner-scoped API key sent
+        in the `X-Api-Key` header. Keys are issued per partner and can be
+        revoked at any time.
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        User authentication with a JSON Web Token issued by the ZippyGo
+        identity service, sent as `Authorization: Bearer <token>`.
+
+  schemas:
+    Error:
+      $ref: ./components/schemas/common/Error.yaml
+    HealthResponse:
+      $ref: ./components/schemas/common/HealthResponse.yaml
+    Money:
+      $ref: ./components/schemas/common/Money.yaml

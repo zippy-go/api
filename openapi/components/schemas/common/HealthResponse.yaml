@@ -1,0 +1,33 @@
+type: object
+description: The result of a health check, returned by `GET /v1/health`.
+required:
+  - status
+  - version
+  - checked_at
+properties:
+  status:
+    type: string
+    enum:
+      - ok
+      - degraded
+    description: |
+      `ok` when every dependency the API needs is reachable, `degraded` when
+      the API is serving requests but at least one dependency is impaired.
+      An unreachable service produces no response at all.
+    examples:
+      - ok
+  version:
+    type: string
+    description: The semantic version of the running API.
+    examples:
+      - 0.1.0
+  checked_at:
+    type: string
+    format: date-time
+    description: The server time at which the check ran, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:00:00Z
+examples:
+  - status: ok
+    version: 0.1.0
+    checked_at: 2026-10-14T08:00:00Z

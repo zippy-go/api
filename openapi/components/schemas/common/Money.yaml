@@ -1,0 +1,28 @@
+type: object
+description: |
+  A monetary amount expressed in the minor unit of an ISO 4217 currency, so
+  that no floating-point arithmetic is ever needed. For a currency with two
+  decimal places, `minor_units: 1250` with `currency: USD` is 12.50 USD; for
+  a currency without minor units (for example JPY) the amount is the whole
+  number of units.
+required:
+  - minor_units
+  - currency
+properties:
+  minor_units:
+    type: integer
+    format: int64
+    description: The amount in the currency's minor unit (cents, pence, paise). Negative values represent refunds and credits.
+    examples:
+      - 1250
+  currency:
+    type: string
+    pattern: ^[A-Z]{3}$
+    minLength: 3
+    maxLength: 3
+    description: The ISO 4217 alphabetic currency code, upper case.
+    examples:
+      - USD
+examples:
+  - minor_units: 1250
+    currency: USD

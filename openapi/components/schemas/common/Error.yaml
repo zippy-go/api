@@ -1,0 +1,77 @@
+type: object
+description: |
+  A problem details document as defined by RFC 9457. Every error response
+  uses the media type `application/problem+json` and this shape. The `code`
+  member is the stable, machine-readable identifier from the error catalog;
+  clients should branch on `code`, not on `title` or `detail`.
+required:
+  - type
+  - title
+  - status
+  - code
+properties:
+  type:
+    type: string
+    format: uri-reference
+    description: |
+      A URI reference that identifies the problem type. ZippyGo uses
+      `/problems/{code}`, resolved against the API host. `about:blank` is
+      used when no more specific type applies.
+    examples:
+      - /problems/validation_failed
+  title:
+    type: string
+    description: A short, human-readable summary of the problem type. It does not change from occurrence to occurrence.
+    examples:
+      - Validation failed
+  status:
+    type: integer
+    format: int32
+    minimum: 400
+    maximum: 599
+    description: The HTTP status code of the response, repeated for clients that lose it.
+    examples:
+      - 400
+  detail:
+    type: string
+    description: A human-readable explanation specific to this occurrence of the problem.
+    examples:
+      - The request body has 1 invalid field.
+  instance:
+    type: string
+    format: uri-reference
+    description: A URI reference that identifies this specific occurrence, usually the request path.
+    examples:
+      - /v1/orders
+  code:
+    type: string
+    pattern: ^[a-z][a-z0-9_]*$
+    description: The stable error code from the error catalog, for example `validation_failed` or `not_found`.
+    examples:
+      - validation_failed
+  errors:
+    type: array
+    description: Field-level problems. Present for `validation_failed`, otherwise omitted.
+    items:
+      type: object
+      description: One invalid field and why it was rejected.
+      required:
+        - pointer
+        - message
+      properties:
+        pointer:
+          type: string
+          description: JSON Pointer (RFC 6901) to the offending member of the request body, or an empty string for the whole body.
+        message:
+          type: string
+          description: Why the value was rejected.
+examples:
+  - type: /problems/validation_failed
+    title: Validation failed
+    status: 400
+    detail: The request body has 1 invalid field.
+    instance: /v1/orders
+    code: validation_failed
+    errors:
+      - pointer: /items/0/quantity
+        message: must be greater than 0
