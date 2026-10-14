@@ -20,7 +20,7 @@ properties:
     type: string
     description: The semantic version of the running API.
     examples:
-      - 0.2.0
+      - 0.3.0
   checked_at:
     type: string
     format: date-time
@@ -29,5 +29,5 @@ properties:
       - 2026-10-14T08:00:00Z
 examples:
   - status: ok
-    version: 0.2.0
+    version: 0.3.0
     checked_at: 2026-10-14T08:00:00Z

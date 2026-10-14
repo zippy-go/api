@@ -1,0 +1,24 @@
+type: object
+description: >-
+  The request body of `POST /v1/auth/otp/verify`: the challenge and the code that was delivered for it.
+required:
+  - challenge_id
+  - code
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: The `challenge_id` from the response of `POST /v1/auth/otp/request`.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+  code:
+    type: string
+    pattern: ^[0-9]{6}$
+    minLength: 6
+    maxLength: 6
+    description: The six-digit code, sent as a string so that leading zeros are kept.
+    examples:
+      - '123456'
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+    code: '123456'

@@ -1,0 +1,63 @@
+# Path item for /v1/auth/otp/request. Referenced from openapi.yaml.
+post:
+  operationId: requestOtp
+  summary: Request a one-time code
+  description: |
+    Sends a six-digit one-time code to an email address or a phone number.
+    Every well-formed request is answered with `202` and a challenge,
+    whether or not an account exists for the identifier, so that the
+    operation cannot be used to find out who has an account. The code is
+    accepted until `expires_at`; exchange it for a session with
+    `POST /v1/auth/otp/verify`. The first successful verification for an
+    identifier creates the user.
+
+    Codes are rate limited per identifier and per client. When the limit is
+    reached the response is `429` (`too_many_requests`) with a `Retry-After`
+    header.
+  tags:
+    - Auth
+  security: []
+  requestBody:
+    required: true
+    description: The channel to deliver the code through and the identifier to send it to.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/OtpRequest.yaml
+  responses:
+    '202':
+      description: The code is being delivered. The body identifies the challenge to verify the code against.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/OtpChallenge.yaml
+    '400':
+      description: The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel. The `errors` member points at the offending field.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: Too many codes were requested for this identifier or from this client (`too_many_requests`). The `Retry-After` header says how many seconds to wait.
+      headers:
+        Retry-After:
+          description: The number of seconds to wait before requesting another code.
+          schema:
+            type: integer
+            minimum: 0
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

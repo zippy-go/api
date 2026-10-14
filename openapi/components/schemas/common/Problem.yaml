@@ -65,6 +65,10 @@ properties:
         message:
           type: string
           description: Why the value was rejected.
+        code:
+          type: string
+          pattern: ^[a-z][a-z0-9_]*$
+          description: A stable code for the field-level problem, present when the error catalog defines one under the response's `code` (for example `password_weak` under `validation_failed`); omitted otherwise. Branch on it rather than on `message`.
 examples:
   - type: /problems/validation_failed
     title: Validation failed

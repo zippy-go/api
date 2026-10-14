@@ -1,0 +1,40 @@
+type: object
+description: >-
+  The response of `GET /v1/me`: the signed-in user, their memberships and their platform roles.
+required:
+  - user
+  - memberships
+  - platform_roles
+properties:
+  user:
+    $ref: ./User.yaml
+    description: The user the access token belongs to.
+  memberships:
+    type: array
+    description: One entry per partner the user belongs to, with the role held there. Empty for a user who has not created or joined a partner yet.
+    items:
+      $ref: ../memberships/Membership.yaml
+  platform_roles:
+    type: array
+    description: The user's roles in the platform realm, the operations side of ZippyGo; empty for everyone else. The role names are documented when platform operations endpoints are released.
+    items:
+      type: string
+examples:
+  - user:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      email: owner@example.com
+      phone: null
+      display_name: User 20
+      created_at: 2026-10-14T08:00:00Z
+    memberships:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        user:
+          id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+          email: owner@example.com
+          phone: null
+          display_name: User 20
+          created_at: 2026-10-14T08:00:00Z
+        role: owner
+        created_at: 2026-10-14T08:05:00Z
+    platform_roles: []

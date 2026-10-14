@@ -1,0 +1,30 @@
+type: object
+description: |
+  The response of `POST /v1/auth/otp/request`: the challenge a one-time code
+  belongs to. Pass `challenge_id` together with the code to
+  `POST /v1/auth/otp/verify`. The body is the same whether or not an account
+  exists for the identifier.
+required:
+  - challenge_id
+  - expires_at
+  - delivery
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: Identifies the challenge; it is tied to the identifier the code was sent to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+  expires_at:
+    type: string
+    format: date-time
+    description: When the code stops being accepted, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:10:00Z
+  delivery:
+    $ref: ./OtpChannel.yaml
+    description: The channel the code was sent through.
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+    expires_at: 2026-10-14T08:10:00Z
+    delivery: email

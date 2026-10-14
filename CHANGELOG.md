@@ -6,6 +6,40 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-14
+
+### Added
+
+- Identity, under the tag `Auth`: `POST /v1/auth/otp/request` (`requestOtp`),
+  `POST /v1/auth/otp/verify` (`verifyOtp`), `POST /v1/auth/password/sign-in`
+  (`signInWithPassword`), `POST /v1/auth/password` (`changePassword`),
+  `POST /v1/auth/refresh` (`refreshSession`), `POST /v1/auth/sign-out`
+  (`signOut`) and `GET /v1/me` (`getMe`), with the schemas `OtpChannel`,
+  `OtpRequest`, `OtpChallenge`, `OtpVerifyRequest`, `PasswordSignInRequest`,
+  `PasswordChangeRequest`, `RefreshRequest`, `TokenResponse`, `User`, `Me`,
+  `Membership` and `MembershipRole`. Sign-in creates the user on the first
+  successful one-time code. The access token claims are documented on the
+  `Auth` tag.
+- The `X-Client-Type` header (`ClientTypeHeader`) on the sign-in operations:
+  native clients send `native` and receive the refresh token in the body;
+  browsers receive it in the `httpOnly` cookie `zg_refresh`, scoped to
+  `/v1/auth`. Refresh tokens rotate on every use and reuse revokes the
+  session.
+- `GET /.well-known/jwks.json` (`getJwks`, tag `Platform`): the Ed25519
+  public keys that verify access tokens (`JsonWebKeySet`, `JsonWebKey`).
+- Error codes `invalid_code` (401), `code_expired` (401), `too_many_requests`
+  (429) and `too_many_attempts` (429); the detail code `password_weak` under
+  `validation_failed`, carried in the new optional `code` member of the
+  entries of `Problem.errors`.
+
+### Changed
+
+- The `Bearer` security scheme means an access token issued by ZippyGo: an
+  EdDSA-signed JWT valid for 15 minutes, obtained from the `Auth` operations.
+  The scheme itself (`http`, `bearer`, `JWT`) is unchanged.
+- `DevApiKey` stays accepted by `POST /v1/fleet/location-pings` only; its
+  replacement and retirement will be announced here.
+
 ## [0.2.0] - 2026-10-14
 
 ### Added

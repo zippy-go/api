@@ -1,0 +1,23 @@
+type: object
+description: |
+  The response of `GET /.well-known/jwks.json`: the public keys that verify
+  ZippyGo access tokens, as a JSON Web Key Set (RFC 7517). More than one key
+  is listed while keys are being rotated; pick the one whose `kid` matches
+  the token's header.
+required:
+  - keys
+properties:
+  keys:
+    type: array
+    minItems: 1
+    description: The current signing keys.
+    items:
+      $ref: ./JsonWebKey.yaml
+examples:
+  - keys:
+      - kty: OKP
+        crv: Ed25519
+        kid: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+        x: 11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo
+        use: sig
+        alg: EdDSA

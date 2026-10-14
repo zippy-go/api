@@ -1,0 +1,48 @@
+type: object
+description: |
+  A user's membership in a partner, with the role that decides what they may
+  do there. A user holds at most one membership per partner. A membership is
+  not an agent record: a member works in the partner's account, an agent is
+  attached to one of the partner's services to execute tasks.
+required:
+  - id
+  - partner_id
+  - user
+  - role
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner the user is a member of.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  user:
+    $ref: ../auth/User.yaml
+    description: The member.
+  role:
+    $ref: ./MembershipRole.yaml
+    description: The member's role in the partner.
+  created_at:
+    type: string
+    format: date-time
+    description: When the membership was created, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:05:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    user:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      email: owner@example.com
+      phone: null
+      display_name: User 20
+      created_at: 2026-10-14T08:00:00Z
+    role: owner
+    created_at: 2026-10-14T08:05:00Z

@@ -1,0 +1,11 @@
+type: string
+description: |
+  The channel a one-time code is delivered through: `email` sends it to an
+  email address, `phone` sends it to a phone number as a text message.
+  Clients must tolerate values they do not know, because a new channel is
+  an additive change.
+enum:
+  - email
+  - phone
+examples:
+  - email

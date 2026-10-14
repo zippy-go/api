@@ -1,0 +1,72 @@
+# Path item for /v1/auth/otp/verify. Referenced from openapi.yaml.
+post:
+  operationId: verifyOtp
+  summary: Verify a one-time code and sign in
+  description: |
+    Exchanges a one-time code for a session. On success the response is a
+    `TokenResponse`: the access token, the signed-in user and, for native
+    clients, the refresh token; browsers receive the refresh token in the
+    `zg_refresh` cookie instead (see the `Auth` tag). The first successful
+    verification for an identifier creates the user, with the email address
+    or the phone number the code was sent to.
+
+    A wrong code, or a challenge that does not exist, answers `401`
+    (`invalid_code`); a correct code presented after `expires_at` answers
+    `401` (`code_expired`). Request a new code in both cases. After too many
+    wrong codes for one challenge the challenge is locked and every further
+    attempt answers `429` (`too_many_attempts`).
+  tags:
+    - Auth
+  security: []
+  parameters:
+    - $ref: ../../components/parameters/ClientTypeHeader.yaml
+  requestBody:
+    required: true
+    description: The challenge from `POST /v1/auth/otp/request` and the code that was delivered for it.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/OtpVerifyRequest.yaml
+  responses:
+    '200':
+      description: The code was accepted and a session was created.
+      headers:
+        Set-Cookie:
+          description: >-
+            For browsers (no `X-Client-Type: native` header), the refresh token as `zg_refresh=<token>; Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent for native clients.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/TokenResponse.yaml
+    '400':
+      description: The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID or a code that is not six digits.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: The code was not accepted. `invalid_code` when it does not match the challenge or the challenge does not exist; `code_expired` when the challenge is past `expires_at`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: The challenge is locked after too many wrong codes (`too_many_attempts`). Request a new code.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

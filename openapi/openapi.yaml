@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.2.0
+  version: 0.3.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -37,7 +37,33 @@ security:
 
 tags:
   - name: Platform
-    description: Service health and platform-level utilities.
+    description: Service health, the token signing keys and other platform-level utilities.
+  - name: Auth
+    description: |
+      Signing in and sessions: one-time codes by email or phone, passwords,
+      token refresh, sign-out and the signed-in user.
+
+      The sign-in operations return a `TokenResponse`. Its access token is a
+      JSON Web Token signed with EdDSA (Ed25519), valid for 15 minutes and
+      verifiable with the keys from `GET /.well-known/jwks.json`; the key
+      that signed it is named by `kid` in the token header. The claims:
+
+      | Claim         | Meaning                                                                                        |
+      | ------------- | ---------------------------------------------------------------------------------------------- |
+      | `sub`         | The user id.                                                                                   |
+      | `iss`         | The issuer: the base URL of the API host that issued the token.                                |
+      | `aud`         | `zippygo`.                                                                                     |
+      | `iat`, `exp`  | Issued-at and expiry as Unix timestamps; `exp` is at most 15 minutes after `iat`.              |
+      | `jti`         | The token id, unique per token.                                                                |
+      | `sid`         | The session id. A session ends on sign-out, on reuse of a refresh token or when it expires.    |
+      | `memberships` | The user's memberships as a compact list of `{ "p": "<partner_id>", "r": "<role>" }`.          |
+      | `platform`    | The user's platform roles, a list of strings; empty for everyone outside the platform realm.   |
+
+      The refresh token is delivered in an `httpOnly` cookie named
+      `zg_refresh`, scoped to `/v1/auth`, to browsers, and in the body of the
+      `TokenResponse` to native clients that send `X-Client-Type: native`
+      when signing in. Refresh tokens rotate on every use; reusing one
+      revokes the session.
   - name: Partners
     description: Partners, the supply-side tenants (organisations or individuals), with their locations and members.
   - name: Catalog
@@ -72,6 +98,22 @@ paths:
     $ref: ./paths/live/agents.yaml
   /v1/live/events:
     $ref: ./paths/live/events.yaml
+  /v1/auth/otp/request:
+    $ref: ./paths/auth/otp-request.yaml
+  /v1/auth/otp/verify:
+    $ref: ./paths/auth/otp-verify.yaml
+  /v1/auth/password/sign-in:
+    $ref: ./paths/auth/password-sign-in.yaml
+  /v1/auth/password:
+    $ref: ./paths/auth/password.yaml
+  /v1/auth/refresh:
+    $ref: ./paths/auth/refresh.yaml
+  /v1/auth/sign-out:
+    $ref: ./paths/auth/sign-out.yaml
+  /v1/me:
+    $ref: ./paths/auth/me.yaml
+  /.well-known/jwks.json:
+    $ref: ./paths/platform/jwks.yaml
 
 components:
   securitySchemes:
@@ -88,22 +130,30 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: |
-        User authentication with a JSON Web Token issued by the ZippyGo
-        identity service, sent as `Authorization: Bearer <token>`.
+        An access token issued by ZippyGo, sent as
+        `Authorization: Bearer <token>`. Access tokens are JSON Web Tokens
+        signed with EdDSA (Ed25519) and valid for 15 minutes. They are
+        obtained from the sign-in operations under the `Auth` tag and
+        renewed with `POST /v1/auth/refresh`; their claims are documented on
+        that tag and the signing keys are published at
+        `GET /.well-known/jwks.json`.
     DevApiKey:
       type: apiKey
       in: header
       name: X-Dev-Api-Key
       description: |
-        A temporary development credential for Step 0 of the platform, sent
-        in the `X-Dev-Api-Key` header. It is accepted only by the operations
-        that declare it. The identity module replaces it in Step 1; the
-        replacement and the retirement of this scheme are announced in the
-        changelog.
+        A temporary development credential, sent in the `X-Dev-Api-Key`
+        header. It is accepted only by `POST /v1/fleet/location-pings`, for
+        devices that report positions before agents have credentials of
+        their own; every other operation authenticates with `Bearer` access
+        tokens. The replacement and the retirement of this scheme are
+        announced in the changelog.
 
   parameters:
     PartnerIdQuery:
       $ref: ./components/parameters/PartnerIdQuery.yaml
+    ClientTypeHeader:
+      $ref: ./components/parameters/ClientTypeHeader.yaml
 
   schemas:
     # Common
@@ -124,6 +174,36 @@ components:
       $ref: ./components/schemas/platform/HealthChecks.yaml
     HealthDetails:
       $ref: ./components/schemas/platform/HealthDetails.yaml
+    JsonWebKey:
+      $ref: ./components/schemas/platform/JsonWebKey.yaml
+    JsonWebKeySet:
+      $ref: ./components/schemas/platform/JsonWebKeySet.yaml
+    # Auth
+    OtpChannel:
+      $ref: ./components/schemas/auth/OtpChannel.yaml
+    OtpRequest:
+      $ref: ./components/schemas/auth/OtpRequest.yaml
+    OtpChallenge:
+      $ref: ./components/schemas/auth/OtpChallenge.yaml
+    OtpVerifyRequest:
+      $ref: ./components/schemas/auth/OtpVerifyRequest.yaml
+    PasswordSignInRequest:
+      $ref: ./components/schemas/auth/PasswordSignInRequest.yaml
+    PasswordChangeRequest:
+      $ref: ./components/schemas/auth/PasswordChangeRequest.yaml
+    RefreshRequest:
+      $ref: ./components/schemas/auth/RefreshRequest.yaml
+    User:
+      $ref: ./components/schemas/auth/User.yaml
+    TokenResponse:
+      $ref: ./components/schemas/auth/TokenResponse.yaml
+    Me:
+      $ref: ./components/schemas/auth/Me.yaml
+    # Memberships
+    MembershipRole:
+      $ref: ./components/schemas/memberships/MembershipRole.yaml
+    Membership:
+      $ref: ./components/schemas/memberships/Membership.yaml
     # Fleet
     AgentStatus:
       $ref: ./components/schemas/fleet/AgentStatus.yaml

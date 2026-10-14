@@ -7,14 +7,18 @@ under `components.schemas` by name and points at the file that defines it.
 components/
   schemas/
     common/        Shared primitives: Problem, Money, HealthResponse
-    platform/      Detailed health: HealthDetails, HealthChecks, DependencyCheck, OutboxCheck, CheckStatus
+    platform/      Detailed health: HealthDetails, HealthChecks, DependencyCheck, OutboxCheck, CheckStatus;
+                   token signing keys: JsonWebKeySet, JsonWebKey
+    auth/          Signing in and sessions: OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
+                   PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, TokenResponse, User, Me
+    memberships/   A user's place in a partner: Membership, MembershipRole
     fleet/         Agents and positions: Agent, AgentPosition, AgentStatus, ServiceKind, AgentList,
                    LocationPing, LocationPingBatch, LocationPingsAccepted
     events/        The event envelope as the API returns it: Event, EventList
     live/          Server-sent event streams: ServerSentEventStream and the frame data
                    AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate
     <domain>/      One folder per further domain, one file per schema
-  parameters/      Shared query, path and header parameters: PartnerIdQuery
+  parameters/      Shared query, path and header parameters: PartnerIdQuery, ClientTypeHeader
   responses/       Shared responses such as the standard error responses (planned)
 ```
 
@@ -28,7 +32,12 @@ Naming rules:
 - Timestamps are RFC 3339 strings with `format: date-time`, identifiers are
   strings, money is always the `Money` schema (never a bare number).
 - Enumerations use lowercase `snake_case` values. Clients must tolerate
-  values they do not know, because new values are an additive change.
+  values they do not know, because new values are an additive change. A
+  property that can only ever hold one value (such as `token_type`) uses
+  `const` rather than a one-value enumeration.
+- Request bodies get their own schema (`OtpRequest`, `PasswordChangeRequest`)
+  rather than reusing the resource schema, so that required, optional and
+  nullable fields can differ between what is sent and what is returned.
 - Nothing is defined inline in a path file; add a schema file and reference
   it, so the generated SDKs get a stable, named type.
 - A value that may be `null` is written the OpenAPI 3.1 way: a type list

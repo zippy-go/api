@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListEventsData, ListEventsErrors, ListEventsResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetMeData, GetMeErrors, GetMeResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListEventsData, ListEventsErrors, ListEventsResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -159,3 +159,184 @@ export const streamEvents = <ThrowOnError extends boolean = false>(options?: Opt
     url: '/v1/live/events',
     ...options
 });
+
+/**
+ * Request a one-time code
+ *
+ * Sends a six-digit one-time code to an email address or a phone number.
+ * Every well-formed request is answered with `202` and a challenge,
+ * whether or not an account exists for the identifier, so that the
+ * operation cannot be used to find out who has an account. The code is
+ * accepted until `expires_at`; exchange it for a session with
+ * `POST /v1/auth/otp/verify`. The first successful verification for an
+ * identifier creates the user.
+ *
+ * Codes are rate limited per identifier and per client. When the limit is
+ * reached the response is `429` (`too_many_requests`) with a `Retry-After`
+ * header.
+ *
+ */
+export const requestOtp = <ThrowOnError extends boolean = false>(options: Options<RequestOtpData, ThrowOnError>): RequestResult<RequestOtpResponses, RequestOtpErrors, ThrowOnError> => (options.client ?? client).post<RequestOtpResponses, RequestOtpErrors, ThrowOnError>({
+    url: '/v1/auth/otp/request',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Verify a one-time code and sign in
+ *
+ * Exchanges a one-time code for a session. On success the response is a
+ * `TokenResponse`: the access token, the signed-in user and, for native
+ * clients, the refresh token; browsers receive the refresh token in the
+ * `zg_refresh` cookie instead (see the `Auth` tag). The first successful
+ * verification for an identifier creates the user, with the email address
+ * or the phone number the code was sent to.
+ *
+ * A wrong code, or a challenge that does not exist, answers `401`
+ * (`invalid_code`); a correct code presented after `expires_at` answers
+ * `401` (`code_expired`). Request a new code in both cases. After too many
+ * wrong codes for one challenge the challenge is locked and every further
+ * attempt answers `429` (`too_many_attempts`).
+ *
+ */
+export const verifyOtp = <ThrowOnError extends boolean = false>(options: Options<VerifyOtpData, ThrowOnError>): RequestResult<VerifyOtpResponses, VerifyOtpErrors, ThrowOnError> => (options.client ?? client).post<VerifyOtpResponses, VerifyOtpErrors, ThrowOnError>({
+    url: '/v1/auth/otp/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Sign in with a password
+ *
+ * Exchanges an email address and a password for a session. On success the
+ * response is a `TokenResponse`, delivered the same way as for
+ * `POST /v1/auth/otp/verify`: the refresh token goes to the `zg_refresh`
+ * cookie for browsers and into the body for native clients (see the
+ * `Auth` tag).
+ *
+ * A user gets a password by setting one with `POST /v1/auth/password`
+ * after signing in with a one-time code, or by choosing one when accepting
+ * an invitation. An unknown email address, a wrong password or a user
+ * without a password all answer `401` (`unauthenticated`), without saying
+ * which it was.
+ *
+ */
+export const signInWithPassword = <ThrowOnError extends boolean = false>(options: Options<SignInWithPasswordData, ThrowOnError>): RequestResult<SignInWithPasswordResponses, SignInWithPasswordErrors, ThrowOnError> => (options.client ?? client).post<SignInWithPasswordResponses, SignInWithPasswordErrors, ThrowOnError>({
+    url: '/v1/auth/password/sign-in',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set or change the password
+ *
+ * Sets the signed-in user's password, so that they can also sign in with
+ * `POST /v1/auth/password/sign-in`. A user who signed up with a one-time
+ * code has no password yet and sends `current_password` as `null` or
+ * omits it; a user who already has a password must send it, and a wrong
+ * one answers `403` (`forbidden`).
+ *
+ * The new password must be at least 12 characters long. Otherwise the
+ * response is `400` (`validation_failed`) with an `errors` entry that
+ * points at `/new_password` and carries the code `password_weak`.
+ *
+ */
+export const changePassword = <ThrowOnError extends boolean = false>(options: Options<ChangePasswordData, ThrowOnError>): RequestResult<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError> => (options.client ?? client).post<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Refresh the session
+ *
+ * Issues a new access token for the current session and rotates the
+ * refresh token. Where the refresh token travels depends on the client:
+ *
+ * - Browsers received it at sign-in in an `httpOnly` cookie named
+ * `zg_refresh`, scoped to the path `/v1/auth`. They send no body, or an
+ * empty object, and the response sets a new cookie; `refresh_token` in
+ * the body stays `null`.
+ * - Native clients sent `X-Client-Type: native` when signing in and
+ * received `refresh_token` in the body. They send it back here in
+ * `refresh_token` and receive the new one in the body.
+ *
+ * Every refresh token can be used once. Presenting a token that was
+ * already used revokes the whole session, as a defence against a stolen
+ * token, and the user has to sign in again. A missing, unknown, expired
+ * or revoked token answers `401` (`unauthenticated`).
+ *
+ */
+export const refreshSession = <ThrowOnError extends boolean = false>(options?: Options<RefreshSessionData, ThrowOnError>): RequestResult<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError> => (options?.client ?? client).post<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError>({
+    url: '/v1/auth/refresh',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Sign out
+ *
+ * Revokes the session the access token belongs to (its `sid` claim): the
+ * session's refresh token can no longer be used, and for browsers the
+ * `zg_refresh` cookie is cleared. The access token itself stays valid
+ * until its `exp`, at most 15 minutes; clients discard it. Other sessions
+ * of the same user are not affected.
+ *
+ */
+export const signOut = <ThrowOnError extends boolean = false>(options?: Options<SignOutData, ThrowOnError>): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> => (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/sign-out',
+    ...options
+});
+
+/**
+ * Get the signed-in user
+ *
+ * Returns the user the access token belongs to, their memberships with
+ * the role they hold in each partner, and their platform roles. Call it
+ * after signing in to decide which partner to work in. The response
+ * reflects the current state, whereas the token's `memberships` and
+ * `platform` claims are fixed when the token is issued and catch up at
+ * the next refresh.
+ *
+ */
+export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/me',
+    ...options
+});
+
+/**
+ * Get the token signing keys
+ *
+ * Returns the public keys that verify ZippyGo access tokens, as a JSON
+ * Web Key Set (RFC 7517). Every key is an Ed25519 key (`kty` `OKP`, `crv`
+ * `Ed25519`, `alg` `EdDSA`) identified by `kid`, and the header of every
+ * access token names the key that signed it in `kid`.
+ *
+ * Keys rotate: a new key is published here before it signs any token, and
+ * a retired key stays in the set for as long as a token signed with it
+ * can still be valid. Cache the set and fetch it again when a token
+ * carries a `kid` that is not in the cached set.
+ *
+ * The path is outside the `/v1` prefix, as RFC 8615 prescribes for
+ * well-known URIs, and needs no credentials.
+ *
+ */
+export const getJwks = <ThrowOnError extends boolean = false>(options?: Options<GetJwksData, ThrowOnError>): RequestResult<GetJwksResponses, GetJwksErrors, ThrowOnError> => (options?.client ?? client).get<GetJwksResponses, GetJwksErrors, ThrowOnError>({ url: '/.well-known/jwks.json', ...options });

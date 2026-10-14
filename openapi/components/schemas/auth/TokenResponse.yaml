@@ -1,0 +1,55 @@
+type: object
+description: |
+  A session, as returned by the sign-in operations and by
+  `POST /v1/auth/refresh`: the access token to send as
+  `Authorization: Bearer <access_token>`, how long it is valid, the refresh
+  token for native clients and the signed-in user. The refresh token of a
+  browser client is set in the `zg_refresh` cookie instead and
+  `refresh_token` is `null`.
+required:
+  - access_token
+  - token_type
+  - expires_in
+  - refresh_token
+  - user
+properties:
+  access_token:
+    type: string
+    minLength: 1
+    description: A JSON Web Token signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
+    examples:
+      - eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InppcHB5Z28iLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+  token_type:
+    type: string
+    const: Bearer
+    description: Always `Bearer`; the token is sent in the `Authorization` header as RFC 6750 describes.
+    examples:
+      - Bearer
+  expires_in:
+    type: integer
+    minimum: 1
+    description: The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present.
+    examples:
+      - 900
+  refresh_token:
+    type:
+      - string
+      - 'null'
+    description: >-
+      The refresh token for `POST /v1/auth/refresh`, present only for native clients that sent `X-Client-Type: native` when signing in. `null` for browsers, whose refresh token is in the `zg_refresh` cookie.
+    examples:
+      - c2FtcGxlLXJlZnJlc2gtdG9rZW4
+  user:
+    $ref: ./User.yaml
+    description: The user the session belongs to.
+examples:
+  - access_token: eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InppcHB5Z28iLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+    token_type: Bearer
+    expires_in: 900
+    refresh_token: null
+    user:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      email: owner@example.com
+      phone: null
+      display_name: User 20
+      created_at: 2026-10-14T08:00:00Z

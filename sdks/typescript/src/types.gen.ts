@@ -91,6 +91,10 @@ export type Problem = {
          * Why the value was rejected.
          */
         message: string;
+        /**
+         * A stable code for the field-level problem, present when the error catalog defines one under the response's `code` (for example `password_weak` under `validation_failed`); omitted otherwise. Branch on it rather than on `message`.
+         */
+        code?: string;
     }>;
 };
 
@@ -175,6 +179,280 @@ export type HealthDetails = {
      * The individual checks the overall status is derived from.
      */
     checks: HealthChecks;
+};
+
+/**
+ * A public key in JSON Web Key format (RFC 7517), as published by
+ * `GET /.well-known/jwks.json`. ZippyGo signs access tokens with Ed25519,
+ * so every key is an octet key pair (`OKP`) on the `Ed25519` curve used
+ * with the `EdDSA` algorithm (RFC 8037).
+ *
+ */
+export type JsonWebKey = {
+    /**
+     * The key type, always `OKP` (octet key pair).
+     */
+    kty: 'OKP';
+    /**
+     * The curve, always `Ed25519`.
+     */
+    crv: 'Ed25519';
+    /**
+     * The key identifier. The header of every access token names the key that signed it in `kid`.
+     */
+    kid: string;
+    /**
+     * The 32-byte public key, base64url encoded without padding.
+     */
+    x: string;
+    /**
+     * The intended use, always `sig` (signature verification).
+     */
+    use: 'sig';
+    /**
+     * The algorithm the key is used with, always `EdDSA`.
+     */
+    alg: 'EdDSA';
+};
+
+/**
+ * The response of `GET /.well-known/jwks.json`: the public keys that verify
+ * ZippyGo access tokens, as a JSON Web Key Set (RFC 7517). More than one key
+ * is listed while keys are being rotated; pick the one whose `kid` matches
+ * the token's header.
+ *
+ */
+export type JsonWebKeySet = {
+    /**
+     * The current signing keys.
+     */
+    keys: Array<JsonWebKey>;
+};
+
+/**
+ * The channel a one-time code is delivered through: `email` sends it to an
+ * email address, `phone` sends it to a phone number as a text message.
+ * Clients must tolerate values they do not know, because a new channel is
+ * an additive change.
+ *
+ */
+export type OtpChannel = 'email' | 'phone';
+
+/**
+ * The request body of `POST /v1/auth/otp/request`: where to send a one-time code.
+ */
+export type OtpRequest = {
+    /**
+     * The channel to deliver the code through.
+     */
+    channel: OtpChannel;
+    /**
+     * The email address when `channel` is `email`, or the phone number in E.164 format (a `+`, the country code and the number, no spaces) when `channel` is `phone`.
+     */
+    identifier: string;
+};
+
+/**
+ * The response of `POST /v1/auth/otp/request`: the challenge a one-time code
+ * belongs to. Pass `challenge_id` together with the code to
+ * `POST /v1/auth/otp/verify`. The body is the same whether or not an account
+ * exists for the identifier.
+ *
+ */
+export type OtpChallenge = {
+    /**
+     * Identifies the challenge; it is tied to the identifier the code was sent to.
+     */
+    challenge_id: string;
+    /**
+     * When the code stops being accepted, as an RFC 3339 timestamp in UTC.
+     */
+    expires_at: string;
+    /**
+     * The channel the code was sent through.
+     */
+    delivery: OtpChannel;
+};
+
+/**
+ * The request body of `POST /v1/auth/otp/verify`: the challenge and the code that was delivered for it.
+ */
+export type OtpVerifyRequest = {
+    /**
+     * The `challenge_id` from the response of `POST /v1/auth/otp/request`.
+     */
+    challenge_id: string;
+    /**
+     * The six-digit code, sent as a string so that leading zeros are kept.
+     */
+    code: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/password/sign-in`.
+ */
+export type PasswordSignInRequest = {
+    /**
+     * The email address the user registered with.
+     */
+    email: string;
+    /**
+     * The user's password. It is never returned by the API.
+     */
+    password: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/password`. The new password must be at
+ * least 12 characters long; a shorter one is rejected with
+ * `validation_failed` and the detail code `password_weak`.
+ *
+ */
+export type PasswordChangeRequest = {
+    /**
+     * The current password. Send `null`, or omit the field, when the user has no password yet, as after signing up with a one-time code; when a password is set it must match.
+     */
+    current_password?: string | null;
+    /**
+     * The new password, at least 12 characters.
+     */
+    new_password: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/refresh`. Native clients send the
+ * refresh token they received at sign-in; browsers send no body at all,
+ * because their refresh token travels in the `zg_refresh` cookie.
+ *
+ */
+export type RefreshRequest = {
+    /**
+     * The refresh token from the `refresh_token` member of the last `TokenResponse`. Each token can be used once; the response carries its replacement.
+     */
+    refresh_token?: string;
+};
+
+/**
+ * A person who signs in to ZippyGo. A user belongs to partners through
+ * memberships, each with its own role, and may hold platform roles; the
+ * user record itself carries identity data only. A user registers with an
+ * email address or a phone number, so one of the two may be `null`.
+ *
+ */
+export type User = {
+    /**
+     * Unique identifier of the user; the `sub` claim of their access tokens.
+     */
+    id: string;
+    /**
+     * The user's email address, or `null` when the user registered with a phone number and has not added one.
+     */
+    email: string | null;
+    /**
+     * The user's phone number in E.164 format, or `null` when the user registered with an email address and has not added one.
+     */
+    phone: string | null;
+    /**
+     * The name the user is shown under, or `null` until they set one.
+     */
+    display_name: string | null;
+    /**
+     * When the user was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+};
+
+/**
+ * A session, as returned by the sign-in operations and by
+ * `POST /v1/auth/refresh`: the access token to send as
+ * `Authorization: Bearer <access_token>`, how long it is valid, the refresh
+ * token for native clients and the signed-in user. The refresh token of a
+ * browser client is set in the `zg_refresh` cookie instead and
+ * `refresh_token` is `null`.
+ *
+ */
+export type TokenResponse = {
+    /**
+     * A JSON Web Token signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
+     */
+    access_token: string;
+    /**
+     * Always `Bearer`; the token is sent in the `Authorization` header as RFC 6750 describes.
+     */
+    token_type: 'Bearer';
+    /**
+     * The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present.
+     */
+    expires_in: number;
+    /**
+     * The refresh token for `POST /v1/auth/refresh`, present only for native clients that sent `X-Client-Type: native` when signing in. `null` for browsers, whose refresh token is in the `zg_refresh` cookie.
+     */
+    refresh_token: string | null;
+    /**
+     * The user the session belongs to.
+     */
+    user: User;
+};
+
+/**
+ * The response of `GET /v1/me`: the signed-in user, their memberships and their platform roles.
+ */
+export type Me = {
+    /**
+     * The user the access token belongs to.
+     */
+    user: User;
+    /**
+     * One entry per partner the user belongs to, with the role held there. Empty for a user who has not created or joined a partner yet.
+     */
+    memberships: Array<Membership>;
+    /**
+     * The user's roles in the platform realm, the operations side of ZippyGo; empty for everyone else. The role names are documented when platform operations endpoints are released.
+     */
+    platform_roles: Array<string>;
+};
+
+/**
+ * The role a member holds in a partner. `owner` may do everything,
+ * including managing members and the partner record; `manager` manages
+ * locations, services and invitations; `dispatcher` works with deliveries
+ * and the fleet; `kitchen` prepares orders; `staff` handles the day-to-day
+ * at a location. What each role may call is stated on every operation; the
+ * roles whose domains are not released yet are listed so that invitations
+ * can be sent ahead of them. Clients must tolerate values they do not know,
+ * because a new role is an additive change.
+ *
+ */
+export type MembershipRole = 'owner' | 'manager' | 'dispatcher' | 'kitchen' | 'staff';
+
+/**
+ * A user's membership in a partner, with the role that decides what they may
+ * do there. A user holds at most one membership per partner. A membership is
+ * not an agent record: a member works in the partner's account, an agent is
+ * attached to one of the partner's services to execute tasks.
+ *
+ */
+export type Membership = {
+    /**
+     * Unique identifier of the membership.
+     */
+    id: string;
+    /**
+     * The partner the user is a member of.
+     */
+    partner_id: string;
+    /**
+     * The member.
+     */
+    user: User;
+    /**
+     * The member's role in the partner.
+     */
+    role: MembershipRole;
+    /**
+     * When the membership was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
 };
 
 /**
@@ -437,6 +715,16 @@ export type AgentStatusUpdate = {
  */
 export type PartnerIdQuery = string;
 
+/**
+ * How the client keeps its refresh token. Send `native` from a mobile or
+ * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
+ * then returned in `refresh_token` in the response body. Without the header
+ * the client is treated as a browser: the refresh token is set in the
+ * `zg_refresh` cookie and `refresh_token` in the body is `null`.
+ *
+ */
+export type ClientTypeHeader = 'native';
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -681,3 +969,324 @@ export type StreamEventsResponses = {
 };
 
 export type StreamEventsResponse = StreamEventsResponses[keyof StreamEventsResponses];
+
+export type RequestOtpData = {
+    /**
+     * The channel to deliver the code through and the identifier to send it to.
+     */
+    body: OtpRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/otp/request';
+};
+
+export type RequestOtpErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel. The `errors` member points at the offending field.
+     */
+    400: Problem;
+    /**
+     * Too many codes were requested for this identifier or from this client (`too_many_requests`). The `Retry-After` header says how many seconds to wait.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestOtpError = RequestOtpErrors[keyof RequestOtpErrors];
+
+export type RequestOtpResponses = {
+    /**
+     * The code is being delivered. The body identifies the challenge to verify the code against.
+     */
+    202: OtpChallenge;
+};
+
+export type RequestOtpResponse = RequestOtpResponses[keyof RequestOtpResponses];
+
+export type VerifyOtpData = {
+    /**
+     * The challenge from `POST /v1/auth/otp/request` and the code that was delivered for it.
+     */
+    body: OtpVerifyRequest;
+    headers?: {
+        /**
+         * How the client keeps its refresh token. Send `native` from a mobile or
+         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
+         * then returned in `refresh_token` in the response body. Without the header
+         * the client is treated as a browser: the refresh token is set in the
+         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
+         *
+         */
+        'X-Client-Type'?: 'native';
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/auth/otp/verify';
+};
+
+export type VerifyOtpErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID or a code that is not six digits.
+     */
+    400: Problem;
+    /**
+     * The code was not accepted. `invalid_code` when it does not match the challenge or the challenge does not exist; `code_expired` when the challenge is past `expires_at`.
+     */
+    401: Problem;
+    /**
+     * The challenge is locked after too many wrong codes (`too_many_attempts`). Request a new code.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyOtpError = VerifyOtpErrors[keyof VerifyOtpErrors];
+
+export type VerifyOtpResponses = {
+    /**
+     * The code was accepted and a session was created.
+     */
+    200: TokenResponse;
+};
+
+export type VerifyOtpResponse = VerifyOtpResponses[keyof VerifyOtpResponses];
+
+export type SignInWithPasswordData = {
+    /**
+     * The email address and the password.
+     */
+    body: PasswordSignInRequest;
+    headers?: {
+        /**
+         * How the client keeps its refresh token. Send `native` from a mobile or
+         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
+         * then returned in `refresh_token` in the response body. Without the header
+         * the client is treated as a browser: the refresh token is set in the
+         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
+         *
+         */
+        'X-Client-Type'?: 'native';
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/auth/password/sign-in';
+};
+
+export type SignInWithPasswordErrors = {
+    /**
+     * The body failed validation (`validation_failed`), for example an `email` that is not an email address.
+     */
+    400: Problem;
+    /**
+     * The email address or the password is wrong, or the user has no password (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when sign-in attempts are rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SignInWithPasswordError = SignInWithPasswordErrors[keyof SignInWithPasswordErrors];
+
+export type SignInWithPasswordResponses = {
+    /**
+     * The credentials were accepted and a session was created.
+     */
+    200: TokenResponse;
+};
+
+export type SignInWithPasswordResponse = SignInWithPasswordResponses[keyof SignInWithPasswordResponses];
+
+export type ChangePasswordData = {
+    /**
+     * The current password, when one is set, and the new one.
+     */
+    body: PasswordChangeRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/password';
+};
+
+export type ChangePasswordErrors = {
+    /**
+     * The body failed validation (`validation_failed`). A `new_password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The user has a password and `current_password` is missing or does not match it (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ChangePasswordError = ChangePasswordErrors[keyof ChangePasswordErrors];
+
+export type ChangePasswordResponses = {
+    /**
+     * The password was set.
+     */
+    204: void;
+};
+
+export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswordResponses];
+
+export type RefreshSessionData = {
+    /**
+     * The refresh token, for native clients only. Browsers send no body.
+     */
+    body?: RefreshRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/refresh';
+};
+
+export type RefreshSessionErrors = {
+    /**
+     * No refresh token was sent, or it is unknown, expired, already used or revoked (`unauthenticated`). Sign in again.
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `400` (`validation_failed`) for a malformed body or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RefreshSessionError = RefreshSessionErrors[keyof RefreshSessionErrors];
+
+export type RefreshSessionResponses = {
+    /**
+     * A new access token and a new refresh token were issued; the previous refresh token is no longer valid.
+     */
+    200: TokenResponse;
+};
+
+export type RefreshSessionResponse = RefreshSessionResponses[keyof RefreshSessionResponses];
+
+export type SignOutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/sign-out';
+};
+
+export type SignOutErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SignOutError = SignOutErrors[keyof SignOutErrors];
+
+export type SignOutResponses = {
+    /**
+     * The session was revoked.
+     */
+    204: void;
+};
+
+export type SignOutResponse = SignOutResponses[keyof SignOutResponses];
+
+export type GetMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me';
+};
+
+export type GetMeErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMeError = GetMeErrors[keyof GetMeErrors];
+
+export type GetMeResponses = {
+    /**
+     * The signed-in user with their memberships and platform roles.
+     */
+    200: Me;
+};
+
+export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type GetJwksData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/.well-known/jwks.json';
+};
+
+export type GetJwksErrors = {
+    /**
+     * A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetJwksError = GetJwksErrors[keyof GetJwksErrors];
+
+export type GetJwksResponses = {
+    /**
+     * The current signing keys.
+     */
+    200: JsonWebKeySet;
+};
+
+export type GetJwksResponse = GetJwksResponses[keyof GetJwksResponses];

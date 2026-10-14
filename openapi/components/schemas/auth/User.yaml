@@ -1,0 +1,55 @@
+type: object
+description: |
+  A person who signs in to ZippyGo. A user belongs to partners through
+  memberships, each with its own role, and may hold platform roles; the
+  user record itself carries identity data only. A user registers with an
+  email address or a phone number, so one of the two may be `null`.
+required:
+  - id
+  - email
+  - phone
+  - display_name
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the user; the `sub` claim of their access tokens.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  email:
+    type:
+      - string
+      - 'null'
+    format: email
+    description: The user's email address, or `null` when the user registered with a phone number and has not added one.
+    examples:
+      - owner@example.com
+  phone:
+    type:
+      - string
+      - 'null'
+    pattern: ^\+[1-9][0-9]{1,14}$
+    description: The user's phone number in E.164 format, or `null` when the user registered with an email address and has not added one.
+    examples:
+      - '+15555550100'
+  display_name:
+    type:
+      - string
+      - 'null'
+    maxLength: 120
+    description: The name the user is shown under, or `null` until they set one.
+    examples:
+      - User 20
+  created_at:
+    type: string
+    format: date-time
+    description: When the user was created, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    email: owner@example.com
+    phone: null
+    display_name: User 20
+    created_at: 2026-10-14T08:00:00Z

@@ -1,0 +1,17 @@
+# Shared header parameter `X-Client-Type`, sent to the sign-in operations by
+# clients that cannot hold an httpOnly cookie. Referenced from path items and
+# registered under components.parameters in openapi.yaml.
+name: X-Client-Type
+in: header
+required: false
+description: |
+  How the client keeps its refresh token. Send `native` from a mobile or
+  desktop app that cannot hold an `httpOnly` cookie: the refresh token is
+  then returned in `refresh_token` in the response body. Without the header
+  the client is treated as a browser: the refresh token is set in the
+  `zg_refresh` cookie and `refresh_token` in the body is `null`.
+schema:
+  type: string
+  enum:
+    - native
+example: native

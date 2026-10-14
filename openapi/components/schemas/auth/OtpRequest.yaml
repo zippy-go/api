@@ -1,0 +1,20 @@
+type: object
+description: >-
+  The request body of `POST /v1/auth/otp/request`: where to send a one-time code.
+required:
+  - channel
+  - identifier
+properties:
+  channel:
+    $ref: ./OtpChannel.yaml
+    description: The channel to deliver the code through.
+  identifier:
+    type: string
+    minLength: 3
+    maxLength: 254
+    description: The email address when `channel` is `email`, or the phone number in E.164 format (a `+`, the country code and the number, no spaces) when `channel` is `phone`.
+    examples:
+      - owner@example.com
+examples:
+  - channel: email
+    identifier: owner@example.com

@@ -7,6 +7,10 @@
 # the API host. Codes are stable: a code is never renamed or reused, and
 # its status is part of the contract (`validation_failed` is 400 and
 # `idempotency_key_reuse` is 409; both are settled, do not reopen them).
+#
+# `details` lists the stable field-level codes a response may carry in the
+# `code` member of its `errors` entries. They are as stable as the codes
+# themselves.
 errors:
   - code: validation_failed
     status: 400
@@ -16,7 +20,14 @@ errors:
     description: >-
       The request body, query or path parameters did not pass validation.
       The `errors` member lists each offending field with a JSON Pointer and
-      a reason.
+      a reason, and a `code` when one is defined below.
+    details:
+      - code: password_weak
+        message: The password must be at least 12 characters long.
+        description: >-
+          The password sent when setting or changing a password, or when
+          choosing one while accepting an invitation, does not meet the
+          policy. The `errors` entry points at the field that carried it.
 
   - code: unauthenticated
     status: 401
@@ -24,8 +35,27 @@ errors:
     message: The request has no valid credentials.
     retryable: false
     description: >-
-      No API key or bearer token was sent, or the one sent is invalid,
-      expired or revoked.
+      No API key or access token was sent, or the one sent is invalid,
+      expired or revoked. Also the answer of the sign-in and refresh
+      operations when the credentials they were given are wrong.
+
+  - code: invalid_code
+    status: 401
+    title: Invalid code
+    message: The code is not valid for this challenge.
+    retryable: false
+    description: >-
+      The one-time code does not match the challenge, or the challenge does
+      not exist. Request a new code with `POST /v1/auth/otp/request`.
+
+  - code: code_expired
+    status: 401
+    title: Code expired
+    message: The code has expired; request a new one.
+    retryable: false
+    description: >-
+      The one-time code was correct but its challenge is past `expires_at`.
+      Request a new code with `POST /v1/auth/otp/request`.
 
   - code: forbidden
     status: 403
@@ -108,6 +138,28 @@ errors:
     description: >-
       The caller exceeded its request quota. The response carries a
       `Retry-After` header with the number of seconds to wait.
+
+  - code: too_many_requests
+    status: 429
+    title: Too many requests
+    message: Too many requests for {resource}; retry after {retry_after} seconds.
+    retryable: true
+    description: >-
+      A limit specific to one action and target was reached, for example
+      the number of one-time codes that may be sent to one identifier or
+      from one client in a period, as opposed to `rate_limited`, which is
+      the caller's overall quota. The response carries a `Retry-After`
+      header with the number of seconds to wait.
+
+  - code: too_many_attempts
+    status: 429
+    title: Too many attempts
+    message: Too many failed attempts; {resource} is locked.
+    retryable: false
+    description: >-
+      Too many wrong one-time codes were tried against one challenge and
+      the challenge is locked. Retrying with the same challenge cannot
+      succeed; request a new code with `POST /v1/auth/otp/request`.
 
   - code: internal
     status: 500

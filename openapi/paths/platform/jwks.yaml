@@ -1,0 +1,39 @@
+# Path item for /.well-known/jwks.json. Referenced from openapi.yaml.
+get:
+  operationId: getJwks
+  summary: Get the token signing keys
+  description: |
+    Returns the public keys that verify ZippyGo access tokens, as a JSON
+    Web Key Set (RFC 7517). Every key is an Ed25519 key (`kty` `OKP`, `crv`
+    `Ed25519`, `alg` `EdDSA`) identified by `kid`, and the header of every
+    access token names the key that signed it in `kid`.
+
+    Keys rotate: a new key is published here before it signs any token, and
+    a retired key stays in the set for as long as a token signed with it
+    can still be valid. Cache the set and fetch it again when a token
+    carries a `kid` that is not in the cached set.
+
+    The path is outside the `/v1` prefix, as RFC 8615 prescribes for
+    well-known URIs, and needs no credentials.
+  tags:
+    - Platform
+  security: []
+  responses:
+    '200':
+      description: The current signing keys.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/platform/JsonWebKeySet.yaml
+    '4XX':
+      description: A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

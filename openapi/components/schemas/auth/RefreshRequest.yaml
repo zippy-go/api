@@ -1,0 +1,14 @@
+type: object
+description: |
+  The request body of `POST /v1/auth/refresh`. Native clients send the
+  refresh token they received at sign-in; browsers send no body at all,
+  because their refresh token travels in the `zg_refresh` cookie.
+properties:
+  refresh_token:
+    type: string
+    minLength: 1
+    description: The refresh token from the `refresh_token` member of the last `TokenResponse`. Each token can be used once; the response carries its replacement.
+    examples:
+      - c2FtcGxlLXJlZnJlc2gtdG9rZW4
+examples:
+  - refresh_token: c2FtcGxlLXJlZnJlc2gtdG9rZW4
