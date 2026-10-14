@@ -31,17 +31,16 @@
       "examples": ["2026-10-14T08:00:00Z"]
     },
     "partner_id": {
-      "type": "string",
+      "type": ["string", "null"],
       "format": "uuid",
-      "description": "The partner the event belongs to. Every event is scoped to exactly one partner.",
-      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+      "description": "The partner the event belongs to, or `null` for platform-level events that are not scoped to a partner. Every domain event is scoped to exactly one partner.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02", null]
     },
     "correlation_id": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 128,
-      "description": "Identifier shared by every event and request that stem from the same originating action, for tracing a flow end to end. Opaque to consumers.",
-      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03"]
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "A UUID shared by every event and request that stem from the same originating action, for tracing a flow end to end, or `null` when the event was not caused by a traceable request. Opaque to consumers.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03", null]
     },
     "payload": {
       "type": "object",

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.agent.offline.v1.schema.json",
+  "title": "FleetAgentOfflinePayload",
+  "description": "Payload of `fleet.agent.offline` version 1: an agent went offline, by signing off or by not reporting for too long. The envelope's `partner_id` is set to the partner the agent is attached to. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["agent_id", "partner_id", "last_seen_at"],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The agent that went offline.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner whose service the agent is attached to, the same value as the envelope's `partner_id`.",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the agent was last heard from before it went offline, as an RFC 3339 timestamp in UTC.",
+      "examples": ["2026-10-14T08:00:00Z"]
+    }
+  }
+}

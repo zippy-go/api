@@ -17,8 +17,8 @@ The envelope is defined by
 | `type`            | string             | `<domain>.<event>`, for example `order.placed`.                         |
 | `version`         | integer            | Payload schema version for this type.                                   |
 | `occurred_at`     | string (RFC 3339)  | When the event happened, in UTC.                                        |
-| `partner_id`      | string (UUID)      | The partner the event belongs to.                                       |
-| `correlation_id`  | string             | Shared by everything that stems from the same originating action.       |
+| `partner_id`      | string (UUID) or null | The partner the event belongs to; `null` for platform-level events that are not scoped to a partner. |
+| `correlation_id`  | string (UUID) or null | Shared by everything that stems from the same originating action; `null` when the event was not caused by a traceable request. |
 | `payload`         | object             | Event data, defined per `type` and `version` in the catalog.            |
 
 ```json
@@ -37,13 +37,23 @@ The envelope is defined by
 
 Every event type and version is listed in
 [`catalog.yaml`](https://github.com/zippy-go/api/blob/main/events/catalog.yaml)
-with its payload schema and a validated example. The catalog currently
-contains `platform.ping` only; domain events are added together with the
-endpoints that produce them.
+with its payload schema and a validated example. Domain events are added
+together with the endpoints that produce them.
 
-| Type            | Version | Description                                                      |
-| --------------- | ------- | ---------------------------------------------------------------- |
-| `platform.ping` | 1       | Sent on request to verify that a webhook endpoint receives and acknowledges deliveries. Carries no business data. |
+| Type                  | Version | Description                                                      |
+| --------------------- | ------- | ---------------------------------------------------------------- |
+| `platform.ping`       | 1       | Sent on request to verify that a webhook endpoint receives and acknowledges deliveries. Carries no business data. |
+| `fleet.agent.online`  | 1       | An agent went online in one of the partner's services and is reporting. Payload: `agent_id`, `partner_id`, `at`. |
+| `fleet.agent.offline` | 1       | An agent went offline, by signing off or by not reporting for too long. Payload: `agent_id`, `partner_id`, `last_seen_at`. |
+
+## Consuming events
+
+The API exposes events directly, in the same envelope. `GET /v1/events`
+returns the most recent events, newest first, and takes `after` (the newest
+id already received) for polling. `GET /v1/live/events` pushes events as
+they are published, over a server-sent events stream; the Live streams page
+of the developer portal describes the stream and how to recover from a
+dropped connection. Webhooks, below, push events to partner systems.
 
 ## Versioning
 
@@ -58,7 +68,7 @@ endpoints that produce them.
 
 ## Delivery and retries
 
-Webhooks are the first delivery channel; the mechanics below are the
+Webhooks push events to partner systems; the mechanics below are the
 planned behaviour and are confirmed when webhook endpoints become available
 in the API.
 

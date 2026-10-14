@@ -15,3 +15,23 @@ events:
       acknowledges deliveries. Carries no business data.
     payload_schema: ./payloads/platform.ping.v1.schema.json
     example: ./examples/platform.ping.v1.json
+
+  - type: fleet.agent.online
+    version: 1
+    domain: fleet
+    description: >-
+      An agent went online in one of the partner's services and is
+      reporting. The envelope's `partner_id` is the partner the agent is
+      attached to.
+    payload_schema: ./payloads/fleet.agent.online.v1.schema.json
+    example: ./examples/fleet.agent.online.v1.json
+
+  - type: fleet.agent.offline
+    version: 1
+    domain: fleet
+    description: >-
+      An agent went offline, by signing off or by not reporting for too
+      long; the payload says when it was last heard from. The envelope's
+      `partner_id` is the partner the agent is attached to.
+    payload_schema: ./payloads/fleet.agent.offline.v1.schema.json
+    example: ./examples/fleet.agent.offline.v1.json

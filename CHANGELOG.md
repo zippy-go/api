@@ -31,6 +31,8 @@ the version numbers follow the versioning policy.
 - The tags `Live` and `Events`, and the shared `PartnerIdQuery` parameter.
 - Error code `unprocessable` (422): a well-formed request that cannot be
   processed as a whole.
+- Events `fleet.agent.online` and `fleet.agent.offline`, version 1, with
+  payload schemas and examples.
 - Portal: the Live streams page; Concepts describes an agent as a
   membership in a partner's service, not an identity.
 - `info.license` in the OpenAPI document: the contract, the SDKs and the
@@ -38,6 +40,9 @@ the version numbers follow the versioning policy.
 
 ### Changed
 
+- Event envelope: `partner_id` and `correlation_id` may be `null`
+  (platform-level events, events not caused by a traceable request), and
+  `correlation_id` is a UUID. Both keys are always present.
 - The common schema `Error` is renamed to `Problem`; the RFC 9457 problem
   details shape is unchanged. The TypeScript SDK exports the type as
   `Problem` and no longer shadows the global `Error`.
