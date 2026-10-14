@@ -1,0 +1,23 @@
+# Redocly CLI configuration: `pnpm lint:redocly` and `pnpm bundle`.
+# Reference: https://redocly.com/docs/cli/configuration
+apis:
+  zippygo@v1:
+    root: openapi/openapi.yaml
+
+extends:
+  - recommended
+
+rules:
+  operation-operationId: error
+  operation-operationId-unique: error
+  operation-operationId-url-safe: error
+  operation-description: error
+  operation-summary: error
+  operation-tag-defined: error
+  operation-2xx-response: error
+  tag-description: error
+  tags-alphabetical: off
+  no-unresolved-refs: error
+  no-unused-components: off
+  # No licence has been chosen for the API yet.
+  info-license: off

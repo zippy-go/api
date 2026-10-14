@@ -1,0 +1,37 @@
+{
+  "name": "@zippy-go/api-contract",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ZippyGo API contract: OpenAPI document, event schemas, generated SDKs and the developer portal",
+  "type": "module",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "lint": "pnpm lint:redocly && pnpm bundle && pnpm lint:spectral",
+    "lint:redocly": "redocly lint",
+    "lint:spectral": "spectral lint dist/openapi.yaml --fail-severity warn",
+    "bundle": "redocly bundle openapi/openapi.yaml --output dist/openapi.json && redocly bundle openapi/openapi.yaml --output dist/openapi.yaml",
+    "gen:ts": "openapi-ts",
+    "typecheck": "tsc -p sdks/typescript/tsconfig.json --noEmit",
+    "events:check": "node scripts/check-events.mjs",
+    "portal:sync": "node scripts/sync-spec.mjs",
+    "portal:dev": "pnpm bundle && pnpm portal:sync && vitepress dev portal",
+    "portal:build": "pnpm bundle && pnpm portal:sync && vitepress build portal",
+    "portal:preview": "vitepress preview portal",
+    "check": "pnpm lint && pnpm gen:ts && pnpm typecheck && pnpm events:check && pnpm portal:build"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "@redocly/cli": "2.63.0",
+    "@scalar/api-reference": "1.74.0",
+    "@stoplight/spectral-cli": "6.17.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "6.0.3",
+    "vitepress": "1.6.4",
+    "vue": "3.5.44",
+    "yaml": "2.9.1"
+  }
+}

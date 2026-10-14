@@ -1,0 +1,7 @@
+# pnpm settings (this repository is a single package; no workspace packages).
+# pnpm refuses to run dependency build scripts unless they are decided here
+# (true = run the script, false = skip it). Maintain with `pnpm approve-builds`.
+allowBuilds:
+  '@scarf/scarf': false
+  esbuild: true
+  vue-demi: true

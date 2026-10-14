@@ -1,0 +1,81 @@
+# Spectral ruleset for the ZippyGo OpenAPI document.
+# Runs with `pnpm lint:spectral` against the bundled document (dist/openapi.yaml)
+# because Spectral's OpenAPI 3.1 structural check does not accept path items
+# that are external `$ref`s; Redocly lints the source files directly.
+# Warnings fail the build.
+extends:
+  - spectral:oas
+
+rules:
+  # Built-in rules raised to errors: these are hard requirements of the contract.
+  operation-operationId: error
+  operation-operationId-unique: error
+  operation-description: error
+  operation-tags: error
+  operation-tag-defined: error
+  operation-success-response: error
+  openapi-tags: error
+  tag-description: error
+  info-description: error
+  oas3-valid-schema-example: error
+  oas3-valid-media-example: error
+  # Shared primitives (for example Money) are defined before the first
+  # resource that uses them, so unused components are allowed.
+  oas3-unused-component: off
+
+  zippygo-operation-id-camel-case:
+    description: operationId is camelCase (verb + resource, for example listOrders).
+    severity: error
+    given: $.paths[*][get,put,post,delete,options,head,patch,trace].operationId
+    then:
+      function: casing
+      functionOptions:
+        type: camel
+
+  zippygo-schema-name-pascal-case:
+    description: Component schema names are PascalCase.
+    severity: error
+    given: $.components.schemas
+    then:
+      field: '@key'
+      function: casing
+      functionOptions:
+        type: pascal
+
+  zippygo-schema-description:
+    description: Every component schema has a description.
+    severity: error
+    given: $.components.schemas[*]
+    then:
+      field: description
+      function: truthy
+
+  zippygo-schema-examples:
+    description: Every component schema has at least one example.
+    severity: error
+    given: $.components.schemas[*]
+    then:
+      field: examples
+      function: schema
+      functionOptions:
+        schema:
+          type: array
+          minItems: 1
+
+  zippygo-property-snake-case:
+    description: Property names are snake_case.
+    severity: error
+    given: $.components.schemas..properties
+    then:
+      field: '@key'
+      function: casing
+      functionOptions:
+        type: snake
+
+  zippygo-property-description:
+    description: Every property has a description.
+    severity: error
+    given: $.components.schemas..properties[*]
+    then:
+      field: description
+      function: truthy
