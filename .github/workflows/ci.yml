@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, bundle, generate, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - name: Generated SDK is committed and current
+        run: git diff --exit-code -- sdks/typescript/src
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: portal
+          path: portal/.vitepress/dist
+          if-no-files-found: error
+
+  breaking-changes:
+    name: breaking changes against main
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Bundle the base and the revised contract
+        run: |
+          pnpm exec redocly bundle base/openapi/openapi.yaml --output dist/base/openapi.yaml
+          pnpm exec redocly bundle openapi/openapi.yaml --output dist/openapi.yaml
+      - uses: oasdiff/oasdiff-action/breaking@v0.1.18
+        with:
+          base: dist/base/openapi.yaml
+          revision: dist/openapi.yaml
+          fail-on: ERR
+          review: 'false'
