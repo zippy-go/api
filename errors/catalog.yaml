@@ -28,6 +28,81 @@ errors:
           The password sent when setting or changing a password, or when
           choosing one while accepting an invitation, does not meet the
           policy. The `errors` entry points at the field that carried it.
+      - code: malformed_identifier
+        message: The identifier is not a well-formed id.
+        description: >-
+          A path, query or body identifier is not a UUID. Never a 404 and
+          never a 500; the entry points at the parameter or member.
+      - code: cursor_invalid
+        message: The cursor was not issued for this query by this operation.
+        description: >-
+          The page cursor comes from another query, another caller, or was
+          tampered with. Start again without a cursor.
+      - code: idempotency_key_missing
+        message: The Idempotency-Key header is required on this operation.
+        description: >-
+          A write that moves money or places an order was sent without an
+          `Idempotency-Key`.
+      - code: filter_unreadable
+        message: The filter is not a readable filter tree.
+        description: The `filter` parameter is not JSON in the documented shape.
+      - code: filter_field_unknown
+        message: The field is not filterable on this resource.
+        description: The filter, sort or facets name a field the resource does not declare.
+      - code: filter_operator_unsupported
+        message: The field does not admit this operator.
+        description: The operator is not one the field declares.
+      - code: filter_value_unknown
+        message: The value is not one of the field's values.
+        description: A value outside a field's closed set, or of the wrong type for the field.
+      - code: filter_or_unindexed
+        message: Text search is only accepted as a top-level condition.
+        description: A text condition sits inside an any-of group, where the plan cannot stay index-backed.
+      - code: filter_in_empty
+        message: An in condition needs at least one value.
+        description: An `in` condition with no values.
+      - code: filter_text_empty
+        message: A text condition needs text.
+        description: A `text` condition with an empty value.
+      - code: filter_group_empty
+        message: A group needs at least one operand.
+        description: An all-of or any-of group with no operands.
+      - code: filter_range_empty
+        message: A range needs a lower or an upper bound.
+        description: A `range` condition with neither bound.
+      - code: filter_too_deep
+        message: The filter nests deeper than three levels.
+        description: Groups nested more than three levels deep.
+      - code: filter_too_wide
+        message: A list or group holds more than twenty operands.
+        description: More than twenty operands in one `in` list or one group.
+      - code: sort_too_many
+        message: At most three sort keys are accepted.
+        description: More than three keys in `sort`.
+      - code: sort_field_unknown
+        message: The field is not sortable on this resource.
+        description: A sort key the resource does not declare sortable.
+      - code: setting_out_of_range
+        message: The value is outside the setting's range.
+        description: A platform setting value outside its declared minimum and maximum.
+      - code: unsupported_file_type
+        message: The content type is not accepted for this purpose.
+        description: An upload grant was requested with a MIME type the purpose does not accept.
+      - code: file_too_large
+        message: The file is larger than the purpose allows.
+        description: An upload grant was requested for a file above the purpose's ceiling.
+      - code: crop_outside
+        message: The crop rectangle runs past the picture.
+        description: A crop rectangle that does not fit inside the original picture.
+
+  - code: channel_unknown
+    status: 400
+    title: Unknown channel
+    message: The stream names a channel that does not exist.
+    retryable: false
+    description: >-
+      A live stream was opened naming a channel no defined channel produces.
+      The `errors` member points at the position of each unknown name.
 
   - code: unauthenticated
     status: 401
@@ -93,6 +168,46 @@ errors:
       example a state transition that is not allowed or a uniqueness
       constraint that would be violated.
 
+  - code: illegal_transition
+    status: 409
+    title: Illegal transition
+    message: The status cannot change from {from} to {to}.
+    retryable: false
+    description: >-
+      A lifecycle status cannot move from its current value to the one
+      requested, for example a country defined as inactive before it ever
+      traded.
+
+  - code: locations_stranded
+    status: 409
+    title: Locations would be stranded
+    message: Dividing the service area would leave {count} location(s) outside every new area.
+    retryable: false
+    description: >-
+      A service area division would leave the named locations outside every
+      new area. The `errors` member names them; repeat with `force` to
+      deactivate them.
+
+  - code: sign_in_closed
+    status: 409
+    title: Sign-in closed
+    message: Sign-in is closed for this market at the moment.
+    retryable: false
+    description: >-
+      The country the identifier belongs to does not accept sign-ins at the
+      moment. Nothing is sent and nothing is created.
+
+  - code: asset_not_usable
+    status: 409
+    title: Asset not usable
+    message: The asset cannot be used this way.
+    retryable: false
+    description: >-
+      The asset is not in a state or of a purpose that allows the
+      operation: a reservation attached as a picture, a document attached as
+      a logo, a crop of a vector, or a confirmation that found the file
+      outside its purpose's folder or readable by anyone.
+
   - code: idempotency_key_reuse
     status: 409
     title: Idempotency key reused
@@ -122,6 +237,15 @@ errors:
       expired or was already accepted, so it cannot be accepted. Ask the
       partner for a new invitation. A token that never existed answers
       `not_found` instead.
+
+  - code: version_retired
+    status: 410
+    title: API version retired
+    message: This API version has been retired; use {replacement}.
+    retryable: false
+    description: >-
+      The major version called is past its sunset. The `detail` names its
+      replacement.
 
   - code: unsupported_media_type
     status: 415

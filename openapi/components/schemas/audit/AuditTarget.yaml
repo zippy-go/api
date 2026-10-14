@@ -1,0 +1,31 @@
+type: object
+description: The record an audited act was about, as a reference rather than a copy.
+required:
+  - kind
+  - id
+  - label
+properties:
+  kind:
+    type: string
+    maxLength: 64
+    description: The kind of record, for example `partner`, `membership`, `country` or `service_area`.
+    examples:
+      - partner
+  id:
+    type: string
+    maxLength: 128
+    description: The record's id, a UUID or a natural key such as a country code.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  label:
+    type:
+      - string
+      - 'null'
+    maxLength: 200
+    description: The record's display label at the time, when known.
+    examples:
+      - Example Partner
+examples:
+  - kind: partner
+    id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    label: Example Partner

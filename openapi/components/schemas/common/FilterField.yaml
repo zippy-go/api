@@ -1,0 +1,64 @@
+type: object
+description: >-
+  One field of a collection's filter declaration. Its name, the type that
+  decides the control a console draws, the operators it admits and, for
+  enumerations, its closed set of values.
+required:
+  - name
+  - kind
+  - operators
+properties:
+  name:
+    type: string
+    description: The name to filter by.
+    examples:
+      - status
+  kind:
+    type: string
+    enum:
+      - enum
+      - text
+      - timestamp
+      - number
+      - boolean
+      - reference
+      - service_area
+    description: The type of the field.
+    examples:
+      - enum
+  operators:
+    type: array
+    description: The operators the field admits in the filter tree.
+    items:
+      type: string
+      enum:
+        - eq
+        - in
+        - range
+        - contains
+        - starts_with
+        - within
+      description: One operator.
+    examples:
+      - - eq
+        - in
+  values:
+    type: array
+    description: The closed set of values, present for enumerations.
+    items:
+      type: string
+      description: One value.
+    examples:
+      - - pending
+        - active
+        - suspended
+examples:
+  - name: status
+    kind: enum
+    operators:
+      - eq
+      - in
+    values:
+      - pending
+      - active
+      - suspended

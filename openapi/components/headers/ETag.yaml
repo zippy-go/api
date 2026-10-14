@@ -1,0 +1,6 @@
+# The entity tag of a versioned resource, `"v<version>"`. Referenced from the
+# reads and writes of versioned resources.
+description: The resource's version as a strong entity tag, `"v<version>"`. Send it back in `If-None-Match` to be answered `304` when nothing changed, or in `If-Match` on a write to be refused with `412` when the resource has moved.
+schema:
+  type: string
+example: '"v3"'

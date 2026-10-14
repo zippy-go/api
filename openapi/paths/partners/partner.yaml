@@ -13,13 +13,23 @@ get:
     - Partners
   security:
     - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
   responses:
     '200':
-      description: The partner.
+      description: The partner, with its version as the `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/partners/Partner.yaml
+    '304':
+      description: '`If-None-Match` named the current version; nothing is transferred.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
       content:
@@ -53,11 +63,16 @@ patch:
     `legal_name`, `contact_email` and `contact_phone`; `status` may only be
     changed by the platform realm. A caller without the role for a member
     in the body receives `403` (`forbidden`) and nothing is changed. A
-    status change publishes `tenancy.partner.status_changed`.
+    status change publishes `tenancy.partner.status_changed` and appends
+    an audit entry with the `reason`. Send `If-Match` with the version you
+    hold to be refused with `412` (`precondition_failed`) when someone else
+    changed the partner first; every write raises the version by one.
   tags:
     - Partners
   security:
     - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
   requestBody:
     required: true
     description: The members to change.
@@ -67,7 +82,10 @@ patch:
           $ref: ../../components/schemas/partners/PartnerUpdate.yaml
   responses:
     '200':
-      description: The partner after the change.
+      description: The partner after the change, with its new `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
       content:
         application/json:
           schema:
@@ -92,6 +110,12 @@ patch:
             $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`If-Match` no longer matches the partner''s version (`precondition_failed`); fetch it again and retry.'
       content:
         application/problem+json:
           schema:

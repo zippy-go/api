@@ -1,0 +1,148 @@
+# Path item for GET /v1/audit-log. Referenced from openapi.yaml.
+get:
+  operationId: listAuditEntries
+  summary: List audit entries
+  description: |
+    Returns the audit log in pages, newest first unless sorted otherwise.
+    Platform staff read every entry; a partner member reads the entries about
+    their partner's records by naming it in `partner_id` (another partner's
+    is `404`, a member without `partner_id` is `403`).
+
+    Filter with the named parameters, or with the full grammar in `filter`
+    (see `GET /v1/audit-log/filters`): by actor, by target, by action, by
+    partner and by period. Sort with up to three declared keys and ask for
+    facet counts with `facets`. Page with `limit` and `cursor`.
+
+    Entries are never changed or deleted: `PUT`, `PATCH` and `DELETE` on an
+    entry answer `405` (`method_not_allowed`) and the attempt is itself
+    logged as `audit.tamper_attempted`.
+  tags:
+    - Audit
+  security:
+    - Bearer: []
+  parameters:
+    - name: actor
+      in: query
+      required: false
+      description: Only acts by this user.
+      schema:
+        type: string
+        format: uuid
+    - name: target
+      in: query
+      required: false
+      description: Only acts on this record id, which with `target_kind` is a record's own history.
+      schema:
+        type: string
+        maxLength: 128
+    - name: target_kind
+      in: query
+      required: false
+      description: Only acts on records of this kind, for example `partner`.
+      schema:
+        type: string
+        maxLength: 64
+    - name: action
+      in: query
+      required: false
+      description: Only this action, for example `tenancy.partner.status_changed`.
+      schema:
+        type: string
+    - name: partner_id
+      in: query
+      required: false
+      description: Only records of this partner; required for partner members.
+      schema:
+        type: string
+        format: uuid
+    - name: from
+      in: query
+      required: false
+      description: Only acts at or after this instant.
+      schema:
+        type: string
+        format: date-time
+    - name: to
+      in: query
+      required: false
+      description: Only acts at or before this instant.
+      schema:
+        type: string
+        format: date-time
+    - name: filter
+      in: query
+      required: false
+      description: A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/audit-log/filters`.
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: Sort keys, comma separated, `-` for descending; `-occurred_at` by default.
+      schema:
+        type: string
+    - name: facets
+      in: query
+      required: false
+      description: Enumeration fields to count alongside the page, comma separated (`actor_kind`).
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: The maximum number of entries to return per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page. Omit it for the first page.
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    '200':
+      description: A page of entries.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/audit/AuditEntryList.yaml
+    '400':
+      description: A parameter was refused (`validation_failed`); `errors` names each with its field-level code, such as `cursor_invalid` or `filter_field_unknown`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: A partner member asked without naming a partner (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner named is not one the caller belongs to (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

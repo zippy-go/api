@@ -17,13 +17,23 @@ get:
     - Locations
   security:
     - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
   responses:
     '200':
-      description: The location.
+      description: The location, with its version as the `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/locations/Location.yaml
+    '304':
+      description: '`If-None-Match` named the current version; nothing is transferred.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
       content:
@@ -54,11 +64,16 @@ patch:
   description: |
     Changes the members of the location that are present in the body,
     including `status`, and returns the location. Owners and managers may
-    update locations; other members receive `403` (`forbidden`).
+    update locations; other members receive `403` (`forbidden`). Send
+    `If-Match` with the version you hold to be refused with `412`
+    (`precondition_failed`) when someone else changed the location first;
+    every write raises the version by one.
   tags:
     - Locations
   security:
     - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
   requestBody:
     required: true
     description: The members to change.
@@ -68,7 +83,10 @@ patch:
           $ref: ../../components/schemas/locations/LocationUpdate.yaml
   responses:
     '200':
-      description: The location after the change.
+      description: The location after the change, with its new `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
       content:
         application/json:
           schema:
@@ -93,6 +111,12 @@ patch:
             $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner is not visible to the caller, or the location does not exist or belongs to another partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`If-Match` no longer matches the location''s version (`precondition_failed`); fetch it again and retry.'
       content:
         application/problem+json:
           schema:

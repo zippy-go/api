@@ -14,6 +14,9 @@ required:
   - contact_phone
   - created_at
   - updated_at
+  - version
+  - created_by
+  - updated_by
 properties:
   id:
     type: string
@@ -70,6 +73,29 @@ properties:
     description: When the partner was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
     examples:
       - 2026-10-14T08:05:00Z
+  version:
+    type: integer
+    format: int64
+    minimum: 1
+    description: The version, raised by one on every change. Reads return it as the `ETag` (`"v<version>"`); send it in `If-Match` on a write to be refused with `412` when the partner moved.
+    examples:
+      - 1
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the partner, or `null` for seeded partners.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the partner, or `null` until it is changed through the API.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
     kind: organisation
@@ -80,3 +106,6 @@ examples:
     contact_phone: null
     created_at: 2026-10-14T08:05:00Z
     updated_at: 2026-10-14T08:05:00Z
+    version: 1
+    created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20

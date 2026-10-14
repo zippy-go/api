@@ -1,0 +1,10 @@
+# Shared header parameter `If-None-Match`. Referenced from the reads of
+# versioned resources and registered under components.parameters in
+# openapi.yaml.
+name: If-None-Match
+in: header
+required: false
+description: The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+schema:
+  type: string
+example: '"v3"'

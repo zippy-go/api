@@ -10,11 +10,15 @@ post:
 
     The caller's access token does not carry the new membership until it is
     refreshed; `GET /v1/me` reflects it at once. Publishes the events
-    `tenancy.partner.created` and `tenancy.membership.created`.
+    `tenancy.partner.created` and `tenancy.membership.created`. An
+    `Idempotency-Key` is honoured: a retry with the same key and body
+    returns the partner already created.
   tags:
     - Partners
   security:
     - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
   requestBody:
     required: true
     description: The kind, the name and the optional details of the partner.
@@ -62,9 +66,14 @@ get:
     (`forbidden`); a user finds the partners they belong to under
     `GET /v1/me`.
 
-    Filter with `q`, which matches `name` and `legal_name`, and with
-    `status`. Page with `limit` and `cursor`: pass the `next_cursor` of a
-    page to get the next one, until it is `null`.
+    Filter with `q`, which matches `name` and `legal_name`, with `status`
+    and `kind`, or with the full grammar in `filter` whose fields
+    `GET /v1/partners/filters` declares. Sort with up to three declared
+    keys (`-created_at` by default, the id as the tiebreaker) and ask for
+    facet counts with `facets`. Page with `limit` and `cursor`: pass the
+    `next_cursor` of a page to get the next one, until it is `null`; a
+    cursor from another query or another caller is refused with
+    `cursor_invalid`.
   tags:
     - Partners
   security:
@@ -84,6 +93,30 @@ get:
       description: Only include partners with this status.
       schema:
         $ref: ../../components/schemas/partners/PartnerStatus.yaml
+    - name: kind
+      in: query
+      required: false
+      description: Only include partners of this kind.
+      schema:
+        $ref: ../../components/schemas/partners/PartnerKind.yaml
+    - name: filter
+      in: query
+      required: false
+      description: A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/partners/filters`.
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: Sort keys, comma separated, `-` for descending; `-created_at` by default.
+      schema:
+        type: string
+    - name: facets
+      in: query
+      required: false
+      description: Enumeration fields to count alongside the page, comma separated (`status`, `kind`).
+      schema:
+        type: string
     - name: limit
       in: query
       required: false

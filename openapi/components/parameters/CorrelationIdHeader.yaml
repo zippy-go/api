@@ -1,0 +1,11 @@
+# Shared header parameter `X-Correlation-Id`. Registered under
+# components.parameters in openapi.yaml; every operation accepts it and every
+# response echoes it, so it is documented once rather than on each operation.
+name: X-Correlation-Id
+in: header
+required: false
+description: A UUID that follows the request through logs, events and the audit log. When absent the platform mints one; every response carries the value in `X-Correlation-Id`.
+schema:
+  type: string
+  format: uuid
+example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03

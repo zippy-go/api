@@ -1,0 +1,25 @@
+type: object
+description: The counts of one enumeration field, counted against the query with that field's own top-level condition removed, so a tile can be clicked back out of. Every declared value appears, zero counts included.
+required:
+  - field
+  - counts
+properties:
+  field:
+    type: string
+    description: The field.
+    examples:
+      - status
+  counts:
+    type: array
+    description: One entry per declared value.
+    items:
+      $ref: ./FacetCount.yaml
+examples:
+  - field: status
+    counts:
+      - value: pending
+        count: 3
+      - value: active
+        count: 12
+      - value: suspended
+        count: 0

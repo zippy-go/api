@@ -1,0 +1,27 @@
+type: object
+description: A field-level code the catalogue defines under a problem type, with the sentence the `errors` entry carries.
+required:
+  - code
+  - message
+  - description
+properties:
+  code:
+    type: string
+    pattern: ^[a-z][a-z0-9_]*$
+    description: The stable field-level code.
+    examples:
+      - password_weak
+  message:
+    type: string
+    description: The sentence the `errors` entry's `message` carries.
+    examples:
+      - The password must be at least 12 characters long.
+  description:
+    type: string
+    description: When the code is used.
+    examples:
+      - The password does not meet the policy.
+examples:
+  - code: password_weak
+    message: The password must be at least 12 characters long.
+    description: The password does not meet the policy.

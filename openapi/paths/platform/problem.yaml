@@ -1,0 +1,47 @@
+# Path item for GET /problems/{code}. Referenced from openapi.yaml.
+get:
+  operationId: getProblemType
+  summary: Look up a problem code
+  description: |
+    Returns the catalogue entry for a problem code: its title, the status
+    every occurrence is sent with, whether retrying can help, a description
+    and the field-level codes an occurrence may carry in `errors`. Every
+    problem's `type` is `/problems/{code}` resolved against the API host, so
+    a developer can follow it here. The endpoint is unauthenticated.
+  tags:
+    - Platform
+  security: []
+  parameters:
+    - name: code
+      in: path
+      required: true
+      description: The problem code, for example `validation_failed`.
+      schema:
+        type: string
+        pattern: ^[a-z][a-z0-9_]*$
+      example: idempotency_key_reuse
+  responses:
+    '200':
+      description: The catalogue entry.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/ProblemType.yaml
+    '404':
+      description: No such code (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

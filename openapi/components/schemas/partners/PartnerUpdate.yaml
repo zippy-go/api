@@ -40,6 +40,13 @@ properties:
   status:
     $ref: ./PartnerStatus.yaml
     description: The new status. Platform realm only; any other caller receives `403` (`forbidden`).
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 1000
+    description: Why the status is changed, kept in the audit log with the entry for the change. Sent with `status`.
+    examples:
+      - Documents verified
 examples:
   - name: Example Partner
     contact_phone: '+15555550101'

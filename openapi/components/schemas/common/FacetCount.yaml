@@ -1,0 +1,21 @@
+type: object
+description: How many rows carry one value of a faceted field.
+required:
+  - value
+  - count
+properties:
+  value:
+    type: string
+    description: The value.
+    examples:
+      - active
+  count:
+    type: integer
+    format: int64
+    minimum: 0
+    description: How many rows carry it; zero counts are listed too.
+    examples:
+      - 12
+examples:
+  - value: active
+    count: 12

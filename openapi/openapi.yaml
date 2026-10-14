@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.3.0
+  version: 0.4.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -14,6 +14,17 @@ info:
 
     The API is versioned by URL prefix (`/v1`). Changes within a major version
     are additive only; see the versioning policy in the repository.
+
+    Conventions every operation honours (the developer portal's Conventions
+    page has the detail): errors are RFC 9457 problems whose `code` is
+    catalogued and dereferenceable at `/problems/{code}`; identifiers are
+    UUIDs; amounts are `Money` in minor units; instants are RFC 3339 in
+    UTC; collections page with `limit` and `cursor` and filter through a
+    declared grammar; writes may carry `Idempotency-Key`; versioned
+    resources answer with `ETag` and honour `If-None-Match` and
+    `If-Match`; every response carries `RateLimit-Limit`,
+    `RateLimit-Remaining`, `RateLimit-Reset` and `X-Correlation-Id`; a
+    deprecated major answers with `Deprecation` and `Sunset`.
   contact:
     name: ZippyGo API
     url: https://github.com/zippy-go/api
@@ -74,6 +85,8 @@ tags:
     description: Inviting users into a partner by email, and accepting an invitation.
   - name: Services
     description: The kinds of service a partner runs (product sales, field service, delivery), with their status and configuration.
+  - name: Audit
+    description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
   - name: Catalog
     description: Products, modifiers, availability and pricing.
   - name: Orders
@@ -96,6 +109,8 @@ paths:
     $ref: ./paths/platform/health.yaml
   /v1/health/details:
     $ref: ./paths/platform/health-details.yaml
+  /problems/{code}:
+    $ref: ./paths/platform/problem.yaml
   /v1/fleet/agents:
     $ref: ./paths/fleet/agents.yaml
   /v1/fleet/location-pings:
@@ -124,6 +139,10 @@ paths:
     $ref: ./paths/platform/jwks.yaml
   /v1/partners:
     $ref: ./paths/partners/partners.yaml
+  /v1/partners/filters:
+    $ref: ./paths/partners/filters.yaml
+  /v1/partners/summary:
+    $ref: ./paths/partners/summary.yaml
   /v1/partners/{partner_id}:
     $ref: ./paths/partners/partner.yaml
   /v1/partners/{partner_id}/locations:
@@ -144,6 +163,12 @@ paths:
     $ref: ./paths/services/services.yaml
   /v1/partners/{partner_id}/services/{kind}:
     $ref: ./paths/services/service.yaml
+  /v1/audit-log:
+    $ref: ./paths/audit/audit-log.yaml
+  /v1/audit-log/filters:
+    $ref: ./paths/audit/filters.yaml
+  /v1/audit-log/{entry_id}:
+    $ref: ./paths/audit/entry.yaml
 
 components:
   securitySchemes:
@@ -186,6 +211,18 @@ components:
       $ref: ./components/parameters/ClientTypeHeader.yaml
     PartnerIdPath:
       $ref: ./components/parameters/PartnerIdPath.yaml
+    IdempotencyKeyHeader:
+      $ref: ./components/parameters/IdempotencyKeyHeader.yaml
+    IfMatchHeader:
+      $ref: ./components/parameters/IfMatchHeader.yaml
+    IfNoneMatchHeader:
+      $ref: ./components/parameters/IfNoneMatchHeader.yaml
+    CorrelationIdHeader:
+      $ref: ./components/parameters/CorrelationIdHeader.yaml
+
+  headers:
+    ETag:
+      $ref: ./components/headers/ETag.yaml
 
   schemas:
     # Common
@@ -197,6 +234,20 @@ components:
       $ref: ./components/schemas/common/Problem.yaml
     Address:
       $ref: ./components/schemas/common/Address.yaml
+    ProblemType:
+      $ref: ./components/schemas/common/ProblemType.yaml
+    ProblemTypeDetail:
+      $ref: ./components/schemas/common/ProblemTypeDetail.yaml
+    FilterSchema:
+      $ref: ./components/schemas/common/FilterSchema.yaml
+    FilterField:
+      $ref: ./components/schemas/common/FilterField.yaml
+    Facet:
+      $ref: ./components/schemas/common/Facet.yaml
+    FacetCount:
+      $ref: ./components/schemas/common/FacetCount.yaml
+    CollectionSummary:
+      $ref: ./components/schemas/common/CollectionSummary.yaml
     # Platform
     CheckStatus:
       $ref: ./components/schemas/platform/CheckStatus.yaml
@@ -288,6 +339,15 @@ components:
       $ref: ./components/schemas/services/ServiceUpsert.yaml
     ServiceList:
       $ref: ./components/schemas/services/ServiceList.yaml
+    # Audit
+    AuditActor:
+      $ref: ./components/schemas/audit/AuditActor.yaml
+    AuditTarget:
+      $ref: ./components/schemas/audit/AuditTarget.yaml
+    AuditEntry:
+      $ref: ./components/schemas/audit/AuditEntry.yaml
+    AuditEntryList:
+      $ref: ./components/schemas/audit/AuditEntryList.yaml
     # Fleet
     AgentStatus:
       $ref: ./components/schemas/fleet/AgentStatus.yaml

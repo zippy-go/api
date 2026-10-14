@@ -1,0 +1,14 @@
+# Shared header parameter `If-Match`. Referenced from the writes on versioned
+# resources and registered under components.parameters in openapi.yaml.
+name: If-Match
+in: header
+required: false
+description: |
+  The entity tag of the version the caller holds, as returned in the `ETag`
+  of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+  when the resource has moved since, so two operators editing one record
+  cannot silently overwrite each other. Without the header the write is
+  accepted unconditionally.
+schema:
+  type: string
+example: '"v3"'

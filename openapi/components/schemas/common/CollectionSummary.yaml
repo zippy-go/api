@@ -1,0 +1,47 @@
+type: object
+description: Counts of a whole collection by its enumeration fields, taken without fetching rows and served from a copy at most 30 seconds old.
+required:
+  - total
+  - by_field
+  - counted_at
+properties:
+  total:
+    type: integer
+    format: int64
+    minimum: 0
+    description: Rows in the collection.
+    examples:
+      - 40
+  by_field:
+    type: object
+    description: The counts by each enumeration field, keyed by field name.
+    additionalProperties:
+      type: array
+      description: One entry per declared value.
+      items:
+        $ref: ./FacetCount.yaml
+    examples:
+      - status:
+          - value: active
+            count: 37
+          - value: pending
+            count: 3
+          - value: suspended
+            count: 0
+  counted_at:
+    type: string
+    format: date-time
+    description: When the counts were taken, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-15T08:00:00Z
+examples:
+  - total: 40
+    by_field:
+      status:
+        - value: active
+          count: 37
+        - value: pending
+          count: 3
+        - value: suspended
+          count: 0
+    counted_at: 2026-10-15T08:00:00Z

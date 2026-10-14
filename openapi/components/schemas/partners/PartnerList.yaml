@@ -16,6 +16,11 @@ properties:
     description: An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
     examples:
       - MDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTAy
+  facets:
+    type: array
+    description: Facet counts, present when `facets` was asked for.
+    items:
+      $ref: ../common/Facet.yaml
 examples:
   - items:
       - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -27,4 +32,7 @@ examples:
         contact_phone: null
         created_at: 2026-10-14T08:05:00Z
         updated_at: 2026-10-14T09:00:00Z
+        version: 2
+        created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
     next_cursor: null

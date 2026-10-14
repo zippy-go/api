@@ -1,0 +1,20 @@
+# Shared header parameter `Idempotency-Key`. Referenced from the write
+# operations that honour it and registered under components.parameters in
+# openapi.yaml.
+name: Idempotency-Key
+in: header
+required: false
+description: |
+  A UUID the client mints for this write. The key is scoped to the caller
+  and remembered for 24 hours: a repeat with the same key and the same
+  request answers what the first made, with the same status and body and
+  the header `Idempotent-Replayed: true`, and makes nothing new; the same
+  key with a different method, path or body is `409`
+  (`idempotency_key_reuse`); a repeat that arrives while the first is still
+  being processed waits for it. Writes that move money or place an order
+  require the header (`400`, `validation_failed` with
+  `idempotency_key_missing`); every other write may carry it.
+schema:
+  type: string
+  format: uuid
+example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55

@@ -1,0 +1,131 @@
+type: object
+description: |
+  One entry of the audit log: a privileged act, appended when the act
+  committed and never changed or deleted afterwards. Privileged acts are
+  every act under a platform permission, every change to roles, grants and
+  memberships, every suspension and reactivation, every refund, payout
+  release and correction, every impersonation and every change to
+  reference data.
+required:
+  - id
+  - occurred_at
+  - actor
+  - client_address
+  - action
+  - target
+  - partner_id
+  - before
+  - after
+  - reason
+  - correlation_id
+  - proposer_user_id
+  - approver_user_id
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the entry, a UUID version 7; entries sort by it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+  occurred_at:
+    type: string
+    format: date-time
+    description: When the act happened, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-15T08:00:00Z
+  actor:
+    $ref: ./AuditActor.yaml
+    description: Who acted.
+  client_address:
+    type:
+      - string
+      - 'null'
+    description: The client address the request came from, when known.
+    examples:
+      - 203.0.113.9
+  action:
+    type: string
+    pattern: ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$
+    description: What was done, as `<module>.<entity>.<act>`.
+    examples:
+      - tenancy.partner.status_changed
+  target:
+    $ref: ./AuditTarget.yaml
+    description: The record acted on.
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The partner the record belongs to; `null` for platform records such as countries.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  before:
+    type:
+      - object
+      - 'null'
+    description: The values before the act, when the act changed something.
+    examples:
+      - status: active
+  after:
+    type:
+      - object
+      - 'null'
+    description: The values after the act, when the act changed something.
+    examples:
+      - status: suspended
+  reason:
+    type:
+      - string
+      - 'null'
+    maxLength: 1000
+    description: The reason given, where the capability demands one.
+    examples:
+      - payments outage
+  correlation_id:
+    type:
+      - string
+      - 'null'
+    description: The correlation id of the request, the value of its `X-Correlation-Id`.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+  proposer_user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The person who proposed, for a four-eyes approval.
+    examples:
+      - null
+  approver_user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The person who approved, for a four-eyes approval.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+    occurred_at: 2026-10-15T08:00:00Z
+    actor:
+      kind: user
+      user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      membership_id: null
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a00
+      label: null
+    client_address: 203.0.113.9
+    action: tenancy.partner.status_changed
+    target:
+      kind: partner
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      label: Example Partner
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    before:
+      status: active
+    after:
+      status: suspended
+    reason: payments outage
+    correlation_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+    proposer_user_id: null
+    approver_user_id: null

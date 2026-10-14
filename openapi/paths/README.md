@@ -9,6 +9,7 @@ paths/
   platform/health.yaml          GET /v1/health
   platform/health-details.yaml  GET /v1/health/details
   platform/jwks.yaml            GET /.well-known/jwks.json (outside /v1, RFC 8615)
+  platform/problem.yaml         GET /problems/{code} (outside /v1: every problem's type resolves here)
   auth/otp-request.yaml         POST /v1/auth/otp/request
   auth/otp-verify.yaml          POST /v1/auth/otp/verify
   auth/password-sign-in.yaml    POST /v1/auth/password/sign-in
@@ -17,6 +18,8 @@ paths/
   auth/sign-out.yaml            POST /v1/auth/sign-out
   auth/me.yaml                  GET /v1/me
   partners/partners.yaml        POST, GET /v1/partners
+  partners/filters.yaml         GET /v1/partners/filters
+  partners/summary.yaml         GET /v1/partners/summary
   partners/partner.yaml         GET, PATCH /v1/partners/{partner_id}
   locations/locations.yaml      POST, GET /v1/partners/{partner_id}/locations
   locations/location.yaml       GET, PATCH /v1/partners/{partner_id}/locations/{location_id}
@@ -27,6 +30,9 @@ paths/
   invitations/accept.yaml       POST /v1/invitations/{token}/accept
   services/services.yaml        GET /v1/partners/{partner_id}/services
   services/service.yaml         PUT /v1/partners/{partner_id}/services/{kind}
+  audit/audit-log.yaml          GET /v1/audit-log
+  audit/filters.yaml            GET /v1/audit-log/filters
+  audit/entry.yaml              GET /v1/audit-log/{entry_id}
   fleet/agents.yaml             GET /v1/fleet/agents
   fleet/location-pings.yaml     POST /v1/fleet/location-pings
   events/events.yaml            GET /v1/events
@@ -40,8 +46,8 @@ Rules:
 
 - Folder names are the lowercase domain, matching the tag in `openapi.yaml`
   (`platform`, `auth`, `partners`, `locations`, `memberships`,
-  `invitations`, `services`, `catalog`, `orders`, `deliveries`, `fleet`,
-  `live`, `events`, `subscriptions`, `webhooks`). Sub-resources of a
+  `invitations`, `services`, `audit`, `catalog`, `orders`, `deliveries`,
+  `fleet`, `live`, `events`, `subscriptions`, `webhooks`). Sub-resources of a
   partner live in the folder of their own tag, not under `partners/`.
 - The file name is the resource: plural for collections (`orders.yaml`),
   singular for a single resource addressed by id (`order.yaml`), the action

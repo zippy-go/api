@@ -134,6 +134,172 @@ export type Address = {
 };
 
 /**
+ * A catalogue entry, the answer of `GET /problems/{code}`: what a problem
+ * code means, the status every occurrence is sent with, whether retrying
+ * the same request can help, and the field-level codes an occurrence may
+ * carry in `errors`. Every problem's `type` resolves to one of these.
+ *
+ */
+export type ProblemType = {
+    /**
+     * The stable code; never renamed or reused.
+     */
+    code: string;
+    /**
+     * The `type` URI problems of this code carry, `/problems/{code}`.
+     */
+    type: string;
+    /**
+     * The HTTP status every occurrence is sent with; part of the contract.
+     */
+    status: number;
+    /**
+     * The title every occurrence carries.
+     */
+    title: string;
+    /**
+     * Whether retrying the same request can help.
+     */
+    retryable: boolean;
+    /**
+     * What the code means.
+     */
+    description: string;
+    /**
+     * The field-level codes an occurrence may carry in the `code` member of its `errors` entries.
+     */
+    details: Array<ProblemTypeDetail>;
+};
+
+/**
+ * A field-level code the catalogue defines under a problem type, with the sentence the `errors` entry carries.
+ */
+export type ProblemTypeDetail = {
+    /**
+     * The stable field-level code.
+     */
+    code: string;
+    /**
+     * The sentence the `errors` entry's `message` carries.
+     */
+    message: string;
+    /**
+     * When the code is used.
+     */
+    description: string;
+};
+
+/**
+ * A collection's filter declaration, the answer of its `/filters` operation:
+ * the fields it can be filtered by with their types and operators, the
+ * fields it can be sorted by and the sort applied when none is given. A
+ * console builds its filter bar from it without a release.
+ *
+ * The filter tree sent in the `filter` parameter is JSON with an `op` on
+ * every node: `eq` (`field`, `value`), `in` (`field`, `values`), `range`
+ * (`field`, `gte` and/or `lte`), `text` (`field`, `value`, `match` of
+ * `contains` or `starts_with`), `within` (`field`, `ancestor`, a service
+ * area whose subtree is matched), `and` and `or` (`operands`). Trees nest
+ * at most three levels, lists and groups hold at most twenty operands, and
+ * text search is accepted only as a top-level all-of condition. Refusals
+ * are `400` (`validation_failed`) with the field-level codes
+ * `filter_field_unknown`, `filter_operator_unsupported`,
+ * `filter_value_unknown`, `filter_unreadable`, `filter_or_unindexed`,
+ * `filter_in_empty`, `filter_text_empty`, `filter_group_empty`,
+ * `filter_range_empty`, `filter_too_deep`, `filter_too_wide`,
+ * `sort_too_many` and `sort_field_unknown`.
+ *
+ */
+export type FilterSchema = {
+    /**
+     * The collection.
+     */
+    resource: string;
+    /**
+     * The filterable fields.
+     */
+    fields: Array<FilterField>;
+    /**
+     * The names that may appear in `sort`, each optionally prefixed with `-` for descending; at most three per request.
+     */
+    sorts: Array<string>;
+    /**
+     * The sort applied when `sort` is absent.
+     */
+    default_sort: string;
+};
+
+/**
+ * One field of a collection's filter declaration. Its name, the type that decides the control a console draws, the operators it admits and, for enumerations, its closed set of values.
+ */
+export type FilterField = {
+    /**
+     * The name to filter by.
+     */
+    name: string;
+    /**
+     * The type of the field.
+     */
+    kind: 'enum' | 'text' | 'timestamp' | 'number' | 'boolean' | 'reference' | 'service_area';
+    /**
+     * The operators the field admits in the filter tree.
+     */
+    operators: Array<'eq' | 'in' | 'range' | 'contains' | 'starts_with' | 'within'>;
+    /**
+     * The closed set of values, present for enumerations.
+     */
+    values?: Array<string>;
+};
+
+/**
+ * The counts of one enumeration field, counted against the query with that field's own top-level condition removed, so a tile can be clicked back out of. Every declared value appears, zero counts included.
+ */
+export type Facet = {
+    /**
+     * The field.
+     */
+    field: string;
+    /**
+     * One entry per declared value.
+     */
+    counts: Array<FacetCount>;
+};
+
+/**
+ * How many rows carry one value of a faceted field.
+ */
+export type FacetCount = {
+    /**
+     * The value.
+     */
+    value: string;
+    /**
+     * How many rows carry it; zero counts are listed too.
+     */
+    count: number;
+};
+
+/**
+ * Counts of a whole collection by its enumeration fields, taken without fetching rows and served from a copy at most 30 seconds old.
+ */
+export type CollectionSummary = {
+    /**
+     * Rows in the collection.
+     */
+    total: number;
+    /**
+     * The counts by each enumeration field, keyed by field name.
+     */
+    by_field: {
+        [key: string]: Array<FacetCount>;
+    };
+    /**
+     * When the counts were taken, as an RFC 3339 timestamp in UTC.
+     */
+    counted_at: string;
+};
+
+/**
  * The outcome of a health check. `ok` when the subject is working normally,
  * `degraded` when it works but is impaired (slow, or behind), `down` when it
  * is not working. Clients must tolerate values they do not know.
@@ -511,6 +677,18 @@ export type Partner = {
      * When the partner was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
      */
     updated_at: string;
+    /**
+     * The version, raised by one on every change. Reads return it as the `ETag` (`"v<version>"`); send it in `If-Match` on a write to be refused with `412` when the partner moved.
+     */
+    version: number;
+    /**
+     * The user who created the partner, or `null` for seeded partners.
+     */
+    created_by: string | null;
+    /**
+     * The user who last changed the partner, or `null` until it is changed through the API.
+     */
+    updated_by: string | null;
 };
 
 /**
@@ -570,6 +748,10 @@ export type PartnerUpdate = {
      * The new status. Platform realm only; any other caller receives `403` (`forbidden`).
      */
     status?: PartnerStatus;
+    /**
+     * Why the status is changed, kept in the audit log with the entry for the change. Sent with `status`.
+     */
+    reason?: string;
 };
 
 /**
@@ -584,6 +766,10 @@ export type PartnerList = {
      * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
      */
     next_cursor: string | null;
+    /**
+     * Facet counts, present when `facets` was asked for.
+     */
+    facets?: Array<Facet>;
 };
 
 /**
@@ -646,6 +832,18 @@ export type Location = {
      * When the location was last changed, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
      */
     updated_at: string;
+    /**
+     * The version, raised by one on every change. Reads return it as the `ETag` (`"v<version>"`); send it in `If-Match` on a write to be refused with `412` when the location moved.
+     */
+    version: number;
+    /**
+     * The user who created the location, or `null` for seeded locations.
+     */
+    created_by: string | null;
+    /**
+     * The user who last changed the location, or `null` until it is changed through the API.
+     */
+    updated_by: string | null;
 };
 
 /**
@@ -977,6 +1175,136 @@ export type ServiceList = {
 };
 
 /**
+ * Who performed an audited act. A signed-in person, with the membership they acted under and their name frozen at the time, or the system for timers and provider notices.
+ */
+export type AuditActor = {
+    /**
+     * A person or the system.
+     */
+    kind: 'user' | 'system';
+    /**
+     * The user, for a person.
+     */
+    user_id: string | null;
+    /**
+     * The membership acted under, when known.
+     */
+    membership_id: string | null;
+    /**
+     * The partner the membership is in; the platform organisation for platform staff.
+     */
+    partner_id: string | null;
+    /**
+     * The actor's name as it was at the time, when known.
+     */
+    label: string | null;
+};
+
+/**
+ * The record an audited act was about, as a reference rather than a copy.
+ */
+export type AuditTarget = {
+    /**
+     * The kind of record, for example `partner`, `membership`, `country` or `service_area`.
+     */
+    kind: string;
+    /**
+     * The record's id, a UUID or a natural key such as a country code.
+     */
+    id: string;
+    /**
+     * The record's display label at the time, when known.
+     */
+    label: string | null;
+};
+
+/**
+ * One entry of the audit log: a privileged act, appended when the act
+ * committed and never changed or deleted afterwards. Privileged acts are
+ * every act under a platform permission, every change to roles, grants and
+ * memberships, every suspension and reactivation, every refund, payout
+ * release and correction, every impersonation and every change to
+ * reference data.
+ *
+ */
+export type AuditEntry = {
+    /**
+     * Unique identifier of the entry, a UUID version 7; entries sort by it.
+     */
+    id: string;
+    /**
+     * When the act happened, as an RFC 3339 timestamp in UTC.
+     */
+    occurred_at: string;
+    /**
+     * Who acted.
+     */
+    actor: AuditActor;
+    /**
+     * The client address the request came from, when known.
+     */
+    client_address: string | null;
+    /**
+     * What was done, as `<module>.<entity>.<act>`.
+     */
+    action: string;
+    /**
+     * The record acted on.
+     */
+    target: AuditTarget;
+    /**
+     * The partner the record belongs to; `null` for platform records such as countries.
+     */
+    partner_id: string | null;
+    /**
+     * The values before the act, when the act changed something.
+     */
+    before: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The values after the act, when the act changed something.
+     */
+    after: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The reason given, where the capability demands one.
+     */
+    reason: string | null;
+    /**
+     * The correlation id of the request, the value of its `X-Correlation-Id`.
+     */
+    correlation_id: string | null;
+    /**
+     * The person who proposed, for a four-eyes approval.
+     */
+    proposer_user_id: string | null;
+    /**
+     * The person who approved, for a four-eyes approval.
+     */
+    approver_user_id: string | null;
+};
+
+/**
+ * A page of audit entries, the response of `GET /v1/audit-log`.
+ */
+export type AuditEntryList = {
+    /**
+     * The entries on this page, newest first unless sorted otherwise.
+     */
+    items: Array<AuditEntry>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+     */
+    next_cursor: string | null;
+    /**
+     * Facet counts, present when `facets` was asked for.
+     */
+    facets?: Array<Facet>;
+};
+
+/**
  * The working status of an agent. `online` means the agent is attached to
  * its service and reporting; `offline` means it is not. Clients must
  * tolerate values they do not know, because a new status is an additive
@@ -1243,6 +1571,40 @@ export type ClientTypeHeader = 'native';
  */
 export type PartnerIdPath = string;
 
+/**
+ * A UUID the client mints for this write. The key is scoped to the caller
+ * and remembered for 24 hours: a repeat with the same key and the same
+ * request answers what the first made, with the same status and body and
+ * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+ * key with a different method, path or body is `409`
+ * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+ * being processed waits for it. Writes that move money or place an order
+ * require the header (`400`, `validation_failed` with
+ * `idempotency_key_missing`); every other write may carry it.
+ *
+ */
+export type IdempotencyKeyHeader = string;
+
+/**
+ * The entity tag of the version the caller holds, as returned in the `ETag`
+ * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+ * when the resource has moved since, so two operators editing one record
+ * cannot silently overwrite each other. Without the header the write is
+ * accepted unconditionally.
+ *
+ */
+export type IfMatchHeader = string;
+
+/**
+ * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+ */
+export type IfNoneMatchHeader = string;
+
+/**
+ * A UUID that follows the request through logs, events and the audit log. When absent the platform mints one; every response carries the value in `X-Correlation-Id`.
+ */
+export type CorrelationIdHeader = string;
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -1305,6 +1667,44 @@ export type GetHealthDetailsResponses = {
 
 export type GetHealthDetailsResponse = GetHealthDetailsResponses[keyof GetHealthDetailsResponses];
 
+export type GetProblemTypeData = {
+    body?: never;
+    path: {
+        /**
+         * The problem code, for example `validation_failed`.
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/problems/{code}';
+};
+
+export type GetProblemTypeErrors = {
+    /**
+     * No such code (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetProblemTypeError = GetProblemTypeErrors[keyof GetProblemTypeErrors];
+
+export type GetProblemTypeResponses = {
+    /**
+     * The catalogue entry.
+     */
+    200: ProblemType;
+};
+
+export type GetProblemTypeResponse = GetProblemTypeResponses[keyof GetProblemTypeResponses];
+
 export type ListAgentsData = {
     body?: never;
     path?: never;
@@ -1323,7 +1723,11 @@ export type ListAgentsData = {
 
 export type ListAgentsErrors = {
     /**
-     * A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+     * The `partner_id` names a partner the caller does not belong to, answered exactly like a partner that does not exist (`not_found`), so a partner cannot learn that another's id exists.
+     */
+    404: Problem;
+    /**
+     * A client error such as `400` (`validation_failed` with `malformed_identifier` for a `partner_id` that is not a UUID) or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -1439,7 +1843,11 @@ export type StreamAgentsData = {
 
 export type StreamAgentsErrors = {
     /**
-     * A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+     * The `partner_id` names a partner the caller does not belong to, answered exactly like a partner that does not exist (`not_found`), so a partner cannot learn that another's id exists.
+     */
+    404: Problem;
+    /**
+     * A client error such as `400` (`validation_failed` with `malformed_identifier` for a `partner_id` that is not a UUID) or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -1822,6 +2230,22 @@ export type ListPartnersData = {
          */
         status?: PartnerStatus;
         /**
+         * Only include partners of this kind.
+         */
+        kind?: PartnerKind;
+        /**
+         * A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/partners/filters`.
+         */
+        filter?: string;
+        /**
+         * Sort keys, comma separated, `-` for descending; `-created_at` by default.
+         */
+        sort?: string;
+        /**
+         * Enumeration fields to count alongside the page, comma separated (`status`, `kind`).
+         */
+        facets?: string;
+        /**
          * The maximum number of partners to return per page.
          */
         limit?: number;
@@ -1872,6 +2296,21 @@ export type CreatePartnerData = {
      * The kind, the name and the optional details of the partner.
      */
     body: PartnerCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
     path?: never;
     query?: never;
     url: '/v1/partners';
@@ -1907,8 +2346,88 @@ export type CreatePartnerResponses = {
 
 export type CreatePartnerResponse = CreatePartnerResponses[keyof CreatePartnerResponses];
 
+export type GetPartnerFiltersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/partners/filters';
+};
+
+export type GetPartnerFiltersErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is not in the platform realm (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerFiltersError = GetPartnerFiltersErrors[keyof GetPartnerFiltersErrors];
+
+export type GetPartnerFiltersResponses = {
+    /**
+     * The declaration.
+     */
+    200: FilterSchema;
+};
+
+export type GetPartnerFiltersResponse = GetPartnerFiltersResponses[keyof GetPartnerFiltersResponses];
+
+export type GetPartnerSummaryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/partners/summary';
+};
+
+export type GetPartnerSummaryErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller is not in the platform realm (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerSummaryError = GetPartnerSummaryErrors[keyof GetPartnerSummaryErrors];
+
+export type GetPartnerSummaryResponses = {
+    /**
+     * The summary.
+     */
+    200: CollectionSummary;
+};
+
+export type GetPartnerSummaryResponse = GetPartnerSummaryResponses[keyof GetPartnerSummaryResponses];
+
 export type GetPartnerData = {
     body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
@@ -1942,7 +2461,7 @@ export type GetPartnerError = GetPartnerErrors[keyof GetPartnerErrors];
 
 export type GetPartnerResponses = {
     /**
-     * The partner.
+     * The partner, with its version as the `ETag`.
      */
     200: Partner;
 };
@@ -1954,6 +2473,17 @@ export type UpdatePartnerData = {
      * The members to change.
      */
     body: PartnerUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
@@ -1982,6 +2512,10 @@ export type UpdatePartnerErrors = {
      */
     404: Problem;
     /**
+     * `If-Match` no longer matches the partner's version (`precondition_failed`); fetch it again and retry.
+     */
+    412: Problem;
+    /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
@@ -1995,7 +2529,7 @@ export type UpdatePartnerError = UpdatePartnerErrors[keyof UpdatePartnerErrors];
 
 export type UpdatePartnerResponses = {
     /**
-     * The partner after the change.
+     * The partner after the change, with its new `ETag`.
      */
     200: Partner;
 };
@@ -2099,6 +2633,12 @@ export type CreateLocationResponse = CreateLocationResponses[keyof CreateLocatio
 
 export type GetLocationData = {
     body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
@@ -2136,7 +2676,7 @@ export type GetLocationError = GetLocationErrors[keyof GetLocationErrors];
 
 export type GetLocationResponses = {
     /**
-     * The location.
+     * The location, with its version as the `ETag`.
      */
     200: Location;
 };
@@ -2148,6 +2688,17 @@ export type UpdateLocationData = {
      * The members to change.
      */
     body: LocationUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
@@ -2180,6 +2731,10 @@ export type UpdateLocationErrors = {
      */
     404: Problem;
     /**
+     * `If-Match` no longer matches the location's version (`precondition_failed`); fetch it again and retry.
+     */
+    412: Problem;
+    /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
@@ -2193,7 +2748,7 @@ export type UpdateLocationError = UpdateLocationErrors[keyof UpdateLocationError
 
 export type UpdateLocationResponses = {
     /**
-     * The location after the change.
+     * The location after the change, with its new `ETag`.
      */
     200: Location;
 };
@@ -2611,3 +3166,185 @@ export type UpsertServiceResponses = {
 };
 
 export type UpsertServiceResponse = UpsertServiceResponses[keyof UpsertServiceResponses];
+
+export type ListAuditEntriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only acts by this user.
+         */
+        actor?: string;
+        /**
+         * Only acts on this record id, which with `target_kind` is a record's own history.
+         */
+        target?: string;
+        /**
+         * Only acts on records of this kind, for example `partner`.
+         */
+        target_kind?: string;
+        /**
+         * Only this action, for example `tenancy.partner.status_changed`.
+         */
+        action?: string;
+        /**
+         * Only records of this partner; required for partner members.
+         */
+        partner_id?: string;
+        /**
+         * Only acts at or after this instant.
+         */
+        from?: string;
+        /**
+         * Only acts at or before this instant.
+         */
+        to?: string;
+        /**
+         * A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/audit-log/filters`.
+         */
+        filter?: string;
+        /**
+         * Sort keys, comma separated, `-` for descending; `-occurred_at` by default.
+         */
+        sort?: string;
+        /**
+         * Enumeration fields to count alongside the page, comma separated (`actor_kind`).
+         */
+        facets?: string;
+        /**
+         * The maximum number of entries to return per page.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page. Omit it for the first page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/audit-log';
+};
+
+export type ListAuditEntriesErrors = {
+    /**
+     * A parameter was refused (`validation_failed`); `errors` names each with its field-level code, such as `cursor_invalid` or `filter_field_unknown`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A partner member asked without naming a partner (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner named is not one the caller belongs to (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAuditEntriesError = ListAuditEntriesErrors[keyof ListAuditEntriesErrors];
+
+export type ListAuditEntriesResponses = {
+    /**
+     * A page of entries.
+     */
+    200: AuditEntryList;
+};
+
+export type ListAuditEntriesResponse = ListAuditEntriesResponses[keyof ListAuditEntriesResponses];
+
+export type GetAuditFiltersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/audit-log/filters';
+};
+
+export type GetAuditFiltersErrors = {
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAuditFiltersError = GetAuditFiltersErrors[keyof GetAuditFiltersErrors];
+
+export type GetAuditFiltersResponses = {
+    /**
+     * The declaration.
+     */
+    200: FilterSchema;
+};
+
+export type GetAuditFiltersResponse = GetAuditFiltersResponses[keyof GetAuditFiltersResponses];
+
+export type GetAuditEntryData = {
+    body?: never;
+    path: {
+        /**
+         * The entry. An id that is not a UUID answers `400` (`validation_failed`, `malformed_identifier`).
+         */
+        entry_id: string;
+    };
+    query?: {
+        /**
+         * The partner the entry belongs to; required for partner members.
+         */
+        partner_id?: string;
+    };
+    url: '/v1/audit-log/{entry_id}';
+};
+
+export type GetAuditEntryErrors = {
+    /**
+     * The id is not a UUID (`validation_failed`, `malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A partner member asked without naming a partner (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The entry does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAuditEntryError = GetAuditEntryErrors[keyof GetAuditEntryErrors];
+
+export type GetAuditEntryResponses = {
+    /**
+     * The entry.
+     */
+    200: AuditEntry;
+};
+
+export type GetAuditEntryResponse = GetAuditEntryResponses[keyof GetAuditEntryResponses];

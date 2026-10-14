@@ -24,8 +24,14 @@ get:
         application/json:
           schema:
             $ref: ../../components/schemas/fleet/AgentList.yaml
+    '404':
+      description: The `partner_id` names a partner the caller does not belong to, answered exactly like a partner that does not exist (`not_found`), so a partner cannot learn that another's id exists.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '4XX':
-      description: A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+      description: A client error such as `400` (`validation_failed` with `malformed_identifier` for a `partner_id` that is not a UUID) or `429` when rate limited, returned as an RFC 9457 problem details document.
       content:
         application/problem+json:
           schema:

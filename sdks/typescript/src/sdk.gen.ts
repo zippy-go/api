@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLocationData, GetLocationErrors, GetLocationResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServicesData, ListServicesErrors, ListServicesResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLocationData, GetLocationErrors, GetLocationResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServicesData, ListServicesErrors, ListServicesResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -44,6 +44,18 @@ export const getHealth = <ThrowOnError extends boolean = false>(options?: Option
  *
  */
 export const getHealthDetails = <ThrowOnError extends boolean = false>(options?: Options<GetHealthDetailsData, ThrowOnError>): RequestResult<GetHealthDetailsResponses, GetHealthDetailsErrors, ThrowOnError> => (options?.client ?? client).get<GetHealthDetailsResponses, GetHealthDetailsErrors, ThrowOnError>({ url: '/v1/health/details', ...options });
+
+/**
+ * Look up a problem code
+ *
+ * Returns the catalogue entry for a problem code: its title, the status
+ * every occurrence is sent with, whether retrying can help, a description
+ * and the field-level codes an occurrence may carry in `errors`. Every
+ * problem's `type` is `/problems/{code}` resolved against the API host, so
+ * a developer can follow it here. The endpoint is unauthenticated.
+ *
+ */
+export const getProblemType = <ThrowOnError extends boolean = false>(options: Options<GetProblemTypeData, ThrowOnError>): RequestResult<GetProblemTypeResponses, GetProblemTypeErrors, ThrowOnError> => (options.client ?? client).get<GetProblemTypeResponses, GetProblemTypeErrors, ThrowOnError>({ url: '/problems/{code}', ...options });
 
 /**
  * List agents
@@ -349,9 +361,14 @@ export const getJwks = <ThrowOnError extends boolean = false>(options?: Options<
  * (`forbidden`); a user finds the partners they belong to under
  * `GET /v1/me`.
  *
- * Filter with `q`, which matches `name` and `legal_name`, and with
- * `status`. Page with `limit` and `cursor`: pass the `next_cursor` of a
- * page to get the next one, until it is `null`.
+ * Filter with `q`, which matches `name` and `legal_name`, with `status`
+ * and `kind`, or with the full grammar in `filter` whose fields
+ * `GET /v1/partners/filters` declares. Sort with up to three declared
+ * keys (`-created_at` by default, the id as the tiebreaker) and ask for
+ * facet counts with `facets`. Page with `limit` and `cursor`: pass the
+ * `next_cursor` of a page to get the next one, until it is `null`; a
+ * cursor from another query or another caller is refused with
+ * `cursor_invalid`.
  *
  */
 export const listPartners = <ThrowOnError extends boolean = false>(options?: Options<ListPartnersData, ThrowOnError>): RequestResult<ListPartnersResponses, ListPartnersErrors, ThrowOnError> => (options?.client ?? client).get<ListPartnersResponses, ListPartnersErrors, ThrowOnError>({
@@ -370,7 +387,9 @@ export const listPartners = <ThrowOnError extends boolean = false>(options?: Opt
  *
  * The caller's access token does not carry the new membership until it is
  * refreshed; `GET /v1/me` reflects it at once. Publishes the events
- * `tenancy.partner.created` and `tenancy.membership.created`.
+ * `tenancy.partner.created` and `tenancy.membership.created`. An
+ * `Idempotency-Key` is honoured: a retry with the same key and body
+ * returns the partner already created.
  *
  */
 export const createPartner = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerData, ThrowOnError>): RequestResult<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError>({
@@ -381,6 +400,35 @@ export const createPartner = <ThrowOnError extends boolean = false>(options: Opt
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Get the partner filter declaration
+ *
+ * Returns the fields partners can be filtered, sorted and faceted by, with
+ * the type and operators of each and the values of the enumerations, so a
+ * console builds its filter bar from the declaration rather than from a
+ * release. Platform realm only.
+ *
+ */
+export const getPartnerFilters = <ThrowOnError extends boolean = false>(options?: Options<GetPartnerFiltersData, ThrowOnError>): RequestResult<GetPartnerFiltersResponses, GetPartnerFiltersErrors, ThrowOnError> => (options?.client ?? client).get<GetPartnerFiltersResponses, GetPartnerFiltersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/filters',
+    ...options
+});
+
+/**
+ * Get the partner summary
+ *
+ * Returns the counts of every partner by status and by kind, taken without
+ * fetching rows and served from a copy at most 30 seconds old, for the
+ * tiles over a listing. Platform realm only.
+ *
+ */
+export const getPartnerSummary = <ThrowOnError extends boolean = false>(options?: Options<GetPartnerSummaryData, ThrowOnError>): RequestResult<GetPartnerSummaryResponses, GetPartnerSummaryErrors, ThrowOnError> => (options?.client ?? client).get<GetPartnerSummaryResponses, GetPartnerSummaryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/summary',
+    ...options
 });
 
 /**
@@ -406,7 +454,10 @@ export const getPartner = <ThrowOnError extends boolean = false>(options: Option
  * `legal_name`, `contact_email` and `contact_phone`; `status` may only be
  * changed by the platform realm. A caller without the role for a member
  * in the body receives `403` (`forbidden`) and nothing is changed. A
- * status change publishes `tenancy.partner.status_changed`.
+ * status change publishes `tenancy.partner.status_changed` and appends
+ * an audit entry with the `reason`. Send `If-Match` with the version you
+ * hold to be refused with `412` (`precondition_failed`) when someone else
+ * changed the partner first; every write raises the version by one.
  *
  */
 export const updatePartner = <ThrowOnError extends boolean = false>(options: Options<UpdatePartnerData, ThrowOnError>): RequestResult<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError>({
@@ -467,7 +518,10 @@ export const getLocation = <ThrowOnError extends boolean = false>(options: Optio
  *
  * Changes the members of the location that are present in the body,
  * including `status`, and returns the location. Owners and managers may
- * update locations; other members receive `403` (`forbidden`).
+ * update locations; other members receive `403` (`forbidden`). Send
+ * `If-Match` with the version you hold to be refused with `412`
+ * (`precondition_failed`) when someone else changed the location first;
+ * every write raises the version by one.
  *
  */
 export const updateLocation = <ThrowOnError extends boolean = false>(options: Options<UpdateLocationData, ThrowOnError>): RequestResult<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError> => (options.client ?? client).patch<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError>({
@@ -622,4 +676,50 @@ export const upsertService = <ThrowOnError extends boolean = false>(options: Opt
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * List audit entries
+ *
+ * Returns the audit log in pages, newest first unless sorted otherwise.
+ * Platform staff read every entry; a partner member reads the entries about
+ * their partner's records by naming it in `partner_id` (another partner's
+ * is `404`, a member without `partner_id` is `403`).
+ *
+ * Filter with the named parameters, or with the full grammar in `filter`
+ * (see `GET /v1/audit-log/filters`): by actor, by target, by action, by
+ * partner and by period. Sort with up to three declared keys and ask for
+ * facet counts with `facets`. Page with `limit` and `cursor`.
+ *
+ * Entries are never changed or deleted: `PUT`, `PATCH` and `DELETE` on an
+ * entry answer `405` (`method_not_allowed`) and the attempt is itself
+ * logged as `audit.tamper_attempted`.
+ *
+ */
+export const listAuditEntries = <ThrowOnError extends boolean = false>(options?: Options<ListAuditEntriesData, ThrowOnError>): RequestResult<ListAuditEntriesResponses, ListAuditEntriesErrors, ThrowOnError> => (options?.client ?? client).get<ListAuditEntriesResponses, ListAuditEntriesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/audit-log',
+    ...options
+});
+
+/**
+ * Get the audit log filter declaration
+ *
+ * Returns the fields the audit log can be filtered, sorted and faceted by, with the type and operators of each.
+ */
+export const getAuditFilters = <ThrowOnError extends boolean = false>(options?: Options<GetAuditFiltersData, ThrowOnError>): RequestResult<GetAuditFiltersResponses, GetAuditFiltersErrors, ThrowOnError> => (options?.client ?? client).get<GetAuditFiltersResponses, GetAuditFiltersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/audit-log/filters',
+    ...options
+});
+
+/**
+ * Get an audit entry
+ *
+ * Returns one entry. Platform staff read any entry; a partner member reads one about their partner's records by naming the partner in `partner_id`.
+ */
+export const getAuditEntry = <ThrowOnError extends boolean = false>(options: Options<GetAuditEntryData, ThrowOnError>): RequestResult<GetAuditEntryResponses, GetAuditEntryErrors, ThrowOnError> => (options.client ?? client).get<GetAuditEntryResponses, GetAuditEntryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/audit-log/{entry_id}',
+    ...options
 });

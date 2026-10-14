@@ -1,0 +1,43 @@
+# Path item for GET /v1/partners/summary. Referenced from openapi.yaml.
+get:
+  operationId: getPartnerSummary
+  summary: Get the partner summary
+  description: |
+    Returns the counts of every partner by status and by kind, taken without
+    fetching rows and served from a copy at most 30 seconds old, for the
+    tiles over a listing. Platform realm only.
+  tags:
+    - Partners
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The summary.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/CollectionSummary.yaml
+    '401':
+      description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller is not in the platform realm (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

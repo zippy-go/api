@@ -1,0 +1,63 @@
+type: object
+description: |
+  A catalogue entry, the answer of `GET /problems/{code}`: what a problem
+  code means, the status every occurrence is sent with, whether retrying
+  the same request can help, and the field-level codes an occurrence may
+  carry in `errors`. Every problem's `type` resolves to one of these.
+required:
+  - code
+  - type
+  - status
+  - title
+  - retryable
+  - description
+  - details
+properties:
+  code:
+    type: string
+    pattern: ^[a-z][a-z0-9_]*$
+    description: The stable code; never renamed or reused.
+    examples:
+      - idempotency_key_reuse
+  type:
+    type: string
+    format: uri-reference
+    description: The `type` URI problems of this code carry, `/problems/{code}`.
+    examples:
+      - /problems/idempotency_key_reuse
+  status:
+    type: integer
+    format: int32
+    minimum: 400
+    maximum: 599
+    description: The HTTP status every occurrence is sent with; part of the contract.
+    examples:
+      - 409
+  title:
+    type: string
+    description: The title every occurrence carries.
+    examples:
+      - Idempotency key reused
+  retryable:
+    type: boolean
+    description: Whether retrying the same request can help.
+    examples:
+      - false
+  description:
+    type: string
+    description: What the code means.
+    examples:
+      - The `Idempotency-Key` was already used by this caller with a different method, path or body. Use a new key for a new request.
+  details:
+    type: array
+    description: The field-level codes an occurrence may carry in the `code` member of its `errors` entries.
+    items:
+      $ref: ./ProblemTypeDetail.yaml
+examples:
+  - code: idempotency_key_reuse
+    type: /problems/idempotency_key_reuse
+    status: 409
+    title: Idempotency key reused
+    retryable: false
+    description: The `Idempotency-Key` was already used by this caller with a different method, path or body. Use a new key for a new request.
+    details: []

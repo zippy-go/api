@@ -6,6 +6,61 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-15
+
+### Added
+
+- The conventions every operation honours, described on the root document
+  and on the portal's Conventions page: problem codes dereferenceable at
+  `GET /problems/{code}` (`getProblemType`, tag `Platform`, schemas
+  `ProblemType` and `ProblemTypeDetail`); the `RateLimit-Limit`,
+  `RateLimit-Remaining` and `RateLimit-Reset` headers on every response and
+  `429` (`rate_limited`) with `Retry-After`; the `X-Correlation-Id` header
+  (`CorrelationIdHeader`), accepted on every request and echoed on every
+  response; `Idempotency-Key` (`IdempotencyKeyHeader`) on writes, with the
+  replay header `Idempotent-Replayed`; `ETag` (header `ETag`),
+  `If-None-Match` (`IfNoneMatchHeader`) with `304` and `If-Match`
+  (`IfMatchHeader`) with `412` (`precondition_failed`) on versioned
+  resources; `Deprecation`, `Sunset` and `Link` on a deprecated major and
+  `410` (`version_retired`) after its sunset.
+- Field-level codes under `validation_failed`: `malformed_identifier`,
+  `cursor_invalid`, `idempotency_key_missing`, the filter grammar's
+  `filter_unreadable`, `filter_field_unknown`,
+  `filter_operator_unsupported`, `filter_value_unknown`,
+  `filter_or_unindexed`, `filter_in_empty`, `filter_text_empty`,
+  `filter_group_empty`, `filter_range_empty`, `filter_too_deep`,
+  `filter_too_wide`, `sort_too_many` and `sort_field_unknown`, and
+  `setting_out_of_range`, `unsupported_file_type`, `file_too_large` and
+  `crop_outside` for the reference data and asset operations to come.
+- Error codes `channel_unknown` (400), `illegal_transition` (409),
+  `locations_stranded` (409), `sign_in_closed` (409), `asset_not_usable`
+  (409) and `version_retired` (410).
+- The collection grammar: `filter` (a JSON tree of `eq`, `in`, `range`,
+  `text`, `within`, `and` and `or`), `sort` (up to three declared keys) and
+  `facets` on `GET /v1/partners`, with `kind` as a named filter;
+  `GET /v1/partners/filters` (`getPartnerFilters`, schemas `FilterSchema`
+  and `FilterField`) and `GET /v1/partners/summary` (`getPartnerSummary`,
+  `CollectionSummary`); facet counts in `PartnerList.facets` (`Facet`,
+  `FacetCount`).
+- The audit log (tag `Audit`): `GET /v1/audit-log` (`listAuditEntries`,
+  schemas `AuditEntry`, `AuditActor`, `AuditTarget`, `AuditEntryList`),
+  `GET /v1/audit-log/filters` (`getAuditFilters`) and
+  `GET /v1/audit-log/{entry_id}` (`getAuditEntry`). Entries are never
+  changed or deleted; the methods that would are `405` and logged.
+- `Partner` and `Location` carry `version`, `created_by` and `updated_by`;
+  `PartnerUpdate` takes an optional `reason` kept in the audit log with a
+  status change; `GET` and `PATCH` of a partner or a location document the
+  `ETag` and the conditional headers.
+- `GET /v1/fleet/agents` and `GET /v1/live/agents` document `404` for a
+  `partner_id` the caller does not belong to, answered like an unknown id.
+- `generated/platform-openapi.json`, the document the platform serves, and
+  `pnpm platform:check`, which fails when a path and method the platform
+  serves is missing from this contract or the contract describes one the
+  platform does not serve.
+- Portal: the Conventions page (errors and the catalogue, identifiers,
+  money and time, paging, filtering, idempotency, conditional requests,
+  rate limits, correlation, deprecation).
+
 ## [0.3.0] - 2026-10-14
 
 ### Added

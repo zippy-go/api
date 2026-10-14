@@ -1,0 +1,66 @@
+type: object
+description: |
+  A collection's filter declaration, the answer of its `/filters` operation:
+  the fields it can be filtered by with their types and operators, the
+  fields it can be sorted by and the sort applied when none is given. A
+  console builds its filter bar from it without a release.
+
+  The filter tree sent in the `filter` parameter is JSON with an `op` on
+  every node: `eq` (`field`, `value`), `in` (`field`, `values`), `range`
+  (`field`, `gte` and/or `lte`), `text` (`field`, `value`, `match` of
+  `contains` or `starts_with`), `within` (`field`, `ancestor`, a service
+  area whose subtree is matched), `and` and `or` (`operands`). Trees nest
+  at most three levels, lists and groups hold at most twenty operands, and
+  text search is accepted only as a top-level all-of condition. Refusals
+  are `400` (`validation_failed`) with the field-level codes
+  `filter_field_unknown`, `filter_operator_unsupported`,
+  `filter_value_unknown`, `filter_unreadable`, `filter_or_unindexed`,
+  `filter_in_empty`, `filter_text_empty`, `filter_group_empty`,
+  `filter_range_empty`, `filter_too_deep`, `filter_too_wide`,
+  `sort_too_many` and `sort_field_unknown`.
+required:
+  - resource
+  - fields
+  - sorts
+  - default_sort
+properties:
+  resource:
+    type: string
+    description: The collection.
+    examples:
+      - partners
+  fields:
+    type: array
+    description: The filterable fields.
+    items:
+      $ref: ./FilterField.yaml
+  sorts:
+    type: array
+    description: The names that may appear in `sort`, each optionally prefixed with `-` for descending; at most three per request.
+    items:
+      type: string
+      description: One sortable field.
+    examples:
+      - - name
+        - created_at
+  default_sort:
+    type: string
+    description: The sort applied when `sort` is absent.
+    examples:
+      - -created_at
+examples:
+  - resource: partners
+    fields:
+      - name: status
+        kind: enum
+        operators:
+          - eq
+          - in
+        values:
+          - pending
+          - active
+          - suspended
+    sorts:
+      - name
+      - created_at
+    default_sort: -created_at

@@ -1,0 +1,26 @@
+type: object
+description: A page of audit entries, the response of `GET /v1/audit-log`.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    description: The entries on this page, newest first unless sorted otherwise.
+    items:
+      $ref: ./AuditEntry.yaml
+  next_cursor:
+    type:
+      - string
+      - 'null'
+    description: An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+    examples:
+      - AXsidCI6InRpbWVzdGFtcCIsInYiOjE3NjA1MTUyMDAwMDAwMDAwMDB9XQ
+  facets:
+    type: array
+    description: Facet counts, present when `facets` was asked for.
+    items:
+      $ref: ../common/Facet.yaml
+examples:
+  - items: []
+    next_cursor: null
