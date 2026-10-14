@@ -1,0 +1,117 @@
+# Catalog of error codes returned by the ZippyGo API.
+#
+# Every error response is an RFC 9457 problem details document (the `Error`
+# schema in the OpenAPI document) whose `code` is one of the entries below.
+# `message` is the template for the `detail` member; placeholders in braces
+# are filled per occurrence. `type` is `/problems/<code>`, resolved against
+# the API host. Codes are stable: a code is never renamed or reused.
+errors:
+  - code: validation_failed
+    status: 400
+    title: Validation failed
+    message: The request has {count} invalid field(s).
+    retryable: false
+    description: >-
+      The request body, query or path parameters did not pass validation.
+      The `errors` member lists each offending field with a JSON Pointer and
+      a reason.
+
+  - code: unauthenticated
+    status: 401
+    title: Unauthenticated
+    message: The request has no valid credentials.
+    retryable: false
+    description: >-
+      No API key or bearer token was sent, or the one sent is invalid,
+      expired or revoked.
+
+  - code: forbidden
+    status: 403
+    title: Forbidden
+    message: The credentials do not allow {action} on {resource}.
+    retryable: false
+    description: >-
+      The caller is authenticated but is not allowed to perform the action,
+      for example because the resource belongs to another partner or the
+      key lacks the required scope.
+
+  - code: not_found
+    status: 404
+    title: Not found
+    message: "{resource} {id} was not found."
+    retryable: false
+    description: >-
+      The resource does not exist or is not visible to the caller. The API
+      does not distinguish between the two.
+
+  - code: method_not_allowed
+    status: 405
+    title: Method not allowed
+    message: "{method} is not supported on {path}."
+    retryable: false
+    description: The path exists but does not support the HTTP method used.
+
+  - code: conflict
+    status: 409
+    title: Conflict
+    message: "{resource} {id} cannot be changed: {reason}."
+    retryable: false
+    description: >-
+      The request conflicts with the current state of the resource, for
+      example a state transition that is not allowed or a uniqueness
+      constraint that would be violated.
+
+  - code: idempotency_key_reuse
+    status: 409
+    title: Idempotency key reused
+    message: Idempotency key {key} was already used with a different request.
+    retryable: false
+    description: >-
+      The `Idempotency-Key` header value was previously used with a request
+      that had a different method, path or body. Use a new key for a new
+      request.
+
+  - code: precondition_failed
+    status: 412
+    title: Precondition failed
+    message: "{resource} {id} was modified since the version you supplied."
+    retryable: true
+    description: >-
+      A conditional request (`If-Match`) did not match the current version of
+      the resource. Fetch the resource again and retry with the new version.
+
+  - code: unsupported_media_type
+    status: 415
+    title: Unsupported media type
+    message: "Content type {content_type} is not supported; use application/json."
+    retryable: false
+    description: The request body has a content type the endpoint does not accept.
+
+  - code: rate_limited
+    status: 429
+    title: Rate limited
+    message: Rate limit exceeded; retry after {retry_after} seconds.
+    retryable: true
+    description: >-
+      The caller exceeded its request quota. The response carries a
+      `Retry-After` header with the number of seconds to wait.
+
+  - code: internal
+    status: 500
+    title: Internal error
+    message: An unexpected error occurred.
+    retryable: true
+    description: >-
+      Something failed on the server. The problem is logged with the
+      `instance` value; retrying with backoff is safe for idempotent
+      requests.
+
+  - code: unavailable
+    status: 503
+    title: Service unavailable
+    message: The service is temporarily unavailable; retry after {retry_after} seconds.
+    retryable: true
+    description: >-
+      The API or a dependency it needs is temporarily unavailable, for
+      example during maintenance. The response carries a `Retry-After`
+      header when the duration is known.

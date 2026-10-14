@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/platform.ping.v1.schema.json",
+  "title": "PlatformPingPayload",
+  "description": "Payload of `platform.ping` version 1. The event carries no business data; the payload is an empty object.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

@@ -1,0 +1,17 @@
+# Catalog of every event type ZippyGo publishes.
+#
+# One entry per (type, version). `payload_schema` and `example` are paths
+# relative to this file; `pnpm events:check` compiles every schema and
+# validates every example against the envelope and the payload schema.
+#
+# Adding a field to a payload is additive and keeps the version; removing or
+# renaming a field, or changing its type, is a new version (see README.md).
+events:
+  - type: platform.ping
+    version: 1
+    domain: platform
+    description: >-
+      Sent on request to verify that a webhook endpoint receives and
+      acknowledges deliveries. Carries no business data.
+    payload_schema: ./payloads/platform.ping.v1.schema.json
+    example: ./examples/platform.ping.v1.json
