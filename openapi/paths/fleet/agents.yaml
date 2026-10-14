@@ -1,0 +1,38 @@
+# Path item for /v1/fleet/agents. Referenced from openapi.yaml.
+get:
+  operationId: listAgents
+  summary: List agents
+  description: |
+    Returns the agents attached to partners' services, each with its current
+    status and last known position. Filter by partner and by status; without
+    filters, every agent the credential can see is returned. The list is not
+    paginated.
+  tags:
+    - Fleet
+  parameters:
+    - $ref: ../../components/parameters/PartnerIdQuery.yaml
+    - name: status
+      in: query
+      required: false
+      description: Only include agents with this status.
+      schema:
+        $ref: ../../components/schemas/fleet/AgentStatus.yaml
+  responses:
+    '200':
+      description: The agents that match the filters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/fleet/AgentList.yaml
+    '4XX':
+      description: A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

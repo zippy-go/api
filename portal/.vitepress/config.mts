@@ -26,6 +26,7 @@ export default defineConfig({
         text: 'Reference',
         items: [
           { text: 'API reference', link: '/reference' },
+          { text: 'Live streams', link: '/live-streams' },
           { text: 'Events', link: '/events' },
         ],
       },

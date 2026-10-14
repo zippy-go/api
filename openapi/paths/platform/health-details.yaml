@@ -1,0 +1,42 @@
+# Path item for GET /v1/health/details. Referenced from openapi.yaml.
+get:
+  operationId: getHealthDetails
+  summary: Check service health in detail
+  description: |
+    Returns the health of the API and of each dependency it needs: the
+    database, the cache and the event outbox, each with its own status and
+    measurement. The overall `status` is the worst of the checks. The HTTP
+    status follows it: `200` when the service is `ok` or `degraded`, `503`
+    when it is `down`, with the same body in both cases, so that a monitor
+    can alert on the status code while a dashboard shows the details.
+
+    The endpoint is unauthenticated and safe to poll. `GET /v1/health` is
+    the lighter check for plain uptime monitoring.
+  tags:
+    - Platform
+  security: []
+  responses:
+    '200':
+      description: The service is `ok` or `degraded`; the body says which checks are impaired.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/platform/HealthDetails.yaml
+    '503':
+      description: The service is `down`. The body is the same detailed report and names the failing checks.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/platform/HealthDetails.yaml
+    '4XX':
+      description: A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -80,7 +80,7 @@ export type Problem = {
      */
     code: string;
     /**
-     * Field-level problems. Present for `validation_failed`, otherwise omitted.
+     * Field-level problems. Present for `validation_failed` and, when the problem is specific to part of the request, for `unprocessable`; otherwise omitted.
      */
     errors?: Array<{
         /**
@@ -93,6 +93,349 @@ export type Problem = {
         message: string;
     }>;
 };
+
+/**
+ * The outcome of a health check. `ok` when the subject is working normally,
+ * `degraded` when it works but is impaired (slow, or behind), `down` when it
+ * is not working. Clients must tolerate values they do not know.
+ *
+ */
+export type CheckStatus = 'ok' | 'degraded' | 'down';
+
+/**
+ * The result of probing one dependency of the API, such as the database or the cache.
+ */
+export type DependencyCheck = {
+    /**
+     * The outcome of the probe.
+     */
+    status: CheckStatus;
+    /**
+     * The round-trip time of the probe in milliseconds. When the dependency is `down`, the time until the probe failed or timed out.
+     */
+    latency_ms: number;
+};
+
+/**
+ * The state of the event outbox, the queue of events that have been
+ * recorded but not yet published. A growing backlog or an old pending event
+ * means consumers see events late.
+ *
+ */
+export type OutboxCheck = {
+    /**
+     * The outcome of the check, derived from the backlog size and age.
+     */
+    status: CheckStatus;
+    /**
+     * The number of events waiting to be published.
+     */
+    pending: number;
+    /**
+     * How long the oldest pending event has been waiting, in milliseconds, or `null` when nothing is pending.
+     */
+    oldest_pending_age_ms: number | null;
+};
+
+/**
+ * The individual checks behind a detailed health report, one per dependency the API needs. New checks are an additive change; clients must ignore keys they do not know.
+ */
+export type HealthChecks = {
+    /**
+     * The relational database.
+     */
+    postgres: DependencyCheck;
+    /**
+     * The cache and pub/sub store.
+     */
+    valkey: DependencyCheck;
+    /**
+     * The event outbox.
+     */
+    outbox: OutboxCheck;
+};
+
+/**
+ * A detailed health report, returned by `GET /v1/health/details`. The
+ * overall `status` is the worst of the checks: `ok` when every check is
+ * `ok`, `degraded` when the API serves requests but at least one check is
+ * `degraded`, `down` when a check the API cannot serve without is `down`.
+ *
+ */
+export type HealthDetails = {
+    /**
+     * The overall status, the worst of the individual checks.
+     */
+    status: CheckStatus;
+    /**
+     * The semantic version of the running API.
+     */
+    version: string;
+    /**
+     * The individual checks the overall status is derived from.
+     */
+    checks: HealthChecks;
+};
+
+/**
+ * The working status of an agent. `online` means the agent is attached to
+ * its service and reporting; `offline` means it is not. Clients must
+ * tolerate values they do not know, because a new status is an additive
+ * change.
+ *
+ */
+export type AgentStatus = 'online' | 'offline';
+
+/**
+ * The kind of partner service an agent is attached to. `delivery` is the
+ * only kind at present. Clients must tolerate values they do not know,
+ * because a new kind is an additive change.
+ *
+ */
+export type ServiceKind = 'delivery';
+
+/**
+ * The last known position of an agent: WGS 84 coordinates, the heading and
+ * speed reported with them, and the time the position was recorded on the
+ * agent's device.
+ *
+ */
+export type AgentPosition = {
+    /**
+     * Latitude in decimal degrees (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude in decimal degrees (WGS 84).
+     */
+    lng: number;
+    /**
+     * Direction of travel in degrees clockwise from true north, or `null` when the device did not report one.
+     */
+    heading_deg: number | null;
+    /**
+     * Ground speed in metres per second, or `null` when the device did not report one.
+     */
+    speed_mps: number | null;
+    /**
+     * When the position was recorded on the device, as an RFC 3339 timestamp in UTC.
+     */
+    recorded_at: string;
+};
+
+/**
+ * A person attached to one of a partner's services who executes tasks for
+ * it. The agent is a membership in that service, not an identity: the same
+ * person is a separate agent in every service they are attached to, each
+ * with its own id, status and position.
+ *
+ */
+export type Agent = {
+    /**
+     * Unique identifier of the agent.
+     */
+    id: string;
+    /**
+     * The partner whose service the agent is attached to.
+     */
+    partner_id: string;
+    /**
+     * The name the agent is shown under.
+     */
+    display_name: string;
+    /**
+     * The kind of service the agent is attached to.
+     */
+    service_kind: ServiceKind;
+    /**
+     * The agent's current working status.
+     */
+    status: AgentStatus;
+    /**
+     * When the agent was last heard from (a location ping or a status change), as an RFC 3339 timestamp in UTC, or `null` if never.
+     */
+    last_seen_at: string | null;
+    /**
+     * The agent's last known position, or `null` when the agent has not reported one yet.
+     */
+    position: AgentPosition | null;
+};
+
+/**
+ * A list of agents, the response of `GET /v1/fleet/agents`.
+ */
+export type AgentList = {
+    /**
+     * The agents that match the request. The list is not paginated.
+     */
+    items: Array<Agent>;
+};
+
+/**
+ * One position report from an agent's device. Pings are submitted in
+ * batches with `POST /v1/fleet/location-pings` and applied per agent in
+ * `recorded_at` order, so a device that buffered pings while it had no
+ * connectivity can submit them together.
+ *
+ */
+export type LocationPing = {
+    /**
+     * The agent the ping belongs to.
+     */
+    agent_id: string;
+    /**
+     * Latitude in decimal degrees (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude in decimal degrees (WGS 84).
+     */
+    lng: number;
+    /**
+     * Direction of travel in degrees clockwise from true north. Omit it or send `null` when the device did not report one.
+     */
+    heading_deg?: number | null;
+    /**
+     * Ground speed in metres per second. Omit it or send `null` when the device did not report one.
+     */
+    speed_mps?: number | null;
+    /**
+     * When the position was recorded on the device, as an RFC 3339 timestamp in UTC.
+     */
+    recorded_at: string;
+};
+
+/**
+ * The request body of `POST /v1/fleet/location-pings`. One batch carries between 1 and 500 pings, for one agent or several.
+ */
+export type LocationPingBatch = {
+    /**
+     * The pings to apply. Order within the batch does not matter; pings are applied per agent in `recorded_at` order.
+     */
+    pings: Array<LocationPing>;
+};
+
+/**
+ * The response of `POST /v1/fleet/location-pings`, sent once the batch has been validated and queued.
+ */
+export type LocationPingsAccepted = {
+    /**
+     * The number of pings accepted for processing. They are applied after the response is sent; agents' positions and the live streams reflect them shortly after.
+     */
+    accepted: number;
+};
+
+/**
+ * An event as published by ZippyGo: the envelope defined by the event
+ * schemas in this repository (`events/envelope.schema.json`), with the
+ * business data in `payload`. The shape of `payload` is defined per `type`
+ * and `version` in the event catalog.
+ *
+ */
+export type Event = {
+    /**
+     * Unique identifier of the event, a UUID version 7 so that ids sort by creation time. Deduplicate on it.
+     */
+    id: string;
+    /**
+     * The event type as `<domain>.<event>`, for example `fleet.agent.online`. The full list is in the event catalog.
+     */
+    type: string;
+    /**
+     * The payload schema version for this event type.
+     */
+    version: number;
+    /**
+     * When the event happened, as an RFC 3339 timestamp in UTC.
+     */
+    occurred_at: string;
+    /**
+     * The partner the event belongs to, or `null` for platform-level events that are not scoped to a partner.
+     */
+    partner_id: string | null;
+    /**
+     * Shared by every event and request that stem from the same originating action, or `null` when the event was not caused by a traceable request.
+     */
+    correlation_id: string | null;
+    /**
+     * The event data, as defined by `type` and `version` in the event catalog.
+     */
+    payload: {
+        [key: string]: unknown;
+    };
+};
+
+/**
+ * A list of events, the response of `GET /v1/events`.
+ */
+export type EventList = {
+    /**
+     * The events, newest first.
+     */
+    items: Array<Event>;
+};
+
+/**
+ * A stream of server-sent events, as defined by the WHATWG HTML standard,
+ * with the media type `text/event-stream`. Each frame is an `event:` line
+ * naming the event type, a `data:` line carrying JSON (empty for
+ * `heartbeat`) and a blank line. The event types and the shape of their
+ * data are documented on each streaming operation. OpenAPI has no native
+ * type for a stream, so the body is modelled as a string.
+ *
+ */
+export type ServerSentEventStream = string;
+
+/**
+ * The data of a `snapshot` frame on `GET /v1/live/agents`, sent once when the stream opens. It holds every agent that matches the stream's filters, with its current status and position.
+ */
+export type AgentSnapshot = {
+    /**
+     * The agents at the time the stream opened.
+     */
+    agents: Array<Agent>;
+};
+
+/**
+ * The data of a `position` frame on `GET /v1/live/agents`, sent when an agent's position changes.
+ */
+export type AgentPositionUpdate = {
+    /**
+     * The agent that moved.
+     */
+    agent_id: string;
+    /**
+     * The agent's new position.
+     */
+    position: AgentPosition;
+    /**
+     * The agent's status at the time of the update.
+     */
+    status: AgentStatus;
+};
+
+/**
+ * The data of a `status` frame on `GET /v1/live/agents`, sent when an agent goes online or offline.
+ */
+export type AgentStatusUpdate = {
+    /**
+     * The agent whose status changed.
+     */
+    agent_id: string;
+    /**
+     * The agent's new status.
+     */
+    status: AgentStatus;
+    /**
+     * When the agent was last heard from, as an RFC 3339 timestamp in UTC, or `null` if never.
+     */
+    last_seen_at: string | null;
+};
+
+/**
+ * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+ */
+export type PartnerIdQuery = string;
 
 export type GetHealthData = {
     body?: never;
@@ -122,3 +465,219 @@ export type GetHealthResponses = {
 };
 
 export type GetHealthResponse = GetHealthResponses[keyof GetHealthResponses];
+
+export type GetHealthDetailsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/health/details';
+};
+
+export type GetHealthDetailsErrors = {
+    /**
+     * The service is `down`. The body is the same detailed report and names the failing checks.
+     */
+    503: HealthDetails;
+    /**
+     * A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetHealthDetailsError = GetHealthDetailsErrors[keyof GetHealthDetailsErrors];
+
+export type GetHealthDetailsResponses = {
+    /**
+     * The service is `ok` or `degraded`; the body says which checks are impaired.
+     */
+    200: HealthDetails;
+};
+
+export type GetHealthDetailsResponse = GetHealthDetailsResponses[keyof GetHealthDetailsResponses];
+
+export type ListAgentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * Only include agents with this status.
+         */
+        status?: AgentStatus;
+    };
+    url: '/v1/fleet/agents';
+};
+
+export type ListAgentsErrors = {
+    /**
+     * A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentsError = ListAgentsErrors[keyof ListAgentsErrors];
+
+export type ListAgentsResponses = {
+    /**
+     * The agents that match the filters.
+     */
+    200: AgentList;
+};
+
+export type ListAgentsResponse = ListAgentsResponses[keyof ListAgentsResponses];
+
+export type SubmitLocationPingsData = {
+    /**
+     * The pings to apply, 1 to 500 per request.
+     */
+    body: LocationPingBatch;
+    path?: never;
+    query?: never;
+    url: '/v1/fleet/location-pings';
+};
+
+export type SubmitLocationPingsErrors = {
+    /**
+     * The batch failed validation (`validation_failed`), for example a coordinate out of range, a malformed timestamp, no pings or more than 500 of them. The `errors` member points at each offending field.
+     */
+    400: Problem;
+    /**
+     * No valid development credential was sent in `X-Dev-Api-Key` (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The batch is well formed but cannot be processed (`unprocessable`), for example because a ping references an agent that does not exist. The `errors` member points at the offending pings.
+     */
+    422: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SubmitLocationPingsError = SubmitLocationPingsErrors[keyof SubmitLocationPingsErrors];
+
+export type SubmitLocationPingsResponses = {
+    /**
+     * The batch was validated and queued. The body says how many pings were accepted.
+     */
+    202: LocationPingsAccepted;
+};
+
+export type SubmitLocationPingsResponse = SubmitLocationPingsResponses[keyof SubmitLocationPingsResponses];
+
+export type ListEventsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The maximum number of events to return.
+         */
+        limit?: number;
+        /**
+         * Only include events newer than the event with this id; that event itself is not included.
+         */
+        after?: string;
+    };
+    url: '/v1/events';
+};
+
+export type ListEventsErrors = {
+    /**
+     * A client error such as `400` (`validation_failed`) when `limit` is out of range or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListEventsError = ListEventsErrors[keyof ListEventsErrors];
+
+export type ListEventsResponses = {
+    /**
+     * The most recent events, newest first.
+     */
+    200: EventList;
+};
+
+export type ListEventsResponse = ListEventsResponses[keyof ListEventsResponses];
+
+export type StreamAgentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+    };
+    url: '/v1/live/agents';
+};
+
+export type StreamAgentsErrors = {
+    /**
+     * A client error such as `400` (`validation_failed`) for a malformed filter or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StreamAgentsError = StreamAgentsErrors[keyof StreamAgentsErrors];
+
+export type StreamAgentsResponses = {
+    /**
+     * The stream is open. It stays open until the client closes it or the server restarts; frames follow as changes happen.
+     */
+    200: ServerSentEventStream;
+};
+
+export type StreamAgentsResponse = StreamAgentsResponses[keyof StreamAgentsResponses];
+
+export type StreamEventsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/live/events';
+};
+
+export type StreamEventsErrors = {
+    /**
+     * A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StreamEventsError = StreamEventsErrors[keyof StreamEventsErrors];
+
+export type StreamEventsResponses = {
+    /**
+     * The stream is open. It stays open until the client closes it or the server restarts; frames follow as events are published.
+     */
+    200: ServerSentEventStream;
+};
+
+export type StreamEventsResponse = StreamEventsResponses[keyof StreamEventsResponses];

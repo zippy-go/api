@@ -6,8 +6,33 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-14
+
 ### Added
 
+- `GET /v1/health/details`: the health of the API and of each dependency
+  (`HealthDetails`, `HealthChecks`, `DependencyCheck`, `OutboxCheck`,
+  `CheckStatus`); `503` with the same body when the service is down.
+- `GET /v1/fleet/agents`: agents with their status and last known position
+  (`Agent`, `AgentPosition`, `AgentStatus`, `ServiceKind`, `AgentList`),
+  filterable by `partner_id` and `status`.
+- `POST /v1/fleet/location-pings`: batches of 1 to 500 position reports
+  (`LocationPing`, `LocationPingBatch`, `LocationPingsAccepted`), answered
+  with `202`.
+- `GET /v1/events`: the most recent events, newest first, with `limit` and
+  `after` (`Event`, `EventList`).
+- `GET /v1/live/agents` and `GET /v1/live/events`: server-sent event streams
+  (`ServerSentEventStream`) with the event types `snapshot`, `position`,
+  `status`, `event` and `heartbeat`; the frame data schemas `AgentSnapshot`,
+  `AgentPositionUpdate` and `AgentStatusUpdate`.
+- The `DevApiKey` security scheme (`X-Dev-Api-Key` header), a temporary
+  development credential used by `POST /v1/fleet/location-pings` until the
+  identity module replaces it.
+- The tags `Live` and `Events`, and the shared `PartnerIdQuery` parameter.
+- Error code `unprocessable` (422): a well-formed request that cannot be
+  processed as a whole.
+- Portal: the Live streams page; Concepts describes an agent as a
+  membership in a partner's service, not an identity.
 - `info.license` in the OpenAPI document: the contract, the SDKs and the
   portal are released under the MIT licence.
 

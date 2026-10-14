@@ -1,0 +1,27 @@
+type: object
+description: The individual checks behind a detailed health report, one per dependency the API needs. New checks are an additive change; clients must ignore keys they do not know.
+required:
+  - postgres
+  - valkey
+  - outbox
+properties:
+  postgres:
+    $ref: ./DependencyCheck.yaml
+    description: The relational database.
+  valkey:
+    $ref: ./DependencyCheck.yaml
+    description: The cache and pub/sub store.
+  outbox:
+    $ref: ./OutboxCheck.yaml
+    description: The event outbox.
+examples:
+  - postgres:
+      status: ok
+      latency_ms: 2
+    valkey:
+      status: ok
+      latency_ms: 1
+    outbox:
+      status: ok
+      pending: 0
+      oldest_pending_age_ms: null

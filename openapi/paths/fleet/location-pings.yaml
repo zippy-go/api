@@ -1,0 +1,63 @@
+# Path item for /v1/fleet/location-pings. Referenced from openapi.yaml.
+post:
+  operationId: submitLocationPings
+  summary: Submit location pings
+  description: |
+    Accepts a batch of position reports from agents' devices. The batch is
+    validated and queued, and the response is sent before the pings are
+    applied; `GET /v1/fleet/agents` and the live streams reflect them shortly
+    after. Pings are applied per agent in `recorded_at` order, so a device
+    that buffered pings while it had no connectivity can submit them in one
+    batch.
+
+    The operation authenticates with the temporary development credential
+    only (`DevApiKey`, sent in the `X-Dev-Api-Key` header); the identity
+    module replaces that credential in a later step.
+  tags:
+    - Fleet
+  security:
+    - DevApiKey: []
+  requestBody:
+    required: true
+    description: The pings to apply, 1 to 500 per request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/fleet/LocationPingBatch.yaml
+  responses:
+    '202':
+      description: The batch was validated and queued. The body says how many pings were accepted.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/fleet/LocationPingsAccepted.yaml
+    '400':
+      description: The batch failed validation (`validation_failed`), for example a coordinate out of range, a malformed timestamp, no pings or more than 500 of them. The `errors` member points at each offending field.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid development credential was sent in `X-Dev-Api-Key` (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '422':
+      description: The batch is well formed but cannot be processed (`unprocessable`), for example because a ping references an agent that does not exist. The `errors` member points at the offending pings.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '4XX':
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

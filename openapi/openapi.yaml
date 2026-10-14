@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.1.0
+  version: 0.2.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -48,6 +48,10 @@ tags:
     description: Fulfilment of orders from pickup to dropoff, including tasks and trips.
   - name: Fleet
     description: Providers, agents, vehicles and capacity.
+  - name: Live
+    description: Server-sent event streams that push agent positions, statuses and events as they happen.
+  - name: Events
+    description: The events the platform publishes, as a list to poll and as a stream.
   - name: Subscriptions
     description: Plans and schedules that generate recurring orders.
   - name: Webhooks
@@ -56,6 +60,18 @@ tags:
 paths:
   /v1/health:
     $ref: ./paths/platform/health.yaml
+  /v1/health/details:
+    $ref: ./paths/platform/health-details.yaml
+  /v1/fleet/agents:
+    $ref: ./paths/fleet/agents.yaml
+  /v1/fleet/location-pings:
+    $ref: ./paths/fleet/location-pings.yaml
+  /v1/events:
+    $ref: ./paths/events/events.yaml
+  /v1/live/agents:
+    $ref: ./paths/live/agents.yaml
+  /v1/live/events:
+    $ref: ./paths/live/events.yaml
 
 components:
   securitySchemes:
@@ -74,11 +90,68 @@ components:
       description: |
         User authentication with a JSON Web Token issued by the ZippyGo
         identity service, sent as `Authorization: Bearer <token>`.
+    DevApiKey:
+      type: apiKey
+      in: header
+      name: X-Dev-Api-Key
+      description: |
+        A temporary development credential for Step 0 of the platform, sent
+        in the `X-Dev-Api-Key` header. It is accepted only by the operations
+        that declare it. The identity module replaces it in Step 1; the
+        replacement and the retirement of this scheme are announced in the
+        changelog.
+
+  parameters:
+    PartnerIdQuery:
+      $ref: ./components/parameters/PartnerIdQuery.yaml
 
   schemas:
+    # Common
     HealthResponse:
       $ref: ./components/schemas/common/HealthResponse.yaml
     Money:
       $ref: ./components/schemas/common/Money.yaml
     Problem:
       $ref: ./components/schemas/common/Problem.yaml
+    # Platform
+    CheckStatus:
+      $ref: ./components/schemas/platform/CheckStatus.yaml
+    DependencyCheck:
+      $ref: ./components/schemas/platform/DependencyCheck.yaml
+    OutboxCheck:
+      $ref: ./components/schemas/platform/OutboxCheck.yaml
+    HealthChecks:
+      $ref: ./components/schemas/platform/HealthChecks.yaml
+    HealthDetails:
+      $ref: ./components/schemas/platform/HealthDetails.yaml
+    # Fleet
+    AgentStatus:
+      $ref: ./components/schemas/fleet/AgentStatus.yaml
+    ServiceKind:
+      $ref: ./components/schemas/fleet/ServiceKind.yaml
+    AgentPosition:
+      $ref: ./components/schemas/fleet/AgentPosition.yaml
+    Agent:
+      $ref: ./components/schemas/fleet/Agent.yaml
+    AgentList:
+      $ref: ./components/schemas/fleet/AgentList.yaml
+    LocationPing:
+      $ref: ./components/schemas/fleet/LocationPing.yaml
+    LocationPingBatch:
+      $ref: ./components/schemas/fleet/LocationPingBatch.yaml
+    LocationPingsAccepted:
+      $ref: ./components/schemas/fleet/LocationPingsAccepted.yaml
+    # Events
+    Event:
+      $ref: ./components/schemas/events/Event.yaml
+    EventList:
+      $ref: ./components/schemas/events/EventList.yaml
+    # Live
+    ServerSentEventStream:
+      $ref: ./components/schemas/live/ServerSentEventStream.yaml
+    AgentSnapshot:
+      $ref: ./components/schemas/live/AgentSnapshot.yaml
+    AgentPositionUpdate:
+      $ref: ./components/schemas/live/AgentPositionUpdate.yaml
+    AgentStatusUpdate:
+      $ref: ./components/schemas/live/AgentStatusUpdate.yaml

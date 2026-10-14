@@ -1,0 +1,9 @@
+type: string
+description: |
+  The kind of partner service an agent is attached to. `delivery` is the
+  only kind at present. Clients must tolerate values they do not know,
+  because a new kind is an additive change.
+enum:
+  - delivery
+examples:
+  - delivery

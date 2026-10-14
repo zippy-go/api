@@ -1,0 +1,10 @@
+# Shared query parameter `partner_id`. Referenced from path items and
+# registered under components.parameters in openapi.yaml.
+name: partner_id
+in: query
+required: false
+description: Only include items that belong to this partner. Without it, every partner the credential can see is included.
+schema:
+  type: string
+  format: uuid
+example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02

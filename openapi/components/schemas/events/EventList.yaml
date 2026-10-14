@@ -1,0 +1,22 @@
+type: object
+description: A list of events, the response of `GET /v1/events`.
+required:
+  - items
+properties:
+  items:
+    type: array
+    description: The events, newest first.
+    items:
+      $ref: ./Event.yaml
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01
+        type: fleet.agent.online
+        version: 1
+        occurred_at: 2026-10-14T08:00:00Z
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        correlation_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+        payload:
+          agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          at: 2026-10-14T08:00:00Z

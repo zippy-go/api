@@ -29,6 +29,11 @@ says otherwise.
 - **Bearer token** for user sessions: send a JWT in the
   `Authorization: Bearer <token>` header.
 
+During the initial development step, `POST /v1/fleet/location-pings`
+accepts only a temporary development credential sent in the
+`X-Dev-Api-Key` header (`DevApiKey` in the reference). The identity module
+replaces it; the change is announced in the changelog.
+
 Health checks need no credentials:
 
 ```sh
@@ -36,7 +41,7 @@ curl https://sandbox.api.zippygo.example/v1/health
 ```
 
 ```json
-{ "status": "ok", "version": "0.1.0", "checked_at": "2026-10-14T08:00:00Z" }
+{ "status": "ok", "version": "0.2.0", "checked_at": "2026-10-14T08:00:00Z" }
 ```
 
 ## Errors
@@ -61,6 +66,11 @@ Branch on the `code` member, which is stable, rather than on the text:
 The full list of codes, with their HTTP status and whether a retry can
 succeed, is the
 [error catalog](https://github.com/zippy-go/api/blob/main/errors/catalog.yaml).
+
+## Live data
+
+`GET /v1/live/agents` and `GET /v1/live/events` push changes as server-sent
+events instead of being polled; see [Live streams](/live-streams).
 
 ## Conventions
 

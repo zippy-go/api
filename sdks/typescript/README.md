@@ -29,7 +29,35 @@ if (error) {
 Every operation is a function named after its `operationId` and returns
 `{ data, error, request, response }`. Pass `throwOnError: true` in the
 options to get exceptions instead. Types for every schema are exported from
-the package root (`HealthResponse`, `Money`, `Problem`, ...).
+the package root (`Agent`, `Event`, `HealthDetails`, `Problem`, ...).
+
+## Streams
+
+`streamAgents` and `streamEvents` open the server-sent event streams
+(`GET /v1/live/agents` and `GET /v1/live/events`). They resolve to
+`{ stream }`, an async generator that yields the parsed `data` of every
+frame and reconnects with backoff when the connection drops. A frame's event
+name is only visible in the `onSseEvent` callback, so handle frames there.
+The contract models the stream body as a string, so `data` is typed as
+`string` although the client has already parsed the JSON: cast it through
+`unknown` to the frame's schema (`AgentSnapshot`, `AgentPositionUpdate`,
+`AgentStatusUpdate` or `Event`).
+
+```ts
+import { streamEvents, type Event } from '@zippy-go/api';
+
+const { stream } = await streamEvents({
+  onSseEvent: ({ event, data }) => {
+    if (event === 'event') console.log((data as unknown as Event).type);
+  },
+});
+for await (const _frame of stream) {
+  // keeps the connection open
+}
+```
+
+The Live streams page of the developer portal documents the event types of
+each stream and how to recover from a dropped connection.
 
 ## Layout
 

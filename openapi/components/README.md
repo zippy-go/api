@@ -7,8 +7,14 @@ under `components.schemas` by name and points at the file that defines it.
 components/
   schemas/
     common/        Shared primitives: Problem, Money, HealthResponse
-    <domain>/      One folder per domain, one file per schema (planned)
-  parameters/      Shared query, path and header parameters (planned)
+    platform/      Detailed health: HealthDetails, HealthChecks, DependencyCheck, OutboxCheck, CheckStatus
+    fleet/         Agents and positions: Agent, AgentPosition, AgentStatus, ServiceKind, AgentList,
+                   LocationPing, LocationPingBatch, LocationPingsAccepted
+    events/        The event envelope as the API returns it: Event, EventList
+    live/          Server-sent event streams: ServerSentEventStream and the frame data
+                   AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate
+    <domain>/      One folder per further domain, one file per schema
+  parameters/      Shared query, path and header parameters: PartnerIdQuery
   responses/       Shared responses such as the standard error responses (planned)
 ```
 
@@ -25,6 +31,9 @@ Naming rules:
   values they do not know, because new values are an additive change.
 - Nothing is defined inline in a path file; add a schema file and reference
   it, so the generated SDKs get a stable, named type.
+- A value that may be `null` is written the OpenAPI 3.1 way: a type list
+  (`type: [string, 'null']`) for primitives, `oneOf` with `type: 'null'` for
+  a reference. There is no `nullable` keyword in 3.1.
 - The RFC 9457 error shape is named `Problem`, not `Error`, so that the
   generated SDKs do not shadow a language's built-in error type (TypeScript's
   global `Error`, for example).

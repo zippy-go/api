@@ -1,0 +1,11 @@
+type: string
+description: |
+  The working status of an agent. `online` means the agent is attached to
+  its service and reporting; `offline` means it is not. Clients must
+  tolerate values they do not know, because a new status is an additive
+  change.
+enum:
+  - online
+  - offline
+examples:
+  - online

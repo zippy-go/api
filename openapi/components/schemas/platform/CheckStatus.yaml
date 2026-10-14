@@ -1,0 +1,11 @@
+type: string
+description: |
+  The outcome of a health check. `ok` when the subject is working normally,
+  `degraded` when it works but is impaired (slow, or behind), `down` when it
+  is not working. Clients must tolerate values they do not know.
+enum:
+  - ok
+  - degraded
+  - down
+examples:
+  - ok

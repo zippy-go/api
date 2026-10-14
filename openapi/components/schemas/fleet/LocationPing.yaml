@@ -1,0 +1,62 @@
+type: object
+description: |
+  One position report from an agent's device. Pings are submitted in
+  batches with `POST /v1/fleet/location-pings` and applied per agent in
+  `recorded_at` order, so a device that buffered pings while it had no
+  connectivity can submit them together.
+required:
+  - agent_id
+  - lat
+  - lng
+  - recorded_at
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The agent the ping belongs to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  lat:
+    type: number
+    minimum: -90
+    maximum: 90
+    description: Latitude in decimal degrees (WGS 84).
+    examples:
+      - 12.9716
+  lng:
+    type: number
+    minimum: -180
+    maximum: 180
+    description: Longitude in decimal degrees (WGS 84).
+    examples:
+      - 77.5946
+  heading_deg:
+    type:
+      - number
+      - 'null'
+    minimum: 0
+    maximum: 360
+    description: Direction of travel in degrees clockwise from true north. Omit it or send `null` when the device did not report one.
+    examples:
+      - 270.5
+  speed_mps:
+    type:
+      - number
+      - 'null'
+    minimum: 0
+    description: Ground speed in metres per second. Omit it or send `null` when the device did not report one.
+    examples:
+      - 4.2
+  recorded_at:
+    type: string
+    format: date-time
+    description: When the position was recorded on the device, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:00:00Z
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    lat: 12.9716
+    lng: 77.5946
+    heading_deg: 270.5
+    speed_mps: 4.2
+    recorded_at: 2026-10-14T08:00:00Z

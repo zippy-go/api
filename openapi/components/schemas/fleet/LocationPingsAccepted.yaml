@@ -1,0 +1,13 @@
+type: object
+description: The response of `POST /v1/fleet/location-pings`, sent once the batch has been validated and queued.
+required:
+  - accepted
+properties:
+  accepted:
+    type: integer
+    minimum: 0
+    description: The number of pings accepted for processing. They are applied after the response is sent; agents' positions and the live streams reflect them shortly after.
+    examples:
+      - 1
+examples:
+  - accepted: 1

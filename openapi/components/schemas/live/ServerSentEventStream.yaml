@@ -1,0 +1,13 @@
+type: string
+description: |
+  A stream of server-sent events, as defined by the WHATWG HTML standard,
+  with the media type `text/event-stream`. Each frame is an `event:` line
+  naming the event type, a `data:` line carrying JSON (empty for
+  `heartbeat`) and a blank line. The event types and the shape of their
+  data are documented on each streaming operation. OpenAPI has no native
+  type for a stream, so the body is modelled as a string.
+examples:
+  - |
+    event: heartbeat
+    data:
+

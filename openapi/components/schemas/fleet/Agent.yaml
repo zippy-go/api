@@ -1,0 +1,71 @@
+type: object
+description: |
+  A person attached to one of a partner's services who executes tasks for
+  it. The agent is a membership in that service, not an identity: the same
+  person is a separate agent in every service they are attached to, each
+  with its own id, status and position.
+required:
+  - id
+  - partner_id
+  - display_name
+  - service_kind
+  - status
+  - last_seen_at
+  - position
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the agent.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner whose service the agent is attached to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  display_name:
+    type: string
+    minLength: 1
+    description: The name the agent is shown under.
+    examples:
+      - Agent 10
+  service_kind:
+    $ref: ./ServiceKind.yaml
+    description: The kind of service the agent is attached to.
+  status:
+    $ref: ./AgentStatus.yaml
+    description: The agent's current working status.
+  last_seen_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the agent was last heard from (a location ping or a status change), as an RFC 3339 timestamp in UTC, or `null` if never.
+    examples:
+      - 2026-10-14T08:00:00Z
+  position:
+    oneOf:
+      - $ref: ./AgentPosition.yaml
+      - type: 'null'
+    description: The agent's last known position, or `null` when the agent has not reported one yet.
+    examples:
+      - lat: 12.9716
+        lng: 77.5946
+        heading_deg: 270.5
+        speed_mps: 4.2
+        recorded_at: 2026-10-14T08:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    display_name: Agent 10
+    service_kind: delivery
+    status: online
+    last_seen_at: 2026-10-14T08:00:00Z
+    position:
+      lat: 12.9716
+      lng: 77.5946
+      heading_deg: 270.5
+      speed_mps: 4.2
+      recorded_at: 2026-10-14T08:00:00Z

@@ -1,0 +1,73 @@
+type: object
+description: |
+  An event as published by ZippyGo: the envelope defined by the event
+  schemas in this repository (`events/envelope.schema.json`), with the
+  business data in `payload`. The shape of `payload` is defined per `type`
+  and `version` in the event catalog.
+required:
+  - id
+  - type
+  - version
+  - occurred_at
+  - partner_id
+  - correlation_id
+  - payload
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the event, a UUID version 7 so that ids sort by creation time. Deduplicate on it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01
+  type:
+    type: string
+    pattern: ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$
+    description: The event type as `<domain>.<event>`, for example `fleet.agent.online`. The full list is in the event catalog.
+    examples:
+      - fleet.agent.online
+  version:
+    type: integer
+    minimum: 1
+    description: The payload schema version for this event type.
+    examples:
+      - 1
+  occurred_at:
+    type: string
+    format: date-time
+    description: When the event happened, as an RFC 3339 timestamp in UTC.
+    examples:
+      - 2026-10-14T08:00:00Z
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The partner the event belongs to, or `null` for platform-level events that are not scoped to a partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  correlation_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Shared by every event and request that stem from the same originating action, or `null` when the event was not caused by a traceable request.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+  payload:
+    type: object
+    description: The event data, as defined by `type` and `version` in the event catalog.
+    examples:
+      - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        at: 2026-10-14T08:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01
+    type: fleet.agent.online
+    version: 1
+    occurred_at: 2026-10-14T08:00:00Z
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    correlation_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+    payload:
+      agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      at: 2026-10-14T08:00:00Z

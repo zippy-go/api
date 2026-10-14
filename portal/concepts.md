@@ -48,10 +48,15 @@ a trip, and a trip's progress is what live tracking and ETAs are built on.
 
 ## Agent
 
-An agent is a person or, later, a machine that executes tasks for a fleet.
-Agents belong to a provider, have a vehicle and a working status, and are
-assigned trips. Everything the API reports about progress, location and
-proof of delivery comes from the agent executing the task.
+An agent is a person or, later, a machine attached to one of a partner's
+services that executes tasks for it. The agent record is a membership in
+that service, not an identity: it carries the partner, the kind of service
+(`delivery` for now), a display name, a working status (`online` or
+`offline`) and the last known position. The same person is a separate agent
+in every service they are attached to, and signing in is a matter for the
+identity module rather than for the agent record. Agents are assigned
+trips, and everything the API reports about progress, location and proof of
+delivery comes from the agent executing the task.
 
 ## Provider
 

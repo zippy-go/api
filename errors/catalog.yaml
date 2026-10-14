@@ -89,6 +89,17 @@ errors:
     retryable: false
     description: The request body has a content type the endpoint does not accept.
 
+  - code: unprocessable
+    status: 422
+    title: Unprocessable content
+    message: "The request cannot be processed: {reason}."
+    retryable: false
+    description: >-
+      The request is well formed and every field is valid on its own, but it
+      cannot be processed as a whole, for example because it references an
+      agent that does not exist. The `errors` member points at the offending
+      items when the problem is specific to part of the request.
+
   - code: rate_limited
     status: 429
     title: Rate limited

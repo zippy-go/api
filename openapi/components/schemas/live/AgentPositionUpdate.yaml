@@ -1,0 +1,28 @@
+type: object
+description: The data of a `position` frame on `GET /v1/live/agents`, sent when an agent's position changes.
+required:
+  - agent_id
+  - position
+  - status
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The agent that moved.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  position:
+    $ref: ../fleet/AgentPosition.yaml
+    description: The agent's new position.
+  status:
+    $ref: ../fleet/AgentStatus.yaml
+    description: The agent's status at the time of the update.
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    position:
+      lat: 12.9716
+      lng: 77.5946
+      heading_deg: 270.5
+      speed_mps: 4.2
+      recorded_at: 2026-10-14T08:00:00Z
+    status: online

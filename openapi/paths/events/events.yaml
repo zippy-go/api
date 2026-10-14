@@ -1,0 +1,51 @@
+# Path item for /v1/events. Referenced from openapi.yaml.
+get:
+  operationId: listEvents
+  summary: List recent events
+  description: |
+    Returns up to `limit` of the most recent events, newest first. Each item
+    is an event envelope as defined in the event catalog, with the business
+    data in `payload`.
+
+    To poll for new events, pass the newest `id` already received as
+    `after`: only events newer than that one are returned. Event ids are
+    UUID version 7 values, so they sort by creation time. To follow events
+    without polling, use `GET /v1/live/events`.
+  tags:
+    - Events
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: The maximum number of events to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+    - name: after
+      in: query
+      required: false
+      description: Only include events newer than the event with this id; that event itself is not included.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The most recent events, newest first.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/events/EventList.yaml
+    '4XX':
+      description: A client error such as `400` (`validation_failed`) when `limit` is out of range or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

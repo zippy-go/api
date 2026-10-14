@@ -1,0 +1,36 @@
+type: object
+description: |
+  A detailed health report, returned by `GET /v1/health/details`. The
+  overall `status` is the worst of the checks: `ok` when every check is
+  `ok`, `degraded` when the API serves requests but at least one check is
+  `degraded`, `down` when a check the API cannot serve without is `down`.
+required:
+  - status
+  - version
+  - checks
+properties:
+  status:
+    $ref: ./CheckStatus.yaml
+    description: The overall status, the worst of the individual checks.
+  version:
+    type: string
+    description: The semantic version of the running API.
+    examples:
+      - 0.2.0
+  checks:
+    $ref: ./HealthChecks.yaml
+    description: The individual checks the overall status is derived from.
+examples:
+  - status: ok
+    version: 0.2.0
+    checks:
+      postgres:
+        status: ok
+        latency_ms: 2
+      valkey:
+        status: ok
+        latency_ms: 1
+      outbox:
+        status: ok
+        pending: 0
+        oldest_pending_age_ms: null

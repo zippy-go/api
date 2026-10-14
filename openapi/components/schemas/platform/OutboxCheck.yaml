@@ -1,0 +1,31 @@
+type: object
+description: |
+  The state of the event outbox, the queue of events that have been
+  recorded but not yet published. A growing backlog or an old pending event
+  means consumers see events late.
+required:
+  - status
+  - pending
+  - oldest_pending_age_ms
+properties:
+  status:
+    $ref: ./CheckStatus.yaml
+    description: The outcome of the check, derived from the backlog size and age.
+  pending:
+    type: integer
+    minimum: 0
+    description: The number of events waiting to be published.
+    examples:
+      - 0
+  oldest_pending_age_ms:
+    type:
+      - integer
+      - 'null'
+    minimum: 0
+    description: How long the oldest pending event has been waiting, in milliseconds, or `null` when nothing is pending.
+    examples:
+      - 120
+examples:
+  - status: ok
+    pending: 0
+    oldest_pending_age_ms: null

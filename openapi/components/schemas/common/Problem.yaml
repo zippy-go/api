@@ -51,7 +51,7 @@ properties:
       - validation_failed
   errors:
     type: array
-    description: Field-level problems. Present for `validation_failed`, otherwise omitted.
+    description: Field-level problems. Present for `validation_failed` and, when the problem is specific to part of the request, for `unprocessable`; otherwise omitted.
     items:
       type: object
       description: One invalid field and why it was rejected.

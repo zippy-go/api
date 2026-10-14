@@ -1,0 +1,18 @@
+type: object
+description: The result of probing one dependency of the API, such as the database or the cache.
+required:
+  - status
+  - latency_ms
+properties:
+  status:
+    $ref: ./CheckStatus.yaml
+    description: The outcome of the probe.
+  latency_ms:
+    type: integer
+    minimum: 0
+    description: The round-trip time of the probe in milliseconds. When the dependency is `down`, the time until the probe failed or timed out.
+    examples:
+      - 2
+examples:
+  - status: ok
+    latency_ms: 2

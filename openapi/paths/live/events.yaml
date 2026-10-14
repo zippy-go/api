@@ -1,0 +1,49 @@
+# Path item for /v1/live/events. Referenced from openapi.yaml.
+get:
+  operationId: streamEvents
+  summary: Stream events
+  description: |
+    Opens a server-sent events stream (`text/event-stream`) that pushes every
+    event as it is published, in publication order. Each `event` frame
+    carries one event envelope as JSON, the same shape as the items of
+    `GET /v1/events`.
+
+    | Event       | Data                       | When                   |
+    | ----------- | -------------------------- | ---------------------- |
+    | `event`     | `Event`: an event envelope | An event was published |
+    | `heartbeat` | empty                      | Every 15 seconds       |
+
+    Frames carry no `id` field and the `Last-Event-ID` request header is
+    ignored: events published while a client was disconnected are not
+    replayed on the stream. After reconnecting (with backoff), fetch what was
+    missed with `GET /v1/events?after=<id>`, where `<id>` is the newest event
+    id received before the connection was lost. Treat the absence of any
+    frame for 45 seconds, three missed heartbeats, as a lost connection.
+  tags:
+    - Live
+  responses:
+    '200':
+      description: The stream is open. It stays open until the client closes it or the server restarts; frames follow as events are published.
+      content:
+        text/event-stream:
+          schema:
+            $ref: ../../components/schemas/live/ServerSentEventStream.yaml
+          example: |
+            event: event
+            data: {"id":"0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01","type":"fleet.agent.online","version":1,"occurred_at":"2026-10-14T08:00:00Z","partner_id":"0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02","correlation_id":"0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03","payload":{"agent_id":"0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10","partner_id":"0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02","at":"2026-10-14T08:00:00Z"}}
+
+            event: heartbeat
+            data:
+
+    '4XX':
+      description: A client error such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
