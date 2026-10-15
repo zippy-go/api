@@ -77,7 +77,7 @@ properties:
     type:
       - boolean
       - 'null'
-    description: Whether the store delivers to the pin; `null` without a pin. A store out of reach is still listed.
+    description: Whether the store delivers to the pin; `null` without a pin, `false` for a store that offers no delivery. A store out of reach is still listed.
   delivery_fee:
     oneOf:
       - $ref: ../common/Money.yaml

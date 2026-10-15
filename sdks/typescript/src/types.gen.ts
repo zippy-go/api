@@ -8539,7 +8539,7 @@ export type StoreCard = {
      */
     catalogue?: StoreCatalogueSummary | null;
     /**
-     * Whether the store delivers to the pin; `null` without a pin. A store out of reach is still listed.
+     * Whether the store delivers to the pin; `null` without a pin, `false` for a store that offers no delivery. A store out of reach is still listed.
      */
     delivers_to_pin?: boolean | null;
     /**
