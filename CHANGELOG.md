@@ -6,12 +6,12 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
-## [0.12.0] - 2026-10-15
+## [0.11.0] - 2026-10-15
 
 Step 2, customer: customers sign in with a code to their number and keep an
 account, and the storefront places a visitor, composes the opening screen and
-lists a Vertical's stores by distance. Numbered after the catalogue's 0.11.0,
-which merges first (step 2 is built on two branches).
+lists a Vertical's stores by distance. Step 2 is built on two branches; this
+one merges first, and the catalogue follows as 0.12.0.
 
 ### Added
 

@@ -17,7 +17,7 @@ examples:
           id: web-3f2a9c1d8e7b6a50
           platform: web
           model: null
-          app_version: 0.12.0
+          app_version: 1.4.0
           os_version: null
         recognised: true
         last_address: 203.0.113.9
