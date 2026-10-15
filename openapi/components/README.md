@@ -23,7 +23,9 @@ components/
                    LocationPing, LocationPingBatch, LocationPingsAccepted
     events/        The event envelope as the API returns it: Event, EventList
     live/          Server-sent event streams: ServerSentEventStream and the frame data
-                   AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate
+                   AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate (the agent stream); LiveConfig and
+                   the frames of the live stream: Signal, SignalSubject, AgentsSnapshot, Resync,
+                   AgentPositionFrame, AgentStatusFrame, Close, CloseReason
     reference/     Reference data: Country, Currency, Lifecycle, ServiceArea, Fence, ResolvedPin, DivisionPlan,
                    Vertical, VerticalOffer, ReachNode, CampaignSlot, DisplayGrid, ServicePolicy, PolicyLayer,
                    EffectivePolicy, Schedule, ScheduleLayer, EffectiveSchedule, Trading, StoreType, ServiceType,

@@ -6,6 +6,30 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-15
+
+### Added
+
+- The live stream (specification `realtime-messaging`, tag `Live`):
+  `GET /v1/live/stream?channels=` opens one server-sent events stream on
+  the channels an app names, from the closed vocabulary (`broadcast`,
+  `store-{location_id}-menu`, `private-broadcast`,
+  `private-customer-{customer_id}-orders`, `private-order-{order_id}`,
+  `private-location-{location_id}-orders|notices|catalog|kitchen|tables`,
+  `private-partner-{partner_id}-agents`, `private-agents`,
+  `private-orders`, `private-agent-{agent_id}-tasks`); a name no channel
+  produces is `400` (`channel_unknown`); private channels are authorised
+  when the stream opens and an open is refused as a whole with `errors` by
+  position (`401`, `403`, `404`); public channels need no credential.
+  Frames: `snapshot` (`AgentsSnapshot`) or `resync` (`Resync`) per channel
+  on open, `signal` (`Signal`), `agent.position` (`AgentPositionFrame`),
+  `agent.status` (`AgentStatusFrame`), `heartbeat` every 15 seconds and
+  `close` (`Close`: `token_expired`, `revoked`, `replaced`).
+- `GET /v1/live/config` (`LiveConfig`): whether live updates are available
+  and how a client behaves (heartbeat, stale threshold, backoff, the cap of
+  four connections per session, the board re-read interval); `503`
+  (`unavailable`) on the stream when they are off.
+
 ## [0.5.0] - 2026-10-15
 
 ### Added

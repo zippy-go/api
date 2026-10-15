@@ -1,0 +1,69 @@
+type: object
+description: What clients learn about live updates, the `LiveConfig` schema.
+required:
+  - live_updates
+  - stream_path
+  - heartbeat_seconds
+  - stale_after_seconds
+  - reconnect_initial_ms
+  - reconnect_max_ms
+  - max_connections_per_session
+  - board_reread_seconds
+properties:
+  board_reread_seconds:
+    type: integer
+    format: int64
+    description: How often operational boards re-read regardless of signals, in seconds.
+    examples:
+      - 30
+  heartbeat_seconds:
+    type: integer
+    format: int64
+    description: Seconds between heartbeats.
+    examples:
+      - 15
+    minimum: 0
+  live_updates:
+    type: boolean
+    description: Whether live updates are available; when `false`, boards re-read instead of streaming.
+  max_connections_per_session:
+    type: integer
+    format: int64
+    description: Most connections one session may hold open before the oldest is closed.
+    examples:
+      - 4
+  reconnect_initial_ms:
+    type: integer
+    format: int64
+    description: First reconnect delay in milliseconds; doubled with jitter up to the maximum.
+    examples:
+      - 1000
+    minimum: 0
+  reconnect_max_ms:
+    type: integer
+    format: int64
+    description: Longest reconnect delay in milliseconds.
+    examples:
+      - 30000
+    minimum: 0
+  stale_after_seconds:
+    type: integer
+    format: int64
+    description: Seconds without a frame after which a client treats the connection as lost.
+    examples:
+      - 45
+    minimum: 0
+  stream_path:
+    type: string
+    description: The stream's path on the API origin.
+    examples:
+      - /v1/live/stream
+examples:
+  - board_reread_seconds: 30
+    heartbeat_seconds: 15
+    live_updates: true
+    max_connections_per_session: 4
+    reconnect_initial_ms: 1000
+    reconnect_max_ms: 30000
+    stale_after_seconds: 45
+    stream_path: /v1/live/stream

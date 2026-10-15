@@ -1,0 +1,8 @@
+type: string
+description: Why the platform closed a stream, the `reason` of a `close` frame.
+enum:
+  - token_expired
+  - revoked
+  - replaced
+examples:
+  - token_expired

@@ -1,0 +1,30 @@
+type: object
+description: Data of an `agent.status` frame, the `AgentStatusFrame` schema.
+required:
+  - channel
+  - agent_id
+  - status
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The agent whose status changed.
+  channel:
+    type: string
+    description: The channel.
+    examples:
+      - private-agents
+  last_seen_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was last heard from.
+  status:
+    $ref: ../fleet/AgentStatus.yaml
+    description: Its new status.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-00000000a014
+    channel: private-agents
+    last_seen_at: 2026-10-15T09:00:00Z
+    status: online

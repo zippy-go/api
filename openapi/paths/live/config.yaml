@@ -1,0 +1,27 @@
+# Path item for /v1/live/config. Referenced from openapi.yaml.
+get:
+  operationId: getLiveConfig
+  summary: Whether live updates are available and how a client should behave
+  description: Whether live updates are available and how a client should behave; public.
+  tags:
+    - Live
+  security: []
+  responses:
+    '200':
+      description: The live update settings
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/live/LiveConfig.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,48 @@
+type: object
+description: |-
+  A signal, the data of a `signal` frame and the `Signal` schema. Clients refetch on a signal
+  rather than apply it; one holding a version equal to or newer than `version` may skip.
+required:
+  - channel
+  - kind
+  - subject
+properties:
+  channel:
+    type: string
+    description: The channel the signal belongs to.
+    examples:
+      - broadcast
+  kind:
+    type: string
+    description: |-
+      What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
+      `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
+      `table.changed`, `task.changed`.
+    examples:
+      - vertical.transitioned
+  status:
+    type:
+      - string
+      - 'null'
+    description: Its new status, where it has one.
+    examples:
+      - inactive
+  subject:
+    $ref: ./SignalSubject.yaml
+    description: What changed.
+  version:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Its version, which only rises per aggregate.
+    examples:
+      - 3
+examples:
+  - channel: broadcast
+    kind: vertical.transitioned
+    status: inactive
+    subject:
+      id: 01a13a48-9e00-7000-8000-00000000b001
+      kind: vertical
+    version: 3

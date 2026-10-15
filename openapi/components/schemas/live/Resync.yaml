@@ -1,0 +1,12 @@
+type: object
+description: 'Data of a `resync` frame: refetch what you show from this channel, the `Resync` schema.'
+required:
+  - channel
+properties:
+  channel:
+    type: string
+    description: The channel.
+    examples:
+      - private-location-01a13a48-9e00-7000-8000-00000000a014-orders
+examples:
+  - channel: private-location-01a13a48-9e00-7000-8000-00000000a014-orders

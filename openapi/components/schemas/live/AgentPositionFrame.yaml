@@ -1,0 +1,33 @@
+type: object
+description: Data of an `agent.position` frame, the `AgentPositionFrame` schema.
+required:
+  - channel
+  - agent_id
+  - position
+  - status
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The agent that moved.
+  channel:
+    type: string
+    description: The channel.
+    examples:
+      - private-agents
+  position:
+    $ref: ../fleet/AgentPosition.yaml
+    description: Its new position.
+  status:
+    $ref: ../fleet/AgentStatus.yaml
+    description: Its status at the time.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-00000000a014
+    channel: private-agents
+    position:
+      heading_deg: 270.5
+      lat: 17.385
+      lng: 78.4867
+      recorded_at: 2026-10-15T09:00:00Z
+      speed_mps: 4.2
+    status: online

@@ -1,0 +1,19 @@
+type: object
+description: What changed, the `SignalSubject` schema.
+required:
+  - kind
+  - id
+properties:
+  id:
+    type: string
+    description: Its id.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000b001
+  kind:
+    type: string
+    description: 'The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`.'
+    examples:
+      - vertical
+examples:
+  - id: 01a13a48-9e00-7000-8000-00000000b001
+    kind: vertical

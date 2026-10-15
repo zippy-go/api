@@ -1,0 +1,10 @@
+type: object
+description: Data of a `close` frame, the last frame of a stream the platform ends, the `Close` schema.
+required:
+  - reason
+properties:
+  reason:
+    $ref: ./CloseReason.yaml
+    description: Why the stream ends.
+examples:
+  - reason: token_expired

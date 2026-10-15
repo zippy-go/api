@@ -38,6 +38,8 @@ paths/
   events/events.yaml            GET /v1/events
   live/agents.yaml              GET /v1/live/agents (server-sent events)
   live/events.yaml              GET /v1/live/events (server-sent events)
+  live/stream.yaml              GET /v1/live/stream (server-sent events, the one stream every app holds)
+  live/config.yaml              GET /v1/live/config
   currencies/currencies.yaml    GET, POST /v1/currencies
   currencies/currency.yaml      GET, PATCH /v1/currencies/{code}
   countries/countries.yaml      GET, POST /v1/countries

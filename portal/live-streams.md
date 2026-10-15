@@ -1,17 +1,23 @@
 # Live streams
 
-Two endpoints push changes to the client as they happen, instead of being
+Three endpoints push changes to the client as they happen, instead of being
 polled. They use
 [server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html):
 a long-lived HTTP response with the media type `text/event-stream` in which
-the server writes one frame per change. Both are tagged *Live* in the
+the server writes one frame per change. All are tagged *Live* in the
 [API reference](/reference) and accept the same credentials as the rest of
-the API.
+the API; the public channels of `GET /v1/live/stream` need none.
 
 | Endpoint              | What it streams                                                              |
 | --------------------- | ---------------------------------------------------------------------------- |
+| `GET /v1/live/stream` | The channels an app names: signals that something changed, agent positions and statuses, and the frames that open and close the stream |
 | `GET /v1/live/agents` | Agent positions and statuses, for every partner or for one (`partner_id`)    |
 | `GET /v1/live/events` | Every event the platform publishes, as it is published                       |
+
+`GET /v1/live/config` says whether live updates are available in an
+environment and how a client should behave (heartbeat, stale threshold,
+backoff, connections per session); a client reads it before opening a
+stream and re-reads its boards instead when `live_updates` is `false`.
 
 ## Frames
 
@@ -32,6 +38,48 @@ reference (`AgentSnapshot`, `AgentPositionUpdate`, `AgentStatusUpdate` and
 `Event`), so the generated SDKs have types for them. Clients must ignore
 event types and fields they do not know; adding them is not a breaking
 change.
+
+## The stream: `GET /v1/live/stream`
+
+One connection per app, naming every channel its screens listen to:
+`?channels=broadcast,private-location-<id>-orders`. Channels are a closed
+vocabulary; a name no channel produces is `400` (`channel_unknown`) with
+`errors` pointing at its position. Private channels are authorised when the
+stream opens, against the caller's own facts: an open naming a channel the
+caller may not hear is refused as a whole (`401`, `403` or `404`, `errors`
+by position), so the client drops it and opens again. Anonymous clients
+hear the public channels (`broadcast`, `store-<location_id>-menu`).
+
+| Channel                                   | Who hears it                                   |
+| ----------------------------------------- | ---------------------------------------------- |
+| `broadcast`                               | Anyone                                         |
+| `store-{location_id}-menu`                | Anyone                                         |
+| `private-broadcast`                       | Any signed-in person                           |
+| `private-customer-{customer_id}-orders`   | That customer                                  |
+| `private-order-{order_id}`                | The customer who placed it                     |
+| `private-location-{location_id}-orders`, `-notices`, `-catalog`, `-kitchen`, `-tables` | Members of the location's partner |
+| `private-partner-{partner_id}-agents`     | Members of the partner                         |
+| `private-agents`, `private-orders`        | Platform staff (the network)                   |
+| `private-agent-{agent_id}-tasks`          | That agent                                     |
+
+| Event            | Data                                                        | When                                              |
+| ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
+| `snapshot`       | `AgentsSnapshot`: `{ "channel", "agents": [Agent, ...] }`    | On open, per agent channel                        |
+| `resync`         | `Resync`: `{ "channel" }`                                    | On open, per other channel; after a fan-out outage |
+| `signal`         | `Signal`: `{ "channel", "kind", "subject", "status", "version" }` | Something changed; refetch it                |
+| `agent.position` | `AgentPositionFrame`                                        | An agent moved                                    |
+| `agent.status`   | `AgentStatusFrame`                                          | An agent went online or offline                   |
+| `heartbeat`      | empty                                                       | Every 15 seconds                                  |
+| `close`          | `Close`: `{ "reason": "token_expired" \| "revoked" \| "replaced" }` | The platform ends the stream; reconnect or sign in |
+
+A signal says what changed and at which version, never the state: refetch
+on a signal, unless you already hold that version or a newer one. Send
+`client_id` so a connection reopened with a new channel set replaces the
+old one at once; a session holds at most four connections, the oldest
+closing with `replaced`. The stream lives no longer than the access token:
+at expiry it closes with `token_expired`, and the client reconnects with
+its refreshed token. A revoked session or a removed membership closes the
+stream with `revoked` within a minute.
 
 ## Agents: `GET /v1/live/agents`
 

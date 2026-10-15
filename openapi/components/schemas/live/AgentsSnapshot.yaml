@@ -1,0 +1,33 @@
+type: object
+description: |-
+  Data of a `snapshot` frame: the current facts of a channel whose frames carry facts, the
+  `AgentsSnapshot` schema.
+required:
+  - channel
+  - agents
+properties:
+  agents:
+    type: array
+    items:
+      $ref: ../fleet/Agent.yaml
+    description: Every agent the channel covers, at the time the stream opened.
+  channel:
+    type: string
+    description: The channel.
+    examples:
+      - private-agents
+examples:
+  - agents:
+      - display_name: Agent 10
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        last_seen_at: 2026-10-15T09:00:00Z
+        partner_id: 01a13a48-9e00-7000-8000-00000000a014
+        position:
+          heading_deg: 270.5
+          lat: 17.385
+          lng: 78.4867
+          recorded_at: 2026-10-15T09:00:00Z
+          speed_mps: 4.2
+        service_kind: delivery
+        status: online
+    channel: private-agents

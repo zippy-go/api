@@ -1,0 +1,119 @@
+# Path item for /v1/live/stream. Referenced from openapi.yaml.
+get:
+  operationId: openLiveStream
+  summary: Open the live stream
+  description: |
+    Opens the one server-sent events stream an app holds, naming every
+    channel its screens listen to, comma-separated, from the closed
+    vocabulary (see Live streams on the portal). A name no channel produces
+    is `400` (`channel_unknown`) with `errors` by position. Private channels
+    are authorised when the stream opens, against the caller's own facts,
+    never cached: an open naming a channel the caller may not hear is
+    refused as a whole (`401`, `403` or `404`, `errors` pointing at the
+    refused channel's position), so the client drops it and opens again.
+    Public channels (`broadcast`, `store-{location_id}-menu`) need no
+    credential.
+
+    | Event            | Data                 | When                                                        |
+    | ---------------- | -------------------- | ----------------------------------------------------------- |
+    | `snapshot`       | `AgentsSnapshot`     | On open, per agent channel                                  |
+    | `resync`         | `Resync`             | On open, per other channel; after a fan-out outage          |
+    | `signal`         | `Signal`             | Something changed; refetch it unless you hold the version   |
+    | `agent.position` | `AgentPositionFrame` | An agent moved                                              |
+    | `agent.status`   | `AgentStatusFrame`   | An agent went online or offline                             |
+    | `heartbeat`      | empty                | Every 15 seconds                                            |
+    | `close`          | `Close`              | The platform ends the stream: `token_expired`, `revoked`, `replaced` |
+
+    Frames carry no `id` and missed frames are not replayed: after a
+    reconnect the stream starts again with a `snapshot` or `resync` per
+    channel. The stream lives no longer than the access token; a revoked
+    session or a removed membership closes it within a minute; a connection
+    with the same `client_id`, or the fifth connection of a session, replaces
+    the oldest. Treat 45 seconds without a frame as a lost connection and
+    reconnect with backoff.
+  tags:
+    - Live
+  security:
+    - {}
+    - Bearer: []
+  parameters:
+    - name: channels
+      in: query
+      required: true
+      description: Comma-separated channel names from the closed vocabulary
+      schema:
+        type: string
+    - name: client_id
+      in: query
+      required: false
+      description: The client's id for this connection; a new connection with the same id replaces the old one
+      schema:
+        type: string
+    - name: access_token
+      in: query
+      required: false
+      description: The access token, for clients that cannot set the Authorization header (EventSource)
+      schema:
+        type: string
+  responses:
+    '200':
+      description: 'Server-sent events: `snapshot` or `resync` per channel, then `signal`, `agent.position`, `agent.status`, `heartbeat` and finally `close`'
+      content:
+        text/event-stream:
+          schema:
+            $ref: ../../components/schemas/live/ServerSentEventStream.yaml
+          example: |
+            event: resync
+            data: {"channel":"broadcast"}
+
+            event: signal
+            data: {"channel":"broadcast","kind":"vertical.transitioned","subject":{"kind":"vertical","id":"01a13a48-9e00-7000-8000-00000000b001"},"status":"inactive"}
+
+            event: heartbeat
+            data:
+
+            event: close
+            data: {"reason":"token_expired"}
+
+    '400':
+      description: No channels, too many, or a name no channel produces (`channel_unknown`, errors by position)
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: A private channel without a credential, or an invalid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: A channel this population may not hear, errors by position
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: A Location or Partner channel the caller does not belong to, answered like an unknown id
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: Live updates are not configured in this environment
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

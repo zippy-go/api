@@ -3751,6 +3751,171 @@ export type Window = {
 export type Workflow = 'appointment' | 'on_site_job' | 'pickup_and_return';
 
 /**
+ * Data of an `agent.position` frame, the `AgentPositionFrame` schema.
+ */
+export type AgentPositionFrame = {
+    /**
+     * The agent that moved.
+     */
+    agent_id: string;
+    /**
+     * The channel.
+     */
+    channel: string;
+    /**
+     * Its new position.
+     */
+    position: AgentPosition;
+    /**
+     * Its status at the time.
+     */
+    status: AgentStatus;
+};
+
+/**
+ * Data of an `agent.status` frame, the `AgentStatusFrame` schema.
+ */
+export type AgentStatusFrame = {
+    /**
+     * The agent whose status changed.
+     */
+    agent_id: string;
+    /**
+     * The channel.
+     */
+    channel: string;
+    /**
+     * When it was last heard from.
+     */
+    last_seen_at?: string | null;
+    /**
+     * Its new status.
+     */
+    status: AgentStatus;
+};
+
+/**
+ * Data of a `close` frame, the last frame of a stream the platform ends, the `Close` schema.
+ */
+export type Close = {
+    /**
+     * Why the stream ends.
+     */
+    reason: CloseReason;
+};
+
+/**
+ * Why the platform closed a stream, the `reason` of a `close` frame.
+ */
+export type CloseReason = 'token_expired' | 'revoked' | 'replaced';
+
+/**
+ * What clients learn about live updates, the `LiveConfig` schema.
+ */
+export type LiveConfig = {
+    /**
+     * How often operational boards re-read regardless of signals, in seconds.
+     */
+    board_reread_seconds: number;
+    /**
+     * Seconds between heartbeats.
+     */
+    heartbeat_seconds: number;
+    /**
+     * Whether live updates are available; when `false`, boards re-read instead of streaming.
+     */
+    live_updates: boolean;
+    /**
+     * Most connections one session may hold open before the oldest is closed.
+     */
+    max_connections_per_session: number;
+    /**
+     * First reconnect delay in milliseconds; doubled with jitter up to the maximum.
+     */
+    reconnect_initial_ms: number;
+    /**
+     * Longest reconnect delay in milliseconds.
+     */
+    reconnect_max_ms: number;
+    /**
+     * Seconds without a frame after which a client treats the connection as lost.
+     */
+    stale_after_seconds: number;
+    /**
+     * The stream's path on the API origin.
+     */
+    stream_path: string;
+};
+
+/**
+ * Data of a `resync` frame: refetch what you show from this channel, the `Resync` schema.
+ */
+export type Resync = {
+    /**
+     * The channel.
+     */
+    channel: string;
+};
+
+/**
+ * A signal, the data of a `signal` frame and the `Signal` schema. Clients refetch on a signal
+ * rather than apply it; one holding a version equal to or newer than `version` may skip.
+ */
+export type Signal = {
+    /**
+     * The channel the signal belongs to.
+     */
+    channel: string;
+    /**
+     * What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
+     * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
+     * `table.changed`, `task.changed`.
+     */
+    kind: string;
+    /**
+     * Its new status, where it has one.
+     */
+    status?: string | null;
+    /**
+     * What changed.
+     */
+    subject: SignalSubject;
+    /**
+     * Its version, which only rises per aggregate.
+     */
+    version?: number | null;
+};
+
+/**
+ * Data of a `snapshot` frame: the current facts of a channel whose frames carry facts, the
+ * `AgentsSnapshot` schema.
+ */
+export type AgentsSnapshot = {
+    /**
+     * Every agent the channel covers, at the time the stream opened.
+     */
+    agents: Array<Agent>;
+    /**
+     * The channel.
+     */
+    channel: string;
+};
+
+/**
+ * What changed, the `SignalSubject` schema.
+ */
+export type SignalSubject = {
+    /**
+     * Its id.
+     */
+    id: string;
+    /**
+     * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`.
+     */
+    kind: string;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -10043,3 +10208,94 @@ export type SetVerticalStatusResponses = {
 };
 
 export type SetVerticalStatusResponse = SetVerticalStatusResponses[keyof SetVerticalStatusResponses];
+
+export type GetLiveConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/live/config';
+};
+
+export type GetLiveConfigErrors = {
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLiveConfigError = GetLiveConfigErrors[keyof GetLiveConfigErrors];
+
+export type GetLiveConfigResponses = {
+    /**
+     * The live update settings
+     */
+    200: LiveConfig;
+};
+
+export type GetLiveConfigResponse = GetLiveConfigResponses[keyof GetLiveConfigResponses];
+
+export type OpenLiveStreamData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Comma-separated channel names from the closed vocabulary
+         */
+        channels: string;
+        /**
+         * The client's id for this connection; a new connection with the same id replaces the old one
+         */
+        client_id?: string;
+        /**
+         * The access token, for clients that cannot set the Authorization header (EventSource)
+         */
+        access_token?: string;
+    };
+    url: '/v1/live/stream';
+};
+
+export type OpenLiveStreamErrors = {
+    /**
+     * No channels, too many, or a name no channel produces (`channel_unknown`, errors by position)
+     */
+    400: Problem;
+    /**
+     * A private channel without a credential, or an invalid token
+     */
+    401: Problem;
+    /**
+     * A channel this population may not hear, errors by position
+     */
+    403: Problem;
+    /**
+     * A Location or Partner channel the caller does not belong to, answered like an unknown id
+     */
+    404: Problem;
+    /**
+     * Live updates are not configured in this environment
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type OpenLiveStreamError = OpenLiveStreamErrors[keyof OpenLiveStreamErrors];
+
+export type OpenLiveStreamResponses = {
+    /**
+     * Server-sent events: `snapshot` or `resync` per channel, then `signal`, `agent.position`, `agent.status`, `heartbeat` and finally `close`
+     */
+    200: ServerSentEventStream;
+};
+
+export type OpenLiveStreamResponse = OpenLiveStreamResponses[keyof OpenLiveStreamResponses];

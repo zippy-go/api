@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.5.0
+  version: 0.6.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -295,6 +295,10 @@ paths:
     $ref: ./paths/verticals/reach.yaml
   /v1/verticals/{vertical_id}/status:
     $ref: ./paths/verticals/status.yaml
+  /v1/live/config:
+    $ref: ./paths/live/config.yaml
+  /v1/live/stream:
+    $ref: ./paths/live/stream.yaml
 
 components:
   securitySchemes:
@@ -709,3 +713,21 @@ components:
       $ref: ./components/schemas/reference/Window.yaml
     Workflow:
       $ref: ./components/schemas/reference/Workflow.yaml
+    AgentPositionFrame:
+      $ref: ./components/schemas/live/AgentPositionFrame.yaml
+    AgentStatusFrame:
+      $ref: ./components/schemas/live/AgentStatusFrame.yaml
+    Close:
+      $ref: ./components/schemas/live/Close.yaml
+    CloseReason:
+      $ref: ./components/schemas/live/CloseReason.yaml
+    LiveConfig:
+      $ref: ./components/schemas/live/LiveConfig.yaml
+    Resync:
+      $ref: ./components/schemas/live/Resync.yaml
+    Signal:
+      $ref: ./components/schemas/live/Signal.yaml
+    AgentsSnapshot:
+      $ref: ./components/schemas/live/AgentsSnapshot.yaml
+    SignalSubject:
+      $ref: ./components/schemas/live/SignalSubject.yaml

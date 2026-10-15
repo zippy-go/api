@@ -27,4 +27,7 @@ examples:
         status: active
         created_at: 2026-10-14T08:10:00Z
         updated_at: 2026-10-14T08:10:00Z
+        version: 1
+        created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        updated_by: null
         service_area_id: 01a13a48-9e00-7000-8000-00000000a014
