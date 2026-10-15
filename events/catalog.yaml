@@ -122,3 +122,33 @@ events:
       `partner_id` is the partner; the configuration is not in the payload.
     payload_schema: ./payloads/tenancy.service.updated.v1.schema.json
     example: ./examples/tenancy.service.updated.v1.json
+
+  - type: reference.vertical.transitioned
+    version: 1
+    domain: reference
+    description: >-
+      A Vertical moved along its lifecycle (active, inactive, archived), so
+      every open screen re-reads its display grid. The envelope's
+      `partner_id` is `null`.
+    payload_schema: ./payloads/reference.vertical.transitioned.v1.schema.json
+    example: ./examples/reference.vertical.transitioned.v1.json
+
+  - type: reference.country.status_changed
+    version: 1
+    domain: reference
+    description: >-
+      A country's status or one of its switches (orders, sign-in) changed;
+      the payload carries the country's whole operating state. The
+      envelope's `partner_id` is `null`.
+    payload_schema: ./payloads/reference.country.status_changed.v1.schema.json
+    example: ./examples/reference.country.status_changed.v1.json
+
+  - type: reference.service_area.status_changed
+    version: 1
+    domain: reference
+    description: >-
+      A service area's status changed; everything beneath it follows, since
+      `effectively_active` is read through the chain. The envelope's
+      `partner_id` is `null`.
+    payload_schema: ./payloads/reference.service_area.status_changed.v1.schema.json
+    example: ./examples/reference.service_area.status_changed.v1.json

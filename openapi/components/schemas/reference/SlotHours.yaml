@@ -1,0 +1,24 @@
+type: object
+description: Hours of the week a campaign slot shows, in the service area's own clock.
+required:
+  - day
+  - from
+  - to
+properties:
+  day:
+    $ref: ./Day.yaml
+    description: The day.
+  from:
+    type: string
+    description: From this local time.
+    examples:
+      - 07:00
+  to:
+    type: string
+    description: Until this local time; `00:00` means midnight at the close of the day.
+    examples:
+      - 11:00
+examples:
+  - day: monday
+    from: 07:00
+    to: 11:00

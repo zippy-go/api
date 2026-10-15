@@ -1,0 +1,9 @@
+type: string
+description: Which layer of the chain a value came from.
+enum:
+  - country
+  - service_area
+  - partner
+  - location
+examples:
+  - country

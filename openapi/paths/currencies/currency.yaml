@@ -1,0 +1,145 @@
+# Path item for /v1/currencies/{code}. Referenced from openapi.yaml.
+parameters:
+  - name: code
+    in: path
+    required: true
+    description: The ISO 4217 code
+    schema:
+      type: string
+    example: INR
+get:
+  operationId: getCurrency
+  summary: One currency
+  description: One currency.
+  tags:
+    - Currencies
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
+  responses:
+    '200':
+      description: The currency, with its version as the `ETag`
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Currency.yaml
+    '304':
+      description: '`If-None-Match` named the current version'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown currency
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updateCurrency
+  summary: Changes a currency's symbol, locale or status
+  description: Changes a currency's symbol, locale or status; platform staff. Send `If-Match` to be refused when someone else changed it first.
+  tags:
+    - Currencies
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/CurrencyUpdate.yaml
+  responses:
+    '200':
+      description: The currency after the change, with its new `ETag`
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Currency.yaml
+    '400':
+      description: Malformed body or invalid fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown currency
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`illegal_transition`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`If-Match` no longer matches'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

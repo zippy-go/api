@@ -38,6 +38,26 @@ paths/
   events/events.yaml            GET /v1/events
   live/agents.yaml              GET /v1/live/agents (server-sent events)
   live/events.yaml              GET /v1/live/events (server-sent events)
+  currencies/currencies.yaml    GET, POST /v1/currencies
+  currencies/currency.yaml      GET, PATCH /v1/currencies/{code}
+  countries/countries.yaml      GET, POST /v1/countries
+  countries/country.yaml        GET, PATCH /v1/countries/{alpha2}
+  countries/<switch>.yaml       PUT /v1/countries/{alpha2}/status, /orders, /sign-in, /default-service-area
+  countries/holidays.yaml       GET, PUT /v1/countries/{alpha2}/holidays
+  countries/policy.yaml         GET, PUT /v1/countries/{alpha2}/policy (+ policy-versions.yaml)
+  countries/schedule.yaml       GET, PUT /v1/countries/{alpha2}/schedule
+  service-areas/*.yaml          /v1/service-areas (list, create), resolve, {service_area_id} (get, patch), fence, status,
+                                impact, division-plan, divide, merge, policy (+ versions), schedule, verticals,
+                                vertical-order, campaign-slots, display-grid
+  verticals/*.yaml              /v1/verticals (list, create), {vertical_id} (get, patch), status, image, categories, reach
+  campaign-slots/campaign-slot.yaml GET, PATCH, DELETE /v1/campaign-slots/{campaign_slot_id}
+  store-types/*.yaml            /v1/store-types (list, create), {store_type_id} (get, patch), status; store-fields
+  service-types/*.yaml          /v1/service-types (list, create), {service_type_id} (get, patch), status; service-fields
+  settings/settings.yaml        GET /v1/settings
+  settings/setting.yaml         GET, PUT, DELETE /v1/settings/{key}
+  partners/policy.yaml          GET, PUT /v1/partners/{partner_id}/policy (+ policy-versions.yaml, schedule.yaml)
+  locations/policy.yaml         GET, PUT .../locations/{location_id}/policy (+ policy-versions, policy-effective,
+                                schedule, schedule-effective, schedule-trading)
   orders/orders.yaml            /v1/orders            (collection, planned)
   orders/order.yaml             /v1/orders/{order_id} (single resource, planned)
 ```

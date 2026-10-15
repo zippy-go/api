@@ -1,0 +1,10 @@
+type: string
+description: 'The kind of a service area: a label only, nothing branches on it.'
+enum:
+  - region
+  - city
+  - town
+  - village
+  - zone
+examples:
+  - region

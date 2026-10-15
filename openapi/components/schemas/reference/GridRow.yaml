@@ -1,0 +1,28 @@
+type: object
+description: One row, the `GridRow` schema.
+required:
+  - kind
+  - cells
+properties:
+  cells:
+    type: array
+    items:
+      $ref: ./GridCell.yaml
+    description: The cells, each naming its column.
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives edits.
+  kind:
+    $ref: ./RowKind.yaml
+    description: The kind, which fixes the capacity.
+examples:
+  - cells:
+      - campaign_slot_id: 01a13a48-9e00-7000-8000-00000000a014
+        column: 0
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        kind: vertical
+        unavailable: true
+        vertical_id: 01a13a48-9e00-7000-8000-00000000a014
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: default

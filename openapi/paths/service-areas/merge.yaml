@@ -1,0 +1,80 @@
+# Path item for /v1/service-areas/{service_area_id}/merge. Referenced from openapi.yaml.
+parameters:
+  - name: service_area_id
+    in: path
+    required: true
+    description: The area the children fold into
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+post:
+  operationId: mergeServiceAreas
+  summary: Merges the fenced areas beneath an unfenced area back into it, with a reason
+  description: Merges the fenced areas beneath an unfenced area back into it, with a reason; platform staff.
+  tags:
+    - Service areas
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/MergeRequest.yaml
+  responses:
+    '200':
+      description: The area with the joined fence
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/ServiceArea.yaml
+    '400':
+      description: Malformed body, the children misnamed, or no reason
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown area
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: Nothing to merge
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

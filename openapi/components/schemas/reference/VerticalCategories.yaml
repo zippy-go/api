@@ -1,0 +1,18 @@
+type: object
+description: |-
+  Request body of `PUT /v1/verticals/{vertical_id}/categories`, the `VerticalCategories`
+  schema.
+required:
+  - categories
+properties:
+  categories:
+    type: array
+    items:
+      $ref: ./VerticalCategoryInput.yaml
+    description: The categories in merchandising order.
+examples:
+  - categories:
+      - enabled: true
+        icon_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        label: Fresh Produce

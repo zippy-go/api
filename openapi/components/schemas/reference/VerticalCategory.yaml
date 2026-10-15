@@ -1,0 +1,30 @@
+type: object
+description: A category of a Vertical, the `VerticalCategory` schema.
+required:
+  - id
+  - label
+  - enabled
+properties:
+  enabled:
+    type: boolean
+    description: Hidden without deleting when `false`.
+  icon_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: An optional icon.
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives renames and reorders.
+  label:
+    type: string
+    description: The label.
+    examples:
+      - Fresh Produce
+examples:
+  - enabled: true
+    icon_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    label: Fresh Produce

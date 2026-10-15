@@ -1,0 +1,50 @@
+type: object
+description: A Vertical as a service area offers it, the `VerticalOffer` schema.
+required:
+  - vertical_id
+  - code
+  - name
+  - kind
+  - status
+  - offered_here
+  - offered
+properties:
+  code:
+    type: string
+    description: Its code.
+    examples:
+      - FOOD
+  inherited_from:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The ancestor whose declaration reaches here, when inherited.
+  kind:
+    $ref: ./VerticalKind.yaml
+    description: Its kind.
+  name:
+    type: string
+    description: Its name.
+  offered:
+    type: boolean
+    description: 'Whether the Vertical trades here: declared here or inherited, and the Vertical active.'
+  offered_here:
+    type: boolean
+    description: Whether this service area declares the offer itself.
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Its own status.
+  vertical_id:
+    type: string
+    format: uuid
+    description: The Vertical.
+examples:
+  - code: FOOD
+    inherited_from: 01a13a48-9e00-7000-8000-00000000a014
+    kind: product_sales
+    name: example
+    offered: true
+    offered_here: true
+    status: draft
+    vertical_id: 01a13a48-9e00-7000-8000-00000000a014

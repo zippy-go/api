@@ -1,0 +1,22 @@
+type: object
+description: One fenced area that would stop serving.
+required:
+  - service_area
+  - locations
+properties:
+  locations:
+    type: integer
+    format: int64
+    description: Locations in it.
+    examples:
+      - 7
+  service_area:
+    $ref: ./ServiceAreaRef.yaml
+    description: The area.
+examples:
+  - locations: 7
+    service_area:
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      kind: region
+      name: example
+      path: example

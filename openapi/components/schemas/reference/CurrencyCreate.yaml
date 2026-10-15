@@ -1,0 +1,25 @@
+type: object
+description: Request body of `POST /v1/currencies`, the `CurrencyCreate` schema.
+required:
+  - code
+  - display_locale
+properties:
+  code:
+    type: string
+    description: ISO 4217 code.
+    examples:
+      - INR
+  display_locale:
+    type: string
+    description: The locale amounts are rendered in.
+    examples:
+      - en-IN
+  symbol_override:
+    type:
+      - string
+      - 'null'
+    description: A symbol used instead of the runtime's.
+examples:
+  - code: INR
+    display_locale: en-IN
+    symbol_override: example

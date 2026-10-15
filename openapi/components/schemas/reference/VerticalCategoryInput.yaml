@@ -1,0 +1,30 @@
+type: object
+description: One category as sent, the `VerticalCategoryInput` schema; the id is kept when given.
+required:
+  - label
+properties:
+  enabled:
+    type: boolean
+    description: Shown when `true`; `true` when omitted.
+  icon_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: An optional icon.
+  id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The identity to keep; a fresh one when omitted.
+  label:
+    type: string
+    description: The label.
+    examples:
+      - Fresh Produce
+examples:
+  - enabled: true
+    icon_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    label: Fresh Produce

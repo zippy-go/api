@@ -1,0 +1,13 @@
+type: object
+description: Request body of `PUT /v1/settings/{key}`, the `SettingValue` schema.
+required:
+  - value
+properties:
+  value:
+    type: integer
+    format: int64
+    description: The value, within the declared bounds.
+    examples:
+      - 25000
+examples:
+  - value: 25000

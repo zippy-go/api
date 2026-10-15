@@ -1,0 +1,118 @@
+# Path item for /v1/countries/{alpha2}/policy. Referenced from openapi.yaml.
+parameters:
+  - name: alpha2
+    in: path
+    required: true
+    description: The ISO 3166-1 alpha-2 code
+    schema:
+      type: string
+    example: IN
+get:
+  operationId: getCountryPolicy
+  summary: The country's service policy layer, its latest version
+  description: The country's service policy layer, its latest version.
+  tags:
+    - Countries
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The layer; version 0 when never set
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/PolicyLayer.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown country
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putCountryPolicy
+  summary: Saves a new version of the country's service policy layer
+  description: Saves a new version of the country's service policy layer; platform staff.
+  tags:
+    - Countries
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/ServicePolicy.yaml
+  responses:
+    '200':
+      description: The layer as saved
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/PolicyLayer.yaml
+    '400':
+      description: Malformed body or invalid fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown country
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

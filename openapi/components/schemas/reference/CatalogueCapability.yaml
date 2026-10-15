@@ -1,0 +1,19 @@
+type: string
+description: What a store type's items may carry.
+enum:
+  - variants
+  - modifiers
+  - brands
+  - inventory
+  - dietary
+  - allergens
+  - prescription
+  - age_restriction
+  - personalisation
+  - preparation_time
+  - pre_order_only
+  - availability_windows
+  - quantity_limit
+  - tax_class
+examples:
+  - variants

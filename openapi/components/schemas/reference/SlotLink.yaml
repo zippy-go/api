@@ -1,0 +1,22 @@
+type: object
+description: What a campaign slot links to, the `SlotLink` schema.
+required:
+  - kind
+  - targets
+properties:
+  kind:
+    $ref: ./LinkKind.yaml
+    description: The kind of target.
+  targets:
+    type: array
+    items:
+      type: string
+    description: |-
+      The target ids: exactly one for a Vertical, Partner or campaign; one or more Location
+      ids for `locations`; one or more `location_id/product_id` for `products`.
+    examples:
+      - &a1
+        - 01a13a48-9e00-7000-8000-00000000b001
+examples:
+  - kind: vertical
+    targets: *a1

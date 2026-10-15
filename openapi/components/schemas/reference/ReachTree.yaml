@@ -1,0 +1,21 @@
+type: object
+description: 'The `ReachTree` schema: one tree per country.'
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ReachNode.yaml
+    description: The roots.
+examples:
+  - items:
+      - children: []
+        inherited: true
+        offered: true
+        offered_here: true
+        service_area:
+          id: 01a13a48-9e00-7000-8000-00000000a014
+          kind: region
+          name: example
+          path: example

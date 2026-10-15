@@ -1,0 +1,56 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/policy/effective. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The location
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+get:
+  operationId: getLocationEffectivePolicy
+  summary: The effective policy of the location
+  description: 'The effective policy of the location: the country, the service areas, the partner and the location folded, every field with the layer and version that supplied it.'
+  tags:
+    - Partner policy
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The effective policy with its provenance
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/EffectivePolicy.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown partner or location
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

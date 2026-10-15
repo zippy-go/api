@@ -1,0 +1,29 @@
+type: object
+description: A fee ladder with the layer that supplied it, the `SourcedLadder` schema.
+required:
+  - value
+  - source
+properties:
+  source:
+    $ref: ./LayerRef.yaml
+    description: 'Whose decision it was: the layer and the version that supplied the value.'
+  value:
+    type: array
+    items:
+      $ref: ./FeeBand.yaml
+    description: The value in force.
+    examples:
+      - &a1
+        - fee: 2000
+          up_to: 3000
+        - fee: 4000
+          up_to: null
+examples:
+  - source:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3
+    value: *a1

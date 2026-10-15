@@ -1,0 +1,45 @@
+type: object
+description: Request body of `PATCH /v1/store-types/{store_type_id}`, the `StoreTypeUpdate` schema.
+properties:
+  catalogue:
+    oneOf:
+      - $ref: ./CatalogueBlock.yaml
+        description: New catalogue block.
+      - type: 'null'
+    description: The catalogue.
+  fields:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./TypeField.yaml
+    description: New fields.
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+  tagline:
+    type:
+      - string
+      - 'null'
+    description: New tagline.
+examples:
+  - catalogue:
+      allergen_tags:
+        - contains_nuts
+      capabilities:
+        - variants
+      dietary_tags:
+        - vegan
+        - vegetarian
+      product_fields:
+        - key: weight_grams
+          label: Weight (g)
+          type: text
+      term: menu
+    fields:
+      - key: fssai_licence_number
+        required: true
+    name: example
+    tagline: example

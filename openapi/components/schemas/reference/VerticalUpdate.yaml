@@ -1,0 +1,10 @@
+type: object
+description: Request body of `PATCH /v1/verticals/{vertical_id}`, the `VerticalUpdate` schema.
+properties:
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+examples:
+  - name: example

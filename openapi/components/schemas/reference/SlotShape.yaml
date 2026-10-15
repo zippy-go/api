@@ -1,0 +1,7 @@
+type: string
+description: 'The shape of a campaign slot: artwork is drawn for one width, so it never changes.'
+enum:
+  - banner
+  - compact
+examples:
+  - banner

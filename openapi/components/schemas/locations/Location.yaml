@@ -18,6 +18,7 @@ required:
   - version
   - created_by
   - updated_by
+  - service_area_id
 properties:
   id:
     type: string
@@ -107,6 +108,14 @@ properties:
     description: The user who last changed the location, or `null` until it is changed through the API.
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  service_area_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The service area the location's pin resolves to, set when the location is created or its pin moves; `null` for locations placed before service areas existed. See `GET /v1/service-areas/resolve`.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a014
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -128,3 +137,4 @@ examples:
     version: 1
     created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    service_area_id: 01a13a48-9e00-7000-8000-00000000a014

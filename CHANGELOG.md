@@ -6,6 +6,49 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-15
+
+### Added
+
+- Reference data (specification `platform-reference-data`): countries
+  (`/v1/countries`, tag `Countries`) with their status and switches for
+  orders and sign-in, each change with a reason, holiday calendars, the
+  country layer of service policy and schedules and the default service
+  area; currencies (`/v1/currencies`, tag `Currencies`).
+- Service areas (`/v1/service-areas`, tag `Service areas`): the geography
+  tree with PostGIS fences drawn at one level only; public resolution of a
+  pin (`GET /v1/service-areas/resolve`, no token) to the area it is inside,
+  the nearest serving one within the cap or the country's default, with
+  `serviceable` and a reason; status changes with a reason and their
+  deactivation impact; division with a dry run (`division-plan`), `divide`
+  refused with `409` (`locations_stranded`) unless forced with a reason,
+  and `merge`; the Verticals an area offers and their order; campaign slots
+  and the validated display grid.
+- Verticals (`/v1/verticals`, tag `Verticals`) with categories, image,
+  lifecycle and reach; campaign slots (`/v1/campaign-slots/{id}`, tag
+  `Campaign slots`), whose deletion repairs every grid that placed them.
+- Store types and service types (`/v1/store-types`, `/v1/service-types`,
+  tags `Store types` and `Service types`) with the closed field catalogues
+  (`/v1/store-fields`, `/v1/service-fields`) and the lifecycle with
+  `draft`; `409` (`illegal_transition`) on a move the lifecycle refuses.
+- Platform settings (`/v1/settings`, tag `Settings`): the closed, bounded
+  set with defaults; `400` (`setting_out_of_range`) outside the bounds;
+  `DELETE` restores the default.
+- Partner and Location layers of service policy and schedules (tag
+  `Partner policy`): `GET`, `PUT /v1/partners/{partner_id}/policy` and
+  `.../schedule`, the same under `.../locations/{location_id}`, policy
+  versions, the explain `GET .../locations/{location_id}/policy/effective`
+  naming the layer and version behind every field, the effective schedule
+  and `GET .../schedule/trading?at=`.
+- `Location.service_area_id`: the service area a location's pin resolves
+  to; creating or moving a location whose pin is outside every area is
+  `422` (`unprocessable`) on `/lat` and `/lng`.
+- `POST /v1/auth/otp/request` answers `409` (`sign_in_closed`) for a phone
+  number whose country is not accepting sign-in.
+- Events `reference.vertical.transitioned`,
+  `reference.country.status_changed` and
+  `reference.service_area.status_changed`, version 1.
+
 ## [0.4.0] - 2026-10-15
 
 ### Added

@@ -1,0 +1,22 @@
+type: object
+description: One band of a fee ladder, the `FeeBand` schema.
+required:
+  - fee
+properties:
+  fee:
+    type: integer
+    format: int64
+    description: The fee in minor units.
+    examples:
+      - 2500
+  up_to:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: The band's upper bound (metres or minor units); `null` for the open-ended last band.
+    examples:
+      - 3000
+examples:
+  - fee: 2500
+    up_to: 3000

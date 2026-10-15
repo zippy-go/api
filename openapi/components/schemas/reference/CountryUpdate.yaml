@@ -1,0 +1,37 @@
+type: object
+description: Request body of `PATCH /v1/countries/{alpha2}`, the `CountryUpdate` schema.
+properties:
+  calling_code:
+    type:
+      - string
+      - 'null'
+    description: New calling code.
+  currency:
+    type:
+      - string
+      - 'null'
+    description: New currency.
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+  prices_include_tax:
+    type:
+      - boolean
+      - 'null'
+    description: New price-law statement.
+  time_zones:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+    description: New time zones.
+examples:
+  - calling_code: example
+    currency: example
+    name: example
+    prices_include_tax: true
+    time_zones:
+      - example

@@ -120,3 +120,42 @@ that are open to the realm only, such as `GET /v1/partners`, say so in the
 reference and answer `403` (`forbidden`) for everyone else. A platform
 user also reads any partner's locations, members, invitations and
 services, without being a member.
+
+## Service area
+
+A service area is a node of the geography tree of a country: a region, a
+city, a town, a village or a zone. The kind is a label; what makes an area
+serve customers is its fence, a polygon drawn at exactly one level of the
+tree. A pin resolves to the smallest fenced area containing it, else to the
+nearest serving area within the resolution cap, else to the country's
+default area (`GET /v1/service-areas/resolve`, no token needed). Every
+location sits in the fenced area its pin falls in. A fenced area can be
+divided into fenced children, with a dry run first, and children can be
+merged back.
+
+## Vertical
+
+A Vertical is a category of trade a customer browses: Food & Drinks,
+Bakery & Sweets, Markets & Grocery, Health & Pharmacy, Retail & Shops,
+Daily Essentials and Home Services at launch. A service area declares the
+Verticals it offers; the areas beneath inherit them. Each area composes
+its opening screen as a display grid of Vertical tiles and campaign slots.
+
+## Service policy and schedule
+
+Fees, minimum order values, tax and commission rates and delivery
+estimates are a service policy, set in layers: the country, each service
+area in the chain, the partner and the location. A layer leaves a field
+`null` to defer upward; zero is a decision. Every save is a new version and
+the effective policy of a location names, for every field, the layer and
+the version that supplied it. Schedules (a weekly pattern with dated
+exceptions) resolve through the same layers in the location's own time
+zone.
+
+## Store type and service type
+
+A store type says what a location that sells is (Food, Bakery, Drinks,
+Markets, Pharmacy, Retail): its typed fields from a closed catalogue and
+what its items may carry. A service type says what a partner's field
+service does (Salon, Repairs, Laundry, Cleaning): its workflow, durations,
+radius and typed fields.

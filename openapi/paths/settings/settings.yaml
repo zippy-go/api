@@ -1,0 +1,40 @@
+# Path item for /v1/settings. Referenced from openapi.yaml.
+get:
+  operationId: listSettings
+  summary: Every setting with its value in force, bounds and default
+  description: Every setting with its value in force, bounds and default.
+  tags:
+    - Settings
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The settings
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/SettingList.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

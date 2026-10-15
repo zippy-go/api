@@ -1,0 +1,138 @@
+type: object
+description: A node of the geography tree, the `ServiceArea` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - id
+  - country
+  - kind
+  - name
+  - slug
+  - path
+  - time_zone
+  - status
+  - effectively_active
+  - serves
+  - fenced_descendants
+  - default_for_country
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  country:
+    type: string
+    description: The country (alpha-2), immutable.
+    examples:
+      - IN
+  default_for_country:
+    type: boolean
+    description: Whether it is its country's default.
+  effectively_active:
+    type: boolean
+    description: Active, and every ancestor active.
+  fence:
+    oneOf:
+      - $ref: ./Fence.yaml
+        description: The fence, when drawn.
+      - type: 'null'
+    description: The fence.
+  fenced_descendants:
+    type: integer
+    format: int64
+    description: How many fenced service areas sit beneath it.
+    examples:
+      - 6
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  kind:
+    $ref: ./AreaKind.yaml
+    description: A label only; immutable because it appears in history.
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - Gachibowli
+  parent_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The parent node; `null` at the top of a country.
+  path:
+    type: string
+    description: The materialised path every descendant embeds.
+    examples:
+      - /IN/hyderabad/gachibowli
+  serves:
+    type: boolean
+    description: 'Whether the area serves anybody: fenced and effectively active.'
+  slug:
+    type: string
+    description: The slug, immutable; part of the path.
+    examples:
+      - gachibowli
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Own lifecycle status.
+  time_zone:
+    type: string
+    description: The IANA time zone, one the country spans.
+    examples:
+      - Asia/Kolkata
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    country: IN
+    default_for_country: true
+    effectively_active: true
+    fence:
+      rings:
+        - - - 78.42
+            - 17.39
+          - - 78.47
+            - 17.39
+          - - 78.47
+            - 17.44
+          - - 78.42
+            - 17.44
+          - - 78.42
+            - 17.39
+    fenced_descendants: 6
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: region
+    name: Gachibowli
+    parent_id: 01a13a48-9e00-7000-8000-00000000a014
+    path: /IN/hyderabad/gachibowli
+    serves: true
+    slug: gachibowli
+    status: draft
+    time_zone: Asia/Kolkata

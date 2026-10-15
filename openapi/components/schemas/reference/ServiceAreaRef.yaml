@@ -1,0 +1,26 @@
+type: object
+description: A reference to a service area in another record's answer.
+required:
+  - id
+  - name
+  - kind
+  - path
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  kind:
+    $ref: ./AreaKind.yaml
+    description: Kind.
+  name:
+    type: string
+    description: Display name.
+  path:
+    type: string
+    description: Path.
+examples:
+  - id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: region
+    name: example
+    path: example

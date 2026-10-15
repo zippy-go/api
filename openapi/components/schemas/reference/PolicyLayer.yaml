@@ -1,0 +1,39 @@
+type: object
+description: A stored version of a layer, the `PolicyLayer` schema.
+required:
+  - layer
+  - policy
+properties:
+  layer:
+    $ref: ./LayerRef.yaml
+    description: The layer.
+  policy:
+    $ref: ./ServicePolicy.yaml
+    description: Its fields.
+examples:
+  - layer:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3
+    policy:
+      commission_percent: 12
+      coverage_radius_metres: 1
+      delivery_estimate_minutes: 1
+      delivery_fee: 2500
+      fee_by_distance:
+        - fee: 2500
+          up_to: 3000
+      fee_by_order_value:
+        - fee: 2500
+          up_to: 3000
+      gst_rate_percent: 5
+      minimum_order_value: 1
+      prescription_fee: 1
+      prices_include_tax: true
+      service_fee_ceiling: 1
+      service_fee_floor: 1
+      service_fee_percent: 2.5
+      small_order_fee: 1

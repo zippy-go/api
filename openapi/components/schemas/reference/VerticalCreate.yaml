@@ -1,0 +1,24 @@
+type: object
+description: Request body of `POST /v1/verticals`, the `VerticalCreate` schema.
+required:
+  - code
+  - name
+  - kind
+properties:
+  code:
+    type: string
+    description: Stable uppercase code, never renamed.
+    examples:
+      - FOOD
+  kind:
+    $ref: ./VerticalKind.yaml
+    description: Product sales or field service.
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - Food & Drinks
+examples:
+  - code: FOOD
+    kind: product_sales
+    name: Food & Drinks

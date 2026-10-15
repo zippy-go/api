@@ -1,0 +1,19 @@
+type: object
+description: A public holiday on a country's calendar, the `Holiday` schema.
+required:
+  - date
+  - name
+properties:
+  date:
+    type: string
+    description: The date.
+    examples:
+      - 2027-01-26
+  name:
+    type: string
+    description: The name people see.
+    examples:
+      - Republic Day
+examples:
+  - date: 2027-01-26
+    name: Republic Day

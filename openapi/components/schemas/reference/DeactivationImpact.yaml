@@ -1,0 +1,35 @@
+type: object
+description: What would stop serving if an area were deactivated, the `DeactivationImpact` schema.
+required:
+  - service_area
+  - affected
+  - locations
+properties:
+  affected:
+    type: array
+    items:
+      $ref: ./AffectedArea.yaml
+    description: Every fenced area beneath it (itself included when fenced) with its Locations.
+  locations:
+    type: integer
+    format: int64
+    description: Locations in all of them.
+    examples:
+      - 40
+  service_area:
+    $ref: ./ServiceAreaRef.yaml
+    description: The area itself.
+examples:
+  - affected:
+      - locations: 7
+        service_area:
+          id: 01a13a48-9e00-7000-8000-00000000a014
+          kind: region
+          name: example
+          path: example
+    locations: 40
+    service_area:
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      kind: region
+      name: example
+      path: example

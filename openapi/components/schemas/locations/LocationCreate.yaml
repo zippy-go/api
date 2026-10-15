@@ -2,7 +2,9 @@ type: object
 description: |
   The request body of `POST /v1/partners/{partner_id}/locations`. A new
   location is `active`. Coordinates are required because the platform does
-  not geocode addresses.
+  not geocode addresses; the pin must fall inside a fenced service area or
+  within 10 km of one, else the request is refused with `422`
+  (`unprocessable`) naming `/lat` and `/lng`.
 required:
   - name
   - address

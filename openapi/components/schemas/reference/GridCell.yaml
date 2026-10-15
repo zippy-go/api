@@ -1,0 +1,42 @@
+type: object
+description: One cell, the `GridCell` schema.
+required:
+  - kind
+  - column
+properties:
+  campaign_slot_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The campaign slot, for a campaign cell.
+  column:
+    type: integer
+    format: int32
+    description: The column it starts at, zero based.
+    examples:
+      - 0
+    minimum: 0
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives edits.
+  kind:
+    $ref: ./CellKind.yaml
+    description: What it shows.
+  unavailable:
+    type: boolean
+    description: Served as unavailable when the Vertical no longer trades here; ignored on save.
+  vertical_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Vertical, for a Vertical cell.
+examples:
+  - campaign_slot_id: 01a13a48-9e00-7000-8000-00000000a014
+    column: 0
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: vertical
+    unavailable: true
+    vertical_id: 01a13a48-9e00-7000-8000-00000000a014

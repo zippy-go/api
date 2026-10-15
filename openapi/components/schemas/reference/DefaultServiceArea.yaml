@@ -1,0 +1,13 @@
+type: object
+description: |-
+  Request body of `PUT /v1/countries/{alpha2}/default-service-area`, the `DefaultServiceArea`
+  schema.
+properties:
+  service_area_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The area, or `null` to clear.
+examples:
+  - service_area_id: 01a13a48-9e00-7000-8000-00000000a014

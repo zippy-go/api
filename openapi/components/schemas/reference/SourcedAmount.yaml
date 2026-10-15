@@ -1,0 +1,24 @@
+type: object
+description: An amount in minor units with the layer that supplied it, the `SourcedAmount` schema.
+required:
+  - value
+  - source
+properties:
+  source:
+    $ref: ./LayerRef.yaml
+    description: 'Whose decision it was: the layer and the version that supplied the value.'
+  value:
+    type: integer
+    format: int64
+    description: The value in force.
+    examples:
+      - 2500
+examples:
+  - source:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3
+    value: 2500

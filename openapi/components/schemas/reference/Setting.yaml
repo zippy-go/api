@@ -1,0 +1,89 @@
+type: object
+description: A setting as served, the `Setting` schema.
+required:
+  - key
+  - label
+  - description
+  - reason
+  - value
+  - default
+  - choices
+  - overridden
+properties:
+  choices:
+    type: array
+    items:
+      $ref: ./Choice.yaml
+    description: The choices, for a choice.
+  default:
+    type: integer
+    format: int64
+    description: The default.
+  description:
+    type: string
+    description: What it does.
+  key:
+    type: string
+    description: The key.
+    examples:
+      - reference.resolution_cap_metres
+  label:
+    type: string
+    description: The label.
+  maximum:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: The maximum, for a range.
+  minimum:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: The minimum, for a range.
+  overridden:
+    type: boolean
+    description: Whether a value is stored.
+  reason:
+    type: string
+    description: Why it is admitted.
+  unit:
+    type:
+      - string
+      - 'null'
+    description: The unit, for a range.
+  updated_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the stored value was set.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who set it.
+  value:
+    type: integer
+    format: int64
+    description: 'The value in force: the override when one is stored and in range, else the default.'
+    examples:
+      - 25000
+examples:
+  - choices:
+      - label: Keeps the drawer open
+        value: 1
+    default: 1
+    description: example
+    key: reference.resolution_cap_metres
+    label: example
+    maximum: 1
+    minimum: 1
+    overridden: true
+    reason: example
+    unit: example
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    value: 25000

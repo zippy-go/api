@@ -1,0 +1,49 @@
+type: object
+description: What a store type's items may carry, the `CatalogueBlock` schema.
+required:
+  - term
+  - capabilities
+  - dietary_tags
+  - allergen_tags
+  - product_fields
+properties:
+  allergen_tags:
+    type: array
+    items:
+      type: string
+    description: The closed allergen set.
+    examples:
+      - &a1
+        - contains_nuts
+  capabilities:
+    type: array
+    items:
+      $ref: ./CatalogueCapability.yaml
+    description: The capabilities items may use.
+  dietary_tags:
+    type: array
+    items:
+      type: string
+    description: The closed dietary set.
+    examples:
+      - &a2
+        - vegan
+        - vegetarian
+  product_fields:
+    type: array
+    items:
+      $ref: ./ProductField.yaml
+    description: Typed product fields.
+  term:
+    $ref: ./CatalogueTerm.yaml
+    description: Menu or products.
+examples:
+  - allergen_tags: *a1
+    capabilities:
+      - variants
+    dietary_tags: *a2
+    product_fields:
+      - key: weight_grams
+        label: Weight (g)
+        type: text
+    term: menu

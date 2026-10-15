@@ -1,0 +1,54 @@
+type: object
+description: Request body of `POST /v1/countries`, the `CountryCreate` schema.
+required:
+  - alpha2
+  - alpha3
+  - name
+  - currency
+  - calling_code
+  - time_zones
+properties:
+  alpha2:
+    type: string
+    description: ISO 3166-1 alpha-2.
+    examples:
+      - IN
+  alpha3:
+    type: string
+    description: ISO 3166-1 alpha-3.
+    examples:
+      - IND
+  calling_code:
+    type: string
+    description: The calling code without a plus sign.
+    examples:
+      - '91'
+  currency:
+    type: string
+    description: The currency, from the allow-list.
+    examples:
+      - INR
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - India
+  prices_include_tax:
+    type: boolean
+    description: Whether displayed prices include tax; `true` when omitted.
+  time_zones:
+    type: array
+    items:
+      type: string
+    description: The IANA time zones spanned.
+    examples:
+      - &a1
+        - Asia/Kolkata
+examples:
+  - alpha2: IN
+    alpha3: IND
+    calling_code: '91'
+    currency: INR
+    name: India
+    prices_include_tax: true
+    time_zones: *a1

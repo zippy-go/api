@@ -1,0 +1,73 @@
+type: object
+description: A currency, the `Currency` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - code
+  - display_locale
+  - status
+  - operating
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  code:
+    type: string
+    description: The ISO 4217 code; the natural key every amount names, immutable.
+    examples:
+      - INR
+  display_locale:
+    type: string
+    description: The locale amounts are rendered in.
+    examples:
+      - en-IN
+  operating:
+    type: boolean
+    description: Whether the platform operates in this currency (the allow-list).
+    examples:
+      - true
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Lifecycle; only an `active` currency may be given to a new country.
+  symbol_override:
+    type:
+      - string
+      - 'null'
+    description: A symbol used instead of the runtime's, when it cannot format the currency.
+    examples:
+      - ₹
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    code: INR
+    display_locale: en-IN
+    operating: true
+    status: draft
+    symbol_override: ₹

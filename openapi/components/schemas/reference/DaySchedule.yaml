@@ -1,0 +1,19 @@
+type: object
+description: The windows of one weekday, the `DaySchedule` schema.
+required:
+  - day
+  - open
+properties:
+  day:
+    $ref: ./Day.yaml
+    description: The day.
+  open:
+    type: array
+    items:
+      $ref: ./Window.yaml
+    description: The open windows; empty means closed that day.
+examples:
+  - day: monday
+    open:
+      - from: 09:00
+        to: 22:00

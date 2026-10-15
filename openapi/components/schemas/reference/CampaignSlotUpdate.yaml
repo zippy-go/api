@@ -1,0 +1,76 @@
+type: object
+description: |-
+  Request body of `PATCH /v1/campaign-slots/{campaign_slot_id}`, the `CampaignSlotUpdate`
+  schema.
+properties:
+  artwork_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: New artwork, or `null` to clear.
+  colour:
+    type:
+      - string
+      - 'null'
+    description: New colour.
+  enabled:
+    type:
+      - boolean
+      - 'null'
+    description: On or off.
+  headline:
+    type:
+      - string
+      - 'null'
+    description: New headline.
+  hours:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./SlotHours.yaml
+    description: New hours.
+  link:
+    oneOf:
+      - $ref: ./SlotLink.yaml
+        description: New link, or `null` to clear.
+      - type: 'null'
+    description: The link.
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+  paragraph:
+    type:
+      - string
+      - 'null'
+    description: New paragraph, or `null` to clear.
+  shows_from:
+    type:
+      - string
+      - 'null'
+    description: New start, or `null` to clear.
+  shows_to:
+    type:
+      - string
+      - 'null'
+    description: New end, or `null` to clear.
+examples:
+  - artwork_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    colour: example
+    enabled: true
+    headline: example
+    hours:
+      - day: monday
+        from: 07:00
+        to: 11:00
+    link:
+      kind: vertical
+      targets:
+        - 01a13a48-9e00-7000-8000-00000000b001
+    name: example
+    paragraph: example
+    shows_from: example
+    shows_to: example

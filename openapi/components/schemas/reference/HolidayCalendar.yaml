@@ -1,0 +1,16 @@
+type: object
+description: |-
+  A holiday calendar, the `HolidayCalendar` schema: the body of a `PUT` and the answer of a
+  `GET`.
+required:
+  - holidays
+properties:
+  holidays:
+    type: array
+    items:
+      $ref: ./Holiday.yaml
+    description: The holidays, by date.
+examples:
+  - holidays:
+      - date: 2027-01-26
+        name: Republic Day

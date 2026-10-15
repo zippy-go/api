@@ -1,0 +1,35 @@
+type: object
+description: The `ServiceTypeList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ServiceType.yaml
+    description: Every service type.
+examples:
+  - items:
+      - created_at: 2026-10-15T09:00:00Z
+        created_by: 01a13a48-9e00-7000-8000-00000000a014
+        updated_at: 2026-10-15T09:00:00Z
+        updated_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 1
+        catalogue:
+          add_ons: true
+          cancellation_notice: true
+          deposit: true
+          duration: true
+          materials: true
+          price_bases: []
+        code: SALON
+        fields: []
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        name: example
+        radius_metres: 10000
+        slot_minutes: 30
+        status: draft
+        tagline: example
+        turnaround_hours: 48
+        visit_minutes: 60
+        workflow: appointment

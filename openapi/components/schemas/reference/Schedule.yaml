@@ -1,0 +1,25 @@
+type: object
+description: A schedule layer's content, the `Schedule` schema.
+properties:
+  exceptions:
+    type: array
+    items:
+      $ref: ./ScheduleException.yaml
+    description: Dated exceptions.
+  week:
+    type: array
+    items:
+      $ref: ./DaySchedule.yaml
+    description: The weekly pattern; a service area layer leaves it empty.
+examples:
+  - exceptions:
+      - accepts_pre_orders: true
+        closed_all_day: true
+        from: 2027-01-26
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        label: Republic Day
+        open: []
+        to: 2027-01-26
+    week:
+      - day: monday
+        open: []

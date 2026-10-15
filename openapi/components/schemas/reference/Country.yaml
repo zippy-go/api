@@ -1,0 +1,111 @@
+type: object
+description: A country, the `Country` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - alpha2
+  - alpha3
+  - name
+  - currency
+  - calling_code
+  - time_zones
+  - status
+  - accepts_orders
+  - accepts_sign_in
+  - prices_include_tax
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  accepts_orders:
+    type: boolean
+    description: 'Whether its service areas accept orders: is delivery trading.'
+  accepts_sign_in:
+    type: boolean
+    description: Whether its customers may sign in.
+  alpha2:
+    type: string
+    description: ISO 3166-1 alpha-2, immutable; the natural key service areas reference.
+    examples:
+      - IN
+  alpha3:
+    type: string
+    description: ISO 3166-1 alpha-3, immutable.
+    examples:
+      - IND
+  calling_code:
+    type: string
+    description: The calling code without a plus sign; the default when a customer types a local number.
+    examples:
+      - '91'
+  currency:
+    type: string
+    description: The currency quoted, from the allow-list.
+    examples:
+      - INR
+  default_service_area_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Where a customer whose address cannot be placed is sent; `null` when none.
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - India
+  prices_include_tax:
+    type: boolean
+    description: 'The price-law statement: whether displayed prices include tax.'
+  status:
+    $ref: ./Lifecycle.yaml
+    description: 'Lifecycle: is the market configured.'
+  time_zones:
+    type: array
+    items:
+      type: string
+    description: The IANA time zones the country spans.
+    examples:
+      - &a1
+        - Asia/Kolkata
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    accepts_orders: true
+    accepts_sign_in: true
+    alpha2: IN
+    alpha3: IND
+    calling_code: '91'
+    currency: INR
+    default_service_area_id: 01a13a48-9e00-7000-8000-00000000a014
+    name: India
+    prices_include_tax: true
+    status: draft
+    time_zones: *a1

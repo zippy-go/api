@@ -1,0 +1,30 @@
+type: object
+description: An exception with the layer that declared it.
+required:
+  - exception
+  - source
+properties:
+  exception:
+    $ref: ./ScheduleException.yaml
+    description: The exception.
+  source:
+    $ref: ./LayerRef.yaml
+    description: Whose it is.
+examples:
+  - exception:
+      accepts_pre_orders: true
+      closed_all_day: true
+      from: 2027-01-26
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      label: Republic Day
+      open:
+        - from: 09:00
+          to: 22:00
+      to: 2027-01-26
+    source:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3

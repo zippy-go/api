@@ -1,0 +1,12 @@
+type: string
+description: A day of the week, as written on the wire.
+enum:
+  - monday
+  - tuesday
+  - wednesday
+  - thursday
+  - friday
+  - saturday
+  - sunday
+examples:
+  - monday

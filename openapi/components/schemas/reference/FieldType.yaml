@@ -1,0 +1,9 @@
+type: string
+description: The type of a typed extra field.
+enum:
+  - text
+  - number
+  - boolean
+  - choice
+examples:
+  - text

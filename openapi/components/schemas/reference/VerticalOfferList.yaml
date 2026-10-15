@@ -1,0 +1,20 @@
+type: object
+description: The `VerticalOfferList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./VerticalOffer.yaml
+    description: The Verticals as the area offers them, in its order.
+examples:
+  - items:
+      - code: FOOD
+        inherited_from: 01a13a48-9e00-7000-8000-00000000a014
+        kind: product_sales
+        name: example
+        offered: true
+        offered_here: true
+        status: draft
+        vertical_id: 01a13a48-9e00-7000-8000-00000000a014

@@ -1,0 +1,95 @@
+type: object
+description: A Vertical, the `Vertical` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - id
+  - code
+  - name
+  - kind
+  - status
+  - categories
+  - position
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  categories:
+    type: array
+    items:
+      $ref: ./VerticalCategory.yaml
+    description: Categories in merchandising order.
+  code:
+    type: string
+    description: Stable uppercase code, never renamed.
+    examples:
+      - FOOD
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  image_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The image shown on its tile.
+  kind:
+    $ref: ./VerticalKind.yaml
+    description: Product sales or field service.
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - Food & Drinks
+  position:
+    type: integer
+    format: int32
+    description: Creation order, the fallback ordering.
+    examples:
+      - 1
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Lifecycle; no draft.
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    categories:
+      - enabled: true
+        icon_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        label: Fresh Produce
+    code: FOOD
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    image_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: product_sales
+    name: Food & Drinks
+    position: 1
+    status: draft

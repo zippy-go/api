@@ -1,0 +1,169 @@
+# Path item for /v1/settings/{key}. Referenced from openapi.yaml.
+parameters:
+  - name: key
+    in: path
+    required: true
+    description: The setting key, such as reference.resolution_cap_metres
+    schema:
+      type: string
+    example: reference.resolution_cap_metres
+get:
+  operationId: getSetting
+  summary: One setting
+  description: One setting.
+  tags:
+    - Settings
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The setting
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Setting.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: No setting with that key is declared
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putSetting
+  summary: Stores a value within the setting's bounds
+  description: Stores a value within the setting's bounds; platform staff.
+  tags:
+    - Settings
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/SettingValue.yaml
+  responses:
+    '200':
+      description: The setting after the change
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Setting.yaml
+    '400':
+      description: Malformed body, or `setting_out_of_range`
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: No setting with that key is declared
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: resetSetting
+  summary: Removes the stored value so the default is in force again
+  description: Removes the stored value so the default is in force again; platform staff.
+  tags:
+    - Settings
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The setting at its default
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Setting.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: No setting with that key is declared
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

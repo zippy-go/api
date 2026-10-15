@@ -1,0 +1,49 @@
+type: object
+description: Request body of `POST /v1/store-types`, the `StoreTypeCreate` schema.
+required:
+  - code
+  - name
+  - tagline
+  - catalogue
+properties:
+  catalogue:
+    $ref: ./CatalogueBlock.yaml
+    description: What its items may carry.
+  code:
+    type: string
+    description: Stable code.
+    examples:
+      - FOOD
+  fields:
+    type: array
+    items:
+      $ref: ./TypeField.yaml
+    description: Typed extra fields, from the store field catalogue.
+  name:
+    type: string
+    description: Name.
+    examples:
+      - Food
+  tagline:
+    type: string
+    description: Tagline.
+examples:
+  - catalogue:
+      allergen_tags:
+        - contains_nuts
+      capabilities:
+        - variants
+      dietary_tags:
+        - vegan
+        - vegetarian
+      product_fields:
+        - key: weight_grams
+          label: Weight (g)
+          type: text
+      term: menu
+    code: FOOD
+    fields:
+      - key: fssai_licence_number
+        required: true
+    name: Food
+    tagline: example

@@ -1,0 +1,10 @@
+type: string
+description: What a campaign slot links to.
+enum:
+  - vertical
+  - partner
+  - campaign
+  - locations
+  - products
+examples:
+  - vertical

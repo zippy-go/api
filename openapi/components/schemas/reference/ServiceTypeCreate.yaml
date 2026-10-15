@@ -1,0 +1,78 @@
+type: object
+description: Request body of `POST /v1/service-types`, the `ServiceTypeCreate` schema.
+required:
+  - code
+  - name
+  - tagline
+  - workflow
+  - visit_minutes
+  - slot_minutes
+  - radius_metres
+  - catalogue
+properties:
+  catalogue:
+    $ref: ./ServicesBlock.yaml
+    description: What a bookable service collects.
+  code:
+    type: string
+    description: Stable code.
+    examples:
+      - SALON
+  fields:
+    type: array
+    items:
+      $ref: ./TypeField.yaml
+    description: Typed extra fields, from the service field catalogue.
+  name:
+    type: string
+    description: Name.
+  radius_metres:
+    type: integer
+    format: int32
+    description: Default radius in metres.
+    examples:
+      - 10000
+  slot_minutes:
+    type: integer
+    format: int32
+    description: Slot length in minutes.
+    examples:
+      - 30
+  tagline:
+    type: string
+    description: Tagline.
+  turnaround_hours:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: Turnaround in hours, required for pickup-and-return work.
+  visit_minutes:
+    type: integer
+    format: int32
+    description: Default visit duration in minutes.
+    examples:
+      - 60
+  workflow:
+    $ref: ./Workflow.yaml
+    description: Workflow.
+examples:
+  - catalogue:
+      add_ons: true
+      cancellation_notice: true
+      deposit: true
+      duration: true
+      materials: true
+      price_bases:
+        - fixed
+    code: SALON
+    fields:
+      - key: fssai_licence_number
+        required: true
+    name: example
+    radius_metres: 10000
+    slot_minutes: 30
+    tagline: example
+    turnaround_hours: 1
+    visit_minutes: 60
+    workflow: appointment

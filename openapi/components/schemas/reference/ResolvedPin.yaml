@@ -1,0 +1,53 @@
+type: object
+description: The answer to resolving a pin, the `ResolvedPin` schema.
+required:
+  - resolution
+  - serviceable
+properties:
+  distance_metres:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Metres from the pin to the area; zero inside.
+    examples:
+      - 0
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why not, when not serviceable.
+    examples:
+      - The country is not accepting orders.
+  resolution:
+    $ref: ./Resolution.yaml
+    description: How the area was chosen.
+  service_area:
+    oneOf:
+      - $ref: ./ServiceAreaRef.yaml
+        description: The area, when one was chosen.
+      - type: 'null'
+    description: The service area.
+  serviceable:
+    type: boolean
+    description: |-
+      Whether an order can be placed at the pin: inside a serving area of a country accepting
+      orders.
+  time_zone:
+    type:
+      - string
+      - 'null'
+    description: The area's time zone.
+    examples:
+      - Asia/Kolkata
+examples:
+  - distance_metres: 0
+    reason: The country is not accepting orders.
+    resolution: inside
+    service_area:
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      kind: region
+      name: example
+      path: example
+    serviceable: true
+    time_zone: Asia/Kolkata

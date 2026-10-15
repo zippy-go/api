@@ -1,0 +1,9 @@
+type: string
+description: How a pin was resolved.
+enum:
+  - inside
+  - nearest
+  - country_default
+  - none
+examples:
+  - inside

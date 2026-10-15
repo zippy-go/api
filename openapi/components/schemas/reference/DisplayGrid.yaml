@@ -1,0 +1,13 @@
+type: object
+description: A service area's composition, the `DisplayGrid` schema; empty means not configured.
+properties:
+  rows:
+    type: array
+    items:
+      $ref: ./GridRow.yaml
+    description: The rows in order.
+examples:
+  - rows:
+      - cells: []
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        kind: default

@@ -844,12 +844,18 @@ export type Location = {
      * The user who last changed the location, or `null` until it is changed through the API.
      */
     updated_by: string | null;
+    /**
+     * The service area the location's pin resolves to, set when the location is created or its pin moves; `null` for locations placed before service areas existed. See `GET /v1/service-areas/resolve`.
+     */
+    service_area_id: string | null;
 };
 
 /**
  * The request body of `POST /v1/partners/{partner_id}/locations`. A new
  * location is `active`. Coordinates are required because the platform does
- * not geocode addresses.
+ * not geocode addresses; the pin must fall inside a fenced service area or
+ * within 10 km of one, else the request is refused with `422`
+ * (`unprocessable`) naming `/lat` and `/lng`.
  *
  */
 export type LocationCreate = {
@@ -1552,6 +1558,2199 @@ export type AgentStatusUpdate = {
 };
 
 /**
+ * One fenced area that would stop serving.
+ */
+export type AffectedArea = {
+    /**
+     * Locations in it.
+     */
+    locations: number;
+    /**
+     * The area.
+     */
+    service_area: ServiceAreaRef;
+};
+
+/**
+ * The kind of a service area: a label only, nothing branches on it.
+ */
+export type AreaKind = 'region' | 'city' | 'town' | 'village' | 'zone';
+
+/**
+ * A campaign slot, the `CampaignSlot` schema.
+ */
+export type CampaignSlot = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * Optional artwork.
+     */
+    artwork_asset_id?: string | null;
+    /**
+     * Background colour as a hex triplet.
+     */
+    colour: string;
+    /**
+     * Whether it is on.
+     */
+    enabled: boolean;
+    /**
+     * Customer-facing headline.
+     */
+    headline: string;
+    /**
+     * Hours of the week it shows; empty means always.
+     */
+    hours: Array<SlotHours>;
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * The link.
+     */
+    link?: SlotLink | null;
+    /**
+     * Internal name.
+     */
+    name: string;
+    /**
+     * Optional paragraph.
+     */
+    paragraph?: string | null;
+    /**
+     * The service area it belongs to; applies to everything beneath.
+     */
+    service_area_id: string;
+    /**
+     * Banner or compact; immutable.
+     */
+    shape: SlotShape;
+    /**
+     * Shows from this instant; `null` means as soon as it is on.
+     */
+    shows_from?: string | null;
+    /**
+     * Shows until this instant; `null` means until switched off.
+     */
+    shows_to?: string | null;
+    /**
+     * Whether white text on the colour is readable (contrast at least 3).
+     */
+    white_text_readable: boolean;
+};
+
+/**
+ * Request body of `POST /v1/service-areas/{service_area_id}/campaign-slots`, the
+ * `CampaignSlotCreate` schema.
+ */
+export type CampaignSlotCreate = {
+    /**
+     * Artwork.
+     */
+    artwork_asset_id?: string | null;
+    /**
+     * Background colour as a lowercase hex triplet.
+     */
+    colour: string;
+    /**
+     * Whether it is on from the start.
+     */
+    enabled?: boolean;
+    /**
+     * Customer-facing headline.
+     */
+    headline: string;
+    /**
+     * Hours of the week it shows; empty means always.
+     */
+    hours?: Array<SlotHours>;
+    /**
+     * The link.
+     */
+    link?: SlotLink | null;
+    /**
+     * Internal name.
+     */
+    name: string;
+    /**
+     * Optional paragraph.
+     */
+    paragraph?: string | null;
+    /**
+     * Banner or compact; immutable afterwards.
+     */
+    shape: SlotShape;
+    /**
+     * Shows from.
+     */
+    shows_from?: string | null;
+    /**
+     * Shows until.
+     */
+    shows_to?: string | null;
+};
+
+/**
+ * The `CampaignSlotList` schema.
+ */
+export type CampaignSlotList = {
+    /**
+     * The slots, oldest first.
+     */
+    items: Array<CampaignSlot>;
+};
+
+/**
+ * Request body of `PATCH /v1/campaign-slots/{campaign_slot_id}`, the `CampaignSlotUpdate`
+ * schema.
+ */
+export type CampaignSlotUpdate = {
+    /**
+     * New artwork, or `null` to clear.
+     */
+    artwork_asset_id?: string | null;
+    /**
+     * New colour.
+     */
+    colour?: string | null;
+    /**
+     * On or off.
+     */
+    enabled?: boolean | null;
+    /**
+     * New headline.
+     */
+    headline?: string | null;
+    /**
+     * New hours.
+     */
+    hours?: Array<SlotHours> | null;
+    /**
+     * The link.
+     */
+    link?: SlotLink | null;
+    /**
+     * New name.
+     */
+    name?: string | null;
+    /**
+     * New paragraph, or `null` to clear.
+     */
+    paragraph?: string | null;
+    /**
+     * New start, or `null` to clear.
+     */
+    shows_from?: string | null;
+    /**
+     * New end, or `null` to clear.
+     */
+    shows_to?: string | null;
+};
+
+/**
+ * What a store type's items may carry, the `CatalogueBlock` schema.
+ */
+export type CatalogueBlock = {
+    /**
+     * The closed allergen set.
+     */
+    allergen_tags: Array<string>;
+    /**
+     * The capabilities items may use.
+     */
+    capabilities: Array<CatalogueCapability>;
+    /**
+     * The closed dietary set.
+     */
+    dietary_tags: Array<string>;
+    /**
+     * Typed product fields.
+     */
+    product_fields: Array<ProductField>;
+    /**
+     * Menu or products.
+     */
+    term: CatalogueTerm;
+};
+
+/**
+ * What a store type's items may carry.
+ */
+export type CatalogueCapability = 'variants' | 'modifiers' | 'brands' | 'inventory' | 'dietary' | 'allergens' | 'prescription' | 'age_restriction' | 'personalisation' | 'preparation_time' | 'pre_order_only' | 'availability_windows' | 'quantity_limit' | 'tax_class';
+
+/**
+ * What a store type calls its catalogue.
+ */
+export type CatalogueTerm = 'menu' | 'products';
+
+/**
+ * Request body of `PUT /v1/verticals/{vertical_id}/categories`, the `VerticalCategories`
+ * schema.
+ */
+export type VerticalCategories = {
+    /**
+     * The categories in merchandising order.
+     */
+    categories: Array<VerticalCategoryInput>;
+};
+
+/**
+ * What a cell shows.
+ */
+export type CellKind = 'vertical' | 'campaign';
+
+/**
+ * A named choice of a setting.
+ */
+export type Choice = {
+    /**
+     * What it means.
+     */
+    label: string;
+    /**
+     * The stored value.
+     */
+    value: number;
+};
+
+/**
+ * A country, the `Country` schema.
+ */
+export type Country = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * Whether its service areas accept orders: is delivery trading.
+     */
+    accepts_orders: boolean;
+    /**
+     * Whether its customers may sign in.
+     */
+    accepts_sign_in: boolean;
+    /**
+     * ISO 3166-1 alpha-2, immutable; the natural key service areas reference.
+     */
+    alpha2: string;
+    /**
+     * ISO 3166-1 alpha-3, immutable.
+     */
+    alpha3: string;
+    /**
+     * The calling code without a plus sign; the default when a customer types a local number.
+     */
+    calling_code: string;
+    /**
+     * The currency quoted, from the allow-list.
+     */
+    currency: string;
+    /**
+     * Where a customer whose address cannot be placed is sent; `null` when none.
+     */
+    default_service_area_id?: string | null;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * The price-law statement: whether displayed prices include tax.
+     */
+    prices_include_tax: boolean;
+    /**
+     * Lifecycle: is the market configured.
+     */
+    status: Lifecycle;
+    /**
+     * The IANA time zones the country spans.
+     */
+    time_zones: Array<string>;
+};
+
+/**
+ * Request body of `POST /v1/countries`, the `CountryCreate` schema.
+ */
+export type CountryCreate = {
+    /**
+     * ISO 3166-1 alpha-2.
+     */
+    alpha2: string;
+    /**
+     * ISO 3166-1 alpha-3.
+     */
+    alpha3: string;
+    /**
+     * The calling code without a plus sign.
+     */
+    calling_code: string;
+    /**
+     * The currency, from the allow-list.
+     */
+    currency: string;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * Whether displayed prices include tax; `true` when omitted.
+     */
+    prices_include_tax?: boolean;
+    /**
+     * The IANA time zones spanned.
+     */
+    time_zones: Array<string>;
+};
+
+/**
+ * The `CountryList` schema.
+ */
+export type CountryList = {
+    /**
+     * Every country, by name.
+     */
+    items: Array<Country>;
+};
+
+/**
+ * Request body of `PATCH /v1/countries/{alpha2}`, the `CountryUpdate` schema.
+ */
+export type CountryUpdate = {
+    /**
+     * New calling code.
+     */
+    calling_code?: string | null;
+    /**
+     * New currency.
+     */
+    currency?: string | null;
+    /**
+     * New name.
+     */
+    name?: string | null;
+    /**
+     * New price-law statement.
+     */
+    prices_include_tax?: boolean | null;
+    /**
+     * New time zones.
+     */
+    time_zones?: Array<string> | null;
+};
+
+/**
+ * A currency, the `Currency` schema.
+ */
+export type Currency = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * The ISO 4217 code; the natural key every amount names, immutable.
+     */
+    code: string;
+    /**
+     * The locale amounts are rendered in.
+     */
+    display_locale: string;
+    /**
+     * Whether the platform operates in this currency (the allow-list).
+     */
+    operating: boolean;
+    /**
+     * Lifecycle; only an `active` currency may be given to a new country.
+     */
+    status: Lifecycle;
+    /**
+     * A symbol used instead of the runtime's, when it cannot format the currency.
+     */
+    symbol_override?: string | null;
+};
+
+/**
+ * Request body of `POST /v1/currencies`, the `CurrencyCreate` schema.
+ */
+export type CurrencyCreate = {
+    /**
+     * ISO 4217 code.
+     */
+    code: string;
+    /**
+     * The locale amounts are rendered in.
+     */
+    display_locale: string;
+    /**
+     * A symbol used instead of the runtime's.
+     */
+    symbol_override?: string | null;
+};
+
+/**
+ * The `CurrencyList` schema.
+ */
+export type CurrencyList = {
+    /**
+     * Every currency, by code.
+     */
+    items: Array<Currency>;
+};
+
+/**
+ * Request body of `PATCH /v1/currencies/{code}`, the `CurrencyUpdate` schema.
+ */
+export type CurrencyUpdate = {
+    /**
+     * New display locale.
+     */
+    display_locale?: string | null;
+    /**
+     * The status.
+     */
+    status?: Lifecycle | null;
+    /**
+     * New symbol override, or `null` to clear.
+     */
+    symbol_override?: string | null;
+};
+
+/**
+ * A day of the week, as written on the wire.
+ */
+export type Day = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+/**
+ * The windows of one weekday, the `DaySchedule` schema.
+ */
+export type DaySchedule = {
+    /**
+     * The day.
+     */
+    day: Day;
+    /**
+     * The open windows; empty means closed that day.
+     */
+    open: Array<Window>;
+};
+
+/**
+ * What would stop serving if an area were deactivated, the `DeactivationImpact` schema.
+ */
+export type DeactivationImpact = {
+    /**
+     * Every fenced area beneath it (itself included when fenced) with its Locations.
+     */
+    affected: Array<AffectedArea>;
+    /**
+     * Locations in all of them.
+     */
+    locations: number;
+    /**
+     * The area itself.
+     */
+    service_area: ServiceAreaRef;
+};
+
+/**
+ * Request body of `PUT /v1/countries/{alpha2}/default-service-area`, the `DefaultServiceArea`
+ * schema.
+ */
+export type DefaultServiceArea = {
+    /**
+     * The area, or `null` to clear.
+     */
+    service_area_id?: string | null;
+};
+
+/**
+ * A service area's composition, the `DisplayGrid` schema; empty means not configured.
+ */
+export type DisplayGrid = {
+    /**
+     * The rows in order.
+     */
+    rows?: Array<GridRow>;
+};
+
+/**
+ * Request body of `POST /v1/service-areas/{service_area_id}/divide`, the `DivisionRequest`
+ * schema.
+ */
+export type DivisionRequest = {
+    /**
+     * The areas to create beneath.
+     */
+    children: Array<DivisionChild>;
+    /**
+     * Go ahead although Locations would be stranded, deactivating them; needs a reason.
+     */
+    force?: boolean;
+    /**
+     * Why, kept in the audit log.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A child in a division plan.
+ */
+export type DivisionChild = {
+    /**
+     * Kind of the new area.
+     */
+    kind: AreaKind;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its fence as one ring of `[longitude, latitude]` points.
+     */
+    ring: Array<Array<number>>;
+    /**
+     * Its slug.
+     */
+    slug: string;
+};
+
+/**
+ * The outcome of planning or committing a division, the `DivisionPlan` schema.
+ */
+export type DivisionPlan = {
+    /**
+     * The areas that result (would result, for a dry run), each with the Locations it receives.
+     */
+    areas: Array<PlannedArea>;
+    /**
+     * Whether anything was written.
+     */
+    committed: boolean;
+    /**
+     * Locations outside every new area.
+     */
+    stranded: Array<StrandedLocation>;
+};
+
+/**
+ * Request body of `POST /v1/service-areas/{service_area_id}/division-plan`, the
+ * `DivisionPlanRequest` schema.
+ */
+export type DivisionPlanRequest = {
+    /**
+     * The areas to create beneath.
+     */
+    children: Array<DivisionChild>;
+};
+
+/**
+ * The effective policy of a Location, the `EffectivePolicy` schema: per field the value and
+ * the layer that supplied it, with the full chain outermost first.
+ */
+export type EffectivePolicy = {
+    /**
+     * The chain, outermost first, each layer labelled with the version in force.
+     */
+    chain: Array<LayerRef>;
+    /**
+     * The commission percent.
+     */
+    commission_percent?: SourcedRate | null;
+    /**
+     * The coverage radius metres.
+     */
+    coverage_radius_metres?: SourcedAmount | null;
+    /**
+     * The currency every amount is in.
+     */
+    currency: string;
+    /**
+     * The delivery estimate minutes.
+     */
+    delivery_estimate_minutes?: SourcedAmount | null;
+    /**
+     * The delivery fee.
+     */
+    delivery_fee?: SourcedAmount | null;
+    /**
+     * The fee by distance.
+     */
+    fee_by_distance?: SourcedLadder | null;
+    /**
+     * The fee by order value.
+     */
+    fee_by_order_value?: SourcedLadder | null;
+    /**
+     * The gst rate percent.
+     */
+    gst_rate_percent?: SourcedRate | null;
+    /**
+     * The minimum order value.
+     */
+    minimum_order_value?: SourcedAmount | null;
+    /**
+     * The prescription fee.
+     */
+    prescription_fee?: SourcedAmount | null;
+    /**
+     * The prices include tax.
+     */
+    prices_include_tax?: SourcedFlag | null;
+    /**
+     * The service fee ceiling.
+     */
+    service_fee_ceiling?: SourcedAmount | null;
+    /**
+     * The service fee floor.
+     */
+    service_fee_floor?: SourcedAmount | null;
+    /**
+     * The service fee percent.
+     */
+    service_fee_percent?: SourcedRate | null;
+    /**
+     * The small order fee.
+     */
+    small_order_fee?: SourcedAmount | null;
+};
+
+/**
+ * The effective schedule of a Location, the `EffectiveSchedule` schema.
+ */
+export type EffectiveSchedule = {
+    /**
+     * Every exception of every layer, outermost first.
+     */
+    exceptions: Array<SourcedException>;
+    /**
+     * The time zone the times are in.
+     */
+    time_zone: string;
+    /**
+     * The week in force.
+     */
+    week: Array<DaySchedule>;
+    /**
+     * The week source.
+     */
+    week_source?: LayerRef | null;
+};
+
+/**
+ * One band of a fee ladder, the `FeeBand` schema.
+ */
+export type FeeBand = {
+    /**
+     * The fee in minor units.
+     */
+    fee: number;
+    /**
+     * The band's upper bound (metres or minor units); `null` for the open-ended last band.
+     */
+    up_to?: number | null;
+};
+
+/**
+ * A fence: one or more polygons, each as its outer ring of `[longitude, latitude]` points,
+ * the `Fence` schema.
+ */
+export type Fence = {
+    /**
+     * The polygons' outer rings; each ring is closed (first point repeated last).
+     */
+    rings: Array<Array<Array<number>>>;
+};
+
+/**
+ * A field catalogue, the `FieldCatalogue` schema.
+ */
+export type FieldCatalogue = {
+    /**
+     * The fields a type may declare.
+     */
+    items: Array<FieldDefinition>;
+};
+
+/**
+ * A field of the closed catalogue, the `FieldDefinition` schema.
+ */
+export type FieldDefinition = {
+    /**
+     * The key types refer to.
+     */
+    key: string;
+    /**
+     * The label consoles show.
+     */
+    label: string;
+    /**
+     * The options, for a choice.
+     */
+    options: Array<string>;
+    /**
+     * The type of value.
+     */
+    type: FieldType;
+};
+
+/**
+ * The type of a typed extra field.
+ */
+export type FieldType = 'text' | 'number' | 'boolean' | 'choice';
+
+/**
+ * One cell, the `GridCell` schema.
+ */
+export type GridCell = {
+    /**
+     * The campaign slot, for a campaign cell.
+     */
+    campaign_slot_id?: string | null;
+    /**
+     * The column it starts at, zero based.
+     */
+    column: number;
+    /**
+     * Identity that outlives edits.
+     */
+    id?: string;
+    /**
+     * What it shows.
+     */
+    kind: CellKind;
+    /**
+     * Served as unavailable when the Vertical no longer trades here; ignored on save.
+     */
+    unavailable?: boolean;
+    /**
+     * The Vertical, for a Vertical cell.
+     */
+    vertical_id?: string | null;
+};
+
+/**
+ * One row, the `GridRow` schema.
+ */
+export type GridRow = {
+    /**
+     * The cells, each naming its column.
+     */
+    cells: Array<GridCell>;
+    /**
+     * Identity that outlives edits.
+     */
+    id?: string;
+    /**
+     * The kind, which fixes the capacity.
+     */
+    kind: RowKind;
+};
+
+/**
+ * A public holiday on a country's calendar, the `Holiday` schema.
+ */
+export type Holiday = {
+    /**
+     * The date.
+     */
+    date: string;
+    /**
+     * The name people see.
+     */
+    name: string;
+};
+
+/**
+ * A holiday calendar, the `HolidayCalendar` schema: the body of a `PUT` and the answer of a
+ * `GET`.
+ */
+export type HolidayCalendar = {
+    /**
+     * The holidays, by date.
+     */
+    holidays: Array<Holiday>;
+};
+
+/**
+ * Which layer of the chain a value came from.
+ */
+export type LayerKind = 'country' | 'service_area' | 'partner' | 'location';
+
+/**
+ * A layer as named on an answer: whose decision a value was, the `LayerRef` schema.
+ */
+export type LayerRef = {
+    /**
+     * The layer's key: a country code or a record id.
+     */
+    key: string;
+    /**
+     * The kind of layer.
+     */
+    kind: LayerKind;
+    /**
+     * The layer's label, for a screen.
+     */
+    label: string;
+    /**
+     * When that version was saved.
+     */
+    set_at?: string | null;
+    /**
+     * Who saved that version.
+     */
+    set_by?: string | null;
+    /**
+     * The version of the layer that supplied the value; zero for a layer never set.
+     */
+    version: number;
+};
+
+/**
+ * Where a reference record is in its life. Countries, service areas and verticals have no
+ * `draft`; store and service types do.
+ */
+export type Lifecycle = 'draft' | 'active' | 'inactive' | 'archived';
+
+/**
+ * What a campaign slot links to.
+ */
+export type LinkKind = 'vertical' | 'partner' | 'campaign' | 'locations' | 'products';
+
+/**
+ * Request body of `POST /v1/service-areas/{service_area_id}/merge`, the `MergeRequest` schema.
+ */
+export type MergeRequest = {
+    /**
+     * Every fenced area beneath, named so nothing folds in unseen.
+     */
+    child_ids: Array<string>;
+    /**
+     * Why, kept in the audit log; required.
+     */
+    reason?: string | null;
+};
+
+/**
+ * One planned area.
+ */
+export type PlannedArea = {
+    /**
+     * Its id (assigned at planning, kept on commit).
+     */
+    id: string;
+    /**
+     * Its kind.
+     */
+    kind: AreaKind;
+    /**
+     * The Locations it receives.
+     */
+    locations: Array<string>;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its slug.
+     */
+    slug: string;
+};
+
+/**
+ * A stored version of a layer, the `PolicyLayer` schema.
+ */
+export type PolicyLayer = {
+    /**
+     * The layer.
+     */
+    layer: LayerRef;
+    /**
+     * Its fields.
+     */
+    policy: ServicePolicy;
+};
+
+/**
+ * The versions of a policy layer, newest first, the `PolicyLayerList` schema.
+ */
+export type PolicyLayerList = {
+    /**
+     * The versions.
+     */
+    items: Array<PolicyLayer>;
+};
+
+/**
+ * How a bookable service is priced.
+ */
+export type PriceBasis = 'fixed' | 'per_hour' | 'quoted';
+
+/**
+ * A product field a store type's catalogue declares, the `ProductField` schema.
+ */
+export type ProductField = {
+    /**
+     * The key.
+     */
+    key: string;
+    /**
+     * The label.
+     */
+    label: string;
+    /**
+     * The type.
+     */
+    type: FieldType;
+};
+
+/**
+ * Provenance stamps every reference record carries.
+ */
+export type Provenance = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+};
+
+/**
+ * One service area in a Vertical's reach tree, the `ReachNode` schema.
+ */
+export type ReachNode = {
+    /**
+     * The areas beneath.
+     */
+    children: Array<ReachNode>;
+    /**
+     * Reaches here from an ancestor.
+     */
+    inherited: boolean;
+    /**
+     * Trades here.
+     */
+    offered: boolean;
+    /**
+     * Declared at this area.
+     */
+    offered_here: boolean;
+    /**
+     * The area.
+     */
+    service_area: ServiceAreaRef;
+};
+
+/**
+ * The `ReachTree` schema: one tree per country.
+ */
+export type ReachTree = {
+    /**
+     * The roots.
+     */
+    items: Array<ReachNode>;
+};
+
+/**
+ * How a pin was resolved.
+ */
+export type Resolution = 'inside' | 'nearest' | 'country_default' | 'none';
+
+/**
+ * The answer to resolving a pin, the `ResolvedPin` schema.
+ */
+export type ResolvedPin = {
+    /**
+     * Metres from the pin to the area; zero inside.
+     */
+    distance_metres?: number | null;
+    /**
+     * Why not, when not serviceable.
+     */
+    reason?: string | null;
+    /**
+     * How the area was chosen.
+     */
+    resolution: Resolution;
+    /**
+     * The service area.
+     */
+    service_area?: ServiceAreaRef | null;
+    /**
+     * Whether an order can be placed at the pin: inside a serving area of a country accepting
+     * orders.
+     */
+    serviceable: boolean;
+    /**
+     * The area's time zone.
+     */
+    time_zone?: string | null;
+};
+
+/**
+ * The kinds of row and their capacities.
+ */
+export type RowKind = 'default' | 'big';
+
+/**
+ * A schedule layer's content, the `Schedule` schema.
+ */
+export type Schedule = {
+    /**
+     * Dated exceptions.
+     */
+    exceptions?: Array<ScheduleException>;
+    /**
+     * The weekly pattern; a service area layer leaves it empty.
+     */
+    week?: Array<DaySchedule>;
+};
+
+/**
+ * A dated exception, the `ScheduleException` schema.
+ */
+export type ScheduleException = {
+    /**
+     * Whether pre-orders are still taken.
+     */
+    accepts_pre_orders?: boolean | null;
+    /**
+     * Closed all day.
+     */
+    closed_all_day: boolean;
+    /**
+     * First date, inclusive.
+     */
+    from: string;
+    /**
+     * Identity that outlives edits.
+     */
+    id?: string;
+    /**
+     * The label people see.
+     */
+    label: string;
+    /**
+     * Explicit open windows, for a part day.
+     */
+    open?: Array<Window>;
+    /**
+     * Last date, inclusive.
+     */
+    to: string;
+};
+
+/**
+ * A stored version of a schedule layer, the `ScheduleLayer` schema.
+ */
+export type ScheduleLayer = {
+    /**
+     * The layer.
+     */
+    layer: LayerRef;
+    /**
+     * Its content.
+     */
+    schedule: Schedule;
+};
+
+/**
+ * A node of the geography tree, the `ServiceArea` schema.
+ */
+export type ServiceArea = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * The country (alpha-2), immutable.
+     */
+    country: string;
+    /**
+     * Whether it is its country's default.
+     */
+    default_for_country: boolean;
+    /**
+     * Active, and every ancestor active.
+     */
+    effectively_active: boolean;
+    /**
+     * The fence.
+     */
+    fence?: Fence | null;
+    /**
+     * How many fenced service areas sit beneath it.
+     */
+    fenced_descendants: number;
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * A label only; immutable because it appears in history.
+     */
+    kind: AreaKind;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * The parent node; `null` at the top of a country.
+     */
+    parent_id?: string | null;
+    /**
+     * The materialised path every descendant embeds.
+     */
+    path: string;
+    /**
+     * Whether the area serves anybody: fenced and effectively active.
+     */
+    serves: boolean;
+    /**
+     * The slug, immutable; part of the path.
+     */
+    slug: string;
+    /**
+     * Own lifecycle status.
+     */
+    status: Lifecycle;
+    /**
+     * The IANA time zone, one the country spans.
+     */
+    time_zone: string;
+};
+
+/**
+ * Request body of `POST /v1/service-areas`, the `ServiceAreaCreate` schema.
+ */
+export type ServiceAreaCreate = {
+    /**
+     * The country.
+     */
+    country: string;
+    /**
+     * The fence.
+     */
+    fence?: Fence | null;
+    /**
+     * The kind label.
+     */
+    kind: AreaKind;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * The parent, or omitted at the top of the country.
+     */
+    parent_id?: string | null;
+    /**
+     * Slug.
+     */
+    slug: string;
+    /**
+     * Time zone; the parent's, else the country's first, when omitted.
+     */
+    time_zone?: string | null;
+};
+
+/**
+ * The `ServiceAreaList` schema.
+ */
+export type ServiceAreaList = {
+    /**
+     * The areas, by path.
+     */
+    items: Array<ServiceArea>;
+};
+
+/**
+ * A reference to a service area in another record's answer.
+ */
+export type ServiceAreaRef = {
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * Kind.
+     */
+    kind: AreaKind;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * Path.
+     */
+    path: string;
+};
+
+/**
+ * Request body of `PATCH /v1/service-areas/{service_area_id}`, the `ServiceAreaUpdate` schema.
+ */
+export type ServiceAreaUpdate = {
+    /**
+     * New name.
+     */
+    name?: string | null;
+    /**
+     * New time zone.
+     */
+    time_zone?: string | null;
+};
+
+/**
+ * A policy layer's fields, the `ServicePolicy` schema. Every member is optional: `null`
+ * defers to the layer above; zero is a decision.
+ */
+export type ServicePolicy = {
+    /**
+     * Commission rate as a percentage.
+     */
+    commission_percent?: number | null;
+    /**
+     * Coverage radius in metres.
+     */
+    coverage_radius_metres?: number | null;
+    /**
+     * Delivery estimate in minutes.
+     */
+    delivery_estimate_minutes?: number | null;
+    /**
+     * Delivery fee in minor units.
+     */
+    delivery_fee?: number | null;
+    /**
+     * Fee by distance from the Location, a ladder of bands in metres.
+     */
+    fee_by_distance?: Array<FeeBand> | null;
+    /**
+     * Fee by order value, a ladder of bands in minor units.
+     */
+    fee_by_order_value?: Array<FeeBand> | null;
+    /**
+     * GST rate as a percentage.
+     */
+    gst_rate_percent?: number | null;
+    /**
+     * Minimum order value in minor units.
+     */
+    minimum_order_value?: number | null;
+    /**
+     * Prescription fee per dispensed line, in minor units.
+     */
+    prescription_fee?: number | null;
+    /**
+     * Whether displayed prices include tax.
+     */
+    prices_include_tax?: boolean | null;
+    /**
+     * Ceiling of the service fee in minor units.
+     */
+    service_fee_ceiling?: number | null;
+    /**
+     * Floor of the service fee in minor units.
+     */
+    service_fee_floor?: number | null;
+    /**
+     * Platform service fee as a percentage, 0 to 100.
+     */
+    service_fee_percent?: number | null;
+    /**
+     * Fee charged below the minimum instead of refusal, in minor units.
+     */
+    small_order_fee?: number | null;
+};
+
+/**
+ * A service type, the `ServiceType` schema.
+ */
+export type ServiceType = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * What a bookable service collects.
+     */
+    catalogue: ServicesBlock;
+    /**
+     * Stable code.
+     */
+    code: string;
+    /**
+     * Typed extra fields.
+     */
+    fields: Array<TypeField>;
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * Name.
+     */
+    name: string;
+    /**
+     * Default travel radius in metres.
+     */
+    radius_metres: number;
+    /**
+     * Slot length in minutes.
+     */
+    slot_minutes: number;
+    /**
+     * Lifecycle.
+     */
+    status: Lifecycle;
+    /**
+     * Tagline.
+     */
+    tagline: string;
+    /**
+     * Turnaround in hours, for pickup-and-return work.
+     */
+    turnaround_hours?: number | null;
+    /**
+     * Default visit duration in minutes.
+     */
+    visit_minutes: number;
+    /**
+     * The workflow.
+     */
+    workflow: Workflow;
+};
+
+/**
+ * Request body of `POST /v1/service-types`, the `ServiceTypeCreate` schema.
+ */
+export type ServiceTypeCreate = {
+    /**
+     * What a bookable service collects.
+     */
+    catalogue: ServicesBlock;
+    /**
+     * Stable code.
+     */
+    code: string;
+    /**
+     * Typed extra fields, from the service field catalogue.
+     */
+    fields?: Array<TypeField>;
+    /**
+     * Name.
+     */
+    name: string;
+    /**
+     * Default radius in metres.
+     */
+    radius_metres: number;
+    /**
+     * Slot length in minutes.
+     */
+    slot_minutes: number;
+    /**
+     * Tagline.
+     */
+    tagline: string;
+    /**
+     * Turnaround in hours, required for pickup-and-return work.
+     */
+    turnaround_hours?: number | null;
+    /**
+     * Default visit duration in minutes.
+     */
+    visit_minutes: number;
+    /**
+     * Workflow.
+     */
+    workflow: Workflow;
+};
+
+/**
+ * The `ServiceTypeList` schema.
+ */
+export type ServiceTypeList = {
+    /**
+     * Every service type.
+     */
+    items: Array<ServiceType>;
+};
+
+/**
+ * Request body of `PATCH /v1/service-types/{service_type_id}`, the `ServiceTypeUpdate` schema.
+ */
+export type ServiceTypeUpdate = {
+    /**
+     * The catalogue.
+     */
+    catalogue?: ServicesBlock | null;
+    /**
+     * New fields.
+     */
+    fields?: Array<TypeField> | null;
+    /**
+     * New name.
+     */
+    name?: string | null;
+    /**
+     * New radius.
+     */
+    radius_metres?: number | null;
+    /**
+     * New slot length.
+     */
+    slot_minutes?: number | null;
+    /**
+     * New tagline.
+     */
+    tagline?: string | null;
+    /**
+     * New turnaround, or `null` to clear.
+     */
+    turnaround_hours?: number | null;
+    /**
+     * New visit duration.
+     */
+    visit_minutes?: number | null;
+    /**
+     * The workflow.
+     */
+    workflow?: Workflow | null;
+};
+
+/**
+ * What a bookable service of a type collects, the `ServicesBlock` schema.
+ */
+export type ServicesBlock = {
+    /**
+     * Whether add-ons are allowed.
+     */
+    add_ons: boolean;
+    /**
+     * Whether a cancellation notice in hours is stated.
+     */
+    cancellation_notice: boolean;
+    /**
+     * Whether a deposit may be taken.
+     */
+    deposit: boolean;
+    /**
+     * Whether a service states its duration.
+     */
+    duration: boolean;
+    /**
+     * Whether materials are charged.
+     */
+    materials: boolean;
+    /**
+     * The price bases allowed.
+     */
+    price_bases: Array<PriceBasis>;
+};
+
+/**
+ * A setting as served, the `Setting` schema.
+ */
+export type Setting = {
+    /**
+     * The choices, for a choice.
+     */
+    choices: Array<Choice>;
+    /**
+     * The default.
+     */
+    default: number;
+    /**
+     * What it does.
+     */
+    description: string;
+    /**
+     * The key.
+     */
+    key: string;
+    /**
+     * The label.
+     */
+    label: string;
+    /**
+     * The maximum, for a range.
+     */
+    maximum?: number | null;
+    /**
+     * The minimum, for a range.
+     */
+    minimum?: number | null;
+    /**
+     * Whether a value is stored.
+     */
+    overridden: boolean;
+    /**
+     * Why it is admitted.
+     */
+    reason: string;
+    /**
+     * The unit, for a range.
+     */
+    unit?: string | null;
+    /**
+     * When the stored value was set.
+     */
+    updated_at?: string | null;
+    /**
+     * Who set it.
+     */
+    updated_by?: string | null;
+    /**
+     * The value in force: the override when one is stored and in range, else the default.
+     */
+    value: number;
+};
+
+/**
+ * The `SettingList` schema.
+ */
+export type SettingList = {
+    /**
+     * Every setting with the value in force.
+     */
+    items: Array<Setting>;
+};
+
+/**
+ * Request body of `PUT /v1/settings/{key}`, the `SettingValue` schema.
+ */
+export type SettingValue = {
+    /**
+     * The value, within the declared bounds.
+     */
+    value: number;
+};
+
+/**
+ * Hours of the week a campaign slot shows, in the service area's own clock.
+ */
+export type SlotHours = {
+    /**
+     * The day.
+     */
+    day: Day;
+    /**
+     * From this local time.
+     */
+    from: string;
+    /**
+     * Until this local time; `00:00` means midnight at the close of the day.
+     */
+    to: string;
+};
+
+/**
+ * What a campaign slot links to, the `SlotLink` schema.
+ */
+export type SlotLink = {
+    /**
+     * The kind of target.
+     */
+    kind: LinkKind;
+    /**
+     * The target ids: exactly one for a Vertical, Partner or campaign; one or more Location
+     * ids for `locations`; one or more `location_id/product_id` for `products`.
+     */
+    targets: Array<string>;
+};
+
+/**
+ * The shape of a campaign slot: artwork is drawn for one width, so it never changes.
+ */
+export type SlotShape = 'banner' | 'compact';
+
+/**
+ * An amount in minor units with the layer that supplied it, the `SourcedAmount` schema.
+ */
+export type SourcedAmount = {
+    /**
+     * Whose decision it was: the layer and the version that supplied the value.
+     */
+    source: LayerRef;
+    /**
+     * The value in force.
+     */
+    value: number;
+};
+
+/**
+ * An exception with the layer that declared it.
+ */
+export type SourcedException = {
+    /**
+     * The exception.
+     */
+    exception: ScheduleException;
+    /**
+     * Whose it is.
+     */
+    source: LayerRef;
+};
+
+/**
+ * A yes or no with the layer that supplied it, the `SourcedFlag` schema.
+ */
+export type SourcedFlag = {
+    /**
+     * Whose decision it was: the layer and the version that supplied the value.
+     */
+    source: LayerRef;
+    /**
+     * The value in force.
+     */
+    value: boolean;
+};
+
+/**
+ * A fee ladder with the layer that supplied it, the `SourcedLadder` schema.
+ */
+export type SourcedLadder = {
+    /**
+     * Whose decision it was: the layer and the version that supplied the value.
+     */
+    source: LayerRef;
+    /**
+     * The value in force.
+     */
+    value: Array<FeeBand>;
+};
+
+/**
+ * A percentage with the layer that supplied it, the `SourcedRate` schema.
+ */
+export type SourcedRate = {
+    /**
+     * Whose decision it was: the layer and the version that supplied the value.
+     */
+    source: LayerRef;
+    /**
+     * The value in force.
+     */
+    value: number;
+};
+
+/**
+ * A status change with its reason, the `StatusChange` schema. The reason is required where
+ * the capability demands one (countries, service areas).
+ */
+export type StatusChange = {
+    /**
+     * Why, kept in the audit log.
+     */
+    reason?: string | null;
+    /**
+     * The status to move to.
+     */
+    status: Lifecycle;
+};
+
+/**
+ * A store type, the `StoreType` schema.
+ */
+export type StoreType = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * What its items may carry.
+     */
+    catalogue: CatalogueBlock;
+    /**
+     * Stable code.
+     */
+    code: string;
+    /**
+     * The typed extra fields its Locations carry.
+     */
+    fields: Array<TypeField>;
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * Name.
+     */
+    name: string;
+    /**
+     * Lifecycle; only `active` may be given to a new Location.
+     */
+    status: Lifecycle;
+    /**
+     * Tagline shown in the picker.
+     */
+    tagline: string;
+};
+
+/**
+ * Request body of `POST /v1/store-types`, the `StoreTypeCreate` schema.
+ */
+export type StoreTypeCreate = {
+    /**
+     * What its items may carry.
+     */
+    catalogue: CatalogueBlock;
+    /**
+     * Stable code.
+     */
+    code: string;
+    /**
+     * Typed extra fields, from the store field catalogue.
+     */
+    fields?: Array<TypeField>;
+    /**
+     * Name.
+     */
+    name: string;
+    /**
+     * Tagline.
+     */
+    tagline: string;
+};
+
+/**
+ * The `StoreTypeList` schema.
+ */
+export type StoreTypeList = {
+    /**
+     * Every store type.
+     */
+    items: Array<StoreType>;
+};
+
+/**
+ * Request body of `PATCH /v1/store-types/{store_type_id}`, the `StoreTypeUpdate` schema.
+ */
+export type StoreTypeUpdate = {
+    /**
+     * The catalogue.
+     */
+    catalogue?: CatalogueBlock | null;
+    /**
+     * New fields.
+     */
+    fields?: Array<TypeField> | null;
+    /**
+     * New name.
+     */
+    name?: string | null;
+    /**
+     * New tagline.
+     */
+    tagline?: string | null;
+};
+
+/**
+ * A Location a division would strand, named in the refusal.
+ */
+export type StrandedLocation = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its partner.
+     */
+    partner_id: string;
+};
+
+/**
+ * Request body of the switch routes, the `SwitchChange` schema.
+ */
+export type SwitchChange = {
+    /**
+     * On or off.
+     */
+    accepts: boolean;
+    /**
+     * Why, kept in the audit log; required.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Whether a Location trades at an instant, the `Trading` schema.
+ */
+export type Trading = {
+    /**
+     * Open now.
+     */
+    open: boolean;
+    /**
+     * When that changes, in the Location's zone.
+     */
+    until?: string | null;
+};
+
+/**
+ * A typed extra field a type declares, the `TypeField` schema.
+ */
+export type TypeField = {
+    /**
+     * The key, from the closed field catalogue.
+     */
+    key: string;
+    /**
+     * Whether a record of the type must carry it.
+     */
+    required: boolean;
+};
+
+/**
+ * A Vertical, the `Vertical` schema.
+ */
+export type Vertical = {
+    /**
+     * When the record was created.
+     */
+    created_at: string;
+    /**
+     * The user who created the record; `null` for seeded rows.
+     */
+    created_by?: string | null;
+    /**
+     * When the record was last changed.
+     */
+    updated_at: string;
+    /**
+     * The user who last changed the record; `null` until changed through the API.
+     */
+    updated_by?: string | null;
+    /**
+     * The version, raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * Categories in merchandising order.
+     */
+    categories: Array<VerticalCategory>;
+    /**
+     * Stable uppercase code, never renamed.
+     */
+    code: string;
+    /**
+     * Identifier.
+     */
+    id: string;
+    /**
+     * The image shown on its tile.
+     */
+    image_asset_id?: string | null;
+    /**
+     * Product sales or field service.
+     */
+    kind: VerticalKind;
+    /**
+     * Display name.
+     */
+    name: string;
+    /**
+     * Creation order, the fallback ordering.
+     */
+    position: number;
+    /**
+     * Lifecycle; no draft.
+     */
+    status: Lifecycle;
+};
+
+/**
+ * A category of a Vertical, the `VerticalCategory` schema.
+ */
+export type VerticalCategory = {
+    /**
+     * Hidden without deleting when `false`.
+     */
+    enabled: boolean;
+    /**
+     * An optional icon.
+     */
+    icon_asset_id?: string | null;
+    /**
+     * Identity that outlives renames and reorders.
+     */
+    id: string;
+    /**
+     * The label.
+     */
+    label: string;
+};
+
+/**
+ * One category as sent, the `VerticalCategoryInput` schema; the id is kept when given.
+ */
+export type VerticalCategoryInput = {
+    /**
+     * Shown when `true`; `true` when omitted.
+     */
+    enabled?: boolean;
+    /**
+     * An optional icon.
+     */
+    icon_asset_id?: string | null;
+    /**
+     * The identity to keep; a fresh one when omitted.
+     */
+    id?: string | null;
+    /**
+     * The label.
+     */
+    label: string;
+};
+
+/**
+ * Request body of `POST /v1/verticals`, the `VerticalCreate` schema.
+ */
+export type VerticalCreate = {
+    /**
+     * Stable uppercase code, never renamed.
+     */
+    code: string;
+    /**
+     * Product sales or field service.
+     */
+    kind: VerticalKind;
+    /**
+     * Display name.
+     */
+    name: string;
+};
+
+/**
+ * Request body of the Vertical set and order routes, the `VerticalIds` schema.
+ */
+export type VerticalIds = {
+    /**
+     * The Verticals.
+     */
+    vertical_ids: Array<string>;
+};
+
+/**
+ * Request body of `PUT /v1/verticals/{vertical_id}/image`, the `VerticalImage` schema.
+ */
+export type VerticalImage = {
+    /**
+     * The image asset, or `null` to clear.
+     */
+    asset_id?: string | null;
+};
+
+/**
+ * Whether a Vertical lists product sales or field services.
+ */
+export type VerticalKind = 'product_sales' | 'field_service';
+
+/**
+ * The `VerticalList` schema.
+ */
+export type VerticalList = {
+    /**
+     * Every Vertical, in position order.
+     */
+    items: Array<Vertical>;
+};
+
+/**
+ * A Vertical as a service area offers it, the `VerticalOffer` schema.
+ */
+export type VerticalOffer = {
+    /**
+     * Its code.
+     */
+    code: string;
+    /**
+     * The ancestor whose declaration reaches here, when inherited.
+     */
+    inherited_from?: string | null;
+    /**
+     * Its kind.
+     */
+    kind: VerticalKind;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether the Vertical trades here: declared here or inherited, and the Vertical active.
+     */
+    offered: boolean;
+    /**
+     * Whether this service area declares the offer itself.
+     */
+    offered_here: boolean;
+    /**
+     * Its own status.
+     */
+    status: Lifecycle;
+    /**
+     * The Vertical.
+     */
+    vertical_id: string;
+};
+
+/**
+ * The `VerticalOfferList` schema.
+ */
+export type VerticalOfferList = {
+    /**
+     * The Verticals as the area offers them, in its order.
+     */
+    items: Array<VerticalOffer>;
+};
+
+/**
+ * Request body of `PATCH /v1/verticals/{vertical_id}`, the `VerticalUpdate` schema.
+ */
+export type VerticalUpdate = {
+    /**
+     * New name.
+     */
+    name?: string | null;
+};
+
+/**
+ * An open window of a day, the `Window` schema.
+ */
+export type Window = {
+    /**
+     * Opens at.
+     */
+    from: string;
+    /**
+     * Closes at; `00:00` means midnight at the close of the day.
+     */
+    to: string;
+};
+
+/**
+ * The workflow of a field service.
+ */
+export type Workflow = 'appointment' | 'on_site_job' | 'pickup_and_return';
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -1911,6 +4110,10 @@ export type RequestOtpErrors = {
      * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel. The `errors` member points at the offending field.
      */
     400: Problem;
+    /**
+     * The phone number's country is not accepting sign-in (`sign_in_closed`); a number from no known country is refused too.
+     */
+    409: Problem;
     /**
      * Too many codes were requested for this identifier or from this client (`too_many_requests`). The `Retry-After` header says how many seconds to wait.
      */
@@ -2611,6 +4814,10 @@ export type CreateLocationErrors = {
      */
     404: Problem;
     /**
+     * The pin is outside every service area and too far from any to be placed (`unprocessable`, pointers `/lat` and `/lng`).
+     */
+    422: Problem;
+    /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
@@ -2734,6 +4941,10 @@ export type UpdateLocationErrors = {
      * `If-Match` no longer matches the location's version (`precondition_failed`); fetch it again and retry.
      */
     412: Problem;
+    /**
+     * The pin is outside every service area and too far from any to be placed (`unprocessable`, pointers `/lat` and `/lng`).
+     */
+    422: Problem;
     /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -3348,3 +5559,4487 @@ export type GetAuditEntryResponses = {
 };
 
 export type GetAuditEntryResponse = GetAuditEntryResponses[keyof GetAuditEntryResponses];
+
+export type DeleteCampaignSlotData = {
+    body?: never;
+    path: {
+        /**
+         * The slot
+         */
+        campaign_slot_id: string;
+    };
+    query?: never;
+    url: '/v1/campaign-slots/{campaign_slot_id}';
+};
+
+export type DeleteCampaignSlotErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown slot
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteCampaignSlotError = DeleteCampaignSlotErrors[keyof DeleteCampaignSlotErrors];
+
+export type DeleteCampaignSlotResponses = {
+    /**
+     * Removed
+     */
+    204: void;
+};
+
+export type DeleteCampaignSlotResponse = DeleteCampaignSlotResponses[keyof DeleteCampaignSlotResponses];
+
+export type GetCampaignSlotData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The slot
+         */
+        campaign_slot_id: string;
+    };
+    query?: never;
+    url: '/v1/campaign-slots/{campaign_slot_id}';
+};
+
+export type GetCampaignSlotErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown slot
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCampaignSlotError = GetCampaignSlotErrors[keyof GetCampaignSlotErrors];
+
+export type GetCampaignSlotResponses = {
+    /**
+     * The slot, with its version as the `ETag`
+     */
+    200: CampaignSlot;
+};
+
+export type GetCampaignSlotResponse = GetCampaignSlotResponses[keyof GetCampaignSlotResponses];
+
+export type UpdateCampaignSlotData = {
+    /**
+     * The request body.
+     */
+    body: CampaignSlotUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The slot
+         */
+        campaign_slot_id: string;
+    };
+    query?: never;
+    url: '/v1/campaign-slots/{campaign_slot_id}';
+};
+
+export type UpdateCampaignSlotErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown slot
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCampaignSlotError = UpdateCampaignSlotErrors[keyof UpdateCampaignSlotErrors];
+
+export type UpdateCampaignSlotResponses = {
+    /**
+     * The slot after the change, with its new `ETag`
+     */
+    200: CampaignSlot;
+};
+
+export type UpdateCampaignSlotResponse = UpdateCampaignSlotResponses[keyof UpdateCampaignSlotResponses];
+
+export type ListCountriesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/countries';
+};
+
+export type ListCountriesErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCountriesError = ListCountriesErrors[keyof ListCountriesErrors];
+
+export type ListCountriesResponses = {
+    /**
+     * The countries
+     */
+    200: CountryList;
+};
+
+export type ListCountriesResponse = ListCountriesResponses[keyof ListCountriesResponses];
+
+export type CreateCountryData = {
+    /**
+     * The request body.
+     */
+    body: CountryCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/countries';
+};
+
+export type CreateCountryErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The country exists
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCountryError = CreateCountryErrors[keyof CreateCountryErrors];
+
+export type CreateCountryResponses = {
+    /**
+     * The country
+     */
+    201: Country;
+};
+
+export type CreateCountryResponse = CreateCountryResponses[keyof CreateCountryResponses];
+
+export type GetCountryData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}';
+};
+
+export type GetCountryErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCountryError = GetCountryErrors[keyof GetCountryErrors];
+
+export type GetCountryResponses = {
+    /**
+     * The country, with its version as the `ETag`
+     */
+    200: Country;
+};
+
+export type GetCountryResponse = GetCountryResponses[keyof GetCountryResponses];
+
+export type UpdateCountryData = {
+    /**
+     * The request body.
+     */
+    body: CountryUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}';
+};
+
+export type UpdateCountryErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCountryError = UpdateCountryErrors[keyof UpdateCountryErrors];
+
+export type UpdateCountryResponses = {
+    /**
+     * The country after the change, with its new `ETag`
+     */
+    200: Country;
+};
+
+export type UpdateCountryResponse = UpdateCountryResponses[keyof UpdateCountryResponses];
+
+export type PutCountryDefaultServiceAreaData = {
+    /**
+     * The request body.
+     */
+    body: DefaultServiceArea;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/default-service-area';
+};
+
+export type PutCountryDefaultServiceAreaErrors = {
+    /**
+     * Malformed body, or an area of another country
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCountryDefaultServiceAreaError = PutCountryDefaultServiceAreaErrors[keyof PutCountryDefaultServiceAreaErrors];
+
+export type PutCountryDefaultServiceAreaResponses = {
+    /**
+     * The country after the change
+     */
+    200: Country;
+};
+
+export type PutCountryDefaultServiceAreaResponse = PutCountryDefaultServiceAreaResponses[keyof PutCountryDefaultServiceAreaResponses];
+
+export type GetCountryHolidaysData = {
+    body?: never;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/holidays';
+};
+
+export type GetCountryHolidaysErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCountryHolidaysError = GetCountryHolidaysErrors[keyof GetCountryHolidaysErrors];
+
+export type GetCountryHolidaysResponses = {
+    /**
+     * The calendar
+     */
+    200: HolidayCalendar;
+};
+
+export type GetCountryHolidaysResponse = GetCountryHolidaysResponses[keyof GetCountryHolidaysResponses];
+
+export type PutCountryHolidaysData = {
+    /**
+     * The request body.
+     */
+    body: HolidayCalendar;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/holidays';
+};
+
+export type PutCountryHolidaysErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCountryHolidaysError = PutCountryHolidaysErrors[keyof PutCountryHolidaysErrors];
+
+export type PutCountryHolidaysResponses = {
+    /**
+     * The calendar as stored
+     */
+    200: HolidayCalendar;
+};
+
+export type PutCountryHolidaysResponse = PutCountryHolidaysResponses[keyof PutCountryHolidaysResponses];
+
+export type SetCountryOrdersData = {
+    /**
+     * The request body.
+     */
+    body: SwitchChange;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/orders';
+};
+
+export type SetCountryOrdersErrors = {
+    /**
+     * Malformed body, or no reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetCountryOrdersError = SetCountryOrdersErrors[keyof SetCountryOrdersErrors];
+
+export type SetCountryOrdersResponses = {
+    /**
+     * The country after the change
+     */
+    200: Country;
+};
+
+export type SetCountryOrdersResponse = SetCountryOrdersResponses[keyof SetCountryOrdersResponses];
+
+export type GetCountryPolicyData = {
+    body?: never;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/policy';
+};
+
+export type GetCountryPolicyErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCountryPolicyError = GetCountryPolicyErrors[keyof GetCountryPolicyErrors];
+
+export type GetCountryPolicyResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: PolicyLayer;
+};
+
+export type GetCountryPolicyResponse = GetCountryPolicyResponses[keyof GetCountryPolicyResponses];
+
+export type PutCountryPolicyData = {
+    /**
+     * The request body.
+     */
+    body: ServicePolicy;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/policy';
+};
+
+export type PutCountryPolicyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCountryPolicyError = PutCountryPolicyErrors[keyof PutCountryPolicyErrors];
+
+export type PutCountryPolicyResponses = {
+    /**
+     * The layer as saved
+     */
+    200: PolicyLayer;
+};
+
+export type PutCountryPolicyResponse = PutCountryPolicyResponses[keyof PutCountryPolicyResponses];
+
+export type ListCountryPolicyVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/policy/versions';
+};
+
+export type ListCountryPolicyVersionsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCountryPolicyVersionsError = ListCountryPolicyVersionsErrors[keyof ListCountryPolicyVersionsErrors];
+
+export type ListCountryPolicyVersionsResponses = {
+    /**
+     * The versions
+     */
+    200: PolicyLayerList;
+};
+
+export type ListCountryPolicyVersionsResponse = ListCountryPolicyVersionsResponses[keyof ListCountryPolicyVersionsResponses];
+
+export type GetCountryScheduleData = {
+    body?: never;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/schedule';
+};
+
+export type GetCountryScheduleErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCountryScheduleError = GetCountryScheduleErrors[keyof GetCountryScheduleErrors];
+
+export type GetCountryScheduleResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: ScheduleLayer;
+};
+
+export type GetCountryScheduleResponse = GetCountryScheduleResponses[keyof GetCountryScheduleResponses];
+
+export type PutCountryScheduleData = {
+    /**
+     * The request body.
+     */
+    body: Schedule;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/schedule';
+};
+
+export type PutCountryScheduleErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCountryScheduleError = PutCountryScheduleErrors[keyof PutCountryScheduleErrors];
+
+export type PutCountryScheduleResponses = {
+    /**
+     * The layer as saved
+     */
+    200: ScheduleLayer;
+};
+
+export type PutCountryScheduleResponse = PutCountryScheduleResponses[keyof PutCountryScheduleResponses];
+
+export type SetCountrySignInData = {
+    /**
+     * The request body.
+     */
+    body: SwitchChange;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/sign-in';
+};
+
+export type SetCountrySignInErrors = {
+    /**
+     * Malformed body, or no reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetCountrySignInError = SetCountrySignInErrors[keyof SetCountrySignInErrors];
+
+export type SetCountrySignInResponses = {
+    /**
+     * The country after the change
+     */
+    200: Country;
+};
+
+export type SetCountrySignInResponse = SetCountrySignInResponses[keyof SetCountrySignInResponses];
+
+export type SetCountryStatusData = {
+    /**
+     * The request body.
+     */
+    body: StatusChange;
+    path: {
+        /**
+         * The ISO 3166-1 alpha-2 code
+         */
+        alpha2: string;
+    };
+    query?: never;
+    url: '/v1/countries/{alpha2}/status';
+};
+
+export type SetCountryStatusErrors = {
+    /**
+     * Malformed body, or no reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown country
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetCountryStatusError = SetCountryStatusErrors[keyof SetCountryStatusErrors];
+
+export type SetCountryStatusResponses = {
+    /**
+     * The country after the change
+     */
+    200: Country;
+};
+
+export type SetCountryStatusResponse = SetCountryStatusResponses[keyof SetCountryStatusResponses];
+
+export type ListCurrenciesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/currencies';
+};
+
+export type ListCurrenciesErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCurrenciesError = ListCurrenciesErrors[keyof ListCurrenciesErrors];
+
+export type ListCurrenciesResponses = {
+    /**
+     * The currencies
+     */
+    200: CurrencyList;
+};
+
+export type ListCurrenciesResponse = ListCurrenciesResponses[keyof ListCurrenciesResponses];
+
+export type CreateCurrencyData = {
+    /**
+     * The request body.
+     */
+    body: CurrencyCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/currencies';
+};
+
+export type CreateCurrencyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The code exists
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCurrencyError = CreateCurrencyErrors[keyof CreateCurrencyErrors];
+
+export type CreateCurrencyResponses = {
+    /**
+     * The currency
+     */
+    201: Currency;
+};
+
+export type CreateCurrencyResponse = CreateCurrencyResponses[keyof CreateCurrencyResponses];
+
+export type GetCurrencyData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The ISO 4217 code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/v1/currencies/{code}';
+};
+
+export type GetCurrencyErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown currency
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCurrencyError = GetCurrencyErrors[keyof GetCurrencyErrors];
+
+export type GetCurrencyResponses = {
+    /**
+     * The currency, with its version as the `ETag`
+     */
+    200: Currency;
+};
+
+export type GetCurrencyResponse = GetCurrencyResponses[keyof GetCurrencyResponses];
+
+export type UpdateCurrencyData = {
+    /**
+     * The request body.
+     */
+    body: CurrencyUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The ISO 4217 code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/v1/currencies/{code}';
+};
+
+export type UpdateCurrencyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown currency
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCurrencyError = UpdateCurrencyErrors[keyof UpdateCurrencyErrors];
+
+export type UpdateCurrencyResponses = {
+    /**
+     * The currency after the change, with its new `ETag`
+     */
+    200: Currency;
+};
+
+export type UpdateCurrencyResponse = UpdateCurrencyResponses[keyof UpdateCurrencyResponses];
+
+export type GetLocationPolicyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy';
+};
+
+export type GetLocationPolicyErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationPolicyError = GetLocationPolicyErrors[keyof GetLocationPolicyErrors];
+
+export type GetLocationPolicyResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: PolicyLayer;
+};
+
+export type GetLocationPolicyResponse = GetLocationPolicyResponses[keyof GetLocationPolicyResponses];
+
+export type PutLocationPolicyData = {
+    /**
+     * The request body.
+     */
+    body: ServicePolicy;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy';
+};
+
+export type PutLocationPolicyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationPolicyError = PutLocationPolicyErrors[keyof PutLocationPolicyErrors];
+
+export type PutLocationPolicyResponses = {
+    /**
+     * The layer as saved
+     */
+    200: PolicyLayer;
+};
+
+export type PutLocationPolicyResponse = PutLocationPolicyResponses[keyof PutLocationPolicyResponses];
+
+export type GetLocationEffectivePolicyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy/effective';
+};
+
+export type GetLocationEffectivePolicyErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationEffectivePolicyError = GetLocationEffectivePolicyErrors[keyof GetLocationEffectivePolicyErrors];
+
+export type GetLocationEffectivePolicyResponses = {
+    /**
+     * The effective policy with its provenance
+     */
+    200: EffectivePolicy;
+};
+
+export type GetLocationEffectivePolicyResponse = GetLocationEffectivePolicyResponses[keyof GetLocationEffectivePolicyResponses];
+
+export type ListLocationPolicyVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy/versions';
+};
+
+export type ListLocationPolicyVersionsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationPolicyVersionsError = ListLocationPolicyVersionsErrors[keyof ListLocationPolicyVersionsErrors];
+
+export type ListLocationPolicyVersionsResponses = {
+    /**
+     * The versions
+     */
+    200: PolicyLayerList;
+};
+
+export type ListLocationPolicyVersionsResponse = ListLocationPolicyVersionsResponses[keyof ListLocationPolicyVersionsResponses];
+
+export type GetLocationScheduleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule';
+};
+
+export type GetLocationScheduleErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationScheduleError = GetLocationScheduleErrors[keyof GetLocationScheduleErrors];
+
+export type GetLocationScheduleResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: ScheduleLayer;
+};
+
+export type GetLocationScheduleResponse = GetLocationScheduleResponses[keyof GetLocationScheduleResponses];
+
+export type PutLocationScheduleData = {
+    /**
+     * The request body.
+     */
+    body: Schedule;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule';
+};
+
+export type PutLocationScheduleErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationScheduleError = PutLocationScheduleErrors[keyof PutLocationScheduleErrors];
+
+export type PutLocationScheduleResponses = {
+    /**
+     * The layer as saved
+     */
+    200: ScheduleLayer;
+};
+
+export type PutLocationScheduleResponse = PutLocationScheduleResponses[keyof PutLocationScheduleResponses];
+
+export type GetLocationEffectiveScheduleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule/effective';
+};
+
+export type GetLocationEffectiveScheduleErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationEffectiveScheduleError = GetLocationEffectiveScheduleErrors[keyof GetLocationEffectiveScheduleErrors];
+
+export type GetLocationEffectiveScheduleResponses = {
+    /**
+     * The effective schedule
+     */
+    200: EffectiveSchedule;
+};
+
+export type GetLocationEffectiveScheduleResponse = GetLocationEffectiveScheduleResponses[keyof GetLocationEffectiveScheduleResponses];
+
+export type GetLocationTradingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The instant asked about (RFC 3339); now when omitted
+         */
+        at?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule/trading';
+};
+
+export type GetLocationTradingErrors = {
+    /**
+     * Malformed query
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationTradingError = GetLocationTradingErrors[keyof GetLocationTradingErrors];
+
+export type GetLocationTradingResponses = {
+    /**
+     * Open or closed, and until when
+     */
+    200: Trading;
+};
+
+export type GetLocationTradingResponse = GetLocationTradingResponses[keyof GetLocationTradingResponses];
+
+export type GetPartnerPolicyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/policy';
+};
+
+export type GetPartnerPolicyErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerPolicyError = GetPartnerPolicyErrors[keyof GetPartnerPolicyErrors];
+
+export type GetPartnerPolicyResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: PolicyLayer;
+};
+
+export type GetPartnerPolicyResponse = GetPartnerPolicyResponses[keyof GetPartnerPolicyResponses];
+
+export type PutPartnerPolicyData = {
+    /**
+     * The request body.
+     */
+    body: ServicePolicy;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/policy';
+};
+
+export type PutPartnerPolicyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerPolicyError = PutPartnerPolicyErrors[keyof PutPartnerPolicyErrors];
+
+export type PutPartnerPolicyResponses = {
+    /**
+     * The layer as saved
+     */
+    200: PolicyLayer;
+};
+
+export type PutPartnerPolicyResponse = PutPartnerPolicyResponses[keyof PutPartnerPolicyResponses];
+
+export type ListPartnerPolicyVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/policy/versions';
+};
+
+export type ListPartnerPolicyVersionsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerPolicyVersionsError = ListPartnerPolicyVersionsErrors[keyof ListPartnerPolicyVersionsErrors];
+
+export type ListPartnerPolicyVersionsResponses = {
+    /**
+     * The versions
+     */
+    200: PolicyLayerList;
+};
+
+export type ListPartnerPolicyVersionsResponse = ListPartnerPolicyVersionsResponses[keyof ListPartnerPolicyVersionsResponses];
+
+export type GetPartnerScheduleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/schedule';
+};
+
+export type GetPartnerScheduleErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerScheduleError = GetPartnerScheduleErrors[keyof GetPartnerScheduleErrors];
+
+export type GetPartnerScheduleResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: ScheduleLayer;
+};
+
+export type GetPartnerScheduleResponse = GetPartnerScheduleResponses[keyof GetPartnerScheduleResponses];
+
+export type PutPartnerScheduleData = {
+    /**
+     * The request body.
+     */
+    body: Schedule;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/schedule';
+};
+
+export type PutPartnerScheduleErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerScheduleError = PutPartnerScheduleErrors[keyof PutPartnerScheduleErrors];
+
+export type PutPartnerScheduleResponses = {
+    /**
+     * The layer as saved
+     */
+    200: ScheduleLayer;
+};
+
+export type PutPartnerScheduleResponse = PutPartnerScheduleResponses[keyof PutPartnerScheduleResponses];
+
+export type ListServiceAreasData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this country
+         */
+        country?: string;
+        /**
+         * Only the children of this area
+         */
+        parent_id?: string;
+        /**
+         * Only this kind
+         */
+        kind?: AreaKind;
+    };
+    url: '/v1/service-areas';
+};
+
+export type ListServiceAreasErrors = {
+    /**
+     * Malformed query
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceAreasError = ListServiceAreasErrors[keyof ListServiceAreasErrors];
+
+export type ListServiceAreasResponses = {
+    /**
+     * The areas
+     */
+    200: ServiceAreaList;
+};
+
+export type ListServiceAreasResponse = ListServiceAreasResponses[keyof ListServiceAreasResponses];
+
+export type CreateServiceAreaData = {
+    /**
+     * The request body.
+     */
+    body: ServiceAreaCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/service-areas';
+};
+
+export type CreateServiceAreaErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The slug exists here, or the parent is fenced
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateServiceAreaError = CreateServiceAreaErrors[keyof CreateServiceAreaErrors];
+
+export type CreateServiceAreaResponses = {
+    /**
+     * The area
+     */
+    201: ServiceArea;
+};
+
+export type CreateServiceAreaResponse = CreateServiceAreaResponses[keyof CreateServiceAreaResponses];
+
+export type ResolveServiceAreaData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Latitude in decimal degrees
+         */
+        lat: number;
+        /**
+         * Longitude in decimal degrees
+         */
+        lng: number;
+        /**
+         * How far a serving area may be, in metres; the platform setting when omitted
+         */
+        cap?: number;
+    };
+    url: '/v1/service-areas/resolve';
+};
+
+export type ResolveServiceAreaErrors = {
+    /**
+     * Malformed query
+     */
+    400: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolveServiceAreaError = ResolveServiceAreaErrors[keyof ResolveServiceAreaErrors];
+
+export type ResolveServiceAreaResponses = {
+    /**
+     * How the pin resolved
+     */
+    200: ResolvedPin;
+};
+
+export type ResolveServiceAreaResponse = ResolveServiceAreaResponses[keyof ResolveServiceAreaResponses];
+
+export type GetServiceAreaData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}';
+};
+
+export type GetServiceAreaErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceAreaError = GetServiceAreaErrors[keyof GetServiceAreaErrors];
+
+export type GetServiceAreaResponses = {
+    /**
+     * The area, with its version as the `ETag`
+     */
+    200: ServiceArea;
+};
+
+export type GetServiceAreaResponse = GetServiceAreaResponses[keyof GetServiceAreaResponses];
+
+export type UpdateServiceAreaData = {
+    /**
+     * The request body.
+     */
+    body: ServiceAreaUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}';
+};
+
+export type UpdateServiceAreaErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateServiceAreaError = UpdateServiceAreaErrors[keyof UpdateServiceAreaErrors];
+
+export type UpdateServiceAreaResponses = {
+    /**
+     * The area after the change, with its new `ETag`
+     */
+    200: ServiceArea;
+};
+
+export type UpdateServiceAreaResponse = UpdateServiceAreaResponses[keyof UpdateServiceAreaResponses];
+
+export type ListCampaignSlotsData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: {
+        /**
+         * Every slot that applies here, the ancestors' included
+         */
+        effective?: boolean;
+        /**
+         * Only the slots showing at this instant (RFC 3339)
+         */
+        at?: string;
+    };
+    url: '/v1/service-areas/{service_area_id}/campaign-slots';
+};
+
+export type ListCampaignSlotsErrors = {
+    /**
+     * Malformed identifier or query
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCampaignSlotsError = ListCampaignSlotsErrors[keyof ListCampaignSlotsErrors];
+
+export type ListCampaignSlotsResponses = {
+    /**
+     * The slots, oldest first
+     */
+    200: CampaignSlotList;
+};
+
+export type ListCampaignSlotsResponse = ListCampaignSlotsResponses[keyof ListCampaignSlotsResponses];
+
+export type CreateCampaignSlotData = {
+    /**
+     * The request body.
+     */
+    body: CampaignSlotCreate;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/campaign-slots';
+};
+
+export type CreateCampaignSlotErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCampaignSlotError = CreateCampaignSlotErrors[keyof CreateCampaignSlotErrors];
+
+export type CreateCampaignSlotResponses = {
+    /**
+     * The slot
+     */
+    201: CampaignSlot;
+};
+
+export type CreateCampaignSlotResponse = CreateCampaignSlotResponses[keyof CreateCampaignSlotResponses];
+
+export type GetDisplayGridData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/display-grid';
+};
+
+export type GetDisplayGridErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDisplayGridError = GetDisplayGridErrors[keyof GetDisplayGridErrors];
+
+export type GetDisplayGridResponses = {
+    /**
+     * The grid; no rows when not composed
+     */
+    200: DisplayGrid;
+};
+
+export type GetDisplayGridResponse = GetDisplayGridResponses[keyof GetDisplayGridResponses];
+
+export type PutDisplayGridData = {
+    /**
+     * The request body.
+     */
+    body: DisplayGrid;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/display-grid';
+};
+
+export type PutDisplayGridErrors = {
+    /**
+     * Malformed body or an invalid composition
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutDisplayGridError = PutDisplayGridErrors[keyof PutDisplayGridErrors];
+
+export type PutDisplayGridResponses = {
+    /**
+     * The grid as served
+     */
+    200: DisplayGrid;
+};
+
+export type PutDisplayGridResponse = PutDisplayGridResponses[keyof PutDisplayGridResponses];
+
+export type DivideServiceAreaData = {
+    /**
+     * The request body.
+     */
+    body: DivisionRequest;
+    path: {
+        /**
+         * The fenced area to divide
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/divide';
+};
+
+export type DivideServiceAreaErrors = {
+    /**
+     * Malformed body, invalid children, or forcing without a reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * `locations_stranded`, or the area has no fence
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DivideServiceAreaError = DivideServiceAreaErrors[keyof DivideServiceAreaErrors];
+
+export type DivideServiceAreaResponses = {
+    /**
+     * The committed plan
+     */
+    200: DivisionPlan;
+};
+
+export type DivideServiceAreaResponse = DivideServiceAreaResponses[keyof DivideServiceAreaResponses];
+
+export type PlanServiceAreaDivisionData = {
+    /**
+     * The request body.
+     */
+    body: DivisionPlanRequest;
+    path: {
+        /**
+         * The fenced area to divide
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/division-plan';
+};
+
+export type PlanServiceAreaDivisionErrors = {
+    /**
+     * Malformed body or invalid children
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * The area has no fence
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PlanServiceAreaDivisionError = PlanServiceAreaDivisionErrors[keyof PlanServiceAreaDivisionErrors];
+
+export type PlanServiceAreaDivisionResponses = {
+    /**
+     * The plan
+     */
+    200: DivisionPlan;
+};
+
+export type PlanServiceAreaDivisionResponse = PlanServiceAreaDivisionResponses[keyof PlanServiceAreaDivisionResponses];
+
+export type DeleteServiceAreaFenceData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/fence';
+};
+
+export type DeleteServiceAreaFenceErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * `locations_stranded`: Locations sit in the area
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteServiceAreaFenceError = DeleteServiceAreaFenceErrors[keyof DeleteServiceAreaFenceErrors];
+
+export type DeleteServiceAreaFenceResponses = {
+    /**
+     * The area without a fence
+     */
+    200: ServiceArea;
+};
+
+export type DeleteServiceAreaFenceResponse = DeleteServiceAreaFenceResponses[keyof DeleteServiceAreaFenceResponses];
+
+export type PutServiceAreaFenceData = {
+    /**
+     * The request body.
+     */
+    body: Fence;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/fence';
+};
+
+export type PutServiceAreaFenceErrors = {
+    /**
+     * Malformed body or an invalid polygon
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * An ancestor or a descendant is fenced
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceAreaFenceError = PutServiceAreaFenceErrors[keyof PutServiceAreaFenceErrors];
+
+export type PutServiceAreaFenceResponses = {
+    /**
+     * The area with its fence
+     */
+    200: ServiceArea;
+};
+
+export type PutServiceAreaFenceResponse = PutServiceAreaFenceResponses[keyof PutServiceAreaFenceResponses];
+
+export type GetServiceAreaImpactData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/impact';
+};
+
+export type GetServiceAreaImpactErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceAreaImpactError = GetServiceAreaImpactErrors[keyof GetServiceAreaImpactErrors];
+
+export type GetServiceAreaImpactResponses = {
+    /**
+     * The fenced areas beneath and their Locations
+     */
+    200: DeactivationImpact;
+};
+
+export type GetServiceAreaImpactResponse = GetServiceAreaImpactResponses[keyof GetServiceAreaImpactResponses];
+
+export type MergeServiceAreasData = {
+    /**
+     * The request body.
+     */
+    body: MergeRequest;
+    path: {
+        /**
+         * The area the children fold into
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/merge';
+};
+
+export type MergeServiceAreasErrors = {
+    /**
+     * Malformed body, the children misnamed, or no reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * Nothing to merge
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MergeServiceAreasError = MergeServiceAreasErrors[keyof MergeServiceAreasErrors];
+
+export type MergeServiceAreasResponses = {
+    /**
+     * The area with the joined fence
+     */
+    200: ServiceArea;
+};
+
+export type MergeServiceAreasResponse = MergeServiceAreasResponses[keyof MergeServiceAreasResponses];
+
+export type GetServiceAreaPolicyData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/policy';
+};
+
+export type GetServiceAreaPolicyErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceAreaPolicyError = GetServiceAreaPolicyErrors[keyof GetServiceAreaPolicyErrors];
+
+export type GetServiceAreaPolicyResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: PolicyLayer;
+};
+
+export type GetServiceAreaPolicyResponse = GetServiceAreaPolicyResponses[keyof GetServiceAreaPolicyResponses];
+
+export type PutServiceAreaPolicyData = {
+    /**
+     * The request body.
+     */
+    body: ServicePolicy;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/policy';
+};
+
+export type PutServiceAreaPolicyErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceAreaPolicyError = PutServiceAreaPolicyErrors[keyof PutServiceAreaPolicyErrors];
+
+export type PutServiceAreaPolicyResponses = {
+    /**
+     * The layer as saved
+     */
+    200: PolicyLayer;
+};
+
+export type PutServiceAreaPolicyResponse = PutServiceAreaPolicyResponses[keyof PutServiceAreaPolicyResponses];
+
+export type ListServiceAreaPolicyVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/policy/versions';
+};
+
+export type ListServiceAreaPolicyVersionsErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceAreaPolicyVersionsError = ListServiceAreaPolicyVersionsErrors[keyof ListServiceAreaPolicyVersionsErrors];
+
+export type ListServiceAreaPolicyVersionsResponses = {
+    /**
+     * The versions
+     */
+    200: PolicyLayerList;
+};
+
+export type ListServiceAreaPolicyVersionsResponse = ListServiceAreaPolicyVersionsResponses[keyof ListServiceAreaPolicyVersionsResponses];
+
+export type GetServiceAreaScheduleData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/schedule';
+};
+
+export type GetServiceAreaScheduleErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceAreaScheduleError = GetServiceAreaScheduleErrors[keyof GetServiceAreaScheduleErrors];
+
+export type GetServiceAreaScheduleResponses = {
+    /**
+     * The layer; version 0 when never set
+     */
+    200: ScheduleLayer;
+};
+
+export type GetServiceAreaScheduleResponse = GetServiceAreaScheduleResponses[keyof GetServiceAreaScheduleResponses];
+
+export type PutServiceAreaScheduleData = {
+    /**
+     * The request body.
+     */
+    body: Schedule;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/schedule';
+};
+
+export type PutServiceAreaScheduleErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceAreaScheduleError = PutServiceAreaScheduleErrors[keyof PutServiceAreaScheduleErrors];
+
+export type PutServiceAreaScheduleResponses = {
+    /**
+     * The layer as saved
+     */
+    200: ScheduleLayer;
+};
+
+export type PutServiceAreaScheduleResponse = PutServiceAreaScheduleResponses[keyof PutServiceAreaScheduleResponses];
+
+export type SetServiceAreaStatusData = {
+    /**
+     * The request body.
+     */
+    body: StatusChange;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/status';
+};
+
+export type SetServiceAreaStatusErrors = {
+    /**
+     * Malformed body, or no reason
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetServiceAreaStatusError = SetServiceAreaStatusErrors[keyof SetServiceAreaStatusErrors];
+
+export type SetServiceAreaStatusResponses = {
+    /**
+     * The area after the change
+     */
+    200: ServiceArea;
+};
+
+export type SetServiceAreaStatusResponse = SetServiceAreaStatusResponses[keyof SetServiceAreaStatusResponses];
+
+export type PutServiceAreaVerticalOrderData = {
+    /**
+     * The request body.
+     */
+    body: VerticalIds;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/vertical-order';
+};
+
+export type PutServiceAreaVerticalOrderErrors = {
+    /**
+     * Malformed body, or a Vertical not offered here
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceAreaVerticalOrderError = PutServiceAreaVerticalOrderErrors[keyof PutServiceAreaVerticalOrderErrors];
+
+export type PutServiceAreaVerticalOrderResponses = {
+    /**
+     * The offers in the new order
+     */
+    200: VerticalOfferList;
+};
+
+export type PutServiceAreaVerticalOrderResponse = PutServiceAreaVerticalOrderResponses[keyof PutServiceAreaVerticalOrderResponses];
+
+export type ListServiceAreaVerticalsData = {
+    body?: never;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/verticals';
+};
+
+export type ListServiceAreaVerticalsErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceAreaVerticalsError = ListServiceAreaVerticalsErrors[keyof ListServiceAreaVerticalsErrors];
+
+export type ListServiceAreaVerticalsResponses = {
+    /**
+     * The offers
+     */
+    200: VerticalOfferList;
+};
+
+export type ListServiceAreaVerticalsResponse = ListServiceAreaVerticalsResponses[keyof ListServiceAreaVerticalsResponses];
+
+export type PutServiceAreaVerticalsData = {
+    /**
+     * The request body.
+     */
+    body: VerticalIds;
+    path: {
+        /**
+         * The area
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/verticals';
+};
+
+export type PutServiceAreaVerticalsErrors = {
+    /**
+     * Malformed body, or an unknown or archived Vertical
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown area
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceAreaVerticalsError = PutServiceAreaVerticalsErrors[keyof PutServiceAreaVerticalsErrors];
+
+export type PutServiceAreaVerticalsResponses = {
+    /**
+     * The offers after the change
+     */
+    200: VerticalOfferList;
+};
+
+export type PutServiceAreaVerticalsResponse = PutServiceAreaVerticalsResponses[keyof PutServiceAreaVerticalsResponses];
+
+export type ListServiceFieldsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/service-fields';
+};
+
+export type ListServiceFieldsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceFieldsError = ListServiceFieldsErrors[keyof ListServiceFieldsErrors];
+
+export type ListServiceFieldsResponses = {
+    /**
+     * The catalogue
+     */
+    200: FieldCatalogue;
+};
+
+export type ListServiceFieldsResponse = ListServiceFieldsResponses[keyof ListServiceFieldsResponses];
+
+export type ListServiceTypesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/service-types';
+};
+
+export type ListServiceTypesErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceTypesError = ListServiceTypesErrors[keyof ListServiceTypesErrors];
+
+export type ListServiceTypesResponses = {
+    /**
+     * The service types
+     */
+    200: ServiceTypeList;
+};
+
+export type ListServiceTypesResponse = ListServiceTypesResponses[keyof ListServiceTypesResponses];
+
+export type CreateServiceTypeData = {
+    /**
+     * The request body.
+     */
+    body: ServiceTypeCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/service-types';
+};
+
+export type CreateServiceTypeErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The code exists
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateServiceTypeError = CreateServiceTypeErrors[keyof CreateServiceTypeErrors];
+
+export type CreateServiceTypeResponses = {
+    /**
+     * The service type
+     */
+    201: ServiceType;
+};
+
+export type CreateServiceTypeResponse = CreateServiceTypeResponses[keyof CreateServiceTypeResponses];
+
+export type GetServiceTypeData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The service type
+         */
+        service_type_id: string;
+    };
+    query?: never;
+    url: '/v1/service-types/{service_type_id}';
+};
+
+export type GetServiceTypeErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown service type
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceTypeError = GetServiceTypeErrors[keyof GetServiceTypeErrors];
+
+export type GetServiceTypeResponses = {
+    /**
+     * The service type, with its version as the `ETag`
+     */
+    200: ServiceType;
+};
+
+export type GetServiceTypeResponse = GetServiceTypeResponses[keyof GetServiceTypeResponses];
+
+export type UpdateServiceTypeData = {
+    /**
+     * The request body.
+     */
+    body: ServiceTypeUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The service type
+         */
+        service_type_id: string;
+    };
+    query?: never;
+    url: '/v1/service-types/{service_type_id}';
+};
+
+export type UpdateServiceTypeErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown service type
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateServiceTypeError = UpdateServiceTypeErrors[keyof UpdateServiceTypeErrors];
+
+export type UpdateServiceTypeResponses = {
+    /**
+     * The service type after the change, with its new `ETag`
+     */
+    200: ServiceType;
+};
+
+export type UpdateServiceTypeResponse = UpdateServiceTypeResponses[keyof UpdateServiceTypeResponses];
+
+export type SetServiceTypeStatusData = {
+    /**
+     * The request body.
+     */
+    body: StatusChange;
+    path: {
+        /**
+         * The service type
+         */
+        service_type_id: string;
+    };
+    query?: never;
+    url: '/v1/service-types/{service_type_id}/status';
+};
+
+export type SetServiceTypeStatusErrors = {
+    /**
+     * Malformed body
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown service type
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetServiceTypeStatusError = SetServiceTypeStatusErrors[keyof SetServiceTypeStatusErrors];
+
+export type SetServiceTypeStatusResponses = {
+    /**
+     * The service type after the change
+     */
+    200: ServiceType;
+};
+
+export type SetServiceTypeStatusResponse = SetServiceTypeStatusResponses[keyof SetServiceTypeStatusResponses];
+
+export type ListSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/settings';
+};
+
+export type ListSettingsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSettingsError = ListSettingsErrors[keyof ListSettingsErrors];
+
+export type ListSettingsResponses = {
+    /**
+     * The settings
+     */
+    200: SettingList;
+};
+
+export type ListSettingsResponse = ListSettingsResponses[keyof ListSettingsResponses];
+
+export type ResetSettingData = {
+    body?: never;
+    path: {
+        /**
+         * The setting key, such as reference.resolution_cap_metres
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/v1/settings/{key}';
+};
+
+export type ResetSettingErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * No setting with that key is declared
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResetSettingError = ResetSettingErrors[keyof ResetSettingErrors];
+
+export type ResetSettingResponses = {
+    /**
+     * The setting at its default
+     */
+    200: Setting;
+};
+
+export type ResetSettingResponse = ResetSettingResponses[keyof ResetSettingResponses];
+
+export type GetSettingData = {
+    body?: never;
+    path: {
+        /**
+         * The setting key, such as reference.resolution_cap_metres
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/v1/settings/{key}';
+};
+
+export type GetSettingErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * No setting with that key is declared
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSettingError = GetSettingErrors[keyof GetSettingErrors];
+
+export type GetSettingResponses = {
+    /**
+     * The setting
+     */
+    200: Setting;
+};
+
+export type GetSettingResponse = GetSettingResponses[keyof GetSettingResponses];
+
+export type PutSettingData = {
+    /**
+     * The request body.
+     */
+    body: SettingValue;
+    path: {
+        /**
+         * The setting key, such as reference.resolution_cap_metres
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/v1/settings/{key}';
+};
+
+export type PutSettingErrors = {
+    /**
+     * Malformed body, or `setting_out_of_range`
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * No setting with that key is declared
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutSettingError = PutSettingErrors[keyof PutSettingErrors];
+
+export type PutSettingResponses = {
+    /**
+     * The setting after the change
+     */
+    200: Setting;
+};
+
+export type PutSettingResponse = PutSettingResponses[keyof PutSettingResponses];
+
+export type ListStoreFieldsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/store-fields';
+};
+
+export type ListStoreFieldsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStoreFieldsError = ListStoreFieldsErrors[keyof ListStoreFieldsErrors];
+
+export type ListStoreFieldsResponses = {
+    /**
+     * The catalogue
+     */
+    200: FieldCatalogue;
+};
+
+export type ListStoreFieldsResponse = ListStoreFieldsResponses[keyof ListStoreFieldsResponses];
+
+export type ListStoreTypesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/store-types';
+};
+
+export type ListStoreTypesErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStoreTypesError = ListStoreTypesErrors[keyof ListStoreTypesErrors];
+
+export type ListStoreTypesResponses = {
+    /**
+     * The store types
+     */
+    200: StoreTypeList;
+};
+
+export type ListStoreTypesResponse = ListStoreTypesResponses[keyof ListStoreTypesResponses];
+
+export type CreateStoreTypeData = {
+    /**
+     * The request body.
+     */
+    body: StoreTypeCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/store-types';
+};
+
+export type CreateStoreTypeErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The code exists
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateStoreTypeError = CreateStoreTypeErrors[keyof CreateStoreTypeErrors];
+
+export type CreateStoreTypeResponses = {
+    /**
+     * The store type
+     */
+    201: StoreType;
+};
+
+export type CreateStoreTypeResponse = CreateStoreTypeResponses[keyof CreateStoreTypeResponses];
+
+export type GetStoreTypeData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The store type
+         */
+        store_type_id: string;
+    };
+    query?: never;
+    url: '/v1/store-types/{store_type_id}';
+};
+
+export type GetStoreTypeErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown store type
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreTypeError = GetStoreTypeErrors[keyof GetStoreTypeErrors];
+
+export type GetStoreTypeResponses = {
+    /**
+     * The store type, with its version as the `ETag`
+     */
+    200: StoreType;
+};
+
+export type GetStoreTypeResponse = GetStoreTypeResponses[keyof GetStoreTypeResponses];
+
+export type UpdateStoreTypeData = {
+    /**
+     * The request body.
+     */
+    body: StoreTypeUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The store type
+         */
+        store_type_id: string;
+    };
+    query?: never;
+    url: '/v1/store-types/{store_type_id}';
+};
+
+export type UpdateStoreTypeErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown store type
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateStoreTypeError = UpdateStoreTypeErrors[keyof UpdateStoreTypeErrors];
+
+export type UpdateStoreTypeResponses = {
+    /**
+     * The store type after the change, with its new `ETag`
+     */
+    200: StoreType;
+};
+
+export type UpdateStoreTypeResponse = UpdateStoreTypeResponses[keyof UpdateStoreTypeResponses];
+
+export type SetStoreTypeStatusData = {
+    /**
+     * The request body.
+     */
+    body: StatusChange;
+    path: {
+        /**
+         * The store type
+         */
+        store_type_id: string;
+    };
+    query?: never;
+    url: '/v1/store-types/{store_type_id}/status';
+};
+
+export type SetStoreTypeStatusErrors = {
+    /**
+     * Malformed body
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown store type
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetStoreTypeStatusError = SetStoreTypeStatusErrors[keyof SetStoreTypeStatusErrors];
+
+export type SetStoreTypeStatusResponses = {
+    /**
+     * The store type after the change
+     */
+    200: StoreType;
+};
+
+export type SetStoreTypeStatusResponse = SetStoreTypeStatusResponses[keyof SetStoreTypeStatusResponses];
+
+export type ListVerticalsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/verticals';
+};
+
+export type ListVerticalsErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListVerticalsError = ListVerticalsErrors[keyof ListVerticalsErrors];
+
+export type ListVerticalsResponses = {
+    /**
+     * The Verticals
+     */
+    200: VerticalList;
+};
+
+export type ListVerticalsResponse = ListVerticalsResponses[keyof ListVerticalsResponses];
+
+export type CreateVerticalData = {
+    /**
+     * The request body.
+     */
+    body: VerticalCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/verticals';
+};
+
+export type CreateVerticalErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * The code exists
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateVerticalError = CreateVerticalErrors[keyof CreateVerticalErrors];
+
+export type CreateVerticalResponses = {
+    /**
+     * The Vertical
+     */
+    201: Vertical;
+};
+
+export type CreateVerticalResponse = CreateVerticalResponses[keyof CreateVerticalResponses];
+
+export type GetVerticalData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}';
+};
+
+export type GetVerticalErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetVerticalError = GetVerticalErrors[keyof GetVerticalErrors];
+
+export type GetVerticalResponses = {
+    /**
+     * The Vertical, with its version as the `ETag`
+     */
+    200: Vertical;
+};
+
+export type GetVerticalResponse = GetVerticalResponses[keyof GetVerticalResponses];
+
+export type UpdateVerticalData = {
+    /**
+     * The request body.
+     */
+    body: VerticalUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}';
+};
+
+export type UpdateVerticalErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * `If-Match` no longer matches
+     */
+    412: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateVerticalError = UpdateVerticalErrors[keyof UpdateVerticalErrors];
+
+export type UpdateVerticalResponses = {
+    /**
+     * The Vertical after the change, with its new `ETag`
+     */
+    200: Vertical;
+};
+
+export type UpdateVerticalResponse = UpdateVerticalResponses[keyof UpdateVerticalResponses];
+
+export type PutVerticalCategoriesData = {
+    /**
+     * The request body.
+     */
+    body: VerticalCategories;
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}/categories';
+};
+
+export type PutVerticalCategoriesErrors = {
+    /**
+     * Malformed body or invalid fields
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutVerticalCategoriesError = PutVerticalCategoriesErrors[keyof PutVerticalCategoriesErrors];
+
+export type PutVerticalCategoriesResponses = {
+    /**
+     * The Vertical with its categories
+     */
+    200: Vertical;
+};
+
+export type PutVerticalCategoriesResponse = PutVerticalCategoriesResponses[keyof PutVerticalCategoriesResponses];
+
+export type PutVerticalImageData = {
+    /**
+     * The request body.
+     */
+    body: VerticalImage;
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}/image';
+};
+
+export type PutVerticalImageErrors = {
+    /**
+     * Malformed body
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutVerticalImageError = PutVerticalImageErrors[keyof PutVerticalImageErrors];
+
+export type PutVerticalImageResponses = {
+    /**
+     * The Vertical after the change
+     */
+    200: Vertical;
+};
+
+export type PutVerticalImageResponse = PutVerticalImageResponses[keyof PutVerticalImageResponses];
+
+export type GetVerticalReachData = {
+    body?: never;
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}/reach';
+};
+
+export type GetVerticalReachErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetVerticalReachError = GetVerticalReachErrors[keyof GetVerticalReachErrors];
+
+export type GetVerticalReachResponses = {
+    /**
+     * The reach tree
+     */
+    200: ReachTree;
+};
+
+export type GetVerticalReachResponse = GetVerticalReachResponses[keyof GetVerticalReachResponses];
+
+export type SetVerticalStatusData = {
+    /**
+     * The request body.
+     */
+    body: StatusChange;
+    path: {
+        /**
+         * The Vertical
+         */
+        vertical_id: string;
+    };
+    query?: never;
+    url: '/v1/verticals/{vertical_id}/status';
+};
+
+export type SetVerticalStatusErrors = {
+    /**
+     * Malformed body
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff
+     */
+    403: Problem;
+    /**
+     * Unknown Vertical
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetVerticalStatusError = SetVerticalStatusErrors[keyof SetVerticalStatusErrors];
+
+export type SetVerticalStatusResponses = {
+    /**
+     * The Vertical after the change
+     */
+    200: Vertical;
+};
+
+export type SetVerticalStatusResponse = SetVerticalStatusResponses[keyof SetVerticalStatusResponses];

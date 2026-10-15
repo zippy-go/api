@@ -1,0 +1,35 @@
+type: object
+description: One planned area.
+required:
+  - id
+  - name
+  - slug
+  - kind
+  - locations
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Its id (assigned at planning, kept on commit).
+  kind:
+    $ref: ./AreaKind.yaml
+    description: Its kind.
+  locations:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Locations it receives.
+  name:
+    type: string
+    description: Its name.
+  slug:
+    type: string
+    description: Its slug.
+examples:
+  - id: 01a13a48-9e00-7000-8000-00000000a014
+    kind: region
+    locations:
+      - 01a13a48-9e00-7000-8000-00000000a014
+    name: example
+    slug: example

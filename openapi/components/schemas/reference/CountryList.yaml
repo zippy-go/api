@@ -1,0 +1,29 @@
+type: object
+description: The `CountryList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Country.yaml
+    description: Every country, by name.
+examples:
+  - items:
+      - created_at: 2026-10-15T09:00:00Z
+        created_by: 01a13a48-9e00-7000-8000-00000000a014
+        updated_at: 2026-10-15T09:00:00Z
+        updated_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 1
+        accepts_orders: true
+        accepts_sign_in: true
+        alpha2: IN
+        alpha3: IND
+        calling_code: '91'
+        currency: INR
+        default_service_area_id: 01a13a48-9e00-7000-8000-00000000a014
+        name: India
+        prices_include_tax: true
+        status: draft
+        time_zones:
+          - Asia/Kolkata

@@ -1,0 +1,32 @@
+type: object
+description: A stored version of a schedule layer, the `ScheduleLayer` schema.
+required:
+  - layer
+  - schedule
+properties:
+  layer:
+    $ref: ./LayerRef.yaml
+    description: The layer.
+  schedule:
+    $ref: ./Schedule.yaml
+    description: Its content.
+examples:
+  - layer:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3
+    schedule:
+      exceptions:
+        - accepts_pre_orders: true
+          closed_all_day: true
+          from: 2027-01-26
+          id: 01a13a48-9e00-7000-8000-00000000a014
+          label: Republic Day
+          open: []
+          to: 2027-01-26
+      week:
+        - day: monday
+          open: []

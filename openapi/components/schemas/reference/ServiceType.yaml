@@ -1,0 +1,126 @@
+type: object
+description: A service type, the `ServiceType` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - id
+  - code
+  - name
+  - tagline
+  - status
+  - workflow
+  - visit_minutes
+  - slot_minutes
+  - radius_metres
+  - fields
+  - catalogue
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  catalogue:
+    $ref: ./ServicesBlock.yaml
+    description: What a bookable service collects.
+  code:
+    type: string
+    description: Stable code.
+    examples:
+      - SALON
+  fields:
+    type: array
+    items:
+      $ref: ./TypeField.yaml
+    description: Typed extra fields.
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  name:
+    type: string
+    description: Name.
+  radius_metres:
+    type: integer
+    format: int32
+    description: Default travel radius in metres.
+    examples:
+      - 10000
+  slot_minutes:
+    type: integer
+    format: int32
+    description: Slot length in minutes.
+    examples:
+      - 30
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Lifecycle.
+  tagline:
+    type: string
+    description: Tagline.
+  turnaround_hours:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: Turnaround in hours, for pickup-and-return work.
+    examples:
+      - 48
+  visit_minutes:
+    type: integer
+    format: int32
+    description: Default visit duration in minutes.
+    examples:
+      - 60
+  workflow:
+    $ref: ./Workflow.yaml
+    description: The workflow.
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    catalogue:
+      add_ons: true
+      cancellation_notice: true
+      deposit: true
+      duration: true
+      materials: true
+      price_bases:
+        - fixed
+    code: SALON
+    fields:
+      - key: fssai_licence_number
+        required: true
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    name: example
+    radius_metres: 10000
+    slot_minutes: 30
+    status: draft
+    tagline: example
+    turnaround_hours: 48
+    visit_minutes: 60
+    workflow: appointment

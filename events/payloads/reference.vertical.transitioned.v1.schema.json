@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reference.vertical.transitioned.v1.schema.json",
+  "title": "ReferenceVerticalTransitionedPayload",
+  "description": "Payload of `reference.vertical.transitioned` version 1: a Vertical moved along its lifecycle, so every open screen re-reads its grid. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "vertical_id",
+    "code",
+    "from",
+    "to"
+  ],
+  "properties": {
+    "vertical_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Vertical.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000b001"
+      ]
+    },
+    "code": {
+      "type": "string",
+      "description": "Its stable code.",
+      "examples": [
+        "FOOD"
+      ]
+    },
+    "from": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "inactive",
+        "archived"
+      ],
+      "description": "The status before.",
+      "examples": [
+        "active"
+      ]
+    },
+    "to": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "inactive",
+        "archived"
+      ],
+      "description": "The status after.",
+      "examples": [
+        "inactive"
+      ]
+    }
+  }
+}

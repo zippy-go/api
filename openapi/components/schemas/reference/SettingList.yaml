@@ -1,0 +1,25 @@
+type: object
+description: The `SettingList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Setting.yaml
+    description: Every setting with the value in force.
+examples:
+  - items:
+      - choices: []
+        default: 1
+        description: example
+        key: reference.resolution_cap_metres
+        label: example
+        maximum: 1
+        minimum: 1
+        overridden: true
+        reason: example
+        unit: example
+        updated_at: 2026-10-15T09:00:00Z
+        updated_by: 01a13a48-9e00-7000-8000-00000000a014
+        value: 25000

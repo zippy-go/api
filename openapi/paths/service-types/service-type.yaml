@@ -1,0 +1,146 @@
+# Path item for /v1/service-types/{service_type_id}. Referenced from openapi.yaml.
+parameters:
+  - name: service_type_id
+    in: path
+    required: true
+    description: The service type
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+get:
+  operationId: getServiceType
+  summary: One service type
+  description: One service type.
+  tags:
+    - Service types
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
+  responses:
+    '200':
+      description: The service type, with its version as the `ETag`
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/ServiceType.yaml
+    '304':
+      description: '`If-None-Match` named the current version'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+    '400':
+      description: Malformed identifier
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown service type
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updateServiceType
+  summary: Changes a service type
+  description: Changes a service type; platform staff. Send `If-Match` to be refused when someone else changed it first.
+  tags:
+    - Service types
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/ServiceTypeUpdate.yaml
+  responses:
+    '200':
+      description: The service type after the change, with its new `ETag`
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/ServiceType.yaml
+    '400':
+      description: Malformed body or invalid fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown service type
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`If-Match` no longer matches'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

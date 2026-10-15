@@ -1,0 +1,56 @@
+type: object
+description: The effective schedule of a Location, the `EffectiveSchedule` schema.
+required:
+  - week
+  - exceptions
+  - time_zone
+properties:
+  exceptions:
+    type: array
+    items:
+      $ref: ./SourcedException.yaml
+    description: Every exception of every layer, outermost first.
+  time_zone:
+    type: string
+    description: The time zone the times are in.
+    examples:
+      - Asia/Kolkata
+  week:
+    type: array
+    items:
+      $ref: ./DaySchedule.yaml
+    description: The week in force.
+  week_source:
+    oneOf:
+      - $ref: ./LayerRef.yaml
+        description: The layer whose week is in force.
+      - type: 'null'
+    description: The week source.
+examples:
+  - exceptions:
+      - exception:
+          accepts_pre_orders: true
+          closed_all_day: true
+          from: 2027-01-26
+          id: 01a13a48-9e00-7000-8000-00000000a014
+          label: Republic Day
+          open: []
+          to: 2027-01-26
+        source:
+          key: IN
+          kind: country
+          label: India
+          set_at: 2026-10-15T09:00:00Z
+          set_by: 01a13a48-9e00-7000-8000-00000000a014
+          version: 3
+    time_zone: Asia/Kolkata
+    week:
+      - day: monday
+        open: []
+    week_source:
+      key: IN
+      kind: country
+      label: India
+      set_at: 2026-10-15T09:00:00Z
+      set_by: 01a13a48-9e00-7000-8000-00000000a014
+      version: 3

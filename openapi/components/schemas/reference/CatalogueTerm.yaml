@@ -1,0 +1,7 @@
+type: string
+description: What a store type calls its catalogue.
+enum:
+  - menu
+  - products
+examples:
+  - menu

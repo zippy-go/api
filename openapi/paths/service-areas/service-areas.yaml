@@ -1,0 +1,130 @@
+# Path item for /v1/service-areas. Referenced from openapi.yaml.
+get:
+  operationId: listServiceAreas
+  summary: The service areas matching the query, by path, so a country's tree reads top down
+  description: The service areas matching the query, by path, so a country's tree reads top down.
+  tags:
+    - Service areas
+  security:
+    - Bearer: []
+  parameters:
+    - name: country
+      in: query
+      required: false
+      description: Only this country
+      schema:
+        type: string
+    - name: parent_id
+      in: query
+      required: false
+      description: Only the children of this area
+      schema:
+        type: string
+        format: uuid
+    - name: kind
+      in: query
+      required: false
+      description: Only this kind
+      schema:
+        $ref: ../../components/schemas/reference/AreaKind.yaml
+  responses:
+    '200':
+      description: The areas
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/ServiceAreaList.yaml
+    '400':
+      description: Malformed query
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createServiceArea
+  summary: Adds a service area beneath its parent or at the top of its country
+  description: 'Adds a service area beneath its parent or at the top of its country; platform staff. Nothing is created beneath a fenced area: divide it instead.'
+  tags:
+    - Service areas
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/ServiceAreaCreate.yaml
+  responses:
+    '201':
+      description: The area
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/ServiceArea.yaml
+    '400':
+      description: Malformed body or invalid fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The slug exists here, or the parent is fenced
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

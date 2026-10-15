@@ -1,0 +1,95 @@
+type: object
+description: A store type, the `StoreType` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - id
+  - code
+  - name
+  - tagline
+  - status
+  - fields
+  - catalogue
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  catalogue:
+    $ref: ./CatalogueBlock.yaml
+    description: What its items may carry.
+  code:
+    type: string
+    description: Stable code.
+    examples:
+      - FOOD
+  fields:
+    type: array
+    items:
+      $ref: ./TypeField.yaml
+    description: The typed extra fields its Locations carry.
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  name:
+    type: string
+    description: Name.
+    examples:
+      - Food
+  status:
+    $ref: ./Lifecycle.yaml
+    description: Lifecycle; only `active` may be given to a new Location.
+  tagline:
+    type: string
+    description: Tagline shown in the picker.
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    catalogue:
+      allergen_tags:
+        - contains_nuts
+      capabilities:
+        - variants
+      dietary_tags:
+        - vegan
+        - vegetarian
+      product_fields:
+        - key: weight_grams
+          label: Weight (g)
+          type: text
+      term: menu
+    code: FOOD
+    fields:
+      - key: fssai_licence_number
+        required: true
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    name: Food
+    status: draft
+    tagline: example

@@ -1,0 +1,17 @@
+type: object
+description: Whether a Location trades at an instant, the `Trading` schema.
+required:
+  - open
+properties:
+  open:
+    type: boolean
+    description: Open now.
+  until:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When that changes, in the Location's zone.
+examples:
+  - open: true
+    until: 2026-10-15T09:00:00Z

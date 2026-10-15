@@ -1,0 +1,83 @@
+type: object
+description: |-
+  Request body of `POST /v1/service-areas/{service_area_id}/campaign-slots`, the
+  `CampaignSlotCreate` schema.
+required:
+  - name
+  - headline
+  - colour
+  - shape
+properties:
+  artwork_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Artwork.
+  colour:
+    type: string
+    description: Background colour as a lowercase hex triplet.
+    examples:
+      - '#b23a00'
+  enabled:
+    type: boolean
+    description: Whether it is on from the start.
+  headline:
+    type: string
+    description: Customer-facing headline.
+    examples:
+      - Sweets for Diwali, delivered
+  hours:
+    type: array
+    items:
+      $ref: ./SlotHours.yaml
+    description: Hours of the week it shows; empty means always.
+  link:
+    oneOf:
+      - $ref: ./SlotLink.yaml
+        description: Link.
+      - type: 'null'
+    description: The link.
+  name:
+    type: string
+    description: Internal name.
+    examples:
+      - Diwali sweets
+  paragraph:
+    type:
+      - string
+      - 'null'
+    description: Optional paragraph.
+  shape:
+    $ref: ./SlotShape.yaml
+    description: Banner or compact; immutable afterwards.
+  shows_from:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: Shows from.
+  shows_to:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: Shows until.
+examples:
+  - artwork_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    colour: '#b23a00'
+    enabled: true
+    headline: Sweets for Diwali, delivered
+    hours:
+      - day: monday
+        from: 07:00
+        to: 11:00
+    link:
+      kind: vertical
+      targets:
+        - 01a13a48-9e00-7000-8000-00000000b001
+    name: Diwali sweets
+    paragraph: example
+    shape: banner
+    shows_from: 2026-10-15T09:00:00Z
+    shows_to: 2026-10-15T09:00:00Z

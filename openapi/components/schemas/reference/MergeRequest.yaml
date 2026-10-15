@@ -1,0 +1,20 @@
+type: object
+description: Request body of `POST /v1/service-areas/{service_area_id}/merge`, the `MergeRequest` schema.
+required:
+  - child_ids
+properties:
+  child_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Every fenced area beneath, named so nothing folds in unseen.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, kept in the audit log; required.
+examples:
+  - child_ids:
+      - 01a13a48-9e00-7000-8000-00000000a014
+    reason: example

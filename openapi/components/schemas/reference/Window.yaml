@@ -1,0 +1,19 @@
+type: object
+description: An open window of a day, the `Window` schema.
+required:
+  - from
+  - to
+properties:
+  from:
+    type: string
+    description: Opens at.
+    examples:
+      - 09:00
+  to:
+    type: string
+    description: Closes at; `00:00` means midnight at the close of the day.
+    examples:
+      - 22:00
+examples:
+  - from: 09:00
+    to: 22:00

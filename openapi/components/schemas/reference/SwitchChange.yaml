@@ -1,0 +1,18 @@
+type: object
+description: Request body of the switch routes, the `SwitchChange` schema.
+required:
+  - accepts
+properties:
+  accepts:
+    type: boolean
+    description: On or off.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, kept in the audit log; required.
+    examples:
+      - Payments outage
+examples:
+  - accepts: true
+    reason: Payments outage

@@ -1,0 +1,17 @@
+type: object
+description: A typed extra field a type declares, the `TypeField` schema.
+required:
+  - key
+  - required
+properties:
+  key:
+    type: string
+    description: The key, from the closed field catalogue.
+    examples:
+      - fssai_licence_number
+  required:
+    type: boolean
+    description: Whether a record of the type must carry it.
+examples:
+  - key: fssai_licence_number
+    required: true

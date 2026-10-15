@@ -1,0 +1,46 @@
+type: object
+description: 'A layer as named on an answer: whose decision a value was, the `LayerRef` schema.'
+required:
+  - kind
+  - key
+  - label
+  - version
+properties:
+  key:
+    type: string
+    description: "The layer's key: a country code or a record id."
+    examples:
+      - IN
+  kind:
+    $ref: ./LayerKind.yaml
+    description: The kind of layer.
+  label:
+    type: string
+    description: The layer's label, for a screen.
+    examples:
+      - India
+  set_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When that version was saved.
+  set_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who saved that version.
+  version:
+    type: integer
+    format: int64
+    description: The version of the layer that supplied the value; zero for a layer never set.
+    examples:
+      - 3
+examples:
+  - key: IN
+    kind: country
+    label: India
+    set_at: 2026-10-15T09:00:00Z
+    set_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 3

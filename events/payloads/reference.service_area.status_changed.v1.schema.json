@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reference.service_area.status_changed.v1.schema.json",
+  "title": "ReferenceServiceAreaStatusChangedPayload",
+  "description": "Payload of `reference.service_area.status_changed` version 1: a service area's status changed; `effectively_active` says whether it and every ancestor are active after the change. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "service_area_id",
+    "path",
+    "status",
+    "effectively_active"
+  ],
+  "properties": {
+    "service_area_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The service area.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000a014"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "description": "Its materialised path.",
+      "examples": [
+        "/IN/hyderabad/banjara-hills"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "inactive",
+        "archived"
+      ],
+      "description": "Its own status.",
+      "examples": [
+        "inactive"
+      ]
+    },
+    "effectively_active": {
+      "type": "boolean",
+      "description": "Whether it and every ancestor are active.",
+      "examples": [
+        false
+      ]
+    }
+  }
+}

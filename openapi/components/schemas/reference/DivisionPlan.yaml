@@ -1,0 +1,32 @@
+type: object
+description: The outcome of planning or committing a division, the `DivisionPlan` schema.
+required:
+  - areas
+  - stranded
+  - committed
+properties:
+  areas:
+    type: array
+    items:
+      $ref: ./PlannedArea.yaml
+    description: The areas that result (would result, for a dry run), each with the Locations it receives.
+  committed:
+    type: boolean
+    description: Whether anything was written.
+  stranded:
+    type: array
+    items:
+      $ref: ./StrandedLocation.yaml
+    description: Locations outside every new area.
+examples:
+  - areas:
+      - id: 01a13a48-9e00-7000-8000-00000000a014
+        kind: region
+        locations: []
+        name: example
+        slug: example
+    committed: true
+    stranded:
+      - location_id: 01a13a48-9e00-7000-8000-00000000a014
+        name: example
+        partner_id: 01a13a48-9e00-7000-8000-00000000a014

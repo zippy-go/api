@@ -37,6 +37,12 @@ post:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The phone number's country is not accepting sign-in (`sign_in_closed`); a number from no known country is refused too.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '429':
       description: Too many codes were requested for this identifier or from this client (`too_many_requests`). The `Retry-After` header says how many seconds to wait.
       headers:

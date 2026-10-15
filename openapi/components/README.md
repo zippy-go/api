@@ -24,6 +24,10 @@ components/
     events/        The event envelope as the API returns it: Event, EventList
     live/          Server-sent event streams: ServerSentEventStream and the frame data
                    AgentSnapshot, AgentPositionUpdate, AgentStatusUpdate
+    reference/     Reference data: Country, Currency, Lifecycle, ServiceArea, Fence, ResolvedPin, DivisionPlan,
+                   Vertical, VerticalOffer, ReachNode, CampaignSlot, DisplayGrid, ServicePolicy, PolicyLayer,
+                   EffectivePolicy, Schedule, ScheduleLayer, EffectiveSchedule, Trading, StoreType, ServiceType,
+                   FieldDefinition, Setting and their request bodies (`*Create`, `*Update`, StatusChange, ...)
     <domain>/      One folder per further domain, one file per schema
   parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath, ClientTypeHeader,
                    IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader

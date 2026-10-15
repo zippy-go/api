@@ -1,0 +1,34 @@
+# Path item for /v1/service-fields. Referenced from openapi.yaml.
+get:
+  operationId: listServiceFields
+  summary: The closed catalogue of fields a service type may declare
+  description: The closed catalogue of fields a service type may declare.
+  tags:
+    - Service types
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The catalogue
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/FieldCatalogue.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

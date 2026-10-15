@@ -1,0 +1,62 @@
+type: object
+description: Request body of `POST /v1/service-areas`, the `ServiceAreaCreate` schema.
+required:
+  - country
+  - kind
+  - name
+  - slug
+properties:
+  country:
+    type: string
+    description: The country.
+    examples:
+      - IN
+  fence:
+    oneOf:
+      - $ref: ./Fence.yaml
+        description: The fence, when the area serves itself.
+      - type: 'null'
+    description: The fence.
+  kind:
+    $ref: ./AreaKind.yaml
+    description: The kind label.
+  name:
+    type: string
+    description: Display name.
+    examples:
+      - Gachibowli
+  parent_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The parent, or omitted at the top of the country.
+  slug:
+    type: string
+    description: Slug.
+    examples:
+      - gachibowli
+  time_zone:
+    type:
+      - string
+      - 'null'
+    description: Time zone; the parent's, else the country's first, when omitted.
+examples:
+  - country: IN
+    fence:
+      rings:
+        - - - 78.42
+            - 17.39
+          - - 78.47
+            - 17.39
+          - - 78.47
+            - 17.44
+          - - 78.42
+            - 17.44
+          - - 78.42
+            - 17.39
+    kind: region
+    name: Gachibowli
+    parent_id: 01a13a48-9e00-7000-8000-00000000a014
+    slug: gachibowli
+    time_zone: example

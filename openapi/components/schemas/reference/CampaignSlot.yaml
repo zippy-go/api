@@ -1,0 +1,134 @@
+type: object
+description: A campaign slot, the `CampaignSlot` schema.
+required:
+  - version
+  - created_at
+  - updated_at
+  - id
+  - service_area_id
+  - name
+  - headline
+  - colour
+  - shape
+  - hours
+  - enabled
+  - white_text_readable
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When the record was created.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who created the record; `null` for seeded rows.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the record was last changed.
+  updated_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The user who last changed the record; `null` until changed through the API.
+  version:
+    type: integer
+    format: int64
+    description: The version, raised by one on every change; the entity tag of reads.
+    examples:
+      - 1
+  artwork_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Optional artwork.
+  colour:
+    type: string
+    description: Background colour as a hex triplet.
+    examples:
+      - '#ff5a00'
+  enabled:
+    type: boolean
+    description: Whether it is on.
+  headline:
+    type: string
+    description: Customer-facing headline.
+    examples:
+      - Sweets for Diwali, delivered
+  hours:
+    type: array
+    items:
+      $ref: ./SlotHours.yaml
+    description: Hours of the week it shows; empty means always.
+  id:
+    type: string
+    format: uuid
+    description: Identifier.
+  link:
+    oneOf:
+      - $ref: ./SlotLink.yaml
+        description: Optional link; an announcement when `null`.
+      - type: 'null'
+    description: The link.
+  name:
+    type: string
+    description: Internal name.
+    examples:
+      - Diwali sweets
+  paragraph:
+    type:
+      - string
+      - 'null'
+    description: Optional paragraph.
+  service_area_id:
+    type: string
+    format: uuid
+    description: The service area it belongs to; applies to everything beneath.
+  shape:
+    $ref: ./SlotShape.yaml
+    description: Banner or compact; immutable.
+  shows_from:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: Shows from this instant; `null` means as soon as it is on.
+  shows_to:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: Shows until this instant; `null` means until switched off.
+  white_text_readable:
+    type: boolean
+    description: Whether white text on the colour is readable (contrast at least 3).
+examples:
+  - created_at: 2026-10-15T09:00:00Z
+    created_by: 01a13a48-9e00-7000-8000-00000000a014
+    updated_at: 2026-10-15T09:00:00Z
+    updated_by: 01a13a48-9e00-7000-8000-00000000a014
+    version: 1
+    artwork_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    colour: '#ff5a00'
+    enabled: true
+    headline: Sweets for Diwali, delivered
+    hours:
+      - day: monday
+        from: 07:00
+        to: 11:00
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    link:
+      kind: vertical
+      targets:
+        - 01a13a48-9e00-7000-8000-00000000b001
+    name: Diwali sweets
+    paragraph: example
+    service_area_id: 01a13a48-9e00-7000-8000-00000000a014
+    shape: banner
+    shows_from: 2026-10-15T09:00:00Z
+    shows_to: 2026-10-15T09:00:00Z
+    white_text_readable: true

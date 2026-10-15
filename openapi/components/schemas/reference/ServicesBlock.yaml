@@ -1,0 +1,38 @@
+type: object
+description: What a bookable service of a type collects, the `ServicesBlock` schema.
+required:
+  - duration
+  - price_bases
+  - add_ons
+  - materials
+  - deposit
+  - cancellation_notice
+properties:
+  add_ons:
+    type: boolean
+    description: Whether add-ons are allowed.
+  cancellation_notice:
+    type: boolean
+    description: Whether a cancellation notice in hours is stated.
+  deposit:
+    type: boolean
+    description: Whether a deposit may be taken.
+  duration:
+    type: boolean
+    description: Whether a service states its duration.
+  materials:
+    type: boolean
+    description: Whether materials are charged.
+  price_bases:
+    type: array
+    items:
+      $ref: ./PriceBasis.yaml
+    description: The price bases allowed.
+examples:
+  - add_ons: true
+    cancellation_notice: true
+    deposit: true
+    duration: true
+    materials: true
+    price_bases:
+      - fixed

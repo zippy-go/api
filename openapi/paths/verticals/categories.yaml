@@ -1,0 +1,74 @@
+# Path item for /v1/verticals/{vertical_id}/categories. Referenced from openapi.yaml.
+parameters:
+  - name: vertical_id
+    in: path
+    required: true
+    description: The Vertical
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+put:
+  operationId: putVerticalCategories
+  summary: Replaces a Vertical's categories in merchandising order
+  description: Replaces a Vertical's categories in merchandising order; platform staff. Ids given are kept.
+  tags:
+    - Verticals
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reference/VerticalCategories.yaml
+  responses:
+    '200':
+      description: The Vertical with its categories
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/Vertical.yaml
+    '400':
+      description: Malformed body or invalid fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown Vertical
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,11 @@
+type: object
+description: Request body of `PUT /v1/verticals/{vertical_id}/image`, the `VerticalImage` schema.
+properties:
+  asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The image asset, or `null` to clear.
+examples:
+  - asset_id: 01a13a48-9e00-7000-8000-00000000a014

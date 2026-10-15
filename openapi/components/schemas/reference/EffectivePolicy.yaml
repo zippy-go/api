@@ -1,0 +1,241 @@
+type: object
+description: |-
+  The effective policy of a Location, the `EffectivePolicy` schema: per field the value and
+  the layer that supplied it, with the full chain outermost first.
+required:
+  - currency
+  - chain
+properties:
+  chain:
+    type: array
+    items:
+      $ref: ./LayerRef.yaml
+    description: The chain, outermost first, each layer labelled with the version in force.
+  commission_percent:
+    oneOf:
+      - $ref: ./SourcedRate.yaml
+        description: Commission percent.
+      - type: 'null'
+    description: The commission percent.
+  coverage_radius_metres:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Coverage radius in metres.
+      - type: 'null'
+    description: The coverage radius metres.
+  currency:
+    type: string
+    description: The currency every amount is in.
+    examples:
+      - INR
+  delivery_estimate_minutes:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Delivery estimate in minutes.
+      - type: 'null'
+    description: The delivery estimate minutes.
+  delivery_fee:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Delivery fee.
+      - type: 'null'
+    description: The delivery fee.
+  fee_by_distance:
+    oneOf:
+      - $ref: ./SourcedLadder.yaml
+        description: Fee by distance.
+      - type: 'null'
+    description: The fee by distance.
+  fee_by_order_value:
+    oneOf:
+      - $ref: ./SourcedLadder.yaml
+        description: Fee by order value.
+      - type: 'null'
+    description: The fee by order value.
+  gst_rate_percent:
+    oneOf:
+      - $ref: ./SourcedRate.yaml
+        description: GST rate percent.
+      - type: 'null'
+    description: The gst rate percent.
+  minimum_order_value:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Minimum order value.
+      - type: 'null'
+    description: The minimum order value.
+  prescription_fee:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Prescription fee per line.
+      - type: 'null'
+    description: The prescription fee.
+  prices_include_tax:
+    oneOf:
+      - $ref: ./SourcedFlag.yaml
+        description: Whether prices include tax.
+      - type: 'null'
+    description: The prices include tax.
+  service_fee_ceiling:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Service fee ceiling.
+      - type: 'null'
+    description: The service fee ceiling.
+  service_fee_floor:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Service fee floor.
+      - type: 'null'
+    description: The service fee floor.
+  service_fee_percent:
+    oneOf:
+      - $ref: ./SourcedRate.yaml
+        description: Service fee percent.
+      - type: 'null'
+    description: The service fee percent.
+  small_order_fee:
+    oneOf:
+      - $ref: ./SourcedAmount.yaml
+        description: Small order fee.
+      - type: 'null'
+    description: The small order fee.
+examples:
+  - chain:
+      - key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+    commission_percent:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 5
+    coverage_radius_metres:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    currency: INR
+    delivery_estimate_minutes:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    delivery_fee:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    fee_by_distance:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: &a1
+        - fee: 2000
+          up_to: 3000
+        - fee: 4000
+          up_to: null
+    fee_by_order_value:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: *a1
+    gst_rate_percent:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 5
+    minimum_order_value:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    prescription_fee:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    prices_include_tax:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: true
+    service_fee_ceiling:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    service_fee_floor:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500
+    service_fee_percent:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 5
+    small_order_fee:
+      source:
+        key: IN
+        kind: country
+        label: India
+        set_at: 2026-10-15T09:00:00Z
+        set_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 3
+      value: 2500

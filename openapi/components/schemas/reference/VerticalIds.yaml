@@ -1,0 +1,14 @@
+type: object
+description: Request body of the Vertical set and order routes, the `VerticalIds` schema.
+required:
+  - vertical_ids
+properties:
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Verticals.
+examples:
+  - vertical_ids:
+      - 01a13a48-9e00-7000-8000-00000000a014

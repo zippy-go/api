@@ -1,0 +1,32 @@
+type: object
+description: The `StoreTypeList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./StoreType.yaml
+    description: Every store type.
+examples:
+  - items:
+      - created_at: 2026-10-15T09:00:00Z
+        created_by: 01a13a48-9e00-7000-8000-00000000a014
+        updated_at: 2026-10-15T09:00:00Z
+        updated_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 1
+        catalogue:
+          allergen_tags:
+            - contains_nuts
+          capabilities: []
+          dietary_tags:
+            - vegan
+            - vegetarian
+          product_fields: []
+          term: menu
+        code: FOOD
+        fields: []
+        id: 01a13a48-9e00-7000-8000-00000000a014
+        name: Food
+        status: draft
+        tagline: example

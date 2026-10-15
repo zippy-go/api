@@ -1,0 +1,8 @@
+type: string
+description: How a bookable service is priced.
+enum:
+  - fixed
+  - per_hour
+  - quoted
+examples:
+  - fixed

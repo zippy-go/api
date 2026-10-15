@@ -1,0 +1,8 @@
+type: string
+description: The workflow of a field service.
+enum:
+  - appointment
+  - on_site_job
+  - pickup_and_return
+examples:
+  - appointment

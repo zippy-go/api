@@ -1,0 +1,18 @@
+type: object
+description: |-
+  Request body of `POST /v1/service-areas/{service_area_id}/division-plan`, the
+  `DivisionPlanRequest` schema.
+required:
+  - children
+properties:
+  children:
+    type: array
+    items:
+      $ref: ./DivisionChild.yaml
+    description: The areas to create beneath.
+examples:
+  - children:
+      - kind: region
+        name: Gachibowli
+        ring: []
+        slug: gachibowli

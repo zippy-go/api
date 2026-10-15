@@ -1,0 +1,117 @@
+type: object
+description: |-
+  A policy layer's fields, the `ServicePolicy` schema. Every member is optional: `null`
+  defers to the layer above; zero is a decision.
+properties:
+  commission_percent:
+    type:
+      - number
+      - 'null'
+    format: double
+    description: Commission rate as a percentage.
+    examples:
+      - 12
+  coverage_radius_metres:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Coverage radius in metres.
+  delivery_estimate_minutes:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Delivery estimate in minutes.
+  delivery_fee:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Delivery fee in minor units.
+    examples:
+      - 2500
+  fee_by_distance:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./FeeBand.yaml
+    description: Fee by distance from the Location, a ladder of bands in metres.
+  fee_by_order_value:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./FeeBand.yaml
+    description: Fee by order value, a ladder of bands in minor units.
+  gst_rate_percent:
+    type:
+      - number
+      - 'null'
+    format: double
+    description: GST rate as a percentage.
+    examples:
+      - 5
+  minimum_order_value:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Minimum order value in minor units.
+  prescription_fee:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Prescription fee per dispensed line, in minor units.
+  prices_include_tax:
+    type:
+      - boolean
+      - 'null'
+    description: Whether displayed prices include tax.
+  service_fee_ceiling:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Ceiling of the service fee in minor units.
+  service_fee_floor:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Floor of the service fee in minor units.
+  service_fee_percent:
+    type:
+      - number
+      - 'null'
+    format: double
+    description: Platform service fee as a percentage, 0 to 100.
+    examples:
+      - 2.5
+  small_order_fee:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: Fee charged below the minimum instead of refusal, in minor units.
+examples:
+  - commission_percent: 12
+    coverage_radius_metres: 1
+    delivery_estimate_minutes: 1
+    delivery_fee: 2500
+    fee_by_distance:
+      - fee: 2500
+        up_to: 3000
+    fee_by_order_value:
+      - fee: 2500
+        up_to: 3000
+    gst_rate_percent: 5
+    minimum_order_value: 1
+    prescription_fee: 1
+    prices_include_tax: true
+    service_fee_ceiling: 1
+    service_fee_floor: 1
+    service_fee_percent: 2.5
+    small_order_fee: 1

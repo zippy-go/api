@@ -1,0 +1,7 @@
+type: string
+description: Whether a Vertical lists product sales or field services.
+enum:
+  - product_sales
+  - field_service
+examples:
+  - product_sales

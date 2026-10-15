@@ -1,0 +1,24 @@
+type: object
+description: A product field a store type's catalogue declares, the `ProductField` schema.
+required:
+  - key
+  - label
+  - type
+properties:
+  key:
+    type: string
+    description: The key.
+    examples:
+      - weight_grams
+  label:
+    type: string
+    description: The label.
+    examples:
+      - Weight (g)
+  type:
+    $ref: ./FieldType.yaml
+    description: The type.
+examples:
+  - key: weight_grams
+    label: Weight (g)
+    type: text

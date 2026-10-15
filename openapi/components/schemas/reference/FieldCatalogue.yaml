@@ -1,0 +1,19 @@
+type: object
+description: A field catalogue, the `FieldCatalogue` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./FieldDefinition.yaml
+    description: The fields a type may declare.
+examples:
+  - items:
+      - key: storage_temperature
+        label: Storage temperature
+        options:
+          - ambient
+          - chilled
+          - frozen
+        type: text

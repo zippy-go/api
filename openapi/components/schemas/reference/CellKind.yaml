@@ -1,0 +1,7 @@
+type: string
+description: What a cell shows.
+enum:
+  - vertical
+  - campaign
+examples:
+  - vertical

@@ -1,0 +1,48 @@
+# Path item for /v1/partners/{partner_id}/policy/versions. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerPolicyVersions
+  summary: Every version of the partner's policy layer, newest first
+  description: Every version of the partner's policy layer, newest first.
+  tags:
+    - Partner policy
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The versions
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reference/PolicyLayerList.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

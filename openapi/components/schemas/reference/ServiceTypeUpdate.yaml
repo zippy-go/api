@@ -1,0 +1,75 @@
+type: object
+description: Request body of `PATCH /v1/service-types/{service_type_id}`, the `ServiceTypeUpdate` schema.
+properties:
+  catalogue:
+    oneOf:
+      - $ref: ./ServicesBlock.yaml
+        description: New block.
+      - type: 'null'
+    description: The catalogue.
+  fields:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./TypeField.yaml
+    description: New fields.
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+  radius_metres:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: New radius.
+  slot_minutes:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: New slot length.
+  tagline:
+    type:
+      - string
+      - 'null'
+    description: New tagline.
+  turnaround_hours:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: New turnaround, or `null` to clear.
+  visit_minutes:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: New visit duration.
+  workflow:
+    oneOf:
+      - $ref: ./Workflow.yaml
+        description: New workflow.
+      - type: 'null'
+    description: The workflow.
+examples:
+  - catalogue:
+      add_ons: true
+      cancellation_notice: true
+      deposit: true
+      duration: true
+      materials: true
+      price_bases:
+        - fixed
+    fields:
+      - key: fssai_licence_number
+        required: true
+    name: example
+    radius_metres: 1
+    slot_minutes: 1
+    tagline: example
+    turnaround_hours: 1
+    visit_minutes: 1
+    workflow: appointment

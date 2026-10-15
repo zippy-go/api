@@ -1,0 +1,36 @@
+type: object
+description: A field of the closed catalogue, the `FieldDefinition` schema.
+required:
+  - key
+  - label
+  - type
+  - options
+properties:
+  key:
+    type: string
+    description: The key types refer to.
+    examples:
+      - storage_temperature
+  label:
+    type: string
+    description: The label consoles show.
+    examples:
+      - Storage temperature
+  options:
+    type: array
+    items:
+      type: string
+    description: The options, for a choice.
+    examples:
+      - &a1
+        - ambient
+        - chilled
+        - frozen
+  type:
+    $ref: ./FieldType.yaml
+    description: The type of value.
+examples:
+  - key: storage_temperature
+    label: Storage temperature
+    options: *a1
+    type: text

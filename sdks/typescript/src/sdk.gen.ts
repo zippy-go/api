@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLocationData, GetLocationErrors, GetLocationResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServicesData, ListServicesErrors, ListServicesResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateCampaignSlotData, CreateCampaignSlotErrors, CreateCampaignSlotResponses, CreateCountryData, CreateCountryErrors, CreateCountryResponses, CreateCurrencyData, CreateCurrencyErrors, CreateCurrencyResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, CreateServiceAreaData, CreateServiceAreaErrors, CreateServiceAreaResponses, CreateServiceTypeData, CreateServiceTypeErrors, CreateServiceTypeResponses, CreateStoreTypeData, CreateStoreTypeErrors, CreateStoreTypeResponses, CreateVerticalData, CreateVerticalErrors, CreateVerticalResponses, DeleteCampaignSlotData, DeleteCampaignSlotErrors, DeleteCampaignSlotResponses, DeleteServiceAreaFenceData, DeleteServiceAreaFenceErrors, DeleteServiceAreaFenceResponses, DivideServiceAreaData, DivideServiceAreaErrors, DivideServiceAreaResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetCampaignSlotData, GetCampaignSlotErrors, GetCampaignSlotResponses, GetCountryData, GetCountryErrors, GetCountryHolidaysData, GetCountryHolidaysErrors, GetCountryHolidaysResponses, GetCountryPolicyData, GetCountryPolicyErrors, GetCountryPolicyResponses, GetCountryResponses, GetCountryScheduleData, GetCountryScheduleErrors, GetCountryScheduleResponses, GetCurrencyData, GetCurrencyErrors, GetCurrencyResponses, GetDisplayGridData, GetDisplayGridErrors, GetDisplayGridResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLocationData, GetLocationEffectivePolicyData, GetLocationEffectivePolicyErrors, GetLocationEffectivePolicyResponses, GetLocationEffectiveScheduleData, GetLocationEffectiveScheduleErrors, GetLocationEffectiveScheduleResponses, GetLocationErrors, GetLocationPolicyData, GetLocationPolicyErrors, GetLocationPolicyResponses, GetLocationResponses, GetLocationScheduleData, GetLocationScheduleErrors, GetLocationScheduleResponses, GetLocationTradingData, GetLocationTradingErrors, GetLocationTradingResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerPolicyData, GetPartnerPolicyErrors, GetPartnerPolicyResponses, GetPartnerResponses, GetPartnerScheduleData, GetPartnerScheduleErrors, GetPartnerScheduleResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, GetServiceAreaData, GetServiceAreaErrors, GetServiceAreaImpactData, GetServiceAreaImpactErrors, GetServiceAreaImpactResponses, GetServiceAreaPolicyData, GetServiceAreaPolicyErrors, GetServiceAreaPolicyResponses, GetServiceAreaResponses, GetServiceAreaScheduleData, GetServiceAreaScheduleErrors, GetServiceAreaScheduleResponses, GetServiceTypeData, GetServiceTypeErrors, GetServiceTypeResponses, GetSettingData, GetSettingErrors, GetSettingResponses, GetStoreTypeData, GetStoreTypeErrors, GetStoreTypeResponses, GetVerticalData, GetVerticalErrors, GetVerticalReachData, GetVerticalReachErrors, GetVerticalReachResponses, GetVerticalResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListCampaignSlotsData, ListCampaignSlotsErrors, ListCampaignSlotsResponses, ListCountriesData, ListCountriesErrors, ListCountriesResponses, ListCountryPolicyVersionsData, ListCountryPolicyVersionsErrors, ListCountryPolicyVersionsResponses, ListCurrenciesData, ListCurrenciesErrors, ListCurrenciesResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationPolicyVersionsData, ListLocationPolicyVersionsErrors, ListLocationPolicyVersionsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnerPolicyVersionsData, ListPartnerPolicyVersionsErrors, ListPartnerPolicyVersionsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServiceAreaPolicyVersionsData, ListServiceAreaPolicyVersionsErrors, ListServiceAreaPolicyVersionsResponses, ListServiceAreasData, ListServiceAreasErrors, ListServiceAreasResponses, ListServiceAreaVerticalsData, ListServiceAreaVerticalsErrors, ListServiceAreaVerticalsResponses, ListServiceFieldsData, ListServiceFieldsErrors, ListServiceFieldsResponses, ListServicesData, ListServicesErrors, ListServicesResponses, ListServiceTypesData, ListServiceTypesErrors, ListServiceTypesResponses, ListSettingsData, ListSettingsErrors, ListSettingsResponses, ListStoreFieldsData, ListStoreFieldsErrors, ListStoreFieldsResponses, ListStoreTypesData, ListStoreTypesErrors, ListStoreTypesResponses, ListVerticalsData, ListVerticalsErrors, ListVerticalsResponses, MergeServiceAreasData, MergeServiceAreasErrors, MergeServiceAreasResponses, PlanServiceAreaDivisionData, PlanServiceAreaDivisionErrors, PlanServiceAreaDivisionResponses, PutCountryDefaultServiceAreaData, PutCountryDefaultServiceAreaErrors, PutCountryDefaultServiceAreaResponses, PutCountryHolidaysData, PutCountryHolidaysErrors, PutCountryHolidaysResponses, PutCountryPolicyData, PutCountryPolicyErrors, PutCountryPolicyResponses, PutCountryScheduleData, PutCountryScheduleErrors, PutCountryScheduleResponses, PutDisplayGridData, PutDisplayGridErrors, PutDisplayGridResponses, PutLocationPolicyData, PutLocationPolicyErrors, PutLocationPolicyResponses, PutLocationScheduleData, PutLocationScheduleErrors, PutLocationScheduleResponses, PutPartnerPolicyData, PutPartnerPolicyErrors, PutPartnerPolicyResponses, PutPartnerScheduleData, PutPartnerScheduleErrors, PutPartnerScheduleResponses, PutServiceAreaFenceData, PutServiceAreaFenceErrors, PutServiceAreaFenceResponses, PutServiceAreaPolicyData, PutServiceAreaPolicyErrors, PutServiceAreaPolicyResponses, PutServiceAreaScheduleData, PutServiceAreaScheduleErrors, PutServiceAreaScheduleResponses, PutServiceAreaVerticalOrderData, PutServiceAreaVerticalOrderErrors, PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalsData, PutServiceAreaVerticalsErrors, PutServiceAreaVerticalsResponses, PutSettingData, PutSettingErrors, PutSettingResponses, PutVerticalCategoriesData, PutVerticalCategoriesErrors, PutVerticalCategoriesResponses, PutVerticalImageData, PutVerticalImageErrors, PutVerticalImageResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, ResetSettingData, ResetSettingErrors, ResetSettingResponses, ResolveServiceAreaData, ResolveServiceAreaErrors, ResolveServiceAreaResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SetCountryOrdersData, SetCountryOrdersErrors, SetCountryOrdersResponses, SetCountrySignInData, SetCountrySignInErrors, SetCountrySignInResponses, SetCountryStatusData, SetCountryStatusErrors, SetCountryStatusResponses, SetServiceAreaStatusData, SetServiceAreaStatusErrors, SetServiceAreaStatusResponses, SetServiceTypeStatusData, SetServiceTypeStatusErrors, SetServiceTypeStatusResponses, SetStoreTypeStatusData, SetStoreTypeStatusErrors, SetStoreTypeStatusResponses, SetVerticalStatusData, SetVerticalStatusErrors, SetVerticalStatusResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateCampaignSlotData, UpdateCampaignSlotErrors, UpdateCampaignSlotResponses, UpdateCountryData, UpdateCountryErrors, UpdateCountryResponses, UpdateCurrencyData, UpdateCurrencyErrors, UpdateCurrencyResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpdateServiceAreaData, UpdateServiceAreaErrors, UpdateServiceAreaResponses, UpdateServiceTypeData, UpdateServiceTypeErrors, UpdateServiceTypeResponses, UpdateStoreTypeData, UpdateStoreTypeErrors, UpdateStoreTypeResponses, UpdateVerticalData, UpdateVerticalErrors, UpdateVerticalResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -722,4 +722,1077 @@ export const getAuditEntry = <ThrowOnError extends boolean = false>(options: Opt
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/v1/audit-log/{entry_id}',
     ...options
+});
+
+/**
+ * Removes a campaign slot and takes it out of every display grid
+ *
+ * Removes a campaign slot and takes it out of every display grid; platform staff.
+ */
+export const deleteCampaignSlot = <ThrowOnError extends boolean = false>(options: Options<DeleteCampaignSlotData, ThrowOnError>): RequestResult<DeleteCampaignSlotResponses, DeleteCampaignSlotErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCampaignSlotResponses, DeleteCampaignSlotErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/campaign-slots/{campaign_slot_id}',
+    ...options
+});
+
+/**
+ * One campaign slot
+ *
+ * One campaign slot.
+ */
+export const getCampaignSlot = <ThrowOnError extends boolean = false>(options: Options<GetCampaignSlotData, ThrowOnError>): RequestResult<GetCampaignSlotResponses, GetCampaignSlotErrors, ThrowOnError> => (options.client ?? client).get<GetCampaignSlotResponses, GetCampaignSlotErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/campaign-slots/{campaign_slot_id}',
+    ...options
+});
+
+/**
+ * Changes a campaign slot
+ *
+ * Changes a campaign slot; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateCampaignSlot = <ThrowOnError extends boolean = false>(options: Options<UpdateCampaignSlotData, ThrowOnError>): RequestResult<UpdateCampaignSlotResponses, UpdateCampaignSlotErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCampaignSlotResponses, UpdateCampaignSlotErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/campaign-slots/{campaign_slot_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every country
+ *
+ * Every country.
+ */
+export const listCountries = <ThrowOnError extends boolean = false>(options?: Options<ListCountriesData, ThrowOnError>): RequestResult<ListCountriesResponses, ListCountriesErrors, ThrowOnError> => (options?.client ?? client).get<ListCountriesResponses, ListCountriesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries',
+    ...options
+});
+
+/**
+ * Opens a market
+ *
+ * Opens a market: the country is created active with orders and sign-in on; platform staff.
+ */
+export const createCountry = <ThrowOnError extends boolean = false>(options: Options<CreateCountryData, ThrowOnError>): RequestResult<CreateCountryResponses, CreateCountryErrors, ThrowOnError> => (options.client ?? client).post<CreateCountryResponses, CreateCountryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * One country
+ *
+ * One country.
+ */
+export const getCountry = <ThrowOnError extends boolean = false>(options: Options<GetCountryData, ThrowOnError>): RequestResult<GetCountryResponses, GetCountryErrors, ThrowOnError> => (options.client ?? client).get<GetCountryResponses, GetCountryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}',
+    ...options
+});
+
+/**
+ * Changes a country's details
+ *
+ * Changes a country's details; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateCountry = <ThrowOnError extends boolean = false>(options: Options<UpdateCountryData, ThrowOnError>): RequestResult<UpdateCountryResponses, UpdateCountryErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCountryResponses, UpdateCountryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Names the service area customers who cannot be placed are sent to
+ *
+ * Names the service area customers who cannot be placed are sent to; platform staff.
+ */
+export const putCountryDefaultServiceArea = <ThrowOnError extends boolean = false>(options: Options<PutCountryDefaultServiceAreaData, ThrowOnError>): RequestResult<PutCountryDefaultServiceAreaResponses, PutCountryDefaultServiceAreaErrors, ThrowOnError> => (options.client ?? client).put<PutCountryDefaultServiceAreaResponses, PutCountryDefaultServiceAreaErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/default-service-area',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The country's public holidays
+ *
+ * The country's public holidays.
+ */
+export const getCountryHolidays = <ThrowOnError extends boolean = false>(options: Options<GetCountryHolidaysData, ThrowOnError>): RequestResult<GetCountryHolidaysResponses, GetCountryHolidaysErrors, ThrowOnError> => (options.client ?? client).get<GetCountryHolidaysResponses, GetCountryHolidaysErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/holidays',
+    ...options
+});
+
+/**
+ * Replaces the country's holiday calendar
+ *
+ * Replaces the country's holiday calendar; platform staff.
+ */
+export const putCountryHolidays = <ThrowOnError extends boolean = false>(options: Options<PutCountryHolidaysData, ThrowOnError>): RequestResult<PutCountryHolidaysResponses, PutCountryHolidaysErrors, ThrowOnError> => (options.client ?? client).put<PutCountryHolidaysResponses, PutCountryHolidaysErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/holidays',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Turns order taking on or off for the country, with a reason
+ *
+ * Turns order taking on or off for the country, with a reason; platform staff.
+ */
+export const setCountryOrders = <ThrowOnError extends boolean = false>(options: Options<SetCountryOrdersData, ThrowOnError>): RequestResult<SetCountryOrdersResponses, SetCountryOrdersErrors, ThrowOnError> => (options.client ?? client).put<SetCountryOrdersResponses, SetCountryOrdersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/orders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The country's service policy layer, its latest version
+ *
+ * The country's service policy layer, its latest version.
+ */
+export const getCountryPolicy = <ThrowOnError extends boolean = false>(options: Options<GetCountryPolicyData, ThrowOnError>): RequestResult<GetCountryPolicyResponses, GetCountryPolicyErrors, ThrowOnError> => (options.client ?? client).get<GetCountryPolicyResponses, GetCountryPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/policy',
+    ...options
+});
+
+/**
+ * Saves a new version of the country's service policy layer
+ *
+ * Saves a new version of the country's service policy layer; platform staff.
+ */
+export const putCountryPolicy = <ThrowOnError extends boolean = false>(options: Options<PutCountryPolicyData, ThrowOnError>): RequestResult<PutCountryPolicyResponses, PutCountryPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutCountryPolicyResponses, PutCountryPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/policy',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every version of the country's policy layer, newest first
+ *
+ * Every version of the country's policy layer, newest first.
+ */
+export const listCountryPolicyVersions = <ThrowOnError extends boolean = false>(options: Options<ListCountryPolicyVersionsData, ThrowOnError>): RequestResult<ListCountryPolicyVersionsResponses, ListCountryPolicyVersionsErrors, ThrowOnError> => (options.client ?? client).get<ListCountryPolicyVersionsResponses, ListCountryPolicyVersionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/policy/versions',
+    ...options
+});
+
+/**
+ * The country's schedule layer (its exceptions
+ *
+ * The country's schedule layer (its exceptions: the public holidays as closures, when set).
+ */
+export const getCountrySchedule = <ThrowOnError extends boolean = false>(options: Options<GetCountryScheduleData, ThrowOnError>): RequestResult<GetCountryScheduleResponses, GetCountryScheduleErrors, ThrowOnError> => (options.client ?? client).get<GetCountryScheduleResponses, GetCountryScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/schedule',
+    ...options
+});
+
+/**
+ * Saves a new version of the country's schedule layer
+ *
+ * Saves a new version of the country's schedule layer; platform staff.
+ */
+export const putCountrySchedule = <ThrowOnError extends boolean = false>(options: Options<PutCountryScheduleData, ThrowOnError>): RequestResult<PutCountryScheduleResponses, PutCountryScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutCountryScheduleResponses, PutCountryScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/schedule',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Turns customer sign-in on or off for the country, with a reason
+ *
+ * Turns customer sign-in on or off for the country, with a reason; platform staff.
+ */
+export const setCountrySignIn = <ThrowOnError extends boolean = false>(options: Options<SetCountrySignInData, ThrowOnError>): RequestResult<SetCountrySignInResponses, SetCountrySignInErrors, ThrowOnError> => (options.client ?? client).put<SetCountrySignInResponses, SetCountrySignInErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/sign-in',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Moves a country along its lifecycle, with a reason
+ *
+ * Moves a country along its lifecycle, with a reason; platform staff.
+ */
+export const setCountryStatus = <ThrowOnError extends boolean = false>(options: Options<SetCountryStatusData, ThrowOnError>): RequestResult<SetCountryStatusResponses, SetCountryStatusErrors, ThrowOnError> => (options.client ?? client).put<SetCountryStatusResponses, SetCountryStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/countries/{alpha2}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every currency
+ *
+ * Every currency.
+ */
+export const listCurrencies = <ThrowOnError extends boolean = false>(options?: Options<ListCurrenciesData, ThrowOnError>): RequestResult<ListCurrenciesResponses, ListCurrenciesErrors, ThrowOnError> => (options?.client ?? client).get<ListCurrenciesResponses, ListCurrenciesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/currencies',
+    ...options
+});
+
+/**
+ * Adds a currency
+ *
+ * Adds a currency; platform staff.
+ */
+export const createCurrency = <ThrowOnError extends boolean = false>(options: Options<CreateCurrencyData, ThrowOnError>): RequestResult<CreateCurrencyResponses, CreateCurrencyErrors, ThrowOnError> => (options.client ?? client).post<CreateCurrencyResponses, CreateCurrencyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/currencies',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * One currency
+ *
+ * One currency.
+ */
+export const getCurrency = <ThrowOnError extends boolean = false>(options: Options<GetCurrencyData, ThrowOnError>): RequestResult<GetCurrencyResponses, GetCurrencyErrors, ThrowOnError> => (options.client ?? client).get<GetCurrencyResponses, GetCurrencyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/currencies/{code}',
+    ...options
+});
+
+/**
+ * Changes a currency's symbol, locale or status
+ *
+ * Changes a currency's symbol, locale or status; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateCurrency = <ThrowOnError extends boolean = false>(options: Options<UpdateCurrencyData, ThrowOnError>): RequestResult<UpdateCurrencyResponses, UpdateCurrencyErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCurrencyResponses, UpdateCurrencyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/currencies/{code}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The location's own service policy layer, its latest version
+ *
+ * The location's own service policy layer, its latest version.
+ */
+export const getLocationPolicy = <ThrowOnError extends boolean = false>(options: Options<GetLocationPolicyData, ThrowOnError>): RequestResult<GetLocationPolicyResponses, GetLocationPolicyErrors, ThrowOnError> => (options.client ?? client).get<GetLocationPolicyResponses, GetLocationPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy',
+    ...options
+});
+
+/**
+ * Saves a new version of the location's service policy layer
+ *
+ * Saves a new version of the location's service policy layer; owners and managers.
+ */
+export const putLocationPolicy = <ThrowOnError extends boolean = false>(options: Options<PutLocationPolicyData, ThrowOnError>): RequestResult<PutLocationPolicyResponses, PutLocationPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutLocationPolicyResponses, PutLocationPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The effective policy of the location
+ *
+ * The effective policy of the location: the country, the service areas, the partner and the location folded, every field with the layer and version that supplied it.
+ */
+export const getLocationEffectivePolicy = <ThrowOnError extends boolean = false>(options: Options<GetLocationEffectivePolicyData, ThrowOnError>): RequestResult<GetLocationEffectivePolicyResponses, GetLocationEffectivePolicyErrors, ThrowOnError> => (options.client ?? client).get<GetLocationEffectivePolicyResponses, GetLocationEffectivePolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy/effective',
+    ...options
+});
+
+/**
+ * Every version of the location's policy layer, newest first
+ *
+ * Every version of the location's policy layer, newest first.
+ */
+export const listLocationPolicyVersions = <ThrowOnError extends boolean = false>(options: Options<ListLocationPolicyVersionsData, ThrowOnError>): RequestResult<ListLocationPolicyVersionsResponses, ListLocationPolicyVersionsErrors, ThrowOnError> => (options.client ?? client).get<ListLocationPolicyVersionsResponses, ListLocationPolicyVersionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/policy/versions',
+    ...options
+});
+
+/**
+ * The location's own schedule layer, its latest version
+ *
+ * The location's own schedule layer, its latest version.
+ */
+export const getLocationSchedule = <ThrowOnError extends boolean = false>(options: Options<GetLocationScheduleData, ThrowOnError>): RequestResult<GetLocationScheduleResponses, GetLocationScheduleErrors, ThrowOnError> => (options.client ?? client).get<GetLocationScheduleResponses, GetLocationScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule',
+    ...options
+});
+
+/**
+ * Saves a new version of the location's schedule layer
+ *
+ * Saves a new version of the location's schedule layer; owners and managers.
+ */
+export const putLocationSchedule = <ThrowOnError extends boolean = false>(options: Options<PutLocationScheduleData, ThrowOnError>): RequestResult<PutLocationScheduleResponses, PutLocationScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutLocationScheduleResponses, PutLocationScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The effective schedule of the location
+ *
+ * The effective schedule of the location: the nearest week and every exception, in the location's time zone.
+ */
+export const getLocationEffectiveSchedule = <ThrowOnError extends boolean = false>(options: Options<GetLocationEffectiveScheduleData, ThrowOnError>): RequestResult<GetLocationEffectiveScheduleResponses, GetLocationEffectiveScheduleErrors, ThrowOnError> => (options.client ?? client).get<GetLocationEffectiveScheduleResponses, GetLocationEffectiveScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule/effective',
+    ...options
+});
+
+/**
+ * Whether the location trades at an instant and when that changes
+ *
+ * Whether the location trades at an instant and when that changes.
+ */
+export const getLocationTrading = <ThrowOnError extends boolean = false>(options: Options<GetLocationTradingData, ThrowOnError>): RequestResult<GetLocationTradingResponses, GetLocationTradingErrors, ThrowOnError> => (options.client ?? client).get<GetLocationTradingResponses, GetLocationTradingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/schedule/trading',
+    ...options
+});
+
+/**
+ * The partner's service policy layer, its latest version
+ *
+ * The partner's service policy layer, its latest version; members and platform staff.
+ */
+export const getPartnerPolicy = <ThrowOnError extends boolean = false>(options: Options<GetPartnerPolicyData, ThrowOnError>): RequestResult<GetPartnerPolicyResponses, GetPartnerPolicyErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerPolicyResponses, GetPartnerPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/policy',
+    ...options
+});
+
+/**
+ * Saves a new version of the partner's service policy layer
+ *
+ * Saves a new version of the partner's service policy layer; owners and managers.
+ */
+export const putPartnerPolicy = <ThrowOnError extends boolean = false>(options: Options<PutPartnerPolicyData, ThrowOnError>): RequestResult<PutPartnerPolicyResponses, PutPartnerPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerPolicyResponses, PutPartnerPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/policy',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every version of the partner's policy layer, newest first
+ *
+ * Every version of the partner's policy layer, newest first.
+ */
+export const listPartnerPolicyVersions = <ThrowOnError extends boolean = false>(options: Options<ListPartnerPolicyVersionsData, ThrowOnError>): RequestResult<ListPartnerPolicyVersionsResponses, ListPartnerPolicyVersionsErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerPolicyVersionsResponses, ListPartnerPolicyVersionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/policy/versions',
+    ...options
+});
+
+/**
+ * The partner's schedule layer, its latest version
+ *
+ * The partner's schedule layer, its latest version.
+ */
+export const getPartnerSchedule = <ThrowOnError extends boolean = false>(options: Options<GetPartnerScheduleData, ThrowOnError>): RequestResult<GetPartnerScheduleResponses, GetPartnerScheduleErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerScheduleResponses, GetPartnerScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/schedule',
+    ...options
+});
+
+/**
+ * Saves a new version of the partner's schedule layer (the default week of its locations)
+ *
+ * Saves a new version of the partner's schedule layer (the default week of its locations); owners and managers.
+ */
+export const putPartnerSchedule = <ThrowOnError extends boolean = false>(options: Options<PutPartnerScheduleData, ThrowOnError>): RequestResult<PutPartnerScheduleResponses, PutPartnerScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerScheduleResponses, PutPartnerScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/schedule',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The service areas matching the query, by path, so a country's tree reads top down
+ *
+ * The service areas matching the query, by path, so a country's tree reads top down.
+ */
+export const listServiceAreas = <ThrowOnError extends boolean = false>(options?: Options<ListServiceAreasData, ThrowOnError>): RequestResult<ListServiceAreasResponses, ListServiceAreasErrors, ThrowOnError> => (options?.client ?? client).get<ListServiceAreasResponses, ListServiceAreasErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas',
+    ...options
+});
+
+/**
+ * Adds a service area beneath its parent or at the top of its country
+ *
+ * Adds a service area beneath its parent or at the top of its country; platform staff. Nothing is created beneath a fenced area: divide it instead.
+ */
+export const createServiceArea = <ThrowOnError extends boolean = false>(options: Options<CreateServiceAreaData, ThrowOnError>): RequestResult<CreateServiceAreaResponses, CreateServiceAreaErrors, ThrowOnError> => (options.client ?? client).post<CreateServiceAreaResponses, CreateServiceAreaErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Resolves a pin to a service area
+ *
+ * Resolves a pin to a service area: the fenced area containing it, else the nearest serving area within the cap, else the country's default. Public: the customer app asks before anybody signs in.
+ */
+export const resolveServiceArea = <ThrowOnError extends boolean = false>(options: Options<ResolveServiceAreaData, ThrowOnError>): RequestResult<ResolveServiceAreaResponses, ResolveServiceAreaErrors, ThrowOnError> => (options.client ?? client).get<ResolveServiceAreaResponses, ResolveServiceAreaErrors, ThrowOnError>({ url: '/v1/service-areas/resolve', ...options });
+
+/**
+ * One service area
+ *
+ * One service area.
+ */
+export const getServiceArea = <ThrowOnError extends boolean = false>(options: Options<GetServiceAreaData, ThrowOnError>): RequestResult<GetServiceAreaResponses, GetServiceAreaErrors, ThrowOnError> => (options.client ?? client).get<GetServiceAreaResponses, GetServiceAreaErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}',
+    ...options
+});
+
+/**
+ * Renames an area or changes its time zone
+ *
+ * Renames an area or changes its time zone; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateServiceArea = <ThrowOnError extends boolean = false>(options: Options<UpdateServiceAreaData, ThrowOnError>): RequestResult<UpdateServiceAreaResponses, UpdateServiceAreaErrors, ThrowOnError> => (options.client ?? client).patch<UpdateServiceAreaResponses, UpdateServiceAreaErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The area's campaign slots, or with `effective` every slot that applies there
+ *
+ * The area's campaign slots, or with `effective` every slot that applies there.
+ */
+export const listCampaignSlots = <ThrowOnError extends boolean = false>(options: Options<ListCampaignSlotsData, ThrowOnError>): RequestResult<ListCampaignSlotsResponses, ListCampaignSlotsErrors, ThrowOnError> => (options.client ?? client).get<ListCampaignSlotsResponses, ListCampaignSlotsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/campaign-slots',
+    ...options
+});
+
+/**
+ * Adds a campaign slot to the area
+ *
+ * Adds a campaign slot to the area; platform staff.
+ */
+export const createCampaignSlot = <ThrowOnError extends boolean = false>(options: Options<CreateCampaignSlotData, ThrowOnError>): RequestResult<CreateCampaignSlotResponses, CreateCampaignSlotErrors, ThrowOnError> => (options.client ?? client).post<CreateCampaignSlotResponses, CreateCampaignSlotErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/campaign-slots',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The area's display grid as served
+ *
+ * The area's display grid as served: Verticals no longer offered flagged unavailable.
+ */
+export const getDisplayGrid = <ThrowOnError extends boolean = false>(options: Options<GetDisplayGridData, ThrowOnError>): RequestResult<GetDisplayGridResponses, GetDisplayGridErrors, ThrowOnError> => (options.client ?? client).get<GetDisplayGridResponses, GetDisplayGridErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/display-grid',
+    ...options
+});
+
+/**
+ * Replaces the area's display grid, validated against what it offers now
+ *
+ * Replaces the area's display grid, validated against what it offers now; platform staff.
+ */
+export const putDisplayGrid = <ThrowOnError extends boolean = false>(options: Options<PutDisplayGridData, ThrowOnError>): RequestResult<PutDisplayGridResponses, PutDisplayGridErrors, ThrowOnError> => (options.client ?? client).put<PutDisplayGridResponses, PutDisplayGridErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/display-grid',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Divides a fenced area into fenced children, re-pointing its Locations
+ *
+ * Divides a fenced area into fenced children, re-pointing its Locations; platform staff. Refused with `locations_stranded` unless forced with a reason.
+ */
+export const divideServiceArea = <ThrowOnError extends boolean = false>(options: Options<DivideServiceAreaData, ThrowOnError>): RequestResult<DivideServiceAreaResponses, DivideServiceAreaErrors, ThrowOnError> => (options.client ?? client).post<DivideServiceAreaResponses, DivideServiceAreaErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/divide',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Plans a division without writing
+ *
+ * Plans a division without writing: which Locations each child would receive and which would be stranded; platform staff.
+ */
+export const planServiceAreaDivision = <ThrowOnError extends boolean = false>(options: Options<PlanServiceAreaDivisionData, ThrowOnError>): RequestResult<PlanServiceAreaDivisionResponses, PlanServiceAreaDivisionErrors, ThrowOnError> => (options.client ?? client).post<PlanServiceAreaDivisionResponses, PlanServiceAreaDivisionErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/division-plan',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Removes the fence
+ *
+ * Removes the fence; platform staff. Refused with `locations_stranded` while Locations sit in the area.
+ */
+export const deleteServiceAreaFence = <ThrowOnError extends boolean = false>(options: Options<DeleteServiceAreaFenceData, ThrowOnError>): RequestResult<DeleteServiceAreaFenceResponses, DeleteServiceAreaFenceErrors, ThrowOnError> => (options.client ?? client).delete<DeleteServiceAreaFenceResponses, DeleteServiceAreaFenceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/fence',
+    ...options
+});
+
+/**
+ * Draws the fence
+ *
+ * Draws the fence; platform staff. A fence is drawn at one level only: refused when an ancestor or a descendant is fenced.
+ */
+export const putServiceAreaFence = <ThrowOnError extends boolean = false>(options: Options<PutServiceAreaFenceData, ThrowOnError>): RequestResult<PutServiceAreaFenceResponses, PutServiceAreaFenceErrors, ThrowOnError> => (options.client ?? client).put<PutServiceAreaFenceResponses, PutServiceAreaFenceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/fence',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * What would stop serving if the area were deactivated
+ *
+ * What would stop serving if the area were deactivated.
+ */
+export const getServiceAreaImpact = <ThrowOnError extends boolean = false>(options: Options<GetServiceAreaImpactData, ThrowOnError>): RequestResult<GetServiceAreaImpactResponses, GetServiceAreaImpactErrors, ThrowOnError> => (options.client ?? client).get<GetServiceAreaImpactResponses, GetServiceAreaImpactErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/impact',
+    ...options
+});
+
+/**
+ * Merges the fenced areas beneath an unfenced area back into it, with a reason
+ *
+ * Merges the fenced areas beneath an unfenced area back into it, with a reason; platform staff.
+ */
+export const mergeServiceAreas = <ThrowOnError extends boolean = false>(options: Options<MergeServiceAreasData, ThrowOnError>): RequestResult<MergeServiceAreasResponses, MergeServiceAreasErrors, ThrowOnError> => (options.client ?? client).post<MergeServiceAreasResponses, MergeServiceAreasErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/merge',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The area's service policy layer, its latest version
+ *
+ * The area's service policy layer, its latest version.
+ */
+export const getServiceAreaPolicy = <ThrowOnError extends boolean = false>(options: Options<GetServiceAreaPolicyData, ThrowOnError>): RequestResult<GetServiceAreaPolicyResponses, GetServiceAreaPolicyErrors, ThrowOnError> => (options.client ?? client).get<GetServiceAreaPolicyResponses, GetServiceAreaPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/policy',
+    ...options
+});
+
+/**
+ * Saves a new version of the area's service policy layer
+ *
+ * Saves a new version of the area's service policy layer; platform staff.
+ */
+export const putServiceAreaPolicy = <ThrowOnError extends boolean = false>(options: Options<PutServiceAreaPolicyData, ThrowOnError>): RequestResult<PutServiceAreaPolicyResponses, PutServiceAreaPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutServiceAreaPolicyResponses, PutServiceAreaPolicyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/policy',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every version of the area's policy layer, newest first
+ *
+ * Every version of the area's policy layer, newest first.
+ */
+export const listServiceAreaPolicyVersions = <ThrowOnError extends boolean = false>(options: Options<ListServiceAreaPolicyVersionsData, ThrowOnError>): RequestResult<ListServiceAreaPolicyVersionsResponses, ListServiceAreaPolicyVersionsErrors, ThrowOnError> => (options.client ?? client).get<ListServiceAreaPolicyVersionsResponses, ListServiceAreaPolicyVersionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/policy/versions',
+    ...options
+});
+
+/**
+ * The area's schedule layer (exceptions only
+ *
+ * The area's schedule layer (exceptions only: closures for the whole area).
+ */
+export const getServiceAreaSchedule = <ThrowOnError extends boolean = false>(options: Options<GetServiceAreaScheduleData, ThrowOnError>): RequestResult<GetServiceAreaScheduleResponses, GetServiceAreaScheduleErrors, ThrowOnError> => (options.client ?? client).get<GetServiceAreaScheduleResponses, GetServiceAreaScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/schedule',
+    ...options
+});
+
+/**
+ * Saves a new version of the area's schedule layer
+ *
+ * Saves a new version of the area's schedule layer; platform staff.
+ */
+export const putServiceAreaSchedule = <ThrowOnError extends boolean = false>(options: Options<PutServiceAreaScheduleData, ThrowOnError>): RequestResult<PutServiceAreaScheduleResponses, PutServiceAreaScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutServiceAreaScheduleResponses, PutServiceAreaScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/schedule',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Moves an area along its lifecycle, with a reason
+ *
+ * Moves an area along its lifecycle, with a reason; platform staff. Everything beneath follows.
+ */
+export const setServiceAreaStatus = <ThrowOnError extends boolean = false>(options: Options<SetServiceAreaStatusData, ThrowOnError>): RequestResult<SetServiceAreaStatusResponses, SetServiceAreaStatusErrors, ThrowOnError> => (options.client ?? client).put<SetServiceAreaStatusResponses, SetServiceAreaStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Sets the order Verticals appear in for the area
+ *
+ * Sets the order Verticals appear in for the area; platform staff.
+ */
+export const putServiceAreaVerticalOrder = <ThrowOnError extends boolean = false>(options: Options<PutServiceAreaVerticalOrderData, ThrowOnError>): RequestResult<PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalOrderErrors, ThrowOnError> => (options.client ?? client).put<PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalOrderErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/vertical-order',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The Verticals the area offers
+ *
+ * The Verticals the area offers: declared here or inherited, in its order.
+ */
+export const listServiceAreaVerticals = <ThrowOnError extends boolean = false>(options: Options<ListServiceAreaVerticalsData, ThrowOnError>): RequestResult<ListServiceAreaVerticalsResponses, ListServiceAreaVerticalsErrors, ThrowOnError> => (options.client ?? client).get<ListServiceAreaVerticalsResponses, ListServiceAreaVerticalsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/verticals',
+    ...options
+});
+
+/**
+ * Replaces the Verticals the area declares itself
+ *
+ * Replaces the Verticals the area declares itself; platform staff.
+ */
+export const putServiceAreaVerticals = <ThrowOnError extends boolean = false>(options: Options<PutServiceAreaVerticalsData, ThrowOnError>): RequestResult<PutServiceAreaVerticalsResponses, PutServiceAreaVerticalsErrors, ThrowOnError> => (options.client ?? client).put<PutServiceAreaVerticalsResponses, PutServiceAreaVerticalsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-areas/{service_area_id}/verticals',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The closed catalogue of fields a service type may declare
+ *
+ * The closed catalogue of fields a service type may declare.
+ */
+export const listServiceFields = <ThrowOnError extends boolean = false>(options?: Options<ListServiceFieldsData, ThrowOnError>): RequestResult<ListServiceFieldsResponses, ListServiceFieldsErrors, ThrowOnError> => (options?.client ?? client).get<ListServiceFieldsResponses, ListServiceFieldsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-fields',
+    ...options
+});
+
+/**
+ * Every service type
+ *
+ * Every service type.
+ */
+export const listServiceTypes = <ThrowOnError extends boolean = false>(options?: Options<ListServiceTypesData, ThrowOnError>): RequestResult<ListServiceTypesResponses, ListServiceTypesErrors, ThrowOnError> => (options?.client ?? client).get<ListServiceTypesResponses, ListServiceTypesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-types',
+    ...options
+});
+
+/**
+ * Adds a service type as a draft
+ *
+ * Adds a service type as a draft; platform staff.
+ */
+export const createServiceType = <ThrowOnError extends boolean = false>(options: Options<CreateServiceTypeData, ThrowOnError>): RequestResult<CreateServiceTypeResponses, CreateServiceTypeErrors, ThrowOnError> => (options.client ?? client).post<CreateServiceTypeResponses, CreateServiceTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-types',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * One service type
+ *
+ * One service type.
+ */
+export const getServiceType = <ThrowOnError extends boolean = false>(options: Options<GetServiceTypeData, ThrowOnError>): RequestResult<GetServiceTypeResponses, GetServiceTypeErrors, ThrowOnError> => (options.client ?? client).get<GetServiceTypeResponses, GetServiceTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-types/{service_type_id}',
+    ...options
+});
+
+/**
+ * Changes a service type
+ *
+ * Changes a service type; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateServiceType = <ThrowOnError extends boolean = false>(options: Options<UpdateServiceTypeData, ThrowOnError>): RequestResult<UpdateServiceTypeResponses, UpdateServiceTypeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateServiceTypeResponses, UpdateServiceTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-types/{service_type_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Moves a service type along its lifecycle
+ *
+ * Moves a service type along its lifecycle; platform staff.
+ */
+export const setServiceTypeStatus = <ThrowOnError extends boolean = false>(options: Options<SetServiceTypeStatusData, ThrowOnError>): RequestResult<SetServiceTypeStatusResponses, SetServiceTypeStatusErrors, ThrowOnError> => (options.client ?? client).put<SetServiceTypeStatusResponses, SetServiceTypeStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/service-types/{service_type_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every setting with its value in force, bounds and default
+ *
+ * Every setting with its value in force, bounds and default.
+ */
+export const listSettings = <ThrowOnError extends boolean = false>(options?: Options<ListSettingsData, ThrowOnError>): RequestResult<ListSettingsResponses, ListSettingsErrors, ThrowOnError> => (options?.client ?? client).get<ListSettingsResponses, ListSettingsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/settings',
+    ...options
+});
+
+/**
+ * Removes the stored value so the default is in force again
+ *
+ * Removes the stored value so the default is in force again; platform staff.
+ */
+export const resetSetting = <ThrowOnError extends boolean = false>(options: Options<ResetSettingData, ThrowOnError>): RequestResult<ResetSettingResponses, ResetSettingErrors, ThrowOnError> => (options.client ?? client).delete<ResetSettingResponses, ResetSettingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/settings/{key}',
+    ...options
+});
+
+/**
+ * One setting
+ *
+ * One setting.
+ */
+export const getSetting = <ThrowOnError extends boolean = false>(options: Options<GetSettingData, ThrowOnError>): RequestResult<GetSettingResponses, GetSettingErrors, ThrowOnError> => (options.client ?? client).get<GetSettingResponses, GetSettingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/settings/{key}',
+    ...options
+});
+
+/**
+ * Stores a value within the setting's bounds
+ *
+ * Stores a value within the setting's bounds; platform staff.
+ */
+export const putSetting = <ThrowOnError extends boolean = false>(options: Options<PutSettingData, ThrowOnError>): RequestResult<PutSettingResponses, PutSettingErrors, ThrowOnError> => (options.client ?? client).put<PutSettingResponses, PutSettingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/settings/{key}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The closed catalogue of fields a store type may declare
+ *
+ * The closed catalogue of fields a store type may declare.
+ */
+export const listStoreFields = <ThrowOnError extends boolean = false>(options?: Options<ListStoreFieldsData, ThrowOnError>): RequestResult<ListStoreFieldsResponses, ListStoreFieldsErrors, ThrowOnError> => (options?.client ?? client).get<ListStoreFieldsResponses, ListStoreFieldsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-fields',
+    ...options
+});
+
+/**
+ * Every store type
+ *
+ * Every store type.
+ */
+export const listStoreTypes = <ThrowOnError extends boolean = false>(options?: Options<ListStoreTypesData, ThrowOnError>): RequestResult<ListStoreTypesResponses, ListStoreTypesErrors, ThrowOnError> => (options?.client ?? client).get<ListStoreTypesResponses, ListStoreTypesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-types',
+    ...options
+});
+
+/**
+ * Adds a store type as a draft
+ *
+ * Adds a store type as a draft; platform staff.
+ */
+export const createStoreType = <ThrowOnError extends boolean = false>(options: Options<CreateStoreTypeData, ThrowOnError>): RequestResult<CreateStoreTypeResponses, CreateStoreTypeErrors, ThrowOnError> => (options.client ?? client).post<CreateStoreTypeResponses, CreateStoreTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-types',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * One store type
+ *
+ * One store type.
+ */
+export const getStoreType = <ThrowOnError extends boolean = false>(options: Options<GetStoreTypeData, ThrowOnError>): RequestResult<GetStoreTypeResponses, GetStoreTypeErrors, ThrowOnError> => (options.client ?? client).get<GetStoreTypeResponses, GetStoreTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-types/{store_type_id}',
+    ...options
+});
+
+/**
+ * Changes a store type
+ *
+ * Changes a store type; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateStoreType = <ThrowOnError extends boolean = false>(options: Options<UpdateStoreTypeData, ThrowOnError>): RequestResult<UpdateStoreTypeResponses, UpdateStoreTypeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateStoreTypeResponses, UpdateStoreTypeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-types/{store_type_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Moves a store type along its lifecycle
+ *
+ * Moves a store type along its lifecycle; platform staff.
+ */
+export const setStoreTypeStatus = <ThrowOnError extends boolean = false>(options: Options<SetStoreTypeStatusData, ThrowOnError>): RequestResult<SetStoreTypeStatusResponses, SetStoreTypeStatusErrors, ThrowOnError> => (options.client ?? client).put<SetStoreTypeStatusResponses, SetStoreTypeStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/store-types/{store_type_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Every Vertical with its categories
+ *
+ * Every Vertical with its categories.
+ */
+export const listVerticals = <ThrowOnError extends boolean = false>(options?: Options<ListVerticalsData, ThrowOnError>): RequestResult<ListVerticalsResponses, ListVerticalsErrors, ThrowOnError> => (options?.client ?? client).get<ListVerticalsResponses, ListVerticalsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals',
+    ...options
+});
+
+/**
+ * Adds a Vertical, active, at the end of the order
+ *
+ * Adds a Vertical, active, at the end of the order; platform staff.
+ */
+export const createVertical = <ThrowOnError extends boolean = false>(options: Options<CreateVerticalData, ThrowOnError>): RequestResult<CreateVerticalResponses, CreateVerticalErrors, ThrowOnError> => (options.client ?? client).post<CreateVerticalResponses, CreateVerticalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * One Vertical
+ *
+ * One Vertical.
+ */
+export const getVertical = <ThrowOnError extends boolean = false>(options: Options<GetVerticalData, ThrowOnError>): RequestResult<GetVerticalResponses, GetVerticalErrors, ThrowOnError> => (options.client ?? client).get<GetVerticalResponses, GetVerticalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}',
+    ...options
+});
+
+/**
+ * Renames a Vertical
+ *
+ * Renames a Vertical; platform staff. Send `If-Match` to be refused when someone else changed it first.
+ */
+export const updateVertical = <ThrowOnError extends boolean = false>(options: Options<UpdateVerticalData, ThrowOnError>): RequestResult<UpdateVerticalResponses, UpdateVerticalErrors, ThrowOnError> => (options.client ?? client).patch<UpdateVerticalResponses, UpdateVerticalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Replaces a Vertical's categories in merchandising order
+ *
+ * Replaces a Vertical's categories in merchandising order; platform staff. Ids given are kept.
+ */
+export const putVerticalCategories = <ThrowOnError extends boolean = false>(options: Options<PutVerticalCategoriesData, ThrowOnError>): RequestResult<PutVerticalCategoriesResponses, PutVerticalCategoriesErrors, ThrowOnError> => (options.client ?? client).put<PutVerticalCategoriesResponses, PutVerticalCategoriesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}/categories',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Sets or clears the image on a Vertical's tile
+ *
+ * Sets or clears the image on a Vertical's tile; platform staff.
+ */
+export const putVerticalImage = <ThrowOnError extends boolean = false>(options: Options<PutVerticalImageData, ThrowOnError>): RequestResult<PutVerticalImageResponses, PutVerticalImageErrors, ThrowOnError> => (options.client ?? client).put<PutVerticalImageResponses, PutVerticalImageErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}/image',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Where a Vertical reaches
+ *
+ * Where a Vertical reaches: every country's tree with the declared and inherited offers.
+ */
+export const getVerticalReach = <ThrowOnError extends boolean = false>(options: Options<GetVerticalReachData, ThrowOnError>): RequestResult<GetVerticalReachResponses, GetVerticalReachErrors, ThrowOnError> => (options.client ?? client).get<GetVerticalReachResponses, GetVerticalReachErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}/reach',
+    ...options
+});
+
+/**
+ * Moves a Vertical along its lifecycle
+ *
+ * Moves a Vertical along its lifecycle; platform staff. Every open screen re-reads its grid.
+ */
+export const setVerticalStatus = <ThrowOnError extends boolean = false>(options: Options<SetVerticalStatusData, ThrowOnError>): RequestResult<SetVerticalStatusResponses, SetVerticalStatusErrors, ThrowOnError> => (options.client ?? client).put<SetVerticalStatusResponses, SetVerticalStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/verticals/{vertical_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });

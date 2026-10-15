@@ -1,0 +1,45 @@
+type: object
+description: One service area in a Vertical's reach tree, the `ReachNode` schema.
+required:
+  - service_area
+  - offered_here
+  - inherited
+  - offered
+  - children
+properties:
+  children:
+    type: array
+    items:
+      $ref: ./ReachNode.yaml
+    description: The areas beneath.
+  inherited:
+    type: boolean
+    description: Reaches here from an ancestor.
+  offered:
+    type: boolean
+    description: Trades here.
+  offered_here:
+    type: boolean
+    description: Declared at this area.
+  service_area:
+    $ref: ./ServiceAreaRef.yaml
+    description: The area.
+examples:
+  - children:
+      - children: []
+        inherited: true
+        offered: true
+        offered_here: true
+        service_area:
+          id: 01a13a48-9e00-7000-8000-00000000a014
+          kind: region
+          name: example
+          path: example
+    inherited: true
+    offered: true
+    offered_here: true
+    service_area:
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      kind: region
+      name: example
+      path: example

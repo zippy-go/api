@@ -1,0 +1,14 @@
+{
+  "id": "01a13d05-75a0-7427-8eaf-1f2d912943ab",
+  "type": "reference.service_area.status_changed",
+  "version": 1,
+  "occurred_at": "2026-10-15T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": "01a13d05-75a0-7427-8eaf-1f2d912943ac",
+  "payload": {
+    "service_area_id": "01a13a48-9e00-7000-8000-00000000a014",
+    "path": "/IN/hyderabad/banjara-hills",
+    "status": "inactive",
+    "effectively_active": false
+  }
+}

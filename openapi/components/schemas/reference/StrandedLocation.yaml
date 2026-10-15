@@ -1,0 +1,22 @@
+type: object
+description: A Location a division would strand, named in the refusal.
+required:
+  - location_id
+  - partner_id
+  - name
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+  name:
+    type: string
+    description: Its name.
+  partner_id:
+    type: string
+    format: uuid
+    description: Its partner.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-00000000a014
+    name: example
+    partner_id: 01a13a48-9e00-7000-8000-00000000a014

@@ -1,0 +1,7 @@
+type: string
+description: The kinds of row and their capacities.
+enum:
+  - default
+  - big
+examples:
+  - default

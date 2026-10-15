@@ -1,0 +1,20 @@
+type: object
+description: |-
+  A status change with its reason, the `StatusChange` schema. The reason is required where
+  the capability demands one (countries, service areas).
+required:
+  - status
+properties:
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, kept in the audit log.
+    examples:
+      - Launch day
+  status:
+    $ref: ./Lifecycle.yaml
+    description: The status to move to.
+examples:
+  - reason: Launch day
+    status: draft

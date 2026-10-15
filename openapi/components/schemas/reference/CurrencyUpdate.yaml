@@ -1,0 +1,23 @@
+type: object
+description: Request body of `PATCH /v1/currencies/{code}`, the `CurrencyUpdate` schema.
+properties:
+  display_locale:
+    type:
+      - string
+      - 'null'
+    description: New display locale.
+  status:
+    oneOf:
+      - $ref: ./Lifecycle.yaml
+        description: New status.
+      - type: 'null'
+    description: The status.
+  symbol_override:
+    type:
+      - string
+      - 'null'
+    description: New symbol override, or `null` to clear.
+examples:
+  - display_locale: example
+    status: draft
+    symbol_override: example

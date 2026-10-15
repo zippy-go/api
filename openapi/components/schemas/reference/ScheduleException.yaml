@@ -1,0 +1,50 @@
+type: object
+description: A dated exception, the `ScheduleException` schema.
+required:
+  - label
+  - from
+  - to
+  - closed_all_day
+properties:
+  accepts_pre_orders:
+    type:
+      - boolean
+      - 'null'
+    description: Whether pre-orders are still taken.
+  closed_all_day:
+    type: boolean
+    description: Closed all day.
+  from:
+    type: string
+    description: First date, inclusive.
+    examples:
+      - 2027-01-26
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives edits.
+  label:
+    type: string
+    description: The label people see.
+    examples:
+      - Republic Day
+  open:
+    type: array
+    items:
+      $ref: ./Window.yaml
+    description: Explicit open windows, for a part day.
+  to:
+    type: string
+    description: Last date, inclusive.
+    examples:
+      - 2027-01-26
+examples:
+  - accepts_pre_orders: true
+    closed_all_day: true
+    from: 2027-01-26
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    label: Republic Day
+    open:
+      - from: 09:00
+        to: 22:00
+    to: 2027-01-26

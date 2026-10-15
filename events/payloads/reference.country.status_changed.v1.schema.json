@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reference.country.status_changed.v1.schema.json",
+  "title": "ReferenceCountryStatusChangedPayload",
+  "description": "Payload of `reference.country.status_changed` version 1: a country's status or one of its switches changed; the payload carries the whole operating state. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "country",
+    "status",
+    "accepts_orders",
+    "accepts_sign_in"
+  ],
+  "properties": {
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "The country, ISO 3166-1 alpha-2.",
+      "examples": [
+        "IN"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "inactive",
+        "archived"
+      ],
+      "description": "The country's status.",
+      "examples": [
+        "active"
+      ]
+    },
+    "accepts_orders": {
+      "type": "boolean",
+      "description": "Whether its service areas accept orders.",
+      "examples": [
+        true
+      ]
+    },
+    "accepts_sign_in": {
+      "type": "boolean",
+      "description": "Whether its customers may sign in.",
+      "examples": [
+        true
+      ]
+    }
+  }
+}

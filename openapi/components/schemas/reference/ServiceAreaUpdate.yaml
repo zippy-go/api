@@ -1,0 +1,16 @@
+type: object
+description: Request body of `PATCH /v1/service-areas/{service_area_id}`, the `ServiceAreaUpdate` schema.
+properties:
+  name:
+    type:
+      - string
+      - 'null'
+    description: New name.
+  time_zone:
+    type:
+      - string
+      - 'null'
+    description: New time zone.
+examples:
+  - name: example
+    time_zone: example

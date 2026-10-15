@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.4.0
+  version: 0.5.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -87,6 +87,24 @@ tags:
     description: The kinds of service a partner runs (product sales, field service, delivery), with their status and configuration.
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
+  - name: Campaign slots
+    description: "Promotional slots placed on the opening screen of a service area and everything beneath it."
+  - name: Countries
+    description: "Countries: the markets ZippyGo trades in, with their switches for orders and sign-in, holiday calendars, and the country layer of service policy and schedules."
+  - name: Currencies
+    description: "The currencies the platform operates in, with the display conventions of each."
+  - name: Partner policy
+    description: "The Partner and Location layers of service policy and schedules, the explain of the effective policy and whether a Location trades at an instant."
+  - name: Service areas
+    description: "The geography tree with its fences: resolving a pin to a service area, dividing and merging fenced areas, the Verticals an area offers, its campaign slots, its display grid and its policy and schedule layers."
+  - name: Service types
+    description: "What a Partner's field service does: workflows, durations, radii and the typed fields of the closed catalogue."
+  - name: Settings
+    description: "The closed, bounded set of platform settings, each with its default, bounds and the sentence saying what it does."
+  - name: Store types
+    description: "What a Location that sells is: the vocabulary of stores, their typed fields from the closed catalogue and what their items may carry."
+  - name: Verticals
+    description: "The categories of trade customers browse, with their categories, images and the service areas they reach."
   - name: Catalog
     description: Products, modifiers, availability and pricing.
   - name: Orders
@@ -169,6 +187,114 @@ paths:
     $ref: ./paths/audit/filters.yaml
   /v1/audit-log/{entry_id}:
     $ref: ./paths/audit/entry.yaml
+  /v1/campaign-slots/{campaign_slot_id}:
+    $ref: ./paths/campaign-slots/campaign-slot.yaml
+  /v1/countries:
+    $ref: ./paths/countries/countries.yaml
+  /v1/countries/{alpha2}:
+    $ref: ./paths/countries/country.yaml
+  /v1/countries/{alpha2}/default-service-area:
+    $ref: ./paths/countries/default-service-area.yaml
+  /v1/countries/{alpha2}/holidays:
+    $ref: ./paths/countries/holidays.yaml
+  /v1/countries/{alpha2}/orders:
+    $ref: ./paths/countries/orders.yaml
+  /v1/countries/{alpha2}/policy:
+    $ref: ./paths/countries/policy.yaml
+  /v1/countries/{alpha2}/policy/versions:
+    $ref: ./paths/countries/policy-versions.yaml
+  /v1/countries/{alpha2}/schedule:
+    $ref: ./paths/countries/schedule.yaml
+  /v1/countries/{alpha2}/sign-in:
+    $ref: ./paths/countries/sign-in.yaml
+  /v1/countries/{alpha2}/status:
+    $ref: ./paths/countries/status.yaml
+  /v1/currencies:
+    $ref: ./paths/currencies/currencies.yaml
+  /v1/currencies/{code}:
+    $ref: ./paths/currencies/currency.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/policy:
+    $ref: ./paths/locations/policy.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/policy/effective:
+    $ref: ./paths/locations/policy-effective.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/policy/versions:
+    $ref: ./paths/locations/policy-versions.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/schedule:
+    $ref: ./paths/locations/schedule.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/schedule/effective:
+    $ref: ./paths/locations/schedule-effective.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/schedule/trading:
+    $ref: ./paths/locations/schedule-trading.yaml
+  /v1/partners/{partner_id}/policy:
+    $ref: ./paths/partners/policy.yaml
+  /v1/partners/{partner_id}/policy/versions:
+    $ref: ./paths/partners/policy-versions.yaml
+  /v1/partners/{partner_id}/schedule:
+    $ref: ./paths/partners/schedule.yaml
+  /v1/service-areas:
+    $ref: ./paths/service-areas/service-areas.yaml
+  /v1/service-areas/resolve:
+    $ref: ./paths/service-areas/resolve.yaml
+  /v1/service-areas/{service_area_id}:
+    $ref: ./paths/service-areas/service-area.yaml
+  /v1/service-areas/{service_area_id}/campaign-slots:
+    $ref: ./paths/service-areas/campaign-slots.yaml
+  /v1/service-areas/{service_area_id}/display-grid:
+    $ref: ./paths/service-areas/display-grid.yaml
+  /v1/service-areas/{service_area_id}/divide:
+    $ref: ./paths/service-areas/divide.yaml
+  /v1/service-areas/{service_area_id}/division-plan:
+    $ref: ./paths/service-areas/division-plan.yaml
+  /v1/service-areas/{service_area_id}/fence:
+    $ref: ./paths/service-areas/fence.yaml
+  /v1/service-areas/{service_area_id}/impact:
+    $ref: ./paths/service-areas/impact.yaml
+  /v1/service-areas/{service_area_id}/merge:
+    $ref: ./paths/service-areas/merge.yaml
+  /v1/service-areas/{service_area_id}/policy:
+    $ref: ./paths/service-areas/policy.yaml
+  /v1/service-areas/{service_area_id}/policy/versions:
+    $ref: ./paths/service-areas/policy-versions.yaml
+  /v1/service-areas/{service_area_id}/schedule:
+    $ref: ./paths/service-areas/schedule.yaml
+  /v1/service-areas/{service_area_id}/status:
+    $ref: ./paths/service-areas/status.yaml
+  /v1/service-areas/{service_area_id}/vertical-order:
+    $ref: ./paths/service-areas/vertical-order.yaml
+  /v1/service-areas/{service_area_id}/verticals:
+    $ref: ./paths/service-areas/verticals.yaml
+  /v1/service-fields:
+    $ref: ./paths/service-types/service-fields.yaml
+  /v1/service-types:
+    $ref: ./paths/service-types/service-types.yaml
+  /v1/service-types/{service_type_id}:
+    $ref: ./paths/service-types/service-type.yaml
+  /v1/service-types/{service_type_id}/status:
+    $ref: ./paths/service-types/status.yaml
+  /v1/settings:
+    $ref: ./paths/settings/settings.yaml
+  /v1/settings/{key}:
+    $ref: ./paths/settings/setting.yaml
+  /v1/store-fields:
+    $ref: ./paths/store-types/store-fields.yaml
+  /v1/store-types:
+    $ref: ./paths/store-types/store-types.yaml
+  /v1/store-types/{store_type_id}:
+    $ref: ./paths/store-types/store-type.yaml
+  /v1/store-types/{store_type_id}/status:
+    $ref: ./paths/store-types/status.yaml
+  /v1/verticals:
+    $ref: ./paths/verticals/verticals.yaml
+  /v1/verticals/{vertical_id}:
+    $ref: ./paths/verticals/vertical.yaml
+  /v1/verticals/{vertical_id}/categories:
+    $ref: ./paths/verticals/categories.yaml
+  /v1/verticals/{vertical_id}/image:
+    $ref: ./paths/verticals/image.yaml
+  /v1/verticals/{vertical_id}/reach:
+    $ref: ./paths/verticals/reach.yaml
+  /v1/verticals/{vertical_id}/status:
+    $ref: ./paths/verticals/status.yaml
 
 components:
   securitySchemes:
@@ -377,3 +503,209 @@ components:
       $ref: ./components/schemas/live/AgentPositionUpdate.yaml
     AgentStatusUpdate:
       $ref: ./components/schemas/live/AgentStatusUpdate.yaml
+    AffectedArea:
+      $ref: ./components/schemas/reference/AffectedArea.yaml
+    AreaKind:
+      $ref: ./components/schemas/reference/AreaKind.yaml
+    CampaignSlot:
+      $ref: ./components/schemas/reference/CampaignSlot.yaml
+    CampaignSlotCreate:
+      $ref: ./components/schemas/reference/CampaignSlotCreate.yaml
+    CampaignSlotList:
+      $ref: ./components/schemas/reference/CampaignSlotList.yaml
+    CampaignSlotUpdate:
+      $ref: ./components/schemas/reference/CampaignSlotUpdate.yaml
+    CatalogueBlock:
+      $ref: ./components/schemas/reference/CatalogueBlock.yaml
+    CatalogueCapability:
+      $ref: ./components/schemas/reference/CatalogueCapability.yaml
+    CatalogueTerm:
+      $ref: ./components/schemas/reference/CatalogueTerm.yaml
+    VerticalCategories:
+      $ref: ./components/schemas/reference/VerticalCategories.yaml
+    CellKind:
+      $ref: ./components/schemas/reference/CellKind.yaml
+    Choice:
+      $ref: ./components/schemas/reference/Choice.yaml
+    Country:
+      $ref: ./components/schemas/reference/Country.yaml
+    CountryCreate:
+      $ref: ./components/schemas/reference/CountryCreate.yaml
+    CountryList:
+      $ref: ./components/schemas/reference/CountryList.yaml
+    CountryUpdate:
+      $ref: ./components/schemas/reference/CountryUpdate.yaml
+    Currency:
+      $ref: ./components/schemas/reference/Currency.yaml
+    CurrencyCreate:
+      $ref: ./components/schemas/reference/CurrencyCreate.yaml
+    CurrencyList:
+      $ref: ./components/schemas/reference/CurrencyList.yaml
+    CurrencyUpdate:
+      $ref: ./components/schemas/reference/CurrencyUpdate.yaml
+    Day:
+      $ref: ./components/schemas/reference/Day.yaml
+    DaySchedule:
+      $ref: ./components/schemas/reference/DaySchedule.yaml
+    DeactivationImpact:
+      $ref: ./components/schemas/reference/DeactivationImpact.yaml
+    DefaultServiceArea:
+      $ref: ./components/schemas/reference/DefaultServiceArea.yaml
+    DisplayGrid:
+      $ref: ./components/schemas/reference/DisplayGrid.yaml
+    DivisionRequest:
+      $ref: ./components/schemas/reference/DivisionRequest.yaml
+    DivisionChild:
+      $ref: ./components/schemas/reference/DivisionChild.yaml
+    DivisionPlan:
+      $ref: ./components/schemas/reference/DivisionPlan.yaml
+    DivisionPlanRequest:
+      $ref: ./components/schemas/reference/DivisionPlanRequest.yaml
+    EffectivePolicy:
+      $ref: ./components/schemas/reference/EffectivePolicy.yaml
+    EffectiveSchedule:
+      $ref: ./components/schemas/reference/EffectiveSchedule.yaml
+    FeeBand:
+      $ref: ./components/schemas/reference/FeeBand.yaml
+    Fence:
+      $ref: ./components/schemas/reference/Fence.yaml
+    FieldCatalogue:
+      $ref: ./components/schemas/reference/FieldCatalogue.yaml
+    FieldDefinition:
+      $ref: ./components/schemas/reference/FieldDefinition.yaml
+    FieldType:
+      $ref: ./components/schemas/reference/FieldType.yaml
+    GridCell:
+      $ref: ./components/schemas/reference/GridCell.yaml
+    GridRow:
+      $ref: ./components/schemas/reference/GridRow.yaml
+    Holiday:
+      $ref: ./components/schemas/reference/Holiday.yaml
+    HolidayCalendar:
+      $ref: ./components/schemas/reference/HolidayCalendar.yaml
+    LayerKind:
+      $ref: ./components/schemas/reference/LayerKind.yaml
+    LayerRef:
+      $ref: ./components/schemas/reference/LayerRef.yaml
+    Lifecycle:
+      $ref: ./components/schemas/reference/Lifecycle.yaml
+    LinkKind:
+      $ref: ./components/schemas/reference/LinkKind.yaml
+    MergeRequest:
+      $ref: ./components/schemas/reference/MergeRequest.yaml
+    PlannedArea:
+      $ref: ./components/schemas/reference/PlannedArea.yaml
+    PolicyLayer:
+      $ref: ./components/schemas/reference/PolicyLayer.yaml
+    PolicyLayerList:
+      $ref: ./components/schemas/reference/PolicyLayerList.yaml
+    PriceBasis:
+      $ref: ./components/schemas/reference/PriceBasis.yaml
+    ProductField:
+      $ref: ./components/schemas/reference/ProductField.yaml
+    Provenance:
+      $ref: ./components/schemas/reference/Provenance.yaml
+    ReachNode:
+      $ref: ./components/schemas/reference/ReachNode.yaml
+    ReachTree:
+      $ref: ./components/schemas/reference/ReachTree.yaml
+    Resolution:
+      $ref: ./components/schemas/reference/Resolution.yaml
+    ResolvedPin:
+      $ref: ./components/schemas/reference/ResolvedPin.yaml
+    RowKind:
+      $ref: ./components/schemas/reference/RowKind.yaml
+    Schedule:
+      $ref: ./components/schemas/reference/Schedule.yaml
+    ScheduleException:
+      $ref: ./components/schemas/reference/ScheduleException.yaml
+    ScheduleLayer:
+      $ref: ./components/schemas/reference/ScheduleLayer.yaml
+    ServiceArea:
+      $ref: ./components/schemas/reference/ServiceArea.yaml
+    ServiceAreaCreate:
+      $ref: ./components/schemas/reference/ServiceAreaCreate.yaml
+    ServiceAreaList:
+      $ref: ./components/schemas/reference/ServiceAreaList.yaml
+    ServiceAreaRef:
+      $ref: ./components/schemas/reference/ServiceAreaRef.yaml
+    ServiceAreaUpdate:
+      $ref: ./components/schemas/reference/ServiceAreaUpdate.yaml
+    ServicePolicy:
+      $ref: ./components/schemas/reference/ServicePolicy.yaml
+    ServiceType:
+      $ref: ./components/schemas/reference/ServiceType.yaml
+    ServiceTypeCreate:
+      $ref: ./components/schemas/reference/ServiceTypeCreate.yaml
+    ServiceTypeList:
+      $ref: ./components/schemas/reference/ServiceTypeList.yaml
+    ServiceTypeUpdate:
+      $ref: ./components/schemas/reference/ServiceTypeUpdate.yaml
+    ServicesBlock:
+      $ref: ./components/schemas/reference/ServicesBlock.yaml
+    Setting:
+      $ref: ./components/schemas/reference/Setting.yaml
+    SettingList:
+      $ref: ./components/schemas/reference/SettingList.yaml
+    SettingValue:
+      $ref: ./components/schemas/reference/SettingValue.yaml
+    SlotHours:
+      $ref: ./components/schemas/reference/SlotHours.yaml
+    SlotLink:
+      $ref: ./components/schemas/reference/SlotLink.yaml
+    SlotShape:
+      $ref: ./components/schemas/reference/SlotShape.yaml
+    SourcedAmount:
+      $ref: ./components/schemas/reference/SourcedAmount.yaml
+    SourcedException:
+      $ref: ./components/schemas/reference/SourcedException.yaml
+    SourcedFlag:
+      $ref: ./components/schemas/reference/SourcedFlag.yaml
+    SourcedLadder:
+      $ref: ./components/schemas/reference/SourcedLadder.yaml
+    SourcedRate:
+      $ref: ./components/schemas/reference/SourcedRate.yaml
+    StatusChange:
+      $ref: ./components/schemas/reference/StatusChange.yaml
+    StoreType:
+      $ref: ./components/schemas/reference/StoreType.yaml
+    StoreTypeCreate:
+      $ref: ./components/schemas/reference/StoreTypeCreate.yaml
+    StoreTypeList:
+      $ref: ./components/schemas/reference/StoreTypeList.yaml
+    StoreTypeUpdate:
+      $ref: ./components/schemas/reference/StoreTypeUpdate.yaml
+    StrandedLocation:
+      $ref: ./components/schemas/reference/StrandedLocation.yaml
+    SwitchChange:
+      $ref: ./components/schemas/reference/SwitchChange.yaml
+    Trading:
+      $ref: ./components/schemas/reference/Trading.yaml
+    TypeField:
+      $ref: ./components/schemas/reference/TypeField.yaml
+    Vertical:
+      $ref: ./components/schemas/reference/Vertical.yaml
+    VerticalCategory:
+      $ref: ./components/schemas/reference/VerticalCategory.yaml
+    VerticalCategoryInput:
+      $ref: ./components/schemas/reference/VerticalCategoryInput.yaml
+    VerticalCreate:
+      $ref: ./components/schemas/reference/VerticalCreate.yaml
+    VerticalIds:
+      $ref: ./components/schemas/reference/VerticalIds.yaml
+    VerticalImage:
+      $ref: ./components/schemas/reference/VerticalImage.yaml
+    VerticalKind:
+      $ref: ./components/schemas/reference/VerticalKind.yaml
+    VerticalList:
+      $ref: ./components/schemas/reference/VerticalList.yaml
+    VerticalOffer:
+      $ref: ./components/schemas/reference/VerticalOffer.yaml
+    VerticalOfferList:
+      $ref: ./components/schemas/reference/VerticalOfferList.yaml
+    VerticalUpdate:
+      $ref: ./components/schemas/reference/VerticalUpdate.yaml
+    Window:
+      $ref: ./components/schemas/reference/Window.yaml
+    Workflow:
+      $ref: ./components/schemas/reference/Workflow.yaml

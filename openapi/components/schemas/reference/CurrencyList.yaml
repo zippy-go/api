@@ -1,0 +1,22 @@
+type: object
+description: The `CurrencyList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Currency.yaml
+    description: Every currency, by code.
+examples:
+  - items:
+      - created_at: 2026-10-15T09:00:00Z
+        created_by: 01a13a48-9e00-7000-8000-00000000a014
+        updated_at: 2026-10-15T09:00:00Z
+        updated_by: 01a13a48-9e00-7000-8000-00000000a014
+        version: 1
+        code: INR
+        display_locale: en-IN
+        operating: true
+        status: draft
+        symbol_override: ₹

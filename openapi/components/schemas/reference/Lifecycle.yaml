@@ -1,0 +1,11 @@
+type: string
+description: |-
+  Where a reference record is in its life. Countries, service areas and verticals have no
+  `draft`; store and service types do.
+enum:
+  - draft
+  - active
+  - inactive
+  - archived
+examples:
+  - draft
