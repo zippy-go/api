@@ -38,6 +38,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`: a Mission Control token without `currency:read`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown currency
       content:
@@ -102,7 +108,7 @@ patch:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff
+      description: 'Not platform staff, or `access_denied` without `currency:write`'
       content:
         application/problem+json:
           schema:

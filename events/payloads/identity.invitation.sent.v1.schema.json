@@ -20,8 +20,8 @@
     },
     "role": {
       "type": "string",
-      "enum": ["owner", "manager", "dispatcher", "kitchen", "staff"],
-      "description": "The role the membership will have once the invitation is accepted.",
+      "enum": ["owner", "manager", "dispatcher", "kitchen", "staff", "custom"],
+      "description": "The role label the membership will have once the invitation is accepted: a default role, or `custom` for a role the partner defined and for an invitation into the platform, whose roles are granted afterwards. Consumers must tolerate values they do not know.",
       "examples": ["manager"]
     }
   }

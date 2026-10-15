@@ -4,7 +4,7 @@ parameters:
 get:
   operationId: getPartnerPolicy
   summary: The partner's service policy layer, its latest version
-  description: The partner's service policy layer, its latest version; members and platform staff.
+  description: The partner's service policy layer, its latest version; members, and platform staff with `partner:read`.
   tags:
     - Partner policy
   security:
@@ -18,6 +18,12 @@ get:
             $ref: ../../components/schemas/reference/PolicyLayer.yaml
     '401':
       description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Platform staff without `partner:read` (`access_denied`).
       content:
         application/problem+json:
           schema:
@@ -49,7 +55,7 @@ get:
 put:
   operationId: putPartnerPolicy
   summary: Saves a new version of the partner's service policy layer
-  description: Saves a new version of the partner's service policy layer; owners and managers.
+  description: Saves a new version of the partner's service policy layer; `location:write` across the partner.
   tags:
     - Partner policy
   security:
@@ -81,7 +87,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager
+      description: The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
       content:
         application/problem+json:
           schema:

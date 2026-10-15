@@ -1,0 +1,22 @@
+type: object
+description: A new authenticator secret, the response of `POST /v1/auth/two-step/setup`. Show `otpauth_uri` as a QR code (and `secret` for typing); two-step sign-in is on only once `POST /v1/auth/two-step/confirm` receives a code from the app. The secret is not shown again.
+required:
+  - secret
+  - otpauth_uri
+  - issuer
+properties:
+  secret:
+    type: string
+    description: The shared secret in base32, for typing into the app when the QR code cannot be scanned.
+  otpauth_uri:
+    type: string
+    description: The `otpauth://totp/` link (SHA-1, six digits, thirty seconds) to render as a QR code.
+  issuer:
+    type: string
+    description: 'The name the app files the codes under: `ZippyGo Mission Control` or `ZippyGo Partner console`.'
+    examples:
+      - ZippyGo Mission Control
+examples:
+  - secret: JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+    otpauth_uri: otpauth://totp/ZippyGo%20Partner%20console:owner%40example.com?secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP&issuer=ZippyGo%20Partner%20console&algorithm=SHA1&digits=6&period=30
+    issuer: ZippyGo Partner console

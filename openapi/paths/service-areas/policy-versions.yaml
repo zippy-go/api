@@ -35,6 +35,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`: a Mission Control token without `zone:read`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown area
       content:

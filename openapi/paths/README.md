@@ -17,6 +17,11 @@ paths/
   auth/refresh.yaml             POST /v1/auth/refresh
   auth/sign-out.yaml            POST /v1/auth/sign-out
   auth/me.yaml                  GET /v1/me
+  auth/two-step-*.yaml          POST /v1/auth/two-step/verify, setup, confirm, recovery-codes, disable
+  auth/step-up.yaml             POST /v1/auth/step-up (+ step-up-code.yaml, POST /v1/auth/step-up/code)
+  auth/password-reset*.yaml     POST /v1/auth/password/reset-request, POST /v1/auth/password/reset
+  auth/identifier-change.yaml   POST, DELETE /v1/auth/identifier-change (+ identifier-change-confirm.yaml)
+  auth/service-tokens.yaml      POST /v1/auth/service-tokens
   partners/partners.yaml        POST, GET /v1/partners
   partners/filters.yaml         GET /v1/partners/filters
   partners/summary.yaml         GET /v1/partners/summary
@@ -44,6 +49,18 @@ paths/
   services/service.yaml         GET, PUT, PATCH /v1/partners/{partner_id}/services/{kind}
   services/service-location.yaml GET, PUT, DELETE .../services/{service_id}/locations/{location_id}
   services/pricing.yaml         GET, PUT .../services/{service_id}/pricing (+ pricing-quote.yaml)
+  access/permissions.yaml       GET /v1/permissions (+ partner-permissions.yaml, GET /v1/partners/{partner_id}/permissions)
+  access/entitlements.yaml      GET, PUT /v1/partners/{partner_id}/entitlements
+  access/partner-roles.yaml     GET, POST /v1/partners/{partner_id}/roles (+ partner-role.yaml, GET, PATCH, DELETE .../{role_id})
+  access/members.yaml           GET /v1/partners/{partner_id}/members (+ member.yaml, GET, PATCH, DELETE .../{membership_id};
+                                member-access.yaml, -disable, -enable, -grants, -grant, -two-step-reset)
+  access/*access-history.yaml   GET /v1/partners/{partner_id}/access-history, GET /v1/platform/access-history
+  access/platform-*.yaml        /v1/platform/roles (+ {role_id}), /v1/platform/staff (+ {membership_id}, enable),
+                                /v1/platform/invitations (+ {invitation_id})
+  oversight/approval*.yaml      /v1/platform/approvals (list, propose), {approval_id} (get, approve, reject)
+  oversight/consents.yaml       GET, POST /v1/platform/impersonation/consents
+  oversight/impersonation*.yaml GET, POST /v1/platform/impersonation/sessions, {impersonation_id}/end, /token
+  oversight/partner-*.yaml      /v1/partners/{partner_id}/impersonation/consents (+ approve, reject, revoke), /sessions
   audit/audit-log.yaml          GET /v1/audit-log
   audit/filters.yaml            GET /v1/audit-log/filters
   audit/entry.yaml              GET /v1/audit-log/{entry_id}
@@ -90,8 +107,9 @@ Rules:
 
 - Folder names are the lowercase domain, matching the tag in `openapi.yaml`
   (`platform`, `auth`, `partners`, `locations`, `memberships`,
-  `invitations`, `services`, `audit`, `catalog`, `orders`, `deliveries`,
-  `fleet`, `live`, `events`, `subscriptions`, `webhooks`). Sub-resources of a
+  `invitations`, `services`, `access`, `oversight`, `audit`, `catalog`,
+  `orders`, `deliveries`, `fleet`, `live`, `events`, `subscriptions`,
+  `webhooks`). Sub-resources of a
   partner live in the folder of their own tag, not under `partners/`.
 - The file name is the resource: plural for collections (`orders.yaml`),
   singular for a single resource addressed by id (`order.yaml`), the action

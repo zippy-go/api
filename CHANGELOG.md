@@ -6,6 +6,163 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-15
+
+### Added
+
+- Sessions bound to one surface (specification `partner-and-staff-access`,
+  tag `Auth`): the sign-in operations take `audience` (`partner`,
+  `platform`, `agent`) and `delivery` (`cookie` or `body`, required with an
+  audience, `delivery_required` otherwise) in `OtpRequest`,
+  `OtpVerifyRequest`, `PasswordSignInRequest`, `RefreshRequest` and
+  `InvitationAcceptRequest`; the refresh cookie is named per surface
+  (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`);
+  `TokenResponse.audience` and `TokenResponse.two_step_setup_required`;
+  the schemas `Audience` and `Delivery`. Mission Control is never offered
+  a one-time code (`audience_not_allowed`).
+- Two-step sign-in with an authenticator app: `POST /v1/auth/two-step/setup`
+  (`TwoStepSetup`), `/confirm` (`RecoveryCodes`), `/recovery-codes`,
+  `/disable` (`PasswordProof`) and `/verify` (`TwoStepVerifyRequest`). The
+  sign-in operations and `POST /v1/invitations/{token}/accept` answer `202`
+  with a `TwoStepChallenge` (`InvitationSecondStep` for an invitation) when
+  it is on. Platform staff without a second factor reach only the set-up
+  (`two_step_setup_required`).
+- Password links: `POST /v1/auth/password/reset-request` (always `202`) and
+  `POST /v1/auth/password/reset` (`link_invalid`).
+- Step-up before sensitive acts: `POST /v1/auth/step-up` and
+  `POST /v1/auth/step-up/code` (`step_up_required`).
+- Changing the sign-in address: `POST`, `DELETE /v1/auth/identifier-change`
+  and `POST /v1/auth/identifier-change/confirm` (`identifier_taken`).
+- Service tokens for background jobs: `POST /v1/auth/service-tokens`
+  (`ServiceTokenRequest`, `ServiceToken`), audience `service`, refused by
+  every operation for people.
+- `SignOutRequest`: `everywhere` ends every session of the user; the
+  surface or the refresh token ends a session whose access token expired.
+- `GET /v1/me` names the surface (`audience`) and the account (`MeAccount`),
+  and lists what the user holds there: partner memberships with their
+  grants per scope (`MeMembership`), the platform membership (`MePlatform`)
+  and agent memberships (`MeAgentMembership`).
+- Who may do what (specification `operator-administration`, tag `Access`):
+  the permission catalogue (`GET /v1/permissions`,
+  `GET /v1/partners/{partner_id}/permissions`), a partner's entitlements
+  (`GET`, `PUT /v1/partners/{partner_id}/entitlements`), roles of a partner
+  and of the platform (`/v1/partners/{partner_id}/roles`,
+  `/v1/platform/roles`, with `ETag` and `If-Match`), team members with
+  their grants per scope (`/v1/partners/{partner_id}/members`: get, rename,
+  remove, disable, enable, grant, revoke, set access in one act, turn
+  two-step off), platform staff (`/v1/platform/staff`) and their
+  invitations (`/v1/platform/invitations`), and the access history of a
+  partner and of every realm.
+- Oversight (tag `Oversight`): four-eyes proposals for granting or revoking
+  a platform role, turning a platform member's two-step off and disabling a
+  platform member (`/v1/platform/approvals`, approve, reject); viewing a
+  partner's console with an owner's consent
+  (`/v1/platform/impersonation/consents` and `/sessions`, with end and
+  token; the owners decide under
+  `/v1/partners/{partner_id}/impersonation/consents` and read
+  `/v1/partners/{partner_id}/impersonation/sessions`).
+- `PartnerCreate.withheld_permissions`, for platform staff onboarding a
+  partner; `InvitationCreate.role_id`, `location_ids`, `service_ids` and
+  `display_name`, with the same members on `Invitation`;
+  `AuditActor.on_behalf_of_user_id`; the `MembershipRole` value `custom`.
+- Problem codes: `authentication_failed`, `unknown_permission`,
+  `invalid_scope`, `access_denied`, `not_enabled_for_partner`,
+  `permission_escalation`, `no_location_assigned`,
+  `permission_not_grantable`, `partner_cannot_sign_in`,
+  `outside_entitlements`, `cross_tenant_role`, `cross_tenant_scope`,
+  `role_maintained`, `role_name_reserved`, `role_in_use`, `last_owner`,
+  `cannot_disable_self`, `link_invalid`, `step_up_required`,
+  `two_step_setup_required`, `two_step_self`, `identifier_taken`,
+  `approval_required`, `self_approval`, `approval_voided`,
+  `approval_expired`, `approval_decided`, `consent_required`,
+  `impersonation_read_only`, `two_step_unavailable`; field codes
+  `delivery_required`, `code_invalid` and `audience_not_allowed`.
+- Events: `identity.sign_in.failed` v1, `access.grant.granted` v1,
+  `access.grant.revoked` v1, `access.membership.status_changed` v1,
+  `access.membership.removed` v1, `access.role.changed` v1,
+  `access.envelope.changed` v1; the optional `audience`, `client` and
+  `method` in `identity.session.created`; the role label `custom` in
+  `tenancy.membership.created` and `identity.invitation.sent`.
+- The permission `plan:write` in the partner pool, which the default role
+  `OWNER` holds: choosing the plan a partner's trial ends into.
+- `403` responses on reads that now check a permission: the reference data
+  (countries, currencies, service areas, campaign slots, Verticals, store
+  and service types, settings) for a Mission Control token without the read
+  permission, and a partner's activation, documents, payout account,
+  standing, plan, policy and schedule layers, Services, pricing and
+  Location activation and holidays for a caller without the permission
+  the read needs.
+
+### Changed
+
+- Access tokens are typed `at+jwt` and their `aud` claim is the surface
+  they were issued for (`partner`, `platform`, `agent`, `service`) instead
+  of `zippygo`; `memberships` is filled on Partner tokens only and
+  `platform` on Mission Control tokens only. A verifier that pinned `aud`
+  to `zippygo` accepts the surface it serves instead.
+- Authorisation follows permissions, not role names: operations that
+  answered `403` (`forbidden`) to a member who was neither owner nor
+  manager now answer `403` (`access_denied`) naming the permission, or
+  `not_enabled_for_partner`. Listing members and invitations needs
+  `staff:read`; a member holding `location:read` at chosen Locations lists
+  and reads those Locations only. The same holds for the routes of 0.8.0:
+  Locations need `location:read` and `location:write` at the Location
+  (the bin lists the Locations the reader reaches), the registry of
+  Services `service:read` and `service:write`, the profile, documents,
+  payout account, logo and banner `partner:profile:write`, the plan after
+  the trial `plan:write`, and platform staff `partner:read`,
+  `partner:write` and, to review a document or verify a payout account,
+  `partner:approve`. The default role `MANAGER` holds `staff:read` and
+  `partner:profile:write`.
+- Reference data is written with the permission of its entity:
+  `city:write` for countries, `zone:write` for service areas with their
+  fences, policy, schedules, Verticals offered and display grid,
+  `currency:write`, `vertical:write`, `promo-slot:write` for campaign
+  slots, `location-type:write` for store and service types, and
+  `setting:write`. Mission Control reads it with the matching read
+  permission; every other surface reads it as before.
+- Asset grants and writes need the permission that writes the file: the
+  owning capability's for a platform purpose (`vertical:write`,
+  `promo-slot:write`), `partner:profile:write` for a partner's own,
+  `location:write` at the Location for a Location's, and `partner:write`
+  for platform staff on a partner's.
+- `PartnerCreate.owner` names a user who already exists: they become the
+  owner at once and are told by email; a new person is still invited.
+  Platform staff onboarding a partner need `partner:write` and
+  `staff:write`.
+- The Agent app admits agents only, people who hold an agent membership in
+  a Service: anybody else signing in to it gets `401`
+  (`authentication_failed`), and a one-time code for it creates nobody.
+- Every failed sign-in answers `401` (`authentication_failed`) whatever the
+  reason (a wrong password answered `unauthenticated`); five failures in
+  fifteen minutes for one identifier on one surface, or from one client,
+  answer `429` (`too_many_requests`) with `Retry-After`.
+- One-time codes work for five minutes (ten before), and a second code for
+  the same identifier within a minute answers `429` with `Retry-After`.
+- `POST /v1/auth/sign-out` takes the bearer token, the cookie or the body,
+  and answers `204` whether or not a session was left to end (it answered
+  `401` without a token).
+- `POST /v1/auth/password`: a first password needs a fresh proof
+  (`POST /v1/auth/step-up`), which a sign-in made in the last ten minutes
+  is; a change ends every session of the user, this one included;
+  passwords may be up to 200 characters.
+- `POST /v1/auth/refresh` forgives the token spent by the latest rotation
+  for fifteen seconds (two tabs refreshing at once stay signed in);
+  sessions end at the surface's idle and absolute limits.
+- `POST /v1/fleet/location-pings` takes the simulator's service token
+  (`Bearer`, job `simulator`) as its only credential.
+- `InvitationCreate.role` is optional when `role_id` names the role.
+- Clients that name no audience keep the step 1 behaviour: the `zg_refresh`
+  cookie, or the body with `X-Client-Type: native`, and a password sign-in
+  that opens Mission Control for platform staff. A later minor retires it,
+  once the web consoles send their surface.
+
+### Removed
+
+- The `DevApiKey` security scheme (`X-Dev-Api-Key` header), the temporary
+  development credential of `POST /v1/fleet/location-pings`; the
+  simulator's service token replaces it, as announced in 0.3.0.
+
 ## [0.8.0] - 2026-10-15
 
 ### Added

@@ -62,7 +62,7 @@ get:
 delete:
   operationId: discardAsset
   summary: Discards an asset and everything derived from it, deleting the bytes at the destination
-  description: Discards an asset and everything derived from it, deleting the bytes at the destination; the row stays readable as discarded. Owners and managers, or platform staff.
+  description: "Discards an asset and everything derived from it, deleting the bytes at the destination; the row stays readable as discarded. With the permission that writes the file."
   tags:
     - Assets
   security:
@@ -87,7 +87,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not allowed to write the asset's owner
+      description: '`access_denied` without the permission that writes the file'
       content:
         application/problem+json:
           schema:

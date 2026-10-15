@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/access.grant.revoked.v1.schema.json",
+  "title": "AccessGrantRevokedPayload",
+  "description": "Payload of `access.grant.revoked` version 1: a grant was revoked. The envelope's `partner_id` is the partner, or `null` for a platform grant. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "grant_id",
+    "membership_id",
+    "user_id",
+    "role_id",
+    "scope"
+  ],
+  "properties": {
+    "grant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The grant.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71"
+      ]
+    },
+    "membership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The membership the grant is held through.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32"
+      ]
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The member.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a25"
+      ]
+    },
+    "role_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The role granted.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Where the grant applies. `platform` and `partner` scopes name no place; a `location` scope names its Location, a `service` scope its Service.",
+      "required": [
+        "kind",
+        "location_id",
+        "service_id"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "platform",
+            "partner",
+            "location",
+            "service"
+          ],
+          "description": "The kind of scope. Consumers must tolerate values they do not know.",
+          "examples": [
+            "location"
+          ]
+        },
+        "location_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "The Location, for a `location` scope; `null` otherwise.",
+          "examples": [
+            "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+          ]
+        },
+        "service_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "The Service, for a `service` scope; `null` otherwise.",
+          "examples": [
+            null
+          ]
+        }
+      }
+    }
+  }
+}

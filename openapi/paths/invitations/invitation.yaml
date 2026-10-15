@@ -14,8 +14,8 @@ delete:
   summary: Revoke an invitation
   description: |
     Revokes a pending invitation, so that its link no longer works, and
-    keeps it in the list with the status `revoked`. Owners and managers may
-    revoke. An invitation that is not `pending` any more answers `409`
+    keeps it in the list with the status `revoked`. Revoking needs
+    `staff:write`. An invitation that is not `pending` any more answers `409`
     (`conflict`).
   tags:
     - Invitations
@@ -31,7 +31,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is a member but neither owner nor manager (`forbidden`).
+      description: The caller lacks `staff:write` (`access_denied`).
       content:
         application/problem+json:
           schema:

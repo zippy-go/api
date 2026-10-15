@@ -1,0 +1,17 @@
+type: object
+description: 'The request body of `POST /v1/auth/identifier-change`: the new email address or phone number to sign in with.'
+required:
+  - channel
+  - identifier
+properties:
+  channel:
+    $ref: ./OtpChannel.yaml
+    description: '`email` to change the email address, `phone` to change the phone number.'
+  identifier:
+    type: string
+    description: The new email address, or the new phone number in E.164 format.
+    examples:
+      - new-owner@example.com
+examples:
+  - channel: email
+    identifier: new-owner@example.com

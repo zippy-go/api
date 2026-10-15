@@ -1,0 +1,10 @@
+type: string
+description: 'Where a proposal stands: `pending`, `approved`, `rejected`, `voided` (what it named changed, or its proposer left) or `expired` (undecided after seventy-two hours; never stored, a pending proposal past its expiry reads so). Clients must tolerate values they do not know.'
+enum:
+  - pending
+  - approved
+  - rejected
+  - voided
+  - expired
+examples:
+  - pending

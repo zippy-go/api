@@ -1,0 +1,10 @@
+type: object
+description: "The request body of `POST /v1/auth/service-tokens`: the job's bootstrap credential, issued when the job is provisioned and kept in its secret store."
+required:
+  - credential
+properties:
+  credential:
+    type: string
+    description: The job's credential. An unknown or revoked credential answers `401` (`authentication_failed`).
+examples:
+  - credential: zgsc_example-credential

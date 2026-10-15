@@ -1,0 +1,12 @@
+type: object
+description: 'The request body of the operations that confirm something with a six-digit code: `POST /v1/auth/two-step/confirm` (a code from the authenticator app) and `POST /v1/auth/identifier-change/confirm` (the code sent to the new address).'
+required:
+  - code
+properties:
+  code:
+    type: string
+    description: The six-digit code, sent as a string so that leading zeros are kept.
+    examples:
+      - '123456'
+examples:
+  - code: '123456'

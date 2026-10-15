@@ -1,0 +1,26 @@
+type: object
+description: 'The second step of a sign-in: the password or the one-time code was right, and the account has two-step sign-in on, so an authenticator code (or a recovery code) is awaited at `POST /v1/auth/two-step/verify`. No session exists until it passes.'
+required:
+  - challenge_id
+  - expires_at
+  - methods
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: Identifies the waiting sign-in; send it back with the code to `POST /v1/auth/two-step/verify`.
+  expires_at:
+    type: string
+    format: date-time
+    description: When the second step stops waiting, five minutes after the first step, as an RFC 3339 timestamp in UTC.
+  methods:
+    type: array
+    items:
+      type: string
+    description: 'What may answer it: `authenticator` (six digits from the app) and, while any are left, `recovery_code`.'
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a26
+    expires_at: 2026-10-15T09:05:00Z
+    methods:
+      - authenticator
+      - recovery_code

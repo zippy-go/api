@@ -1,0 +1,59 @@
+# Path item for /v1/auth/two-step/confirm. Referenced from openapi.yaml.
+post:
+  operationId: confirmTwoStep
+  summary: Turn two-step sign-in on
+  description: Turns two-step sign-in on with a code from the app, and returns ten recovery codes, shown once. A Mission Control session that reached the set-up only reaches everything from now.
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: A code from the authenticator app, proving it holds the new secret.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/CodeConfirmRequest.yaml
+  responses:
+    '200':
+      description: Two-step sign-in is on.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/RecoveryCodes.yaml
+    '400':
+      description: '`validation_failed` with `code_invalid` on `/code`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`conflict`: two-step sign-in is already on.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: '`two_step_unavailable`, or a store is unavailable.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

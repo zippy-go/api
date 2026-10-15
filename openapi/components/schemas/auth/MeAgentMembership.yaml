@@ -1,0 +1,40 @@
+type: object
+description: "One of the user's agent memberships, as `GET /v1/me` lists them on the Agent app: the Service of a partner the person executes tasks for."
+required:
+  - agent_id
+  - partner_id
+  - service_kind
+  - display_name
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The agent membership.
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner whose Service it is.
+  service_kind:
+    $ref: ../services/ServiceKind.yaml
+    description: The kind of the Service, for example `delivery`.
+  display_name:
+    type: string
+    description: The name the agent is shown under.
+  partner_name:
+    type:
+      - string
+      - 'null'
+    description: The partner's name; `null` when the partner no longer exists.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Service; `null` for a membership that predates Services.
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    service_kind: delivery
+    display_name: Agent 1
+    partner_name: Example Partner
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45

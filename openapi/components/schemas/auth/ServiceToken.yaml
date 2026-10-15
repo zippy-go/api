@@ -1,0 +1,31 @@
+type: object
+description: 'A service token for a background job, the response of `POST /v1/auth/service-tokens`: an access token of audience `service` that names one job, holds no memberships and is refused by every human surface.'
+required:
+  - access_token
+  - token_type
+  - expires_in
+  - job
+properties:
+  access_token:
+    type: string
+    description: 'The token, a JSON Web Token signed with EdDSA, for the `Authorization: Bearer` header of the routes the job may call.'
+  token_type:
+    type: string
+    const: Bearer
+    description: Always `Bearer`.
+  expires_in:
+    type: integer
+    description: Seconds until the token expires, at most an hour; mint another from the credential then.
+    minimum: 0
+    examples:
+      - 3600
+  job:
+    type: string
+    description: The one job the token may do, its `job` claim.
+    examples:
+      - simulator
+examples:
+  - access_token: eyJhbGciOiJFZERTQSIsImtpZCI6ImV4YW1wbGUiLCJ0eXAiOiJhdCtqd3QifQ.eyJzdWIiOiJleGFtcGxlIiwiYXVkIjoic2VydmljZSIsImpvYiI6InNpbXVsYXRvciJ9.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+    token_type: Bearer
+    expires_in: 3600
+    job: simulator

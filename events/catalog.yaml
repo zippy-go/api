@@ -292,3 +292,75 @@ events:
       `partner_id` is `null`.
     payload_schema: ./payloads/reference.service_area.status_changed.v1.schema.json
     example: ./examples/reference.service_area.status_changed.v1.json
+
+  - type: identity.sign_in.failed
+    version: 1
+    domain: identity
+    description: >-
+      A sign-in, a second step, a proof of the signed-in person or a
+      service credential failed, with its true reason, which the answer to
+      the caller never carries, for detecting credential stuffing. The
+      envelope's `partner_id` is `null`; the payload carries a digest of
+      the identifier and never the address, the password or the code.
+    payload_schema: ./payloads/identity.sign_in.failed.v1.schema.json
+    example: ./examples/identity.sign_in.failed.v1.json
+
+  - type: access.grant.granted
+    version: 1
+    domain: access
+    description: >-
+      A role was granted to a member at a scope: the whole partner, one
+      Location or one Service, or the platform. The envelope's
+      `partner_id` is the partner, or `null` for a platform grant.
+    payload_schema: ./payloads/access.grant.granted.v1.schema.json
+    example: ./examples/access.grant.granted.v1.json
+
+  - type: access.grant.revoked
+    version: 1
+    domain: access
+    description: >-
+      A grant was revoked, directly, by setting the member's access, or by
+      removing the membership. The envelope's `partner_id` is the partner,
+      or `null` for a platform grant.
+    payload_schema: ./payloads/access.grant.revoked.v1.schema.json
+    example: ./examples/access.grant.revoked.v1.json
+
+  - type: access.membership.status_changed
+    version: 1
+    domain: access
+    description: >-
+      A membership was disabled or enabled; a disabled member keeps their
+      grants for re-enabling. The envelope's `partner_id` is the partner,
+      or `null` for a platform membership.
+    payload_schema: ./payloads/access.membership.status_changed.v1.schema.json
+    example: ./examples/access.membership.status_changed.v1.json
+
+  - type: access.membership.removed
+    version: 1
+    domain: access
+    description: >-
+      A membership was removed and its grants revoked; the person, their
+      profile and their other memberships remain. The envelope's
+      `partner_id` is the partner, or `null` for a platform membership.
+    payload_schema: ./payloads/access.membership.removed.v1.schema.json
+    example: ./examples/access.membership.removed.v1.json
+
+  - type: access.role.changed
+    version: 1
+    domain: access
+    description: >-
+      A role was defined, renamed or given new permissions, or deleted.
+      The envelope's `partner_id` is the partner that owns the role, or
+      `null` for a platform role.
+    payload_schema: ./payloads/access.role.changed.v1.schema.json
+    example: ./examples/access.role.changed.v1.json
+
+  - type: access.envelope.changed
+    version: 1
+    domain: access
+    description: >-
+      The platform changed what it withholds from a partner's
+      entitlements; every role of the partner lost what is withheld at
+      once. The envelope's `partner_id` is the partner.
+    payload_schema: ./payloads/access.envelope.changed.v1.schema.json
+    example: ./examples/access.envelope.changed.v1.json

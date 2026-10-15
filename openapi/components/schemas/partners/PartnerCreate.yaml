@@ -1,7 +1,10 @@
 type: object
 description: |
-  The request body of `POST /v1/partners`. The caller becomes the partner's
-  first owner and the partner starts with the status `pending`.
+  The request body of `POST /v1/partners`. The partner starts with the
+  status `pending`. Without `owner` the caller becomes the partner's first
+  owner; Mission Control onboards a partner for somebody else by naming
+  the `owner`, and may withhold permissions from the partner's
+  entitlements from the start.
 required:
   - kind
   - name
@@ -59,7 +62,8 @@ properties:
     oneOf:
       - $ref: ./PartnerOwner.yaml
       - type: 'null'
-    description: "The administrator, for Mission Control's onboarding on the Partner's behalf (platform staff only, and required of them): invited by email as the Partner's owner. Omitted from the Partner console, where the caller becomes the owner."
+    description: >-
+      The administrator, for Mission Control's onboarding on the Partner's behalf (platform staff holding `partner:write` and `staff:write`, and required of them): an existing user is attached as the Partner's owner and told, a new person is invited by email. Omitted from the Partner console, where the caller becomes the owner.
   pan:
     type:
       - string
@@ -75,6 +79,13 @@ properties:
       - string
       - 'null'
     description: The company or LLP registration number, for an organisation that has one.
+  withheld_permissions:
+    type: array
+    items:
+      type: string
+    description: Permissions to withhold from the partner's entitlements, for platform staff onboarding a partner; never `partner:access` (`partner_cannot_sign_in`).
+    examples:
+      - - promotion:write
 examples:
   - kind: organisation
     name: Example Partner

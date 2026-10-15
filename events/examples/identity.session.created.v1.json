@@ -7,6 +7,9 @@
   "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
   "payload": {
     "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20",
-    "session_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22"
+    "session_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22",
+    "audience": "partner",
+    "client": "browser",
+    "method": "password"
   }
 }

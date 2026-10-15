@@ -1,0 +1,20 @@
+type: object
+description: 'The request body of `POST /v1/platform/impersonation/consents`: the partner to view and why.'
+required:
+  - partner_id
+  - reason
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner whose console to view.
+  reason:
+    type: string
+    description: Why, shown to the partner's owners; required.
+  writes:
+    type: boolean
+    description: '`true` asks to change things too; viewing only otherwise.'
+examples:
+  - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    reason: The owner reports that a Location's hours do not save
+    writes: false

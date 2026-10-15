@@ -1,8 +1,14 @@
 type: object
-description: The request body of `POST /v1/partners/{partner_id}/invitations`.
+description: |
+  The request body of `POST /v1/partners/{partner_id}/invitations`: who to
+  invite, the role to grant on acceptance and where it applies. Name the
+  role with `role_id` (any role of the partner) or, as in step 1, with
+  `role` (a default role by name); one of the two is required
+  (`validation_failed` on `/role_id` otherwise). The owner role covers the
+  whole partner (`invalid_scope` with Locations or Services). Nobody hands
+  out a role holding more than they hold (`permission_escalation`).
 required:
   - email
-  - role
 properties:
   email:
     type: string
@@ -13,7 +19,39 @@ properties:
       - manager@example.com
   role:
     $ref: ../memberships/MembershipRole.yaml
-    description: The role the membership will have. Only an owner may grant `owner`.
+    description: A default role by name (`custom` is refused); `role_id` wins when both are sent.
+  role_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The role to grant, any role of the partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a73
+  location_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Locations the role is limited to; empty or absent for the whole partner.
+  service_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Services the role is limited to; empty or absent for the whole partner.
+  display_name:
+    type:
+      - string
+      - 'null'
+    description: The name the invitee will be shown under in the partner.
+    examples:
+      - User 21
 examples:
   - email: manager@example.com
     role: manager
+  - email: staff@example.com
+    role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    location_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    display_name: User 25

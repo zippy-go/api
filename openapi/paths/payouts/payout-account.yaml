@@ -22,6 +22,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Platform staff without `partner:read` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown partner, or no account stated yet.
       content:
@@ -49,7 +55,7 @@ get:
 put:
   operationId: putPayoutAccount
   summary: State the payout account
-  description: 'States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. Owners and managers, or platform staff.'
+  description: "States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. `partner:profile:write`, or platform staff with `partner:write`."
   tags:
     - Payout accounts
   security:
@@ -81,7 +87,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not change the account.
+      description: 'The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

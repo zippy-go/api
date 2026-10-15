@@ -9,8 +9,9 @@ get:
     status, each with the locations it is switched on at, whether it trades
     and what stops it; every kind as enabled, awaiting documents, disabled,
     available, or not in the plan with the plan that includes it; and the
-    plan. Any member of the partner and the platform realm may read it. The
-    list is not paginated.
+    plan. Reading it needs `service:read` across the partner (platform staff
+    `partner:read`); other members receive `403` (`access_denied`). The list
+    is not paginated.
   tags:
     - Services
   security:
@@ -24,6 +25,12 @@ get:
             $ref: ../../components/schemas/services/ServiceList.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).'
       content:
         application/problem+json:
           schema:
@@ -49,7 +56,7 @@ get:
 post:
   operationId: createService
   summary: Register a service
-  description: 'Registers a Service: several of one kind are allowed. Enabled unless `enabled` is `false`; a kind the plan lacks is refused naming the plan that has it; a kind needing documents not yet approved (product sales of a food catalogue type needs the FSSAI licence) lands in `awaiting_documents`, configurable and not trading. Switched on everywhere unless `location_ids` names some. Send `Idempotency-Key` to make a repeated creation answer the first. Owners and managers; platform staff with a reason.'
+  description: "Registers a Service: several of one kind are allowed. Enabled unless `enabled` is `false`; a kind the plan lacks is refused naming the plan that has it; a kind needing documents not yet approved (product sales of a food catalogue type needs the FSSAI licence) lands in `awaiting_documents`, configurable and not trading. Switched on everywhere unless `location_ids` names some. Send `Idempotency-Key` to make a repeated creation answer the first. `service:write`; platform staff with `partner:write` and a reason."
   tags:
     - Services
   security:
@@ -81,7 +88,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: 'Neither owner nor manager, or `not_in_plan`: the plan does not include the kind.'
+      description: 'The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`), or the plan does not include the kind (`not_in_plan`).'
       content:
         application/problem+json:
           schema:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.8.0
+  version: 0.9.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -52,29 +52,60 @@ tags:
   - name: Auth
     description: |
       Signing in and sessions: one-time codes by email or phone, passwords,
-      token refresh, sign-out and the signed-in user.
+      two-step sign-in with an authenticator app, password links, step-up
+      before sensitive acts, address changes, token refresh, sign-out, the
+      signed-in user, and service tokens for background jobs.
 
-      The sign-in operations return a `TokenResponse`. Its access token is a
-      JSON Web Token signed with EdDSA (Ed25519), valid for 15 minutes and
-      verifiable with the keys from `GET /.well-known/jwks.json`; the key
-      that signed it is named by `kid` in the token header. The claims:
+      Every session is for one surface, its audience: `partner` (the
+      Partner console), `platform` (Mission Control) or `agent` (the Agent
+      app). A client names it in `audience` when it signs in, together with
+      `delivery`: `cookie` for browsers, whose refresh token is kept in an
+      `httpOnly` cookie named for the surface (`zg_refresh_partner`,
+      `zg_refresh_platform`, `zg_refresh_agent`) and scoped to `/v1/auth`,
+      or `body` for apps, which receive `refresh_token` and keep it in the
+      platform keystore. A client that names no audience keeps the step 1
+      behaviour: the `zg_refresh` cookie, or the body when it sends
+      `X-Client-Type: native`. A refresh token is valid for the surface's
+      idle limit and the session ends at its absolute limit whatever the
+      refreshes: fourteen and ninety days on the Partner console, thirty and
+      one hundred and eighty days on the Agent app, sixty minutes and twelve
+      hours on Mission Control. Refresh tokens rotate on every use; the
+      token spent by the latest rotation is forgiven for fifteen seconds,
+      an older one revokes the session.
 
-      | Claim         | Meaning                                                                                        |
-      | ------------- | ---------------------------------------------------------------------------------------------- |
-      | `sub`         | The user id.                                                                                   |
-      | `iss`         | The issuer: the base URL of the API host that issued the token.                                |
-      | `aud`         | `zippygo`.                                                                                     |
-      | `iat`, `exp`  | Issued-at and expiry as Unix timestamps; `exp` is at most 15 minutes after `iat`.              |
-      | `jti`         | The token id, unique per token.                                                                |
-      | `sid`         | The session id. A session ends on sign-out, on reuse of a refresh token or when it expires.    |
-      | `memberships` | The user's memberships as a compact list of `{ "p": "<partner_id>", "r": "<role>" }`.          |
-      | `platform`    | The user's platform roles, a list of strings; empty for everyone outside the platform realm.   |
+      The sign-in operations return a `TokenResponse`, or `202` with a
+      `TwoStepChallenge` when the account has two-step sign-in on. The
+      access token is a JSON Web Token typed `at+jwt`, signed with EdDSA
+      (Ed25519), valid for 15 minutes and verifiable with the keys from
+      `GET /.well-known/jwks.json`; the key that signed it is named by `kid`
+      in the token header. A token is refused by every surface it does not
+      name. The claims:
 
-      The refresh token is delivered in an `httpOnly` cookie named
-      `zg_refresh`, scoped to `/v1/auth`, to browsers, and in the body of the
-      `TokenResponse` to native clients that send `X-Client-Type: native`
-      when signing in. Refresh tokens rotate on every use; reusing one
-      revokes the session.
+      | Claim         | Meaning                                                                                                   |
+      | ------------- | --------------------------------------------------------------------------------------------------------- |
+      | `sub`         | The user id; on a service token, the job's credential.                                                    |
+      | `iss`         | The issuer: the base URL of the API host that issued the token.                                           |
+      | `aud`         | The surface: `partner`, `platform`, `agent`, or `service` for a background job.                           |
+      | `iat`, `exp`  | Issued-at and expiry as Unix timestamps; `exp` is at most 15 minutes after `iat`, an hour on a service token. |
+      | `jti`         | The token id, unique per token.                                                                           |
+      | `sid`         | The session id. A session ends on sign-out, on reuse of an old refresh token, at its idle or absolute limit, or when the user is offboarded. |
+      | `memberships` | On a `partner` token, the user's memberships as a compact list of `{ "p": "<partner_id>", "r": "<role>" }`; empty elsewhere. |
+      | `platform`    | On a `platform` token, the user's platform role names; empty elsewhere.                                   |
+      | `job`         | On a `service` token only, the one job it may do.                                                         |
+      | `act`         | On an impersonation token only, `{ "sub": "<platform member>", "writes": <bool> }`: the platform member viewing the Partner console as `sub` with an owner's consent. |
+
+      The `memberships` and `platform` claims are hints fixed at issue
+      time: the API resolves what a user holds from its records on every
+      request (see the `Access` tag), and checks every Mission Control
+      session on every request, so a session ended elsewhere stops at once.
+
+      Platform staff sign in to Mission Control with a password and a
+      second factor; without one, the session reaches only `GET /v1/me`,
+      the two-step set-up and sign-out, and everything else answers `403`
+      (`two_step_setup_required`). Every failed sign-in answers `401`
+      (`authentication_failed`), whatever the reason; five failures in
+      fifteen minutes for one identifier on one surface, or from one
+      client, lock it for the rest of the window.
   - name: Partners
     description: Partners, the supply-side tenants (organisations or individuals). Their locations, members, invitations and services have tags of their own.
   - name: Locations
@@ -93,6 +124,37 @@ tags:
     description: "The bank account a partner is paid into, held until platform staff verify it."
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
+  - name: Access
+    description: |
+      Who may do what. A permission names one act (`<entity>:<action>`,
+      such as `location:write`); a role is a named set of permissions,
+      owned by the platform or by one partner; a grant gives a member a role
+      at a scope: the platform, a whole partner, one Location or one
+      Service. What a member may do at a place is the union of the
+      permissions of the grants that cover it, limited by the partner's
+      entitlements (what the platform lets its roles contain). Nobody hands
+      out more than they hold: defining, changing or granting a role that
+      holds a permission the actor lacks answers `403`
+      (`permission_escalation`).
+
+      Every operation states the permission it needs. A member lacking it
+      at the place receives `403` (`access_denied`), a partner not entitled
+      to it `403` (`not_enabled_for_partner`), and somebody who is not a
+      member `404`, as for a record that does not exist. Every grant and
+      revocation is kept in the access history.
+  - name: Oversight
+    description: |
+      The second pair of eyes on the most dangerous platform acts, and
+      platform staff viewing a partner's console with an owner's consent.
+
+      Granting or revoking a platform role, turning a platform member's
+      two-step sign-in off and disabling a platform member are proposed and
+      run only when a different platform member approves them (four eyes).
+      Viewing a partner's console needs the consent of one of its owners,
+      given for twenty-four hours, viewing only unless changes were asked
+      for and allowed; every viewing session lasts at most sixty minutes,
+      is told to the owner, and is recorded in the audit log, with the
+      platform member as the actor and the owner as the person acted for.
   - name: Assets
     description: "Assets"
   - name: Campaign slots
@@ -161,6 +223,30 @@ paths:
     $ref: ./paths/auth/sign-out.yaml
   /v1/me:
     $ref: ./paths/auth/me.yaml
+  /v1/auth/two-step/verify:
+    $ref: ./paths/auth/two-step-verify.yaml
+  /v1/auth/two-step/setup:
+    $ref: ./paths/auth/two-step-setup.yaml
+  /v1/auth/two-step/confirm:
+    $ref: ./paths/auth/two-step-confirm.yaml
+  /v1/auth/two-step/recovery-codes:
+    $ref: ./paths/auth/two-step-recovery-codes.yaml
+  /v1/auth/two-step/disable:
+    $ref: ./paths/auth/two-step-disable.yaml
+  /v1/auth/step-up:
+    $ref: ./paths/auth/step-up.yaml
+  /v1/auth/step-up/code:
+    $ref: ./paths/auth/step-up-code.yaml
+  /v1/auth/password/reset-request:
+    $ref: ./paths/auth/password-reset-request.yaml
+  /v1/auth/password/reset:
+    $ref: ./paths/auth/password-reset.yaml
+  /v1/auth/identifier-change:
+    $ref: ./paths/auth/identifier-change.yaml
+  /v1/auth/identifier-change/confirm:
+    $ref: ./paths/auth/identifier-change-confirm.yaml
+  /v1/auth/service-tokens:
+    $ref: ./paths/auth/service-tokens.yaml
   /.well-known/jwks.json:
     $ref: ./paths/platform/jwks.yaml
   /v1/partners:
@@ -241,6 +327,76 @@ paths:
     $ref: ./paths/services/pricing.yaml
   /v1/partners/{partner_id}/services/{service_id}/pricing/quote:
     $ref: ./paths/services/pricing-quote.yaml
+  /v1/permissions:
+    $ref: ./paths/access/permissions.yaml
+  /v1/partners/{partner_id}/access-history:
+    $ref: ./paths/access/partner-access-history.yaml
+  /v1/partners/{partner_id}/entitlements:
+    $ref: ./paths/access/entitlements.yaml
+  /v1/partners/{partner_id}/impersonation/consents:
+    $ref: ./paths/oversight/partner-consents.yaml
+  /v1/partners/{partner_id}/impersonation/consents/{consent_id}/approve:
+    $ref: ./paths/oversight/partner-consent-approve.yaml
+  /v1/partners/{partner_id}/impersonation/consents/{consent_id}/reject:
+    $ref: ./paths/oversight/partner-consent-reject.yaml
+  /v1/partners/{partner_id}/impersonation/consents/{consent_id}/revoke:
+    $ref: ./paths/oversight/partner-consent-revoke.yaml
+  /v1/partners/{partner_id}/impersonation/sessions:
+    $ref: ./paths/oversight/partner-impersonations.yaml
+  /v1/partners/{partner_id}/members:
+    $ref: ./paths/access/members.yaml
+  /v1/partners/{partner_id}/members/{membership_id}:
+    $ref: ./paths/access/member.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/access:
+    $ref: ./paths/access/member-access.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/disable:
+    $ref: ./paths/access/member-disable.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/enable:
+    $ref: ./paths/access/member-enable.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/grants:
+    $ref: ./paths/access/member-grants.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/grants/{grant_id}:
+    $ref: ./paths/access/member-grant.yaml
+  /v1/partners/{partner_id}/members/{membership_id}/two-step/reset:
+    $ref: ./paths/access/member-two-step-reset.yaml
+  /v1/partners/{partner_id}/permissions:
+    $ref: ./paths/access/partner-permissions.yaml
+  /v1/partners/{partner_id}/roles:
+    $ref: ./paths/access/partner-roles.yaml
+  /v1/partners/{partner_id}/roles/{role_id}:
+    $ref: ./paths/access/partner-role.yaml
+  /v1/platform/access-history:
+    $ref: ./paths/access/access-history.yaml
+  /v1/platform/approvals:
+    $ref: ./paths/oversight/approvals.yaml
+  /v1/platform/approvals/{approval_id}:
+    $ref: ./paths/oversight/approval.yaml
+  /v1/platform/approvals/{approval_id}/approve:
+    $ref: ./paths/oversight/approval-approve.yaml
+  /v1/platform/approvals/{approval_id}/reject:
+    $ref: ./paths/oversight/approval-reject.yaml
+  /v1/platform/impersonation/consents:
+    $ref: ./paths/oversight/consents.yaml
+  /v1/platform/impersonation/sessions:
+    $ref: ./paths/oversight/impersonations.yaml
+  /v1/platform/impersonation/sessions/{impersonation_id}/end:
+    $ref: ./paths/oversight/impersonation-end.yaml
+  /v1/platform/impersonation/sessions/{impersonation_id}/token:
+    $ref: ./paths/oversight/impersonation-token.yaml
+  /v1/platform/invitations:
+    $ref: ./paths/access/platform-invitations.yaml
+  /v1/platform/invitations/{invitation_id}:
+    $ref: ./paths/access/platform-invitation.yaml
+  /v1/platform/roles:
+    $ref: ./paths/access/platform-roles.yaml
+  /v1/platform/roles/{role_id}:
+    $ref: ./paths/access/platform-role.yaml
+  /v1/platform/staff:
+    $ref: ./paths/access/platform-staff.yaml
+  /v1/platform/staff/{membership_id}:
+    $ref: ./paths/access/platform-staff-member.yaml
+  /v1/platform/staff/{membership_id}/enable:
+    $ref: ./paths/access/platform-staff-enable.yaml
   /v1/audit-log:
     $ref: ./paths/audit/audit-log.yaml
   /v1/audit-log/filters:
@@ -393,22 +549,14 @@ components:
       description: |
         An access token issued by ZippyGo, sent as
         `Authorization: Bearer <token>`. Access tokens are JSON Web Tokens
-        signed with EdDSA (Ed25519) and valid for 15 minutes. They are
-        obtained from the sign-in operations under the `Auth` tag and
-        renewed with `POST /v1/auth/refresh`; their claims are documented on
-        that tag and the signing keys are published at
+        typed `at+jwt`, signed with EdDSA (Ed25519), valid for 15 minutes
+        and issued for one surface, their `aud`. People obtain them from the
+        sign-in operations under the `Auth` tag and renew them with
+        `POST /v1/auth/refresh`; background jobs mint service tokens (`aud`
+        `service`, at most an hour) at `POST /v1/auth/service-tokens`, which
+        every operation for people refuses. Their claims are documented on
+        the `Auth` tag and the signing keys are published at
         `GET /.well-known/jwks.json`.
-    DevApiKey:
-      type: apiKey
-      in: header
-      name: X-Dev-Api-Key
-      description: |
-        A temporary development credential, sent in the `X-Dev-Api-Key`
-        header. It is accepted only by `POST /v1/fleet/location-pings`, for
-        devices that report positions before agents have credentials of
-        their own; every other operation authenticates with `Bearer` access
-        tokens. The replacement and the retirement of this scheme are
-        announced in the changelog.
 
   parameters:
     PartnerIdQuery:
@@ -490,6 +638,48 @@ components:
       $ref: ./components/schemas/auth/TokenResponse.yaml
     Me:
       $ref: ./components/schemas/auth/Me.yaml
+    Audience:
+      $ref: ./components/schemas/auth/Audience.yaml
+    Delivery:
+      $ref: ./components/schemas/auth/Delivery.yaml
+    TwoStepChallenge:
+      $ref: ./components/schemas/auth/TwoStepChallenge.yaml
+    TwoStepSetup:
+      $ref: ./components/schemas/auth/TwoStepSetup.yaml
+    TwoStepVerifyRequest:
+      $ref: ./components/schemas/auth/TwoStepVerifyRequest.yaml
+    RecoveryCodes:
+      $ref: ./components/schemas/auth/RecoveryCodes.yaml
+    CodeConfirmRequest:
+      $ref: ./components/schemas/auth/CodeConfirmRequest.yaml
+    PasswordProof:
+      $ref: ./components/schemas/auth/PasswordProof.yaml
+    PasswordResetLinkRequest:
+      $ref: ./components/schemas/auth/PasswordResetLinkRequest.yaml
+    PasswordReset:
+      $ref: ./components/schemas/auth/PasswordReset.yaml
+    StepUpRequest:
+      $ref: ./components/schemas/auth/StepUpRequest.yaml
+    StepUpCodeRequest:
+      $ref: ./components/schemas/auth/StepUpCodeRequest.yaml
+    IdentifierChange:
+      $ref: ./components/schemas/auth/IdentifierChange.yaml
+    IdentifierChangeRequest:
+      $ref: ./components/schemas/auth/IdentifierChangeRequest.yaml
+    ServiceToken:
+      $ref: ./components/schemas/auth/ServiceToken.yaml
+    ServiceTokenRequest:
+      $ref: ./components/schemas/auth/ServiceTokenRequest.yaml
+    SignOutRequest:
+      $ref: ./components/schemas/auth/SignOutRequest.yaml
+    MeAccount:
+      $ref: ./components/schemas/auth/MeAccount.yaml
+    MeAgentMembership:
+      $ref: ./components/schemas/auth/MeAgentMembership.yaml
+    MePlatform:
+      $ref: ./components/schemas/auth/MePlatform.yaml
+    MeMembership:
+      $ref: ./components/schemas/auth/MeMembership.yaml
     # Partners
     PartnerKind:
       $ref: ./components/schemas/partners/PartnerKind.yaml
@@ -532,6 +722,8 @@ components:
       $ref: ./components/schemas/invitations/InvitationList.yaml
     InvitationAcceptRequest:
       $ref: ./components/schemas/invitations/InvitationAcceptRequest.yaml
+    InvitationSecondStep:
+      $ref: ./components/schemas/invitations/InvitationSecondStep.yaml
     InvitationAccepted:
       $ref: ./components/schemas/invitations/InvitationAccepted.yaml
     # Services
@@ -706,6 +898,86 @@ components:
       $ref: ./components/schemas/audit/AuditEntry.yaml
     AuditEntryList:
       $ref: ./components/schemas/audit/AuditEntryList.yaml
+    # Access
+    AccessGrant:
+      $ref: ./components/schemas/access/AccessGrant.yaml
+    AccessGrantCreate:
+      $ref: ./components/schemas/access/AccessGrantCreate.yaml
+    AccessGrantList:
+      $ref: ./components/schemas/access/AccessGrantList.yaml
+    AccessHistoryEntry:
+      $ref: ./components/schemas/access/AccessHistoryEntry.yaml
+    AccessHistoryList:
+      $ref: ./components/schemas/access/AccessHistoryList.yaml
+    HistoryAction:
+      $ref: ./components/schemas/access/HistoryAction.yaml
+    AccessRole:
+      $ref: ./components/schemas/access/AccessRole.yaml
+    AccessRoleCreate:
+      $ref: ./components/schemas/access/AccessRoleCreate.yaml
+    AccessRoleUpdate:
+      $ref: ./components/schemas/access/AccessRoleUpdate.yaml
+    AccessRoleList:
+      $ref: ./components/schemas/access/AccessRoleList.yaml
+    RoleKind:
+      $ref: ./components/schemas/access/RoleKind.yaml
+    AccessScope:
+      $ref: ./components/schemas/access/AccessScope.yaml
+    ScopeKind:
+      $ref: ./components/schemas/access/ScopeKind.yaml
+    AccessSet:
+      $ref: ./components/schemas/access/AccessSet.yaml
+    Entitlements:
+      $ref: ./components/schemas/access/Entitlements.yaml
+    EntitlementsUpdate:
+      $ref: ./components/schemas/access/EntitlementsUpdate.yaml
+    MembershipStatus:
+      $ref: ./components/schemas/access/MembershipStatus.yaml
+    Permission:
+      $ref: ./components/schemas/access/Permission.yaml
+    PermissionList:
+      $ref: ./components/schemas/access/PermissionList.yaml
+    PermissionPool:
+      $ref: ./components/schemas/access/PermissionPool.yaml
+    PlatformStaffInvite:
+      $ref: ./components/schemas/access/PlatformStaffInvite.yaml
+    TeamMember:
+      $ref: ./components/schemas/access/TeamMember.yaml
+    TeamMemberList:
+      $ref: ./components/schemas/access/TeamMemberList.yaml
+    TeamMemberUpdate:
+      $ref: ./components/schemas/access/TeamMemberUpdate.yaml
+    # Oversight
+    Approval:
+      $ref: ./components/schemas/oversight/Approval.yaml
+    ApprovalAction:
+      $ref: ./components/schemas/oversight/ApprovalAction.yaml
+    ApprovalCreate:
+      $ref: ./components/schemas/oversight/ApprovalCreate.yaml
+    ApprovalDecision:
+      $ref: ./components/schemas/oversight/ApprovalDecision.yaml
+    ApprovalList:
+      $ref: ./components/schemas/oversight/ApprovalList.yaml
+    ApprovalStatus:
+      $ref: ./components/schemas/oversight/ApprovalStatus.yaml
+    ConsentStatus:
+      $ref: ./components/schemas/oversight/ConsentStatus.yaml
+    ImpersonationConsentList:
+      $ref: ./components/schemas/oversight/ImpersonationConsentList.yaml
+    ImpersonationAccess:
+      $ref: ./components/schemas/oversight/ImpersonationAccess.yaml
+    ImpersonationConsent:
+      $ref: ./components/schemas/oversight/ImpersonationConsent.yaml
+    ImpersonationConsentApproval:
+      $ref: ./components/schemas/oversight/ImpersonationConsentApproval.yaml
+    ImpersonationConsentCreate:
+      $ref: ./components/schemas/oversight/ImpersonationConsentCreate.yaml
+    ImpersonationSession:
+      $ref: ./components/schemas/oversight/ImpersonationSession.yaml
+    ImpersonationSessionCreate:
+      $ref: ./components/schemas/oversight/ImpersonationSessionCreate.yaml
+    ImpersonationSessionList:
+      $ref: ./components/schemas/oversight/ImpersonationSessionList.yaml
     # Fleet
     AgentStatus:
       $ref: ./components/schemas/fleet/AgentStatus.yaml

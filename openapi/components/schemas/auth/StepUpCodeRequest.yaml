@@ -1,0 +1,10 @@
+type: object
+description: "The request body of `POST /v1/auth/step-up/code`: where to send a code that proves the signed-in person, always one of the account's own addresses."
+required:
+  - channel
+properties:
+  channel:
+    $ref: ./OtpChannel.yaml
+    description: "`email` for the account's email address, `phone` for its phone number."
+examples:
+  - channel: email

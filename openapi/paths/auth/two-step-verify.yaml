@@ -1,0 +1,63 @@
+# Path item for /v1/auth/two-step/verify. Referenced from openapi.yaml.
+post:
+  operationId: verifyTwoStep
+  summary: Complete a sign-in with its second step
+  description: 'Exchanges the second step of a sign-in for the session: six digits from the authenticator app (a code already used, or an earlier one, is refused) or a recovery code (once, with or without its dash, in either case). Five wrong codes end the challenge; wrong codes count in the sign-in throttle. The session goes where the sign-in asked, delivered as it stated.'
+  tags:
+    - Auth
+  security: []
+  requestBody:
+    required: true
+    description: The challenge from the sign-in and the code that completes it.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/TwoStepVerifyRequest.yaml
+  responses:
+    '200':
+      description: Signed in.
+      headers:
+        Set-Cookie:
+          description: With cookie delivery, the refresh token in the cookie of the surface signed in to (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`; `zg_refresh` for a client that named no audience), `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/TokenResponse.yaml
+    '400':
+      description: Malformed body.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: The code is wrong or the challenge does not exist (`invalid_code`), or the challenge expired or was already used (`code_expired`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: '`too_many_attempts`, or `too_many_requests` while the throttle holds the identifier or the source.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable, or no two-step key is configured.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

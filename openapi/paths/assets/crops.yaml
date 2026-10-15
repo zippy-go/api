@@ -11,7 +11,7 @@ parameters:
 post:
   operationId: createAssetCrop
   summary: Cuts a crop from a stored picture
-  description: "Cuts a crop from a stored picture: a new asset deriving from the original, with the rectangle in the original's pixels and the editor's recipe. Owners and managers, or platform staff."
+  description: "Cuts a crop from a stored picture: a new asset deriving from the original, with the rectangle in the original's pixels and the editor's recipe. With the permission that writes the original."
   tags:
     - Assets
   security:
@@ -43,7 +43,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not allowed to write the asset's owner
+      description: '`access_denied` without the permission that writes the file'
       content:
         application/problem+json:
           schema:

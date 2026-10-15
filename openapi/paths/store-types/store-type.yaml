@@ -45,6 +45,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`: a Mission Control token without `location-type:read`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown store type
       content:
@@ -109,7 +115,7 @@ patch:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff
+      description: 'Not platform staff, or `access_denied` without `location-type:write`'
       content:
         application/problem+json:
           schema:

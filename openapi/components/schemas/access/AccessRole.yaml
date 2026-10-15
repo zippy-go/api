@@ -1,0 +1,92 @@
+type: object
+description: A named set of permissions, owned by the platform or by one partner. `maintained` roles (`SUPER_ADMIN`, `OWNER`) are kept by the platform and offer neither editing nor deletion; `default` roles (a partner's `MANAGER`, `STAFF`, `DISPATCHER` and `KITCHEN`, the `AGENT` role of each agent-based Service, and the platform's narrower staff roles) are tuned but neither renamed nor deleted; `custom` roles belong to the realm that defined them.
+required:
+  - id
+  - name
+  - kind
+  - maintained
+  - permissions_editable
+  - deletable
+  - permissions
+  - holders
+  - version
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the role.
+  name:
+    type: string
+    description: The role's name, unique within its owner regardless of case.
+    examples:
+      - STAFF
+  kind:
+    $ref: ./RoleKind.yaml
+    description: '`maintained`, `default` or `custom`.'
+  maintained:
+    type: boolean
+    description: '`true` for the roles the platform keeps (`SUPER_ADMIN`, `OWNER`): a console offers neither editing nor deletion.'
+  permissions_editable:
+    type: boolean
+    description: 'Whether the permissions may be changed: every role but a maintained one.'
+  deletable:
+    type: boolean
+    description: 'Whether the role may be renamed and deleted: custom roles, and deleted only while nobody holds them.'
+  permissions:
+    type: array
+    items:
+      type: string
+    description: The permissions, sorted.
+    examples:
+      - - location:read
+        - partner:access
+  holders:
+    type: integer
+    description: How many grants of the role exist, enabled members or not.
+  version:
+    type: integer
+    description: Raised on every change; the entity tag of reads and the `If-Match` of changes.
+  created_at:
+    type: string
+    format: date-time
+    description: When the role was created, as an RFC 3339 timestamp in UTC.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the role last changed, as an RFC 3339 timestamp in UTC.
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The partner that owns the role; `null` for a platform role.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Service an `AGENT` role was created with; `null` otherwise.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    name: STAFF
+    kind: default
+    maintained: false
+    permissions_editable: true
+    deletable: false
+    permissions:
+      - catalog:read
+      - catalog:stock
+      - dispatch:read
+      - location:read
+      - order:manage
+      - order:read
+      - partner:access
+      - promotion:read
+    holders: 3
+    version: 1
+    created_at: 2026-10-14T08:00:00Z
+    updated_at: 2026-10-14T08:00:00Z
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    service_id: null

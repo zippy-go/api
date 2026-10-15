@@ -1,0 +1,127 @@
+# Path item for /v1/platform/staff. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformStaff
+  summary: List the platform staff
+  description: The platform's members with their roles; `staff:read`. Filterable by status and role.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  parameters:
+    - name: status
+      in: query
+      required: false
+      description: Only enabled or disabled members.
+      schema:
+        $ref: ../../components/schemas/access/MembershipStatus.yaml
+    - name: role_id
+      in: query
+      required: false
+      description: Only members holding this platform role.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The platform members.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/TeamMemberList.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or `access_denied` without `staff:read`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: invitePlatformStaff
+  summary: Invite a person into the platform
+  description: |-
+    Invites a person into the platform; `staff:write`. A platform membership grants nothing by default: roles are granted once the invitation is accepted.
+
+    Granting a platform role, revoking one, turning a platform member's two-step sign-in off and disabling a platform member are four-eyes acts: they are proposed at `POST /v1/platform/approvals` and run when a different platform member approves them.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The person to invite.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/access/PlatformStaffInvite.yaml
+  responses:
+    '201':
+      description: The invitation; the email is on its way.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invitations/Invitation.yaml
+    '400':
+      description: Malformed body.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied` without `staff:write`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: Already a member or already invited.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store or mail delivery is unavailable.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

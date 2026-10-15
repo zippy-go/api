@@ -1,0 +1,46 @@
+# Path item for /v1/auth/two-step/setup. Referenced from openapi.yaml.
+post:
+  operationId: beginTwoStep
+  summary: Start setting up an authenticator
+  description: 'Starts setting up an authenticator: a new secret, as text and as an `otpauth://` link the console shows as a QR code, issued as "ZippyGo Mission Control" or "ZippyGo Partner console". Sign-in does not change until `POST /v1/auth/two-step/confirm` proves it.'
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The secret to add to the app.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/TwoStepSetup.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`conflict`: two-step sign-in is already on.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: '`two_step_unavailable`: this deployment holds no two-step key; or a store is unavailable.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

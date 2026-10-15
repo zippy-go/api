@@ -1,0 +1,19 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a92",
+  "type": "access.grant.revoked",
+  "version": 1,
+  "occurred_at": "2026-10-15T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "grant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71",
+    "membership_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32",
+    "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a25",
+    "role_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "scope": {
+      "kind": "location",
+      "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40",
+      "service_id": null
+    }
+  }
+}

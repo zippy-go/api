@@ -59,12 +59,16 @@ patch:
   summary: Update a partner
   description: |
     Changes the members of the partner that are present in the body and
-    returns the partner. Owners and managers may change the profile, the
-    legal identity (`legal_name`, `registration_number`, `gstin`, `pan`,
-    `registered_address`) and the `contacts`; `status`, `kind` and
-    `gst_unregistered` may only be changed by the platform realm, `kind` and
-    `gst_unregistered` with a `reason`. A caller without the role for a
-    member in the body receives `403` (`forbidden`) and nothing is changed.
+    returns the partner. Changing the profile, the legal identity
+    (`legal_name`, `registration_number`, `gstin`, `pan`,
+    `registered_address`) and the `contacts` needs `partner:profile:write`
+    (platform staff `partner:write`); `status`, `kind` and
+    `gst_unregistered` may only be changed by the platform realm: `kind` and
+    `gst_unregistered` with `partner:write` and a `reason`, activating a
+    pending partner with `partner:approve`, any other status with
+    `partner:write`. A caller without the permission for a member in the
+    body receives `403` (`access_denied`, or `forbidden` for a member only
+    the platform realm changes) and nothing is changed.
 
     `status` follows the lifecycle: activating a pending partner is refused
     with `409` (`activation_blocked`) naming every blocker (read them first
@@ -112,7 +116,7 @@ patch:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller's role does not allow the change (`forbidden`), for example a member who is neither owner nor manager, or a `status` sent by anyone outside the platform realm.
+      description: The caller lacks the permission for a member in the body (`access_denied`), or sent `status` from outside the platform realm (`forbidden`).
       content:
         application/problem+json:
           schema:

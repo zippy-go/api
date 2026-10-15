@@ -1,0 +1,83 @@
+type: object
+description: A member of a partner's team, or of the platform's staff, with their status and every grant. `role` is the most senior default role held, or `custom`; the grants carry the whole truth.
+required:
+  - id
+  - partner_id
+  - user
+  - status
+  - role
+  - grants
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the membership.
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner, or the platform organisation for platform staff.
+  user:
+    $ref: ../auth/User.yaml
+    description: The person.
+  status:
+    $ref: ./MembershipStatus.yaml
+    description: Whether the membership admits the member.
+  role:
+    $ref: ../memberships/MembershipRole.yaml
+    description: The most senior default role held, or `custom`.
+  grants:
+    type: array
+    items:
+      $ref: ./AccessGrant.yaml
+    description: Every grant, each with its scope and the permissions held there.
+  created_at:
+    type: string
+    format: date-time
+    description: When the membership was created, as an RFC 3339 timestamp in UTC.
+  disabled_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the membership was disabled, while it is; `null` otherwise.
+  display_name:
+    type:
+      - string
+      - 'null'
+    description: "How the member is shown in this realm: the name set for the membership, else the user's own."
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    user:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a25
+      email: staff@example.com
+      phone: null
+      display_name: User 25
+      created_at: 2026-10-15T08:55:00Z
+    status: enabled
+    role: staff
+    grants:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71
+        role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        role_name: STAFF
+        role_kind: default
+        scope:
+          kind: location
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+          service_id: null
+        permissions:
+          - catalog:read
+          - catalog:stock
+          - dispatch:read
+          - location:read
+          - order:manage
+          - order:read
+          - partner:access
+          - promotion:read
+        granted_at: 2026-10-15T09:00:00Z
+        granted_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    created_at: 2026-10-15T09:00:00Z
+    disabled_at: null
+    display_name: User 25 (front counter)

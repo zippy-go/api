@@ -43,7 +43,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff
+      description: 'Not platform staff, or `access_denied` without `zone:write`'
       content:
         application/problem+json:
           schema:
@@ -106,7 +106,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff
+      description: 'Not platform staff, or `access_denied` without `zone:write`'
       content:
         application/problem+json:
           schema:

@@ -2,13 +2,17 @@ type: object
 description: >-
   Who performed an audited act. A signed-in person, with the membership
   they acted under and their name frozen at the time, or the system for
-  timers and provider notices.
+  timers and provider notices. While a platform member views a partner's
+  console with an owner's consent, the member is the actor and the owner
+  acted as is `on_behalf_of_user_id`; the owner is never recorded as the
+  actor.
 required:
   - kind
   - user_id
   - membership_id
   - partner_id
   - label
+  - on_behalf_of_user_id
 properties:
   kind:
     type: string
@@ -47,12 +51,21 @@ properties:
       - string
       - 'null'
     maxLength: 200
-    description: The actor's name as it was at the time, when known.
+    description: The actor's name as it was at the time; for a person recorded without one, their name now when the reader may see it.
     examples:
       - Platform admin
+  on_behalf_of_user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The person the actor acted as, while impersonating them with their consent; `null` otherwise.
+    examples:
+      - null
 examples:
   - kind: user
     user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     membership_id: null
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
     label: null
+    on_behalf_of_user_id: null

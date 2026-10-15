@@ -1,0 +1,22 @@
+type: object
+description: 'Ten recovery codes, shown once: each one passes the second step of a sign-in once, for when the phone with the authenticator is lost. Issuing new codes makes every earlier code useless.'
+required:
+  - recovery_codes
+properties:
+  recovery_codes:
+    type: array
+    items:
+      type: string
+    description: 'The ten codes: ten lower-case letters and digits each, shown with a dash after the fifth. A code is accepted with or without the dash and in either case.'
+examples:
+  - recovery_codes:
+      - pbu56-8s5f4
+      - 7wv6h-7w59g
+      - 5u5g4-amvb9
+      - nd8es-865f0
+      - wpyys-nhdh7
+      - n0qxm-69vcq
+      - b0v46-pqr0y
+      - 67kz6-5nxmt
+      - r3yrc-905fm
+      - ahuu0-7cxuk

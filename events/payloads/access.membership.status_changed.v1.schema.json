@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/access.membership.status_changed.v1.schema.json",
+  "title": "AccessMembershipStatusChangedPayload",
+  "description": "Payload of `access.membership.status_changed` version 1: a membership was disabled or enabled. The envelope's `partner_id` is the partner, or `null` for a platform membership. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "membership_id",
+    "user_id",
+    "status"
+  ],
+  "properties": {
+    "membership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The membership.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32"
+      ]
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The member.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a25"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "enabled",
+        "disabled"
+      ],
+      "description": "The status after the change. Consumers must tolerate values they do not know.",
+      "examples": [
+        "disabled"
+      ]
+    }
+  }
+}

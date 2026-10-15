@@ -1,0 +1,8 @@
+type: string
+description: "Who may hold a permission: `platform` (platform roles), `partner` (a partner's roles) or `customer`. Clients must tolerate values they do not know."
+enum:
+  - platform
+  - partner
+  - customer
+examples:
+  - partner

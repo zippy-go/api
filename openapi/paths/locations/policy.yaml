@@ -30,6 +30,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller lacks `location:read` at this Location (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown partner or location
       content:
@@ -57,7 +63,7 @@ get:
 put:
   operationId: putLocationPolicy
   summary: Saves a new version of the location's service policy layer
-  description: Saves a new version of the location's service policy layer; owners and managers.
+  description: Saves a new version of the location's service policy layer; `location:write` at the Location.
   tags:
     - Partner policy
   security:
@@ -89,7 +95,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager
+      description: The caller lacks `location:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
       content:
         application/problem+json:
           schema:

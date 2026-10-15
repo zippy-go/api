@@ -1,24 +1,28 @@
 type: object
 description: |
-  A session, as returned by the sign-in operations and by
-  `POST /v1/auth/refresh`: the access token to send as
-  `Authorization: Bearer <access_token>`, how long it is valid, the refresh
-  token for native clients and the signed-in user. The refresh token of a
-  browser client is set in the `zg_refresh` cookie instead and
-  `refresh_token` is `null`.
+  A session, as returned by the sign-in operations, by
+  `POST /v1/auth/two-step/verify` and by `POST /v1/auth/refresh`: the
+  access token to send as `Authorization: Bearer <access_token>`, how long
+  it is valid, the surface it is for, the refresh token when the client
+  chose body delivery, and the signed-in user. With cookie delivery the
+  refresh token is set in the surface's `httpOnly` cookie instead and
+  `refresh_token` is `null`. A session is bound to one surface for good:
+  its tokens are refused by every other surface.
 required:
   - access_token
   - token_type
   - expires_in
   - refresh_token
   - user
+  - audience
+  - two_step_setup_required
 properties:
   access_token:
     type: string
     minLength: 1
-    description: A JSON Web Token signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
+    description: A JSON Web Token typed `at+jwt` and signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
     examples:
-      - eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InppcHB5Z28iLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+      - eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6ImF0K2p3dCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InBhcnRuZXIiLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
   token_type:
     type: string
     const: Bearer
@@ -28,7 +32,7 @@ properties:
   expires_in:
     type: integer
     minimum: 1
-    description: The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present.
+    description: The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present. The refresh token's lifetime is never stated.
     examples:
       - 900
   refresh_token:
@@ -36,14 +40,23 @@ properties:
       - string
       - 'null'
     description: >-
-      The refresh token for `POST /v1/auth/refresh`, present only for native clients that sent `X-Client-Type: native` when signing in. `null` for browsers, whose refresh token is in the `zg_refresh` cookie.
+      The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body` (or, without an audience, sent `X-Client-Type: native`). `null` with cookie delivery, whose refresh token is in the surface's cookie.
     examples:
       - c2FtcGxlLXJlZnJlc2gtdG9rZW4
   user:
     $ref: ./User.yaml
     description: The user the session belongs to.
+  audience:
+    $ref: ./Audience.yaml
+    description: The surface the session is for, the `aud` claim of its access tokens.
+  two_step_setup_required:
+    type: boolean
+    description: >-
+      `true` when the session reaches the two-step set-up only: platform staff without a second factor set one up (`POST /v1/auth/two-step/setup` and `/confirm`) before Mission Control opens; every other operation answers `403` (`two_step_setup_required`) until then. `false` otherwise.
+    examples:
+      - false
 examples:
-  - access_token: eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InppcHB5Z28iLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+  - access_token: eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6ImF0K2p3dCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InBhcnRuZXIiLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
     token_type: Bearer
     expires_in: 900
     refresh_token: null
@@ -53,3 +66,5 @@ examples:
       phone: null
       display_name: User 20
       created_at: 2026-10-14T08:00:00Z
+    audience: partner
+    two_step_setup_required: false

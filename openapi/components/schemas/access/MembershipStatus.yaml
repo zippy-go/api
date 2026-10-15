@@ -1,0 +1,7 @@
+type: string
+description: 'Whether a membership admits its holder: `enabled`, or `disabled` (the member cannot enter the realm and keeps their grants for re-enabling). Clients must tolerate values they do not know.'
+enum:
+  - enabled
+  - disabled
+examples:
+  - enabled

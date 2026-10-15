@@ -1,0 +1,36 @@
+type: object
+description: 'The request body of `POST /v1/platform/approvals`: the act, the platform membership it is about and its parameters.'
+required:
+  - action
+  - membership_id
+properties:
+  action:
+    $ref: ./ApprovalAction.yaml
+    description: The act proposed.
+  membership_id:
+    type: string
+    format: uuid
+    description: The platform membership the act is about.
+  grant_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: 'For `revoke_platform_role`: the grant to revoke.'
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, shown to whoever decides.
+  role_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: 'For `grant_platform_role`: the platform role to grant.'
+examples:
+  - action: grant_platform_role
+    membership_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a33
+    role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a74
+    grant_id: null
+    reason: Joins the finance team on Monday

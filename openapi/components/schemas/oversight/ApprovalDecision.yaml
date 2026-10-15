@@ -1,0 +1,10 @@
+type: object
+description: The optional request body of the decisions on a proposal.
+properties:
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, as the decider says; the audit log keeps it.
+examples:
+  - reason: Confirmed with the finance lead

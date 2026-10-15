@@ -22,6 +22,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Platform staff without `partner:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown, or not visible to the caller
       content:
@@ -49,7 +55,7 @@ get:
 put:
   operationId: putPartnerSchedule
   summary: Saves a new version of the partner's schedule layer (the default week of its locations)
-  description: Saves a new version of the partner's schedule layer (the default week of its locations); owners and managers.
+  description: Saves a new version of the partner's schedule layer (the default week of its locations); `location:write` across the partner.
   tags:
     - Partner policy
   security:
@@ -81,7 +87,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager
+      description: The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
       content:
         application/problem+json:
           schema:

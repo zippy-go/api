@@ -1,0 +1,29 @@
+type: object
+description: One permission of the catalogue, `<entity>:<action>`, with the pools that may hold it.
+required:
+  - name
+  - summary
+  - partner
+  - platform
+properties:
+  name:
+    type: string
+    description: The permission's name, `<entity>:<action>`.
+    examples:
+      - location:write
+  summary:
+    type: string
+    description: What the permission allows, in a sentence a role editor shows.
+    examples:
+      - Add and change Locations
+  partner:
+    type: boolean
+    description: Whether a partner's roles may contain it.
+  platform:
+    type: boolean
+    description: Whether platform roles may contain it.
+examples:
+  - name: location:write
+    summary: Add and change Locations
+    partner: true
+    platform: true

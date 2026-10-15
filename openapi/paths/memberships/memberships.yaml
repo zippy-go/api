@@ -5,9 +5,10 @@ get:
   operationId: listMemberships
   summary: List members
   description: |
-    Returns the partner's members with their roles, oldest first. Any
-    member of the partner and the platform realm may read them. The list
-    is not paginated. Members join through invitations
+    Returns the partner's members with their role labels, oldest first;
+    reading them needs `staff:read`. The list is not paginated. The grants
+    behind each label, per scope, are under
+    `GET /v1/partners/{partner_id}/members`. Members join through invitations
     (`POST /v1/partners/{partner_id}/invitations`); the user who created
     the partner is its first owner.
   tags:
@@ -23,6 +24,12 @@ get:
             $ref: ../../components/schemas/memberships/MembershipList.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller lacks `staff:read` (`access_denied`).
       content:
         application/problem+json:
           schema:

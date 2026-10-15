@@ -1,0 +1,31 @@
+type: object
+description: 'Where a grant applies: `platform` (platform staff only), `partner` (the whole partner and everything in it), `location` (one Location) or `service` (one Service). The identifiers that do not apply to the kind are `null`.'
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./ScopeKind.yaml
+    description: The kind of scope.
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location, for `location`.
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The partner, for every kind but `platform`.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Service, for `service`.
+examples:
+  - kind: location
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    service_id: null

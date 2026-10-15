@@ -3,25 +3,39 @@ post:
   operationId: signOut
   summary: Sign out
   description: |
-    Revokes the session the access token belongs to (its `sid` claim): the
-    session's refresh token can no longer be used, and for browsers the
-    `zg_refresh` cookie is cleared. The access token itself stays valid
-    until its `exp`, at most 15 minutes; clients discard it. Other sessions
-    of the same user are not affected.
+    Ends the current session, or with `everywhere` every session of the
+    user on every surface, and clears the refresh cookie. The answer is `204`
+    whether or not the session still existed, so signing out never fails for
+    a client.
+
+    The session is the one the bearer access token belongs to (its `sid`
+    claim) or, when the access token has expired, the one the refresh cookie
+    (named by `audience`) or the body's `refresh_token` belongs to. Its
+    refresh token can no longer be used; a Mission Control access token is
+    refused from the next request, other access tokens stay valid until their
+    `exp`, at most 15 minutes, and clients discard them.
   tags:
     - Auth
   security:
+    - {}
     - Bearer: []
+  requestBody:
+    required: false
+    description: Optional. `everywhere` to end every session; the surface or the refresh token when the access token has expired.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/SignOutRequest.yaml
   responses:
     '204':
-      description: The session was revoked.
+      description: The session (or every session) ended, or there was nothing to end.
       headers:
         Set-Cookie:
-          description: For browsers, clears the refresh token cookie (`zg_refresh=; Path=/v1/auth; Max-Age=0; HttpOnly; Secure; SameSite=Strict`).
+          description: Clears the refresh cookie (`<name>=; Path=/v1/auth; Max-Age=0; HttpOnly; Secure; SameSite=Strict`).
           schema:
             type: string
-    '401':
-      description: No valid access token was sent (`unauthenticated`).
+    '400':
+      description: The body is not a readable `SignOutRequest` (`validation_failed`).
       content:
         application/problem+json:
           schema:

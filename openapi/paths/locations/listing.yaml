@@ -12,7 +12,7 @@ parameters:
 put:
   operationId: putLocationListing
   summary: Set how a store appears
-  description: 'Replaces how the store appears: reviews on or off, search tags (lower cased and de-duplicated), and the highlights, which only platform staff set. Owners and managers.'
+  description: "Replaces how the store appears: reviews on or off, search tags (lower cased and de-duplicated), and the highlights, which only platform staff set. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not change Locations, or highlights set by a member.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`), or a member set the highlights, which are platform staff''s.'
       content:
         application/problem+json:
           schema:

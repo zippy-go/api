@@ -48,7 +48,8 @@ with the identifiers when it is needed.
 | `fleet.agent.online`  | 1       | An agent went online in one of the partner's services and is reporting. Payload: `agent_id`, `partner_id`, `at`. |
 | `fleet.agent.offline` | 1       | An agent went offline, by signing off or by not reporting for too long. Payload: `agent_id`, `partner_id`, `last_seen_at`. |
 | `identity.user.registered` | 1 | A user was created, by a first one-time code or by accepting an invitation. Not scoped to a partner. Payload: `user_id`, `channel`. |
-| `identity.session.created` | 1 | A user signed in and a session was created. Not scoped to a partner. Payload: `user_id`, `session_id`. |
+| `identity.session.created` | 1 | A user signed in and a session was created. Not scoped to a partner. Payload: `user_id`, `session_id`, and the optional `audience`, `client`, `method`. |
+| `identity.sign_in.failed` | 1 | A sign-in or a proof of the signed-in person failed, with its true reason, for detecting credential stuffing. Not scoped to a partner. Payload: `identifier_hash`, `audience`, `reason`, `source`. |
 | `identity.invitation.sent` | 1 | An invitation to join a partner was created and its email is being sent. Payload: `invitation_id`, `partner_id`, `role`. |
 | `identity.invitation.accepted` | 1 | An invitation was accepted and became a membership. Payload: `invitation_id`, `partner_id`, `user_id`. |
 | `tenancy.partner.created` | 1 | A partner was created, `pending`, with its creator as first owner. Payload: `partner_id`, `kind`, `created_by`. |
@@ -70,6 +71,12 @@ with the identifiers when it is needed.
 | `tenancy.membership.created` | 1 | A user became a member of a partner. Payload: `membership_id`, `partner_id`, `user_id`, `role`. |
 | `tenancy.service.updated` | 1 | A partner's service was registered, enabled, disabled, configured, switched on or off at a location, or repriced. Payload: `partner_id`, `kind`, `status`, `service_id`, `name`, `changed`, `previous_status`, `pricing_version`. |
 | `tenancy.plan.changed` | 1 | A partner's plan changed; services of kinds it lacks were disabled. Payload: `partner_id`, `plan`, `previous_plan`, `trial_ended`, `disabled_service_ids`. |
+| `access.grant.granted` | 1 | A role was granted to a member at a scope. Payload: `grant_id`, `membership_id`, `user_id`, `role_id`, `scope`. |
+| `access.grant.revoked` | 1 | A grant was revoked. Payload: `grant_id`, `membership_id`, `user_id`, `role_id`, `scope`. |
+| `access.membership.status_changed` | 1 | A membership was disabled or enabled. Payload: `membership_id`, `user_id`, `status`. |
+| `access.membership.removed` | 1 | A membership was removed and its grants revoked. Payload: `membership_id`, `user_id`. |
+| `access.role.changed` | 1 | A role was defined, changed or deleted. Payload: `role_id`, `change`. |
+| `access.envelope.changed` | 1 | What the platform withholds from a partner's entitlements changed. Payload: `partner_id`, `withheld`. |
 
 ## Consuming events
 

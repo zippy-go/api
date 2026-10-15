@@ -12,7 +12,7 @@ parameters:
 put:
   operationId: putLocationFulfilment
   summary: Set how a store's orders leave it
-  description: "Replaces how orders leave the store: a method's presence enables it, own agents need the Partner's delivery Service, dine-in needs tables (not yet), and switching delivery off discards its zone. A branch has no fulfilment. Owners and managers."
+  description: "Replaces how orders leave the store: a method's presence enables it, own agents need the Partner's delivery Service, dine-in needs tables (not yet), and switching delivery off discards its zone. A branch has no fulfilment. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not change Locations, or `not_in_plan` for the platform fleet.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`), or the platform fleet is not in the plan (`not_in_plan`).'
       content:
         application/problem+json:
           schema:

@@ -1,5 +1,5 @@
 type: object
-description: A list of a partner's invitations, the response of `GET /v1/partners/{partner_id}/invitations`.
+description: A list of invitations, the response of `GET /v1/partners/{partner_id}/invitations` and `GET /v1/platform/invitations`.
 required:
   - items
 properties:
@@ -17,3 +17,7 @@ examples:
         status: pending
         expires_at: 2026-10-21T08:15:00Z
         created_at: 2026-10-14T08:15:00Z
+        role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a73
+        location_ids: []
+        service_ids: []
+        display_name: null

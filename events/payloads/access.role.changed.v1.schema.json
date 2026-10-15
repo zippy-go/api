@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/access.role.changed.v1.schema.json",
+  "title": "AccessRoleChangedPayload",
+  "description": "Payload of `access.role.changed` version 1: a role was defined, changed or deleted. Read the role with the API for its name and permissions. The envelope's `partner_id` is the partner that owns the role, or `null` for a platform role. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "role_id",
+    "change"
+  ],
+  "properties": {
+    "role_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The role.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "defined",
+        "updated",
+        "deleted"
+      ],
+      "description": "What happened: `defined`, `updated` (renamed or new permissions) or `deleted`. Consumers must tolerate values they do not know.",
+      "examples": [
+        "updated"
+      ]
+    }
+  }
+}

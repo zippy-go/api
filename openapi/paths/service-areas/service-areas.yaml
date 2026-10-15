@@ -46,6 +46,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`: a Mission Control token without `zone:read`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '503':
       description: A store is unavailable
       content:
@@ -99,7 +105,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff
+      description: 'Not platform staff, or `access_denied` without `zone:write`'
       content:
         application/problem+json:
           schema:

@@ -1,18 +1,23 @@
 type: string
 description: |
-  The role a member holds in a partner. `owner` may do everything,
-  including managing members and the partner record; `manager` manages
-  locations, services and invitations; `dispatcher` works with deliveries
-  and the fleet; `kitchen` prepares orders; `staff` handles the day-to-day
-  at a location. What each role may call is stated on every operation; the
-  roles whose domains are not released yet are listed so that invitations
-  can be sent ahead of them. Clients must tolerate values they do not know,
-  because a new role is an additive change.
+  The role a member holds in a partner, as a single label. `owner` may do
+  everything the partner is entitled to, including managing members and
+  roles; `manager`, `dispatcher`, `kitchen` and `staff` are the default
+  roles every partner receives and may tune; `custom` stands for a role
+  the partner defined, or for access held only at chosen Locations or
+  Services. When a member holds several roles the label is the most senior
+  one. What a member may do is decided by their grants and the permissions
+  in them, listed under the `Access` tag, never by this label; it is kept so
+  that every operation that answered with a role still does. In a request
+  (an invitation), `custom` is refused: name the role with `role_id`.
+  Clients must tolerate values they do not know, because a new role is an
+  additive change.
 enum:
   - owner
   - manager
   - dispatcher
   - kitchen
   - staff
+  - custom
 examples:
   - owner

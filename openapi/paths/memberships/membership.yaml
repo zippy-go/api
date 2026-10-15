@@ -13,11 +13,13 @@ delete:
   operationId: removeMembership
   summary: Remove a member
   description: |
-    Removes a member from the partner. Only owners may remove members,
-    including themselves, but the last owner cannot be removed: the request
-    answers `409` (`conflict`) and the partner keeps its owner. The removed
-    user's access tokens carry the membership until they expire, at most
-    15 minutes; the API stops honouring it at once.
+    Removes a member from the partner, revoking every grant into the
+    access history; removing needs `staff:write`. The last enabled owner
+    cannot be removed: the request answers `409` (`conflict`) and the
+    partner keeps its owner. The removed user's access tokens carry the
+    membership until they expire, at most 15 minutes; the API stops
+    honouring it at once. `DELETE /v1/partners/{partner_id}/members/{membership_id}`
+    does the same and answers `last_owner`.
   tags:
     - Memberships
   security:
@@ -32,7 +34,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is not an owner of the partner (`forbidden`).
+      description: The caller lacks `staff:write` (`access_denied`).
       content:
         application/problem+json:
           schema:

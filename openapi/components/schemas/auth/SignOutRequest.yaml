@@ -1,0 +1,20 @@
+type: object
+description: The optional request body of `POST /v1/auth/sign-out`. Without a body the operation ends the session of the bearer token, or of the refresh cookie a browser sends.
+properties:
+  audience:
+    oneOf:
+      - $ref: ./Audience.yaml
+      - type: 'null'
+    description: 'For cookie delivery: the surface whose refresh cookie to read and clear.'
+  everywhere:
+    type: boolean
+    description: '`true` ends every session of the user on every surface, not only this one.'
+  refresh_token:
+    type:
+      - string
+      - 'null'
+    description: 'For body delivery: the refresh token, so an app whose access token expired can still end its session.'
+examples:
+  - everywhere: true
+    audience: partner
+    refresh_token: null

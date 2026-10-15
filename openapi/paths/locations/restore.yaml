@@ -12,7 +12,7 @@ parameters:
 post:
   operationId: restoreLocation
   summary: Restore a location from the bin
-  description: Restores a Location from the bin exactly as it was. Owners and managers.
+  description: "Restores a Location from the bin exactly as it was. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -31,7 +31,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not restore Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

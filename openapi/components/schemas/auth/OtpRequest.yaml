@@ -1,6 +1,6 @@
 type: object
 description: >-
-  The request body of `POST /v1/auth/otp/request`: where to send a one-time code.
+  The request body of `POST /v1/auth/otp/request`: where to send a one-time code, and the surface the code signs in to.
 required:
   - channel
   - identifier
@@ -15,6 +15,13 @@ properties:
     description: The email address when `channel` is `email`, or the phone number in E.164 format (a `+`, the country code and the number, no spaces) when `channel` is `phone`.
     examples:
       - owner@example.com
+  audience:
+    oneOf:
+      - $ref: ./Audience.yaml
+      - type: 'null'
+    description: >-
+      The surface the code signs in to: `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`validation_failed` with `audience_not_allowed` on `/audience`). Omitted, the code signs in to the Partner console, as in step 1.
 examples:
   - channel: email
     identifier: owner@example.com
+    audience: partner

@@ -38,6 +38,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:
@@ -65,7 +71,7 @@ get:
 put:
   operationId: putServiceLocation
   summary: Switch a service on at a location
-  description: Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. Owners and managers; platform staff with a reason.
+  description: "Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. `service:write`; platform staff with `partner:write` and a reason."
   tags:
     - Services
   security:
@@ -97,7 +103,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager.
+      description: 'The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:
@@ -129,7 +135,7 @@ put:
 delete:
   operationId: deleteServiceLocation
   summary: Switch a service off at a location
-  description: Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. Owners and managers; platform staff with a reason.
+  description: "Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. `service:write`; platform staff with `partner:write` and a reason."
   tags:
     - Services
   security:
@@ -161,7 +167,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager.
+      description: 'The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

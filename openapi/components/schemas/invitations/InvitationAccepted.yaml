@@ -2,7 +2,8 @@ type: object
 description: |
   The response of `POST /v1/invitations/{token}/accept`: the session of the
   person who accepted, signed in the same way as after a one-time code, and
-  the membership the invitation turned into.
+  the membership the invitation turned into. When the person has two-step
+  sign-in on, the answer is an `InvitationSecondStep` with `202` instead.
 required:
   - token
   - membership
@@ -15,7 +16,7 @@ properties:
     description: The new membership in the partner that sent the invitation.
 examples:
   - token:
-      access_token: eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InppcHB5Z28iLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
+      access_token: eyJhbGciOiJFZERTQSIsImtpZCI6IjAxOTJiNmY0LTliMGEtN2NkZS04ZjNhLTZkMmMxZTRiOWE1MCIsInR5cCI6ImF0K2p3dCJ9.eyJzdWIiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMjAiLCJpc3MiOiJodHRwczovL3NhbmRib3guYXBpLnppcHB5Z28uZXhhbXBsZSIsImF1ZCI6InBhcnRuZXIiLCJpYXQiOjE3OTE5NjQ4MDAsImV4cCI6MTc5MTk2NTcwMCwianRpIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTYwIiwic2lkIjoiMDE5MmI2ZjQtOWIwYS03Y2RlLThmM2EtNmQyYzFlNGI5YTIyIiwibWVtYmVyc2hpcHMiOlt7InAiOiIwMTkyYjZmNC05YjBhLTdjZGUtOGYzYS02ZDJjMWU0YjlhMDIiLCJyIjoib3duZXIifV0sInBsYXRmb3JtIjpbXX0.cGxhY2Vob2xkZXItc2lnbmF0dXJl
       token_type: Bearer
       expires_in: 900
       refresh_token: null
@@ -25,6 +26,8 @@ examples:
         phone: null
         display_name: User 21
         created_at: 2026-10-14T08:20:00Z
+      audience: partner
+      two_step_setup_required: false
     membership:
       id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32
       partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02

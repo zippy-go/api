@@ -5,8 +5,9 @@ post:
   operationId: createLocation
   summary: Create a location
   description: |
-    Adds a location to the partner. Owners and managers may create
-    locations; other members receive `403` (`forbidden`). The location
+    Adds a location to the partner. It needs `location:write` across the
+    whole partner; other members receive `403` (`access_denied`), and a
+    partner whose entitlements lack it `403` (`not_enabled_for_partner`). The location
     starts `active`. Publishes `tenancy.location.created`.
   tags:
     - Locations
@@ -39,7 +40,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is a member but neither owner nor manager (`forbidden`).
+      description: The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
       content:
         application/problem+json:
           schema:
@@ -78,8 +79,10 @@ get:
   operationId: listLocations
   summary: List locations
   description: |
-    Returns the partner's locations, oldest first, in every status. Any
-    member of the partner and the platform realm may read them. The list
+    Returns the partner's locations, oldest first, in every status: every
+    Location for a member holding `location:read` across the partner, and
+    only the Locations their grants name for a member holding it at chosen
+    Locations. The list
     is not paginated.
   tags:
     - Locations
@@ -94,6 +97,12 @@ get:
             $ref: ../../components/schemas/locations/LocationList.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller lacks `location:read` (`access_denied`), or holds it at no Location (`no_location_assigned`).
       content:
         application/problem+json:
           schema:

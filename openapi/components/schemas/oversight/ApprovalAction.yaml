@@ -1,0 +1,9 @@
+type: string
+description: "An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member. Clients must tolerate values they do not know."
+enum:
+  - grant_platform_role
+  - revoke_platform_role
+  - reset_platform_two_step
+  - disable_platform_member
+examples:
+  - grant_platform_role

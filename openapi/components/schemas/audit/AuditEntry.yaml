@@ -113,7 +113,8 @@ examples:
       user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
       membership_id: null
       partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a00
-      label: null
+      label: Platform admin
+      on_behalf_of_user_id: null
     client_address: 203.0.113.9
     action: tenancy.partner.status_changed
     target:

@@ -1,0 +1,14 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90",
+  "type": "identity.sign_in.failed",
+  "version": 1,
+  "occurred_at": "2026-10-15T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "identifier_hash": "3f1d5c8a9b0e2d4f6a7c8b9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b",
+    "audience": "partner",
+    "reason": "wrong_password",
+    "source": "203.0.113.9"
+  }
+}

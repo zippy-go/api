@@ -22,19 +22,19 @@ and its status is part of the contract.
 
 | Status | Codes |
 | --- | --- |
-| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak`, `gstin_invalid`, `pan_invalid`, `ifsc_invalid` or one of the `filter_*` and `sort_*` codes), `channel_unknown` |
-| 401 | `unauthenticated`, `invalid_code`, `code_expired` |
-| 403 | `forbidden`, `not_in_plan` |
+| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak`, `gstin_invalid`, `pan_invalid`, `ifsc_invalid`, `delivery_required`, `code_invalid`, `audience_not_allowed` or one of the `filter_*` and `sort_*` codes), `channel_unknown`, `unknown_permission`, `invalid_scope` |
+| 401 | `unauthenticated`, `authentication_failed`, `invalid_code`, `code_expired` |
+| 403 | `forbidden`, `not_in_plan`, `access_denied` and `not_enabled_for_partner` (each naming the permission), `permission_escalation`, `no_location_assigned`, `step_up_required`, `two_step_setup_required`, `self_approval`, `consent_required`, `impersonation_read_only` |
 | 404 | `not_found`, also for another tenant's record, identical to an id that never existed |
 | 405 | `method_not_allowed` |
-| 409 | `conflict`, `illegal_transition`, `locations_stranded`, `sign_in_closed`, `idempotency_key_reuse`, `asset_not_usable`, `activation_blocked` (each blocker in `errors` with a code such as `document_missing` or `no_fulfilment`), `partner_archived`, `zone_not_serving`, `vertical_not_offered`, `service_required`, `locations_open` |
-| 410 | `invitation_invalid`, `version_retired` |
+| 409 | `conflict`, `illegal_transition`, `locations_stranded`, `sign_in_closed`, `idempotency_key_reuse`, `asset_not_usable`, `activation_blocked` (each blocker in `errors` with a code such as `document_missing` or `no_fulfilment`), `partner_archived`, `zone_not_serving`, `vertical_not_offered`, `service_required`, `locations_open`; access: `permission_not_grantable`, `partner_cannot_sign_in`, `outside_entitlements`, `cross_tenant_role`, `cross_tenant_scope`, `role_maintained`, `role_name_reserved`, `role_in_use`, `last_owner`, `cannot_disable_self`, `two_step_self`, `identifier_taken`, `approval_required`, `approval_voided`, `approval_decided` |
+| 410 | `invitation_invalid`, `version_retired`, `link_invalid`, `approval_expired` |
 | 412 | `precondition_failed` |
 | 415 | `unsupported_media_type` |
 | 422 | `unprocessable` (well formed but cannot be processed as a whole; `errors` points at the offending parts) |
 | 429 | `rate_limited`, `too_many_requests`, `too_many_attempts`, each with `Retry-After` |
 | 500 | `internal` (nothing about the cause; logged under `instance`) |
-| 503 | `unavailable`, with `Retry-After` when the duration is known |
+| 503 | `unavailable`, with `Retry-After` when the duration is known; `two_step_unavailable` |
 
 The full catalogue with every message template is
 [`errors/catalog.yaml`](https://github.com/zippy-go/api/blob/main/errors/catalog.yaml).

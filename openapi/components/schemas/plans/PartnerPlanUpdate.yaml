@@ -16,7 +16,7 @@ properties:
     oneOf:
       - $ref: ./Plan.yaml
       - type: 'null'
-    description: The plan to move to when the trial ends; the owner or platform staff.
+    description: The plan to move to when the trial ends; `plan:write` (the owner), or platform staff.
   reason:
     type:
       - string

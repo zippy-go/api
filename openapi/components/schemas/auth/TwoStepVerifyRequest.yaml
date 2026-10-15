@@ -1,0 +1,18 @@
+type: object
+description: 'The request body of `POST /v1/auth/two-step/verify`: the waiting sign-in and the code that completes it.'
+required:
+  - challenge_id
+  - code
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: The `challenge_id` of the `TwoStepChallenge` the sign-in answered with.
+  code:
+    type: string
+    description: Six digits from the authenticator app, or one recovery code, with or without its dash and in either case.
+    examples:
+      - '123456'
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a26
+    code: '123456'

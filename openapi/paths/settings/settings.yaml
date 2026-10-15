@@ -20,6 +20,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`: a Mission Control token without `setting:read`'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '503':
       description: A store is unavailable
       content:

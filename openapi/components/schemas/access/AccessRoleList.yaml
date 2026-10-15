@@ -1,0 +1,33 @@
+type: object
+description: The roles of one owner, the platform or a partner, each with how many hold it.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AccessRole.yaml
+    description: Maintained and default roles first, then the owner's own by name.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        name: STAFF
+        kind: default
+        maintained: false
+        permissions_editable: true
+        deletable: false
+        permissions:
+          - catalog:read
+          - catalog:stock
+          - dispatch:read
+          - location:read
+          - order:manage
+          - order:read
+          - partner:access
+          - promotion:read
+        holders: 3
+        version: 1
+        created_at: 2026-10-14T08:00:00Z
+        updated_at: 2026-10-14T08:00:00Z
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        service_id: null

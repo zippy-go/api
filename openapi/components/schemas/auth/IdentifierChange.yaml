@@ -1,0 +1,21 @@
+type: object
+description: A pending change of the sign-in email address or phone number, the response of `POST /v1/auth/identifier-change`. The account is unchanged until the code sent to the new address passes at `POST /v1/auth/identifier-change/confirm`.
+required:
+  - channel
+  - identifier
+  - expires_at
+properties:
+  channel:
+    $ref: ./OtpChannel.yaml
+    description: Whether the email address or the phone number changes.
+  identifier:
+    type: string
+    description: The new address, waiting for its code.
+  expires_at:
+    type: string
+    format: date-time
+    description: When the code stops working, fifteen minutes after it was sent, as an RFC 3339 timestamp in UTC.
+examples:
+  - channel: email
+    identifier: new-owner@example.com
+    expires_at: 2026-10-15T09:15:00Z

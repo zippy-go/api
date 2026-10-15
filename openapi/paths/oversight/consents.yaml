@@ -1,0 +1,106 @@
+# Path item for /v1/platform/impersonation/consents. Referenced from openapi.yaml.
+get:
+  operationId: listImpersonationConsents
+  summary: List the requests to view partner consoles
+  description: The consents asked, newest first; `impersonate` or `audit:read`.
+  tags:
+    - Oversight
+  security:
+    - Bearer: []
+  parameters:
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The consents.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/ImpersonationConsentList.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: requestImpersonationConsent
+  summary: Ask a partner's consent to view its console
+  description: Asks a Partner's owners to consent to being viewed; `impersonate`. They decide from a notice in the Partner console.
+  tags:
+    - Oversight
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The partner and why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/oversight/ImpersonationConsentCreate.yaml
+  responses:
+    '201':
+      description: Asked.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/ImpersonationConsent.yaml
+    '400':
+      description: Malformed body or reason.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied` without `impersonate`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown Partner.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

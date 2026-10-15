@@ -10,8 +10,12 @@ components/
                    the collection grammar: FilterSchema, FilterField, Facet, FacetCount, CollectionSummary
     platform/      Detailed health: HealthDetails, HealthChecks, DependencyCheck, OutboxCheck, CheckStatus;
                    token signing keys: JsonWebKeySet, JsonWebKey
-    auth/          Signing in and sessions: OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
-                   PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, TokenResponse, User, Me
+    auth/          Signing in and sessions: Audience, Delivery, OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
+                   PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, SignOutRequest, TokenResponse, User,
+                   Me, MeAccount, MeMembership, MePlatform, MeAgentMembership; two-step sign-in: TwoStepChallenge,
+                   TwoStepVerifyRequest, TwoStepSetup, CodeConfirmRequest, RecoveryCodes, PasswordProof; password
+                   links: PasswordResetLinkRequest, PasswordReset; step-up: StepUpRequest, StepUpCodeRequest;
+                   address changes: IdentifierChangeRequest, IdentifierChange; jobs: ServiceTokenRequest, ServiceToken
     partners/      The tenant record: Partner, PartnerKind, PartnerStatus, PartnerCreate, PartnerUpdate, PartnerList,
                    PartnerOwner, Contact, ContactConsent, ContactPurpose, Blocker, PartnerActivation, PartnerStanding,
                    PartnerStandingSummary, PayoutStanding, PictureUpdate
@@ -28,7 +32,16 @@ components/
                    LocationPause, PauseReason, HolidayOffer, HolidayOfferList
     memberships/   A user's place in a partner: Membership, MembershipRole, MembershipList
     invitations/   Joining a partner: Invitation, InvitationStatus, InvitationCreate, InvitationList,
-                   InvitationAcceptRequest, InvitationAccepted
+                   InvitationAcceptRequest, InvitationAccepted, InvitationSecondStep
+    access/        Who may do what: Permission, PermissionPool, PermissionList, AccessRole, RoleKind, AccessRoleCreate,
+                   AccessRoleUpdate, AccessRoleList, AccessScope, ScopeKind, AccessGrant, AccessGrantCreate,
+                   AccessGrantList, AccessSet, Entitlements, EntitlementsUpdate, TeamMember, TeamMemberList,
+                   TeamMemberUpdate, MembershipStatus, PlatformStaffInvite, AccessHistoryEntry, AccessHistoryList,
+                   HistoryAction
+    oversight/     Four eyes and consented viewing: Approval, ApprovalAction, ApprovalStatus, ApprovalCreate,
+                   ApprovalDecision, ApprovalList, ImpersonationConsent, ConsentStatus, ImpersonationConsentCreate,
+                   ImpersonationConsentApproval, ImpersonationConsentList, ImpersonationSession,
+                   ImpersonationSessionCreate, ImpersonationSessionList, ImpersonationAccess
     services/      What a partner runs: ServiceKind, ServiceStatus, Service, ServiceUpsert, ServiceList, ServiceCreate,
                    ServiceUpdate, KindAvailability, KindState, ServiceAtLocation, ServiceLocationUpdate,
                    FieldServiceSettings, FieldArea, DeliveryPricing, KilometreBand, DeliveryPricingVersion,

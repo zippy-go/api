@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CloseLocationForHolidayData, CloseLocationForHolidayErrors, CloseLocationForHolidayResponses, ConfirmAssetData, ConfirmAssetErrors, ConfirmAssetResponses, CreateAssetCropData, CreateAssetCropErrors, CreateAssetCropResponses, CreateAssetGrantData, CreateAssetGrantErrors, CreateAssetGrantResponses, CreateCampaignSlotData, CreateCampaignSlotErrors, CreateCampaignSlotResponses, CreateCountryData, CreateCountryErrors, CreateCountryResponses, CreateCurrencyData, CreateCurrencyErrors, CreateCurrencyResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerAssetGrantData, CreatePartnerAssetGrantErrors, CreatePartnerAssetGrantResponses, CreatePartnerData, CreatePartnerDocumentData, CreatePartnerDocumentErrors, CreatePartnerDocumentResponses, CreatePartnerErrors, CreatePartnerResponses, CreateServiceAreaData, CreateServiceAreaErrors, CreateServiceAreaResponses, CreateServiceData, CreateServiceErrors, CreateServiceResponses, CreateServiceTypeData, CreateServiceTypeErrors, CreateServiceTypeResponses, CreateStoreTypeData, CreateStoreTypeErrors, CreateStoreTypeResponses, CreateVerticalData, CreateVerticalErrors, CreateVerticalResponses, DeleteCampaignSlotData, DeleteCampaignSlotErrors, DeleteCampaignSlotResponses, DeleteLocationData, DeleteLocationErrors, DeleteLocationResponses, DeleteServiceAreaFenceData, DeleteServiceAreaFenceErrors, DeleteServiceAreaFenceResponses, DeleteServiceLocationData, DeleteServiceLocationErrors, DeleteServiceLocationResponses, DiscardAssetData, DiscardAssetErrors, DiscardAssetResponses, DivideServiceAreaData, DivideServiceAreaErrors, DivideServiceAreaResponses, GetAssetData, GetAssetErrors, GetAssetLinkData, GetAssetLinkErrors, GetAssetLinkResponses, GetAssetRenditionData, GetAssetRenditionErrors, GetAssetRenditionResponses, GetAssetResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetCampaignSlotData, GetCampaignSlotErrors, GetCampaignSlotResponses, GetCountryData, GetCountryErrors, GetCountryHolidaysData, GetCountryHolidaysErrors, GetCountryHolidaysResponses, GetCountryPolicyData, GetCountryPolicyErrors, GetCountryPolicyResponses, GetCountryResponses, GetCountryScheduleData, GetCountryScheduleErrors, GetCountryScheduleResponses, GetCurrencyData, GetCurrencyErrors, GetCurrencyResponses, GetDeliveryPricingData, GetDeliveryPricingErrors, GetDeliveryPricingResponses, GetDisplayGridData, GetDisplayGridErrors, GetDisplayGridResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLiveConfigData, GetLiveConfigErrors, GetLiveConfigResponses, GetLocationActivationData, GetLocationActivationErrors, GetLocationActivationResponses, GetLocationData, GetLocationEffectivePolicyData, GetLocationEffectivePolicyErrors, GetLocationEffectivePolicyResponses, GetLocationEffectiveScheduleData, GetLocationEffectiveScheduleErrors, GetLocationEffectiveScheduleResponses, GetLocationErrors, GetLocationPolicyData, GetLocationPolicyErrors, GetLocationPolicyResponses, GetLocationResponses, GetLocationScheduleData, GetLocationScheduleErrors, GetLocationScheduleResponses, GetLocationTradingData, GetLocationTradingErrors, GetLocationTradingResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerActivationData, GetPartnerActivationErrors, GetPartnerActivationResponses, GetPartnerData, GetPartnerDocumentData, GetPartnerDocumentErrors, GetPartnerDocumentResponses, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerPlanData, GetPartnerPlanErrors, GetPartnerPlanResponses, GetPartnerPolicyData, GetPartnerPolicyErrors, GetPartnerPolicyResponses, GetPartnerResponses, GetPartnerScheduleData, GetPartnerScheduleErrors, GetPartnerScheduleResponses, GetPartnerStandingData, GetPartnerStandingErrors, GetPartnerStandingResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetPayoutAccountData, GetPayoutAccountErrors, GetPayoutAccountResponses, GetPlanImpactData, GetPlanImpactErrors, GetPlanImpactResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, GetServiceAreaData, GetServiceAreaErrors, GetServiceAreaImpactData, GetServiceAreaImpactErrors, GetServiceAreaImpactResponses, GetServiceAreaPolicyData, GetServiceAreaPolicyErrors, GetServiceAreaPolicyResponses, GetServiceAreaResponses, GetServiceAreaScheduleData, GetServiceAreaScheduleErrors, GetServiceAreaScheduleResponses, GetServiceData, GetServiceErrors, GetServiceLocationData, GetServiceLocationErrors, GetServiceLocationResponses, GetServiceResponses, GetServiceTypeData, GetServiceTypeErrors, GetServiceTypeResponses, GetSettingData, GetSettingErrors, GetSettingResponses, GetStoreTypeData, GetStoreTypeErrors, GetStoreTypeResponses, GetVerticalData, GetVerticalErrors, GetVerticalReachData, GetVerticalReachErrors, GetVerticalReachResponses, GetVerticalResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAssetPurposesData, ListAssetPurposesErrors, ListAssetPurposesResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListCampaignSlotsData, ListCampaignSlotsErrors, ListCampaignSlotsResponses, ListCountriesData, ListCountriesErrors, ListCountriesResponses, ListCountryPolicyVersionsData, ListCountryPolicyVersionsErrors, ListCountryPolicyVersionsResponses, ListCurrenciesData, ListCurrenciesErrors, ListCurrenciesResponses, ListDocumentsForReviewData, ListDocumentsForReviewErrors, ListDocumentsForReviewResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationBinData, ListLocationBinErrors, ListLocationBinResponses, ListLocationHolidaysData, ListLocationHolidaysErrors, ListLocationHolidaysResponses, ListLocationPolicyVersionsData, ListLocationPolicyVersionsErrors, ListLocationPolicyVersionsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnerDocumentsData, ListPartnerDocumentsErrors, ListPartnerDocumentsResponses, ListPartnerPolicyVersionsData, ListPartnerPolicyVersionsErrors, ListPartnerPolicyVersionsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServiceAreaPolicyVersionsData, ListServiceAreaPolicyVersionsErrors, ListServiceAreaPolicyVersionsResponses, ListServiceAreasData, ListServiceAreasErrors, ListServiceAreasResponses, ListServiceAreaVerticalsData, ListServiceAreaVerticalsErrors, ListServiceAreaVerticalsResponses, ListServiceFieldsData, ListServiceFieldsErrors, ListServiceFieldsResponses, ListServicesData, ListServicesErrors, ListServicesResponses, ListServiceTypesData, ListServiceTypesErrors, ListServiceTypesResponses, ListSettingsData, ListSettingsErrors, ListSettingsResponses, ListStoreFieldsData, ListStoreFieldsErrors, ListStoreFieldsResponses, ListStoreTypesData, ListStoreTypesErrors, ListStoreTypesResponses, ListVerticalsData, ListVerticalsErrors, ListVerticalsResponses, MergeServiceAreasData, MergeServiceAreasErrors, MergeServiceAreasResponses, OpenLiveStreamData, OpenLiveStreamErrors, OpenLiveStreamResponse, OpenLiveStreamResponses, PauseLocationData, PauseLocationErrors, PauseLocationResponses, PlanServiceAreaDivisionData, PlanServiceAreaDivisionErrors, PlanServiceAreaDivisionResponses, PutCountryDefaultServiceAreaData, PutCountryDefaultServiceAreaErrors, PutCountryDefaultServiceAreaResponses, PutCountryHolidaysData, PutCountryHolidaysErrors, PutCountryHolidaysResponses, PutCountryPolicyData, PutCountryPolicyErrors, PutCountryPolicyResponses, PutCountryScheduleData, PutCountryScheduleErrors, PutCountryScheduleResponses, PutDeliveryPricingData, PutDeliveryPricingErrors, PutDeliveryPricingResponses, PutDisplayGridData, PutDisplayGridErrors, PutDisplayGridResponses, PutLocationBannerData, PutLocationBannerErrors, PutLocationBannerResponses, PutLocationFulfilmentData, PutLocationFulfilmentErrors, PutLocationFulfilmentResponses, PutLocationListingData, PutLocationListingErrors, PutLocationListingResponses, PutLocationLogoData, PutLocationLogoErrors, PutLocationLogoResponses, PutLocationOrderSettingsData, PutLocationOrderSettingsErrors, PutLocationOrderSettingsResponses, PutLocationPolicyData, PutLocationPolicyErrors, PutLocationPolicyResponses, PutLocationScheduleData, PutLocationScheduleErrors, PutLocationScheduleResponses, PutPartnerBannerData, PutPartnerBannerErrors, PutPartnerBannerResponses, PutPartnerLogoData, PutPartnerLogoErrors, PutPartnerLogoResponses, PutPartnerPlanData, PutPartnerPlanErrors, PutPartnerPlanResponses, PutPartnerPolicyData, PutPartnerPolicyErrors, PutPartnerPolicyResponses, PutPartnerScheduleData, PutPartnerScheduleErrors, PutPartnerScheduleResponses, PutPayoutAccountData, PutPayoutAccountErrors, PutPayoutAccountResponses, PutServiceAreaFenceData, PutServiceAreaFenceErrors, PutServiceAreaFenceResponses, PutServiceAreaPolicyData, PutServiceAreaPolicyErrors, PutServiceAreaPolicyResponses, PutServiceAreaScheduleData, PutServiceAreaScheduleErrors, PutServiceAreaScheduleResponses, PutServiceAreaVerticalOrderData, PutServiceAreaVerticalOrderErrors, PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalsData, PutServiceAreaVerticalsErrors, PutServiceAreaVerticalsResponses, PutServiceLocationData, PutServiceLocationErrors, PutServiceLocationResponses, PutSettingData, PutSettingErrors, PutSettingResponses, PutVerticalCategoriesData, PutVerticalCategoriesErrors, PutVerticalCategoriesResponses, PutVerticalImageData, PutVerticalImageErrors, PutVerticalImageResponses, QuoteDeliveryData, QuoteDeliveryErrors, QuoteDeliveryResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RemovePartnerDocumentData, RemovePartnerDocumentErrors, RemovePartnerDocumentResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, ResetSettingData, ResetSettingErrors, ResetSettingResponses, ResolveServiceAreaData, ResolveServiceAreaErrors, ResolveServiceAreaResponses, RestoreLocationData, RestoreLocationErrors, RestoreLocationResponses, ResumeLocationData, ResumeLocationErrors, ResumeLocationResponses, ReviewPartnerDocumentData, ReviewPartnerDocumentErrors, ReviewPartnerDocumentResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SetCountryOrdersData, SetCountryOrdersErrors, SetCountryOrdersResponses, SetCountrySignInData, SetCountrySignInErrors, SetCountrySignInResponses, SetCountryStatusData, SetCountryStatusErrors, SetCountryStatusResponses, SetServiceAreaStatusData, SetServiceAreaStatusErrors, SetServiceAreaStatusResponses, SetServiceTypeStatusData, SetServiceTypeStatusErrors, SetServiceTypeStatusResponses, SetStoreTypeStatusData, SetStoreTypeStatusErrors, SetStoreTypeStatusResponses, SetVerticalStatusData, SetVerticalStatusErrors, SetVerticalStatusResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateCampaignSlotData, UpdateCampaignSlotErrors, UpdateCampaignSlotResponses, UpdateCountryData, UpdateCountryErrors, UpdateCountryResponses, UpdateCurrencyData, UpdateCurrencyErrors, UpdateCurrencyResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpdateServiceAreaData, UpdateServiceAreaErrors, UpdateServiceAreaResponses, UpdateServiceData, UpdateServiceErrors, UpdateServiceResponses, UpdateServiceTypeData, UpdateServiceTypeErrors, UpdateServiceTypeResponses, UpdateStoreTypeData, UpdateStoreTypeErrors, UpdateStoreTypeResponses, UpdateVerticalData, UpdateVerticalErrors, UpdateVerticalResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses, VerifyPayoutAccountData, VerifyPayoutAccountErrors, VerifyPayoutAccountResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ApproveApprovalData, ApproveApprovalErrors, ApproveApprovalResponses, ApproveImpersonationConsentData, ApproveImpersonationConsentErrors, ApproveImpersonationConsentResponses, BeginIdentifierChangeData, BeginIdentifierChangeErrors, BeginIdentifierChangeResponses, BeginTwoStepData, BeginTwoStepErrors, BeginTwoStepResponses, CancelIdentifierChangeData, CancelIdentifierChangeErrors, CancelIdentifierChangeResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CloseLocationForHolidayData, CloseLocationForHolidayErrors, CloseLocationForHolidayResponses, ConfirmAssetData, ConfirmAssetErrors, ConfirmAssetResponses, ConfirmIdentifierChangeData, ConfirmIdentifierChangeErrors, ConfirmIdentifierChangeResponses, ConfirmTwoStepData, ConfirmTwoStepErrors, ConfirmTwoStepResponses, CreateAssetCropData, CreateAssetCropErrors, CreateAssetCropResponses, CreateAssetGrantData, CreateAssetGrantErrors, CreateAssetGrantResponses, CreateCampaignSlotData, CreateCampaignSlotErrors, CreateCampaignSlotResponses, CreateCountryData, CreateCountryErrors, CreateCountryResponses, CreateCurrencyData, CreateCurrencyErrors, CreateCurrencyResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreateMemberGrantData, CreateMemberGrantErrors, CreateMemberGrantResponses, CreatePartnerAssetGrantData, CreatePartnerAssetGrantErrors, CreatePartnerAssetGrantResponses, CreatePartnerData, CreatePartnerDocumentData, CreatePartnerDocumentErrors, CreatePartnerDocumentResponses, CreatePartnerErrors, CreatePartnerResponses, CreatePartnerRoleData, CreatePartnerRoleErrors, CreatePartnerRoleResponses, CreatePlatformRoleData, CreatePlatformRoleErrors, CreatePlatformRoleResponses, CreateServiceAreaData, CreateServiceAreaErrors, CreateServiceAreaResponses, CreateServiceData, CreateServiceErrors, CreateServiceResponses, CreateServiceTypeData, CreateServiceTypeErrors, CreateServiceTypeResponses, CreateStoreTypeData, CreateStoreTypeErrors, CreateStoreTypeResponses, CreateVerticalData, CreateVerticalErrors, CreateVerticalResponses, DeleteCampaignSlotData, DeleteCampaignSlotErrors, DeleteCampaignSlotResponses, DeleteLocationData, DeleteLocationErrors, DeleteLocationResponses, DeletePartnerRoleData, DeletePartnerRoleErrors, DeletePartnerRoleResponses, DeletePlatformRoleData, DeletePlatformRoleErrors, DeletePlatformRoleResponses, DeleteServiceAreaFenceData, DeleteServiceAreaFenceErrors, DeleteServiceAreaFenceResponses, DeleteServiceLocationData, DeleteServiceLocationErrors, DeleteServiceLocationResponses, DisableTeamMemberData, DisableTeamMemberErrors, DisableTeamMemberResponses, DisableTwoStepData, DisableTwoStepErrors, DisableTwoStepResponses, DiscardAssetData, DiscardAssetErrors, DiscardAssetResponses, DivideServiceAreaData, DivideServiceAreaErrors, DivideServiceAreaResponses, EnablePlatformStaffData, EnablePlatformStaffErrors, EnablePlatformStaffResponses, EnableTeamMemberData, EnableTeamMemberErrors, EnableTeamMemberResponses, EndImpersonationData, EndImpersonationErrors, EndImpersonationResponses, GetApprovalData, GetApprovalErrors, GetApprovalResponses, GetAssetData, GetAssetErrors, GetAssetLinkData, GetAssetLinkErrors, GetAssetLinkResponses, GetAssetRenditionData, GetAssetRenditionErrors, GetAssetRenditionResponses, GetAssetResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetCampaignSlotData, GetCampaignSlotErrors, GetCampaignSlotResponses, GetCountryData, GetCountryErrors, GetCountryHolidaysData, GetCountryHolidaysErrors, GetCountryHolidaysResponses, GetCountryPolicyData, GetCountryPolicyErrors, GetCountryPolicyResponses, GetCountryResponses, GetCountryScheduleData, GetCountryScheduleErrors, GetCountryScheduleResponses, GetCurrencyData, GetCurrencyErrors, GetCurrencyResponses, GetDeliveryPricingData, GetDeliveryPricingErrors, GetDeliveryPricingResponses, GetDisplayGridData, GetDisplayGridErrors, GetDisplayGridResponses, GetEntitlementsData, GetEntitlementsErrors, GetEntitlementsResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLiveConfigData, GetLiveConfigErrors, GetLiveConfigResponses, GetLocationActivationData, GetLocationActivationErrors, GetLocationActivationResponses, GetLocationData, GetLocationEffectivePolicyData, GetLocationEffectivePolicyErrors, GetLocationEffectivePolicyResponses, GetLocationEffectiveScheduleData, GetLocationEffectiveScheduleErrors, GetLocationEffectiveScheduleResponses, GetLocationErrors, GetLocationPolicyData, GetLocationPolicyErrors, GetLocationPolicyResponses, GetLocationResponses, GetLocationScheduleData, GetLocationScheduleErrors, GetLocationScheduleResponses, GetLocationTradingData, GetLocationTradingErrors, GetLocationTradingResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerActivationData, GetPartnerActivationErrors, GetPartnerActivationResponses, GetPartnerData, GetPartnerDocumentData, GetPartnerDocumentErrors, GetPartnerDocumentResponses, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerPlanData, GetPartnerPlanErrors, GetPartnerPlanResponses, GetPartnerPolicyData, GetPartnerPolicyErrors, GetPartnerPolicyResponses, GetPartnerResponses, GetPartnerRoleData, GetPartnerRoleErrors, GetPartnerRoleResponses, GetPartnerScheduleData, GetPartnerScheduleErrors, GetPartnerScheduleResponses, GetPartnerStandingData, GetPartnerStandingErrors, GetPartnerStandingResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetPayoutAccountData, GetPayoutAccountErrors, GetPayoutAccountResponses, GetPlanImpactData, GetPlanImpactErrors, GetPlanImpactResponses, GetPlatformRoleData, GetPlatformRoleErrors, GetPlatformRoleResponses, GetPlatformStaffData, GetPlatformStaffErrors, GetPlatformStaffResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, GetServiceAreaData, GetServiceAreaErrors, GetServiceAreaImpactData, GetServiceAreaImpactErrors, GetServiceAreaImpactResponses, GetServiceAreaPolicyData, GetServiceAreaPolicyErrors, GetServiceAreaPolicyResponses, GetServiceAreaResponses, GetServiceAreaScheduleData, GetServiceAreaScheduleErrors, GetServiceAreaScheduleResponses, GetServiceData, GetServiceErrors, GetServiceLocationData, GetServiceLocationErrors, GetServiceLocationResponses, GetServiceResponses, GetServiceTypeData, GetServiceTypeErrors, GetServiceTypeResponses, GetSettingData, GetSettingErrors, GetSettingResponses, GetStoreTypeData, GetStoreTypeErrors, GetStoreTypeResponses, GetTeamMemberData, GetTeamMemberErrors, GetTeamMemberResponses, GetVerticalData, GetVerticalErrors, GetVerticalReachData, GetVerticalReachErrors, GetVerticalReachResponses, GetVerticalResponses, InvitePlatformStaffData, InvitePlatformStaffErrors, InvitePlatformStaffResponses, ListAccessHistoryData, ListAccessHistoryErrors, ListAccessHistoryResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListApprovalsData, ListApprovalsErrors, ListApprovalsResponses, ListAssetPurposesData, ListAssetPurposesErrors, ListAssetPurposesResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListCampaignSlotsData, ListCampaignSlotsErrors, ListCampaignSlotsResponses, ListCountriesData, ListCountriesErrors, ListCountriesResponses, ListCountryPolicyVersionsData, ListCountryPolicyVersionsErrors, ListCountryPolicyVersionsResponses, ListCurrenciesData, ListCurrenciesErrors, ListCurrenciesResponses, ListDocumentsForReviewData, ListDocumentsForReviewErrors, ListDocumentsForReviewResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListImpersonationConsentsData, ListImpersonationConsentsErrors, ListImpersonationConsentsResponses, ListImpersonationsData, ListImpersonationsErrors, ListImpersonationsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationBinData, ListLocationBinErrors, ListLocationBinResponses, ListLocationHolidaysData, ListLocationHolidaysErrors, ListLocationHolidaysResponses, ListLocationPolicyVersionsData, ListLocationPolicyVersionsErrors, ListLocationPolicyVersionsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnerAccessHistoryData, ListPartnerAccessHistoryErrors, ListPartnerAccessHistoryResponses, ListPartnerDocumentsData, ListPartnerDocumentsErrors, ListPartnerDocumentsResponses, ListPartnerImpersonationConsentsData, ListPartnerImpersonationConsentsErrors, ListPartnerImpersonationConsentsResponses, ListPartnerImpersonationsData, ListPartnerImpersonationsErrors, ListPartnerImpersonationsResponses, ListPartnerPermissionsData, ListPartnerPermissionsErrors, ListPartnerPermissionsResponses, ListPartnerPolicyVersionsData, ListPartnerPolicyVersionsErrors, ListPartnerPolicyVersionsResponses, ListPartnerRolesData, ListPartnerRolesErrors, ListPartnerRolesResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListPermissionsData, ListPermissionsErrors, ListPermissionsResponses, ListPlatformInvitationsData, ListPlatformInvitationsErrors, ListPlatformInvitationsResponses, ListPlatformRolesData, ListPlatformRolesErrors, ListPlatformRolesResponses, ListPlatformStaffData, ListPlatformStaffErrors, ListPlatformStaffResponses, ListServiceAreaPolicyVersionsData, ListServiceAreaPolicyVersionsErrors, ListServiceAreaPolicyVersionsResponses, ListServiceAreasData, ListServiceAreasErrors, ListServiceAreasResponses, ListServiceAreaVerticalsData, ListServiceAreaVerticalsErrors, ListServiceAreaVerticalsResponses, ListServiceFieldsData, ListServiceFieldsErrors, ListServiceFieldsResponses, ListServicesData, ListServicesErrors, ListServicesResponses, ListServiceTypesData, ListServiceTypesErrors, ListServiceTypesResponses, ListSettingsData, ListSettingsErrors, ListSettingsResponses, ListStoreFieldsData, ListStoreFieldsErrors, ListStoreFieldsResponses, ListStoreTypesData, ListStoreTypesErrors, ListStoreTypesResponses, ListTeamMembersData, ListTeamMembersErrors, ListTeamMembersResponses, ListVerticalsData, ListVerticalsErrors, ListVerticalsResponses, MergeServiceAreasData, MergeServiceAreasErrors, MergeServiceAreasResponses, MintServiceTokenData, MintServiceTokenErrors, MintServiceTokenResponses, OpenLiveStreamData, OpenLiveStreamErrors, OpenLiveStreamResponse, OpenLiveStreamResponses, PauseLocationData, PauseLocationErrors, PauseLocationResponses, PlanServiceAreaDivisionData, PlanServiceAreaDivisionErrors, PlanServiceAreaDivisionResponses, ProposeApprovalData, ProposeApprovalErrors, ProposeApprovalResponses, PutCountryDefaultServiceAreaData, PutCountryDefaultServiceAreaErrors, PutCountryDefaultServiceAreaResponses, PutCountryHolidaysData, PutCountryHolidaysErrors, PutCountryHolidaysResponses, PutCountryPolicyData, PutCountryPolicyErrors, PutCountryPolicyResponses, PutCountryScheduleData, PutCountryScheduleErrors, PutCountryScheduleResponses, PutDeliveryPricingData, PutDeliveryPricingErrors, PutDeliveryPricingResponses, PutDisplayGridData, PutDisplayGridErrors, PutDisplayGridResponses, PutLocationBannerData, PutLocationBannerErrors, PutLocationBannerResponses, PutLocationFulfilmentData, PutLocationFulfilmentErrors, PutLocationFulfilmentResponses, PutLocationListingData, PutLocationListingErrors, PutLocationListingResponses, PutLocationLogoData, PutLocationLogoErrors, PutLocationLogoResponses, PutLocationOrderSettingsData, PutLocationOrderSettingsErrors, PutLocationOrderSettingsResponses, PutLocationPolicyData, PutLocationPolicyErrors, PutLocationPolicyResponses, PutLocationScheduleData, PutLocationScheduleErrors, PutLocationScheduleResponses, PutPartnerBannerData, PutPartnerBannerErrors, PutPartnerBannerResponses, PutPartnerLogoData, PutPartnerLogoErrors, PutPartnerLogoResponses, PutPartnerPlanData, PutPartnerPlanErrors, PutPartnerPlanResponses, PutPartnerPolicyData, PutPartnerPolicyErrors, PutPartnerPolicyResponses, PutPartnerScheduleData, PutPartnerScheduleErrors, PutPartnerScheduleResponses, PutPayoutAccountData, PutPayoutAccountErrors, PutPayoutAccountResponses, PutServiceAreaFenceData, PutServiceAreaFenceErrors, PutServiceAreaFenceResponses, PutServiceAreaPolicyData, PutServiceAreaPolicyErrors, PutServiceAreaPolicyResponses, PutServiceAreaScheduleData, PutServiceAreaScheduleErrors, PutServiceAreaScheduleResponses, PutServiceAreaVerticalOrderData, PutServiceAreaVerticalOrderErrors, PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalsData, PutServiceAreaVerticalsErrors, PutServiceAreaVerticalsResponses, PutServiceLocationData, PutServiceLocationErrors, PutServiceLocationResponses, PutSettingData, PutSettingErrors, PutSettingResponses, PutVerticalCategoriesData, PutVerticalCategoriesErrors, PutVerticalCategoriesResponses, PutVerticalImageData, PutVerticalImageErrors, PutVerticalImageResponses, QuoteDeliveryData, QuoteDeliveryErrors, QuoteDeliveryResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RejectApprovalData, RejectApprovalErrors, RejectApprovalResponses, RejectImpersonationConsentData, RejectImpersonationConsentErrors, RejectImpersonationConsentResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RemovePartnerDocumentData, RemovePartnerDocumentErrors, RemovePartnerDocumentResponses, RemovePlatformStaffData, RemovePlatformStaffErrors, RemovePlatformStaffResponses, RemoveTeamMemberData, RemoveTeamMemberErrors, RemoveTeamMemberResponses, RenewImpersonationTokenData, RenewImpersonationTokenErrors, RenewImpersonationTokenResponses, ReplaceRecoveryCodesData, ReplaceRecoveryCodesErrors, ReplaceRecoveryCodesResponses, RequestImpersonationConsentData, RequestImpersonationConsentErrors, RequestImpersonationConsentResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, RequestPasswordResetData, RequestPasswordResetErrors, RequestPasswordResetResponses, ResetMemberTwoStepData, ResetMemberTwoStepErrors, ResetMemberTwoStepResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, ResetSettingData, ResetSettingErrors, ResetSettingResponses, ResolveServiceAreaData, ResolveServiceAreaErrors, ResolveServiceAreaResponses, RestoreLocationData, RestoreLocationErrors, RestoreLocationResponses, ResumeLocationData, ResumeLocationErrors, ResumeLocationResponses, ReviewPartnerDocumentData, ReviewPartnerDocumentErrors, ReviewPartnerDocumentResponses, RevokeImpersonationConsentData, RevokeImpersonationConsentErrors, RevokeImpersonationConsentResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, RevokeMemberGrantData, RevokeMemberGrantErrors, RevokeMemberGrantResponses, RevokePlatformInvitationData, RevokePlatformInvitationErrors, RevokePlatformInvitationResponses, SendStepUpCodeData, SendStepUpCodeErrors, SendStepUpCodeResponses, SetCountryOrdersData, SetCountryOrdersErrors, SetCountryOrdersResponses, SetCountrySignInData, SetCountrySignInErrors, SetCountrySignInResponses, SetCountryStatusData, SetCountryStatusErrors, SetCountryStatusResponses, SetMemberAccessData, SetMemberAccessErrors, SetMemberAccessResponses, SetServiceAreaStatusData, SetServiceAreaStatusErrors, SetServiceAreaStatusResponses, SetServiceTypeStatusData, SetServiceTypeStatusErrors, SetServiceTypeStatusResponses, SetStoreTypeStatusData, SetStoreTypeStatusErrors, SetStoreTypeStatusResponses, SetVerticalStatusData, SetVerticalStatusErrors, SetVerticalStatusResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StartImpersonationData, StartImpersonationErrors, StartImpersonationResponses, StepUpData, StepUpErrors, StepUpResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateCampaignSlotData, UpdateCampaignSlotErrors, UpdateCampaignSlotResponses, UpdateCountryData, UpdateCountryErrors, UpdateCountryResponses, UpdateCurrencyData, UpdateCurrencyErrors, UpdateCurrencyResponses, UpdateEntitlementsData, UpdateEntitlementsErrors, UpdateEntitlementsResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpdatePartnerRoleData, UpdatePartnerRoleErrors, UpdatePartnerRoleResponses, UpdatePlatformRoleData, UpdatePlatformRoleErrors, UpdatePlatformRoleResponses, UpdatePlatformStaffData, UpdatePlatformStaffErrors, UpdatePlatformStaffResponses, UpdateServiceAreaData, UpdateServiceAreaErrors, UpdateServiceAreaResponses, UpdateServiceData, UpdateServiceErrors, UpdateServiceResponses, UpdateServiceTypeData, UpdateServiceTypeErrors, UpdateServiceTypeResponses, UpdateStoreTypeData, UpdateStoreTypeErrors, UpdateStoreTypeResponses, UpdateTeamMemberData, UpdateTeamMemberErrors, UpdateTeamMemberResponses, UpdateVerticalData, UpdateVerticalErrors, UpdateVerticalResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses, VerifyPayoutAccountData, VerifyPayoutAccountErrors, VerifyPayoutAccountResponses, VerifyTwoStepData, VerifyTwoStepErrors, VerifyTwoStepResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -82,13 +82,15 @@ export const listAgents = <ThrowOnError extends boolean = false>(options?: Optio
  * that buffered pings while it had no connectivity can submit them in one
  * batch.
  *
- * The operation authenticates with the temporary development credential
- * only (`DevApiKey`, sent in the `X-Dev-Api-Key` header); the identity
- * module replaces that credential in a later step.
+ * The operation authenticates with a service token of the job
+ * `simulator` (`Bearer`, minted at `POST /v1/auth/service-tokens`), the
+ * only credential it takes. A person's access token answers `401`
+ * (`unauthenticated`) and a service token of another job `403`
+ * (`forbidden`).
  *
  */
 export const submitLocationPings = <ThrowOnError extends boolean = false>(options: Options<SubmitLocationPingsData, ThrowOnError>): RequestResult<SubmitLocationPingsResponses, SubmitLocationPingsErrors, ThrowOnError> => (options.client ?? client).post<SubmitLocationPingsResponses, SubmitLocationPingsErrors, ThrowOnError>({
-    security: [{ name: 'X-Dev-Api-Key', type: 'apiKey' }],
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/v1/fleet/location-pings',
     ...options,
     headers: {
@@ -175,17 +177,20 @@ export const streamEvents = <ThrowOnError extends boolean = false>(options?: Opt
 /**
  * Request a one-time code
  *
- * Sends a six-digit one-time code to an email address or a phone number.
- * Every well-formed request is answered with `202` and a challenge,
- * whether or not an account exists for the identifier, so that the
- * operation cannot be used to find out who has an account. The code is
- * accepted until `expires_at`; exchange it for a session with
- * `POST /v1/auth/otp/verify`. The first successful verification for an
- * identifier creates the user.
+ * Sends a six-digit one-time code to an email address or a phone number,
+ * for the surface named in `audience`: the Partner console (`partner`,
+ * the default) or the Agent app (`agent`). Mission Control never signs
+ * in with a code. Every well-formed request is answered with `202` and a
+ * challenge, whether or not an account exists for the identifier, so that
+ * the operation cannot be used to find out who has an account. The code
+ * works for five minutes, until `expires_at`; exchange it for a session
+ * with `POST /v1/auth/otp/verify`. The first successful verification for
+ * an identifier creates the user.
  *
- * Codes are rate limited per identifier and per client. When the limit is
- * reached the response is `429` (`too_many_requests`) with a `Retry-After`
- * header.
+ * Codes are rate limited: a second code for the same identifier within a
+ * minute, more than ten a day for one identifier, or more than two hundred
+ * an hour from one client answer `429` (`too_many_requests`) with a
+ * `Retry-After` header saying how long to wait.
  *
  */
 export const requestOtp = <ThrowOnError extends boolean = false>(options: Options<RequestOtpData, ThrowOnError>): RequestResult<RequestOtpResponses, RequestOtpErrors, ThrowOnError> => (options.client ?? client).post<RequestOtpResponses, RequestOtpErrors, ThrowOnError>({
@@ -200,18 +205,29 @@ export const requestOtp = <ThrowOnError extends boolean = false>(options: Option
 /**
  * Verify a one-time code and sign in
  *
- * Exchanges a one-time code for a session. On success the response is a
- * `TokenResponse`: the access token, the signed-in user and, for native
- * clients, the refresh token; browsers receive the refresh token in the
- * `zg_refresh` cookie instead (see the `Auth` tag). The first successful
- * verification for an identifier creates the user, with the email address
- * or the phone number the code was sent to.
+ * Exchanges a one-time code for a session on the surface the code was
+ * asked for. Name the surface in `audience` and say how the refresh token
+ * travels in `delivery`: `cookie` sets it in the surface's `httpOnly`
+ * cookie, `body` returns it in `refresh_token`. A client that names no
+ * audience keeps the step 1 behaviour (the `zg_refresh` cookie, or the
+ * body with `X-Client-Type: native`). The first successful verification
+ * for an identifier creates the user, with the email address or the phone
+ * number the code was sent to.
  *
- * A wrong code, or a challenge that does not exist, answers `401`
- * (`invalid_code`); a correct code presented after `expires_at` answers
- * `401` (`code_expired`). Request a new code in both cases. After too many
- * wrong codes for one challenge the challenge is locked and every further
- * attempt answers `429` (`too_many_attempts`).
+ * The Agent app admits agents only, people who hold an agent membership in
+ * a Service: a right code for `audience` `agent` from anybody else, or for
+ * an identifier nobody has, answers `401` (`authentication_failed`) and
+ * creates nobody.
+ *
+ * When the account has two-step sign-in on, a right code answers `202`
+ * with a `TwoStepChallenge` instead of a session: complete the sign-in at
+ * `POST /v1/auth/two-step/verify`.
+ *
+ * A wrong code answers `401` (`invalid_code`); an unknown, used or expired
+ * challenge answers `401` (`code_expired`). Request a new code in both
+ * cases. Five wrong codes lock the challenge (`429`, `too_many_attempts`),
+ * and wrong codes also count in the sign-in throttle of the identifier and
+ * the client.
  *
  */
 export const verifyOtp = <ThrowOnError extends boolean = false>(options: Options<VerifyOtpData, ThrowOnError>): RequestResult<VerifyOtpResponses, VerifyOtpErrors, ThrowOnError> => (options.client ?? client).post<VerifyOtpResponses, VerifyOtpErrors, ThrowOnError>({
@@ -226,17 +242,30 @@ export const verifyOtp = <ThrowOnError extends boolean = false>(options: Options
 /**
  * Sign in with a password
  *
- * Exchanges an email address and a password for a session. On success the
- * response is a `TokenResponse`, delivered the same way as for
- * `POST /v1/auth/otp/verify`: the refresh token goes to the `zg_refresh`
- * cookie for browsers and into the body for native clients (see the
- * `Auth` tag).
+ * Exchanges an email address and a password for a session on one surface,
+ * named in `audience` (`partner`, `platform` or `agent`), with the refresh
+ * token delivered as `delivery` says, as for `POST /v1/auth/otp/verify`. A
+ * client that names no audience keeps the step 1 behaviour: it signs in to
+ * Mission Control when the account holds platform access and to the
+ * Partner console otherwise.
  *
- * A user gets a password by setting one with `POST /v1/auth/password`
- * after signing in with a one-time code, or by choosing one when accepting
- * an invitation. An unknown email address, a wrong password or a user
- * without a password all answer `401` (`unauthenticated`), without saying
- * which it was.
+ * An unknown email address, a wrong password, a user without a password, a
+ * disabled account and a surface the account may not enter all answer
+ * `401` (`authentication_failed`), in about the same time, without saying
+ * which it was. The Agent app is entered by agents only, people who hold
+ * an agent membership in a Service. Five failures in fifteen minutes for
+ * one identifier on one surface, or from one client, lock it for the rest
+ * of the window (`429`, `too_many_requests`, with `Retry-After`).
+ *
+ * When the account has two-step sign-in on, a right password answers `202`
+ * with a `TwoStepChallenge`; complete the sign-in at
+ * `POST /v1/auth/two-step/verify`. Platform staff without a second factor
+ * receive a Mission Control session that reaches the two-step set-up only
+ * (`two_step_setup_required` is `true`).
+ *
+ * A user gets a password by setting one with `POST /v1/auth/password`, by
+ * choosing one when accepting an invitation, or through a password link
+ * (`POST /v1/auth/password/reset-request`).
  *
  */
 export const signInWithPassword = <ThrowOnError extends boolean = false>(options: Options<SignInWithPasswordData, ThrowOnError>): RequestResult<SignInWithPasswordResponses, SignInWithPasswordErrors, ThrowOnError> => (options.client ?? client).post<SignInWithPasswordResponses, SignInWithPasswordErrors, ThrowOnError>({
@@ -252,13 +281,24 @@ export const signInWithPassword = <ThrowOnError extends boolean = false>(options
  * Set or change the password
  *
  * Sets the signed-in user's password, so that they can also sign in with
- * `POST /v1/auth/password/sign-in`. A user who signed up with a one-time
- * code has no password yet and sends `current_password` as `null` or
- * omits it; a user who already has a password must send it, and a wrong
- * one answers `403` (`forbidden`).
+ * `POST /v1/auth/password/sign-in`.
  *
- * The new password must be at least 12 characters long. Otherwise the
- * response is `400` (`validation_failed`) with an `errors` entry that
+ * A user who signed up with a one-time code has no password yet: they send
+ * `current_password` as `null` or omit it, and because a first password is
+ * a sensitive act they prove it is them first with `POST /v1/auth/step-up`
+ * (`403`, `step_up_required`, otherwise). Signing in is such a proof for the
+ * session's first ten minutes, so a first password chosen right after a
+ * code sign-in needs nothing more. Setting a first password ends the
+ * user's other sessions.
+ *
+ * A user who already has a password must send it; a missing or wrong one
+ * answers `403` (`forbidden`) and counts in the sign-in throttle (`429`
+ * after too many). A change ends every session of the user on every
+ * surface, this one included (its refresh cookie is cleared), and the user
+ * is told by email; sign in again with the new password.
+ *
+ * The new password must be 12 to 200 characters and not blank. Otherwise
+ * the response is `400` (`validation_failed`) with an `errors` entry that
  * points at `/new_password` and carries the code `password_weak`.
  *
  */
@@ -275,21 +315,27 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Refresh the session
  *
- * Issues a new access token for the current session and rotates the
- * refresh token. Where the refresh token travels depends on the client:
+ * Issues a new access token for the current session, on the session's
+ * surface, and rotates the refresh token. The session keeps the delivery it
+ * was created with, whatever the request carries:
  *
- * - Browsers received it at sign-in in an `httpOnly` cookie named
- * `zg_refresh`, scoped to the path `/v1/auth`. They send no body, or an
- * empty object, and the response sets a new cookie; `refresh_token` in
- * the body stays `null`.
- * - Native clients sent `X-Client-Type: native` when signing in and
- * received `refresh_token` in the body. They send it back here in
- * `refresh_token` and receive the new one in the body.
+ * - Cookie delivery: the refresh token is in the surface's `httpOnly`
+ * cookie (`zg_refresh_partner`, `zg_refresh_platform` or
+ * `zg_refresh_agent`), scoped to `/v1/auth`. Send `{ "audience": "<surface>" }`
+ * so the right cookie is read; the response sets the new one and
+ * `refresh_token` stays `null`. A browser that signed in without an
+ * audience sends no body and uses the `zg_refresh` cookie.
+ * - Body delivery: send the refresh token in `refresh_token` and receive the
+ * new one in the body.
  *
- * Every refresh token can be used once. Presenting a token that was
- * already used revokes the whole session, as a defence against a stolen
- * token, and the user has to sign in again. A missing, unknown, expired
- * or revoked token answers `401` (`unauthenticated`).
+ * Every refresh token can be used once. The token spent by the latest
+ * rotation is forgiven for fifteen seconds and answers with the same
+ * successor, so two tabs refreshing at once do not sign the user out; an
+ * older token revokes the whole session, as a defence against a stolen
+ * token, and the user has to sign in again. A missing, unknown or spent
+ * token, and a session that ended (signed out, revoked, idle or past its
+ * absolute lifetime, or on a surface the user may no longer enter), answer
+ * `401` (`unauthenticated`).
  *
  */
 export const refreshSession = <ThrowOnError extends boolean = false>(options?: Options<RefreshSessionData, ThrowOnError>): RequestResult<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError> => (options?.client ?? client).post<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError>({
@@ -304,34 +350,238 @@ export const refreshSession = <ThrowOnError extends boolean = false>(options?: O
 /**
  * Sign out
  *
- * Revokes the session the access token belongs to (its `sid` claim): the
- * session's refresh token can no longer be used, and for browsers the
- * `zg_refresh` cookie is cleared. The access token itself stays valid
- * until its `exp`, at most 15 minutes; clients discard it. Other sessions
- * of the same user are not affected.
+ * Ends the current session, or with `everywhere` every session of the
+ * user on every surface, and clears the refresh cookie. The answer is `204`
+ * whether or not the session still existed, so signing out never fails for
+ * a client.
+ *
+ * The session is the one the bearer access token belongs to (its `sid`
+ * claim) or, when the access token has expired, the one the refresh cookie
+ * (named by `audience`) or the body's `refresh_token` belongs to. Its
+ * refresh token can no longer be used; a Mission Control access token is
+ * refused from the next request, other access tokens stay valid until their
+ * `exp`, at most 15 minutes, and clients discard them.
  *
  */
 export const signOut = <ThrowOnError extends boolean = false>(options?: Options<SignOutData, ThrowOnError>): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> => (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/v1/auth/sign-out',
-    ...options
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
 });
 
 /**
  * Get the signed-in user
  *
- * Returns the user the access token belongs to, their memberships with
- * the role they hold in each partner, and their platform roles. Call it
- * after signing in to decide which partner to work in. The response
- * reflects the current state, whereas the token's `memberships` and
- * `platform` claims are fixed when the token is issued and catch up at
- * the next refresh.
+ * Returns the user the access token belongs to, the surface the token is
+ * for, the account's credentials, and what the user holds on that surface:
+ * on the Partner console every partner membership they may enter, each with
+ * its grants per scope and whether it opens the console; on Mission
+ * Control the platform membership with its grants; on the Agent app the
+ * agent memberships. Call it after signing in to decide which partner to
+ * work in, and read permissions from the grants rather than from the role
+ * label. The response reflects the current state, whereas the token's
+ * `memberships` and `platform` claims are fixed when the token is issued.
+ * A Mission Control session that has not set up its second factor reaches
+ * this operation, whose `account.two_step_setup_required` says so.
  *
  */
 export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/v1/me',
     ...options
+});
+
+/**
+ * Complete a sign-in with its second step
+ *
+ * Exchanges the second step of a sign-in for the session: six digits from the authenticator app (a code already used, or an earlier one, is refused) or a recovery code (once, with or without its dash, in either case). Five wrong codes end the challenge; wrong codes count in the sign-in throttle. The session goes where the sign-in asked, delivered as it stated.
+ */
+export const verifyTwoStep = <ThrowOnError extends boolean = false>(options: Options<VerifyTwoStepData, ThrowOnError>): RequestResult<VerifyTwoStepResponses, VerifyTwoStepErrors, ThrowOnError> => (options.client ?? client).post<VerifyTwoStepResponses, VerifyTwoStepErrors, ThrowOnError>({
+    url: '/v1/auth/two-step/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Start setting up an authenticator
+ *
+ * Starts setting up an authenticator: a new secret, as text and as an `otpauth://` link the console shows as a QR code, issued as "ZippyGo Mission Control" or "ZippyGo Partner console". Sign-in does not change until `POST /v1/auth/two-step/confirm` proves it.
+ */
+export const beginTwoStep = <ThrowOnError extends boolean = false>(options?: Options<BeginTwoStepData, ThrowOnError>): RequestResult<BeginTwoStepResponses, BeginTwoStepErrors, ThrowOnError> => (options?.client ?? client).post<BeginTwoStepResponses, BeginTwoStepErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/two-step/setup',
+    ...options
+});
+
+/**
+ * Turn two-step sign-in on
+ *
+ * Turns two-step sign-in on with a code from the app, and returns ten recovery codes, shown once. A Mission Control session that reached the set-up only reaches everything from now.
+ */
+export const confirmTwoStep = <ThrowOnError extends boolean = false>(options: Options<ConfirmTwoStepData, ThrowOnError>): RequestResult<ConfirmTwoStepResponses, ConfirmTwoStepErrors, ThrowOnError> => (options.client ?? client).post<ConfirmTwoStepResponses, ConfirmTwoStepErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/two-step/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Replace the recovery codes
+ *
+ * Replaces the recovery codes with ten new ones, only after the password again.
+ */
+export const replaceRecoveryCodes = <ThrowOnError extends boolean = false>(options: Options<ReplaceRecoveryCodesData, ThrowOnError>): RequestResult<ReplaceRecoveryCodesResponses, ReplaceRecoveryCodesErrors, ThrowOnError> => (options.client ?? client).post<ReplaceRecoveryCodesResponses, ReplaceRecoveryCodesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/two-step/recovery-codes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Turn two-step sign-in off
+ *
+ * Turns the user's own two-step sign-in off, only after the password again.
+ */
+export const disableTwoStep = <ThrowOnError extends boolean = false>(options: Options<DisableTwoStepData, ThrowOnError>): RequestResult<DisableTwoStepResponses, DisableTwoStepErrors, ThrowOnError> => (options.client ?? client).post<DisableTwoStepResponses, DisableTwoStepErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/two-step/disable',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Prove it is you again
+ *
+ * Proves the signed-in person afresh, with exactly one of: the password, an authenticator code, or a code from `POST /v1/auth/step-up/code`. The proof stands ten minutes, for this session only; sensitive acts refused as `step_up_required` pass after it. Signing in is a proof too: a session's own sign-in stands as its step-up for its first ten minutes, as made with the factor proven last.
+ *
+ * The acts that ask for it today: setting a first password (`POST /v1/auth/password` without a current password) and starting an address change (`POST /v1/auth/identifier-change`, where a Mission Control email change needs the proof made with the authenticator). A wrong password or authenticator code counts in the sign-in throttle.
+ */
+export const stepUp = <ThrowOnError extends boolean = false>(options: Options<StepUpData, ThrowOnError>): RequestResult<StepUpResponses, StepUpErrors, ThrowOnError> => (options.client ?? client).post<StepUpResponses, StepUpErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/step-up',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Send a code that proves it is you
+ *
+ * Sends a one-time code proving the signed-in person to the account's own email or phone, for `POST /v1/auth/step-up`.
+ */
+export const sendStepUpCode = <ThrowOnError extends boolean = false>(options: Options<SendStepUpCodeData, ThrowOnError>): RequestResult<SendStepUpCodeResponses, SendStepUpCodeErrors, ThrowOnError> => (options.client ?? client).post<SendStepUpCodeResponses, SendStepUpCodeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/step-up/code',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Ask for a password link
+ *
+ * Asks for a password link. The answer is always 202, whether or not the address signs in at this console: when it does, a link is emailed that works once, for thirty minutes, and only at this console, and earlier links stop working. Five asks in fifteen minutes per address and per caller are allowed; beyond that nothing is sent and the answer is the same.
+ *
+ * The link opens `/reset-password/{token}` on the console that asked, whose page sends the token to `POST /v1/auth/password/reset`.
+ */
+export const requestPasswordReset = <ThrowOnError extends boolean = false>(options: Options<RequestPasswordResetData, ThrowOnError>): RequestResult<RequestPasswordResetResponses, RequestPasswordResetErrors, ThrowOnError> => (options.client ?? client).post<RequestPasswordResetResponses, RequestPasswordResetErrors, ThrowOnError>({
+    url: '/v1/auth/password/reset-request',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set a password through a link
+ *
+ * Sets a new password through a link, at the console it was asked from. Every session of the user ends; two-step sign-in still applies to the next sign-in. A refused password leaves the link unused.
+ */
+export const resetPassword = <ThrowOnError extends boolean = false>(options: Options<ResetPasswordData, ThrowOnError>): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> => (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
+    url: '/v1/auth/password/reset',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Cancel a pending address change
+ *
+ * Cancels a pending change: the old address stands and the code sent is useless.
+ */
+export const cancelIdentifierChange = <ThrowOnError extends boolean = false>(options?: Options<CancelIdentifierChangeData, ThrowOnError>): RequestResult<CancelIdentifierChangeResponses, CancelIdentifierChangeErrors, ThrowOnError> => (options?.client ?? client).delete<CancelIdentifierChangeResponses, CancelIdentifierChangeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/identifier-change',
+    ...options
+});
+
+/**
+ * Start changing the sign-in address
+ *
+ * Starts changing the sign-in email or phone: needs a fresh proof (`POST /v1/auth/step-up`; with the authenticator for a Mission Control email), then sends a code to the new address. The account is unchanged until the code passes; the pending address shows on `GET /v1/me`.
+ */
+export const beginIdentifierChange = <ThrowOnError extends boolean = false>(options: Options<BeginIdentifierChangeData, ThrowOnError>): RequestResult<BeginIdentifierChangeResponses, BeginIdentifierChangeErrors, ThrowOnError> => (options.client ?? client).post<BeginIdentifierChangeResponses, BeginIdentifierChangeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/identifier-change',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Confirm the new sign-in address
+ *
+ * Confirms the change with the code sent to the new address: it signs in from now, the old address is told, and every other session ends while this one continues. A new address another account holds is refused, but only once its code passed.
+ */
+export const confirmIdentifierChange = <ThrowOnError extends boolean = false>(options: Options<ConfirmIdentifierChangeData, ThrowOnError>): RequestResult<ConfirmIdentifierChangeResponses, ConfirmIdentifierChangeErrors, ThrowOnError> => (options.client ?? client).post<ConfirmIdentifierChangeResponses, ConfirmIdentifierChangeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/auth/identifier-change/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Mint a service token for a background job
+ *
+ * Mints a service token for a background job (workers, the simulator, CI) from its bootstrap credential: audience `service`, the credential's one job, at most an hour. A service token holds no memberships and is refused by every human surface; only the routes a job may call accept it.
+ *
+ * The credential is a secret of the job's deployment; the platform keeps only its digest. Mint attempts are rate limited per caller.
+ */
+export const mintServiceToken = <ThrowOnError extends boolean = false>(options: Options<MintServiceTokenData, ThrowOnError>): RequestResult<MintServiceTokenResponses, MintServiceTokenErrors, ThrowOnError> => (options.client ?? client).post<MintServiceTokenResponses, MintServiceTokenErrors, ThrowOnError>({
+    url: '/v1/auth/service-tokens',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
@@ -380,10 +630,15 @@ export const listPartners = <ThrowOnError extends boolean = false>(options?: Opt
 /**
  * Create a partner
  *
- * Creates a partner and makes the caller its first owner: a membership
- * with the role `owner` is created in the same request. Any signed-in
- * user may create a partner. The partner starts with the status `pending`
- * and the platform realm activates it.
+ * Creates a partner together with its roles (the maintained `OWNER` and
+ * the default roles) and its first owner, in one request. From the
+ * Partner console the caller becomes the owner: a membership holding the
+ * `OWNER` role is created with it. Platform staff onboarding a partner
+ * name the `owner` instead (an existing user is attached and told, a new
+ * person is invited by email) and may withhold permissions from the
+ * partner's entitlements; that needs `partner:write` and `staff:write`.
+ * The partner starts with the status `pending` and the platform realm
+ * activates it.
  *
  * The caller's access token does not carry the new membership until it is
  * refreshed; `GET /v1/me` reflects it at once. Publishes the events
@@ -459,12 +714,16 @@ export const getPartner = <ThrowOnError extends boolean = false>(options: Option
  * Update a partner
  *
  * Changes the members of the partner that are present in the body and
- * returns the partner. Owners and managers may change the profile, the
- * legal identity (`legal_name`, `registration_number`, `gstin`, `pan`,
- * `registered_address`) and the `contacts`; `status`, `kind` and
- * `gst_unregistered` may only be changed by the platform realm, `kind` and
- * `gst_unregistered` with a `reason`. A caller without the role for a
- * member in the body receives `403` (`forbidden`) and nothing is changed.
+ * returns the partner. Changing the profile, the legal identity
+ * (`legal_name`, `registration_number`, `gstin`, `pan`,
+ * `registered_address`) and the `contacts` needs `partner:profile:write`
+ * (platform staff `partner:write`); `status`, `kind` and
+ * `gst_unregistered` may only be changed by the platform realm: `kind` and
+ * `gst_unregistered` with `partner:write` and a `reason`, activating a
+ * pending partner with `partner:approve`, any other status with
+ * `partner:write`. A caller without the permission for a member in the
+ * body receives `403` (`access_denied`, or `forbidden` for a member only
+ * the platform realm changes) and nothing is changed.
  *
  * `status` follows the lifecycle: activating a pending partner is refused
  * with `409` (`activation_blocked`) naming every blocker (read them first
@@ -515,7 +774,7 @@ export const getPartnerStanding = <ThrowOnError extends boolean = false>(options
 /**
  * Set or clear the partner's logo
  *
- * Applies the Partner's logo as soon as it is stored, or removes it with `null`: a confirmed `partner_logo` asset, square. Owners and managers, or platform staff.
+ * Applies the Partner's logo as soon as it is stored, or removes it with `null`: a confirmed `partner_logo` asset, square. `partner:profile:write`, or platform staff with `partner:write`.
  */
 export const putPartnerLogo = <ThrowOnError extends boolean = false>(options: Options<PutPartnerLogoData, ThrowOnError>): RequestResult<PutPartnerLogoResponses, PutPartnerLogoErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerLogoResponses, PutPartnerLogoErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -530,7 +789,7 @@ export const putPartnerLogo = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Set or clear the partner's banner
  *
- * Applies the Partner's banner as soon as it is stored, or removes it with `null`: a confirmed `partner_banner` asset, twice as wide as tall. Owners and managers, or platform staff.
+ * Applies the Partner's banner as soon as it is stored, or removes it with `null`: a confirmed `partner_banner` asset, twice as wide as tall. `partner:profile:write`, or platform staff with `partner:write`.
  */
 export const putPartnerBanner = <ThrowOnError extends boolean = false>(options: Options<PutPartnerBannerData, ThrowOnError>): RequestResult<PutPartnerBannerResponses, PutPartnerBannerErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerBannerResponses, PutPartnerBannerErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -556,7 +815,7 @@ export const listPartnerDocuments = <ThrowOnError extends boolean = false>(optio
 /**
  * File a document
  *
- * Files a compliance document, pending review: the file is uploaded first under the `partner_document` purpose (private storage) and confirmed. Owners and managers, or platform staff on the Partner's behalf.
+ * Files a compliance document, pending review: the file is uploaded first under the `partner_document` purpose (private storage) and confirmed. `partner:profile:write`, or platform staff with `partner:write` on the Partner's behalf.
  */
 export const createPartnerDocument = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerDocumentData, ThrowOnError>): RequestResult<CreatePartnerDocumentResponses, CreatePartnerDocumentErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerDocumentResponses, CreatePartnerDocumentErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -571,7 +830,7 @@ export const createPartnerDocument = <ThrowOnError extends boolean = false>(opti
 /**
  * Take a document off file
  *
- * Takes a document off file; owners and managers, or platform staff.
+ * Takes a document off file; `partner:profile:write`, or platform staff with `partner:write`.
  */
 export const removePartnerDocument = <ThrowOnError extends boolean = false>(options: Options<RemovePartnerDocumentData, ThrowOnError>): RequestResult<RemovePartnerDocumentResponses, RemovePartnerDocumentErrors, ThrowOnError> => (options.client ?? client).delete<RemovePartnerDocumentResponses, RemovePartnerDocumentErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -630,7 +889,7 @@ export const getPayoutAccount = <ThrowOnError extends boolean = false>(options: 
 /**
  * State the payout account
  *
- * States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. Owners and managers, or platform staff.
+ * States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. `partner:profile:write`, or platform staff with `partner:write`.
  */
 export const putPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<PutPayoutAccountData, ThrowOnError>): RequestResult<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError> => (options.client ?? client).put<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -667,7 +926,7 @@ export const getPartnerPlan = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Change the partner's plan
  *
- * Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. The owner, or platform staff, choose the plan the trial ends into.
+ * Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write`, which the owner holds (platform staff: `partner:write`).
  */
 export const putPartnerPlan = <ThrowOnError extends boolean = false>(options: Options<PutPartnerPlanData, ThrowOnError>): RequestResult<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -682,7 +941,7 @@ export const putPartnerPlan = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Preview what a plan change would stop
  *
- * What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. The owner and platform staff.
+ * What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. `plan:write` (platform staff: `partner:read`).
  */
 export const getPlanImpact = <ThrowOnError extends boolean = false>(options: Options<GetPlanImpactData, ThrowOnError>): RequestResult<GetPlanImpactResponses, GetPlanImpactErrors, ThrowOnError> => (options.client ?? client).get<GetPlanImpactResponses, GetPlanImpactErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -693,8 +952,10 @@ export const getPlanImpact = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * List locations
  *
- * Returns the partner's locations, oldest first, in every status. Any
- * member of the partner and the platform realm may read them. The list
+ * Returns the partner's locations, oldest first, in every status: every
+ * Location for a member holding `location:read` across the partner, and
+ * only the Locations their grants name for a member holding it at chosen
+ * Locations. The list
  * is not paginated.
  *
  */
@@ -707,8 +968,9 @@ export const listLocations = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * Create a location
  *
- * Adds a location to the partner. Owners and managers may create
- * locations; other members receive `403` (`forbidden`). The location
+ * Adds a location to the partner. It needs `location:write` across the
+ * whole partner; other members receive `403` (`access_denied`), and a
+ * partner whose entitlements lack it `403` (`not_enabled_for_partner`). The location
  * starts `active`. Publishes `tenancy.location.created`.
  *
  */
@@ -725,7 +987,7 @@ export const createLocation = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Delete a location into the bin
  *
- * Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. Owners and managers.
+ * Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. `location:write` at the Location.
  */
 export const deleteLocation = <ThrowOnError extends boolean = false>(options: Options<DeleteLocationData, ThrowOnError>): RequestResult<DeleteLocationResponses, DeleteLocationErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLocationResponses, DeleteLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -736,7 +998,7 @@ export const deleteLocation = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Get a location
  *
- * Returns one of the partner's locations. Any member of the partner and the platform realm may read it.
+ * Returns one of the partner's locations. Reading it needs `location:read` at the Location, or across the partner.
  */
 export const getLocation = <ThrowOnError extends boolean = false>(options: Options<GetLocationData, ThrowOnError>): RequestResult<GetLocationResponses, GetLocationErrors, ThrowOnError> => (options.client ?? client).get<GetLocationResponses, GetLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -750,8 +1012,9 @@ export const getLocation = <ThrowOnError extends boolean = false>(options: Optio
  * Changes the members of the location that are present in the body,
  * including `status`, and returns the location with what it reads as, the
  * services on there, what it is doing now, its blockers and warnings.
- * Owners and managers may update locations; other members receive `403`
- * (`forbidden`). `status` follows the lifecycle: going live is refused with
+ * It needs `location:write` at the location (platform staff
+ * `location:write` platform-wide); other members receive `403`
+ * (`access_denied`). `status` follows the lifecycle: going live is refused with
  * `409` (`activation_blocked`) naming every blocker (read them first with
  * `GET .../activation`); asked while the partner is pending, it is
  * remembered and the location goes live with the partner's activation.
@@ -798,7 +1061,7 @@ export const getLocationActivation = <ThrowOnError extends boolean = false>(opti
 /**
  * Set how a store's orders leave it
  *
- * Replaces how orders leave the store: a method's presence enables it, own agents need the Partner's delivery Service, dine-in needs tables (not yet), and switching delivery off discards its zone. A branch has no fulfilment. Owners and managers.
+ * Replaces how orders leave the store: a method's presence enables it, own agents need the Partner's delivery Service, dine-in needs tables (not yet), and switching delivery off discards its zone. A branch has no fulfilment. `location:write` at the Location.
  */
 export const putLocationFulfilment = <ThrowOnError extends boolean = false>(options: Options<PutLocationFulfilmentData, ThrowOnError>): RequestResult<PutLocationFulfilmentResponses, PutLocationFulfilmentErrors, ThrowOnError> => (options.client ?? client).put<PutLocationFulfilmentResponses, PutLocationFulfilmentErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -813,7 +1076,7 @@ export const putLocationFulfilment = <ThrowOnError extends boolean = false>(opti
 /**
  * Change how a store takes orders
  *
- * Changes how the store takes orders; absent members are kept. The slot length, the cap per slot, the auto-reject window and prescriptions are platform staff's; slot settings sent while scheduled orders are off are refused; the window is at most seven days. Owners and managers.
+ * Changes how the store takes orders; absent members are kept. The slot length, the cap per slot, the auto-reject window and prescriptions are platform staff's; slot settings sent while scheduled orders are off are refused; the window is at most seven days. `location:write` at the Location.
  */
 export const putLocationOrderSettings = <ThrowOnError extends boolean = false>(options: Options<PutLocationOrderSettingsData, ThrowOnError>): RequestResult<PutLocationOrderSettingsResponses, PutLocationOrderSettingsErrors, ThrowOnError> => (options.client ?? client).put<PutLocationOrderSettingsResponses, PutLocationOrderSettingsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -828,7 +1091,7 @@ export const putLocationOrderSettings = <ThrowOnError extends boolean = false>(o
 /**
  * Set how a store appears
  *
- * Replaces how the store appears: reviews on or off, search tags (lower cased and de-duplicated), and the highlights, which only platform staff set. Owners and managers.
+ * Replaces how the store appears: reviews on or off, search tags (lower cased and de-duplicated), and the highlights, which only platform staff set. `location:write` at the Location.
  */
 export const putLocationListing = <ThrowOnError extends boolean = false>(options: Options<PutLocationListingData, ThrowOnError>): RequestResult<PutLocationListingResponses, PutLocationListingErrors, ThrowOnError> => (options.client ?? client).put<PutLocationListingResponses, PutLocationListingErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -843,7 +1106,7 @@ export const putLocationListing = <ThrowOnError extends boolean = false>(options
 /**
  * Resume a paused location
  *
- * Resumes a paused Location now. Owners and managers.
+ * Resumes a paused Location now. `location:write` at the Location.
  */
 export const resumeLocation = <ThrowOnError extends boolean = false>(options: Options<ResumeLocationData, ThrowOnError>): RequestResult<ResumeLocationResponses, ResumeLocationErrors, ThrowOnError> => (options.client ?? client).delete<ResumeLocationResponses, ResumeLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -854,7 +1117,7 @@ export const resumeLocation = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Pause a location
  *
- * Pauses the Location for one minute to a day with a reason, recording who; it takes orders again at that moment by itself. Pausing is operational: an active store paused for the evening is still active. Owners and managers.
+ * Pauses the Location for one minute to a day with a reason, recording who; it takes orders again at that moment by itself. Pausing is operational: an active store paused for the evening is still active. `location:write` at the Location.
  */
 export const pauseLocation = <ThrowOnError extends boolean = false>(options: Options<PauseLocationData, ThrowOnError>): RequestResult<PauseLocationResponses, PauseLocationErrors, ThrowOnError> => (options.client ?? client).post<PauseLocationResponses, PauseLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -869,7 +1132,7 @@ export const pauseLocation = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * Restore a location from the bin
  *
- * Restores a Location from the bin exactly as it was. Owners and managers.
+ * Restores a Location from the bin exactly as it was. `location:write` at the Location.
  */
 export const restoreLocation = <ThrowOnError extends boolean = false>(options: Options<RestoreLocationData, ThrowOnError>): RequestResult<RestoreLocationResponses, RestoreLocationErrors, ThrowOnError> => (options.client ?? client).post<RestoreLocationResponses, RestoreLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -880,7 +1143,7 @@ export const restoreLocation = <ThrowOnError extends boolean = false>(options: O
 /**
  * Set or clear a location's tile
  *
- * Applies the Location's tile as soon as it is stored, or removes it with `null`: a confirmed `location_logo` asset, square. Owners and managers.
+ * Applies the Location's tile as soon as it is stored, or removes it with `null`: a confirmed `location_logo` asset, square. `location:write` at the Location.
  */
 export const putLocationLogo = <ThrowOnError extends boolean = false>(options: Options<PutLocationLogoData, ThrowOnError>): RequestResult<PutLocationLogoResponses, PutLocationLogoErrors, ThrowOnError> => (options.client ?? client).put<PutLocationLogoResponses, PutLocationLogoErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -895,7 +1158,7 @@ export const putLocationLogo = <ThrowOnError extends boolean = false>(options: O
 /**
  * Set or clear a location's banner
  *
- * Applies the Location's banner as soon as it is stored, or removes it with `null`: a confirmed `location_banner` asset, twice as wide as tall. Owners and managers.
+ * Applies the Location's banner as soon as it is stored, or removes it with `null`: a confirmed `location_banner` asset, twice as wide as tall. `location:write` at the Location.
  */
 export const putLocationBanner = <ThrowOnError extends boolean = false>(options: Options<PutLocationBannerData, ThrowOnError>): RequestResult<PutLocationBannerResponses, PutLocationBannerErrors, ThrowOnError> => (options.client ?? client).put<PutLocationBannerResponses, PutLocationBannerErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -921,7 +1184,7 @@ export const listLocationHolidays = <ThrowOnError extends boolean = false>(optio
 /**
  * Close a location for a holiday
  *
- * Marks a public holiday closed at the Location in one act: a closed-all-day closure named after the holiday, added to the Location's own schedule. A holiday already covered says so. Owners and managers.
+ * Marks a public holiday closed at the Location in one act: a closed-all-day closure named after the holiday, added to the Location's own schedule. A holiday already covered says so. `location:write` at the Location.
  */
 export const closeLocationForHoliday = <ThrowOnError extends boolean = false>(options: Options<CloseLocationForHolidayData, ThrowOnError>): RequestResult<CloseLocationForHolidayResponses, CloseLocationForHolidayErrors, ThrowOnError> => (options.client ?? client).post<CloseLocationForHolidayResponses, CloseLocationForHolidayErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -932,9 +1195,10 @@ export const closeLocationForHoliday = <ThrowOnError extends boolean = false>(op
 /**
  * List members
  *
- * Returns the partner's members with their roles, oldest first. Any
- * member of the partner and the platform realm may read them. The list
- * is not paginated. Members join through invitations
+ * Returns the partner's members with their role labels, oldest first;
+ * reading them needs `staff:read`. The list is not paginated. The grants
+ * behind each label, per scope, are under
+ * `GET /v1/partners/{partner_id}/members`. Members join through invitations
  * (`POST /v1/partners/{partner_id}/invitations`); the user who created
  * the partner is its first owner.
  *
@@ -948,11 +1212,13 @@ export const listMemberships = <ThrowOnError extends boolean = false>(options: O
 /**
  * Remove a member
  *
- * Removes a member from the partner. Only owners may remove members,
- * including themselves, but the last owner cannot be removed: the request
- * answers `409` (`conflict`) and the partner keeps its owner. The removed
- * user's access tokens carry the membership until they expire, at most
- * 15 minutes; the API stops honouring it at once.
+ * Removes a member from the partner, revoking every grant into the
+ * access history; removing needs `staff:write`. The last enabled owner
+ * cannot be removed: the request answers `409` (`conflict`) and the
+ * partner keeps its owner. The removed user's access tokens carry the
+ * membership until they expire, at most 15 minutes; the API stops
+ * honouring it at once. `DELETE /v1/partners/{partner_id}/members/{membership_id}`
+ * does the same and answers `last_owner`.
  *
  */
 export const removeMembership = <ThrowOnError extends boolean = false>(options: Options<RemoveMembershipData, ThrowOnError>): RequestResult<RemoveMembershipResponses, RemoveMembershipErrors, ThrowOnError> => (options.client ?? client).delete<RemoveMembershipResponses, RemoveMembershipErrors, ThrowOnError>({
@@ -965,8 +1231,8 @@ export const removeMembership = <ThrowOnError extends boolean = false>(options: 
  * List invitations
  *
  * Returns the partner's invitations in every status, newest first.
- * Owners, managers and the platform realm may read them; other members
- * receive `403` (`forbidden`), because invitations carry email addresses.
+ * Reading them needs `staff:read`, because invitations carry email
+ * addresses; other members receive `403` (`access_denied`).
  * The list is not paginated.
  *
  */
@@ -979,12 +1245,15 @@ export const listInvitations = <ThrowOnError extends boolean = false>(options: O
 /**
  * Invite a user
  *
- * Creates an invitation to join the partner with the given role and sends
- * an email to the address with a link that accepts it. Owners and
- * managers may invite; only an owner may grant the role `owner`, and a
- * manager who tries receives `403` (`forbidden`). An address that already
- * belongs to a member, or that has a pending invitation for this partner,
- * answers `409` (`conflict`). Publishes `identity.invitation.sent`.
+ * Creates an invitation to join the partner with a role, at the whole
+ * partner or at the Locations and Services named, and sends an email to
+ * the address with a link that accepts it. Inviting needs `staff:write`,
+ * and nobody hands out a role holding more than they hold: such a role
+ * answers `403` (`permission_escalation`). The owner role covers the whole
+ * partner (`invalid_scope` with places); a place of another partner
+ * answers `409` (`cross_tenant_scope`). An address that already belongs
+ * to a member, or that has a pending invitation for this partner, answers
+ * `409` (`conflict`). Publishes `identity.invitation.sent`.
  *
  */
 export const createInvitation = <ThrowOnError extends boolean = false>(options: Options<CreateInvitationData, ThrowOnError>): RequestResult<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError> => (options.client ?? client).post<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError>({
@@ -1001,8 +1270,8 @@ export const createInvitation = <ThrowOnError extends boolean = false>(options: 
  * Revoke an invitation
  *
  * Revokes a pending invitation, so that its link no longer works, and
- * keeps it in the list with the status `revoked`. Owners and managers may
- * revoke. An invitation that is not `pending` any more answers `409`
+ * keeps it in the list with the status `revoked`. Revoking needs
+ * `staff:write`. An invitation that is not `pending` any more answers `409`
  * (`conflict`).
  *
  */
@@ -1020,9 +1289,15 @@ export const revokeInvitation = <ThrowOnError extends boolean = false>(options: 
  * address, so no other credential is needed. When no user exists for the
  * address, one is created with the `display_name` and the optional
  * `password` from the body; an existing user keeps their own, and the
- * body may be empty or absent. The response carries the session, delivered
- * the same way as by the sign-in operations (see the `Auth` tag), and the
- * new membership.
+ * body may be empty or absent; a `password` is used only when the user
+ * has none yet. The membership is created with the invitation's role at
+ * its places. The response carries the session, for the surface the
+ * invitation was for (Mission Control for an invitation into the platform,
+ * the Partner console otherwise) and delivered as `delivery` says or, when
+ * it is omitted, as in step 1 (see the `Auth` tag), and the new
+ * membership. When the invitee has two-step sign-in on, the answer is
+ * `202`: the membership exists and the session waits for an authenticator
+ * or recovery code at `POST /v1/auth/two-step/verify`.
  *
  * An unknown token answers `404` (`not_found`). A token whose invitation
  * was revoked, has expired or was already accepted answers `410`
@@ -1047,8 +1322,9 @@ export const acceptInvitation = <ThrowOnError extends boolean = false>(options: 
  * status, each with the locations it is switched on at, whether it trades
  * and what stops it; every kind as enabled, awaiting documents, disabled,
  * available, or not in the plan with the plan that includes it; and the
- * plan. Any member of the partner and the platform realm may read it. The
- * list is not paginated.
+ * plan. Reading it needs `service:read` across the partner (platform staff
+ * `partner:read`); other members receive `403` (`access_denied`). The list
+ * is not paginated.
  *
  */
 export const listServices = <ThrowOnError extends boolean = false>(options: Options<ListServicesData, ThrowOnError>): RequestResult<ListServicesResponses, ListServicesErrors, ThrowOnError> => (options.client ?? client).get<ListServicesResponses, ListServicesErrors, ThrowOnError>({
@@ -1060,7 +1336,7 @@ export const listServices = <ThrowOnError extends boolean = false>(options: Opti
 /**
  * Register a service
  *
- * Registers a Service: several of one kind are allowed. Enabled unless `enabled` is `false`; a kind the plan lacks is refused naming the plan that has it; a kind needing documents not yet approved (product sales of a food catalogue type needs the FSSAI licence) lands in `awaiting_documents`, configurable and not trading. Switched on everywhere unless `location_ids` names some. Send `Idempotency-Key` to make a repeated creation answer the first. Owners and managers; platform staff with a reason.
+ * Registers a Service: several of one kind are allowed. Enabled unless `enabled` is `false`; a kind the plan lacks is refused naming the plan that has it; a kind needing documents not yet approved (product sales of a food catalogue type needs the FSSAI licence) lands in `awaiting_documents`, configurable and not trading. Switched on everywhere unless `location_ids` names some. Send `Idempotency-Key` to make a repeated creation answer the first. `service:write`; platform staff with `partner:write` and a reason.
  */
 export const createService = <ThrowOnError extends boolean = false>(options: Options<CreateServiceData, ThrowOnError>): RequestResult<CreateServiceResponses, CreateServiceErrors, ThrowOnError> => (options.client ?? client).post<CreateServiceResponses, CreateServiceErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1086,7 +1362,7 @@ export const getService = <ThrowOnError extends boolean = false>(options: Option
 /**
  * Change a service
  *
- * Changes a Service, by id or by kind: its name, its configuration as a whole, where it is switched on, and enabling or disabling it. Disabling stops its trade at once and keeps the configuration; re-enabling restores it as it was, waiting for documents its kind needs. Owners and managers; platform staff with a reason.
+ * Changes a Service, by id or by kind: its name, its configuration as a whole, where it is switched on, and enabling or disabling it. Disabling stops its trade at once and keeps the configuration; re-enabling restores it as it was, waiting for documents its kind needs. `service:write`; platform staff with `partner:write` and a reason.
  */
 export const updateService = <ThrowOnError extends boolean = false>(options: Options<UpdateServiceData, ThrowOnError>): RequestResult<UpdateServiceResponses, UpdateServiceErrors, ThrowOnError> => (options.client ?? client).patch<UpdateServiceResponses, UpdateServiceErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1105,9 +1381,11 @@ export const updateService = <ThrowOnError extends boolean = false>(options: Opt
  * location, or changes its status, configuration and name when it exists,
  * and returns it with `200` in both cases. Enabling a kind the plan lacks
  * is refused with `403` (`not_in_plan`); enabling a kind that needs
- * documents not yet approved lands in `awaiting_documents`. Owners and
- * managers may put services; other members receive `403` (`forbidden`);
- * platform staff acting for the partner give a `reason`. Publishes
+ * documents not yet approved lands in `awaiting_documents`. It needs
+ * `service:write` across the partner; other members receive `403`
+ * (`access_denied`), and a partner whose entitlements lack the permission
+ * `403` (`not_enabled_for_partner`); platform staff acting for the partner
+ * need `partner:write` and give a `reason`. Publishes
  * `tenancy.service.updated`.
  *
  */
@@ -1124,7 +1402,7 @@ export const upsertService = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * Switch a service off at a location
  *
- * Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. Owners and managers; platform staff with a reason.
+ * Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. `service:write`; platform staff with `partner:write` and a reason.
  */
 export const deleteServiceLocation = <ThrowOnError extends boolean = false>(options: Options<DeleteServiceLocationData, ThrowOnError>): RequestResult<DeleteServiceLocationResponses, DeleteServiceLocationErrors, ThrowOnError> => (options.client ?? client).delete<DeleteServiceLocationResponses, DeleteServiceLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1146,7 +1424,7 @@ export const getServiceLocation = <ThrowOnError extends boolean = false>(options
 /**
  * Switch a service on at a location
  *
- * Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. Owners and managers; platform staff with a reason.
+ * Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. `service:write`; platform staff with `partner:write` and a reason.
  */
 export const putServiceLocation = <ThrowOnError extends boolean = false>(options: Options<PutServiceLocationData, ThrowOnError>): RequestResult<PutServiceLocationResponses, PutServiceLocationErrors, ThrowOnError> => (options.client ?? client).put<PutServiceLocationResponses, PutServiceLocationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1172,7 +1450,7 @@ export const getDeliveryPricing = <ThrowOnError extends boolean = false>(options
 /**
  * Version a delivery service's pricing
  *
- * Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. Owners and managers; platform staff with a reason.
+ * Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. `service:write`; platform staff with `partner:write` and a reason.
  */
 export const putDeliveryPricing = <ThrowOnError extends boolean = false>(options: Options<PutDeliveryPricingData, ThrowOnError>): RequestResult<PutDeliveryPricingResponses, PutDeliveryPricingErrors, ThrowOnError> => (options.client ?? client).put<PutDeliveryPricingResponses, PutDeliveryPricingErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1192,6 +1470,624 @@ export const putDeliveryPricing = <ThrowOnError extends boolean = false>(options
 export const quoteDelivery = <ThrowOnError extends boolean = false>(options: Options<QuoteDeliveryData, ThrowOnError>): RequestResult<QuoteDeliveryResponses, QuoteDeliveryErrors, ThrowOnError> => (options.client ?? client).get<QuoteDeliveryResponses, QuoteDeliveryErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/v1/partners/{partner_id}/services/{service_id}/pricing/quote',
+    ...options
+});
+
+/**
+ * List the permission catalogue of a pool
+ *
+ * The permission catalogue of one pool, so an editor offers exactly what can be granted there: the partner pool is the partner set, never the platform's configuration permissions; the platform pool never holds `partner:access` or `agent:access`. `role:read`.
+ */
+export const listPermissions = <ThrowOnError extends boolean = false>(options?: Options<ListPermissionsData, ThrowOnError>): RequestResult<ListPermissionsResponses, ListPermissionsErrors, ThrowOnError> => (options?.client ?? client).get<ListPermissionsResponses, ListPermissionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/permissions',
+    ...options
+});
+
+/**
+ * List a partner's access history
+ *
+ * Every grant and revocation at the partner, newest first: who acted, on whom, which role, at what scope; filter by `user_id` or `membership_id`. `staff:read`.
+ */
+export const listPartnerAccessHistory = <ThrowOnError extends boolean = false>(options: Options<ListPartnerAccessHistoryData, ThrowOnError>): RequestResult<ListPartnerAccessHistoryResponses, ListPartnerAccessHistoryErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerAccessHistoryResponses, ListPartnerAccessHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/access-history',
+    ...options
+});
+
+/**
+ * Read a partner's entitlements
+ *
+ * The partner's entitlements: what its roles may contain and what the platform withholds. Members with `role:read`; platform staff with `partner:read`.
+ */
+export const getEntitlements = <ThrowOnError extends boolean = false>(options: Options<GetEntitlementsData, ThrowOnError>): RequestResult<GetEntitlementsResponses, GetEntitlementsErrors, ThrowOnError> => (options.client ?? client).get<GetEntitlementsResponses, GetEntitlementsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/entitlements',
+    ...options
+});
+
+/**
+ * Replace what a partner is withheld
+ *
+ * Replaces what the platform withholds from the partner; platform staff with `partner:write`. Every role of the partner loses what is withheld at once, and the audit log records it.
+ */
+export const updateEntitlements = <ThrowOnError extends boolean = false>(options: Options<UpdateEntitlementsData, ThrowOnError>): RequestResult<UpdateEntitlementsResponses, UpdateEntitlementsErrors, ThrowOnError> => (options.client ?? client).put<UpdateEntitlementsResponses, UpdateEntitlementsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/entitlements',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the requests to view the partner's console
+ *
+ * The requests to view the Partner's console, newest first, for its owners: the notice they decide from.
+ */
+export const listPartnerImpersonationConsents = <ThrowOnError extends boolean = false>(options: Options<ListPartnerImpersonationConsentsData, ThrowOnError>): RequestResult<ListPartnerImpersonationConsentsResponses, ListPartnerImpersonationConsentsErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerImpersonationConsentsResponses, ListPartnerImpersonationConsentsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/impersonation/consents',
+    ...options
+});
+
+/**
+ * Consent to being viewed
+ *
+ * An owner approves a request to view the console, for twenty-four hours; changes allowed only when asked for and allowed here.
+ */
+export const approveImpersonationConsent = <ThrowOnError extends boolean = false>(options: Options<ApproveImpersonationConsentData, ThrowOnError>): RequestResult<ApproveImpersonationConsentResponses, ApproveImpersonationConsentErrors, ThrowOnError> => (options.client ?? client).post<ApproveImpersonationConsentResponses, ApproveImpersonationConsentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/approve',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Refuse to be viewed
+ *
+ * An owner refuses a request to view the console.
+ */
+export const rejectImpersonationConsent = <ThrowOnError extends boolean = false>(options: Options<RejectImpersonationConsentData, ThrowOnError>): RequestResult<RejectImpersonationConsentResponses, RejectImpersonationConsentErrors, ThrowOnError> => (options.client ?? client).post<RejectImpersonationConsentResponses, RejectImpersonationConsentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/reject',
+    ...options
+});
+
+/**
+ * Withdraw a consent
+ *
+ * An owner withdraws a consent: the sessions running under it end at once.
+ */
+export const revokeImpersonationConsent = <ThrowOnError extends boolean = false>(options: Options<RevokeImpersonationConsentData, ThrowOnError>): RequestResult<RevokeImpersonationConsentResponses, RevokeImpersonationConsentErrors, ThrowOnError> => (options.client ?? client).post<RevokeImpersonationConsentResponses, RevokeImpersonationConsentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/revoke',
+    ...options
+});
+
+/**
+ * List who viewed the partner's console
+ *
+ * The sessions in which platform staff viewed the console, running and past, for its owners.
+ */
+export const listPartnerImpersonations = <ThrowOnError extends boolean = false>(options: Options<ListPartnerImpersonationsData, ThrowOnError>): RequestResult<ListPartnerImpersonationsResponses, ListPartnerImpersonationsErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerImpersonationsResponses, ListPartnerImpersonationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/impersonation/sessions',
+    ...options
+});
+
+/**
+ * List a partner's team with their grants
+ *
+ * The partner's members, each with every grant naming its scope and the permissions held there; `staff:read`. Filterable by status, role and Location.
+ */
+export const listTeamMembers = <ThrowOnError extends boolean = false>(options: Options<ListTeamMembersData, ThrowOnError>): RequestResult<ListTeamMembersResponses, ListTeamMembersErrors, ThrowOnError> => (options.client ?? client).get<ListTeamMembersResponses, ListTeamMembersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members',
+    ...options
+});
+
+/**
+ * Remove a team member
+ *
+ * Removes a member, revoking every grant into the access history; `staff:write`. The user, their profile and their other memberships remain; the last enabled owner stays (`last_owner`).
+ */
+export const removeTeamMember = <ThrowOnError extends boolean = false>(options: Options<RemoveTeamMemberData, ThrowOnError>): RequestResult<RemoveTeamMemberResponses, RemoveTeamMemberErrors, ThrowOnError> => (options.client ?? client).delete<RemoveTeamMemberResponses, RemoveTeamMemberErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}',
+    ...options
+});
+
+/**
+ * Get a team member
+ *
+ * One member with every grant; `staff:read`.
+ */
+export const getTeamMember = <ThrowOnError extends boolean = false>(options: Options<GetTeamMemberData, ThrowOnError>): RequestResult<GetTeamMemberResponses, GetTeamMemberErrors, ThrowOnError> => (options.client ?? client).get<GetTeamMemberResponses, GetTeamMemberErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}',
+    ...options
+});
+
+/**
+ * Rename a team member
+ *
+ * Renames how a member is shown here; `staff:write`.
+ */
+export const updateTeamMember = <ThrowOnError extends boolean = false>(options: Options<UpdateTeamMemberData, ThrowOnError>): RequestResult<UpdateTeamMemberResponses, UpdateTeamMemberErrors, ThrowOnError> => (options.client ?? client).patch<UpdateTeamMemberResponses, UpdateTeamMemberErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set a member's access in one act
+ *
+ * Sets a member's access in one act as one role at the whole partner or at the Locations and Services named; the difference is applied as grants and revocations, each in the access history. `staff:write`, and the role must be held by who acts.
+ */
+export const setMemberAccess = <ThrowOnError extends boolean = false>(options: Options<SetMemberAccessData, ThrowOnError>): RequestResult<SetMemberAccessResponses, SetMemberAccessErrors, ThrowOnError> => (options.client ?? client).put<SetMemberAccessResponses, SetMemberAccessErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/access',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Disable a team member
+ *
+ * Disables a membership: the member cannot enter the partner and keeps their grants for re-enabling. `staff:write`; nobody disables themselves (`cannot_disable_self`) and the last enabled owner stays (`last_owner`).
+ */
+export const disableTeamMember = <ThrowOnError extends boolean = false>(options: Options<DisableTeamMemberData, ThrowOnError>): RequestResult<DisableTeamMemberResponses, DisableTeamMemberErrors, ThrowOnError> => (options.client ?? client).post<DisableTeamMemberResponses, DisableTeamMemberErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/disable',
+    ...options
+});
+
+/**
+ * Enable a team member
+ *
+ * Enables a disabled membership: its grants apply again; `staff:write`.
+ */
+export const enableTeamMember = <ThrowOnError extends boolean = false>(options: Options<EnableTeamMemberData, ThrowOnError>): RequestResult<EnableTeamMemberResponses, EnableTeamMemberErrors, ThrowOnError> => (options.client ?? client).post<EnableTeamMemberResponses, EnableTeamMemberErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/enable',
+    ...options
+});
+
+/**
+ * Grant a role to a member
+ *
+ * Grants a role to a member at the whole partner, or at one Location or one Service of it; `staff:write`, and nobody hands out a role holding more than they hold.
+ */
+export const createMemberGrant = <ThrowOnError extends boolean = false>(options: Options<CreateMemberGrantData, ThrowOnError>): RequestResult<CreateMemberGrantResponses, CreateMemberGrantErrors, ThrowOnError> => (options.client ?? client).post<CreateMemberGrantResponses, CreateMemberGrantErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/grants',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Revoke a member's grant
+ *
+ * Revokes a grant; `staff:write`. The owner role is never revoked from its last enabled holder (`last_owner`).
+ */
+export const revokeMemberGrant = <ThrowOnError extends boolean = false>(options: Options<RevokeMemberGrantData, ThrowOnError>): RequestResult<RevokeMemberGrantResponses, RevokeMemberGrantErrors, ThrowOnError> => (options.client ?? client).delete<RevokeMemberGrantResponses, RevokeMemberGrantErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/grants/{grant_id}',
+    ...options
+});
+
+/**
+ * Turn a member's two-step sign-in off
+ *
+ * Turns a member's two-step sign-in off when they lost their phone and their recovery codes: `staff:write`, never for oneself (`two_step_self`). The member's sessions end, the act is in the audit log, and they sign in with the password alone.
+ */
+export const resetMemberTwoStep = <ThrowOnError extends boolean = false>(options: Options<ResetMemberTwoStepData, ThrowOnError>): RequestResult<ResetMemberTwoStepResponses, ResetMemberTwoStepErrors, ThrowOnError> => (options.client ?? client).post<ResetMemberTwoStepResponses, ResetMemberTwoStepErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/members/{membership_id}/two-step/reset',
+    ...options
+});
+
+/**
+ * List the permissions a partner's roles may contain
+ *
+ * The permissions this partner's roles may contain: its entitlements, as the role editor offers them; `role:read`.
+ */
+export const listPartnerPermissions = <ThrowOnError extends boolean = false>(options: Options<ListPartnerPermissionsData, ThrowOnError>): RequestResult<ListPartnerPermissionsResponses, ListPartnerPermissionsErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerPermissionsResponses, ListPartnerPermissionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/permissions',
+    ...options
+});
+
+/**
+ * List a partner's roles
+ *
+ * The partner's roles with how many hold each; `role:read`.
+ */
+export const listPartnerRoles = <ThrowOnError extends boolean = false>(options: Options<ListPartnerRolesData, ThrowOnError>): RequestResult<ListPartnerRolesResponses, ListPartnerRolesErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerRolesResponses, ListPartnerRolesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/roles',
+    ...options
+});
+
+/**
+ * Define a partner role
+ *
+ * Defines a role of the partner: every permission known, inside the partner's entitlements and held by who acts. `role:write`; platform staff `partner:role:write`.
+ */
+export const createPartnerRole = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerRoleData, ThrowOnError>): RequestResult<CreatePartnerRoleResponses, CreatePartnerRoleErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerRoleResponses, CreatePartnerRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/roles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a partner role
+ *
+ * Deletes a custom role nobody holds; `role:write` (platform staff `partner:role:write`). Maintained and default roles are refused, a held role is `role_in_use`.
+ */
+export const deletePartnerRole = <ThrowOnError extends boolean = false>(options: Options<DeletePartnerRoleData, ThrowOnError>): RequestResult<DeletePartnerRoleResponses, DeletePartnerRoleErrors, ThrowOnError> => (options.client ?? client).delete<DeletePartnerRoleResponses, DeletePartnerRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/roles/{role_id}',
+    ...options
+});
+
+/**
+ * Get a partner role
+ *
+ * One role of the partner, with its version as the `ETag`; `role:read`. Another partner's role is not found.
+ */
+export const getPartnerRole = <ThrowOnError extends boolean = false>(options: Options<GetPartnerRoleData, ThrowOnError>): RequestResult<GetPartnerRoleResponses, GetPartnerRoleErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerRoleResponses, GetPartnerRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/roles/{role_id}',
+    ...options
+});
+
+/**
+ * Change a partner role
+ *
+ * Renames a custom role or replaces a role's permissions (never a maintained role's). The whole new set must be inside the entitlements and held by who acts. `role:write`; platform staff `partner:role:write`. Send `If-Match` to be refused when the role moved.
+ */
+export const updatePartnerRole = <ThrowOnError extends boolean = false>(options: Options<UpdatePartnerRoleData, ThrowOnError>): RequestResult<UpdatePartnerRoleResponses, UpdatePartnerRoleErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePartnerRoleResponses, UpdatePartnerRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/roles/{role_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the access history of every realm
+ *
+ * Every Partner's and the platform's access history, newest first; filter by `partner_id`, `user_id` or `membership_id`. `staff:read`.
+ */
+export const listAccessHistory = <ThrowOnError extends boolean = false>(options?: Options<ListAccessHistoryData, ThrowOnError>): RequestResult<ListAccessHistoryResponses, ListAccessHistoryErrors, ThrowOnError> => (options?.client ?? client).get<ListAccessHistoryResponses, ListAccessHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/access-history',
+    ...options
+});
+
+/**
+ * List the four-eyes proposals
+ *
+ * The proposals, newest first; `staff:read` or `approval:decide`.
+ */
+export const listApprovals = <ThrowOnError extends boolean = false>(options?: Options<ListApprovalsData, ThrowOnError>): RequestResult<ListApprovalsResponses, ListApprovalsErrors, ThrowOnError> => (options?.client ?? client).get<ListApprovalsResponses, ListApprovalsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/approvals',
+    ...options
+});
+
+/**
+ * Propose a four-eyes act
+ *
+ * Proposes a four-eyes act: granting or revoking a platform role, turning a platform member's two-step off, or disabling a platform member. `staff:write`. The parameters are checked and frozen now (a Partner's role is `cross_tenant_role`, a role holding more than the proposer holds `permission_escalation`, oneself `two_step_self` or `cannot_disable_self`). When no other platform member could decide it, the act runs at once and the proposal reads approved, flagged `sole_decider`.
+ *
+ * These four acts happen only through a proposal; there is no direct operation for them.
+ */
+export const proposeApproval = <ThrowOnError extends boolean = false>(options: Options<ProposeApprovalData, ThrowOnError>): RequestResult<ProposeApprovalResponses, ProposeApprovalErrors, ThrowOnError> => (options.client ?? client).post<ProposeApprovalResponses, ProposeApprovalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/approvals',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get a proposal
+ *
+ * One proposal; `staff:read` or `approval:decide`.
+ */
+export const getApproval = <ThrowOnError extends boolean = false>(options: Options<GetApprovalData, ThrowOnError>): RequestResult<GetApprovalResponses, GetApprovalErrors, ThrowOnError> => (options.client ?? client).get<GetApprovalResponses, GetApprovalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/approvals/{approval_id}',
+    ...options
+});
+
+/**
+ * Approve a proposal
+ *
+ * Approves a proposal: the act runs exactly as proposed and the audit log names proposer and approver. `approval:decide` and the act's permission (`staff:write`); never the proposer (`self_approval`, the super admin included). A decided proposal is `approval_decided`, one past seventy-two hours `approval_expired`, one whose membership changed since `approval_voided`.
+ */
+export const approveApproval = <ThrowOnError extends boolean = false>(options: Options<ApproveApprovalData, ThrowOnError>): RequestResult<ApproveApprovalResponses, ApproveApprovalErrors, ThrowOnError> => (options.client ?? client).post<ApproveApprovalResponses, ApproveApprovalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/approvals/{approval_id}/approve',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Reject a proposal
+ *
+ * Rejects a proposal; `approval:decide`.
+ */
+export const rejectApproval = <ThrowOnError extends boolean = false>(options: Options<RejectApprovalData, ThrowOnError>): RequestResult<RejectApprovalResponses, RejectApprovalErrors, ThrowOnError> => (options.client ?? client).post<RejectApprovalResponses, RejectApprovalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/approvals/{approval_id}/reject',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the requests to view partner consoles
+ *
+ * The consents asked, newest first; `impersonate` or `audit:read`.
+ */
+export const listImpersonationConsents = <ThrowOnError extends boolean = false>(options?: Options<ListImpersonationConsentsData, ThrowOnError>): RequestResult<ListImpersonationConsentsResponses, ListImpersonationConsentsErrors, ThrowOnError> => (options?.client ?? client).get<ListImpersonationConsentsResponses, ListImpersonationConsentsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/consents',
+    ...options
+});
+
+/**
+ * Ask a partner's consent to view its console
+ *
+ * Asks a Partner's owners to consent to being viewed; `impersonate`. They decide from a notice in the Partner console.
+ */
+export const requestImpersonationConsent = <ThrowOnError extends boolean = false>(options: Options<RequestImpersonationConsentData, ThrowOnError>): RequestResult<RequestImpersonationConsentResponses, RequestImpersonationConsentErrors, ThrowOnError> => (options.client ?? client).post<RequestImpersonationConsentResponses, RequestImpersonationConsentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/consents',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the impersonation log
+ *
+ * The impersonation log: every session, newest first; `impersonate` or `audit:read`.
+ */
+export const listImpersonations = <ThrowOnError extends boolean = false>(options?: Options<ListImpersonationsData, ThrowOnError>): RequestResult<ListImpersonationsResponses, ListImpersonationsErrors, ThrowOnError> => (options?.client ?? client).get<ListImpersonationsResponses, ListImpersonationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/sessions',
+    ...options
+});
+
+/**
+ * Start viewing a partner's console
+ *
+ * Starts viewing a Partner's console as the owner who consented: the member who asked, `impersonate`, while the consent lasts (`consent_required` otherwise). Sixty minutes at most; the owner is told when it starts and ends.
+ */
+export const startImpersonation = <ThrowOnError extends boolean = false>(options: Options<StartImpersonationData, ThrowOnError>): RequestResult<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError> => (options.client ?? client).post<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/sessions',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * End an impersonation session
+ *
+ * Ends a running session of the caller's; its tokens are refused from the next request.
+ */
+export const endImpersonation = <ThrowOnError extends boolean = false>(options: Options<EndImpersonationData, ThrowOnError>): RequestResult<EndImpersonationResponses, EndImpersonationErrors, ThrowOnError> => (options.client ?? client).post<EndImpersonationResponses, EndImpersonationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/sessions/{impersonation_id}/end',
+    ...options
+});
+
+/**
+ * Renew an impersonation token
+ *
+ * A fresh token for a running session of the caller's; `impersonate`.
+ */
+export const renewImpersonationToken = <ThrowOnError extends boolean = false>(options: Options<RenewImpersonationTokenData, ThrowOnError>): RequestResult<RenewImpersonationTokenResponses, RenewImpersonationTokenErrors, ThrowOnError> => (options.client ?? client).post<RenewImpersonationTokenResponses, RenewImpersonationTokenErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/impersonation/sessions/{impersonation_id}/token',
+    ...options
+});
+
+/**
+ * List the platform invitations
+ *
+ * The platform's invitations, newest first; `staff:read`.
+ */
+export const listPlatformInvitations = <ThrowOnError extends boolean = false>(options?: Options<ListPlatformInvitationsData, ThrowOnError>): RequestResult<ListPlatformInvitationsResponses, ListPlatformInvitationsErrors, ThrowOnError> => (options?.client ?? client).get<ListPlatformInvitationsResponses, ListPlatformInvitationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/invitations',
+    ...options
+});
+
+/**
+ * Revoke a platform invitation
+ *
+ * Revokes a pending platform invitation; `staff:write`.
+ */
+export const revokePlatformInvitation = <ThrowOnError extends boolean = false>(options: Options<RevokePlatformInvitationData, ThrowOnError>): RequestResult<RevokePlatformInvitationResponses, RevokePlatformInvitationErrors, ThrowOnError> => (options.client ?? client).delete<RevokePlatformInvitationResponses, RevokePlatformInvitationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/invitations/{invitation_id}',
+    ...options
+});
+
+/**
+ * List the platform roles
+ *
+ * The platform's roles with how many hold each; `role:read`. `SUPER_ADMIN` is maintained: a console offers neither editing nor deletion.
+ */
+export const listPlatformRoles = <ThrowOnError extends boolean = false>(options?: Options<ListPlatformRolesData, ThrowOnError>): RequestResult<ListPlatformRolesResponses, ListPlatformRolesErrors, ThrowOnError> => (options?.client ?? client).get<ListPlatformRolesResponses, ListPlatformRolesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/roles',
+    ...options
+});
+
+/**
+ * Define a platform role
+ *
+ * Defines a platform role from the platform pool, holding only what who acts holds; `role:write`. `SUPER_ADMIN` is a reserved name, refused before the ceiling.
+ */
+export const createPlatformRole = <ThrowOnError extends boolean = false>(options: Options<CreatePlatformRoleData, ThrowOnError>): RequestResult<CreatePlatformRoleResponses, CreatePlatformRoleErrors, ThrowOnError> => (options.client ?? client).post<CreatePlatformRoleResponses, CreatePlatformRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/roles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a platform role
+ *
+ * Deletes a custom platform role nobody holds; `role:write`.
+ */
+export const deletePlatformRole = <ThrowOnError extends boolean = false>(options: Options<DeletePlatformRoleData, ThrowOnError>): RequestResult<DeletePlatformRoleResponses, DeletePlatformRoleErrors, ThrowOnError> => (options.client ?? client).delete<DeletePlatformRoleResponses, DeletePlatformRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/roles/{role_id}',
+    ...options
+});
+
+/**
+ * Get a platform role
+ *
+ * One platform role; `role:read`. A Partner's role is not found here: a tenant's roles are reached only through its own door.
+ */
+export const getPlatformRole = <ThrowOnError extends boolean = false>(options: Options<GetPlatformRoleData, ThrowOnError>): RequestResult<GetPlatformRoleResponses, GetPlatformRoleErrors, ThrowOnError> => (options.client ?? client).get<GetPlatformRoleResponses, GetPlatformRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/roles/{role_id}',
+    ...options
+});
+
+/**
+ * Change a platform role
+ *
+ * Renames a custom platform role or replaces a platform role's permissions; `role:write`. `SUPER_ADMIN` is refused as maintained by the platform; a Partner's role is not found.
+ */
+export const updatePlatformRole = <ThrowOnError extends boolean = false>(options: Options<UpdatePlatformRoleData, ThrowOnError>): RequestResult<UpdatePlatformRoleResponses, UpdatePlatformRoleErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePlatformRoleResponses, UpdatePlatformRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/roles/{role_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the platform staff
+ *
+ * The platform's members with their roles; `staff:read`. Filterable by status and role.
+ */
+export const listPlatformStaff = <ThrowOnError extends boolean = false>(options?: Options<ListPlatformStaffData, ThrowOnError>): RequestResult<ListPlatformStaffResponses, ListPlatformStaffErrors, ThrowOnError> => (options?.client ?? client).get<ListPlatformStaffResponses, ListPlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff',
+    ...options
+});
+
+/**
+ * Invite a person into the platform
+ *
+ * Invites a person into the platform; `staff:write`. A platform membership grants nothing by default: roles are granted once the invitation is accepted.
+ *
+ * Granting a platform role, revoking one, turning a platform member's two-step sign-in off and disabling a platform member are four-eyes acts: they are proposed at `POST /v1/platform/approvals` and run when a different platform member approves them.
+ */
+export const invitePlatformStaff = <ThrowOnError extends boolean = false>(options: Options<InvitePlatformStaffData, ThrowOnError>): RequestResult<InvitePlatformStaffResponses, InvitePlatformStaffErrors, ThrowOnError> => (options.client ?? client).post<InvitePlatformStaffResponses, InvitePlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Remove a platform member
+ *
+ * Removes a platform membership; `staff:write`. The person's identity, their other memberships and their customer profile remain; the last enabled `SUPER_ADMIN` stays.
+ */
+export const removePlatformStaff = <ThrowOnError extends boolean = false>(options: Options<RemovePlatformStaffData, ThrowOnError>): RequestResult<RemovePlatformStaffResponses, RemovePlatformStaffErrors, ThrowOnError> => (options.client ?? client).delete<RemovePlatformStaffResponses, RemovePlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff/{membership_id}',
+    ...options
+});
+
+/**
+ * Get a platform member
+ *
+ * One platform member with their roles; `staff:read`.
+ */
+export const getPlatformStaff = <ThrowOnError extends boolean = false>(options: Options<GetPlatformStaffData, ThrowOnError>): RequestResult<GetPlatformStaffResponses, GetPlatformStaffErrors, ThrowOnError> => (options.client ?? client).get<GetPlatformStaffResponses, GetPlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff/{membership_id}',
+    ...options
+});
+
+/**
+ * Rename a platform member
+ *
+ * Renames how a platform member is shown; `staff:write`.
+ */
+export const updatePlatformStaff = <ThrowOnError extends boolean = false>(options: Options<UpdatePlatformStaffData, ThrowOnError>): RequestResult<UpdatePlatformStaffResponses, UpdatePlatformStaffErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePlatformStaffResponses, UpdatePlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff/{membership_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Enable a platform member
+ *
+ * Enables a disabled platform membership; `staff:write`.
+ */
+export const enablePlatformStaff = <ThrowOnError extends boolean = false>(options: Options<EnablePlatformStaffData, ThrowOnError>): RequestResult<EnablePlatformStaffResponses, EnablePlatformStaffErrors, ThrowOnError> => (options.client ?? client).post<EnablePlatformStaffResponses, EnablePlatformStaffErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/platform/staff/{membership_id}/enable',
     ...options
 });
 
@@ -1545,7 +2441,7 @@ export const getLocationPolicy = <ThrowOnError extends boolean = false>(options:
 /**
  * Saves a new version of the location's service policy layer
  *
- * Saves a new version of the location's service policy layer; owners and managers.
+ * Saves a new version of the location's service policy layer; `location:write` at the Location.
  */
 export const putLocationPolicy = <ThrowOnError extends boolean = false>(options: Options<PutLocationPolicyData, ThrowOnError>): RequestResult<PutLocationPolicyResponses, PutLocationPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutLocationPolicyResponses, PutLocationPolicyErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1593,7 +2489,7 @@ export const getLocationSchedule = <ThrowOnError extends boolean = false>(option
 /**
  * Saves a new version of the location's schedule layer
  *
- * Saves a new version of the location's schedule layer; owners and managers.
+ * Saves a new version of the location's schedule layer; `location:write` at the Location.
  */
 export const putLocationSchedule = <ThrowOnError extends boolean = false>(options: Options<PutLocationScheduleData, ThrowOnError>): RequestResult<PutLocationScheduleResponses, PutLocationScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutLocationScheduleResponses, PutLocationScheduleErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1630,7 +2526,7 @@ export const getLocationTrading = <ThrowOnError extends boolean = false>(options
 /**
  * The partner's service policy layer, its latest version
  *
- * The partner's service policy layer, its latest version; members and platform staff.
+ * The partner's service policy layer, its latest version; members, and platform staff with `partner:read`.
  */
 export const getPartnerPolicy = <ThrowOnError extends boolean = false>(options: Options<GetPartnerPolicyData, ThrowOnError>): RequestResult<GetPartnerPolicyResponses, GetPartnerPolicyErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerPolicyResponses, GetPartnerPolicyErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1641,7 +2537,7 @@ export const getPartnerPolicy = <ThrowOnError extends boolean = false>(options: 
 /**
  * Saves a new version of the partner's service policy layer
  *
- * Saves a new version of the partner's service policy layer; owners and managers.
+ * Saves a new version of the partner's service policy layer; `location:write` across the partner.
  */
 export const putPartnerPolicy = <ThrowOnError extends boolean = false>(options: Options<PutPartnerPolicyData, ThrowOnError>): RequestResult<PutPartnerPolicyResponses, PutPartnerPolicyErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerPolicyResponses, PutPartnerPolicyErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1678,7 +2574,7 @@ export const getPartnerSchedule = <ThrowOnError extends boolean = false>(options
 /**
  * Saves a new version of the partner's schedule layer (the default week of its locations)
  *
- * Saves a new version of the partner's schedule layer (the default week of its locations); owners and managers.
+ * Saves a new version of the partner's schedule layer (the default week of its locations); `location:write` across the partner.
  */
 export const putPartnerSchedule = <ThrowOnError extends boolean = false>(options: Options<PutPartnerScheduleData, ThrowOnError>): RequestResult<PutPartnerScheduleResponses, PutPartnerScheduleErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerScheduleResponses, PutPartnerScheduleErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -2389,7 +3285,7 @@ export const listAssetPurposes = <ThrowOnError extends boolean = false>(options?
 /**
  * Discards an asset and everything derived from it, deleting the bytes at the destination
  *
- * Discards an asset and everything derived from it, deleting the bytes at the destination; the row stays readable as discarded. Owners and managers, or platform staff.
+ * Discards an asset and everything derived from it, deleting the bytes at the destination; the row stays readable as discarded. With the permission that writes the file.
  */
 export const discardAsset = <ThrowOnError extends boolean = false>(options: Options<DiscardAssetData, ThrowOnError>): RequestResult<DiscardAssetResponses, DiscardAssetErrors, ThrowOnError> => (options.client ?? client).delete<DiscardAssetResponses, DiscardAssetErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -2411,7 +3307,7 @@ export const getAsset = <ThrowOnError extends boolean = false>(options: Options<
 /**
  * Confirms an upload
  *
- * Confirms an upload: the platform asks the destination to describe the file and takes every fact from that answer. Owners and managers of the Partner, or platform staff.
+ * Confirms an upload: the platform asks the destination to describe the file and takes every fact from that answer. With the permission that writes the file: the owning capability's for a platform asset, `partner:profile:write` for a Partner's (`location:write` at the Location for a Location's), `partner:write` for platform staff on a Partner's.
  */
 export const confirmAsset = <ThrowOnError extends boolean = false>(options: Options<ConfirmAssetData, ThrowOnError>): RequestResult<ConfirmAssetResponses, ConfirmAssetErrors, ThrowOnError> => (options.client ?? client).post<ConfirmAssetResponses, ConfirmAssetErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -2426,7 +3322,7 @@ export const confirmAsset = <ThrowOnError extends boolean = false>(options: Opti
 /**
  * Cuts a crop from a stored picture
  *
- * Cuts a crop from a stored picture: a new asset deriving from the original, with the rectangle in the original's pixels and the editor's recipe. Owners and managers, or platform staff.
+ * Cuts a crop from a stored picture: a new asset deriving from the original, with the rectangle in the original's pixels and the editor's recipe. With the permission that writes the original.
  */
 export const createAssetCrop = <ThrowOnError extends boolean = false>(options: Options<CreateAssetCropData, ThrowOnError>): RequestResult<CreateAssetCropResponses, CreateAssetCropErrors, ThrowOnError> => (options.client ?? client).post<CreateAssetCropResponses, CreateAssetCropErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -2459,7 +3355,7 @@ export const getAssetRendition = <ThrowOnError extends boolean = false>(options:
 /**
  * A grant for a Partner's purpose (document, logo, banner) or one of its Locations'...
  *
- * A grant for a Partner's purpose (document, logo, banner) or one of its Locations' (logo, banner); owners and managers of the Partner, or platform staff. A Location of another Partner is not found.
+ * A grant for a Partner's purpose (document, logo, banner), with `partner:profile:write` (platform staff: `partner:write`), or one of its Locations' (logo, banner), with `location:write` at the Location (platform staff: platform-wide). A Location of another Partner is not found.
  */
 export const createPartnerAssetGrant = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerAssetGrantData, ThrowOnError>): RequestResult<CreatePartnerAssetGrantResponses, CreatePartnerAssetGrantErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerAssetGrantResponses, CreatePartnerAssetGrantErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

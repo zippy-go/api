@@ -1,0 +1,30 @@
+type: object
+description: "The response of `POST /v1/invitations/{token}/accept` when the invitee's two-step sign-in is on: the membership exists, and the session waits for an authenticator or recovery code at `POST /v1/auth/two-step/verify`."
+required:
+  - second_step
+  - membership
+properties:
+  second_step:
+    $ref: ../auth/TwoStepChallenge.yaml
+    description: The second step the session waits for.
+  membership:
+    $ref: ../memberships/Membership.yaml
+    description: The new membership.
+examples:
+  - membership:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      user:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        email: owner@example.com
+        phone: null
+        display_name: User 20
+        created_at: 2026-10-14T08:00:00Z
+      role: manager
+      created_at: 2026-10-15T09:00:00Z
+    second_step:
+      challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a26
+      expires_at: 2026-10-15T09:05:00Z
+      methods:
+        - authenticator
+        - recovery_code

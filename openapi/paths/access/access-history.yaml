@@ -1,0 +1,100 @@
+# Path item for /v1/platform/access-history. Referenced from openapi.yaml.
+get:
+  operationId: listAccessHistory
+  summary: List the access history of every realm
+  description: Every Partner's and the platform's access history, newest first; filter by `partner_id`, `user_id` or `membership_id`. `staff:read`.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  parameters:
+    - name: partner_id
+      in: query
+      required: false
+      description: 'Only this realm: a partner, or the platform organisation.'
+      schema:
+        type: string
+        format: uuid
+    - name: user_id
+      in: query
+      required: false
+      description: Only this person.
+      schema:
+        type: string
+        format: uuid
+    - name: membership_id
+      in: query
+      required: false
+      description: Only this membership.
+      schema:
+        type: string
+        format: uuid
+    - name: filter
+      in: query
+      required: false
+      description: A filter tree as JSON over user, membership, role, partner, action and occurred_at.
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: Sort keys (default `-occurred_at`).
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: Page size (default 25).
+      schema:
+        type: integer
+        maximum: 100
+        minimum: 1
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: A page of history.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/AccessHistoryList.yaml
+    '400':
+      description: A parameter was refused.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or `access_denied` without `staff:read`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

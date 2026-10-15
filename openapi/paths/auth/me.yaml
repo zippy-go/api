@@ -3,25 +3,30 @@ get:
   operationId: getMe
   summary: Get the signed-in user
   description: |
-    Returns the user the access token belongs to, their memberships with
-    the role they hold in each partner, and their platform roles. Call it
-    after signing in to decide which partner to work in. The response
-    reflects the current state, whereas the token's `memberships` and
-    `platform` claims are fixed when the token is issued and catch up at
-    the next refresh.
+    Returns the user the access token belongs to, the surface the token is
+    for, the account's credentials, and what the user holds on that surface:
+    on the Partner console every partner membership they may enter, each with
+    its grants per scope and whether it opens the console; on Mission
+    Control the platform membership with its grants; on the Agent app the
+    agent memberships. Call it after signing in to decide which partner to
+    work in, and read permissions from the grants rather than from the role
+    label. The response reflects the current state, whereas the token's
+    `memberships` and `platform` claims are fixed when the token is issued.
+    A Mission Control session that has not set up its second factor reaches
+    this operation, whose `account.two_step_setup_required` says so.
   tags:
     - Auth
   security:
     - Bearer: []
   responses:
     '200':
-      description: The signed-in user with their memberships and platform roles.
+      description: The signed-in user, the surface and what they hold there.
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/auth/Me.yaml
     '401':
-      description: No valid access token was sent (`unauthenticated`).
+      description: No valid access token was sent, or its Mission Control session has ended (`unauthenticated`).
       content:
         application/problem+json:
           schema:

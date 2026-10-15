@@ -1,0 +1,59 @@
+# Path item for /v1/permissions. Referenced from openapi.yaml.
+get:
+  operationId: listPermissions
+  summary: List the permission catalogue of a pool
+  description: "The permission catalogue of one pool, so an editor offers exactly what can be granted there: the partner pool is the partner set, never the platform's configuration permissions; the platform pool never holds `partner:access` or `agent:access`. `role:read`."
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  parameters:
+    - name: pool
+      in: query
+      required: false
+      description: The pool, `platform` by default.
+      schema:
+        $ref: ../../components/schemas/access/PermissionPool.yaml
+  responses:
+    '200':
+      description: The permissions of the pool.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/PermissionList.yaml
+    '400':
+      description: An unknown pool.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or `access_denied` without `role:read`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

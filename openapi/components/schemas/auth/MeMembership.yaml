@@ -1,0 +1,101 @@
+type: object
+description: "One of the user's partner memberships as `GET /v1/me` lists them on the Partner console: the membership, the partner it is in, and every grant with its scope and the permissions held there, never merged. `role` is the most senior default role held, or `custom`."
+required:
+  - id
+  - partner_id
+  - user
+  - role
+  - created_at
+  - partner_name
+  - partner_kind
+  - partner_status
+  - console_access
+  - grants
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the membership.
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner.
+  user:
+    $ref: ./User.yaml
+    description: The member, the signed-in user.
+  role:
+    $ref: ../memberships/MembershipRole.yaml
+    description: The most senior default role held (`owner`, `manager`, `dispatcher`, `kitchen`, `staff`), or `custom` for a role the partner defined or access held only at chosen Locations or Services.
+  created_at:
+    type: string
+    format: date-time
+    description: When the membership was created, as an RFC 3339 timestamp in UTC.
+  partner_name:
+    type: string
+    description: The partner's name.
+    examples:
+      - Example Partner
+  partner_kind:
+    $ref: ../partners/PartnerKind.yaml
+    description: '`organisation` or `individual`.'
+  partner_status:
+    $ref: ../partners/PartnerStatus.yaml
+    description: '`pending`, `active` or `suspended`.'
+  console_access:
+    type: boolean
+    description: Whether a grant carries `partner:access`; a membership without it opens nothing of the partner in the console.
+  grants:
+    type: array
+    items:
+      $ref: ../access/AccessGrant.yaml
+    description: Every grant, each with its scope and the permissions held there.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Service, for an agent membership; `null` for a partner's staff.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    user:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      email: owner@example.com
+      phone: null
+      display_name: User 20
+      created_at: 2026-10-14T08:00:00Z
+    role: manager
+    created_at: 2026-10-14T08:05:00Z
+    partner_name: Example Partner
+    partner_kind: organisation
+    partner_status: active
+    console_access: true
+    grants:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a76
+        role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a77
+        role_name: MANAGER
+        role_kind: default
+        scope:
+          kind: partner
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          location_id: null
+          service_id: null
+        permissions:
+          - agent:manage
+          - agent:read
+          - catalog:read
+          - catalog:stock
+          - catalog:write
+          - dispatch:manage
+          - dispatch:read
+          - location:read
+          - location:write
+          - order:manage
+          - order:read
+          - partner:access
+          - payout:read
+          - promotion:read
+          - promotion:write
+          - review:read
+        granted_at: 2026-10-14T08:05:00Z
+        granted_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21

@@ -1,0 +1,25 @@
+type: object
+description: 'The request body of `POST /v1/partners/{partner_id}/members/{membership_id}/grants`: a role of the partner, at the whole partner or at one of its Locations or Services.'
+required:
+  - role_id
+properties:
+  role_id:
+    type: string
+    format: uuid
+    description: The role to grant, a role of the partner.
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: A Location of the partner, to hold the role there only.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: A Service of the partner, to hold the role there only; an `AGENT` role is held at its own Service.
+examples:
+  - role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    service_id: null

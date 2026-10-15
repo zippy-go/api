@@ -1,0 +1,42 @@
+type: object
+description: "A partner's entitlements: the permissions its roles may contain (the partner pool less what the platform withholds). Every role of the partner is cut to them at once when they shrink."
+required:
+  - partner_id
+  - granted
+  - withheld
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner.
+  granted:
+    type: array
+    items:
+      type: string
+    description: The permissions the partner's roles may contain, sorted.
+    examples:
+      - - agent:access
+        - location:read
+        - partner:access
+  withheld:
+    type: array
+    items:
+      type: string
+    description: What the platform withholds from the partner, sorted.
+    examples:
+      - - promotion:write
+examples:
+  - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    granted:
+      - agent:access
+      - catalog:read
+      - location:read
+      - location:write
+      - order:read
+      - partner:access
+      - role:read
+      - role:write
+      - staff:read
+      - staff:write
+    withheld:
+      - promotion:write

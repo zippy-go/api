@@ -22,6 +22,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Platform staff without `partner:read` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:
@@ -49,7 +55,7 @@ get:
 put:
   operationId: putPartnerPlan
   summary: Change the partner's plan
-  description: Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. The owner, or platform staff, choose the plan the trial ends into.
+  description: "Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write`, which the owner holds (platform staff: `partner:write`)."
   tags:
     - Plans
   security:
@@ -81,7 +87,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not the owner, or a move by somebody who is not platform staff.
+      description: 'The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).'
       content:
         application/problem+json:
           schema:

@@ -2,9 +2,10 @@ type: object
 description: |
   The request body of `PATCH /v1/partners/{partner_id}`. Only the members
   present are changed; `null` clears a member that may be `null` in the
-  resource. Owners and managers may change `name`, `legal_name`,
-  `contact_email` and `contact_phone`; `status` may only be changed by the
-  platform realm.
+  resource. Changing the profile and the legal identity needs
+  `partner:profile:write` (platform staff `partner:write`); `status`,
+  `kind` and `gst_unregistered` may only be changed by the platform
+  realm.
 properties:
   name:
     type: string

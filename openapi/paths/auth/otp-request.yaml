@@ -3,23 +3,26 @@ post:
   operationId: requestOtp
   summary: Request a one-time code
   description: |
-    Sends a six-digit one-time code to an email address or a phone number.
-    Every well-formed request is answered with `202` and a challenge,
-    whether or not an account exists for the identifier, so that the
-    operation cannot be used to find out who has an account. The code is
-    accepted until `expires_at`; exchange it for a session with
-    `POST /v1/auth/otp/verify`. The first successful verification for an
-    identifier creates the user.
+    Sends a six-digit one-time code to an email address or a phone number,
+    for the surface named in `audience`: the Partner console (`partner`,
+    the default) or the Agent app (`agent`). Mission Control never signs
+    in with a code. Every well-formed request is answered with `202` and a
+    challenge, whether or not an account exists for the identifier, so that
+    the operation cannot be used to find out who has an account. The code
+    works for five minutes, until `expires_at`; exchange it for a session
+    with `POST /v1/auth/otp/verify`. The first successful verification for
+    an identifier creates the user.
 
-    Codes are rate limited per identifier and per client. When the limit is
-    reached the response is `429` (`too_many_requests`) with a `Retry-After`
-    header.
+    Codes are rate limited: a second code for the same identifier within a
+    minute, more than ten a day for one identifier, or more than two hundred
+    an hour from one client answer `429` (`too_many_requests`) with a
+    `Retry-After` header saying how long to wait.
   tags:
     - Auth
   security: []
   requestBody:
     required: true
-    description: The channel to deliver the code through and the identifier to send it to.
+    description: The channel to deliver the code through, the identifier to send it to and the surface it signs in to.
     content:
       application/json:
         schema:
@@ -32,7 +35,7 @@ post:
           schema:
             $ref: ../../components/schemas/auth/OtpChallenge.yaml
     '400':
-      description: The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel. The `errors` member points at the offending field.
+      description: The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
       content:
         application/problem+json:
           schema:

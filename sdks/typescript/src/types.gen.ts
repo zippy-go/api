@@ -444,7 +444,7 @@ export type JsonWebKeySet = {
 export type OtpChannel = 'email' | 'phone';
 
 /**
- * The request body of `POST /v1/auth/otp/request`: where to send a one-time code.
+ * The request body of `POST /v1/auth/otp/request`: where to send a one-time code, and the surface the code signs in to.
  */
 export type OtpRequest = {
     /**
@@ -455,13 +455,17 @@ export type OtpRequest = {
      * The email address when `channel` is `email`, or the phone number in E.164 format (a `+`, the country code and the number, no spaces) when `channel` is `phone`.
      */
     identifier: string;
+    /**
+     * The surface the code signs in to: `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`validation_failed` with `audience_not_allowed` on `/audience`). Omitted, the code signs in to the Partner console, as in step 1.
+     */
+    audience?: Audience | null;
 };
 
 /**
  * The response of `POST /v1/auth/otp/request`: the challenge a one-time code
  * belongs to. Pass `challenge_id` together with the code to
  * `POST /v1/auth/otp/verify`. The body is the same whether or not an account
- * exists for the identifier.
+ * exists for the identifier. A code works for five minutes.
  *
  */
 export type OtpChallenge = {
@@ -480,7 +484,7 @@ export type OtpChallenge = {
 };
 
 /**
- * The request body of `POST /v1/auth/otp/verify`: the challenge and the code that was delivered for it.
+ * The request body of `POST /v1/auth/otp/verify`: the challenge, the code that was delivered for it, and how the session's refresh token travels.
  */
 export type OtpVerifyRequest = {
     /**
@@ -491,6 +495,14 @@ export type OtpVerifyRequest = {
      * The six-digit code, sent as a string so that leading zeros are kept.
      */
     code: string;
+    /**
+     * The surface the code was asked for. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`); without it the client keeps the step 1 behaviour.
+     */
+    audience?: Audience | null;
+    /**
+     * How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
+     */
+    delivery?: Delivery | null;
 };
 
 /**
@@ -505,36 +517,51 @@ export type PasswordSignInRequest = {
      * The user's password. It is never returned by the API.
      */
     password: string;
+    /**
+     * The surface signed in to: `partner`, `platform` or `agent`. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`). A client that omits it keeps the step 1 behaviour: it signs in to Mission Control when the account holds platform access and to the Partner console otherwise.
+     */
+    audience?: Audience | null;
+    /**
+     * How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
+     */
+    delivery?: Delivery | null;
 };
 
 /**
- * The request body of `POST /v1/auth/password`. The new password must be at
- * least 12 characters long; a shorter one is rejected with
- * `validation_failed` and the detail code `password_weak`.
+ * The request body of `POST /v1/auth/password`. The new password must be
+ * 12 to 200 characters and not blank; anything else is rejected with
+ * `validation_failed` and the detail code `password_weak`. A first
+ * password needs a fresh proof of the signed-in person first
+ * (`POST /v1/auth/step-up`); a change needs the current password.
  *
  */
 export type PasswordChangeRequest = {
     /**
-     * The current password. Send `null`, or omit the field, when the user has no password yet, as after signing up with a one-time code; when a password is set it must match.
+     * The current password. Send `null`, or omit the field, when the user has no password yet, as after signing up with a one-time code; when a password is set it must match, and a wrong one counts in the sign-in throttle.
      */
     current_password?: string | null;
     /**
-     * The new password, at least 12 characters.
+     * The new password, 12 to 200 characters and not blank.
      */
     new_password: string;
 };
 
 /**
- * The request body of `POST /v1/auth/refresh`. Native clients send the
- * refresh token they received at sign-in; browsers send no body at all,
- * because their refresh token travels in the `zg_refresh` cookie.
+ * The request body of `POST /v1/auth/refresh`. A client with body delivery
+ * sends the refresh token it holds; a browser with cookie delivery sends
+ * the surface whose cookie carries it (`audience`), or no body at all when
+ * it signed in without an audience and keeps the `zg_refresh` cookie.
  *
  */
 export type RefreshRequest = {
     /**
-     * The refresh token from the `refresh_token` member of the last `TokenResponse`. Each token can be used once; the response carries its replacement.
+     * The refresh token from the `refresh_token` member of the last `TokenResponse`, for clients with body delivery. Each token can be used once; the response carries its replacement.
      */
     refresh_token?: string;
+    /**
+     * For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`).
+     */
+    audience?: Audience | null;
 };
 
 /**
@@ -568,17 +595,19 @@ export type User = {
 };
 
 /**
- * A session, as returned by the sign-in operations and by
- * `POST /v1/auth/refresh`: the access token to send as
- * `Authorization: Bearer <access_token>`, how long it is valid, the refresh
- * token for native clients and the signed-in user. The refresh token of a
- * browser client is set in the `zg_refresh` cookie instead and
- * `refresh_token` is `null`.
+ * A session, as returned by the sign-in operations, by
+ * `POST /v1/auth/two-step/verify` and by `POST /v1/auth/refresh`: the
+ * access token to send as `Authorization: Bearer <access_token>`, how long
+ * it is valid, the surface it is for, the refresh token when the client
+ * chose body delivery, and the signed-in user. With cookie delivery the
+ * refresh token is set in the surface's `httpOnly` cookie instead and
+ * `refresh_token` is `null`. A session is bound to one surface for good:
+ * its tokens are refused by every other surface.
  *
  */
 export type TokenResponse = {
     /**
-     * A JSON Web Token signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
+     * A JSON Web Token typed `at+jwt` and signed with EdDSA (Ed25519), valid for `expires_in` seconds. Its claims are documented on the `Auth` tag; verify it with the keys from `GET /.well-known/jwks.json`.
      */
     access_token: string;
     /**
@@ -586,21 +615,29 @@ export type TokenResponse = {
      */
     token_type: 'Bearer';
     /**
-     * The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present.
+     * The number of seconds the access token is valid for from the moment it was issued; 900 (15 minutes) at present. The refresh token's lifetime is never stated.
      */
     expires_in: number;
     /**
-     * The refresh token for `POST /v1/auth/refresh`, present only for native clients that sent `X-Client-Type: native` when signing in. `null` for browsers, whose refresh token is in the `zg_refresh` cookie.
+     * The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body` (or, without an audience, sent `X-Client-Type: native`). `null` with cookie delivery, whose refresh token is in the surface's cookie.
      */
     refresh_token: string | null;
     /**
      * The user the session belongs to.
      */
     user: User;
+    /**
+     * The surface the session is for, the `aud` claim of its access tokens.
+     */
+    audience: Audience;
+    /**
+     * `true` when the session reaches the two-step set-up only: platform staff without a second factor set one up (`POST /v1/auth/two-step/setup` and `/confirm`) before Mission Control opens; every other operation answers `403` (`two_step_setup_required`) until then. `false` otherwise.
+     */
+    two_step_setup_required: boolean;
 };
 
 /**
- * The response of `GET /v1/me`: the signed-in user, their memberships and their platform roles.
+ * The response of `GET /v1/me`: the signed-in user, the surface the token is for, the account's credentials, and what the user holds on that surface only. On the Partner console `memberships` lists every enabled partner membership with its grants; on Mission Control `platform` is the platform membership and `platform_roles` its role names; on the Agent app `agent_memberships` lists the Services the person works for. The other members are empty on each surface.
  */
 export type Me = {
     /**
@@ -608,13 +645,393 @@ export type Me = {
      */
     user: User;
     /**
-     * One entry per partner the user belongs to, with the role held there. Empty for a user who has not created or joined a partner yet.
+     * The surface the access token is for.
      */
-    memberships: Array<Membership>;
+    audience: Audience;
     /**
-     * The user's roles in the platform realm, the operations side of ZippyGo; empty for everyone else. The role names are documented when platform operations endpoints are released.
+     * The account's credentials and second factor, for the account page.
+     */
+    account: MeAccount;
+    /**
+     * On the Partner console, one entry per partner the user belongs to and may enter, each with every grant and the permissions held at its scope. Empty on the other surfaces, and for a user who has not created or joined a partner yet.
+     */
+    memberships: Array<MeMembership>;
+    /**
+     * On Mission Control, the platform membership with its grants; `null` on the other surfaces.
+     */
+    platform?: MePlatform | null;
+    /**
+     * On Mission Control, the names of the user's platform roles; empty on the other surfaces and for everyone outside the platform realm.
      */
     platform_roles: Array<string>;
+    /**
+     * On the Agent app, every agent membership, one per Service; empty on the other surfaces.
+     */
+    agent_memberships: Array<MeAgentMembership>;
+};
+
+/**
+ * The surface a session, and every access token of it, is issued for, carried in the token's `aud` claim: `partner` for the Partner console, `platform` for Mission Control, `agent` for the Agent app, `customer` for the Customer app (not signed in to here yet) and `service` for the service tokens of background jobs. A token is refused by every surface it does not name. Clients must tolerate values they do not know, because a new surface is an additive change.
+ */
+export type Audience = 'partner' | 'platform' | 'agent' | 'customer' | 'service';
+
+/**
+ * How a session's refresh token travels, stated by the client when it signs in and bound to the session for good. `cookie`: browsers keep it in an `httpOnly` cookie named for the surface (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`), scoped to `/v1/auth`, and never see it. `body`: apps receive it in `refresh_token` and keep it in the platform keystore. The access token always travels as a bearer header.
+ */
+export type Delivery = 'cookie' | 'body';
+
+/**
+ * The second step of a sign-in: the password or the one-time code was right, and the account has two-step sign-in on, so an authenticator code (or a recovery code) is awaited at `POST /v1/auth/two-step/verify`. No session exists until it passes.
+ */
+export type TwoStepChallenge = {
+    /**
+     * Identifies the waiting sign-in; send it back with the code to `POST /v1/auth/two-step/verify`.
+     */
+    challenge_id: string;
+    /**
+     * When the second step stops waiting, five minutes after the first step, as an RFC 3339 timestamp in UTC.
+     */
+    expires_at: string;
+    /**
+     * What may answer it: `authenticator` (six digits from the app) and, while any are left, `recovery_code`.
+     */
+    methods: Array<string>;
+};
+
+/**
+ * A new authenticator secret, the response of `POST /v1/auth/two-step/setup`. Show `otpauth_uri` as a QR code (and `secret` for typing); two-step sign-in is on only once `POST /v1/auth/two-step/confirm` receives a code from the app. The secret is not shown again.
+ */
+export type TwoStepSetup = {
+    /**
+     * The shared secret in base32, for typing into the app when the QR code cannot be scanned.
+     */
+    secret: string;
+    /**
+     * The `otpauth://totp/` link (SHA-1, six digits, thirty seconds) to render as a QR code.
+     */
+    otpauth_uri: string;
+    /**
+     * The name the app files the codes under: `ZippyGo Mission Control` or `ZippyGo Partner console`.
+     */
+    issuer: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/two-step/verify`: the waiting sign-in and the code that completes it.
+ */
+export type TwoStepVerifyRequest = {
+    /**
+     * The `challenge_id` of the `TwoStepChallenge` the sign-in answered with.
+     */
+    challenge_id: string;
+    /**
+     * Six digits from the authenticator app, or one recovery code, with or without its dash and in either case.
+     */
+    code: string;
+};
+
+/**
+ * Ten recovery codes, shown once: each one passes the second step of a sign-in once, for when the phone with the authenticator is lost. Issuing new codes makes every earlier code useless.
+ */
+export type RecoveryCodes = {
+    /**
+     * The ten codes: ten lower-case letters and digits each, shown with a dash after the fifth. A code is accepted with or without the dash and in either case.
+     */
+    recovery_codes: Array<string>;
+};
+
+/**
+ * The request body of the operations that confirm something with a six-digit code: `POST /v1/auth/two-step/confirm` (a code from the authenticator app) and `POST /v1/auth/identifier-change/confirm` (the code sent to the new address).
+ */
+export type CodeConfirmRequest = {
+    /**
+     * The six-digit code, sent as a string so that leading zeros are kept.
+     */
+    code: string;
+};
+
+/**
+ * The request body of the operations that ask for the password again before they act: replacing the recovery codes and turning two-step sign-in off.
+ */
+export type PasswordProof = {
+    /**
+     * The account's current password. A wrong one is refused and counts in the sign-in throttle.
+     */
+    password: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/password/reset-request`: the account's email address and the console asking. The answer is the same whether or not the address signs in there.
+ */
+export type PasswordResetLinkRequest = {
+    /**
+     * The email address of the account.
+     */
+    email: string;
+    /**
+     * The console asking, `partner` or `platform`; the link works at that console only. The Agent app signs in with one-time codes and has no password link (`audience_not_allowed`).
+     */
+    audience: Audience;
+};
+
+/**
+ * The request body of `POST /v1/auth/password/reset`: the token from the emailed link, the console it is used at and the new password.
+ */
+export type PasswordReset = {
+    /**
+     * The token from the link, the last segment of its path.
+     */
+    token: string;
+    /**
+     * The console the link is used at: the one it was asked from, `partner` or `platform`.
+     */
+    audience: Audience;
+    /**
+     * The new password, 12 to 200 characters and not blank (`password_weak` otherwise).
+     */
+    new_password: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/step-up`: exactly one proof of the signed-in person, either `password`, or `authenticator_code`, or `challenge_id` with `code` from `POST /v1/auth/step-up/code`.
+ */
+export type StepUpRequest = {
+    /**
+     * Six digits from the authenticator app, while two-step sign-in is on.
+     */
+    authenticator_code?: string | null;
+    /**
+     * The `challenge_id` of a code sent by `POST /v1/auth/step-up/code`, together with `code`.
+     */
+    challenge_id?: string | null;
+    /**
+     * The six-digit code sent by `POST /v1/auth/step-up/code`, together with `challenge_id`.
+     */
+    code?: string | null;
+    /**
+     * The account's password.
+     */
+    password?: string | null;
+};
+
+/**
+ * The request body of `POST /v1/auth/step-up/code`: where to send a code that proves the signed-in person, always one of the account's own addresses.
+ */
+export type StepUpCodeRequest = {
+    /**
+     * `email` for the account's email address, `phone` for its phone number.
+     */
+    channel: OtpChannel;
+};
+
+/**
+ * A pending change of the sign-in email address or phone number, the response of `POST /v1/auth/identifier-change`. The account is unchanged until the code sent to the new address passes at `POST /v1/auth/identifier-change/confirm`.
+ */
+export type IdentifierChange = {
+    /**
+     * Whether the email address or the phone number changes.
+     */
+    channel: OtpChannel;
+    /**
+     * The new address, waiting for its code.
+     */
+    identifier: string;
+    /**
+     * When the code stops working, fifteen minutes after it was sent, as an RFC 3339 timestamp in UTC.
+     */
+    expires_at: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/identifier-change`: the new email address or phone number to sign in with.
+ */
+export type IdentifierChangeRequest = {
+    /**
+     * `email` to change the email address, `phone` to change the phone number.
+     */
+    channel: OtpChannel;
+    /**
+     * The new email address, or the new phone number in E.164 format.
+     */
+    identifier: string;
+};
+
+/**
+ * A service token for a background job, the response of `POST /v1/auth/service-tokens`: an access token of audience `service` that names one job, holds no memberships and is refused by every human surface.
+ */
+export type ServiceToken = {
+    /**
+     * The token, a JSON Web Token signed with EdDSA, for the `Authorization: Bearer` header of the routes the job may call.
+     */
+    access_token: string;
+    /**
+     * Always `Bearer`.
+     */
+    token_type: 'Bearer';
+    /**
+     * Seconds until the token expires, at most an hour; mint another from the credential then.
+     */
+    expires_in: number;
+    /**
+     * The one job the token may do, its `job` claim.
+     */
+    job: string;
+};
+
+/**
+ * The request body of `POST /v1/auth/service-tokens`: the job's bootstrap credential, issued when the job is provisioned and kept in its secret store.
+ */
+export type ServiceTokenRequest = {
+    /**
+     * The job's credential. An unknown or revoked credential answers `401` (`authentication_failed`).
+     */
+    credential: string;
+};
+
+/**
+ * The optional request body of `POST /v1/auth/sign-out`. Without a body the operation ends the session of the bearer token, or of the refresh cookie a browser sends.
+ */
+export type SignOutRequest = {
+    /**
+     * For cookie delivery: the surface whose refresh cookie to read and clear.
+     */
+    audience?: Audience | null;
+    /**
+     * `true` ends every session of the user on every surface, not only this one.
+     */
+    everywhere?: boolean;
+    /**
+     * For body delivery: the refresh token, so an app whose access token expired can still end its session.
+     */
+    refresh_token?: string | null;
+};
+
+/**
+ * What the account says about its own credentials, for the account page of every console.
+ */
+export type MeAccount = {
+    /**
+     * Whether a password is set; a user without one signs in with one-time codes.
+     */
+    password_set: boolean;
+    /**
+     * Whether two-step sign-in is on.
+     */
+    two_step_enabled: boolean;
+    /**
+     * `true` while this session reaches the two-step set-up only: platform staff set up a second factor before Mission Control opens.
+     */
+    two_step_setup_required: boolean;
+    /**
+     * When the password was last set, as an RFC 3339 timestamp in UTC; `null` without a password.
+     */
+    password_changed_at?: string | null;
+    /**
+     * A new email address waiting for its code while a change is pending; `null` otherwise.
+     */
+    pending_email?: string | null;
+    /**
+     * A new phone number waiting for its code while a change is pending; `null` otherwise.
+     */
+    pending_phone?: string | null;
+    /**
+     * How many recovery codes are left while two-step sign-in is on; `null` while it is off.
+     */
+    recovery_codes_remaining?: number | null;
+};
+
+/**
+ * One of the user's agent memberships, as `GET /v1/me` lists them on the Agent app: the Service of a partner the person executes tasks for.
+ */
+export type MeAgentMembership = {
+    /**
+     * The agent membership.
+     */
+    agent_id: string;
+    /**
+     * The partner whose Service it is.
+     */
+    partner_id: string;
+    /**
+     * The kind of the Service, for example `delivery`.
+     */
+    service_kind: ServiceKind;
+    /**
+     * The name the agent is shown under.
+     */
+    display_name: string;
+    /**
+     * The partner's name; `null` when the partner no longer exists.
+     */
+    partner_name?: string | null;
+    /**
+     * The Service; `null` for a membership that predates Services.
+     */
+    service_id?: string | null;
+};
+
+/**
+ * The user's platform membership as `GET /v1/me` shows it on Mission Control, with every grant and the permissions it carries.
+ */
+export type MePlatform = {
+    /**
+     * The platform membership.
+     */
+    membership_id: string;
+    /**
+     * Every platform grant, each with its role and the permissions of that role.
+     */
+    grants: Array<AccessGrant>;
+};
+
+/**
+ * One of the user's partner memberships as `GET /v1/me` lists them on the Partner console: the membership, the partner it is in, and every grant with its scope and the permissions held there, never merged. `role` is the most senior default role held, or `custom`.
+ */
+export type MeMembership = {
+    /**
+     * Unique identifier of the membership.
+     */
+    id: string;
+    /**
+     * The partner.
+     */
+    partner_id: string;
+    /**
+     * The member, the signed-in user.
+     */
+    user: User;
+    /**
+     * The most senior default role held (`owner`, `manager`, `dispatcher`, `kitchen`, `staff`), or `custom` for a role the partner defined or access held only at chosen Locations or Services.
+     */
+    role: MembershipRole;
+    /**
+     * When the membership was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * The partner's name.
+     */
+    partner_name: string;
+    /**
+     * `organisation` or `individual`.
+     */
+    partner_kind: PartnerKind;
+    /**
+     * `pending`, `active` or `suspended`.
+     */
+    partner_status: PartnerStatus;
+    /**
+     * Whether a grant carries `partner:access`; a membership without it opens nothing of the partner in the console.
+     */
+    console_access: boolean;
+    /**
+     * Every grant, each with its scope and the permissions held there.
+     */
+    grants: Array<AccessGrant>;
+    /**
+     * The Service, for an agent membership; `null` for a partner's staff.
+     */
+    service_id?: string | null;
 };
 
 /**
@@ -763,8 +1180,11 @@ export type Partner = {
 };
 
 /**
- * The request body of `POST /v1/partners`. The caller becomes the partner's
- * first owner and the partner starts with the status `pending`.
+ * The request body of `POST /v1/partners`. The partner starts with the
+ * status `pending`. Without `owner` the caller becomes the partner's first
+ * owner; Mission Control onboards a partner for somebody else by naming
+ * the `owner`, and may withhold permissions from the partner's
+ * entitlements from the start.
  *
  */
 export type PartnerCreate = {
@@ -801,7 +1221,7 @@ export type PartnerCreate = {
      */
     gstin?: string | null;
     /**
-     * The administrator, for Mission Control's onboarding on the Partner's behalf (platform staff only, and required of them): invited by email as the Partner's owner. Omitted from the Partner console, where the caller becomes the owner.
+     * The administrator, for Mission Control's onboarding on the Partner's behalf (platform staff holding `partner:write` and `staff:write`, and required of them): an existing user is attached as the Partner's owner and told, a new person is invited by email. Omitted from the Partner console, where the caller becomes the owner.
      */
     owner?: PartnerOwner | null;
     /**
@@ -816,14 +1236,19 @@ export type PartnerCreate = {
      * The company or LLP registration number, for an organisation that has one.
      */
     registration_number?: string | null;
+    /**
+     * Permissions to withhold from the partner's entitlements, for platform staff onboarding a partner; never `partner:access` (`partner_cannot_sign_in`).
+     */
+    withheld_permissions?: Array<string>;
 };
 
 /**
  * The request body of `PATCH /v1/partners/{partner_id}`. Only the members
  * present are changed; `null` clears a member that may be `null` in the
- * resource. Owners and managers may change `name`, `legal_name`,
- * `contact_email` and `contact_phone`; `status` may only be changed by the
- * platform realm.
+ * resource. Changing the profile and the legal identity needs
+ * `partner:profile:write` (platform staff `partner:write`); `status`,
+ * `kind` and `gst_unregistered` may only be changed by the platform
+ * realm.
  *
  */
 export type PartnerUpdate = {
@@ -1208,17 +1633,21 @@ export type LocationList = {
 };
 
 /**
- * The role a member holds in a partner. `owner` may do everything,
- * including managing members and the partner record; `manager` manages
- * locations, services and invitations; `dispatcher` works with deliveries
- * and the fleet; `kitchen` prepares orders; `staff` handles the day-to-day
- * at a location. What each role may call is stated on every operation; the
- * roles whose domains are not released yet are listed so that invitations
- * can be sent ahead of them. Clients must tolerate values they do not know,
- * because a new role is an additive change.
+ * The role a member holds in a partner, as a single label. `owner` may do
+ * everything the partner is entitled to, including managing members and
+ * roles; `manager`, `dispatcher`, `kitchen` and `staff` are the default
+ * roles every partner receives and may tune; `custom` stands for a role
+ * the partner defined, or for access held only at chosen Locations or
+ * Services. When a member holds several roles the label is the most senior
+ * one. What a member may do is decided by their grants and the permissions
+ * in them, listed under the `Access` tag, never by this label; it is kept so
+ * that every operation that answered with a role still does. In a request
+ * (an invitation), `custom` is refused: name the role with `role_id`.
+ * Clients must tolerate values they do not know, because a new role is an
+ * additive change.
  *
  */
-export type MembershipRole = 'owner' | 'manager' | 'dispatcher' | 'kitchen' | 'staff';
+export type MembershipRole = 'owner' | 'manager' | 'dispatcher' | 'kitchen' | 'staff' | 'custom';
 
 /**
  * A user's membership in a partner, with the role that decides what they may
@@ -1270,11 +1699,11 @@ export type MembershipList = {
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
 
 /**
- * An invitation to join a partner with a given role, sent by email. The
- * invited person accepts it with the token from the email through
- * `POST /v1/invitations/{token}/accept`; the token itself is never returned
- * by the API. The invitation is `pending` until it is accepted, revoked or
- * past `expires_at`.
+ * An invitation to join a partner, or the platform, with a role, sent by
+ * email. The invited person accepts it with the token from the email
+ * through `POST /v1/invitations/{token}/accept`; the token itself is never
+ * returned by the API. The invitation is `pending` until it is accepted,
+ * revoked or past `expires_at`.
  *
  */
 export type Invitation = {
@@ -1283,7 +1712,7 @@ export type Invitation = {
      */
     id: string;
     /**
-     * The partner the invitation is for.
+     * The partner the invitation is for; the platform organisation for an invitation into the platform.
      */
     partner_id: string;
     /**
@@ -1291,7 +1720,7 @@ export type Invitation = {
      */
     email: string;
     /**
-     * The role the membership will have once the invitation is accepted.
+     * The default role the membership will have once the invitation is accepted, or `custom` for a role the partner defined.
      */
     role: MembershipRole;
     /**
@@ -1306,10 +1735,33 @@ export type Invitation = {
      * When the invitation was created, as an RFC 3339 timestamp in UTC.
      */
     created_at: string;
+    /**
+     * The role to grant on acceptance; `null` for an invitation into the platform, whose roles are granted afterwards.
+     */
+    role_id?: string | null;
+    /**
+     * The Locations the role is limited to; empty for the whole partner.
+     */
+    location_ids: Array<string>;
+    /**
+     * The Services the role is limited to; empty for the whole partner.
+     */
+    service_ids: Array<string>;
+    /**
+     * The name the invitee will be shown under, when one was given.
+     */
+    display_name?: string | null;
 };
 
 /**
- * The request body of `POST /v1/partners/{partner_id}/invitations`.
+ * The request body of `POST /v1/partners/{partner_id}/invitations`: who to
+ * invite, the role to grant on acceptance and where it applies. Name the
+ * role with `role_id` (any role of the partner) or, as in step 1, with
+ * `role` (a default role by name); one of the two is required
+ * (`validation_failed` on `/role_id` otherwise). The owner role covers the
+ * whole partner (`invalid_scope` with Locations or Services). Nobody hands
+ * out a role holding more than they hold (`permission_escalation`).
+ *
  */
 export type InvitationCreate = {
     /**
@@ -1317,13 +1769,29 @@ export type InvitationCreate = {
      */
     email: string;
     /**
-     * The role the membership will have. Only an owner may grant `owner`.
+     * A default role by name (`custom` is refused); `role_id` wins when both are sent.
      */
-    role: MembershipRole;
+    role?: MembershipRole;
+    /**
+     * The role to grant, any role of the partner.
+     */
+    role_id?: string | null;
+    /**
+     * The Locations the role is limited to; empty or absent for the whole partner.
+     */
+    location_ids?: Array<string>;
+    /**
+     * The Services the role is limited to; empty or absent for the whole partner.
+     */
+    service_ids?: Array<string>;
+    /**
+     * The name the invitee will be shown under in the partner.
+     */
+    display_name?: string | null;
 };
 
 /**
- * A list of a partner's invitations, the response of `GET /v1/partners/{partner_id}/invitations`.
+ * A list of invitations, the response of `GET /v1/partners/{partner_id}/invitations` and `GET /v1/platform/invitations`.
  */
 export type InvitationList = {
     /**
@@ -1333,10 +1801,11 @@ export type InvitationList = {
 };
 
 /**
- * The request body of `POST /v1/invitations/{token}/accept`. Both members
- * are used only when the call creates the user; a person who already has an
- * account keeps their name and password, and may send an empty body or
- * none at all.
+ * The request body of `POST /v1/invitations/{token}/accept`. `display_name`
+ * is used only when the call creates the user and `password` only when the
+ * user has no password yet; a person who already has an account keeps
+ * their name and password, and may send an empty body or none at all.
+ * `delivery` says how the new session's refresh token travels.
  *
  */
 export type InvitationAcceptRequest = {
@@ -1345,15 +1814,34 @@ export type InvitationAcceptRequest = {
      */
     display_name?: string;
     /**
-     * A password for the new user, at least 12 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
+     * A password for a user who has none yet, 12 to 200 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
      */
     password?: string;
+    /**
+     * How the refresh token of the new session travels, `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform, the Partner console otherwise. Omitted, the client keeps the step 1 behaviour: the `zg_refresh` cookie unless it sends `X-Client-Type: native`.
+     */
+    delivery?: Delivery | null;
+};
+
+/**
+ * The response of `POST /v1/invitations/{token}/accept` when the invitee's two-step sign-in is on: the membership exists, and the session waits for an authenticator or recovery code at `POST /v1/auth/two-step/verify`.
+ */
+export type InvitationSecondStep = {
+    /**
+     * The second step the session waits for.
+     */
+    second_step: TwoStepChallenge;
+    /**
+     * The new membership.
+     */
+    membership: Membership;
 };
 
 /**
  * The response of `POST /v1/invitations/{token}/accept`: the session of the
  * person who accepted, signed in the same way as after a one-time code, and
- * the membership the invitation turned into.
+ * the membership the invitation turned into. When the person has two-step
+ * sign-in on, the answer is an `InvitationSecondStep` with `202` instead.
  *
  */
 export type InvitationAccepted = {
@@ -1565,11 +2053,11 @@ export type PartnerActivation = {
 };
 
 /**
- * The administrator Mission Control names when it onboards a Partner, the `PartnerOwner` schema.
+ * The administrator Mission Control names when it onboards a Partner, its first owner: an existing user is attached and told, a new person is invited by email.
  */
 export type PartnerOwner = {
     /**
-     * The administrator's email address; the invitation goes there, also when the address already belongs to a member of another Partner.
+     * The administrator's email address: an existing user's is attached at once and told there, a new person's invitation goes there.
      */
     email: string;
     /**
@@ -1900,7 +2388,7 @@ export type PartnerPlanUpdate = {
      */
     plan?: Plan | null;
     /**
-     * The plan to move to when the trial ends; the owner or platform staff.
+     * The plan to move to when the trial ends; `plan:write` (the owner), or platform staff.
      */
     plan_after_trial?: Plan | null;
     /**
@@ -2987,7 +3475,7 @@ export type VehicleKind = 'bicycle' | 'two_wheeler' | 'three_wheeler' | 'four_wh
 export type CatalogueType = 'food' | 'bakery' | 'drinks' | 'grocery' | 'pharmacy' | 'retail' | 'general';
 
 /**
- * Who performed an audited act. A signed-in person, with the membership they acted under and their name frozen at the time, or the system for timers and provider notices.
+ * Who performed an audited act. A signed-in person, with the membership they acted under and their name frozen at the time, or the system for timers and provider notices. While a platform member views a partner's console with an owner's consent, the member is the actor and the owner acted as is `on_behalf_of_user_id`; the owner is never recorded as the actor.
  */
 export type AuditActor = {
     /**
@@ -3007,9 +3495,13 @@ export type AuditActor = {
      */
     partner_id: string | null;
     /**
-     * The actor's name as it was at the time, when known.
+     * The actor's name as it was at the time; for a person recorded without one, their name now when the reader may see it.
      */
     label: string | null;
+    /**
+     * The person the actor acted as, while impersonating them with their consent; `null` otherwise.
+     */
+    on_behalf_of_user_id: string | null;
 };
 
 /**
@@ -3114,6 +3606,740 @@ export type AuditEntryList = {
      * Facet counts, present when `facets` was asked for.
      */
     facets?: Array<Facet>;
+};
+
+/**
+ * A role held by a member at one scope: the whole partner, one Location or one Service of it, or the platform. A member may hold several grants; each lists the permissions held at its scope, never merged with another's.
+ */
+export type AccessGrant = {
+    /**
+     * Unique identifier of the grant.
+     */
+    id: string;
+    /**
+     * The role granted.
+     */
+    role_id: string;
+    /**
+     * The role's name.
+     */
+    role_name: string;
+    /**
+     * Whether the role is maintained by the platform, a default every partner receives, or the realm's own.
+     */
+    role_kind: RoleKind;
+    /**
+     * Where the role applies.
+     */
+    scope: AccessScope;
+    /**
+     * The permissions held at that scope, sorted: the role's, within the partner's entitlements.
+     */
+    permissions: Array<string>;
+    /**
+     * When it was granted, as an RFC 3339 timestamp in UTC.
+     */
+    granted_at: string;
+    /**
+     * Who granted it; `null` when the platform did, at onboarding or provisioning.
+     */
+    granted_by?: string | null;
+};
+
+/**
+ * The request body of `POST /v1/partners/{partner_id}/members/{membership_id}/grants`: a role of the partner, at the whole partner or at one of its Locations or Services.
+ */
+export type AccessGrantCreate = {
+    /**
+     * The role to grant, a role of the partner.
+     */
+    role_id: string;
+    /**
+     * A Location of the partner, to hold the role there only.
+     */
+    location_id?: string | null;
+    /**
+     * A Service of the partner, to hold the role there only; an `AGENT` role is held at its own Service.
+     */
+    service_id?: string | null;
+};
+
+/**
+ * A member's grants after a change, the response of `PUT /v1/partners/{partner_id}/members/{membership_id}/access`.
+ */
+export type AccessGrantList = {
+    /**
+     * Every grant of the member after the change.
+     */
+    items: Array<AccessGrant>;
+};
+
+/**
+ * One entry of the access history: a role granted or revoked, by whom, to whom, at what scope. The history is append-only and outlives the roles and memberships it names.
+ */
+export type AccessHistoryEntry = {
+    /**
+     * Unique identifier of the entry.
+     */
+    id: string;
+    /**
+     * When it happened, as an RFC 3339 timestamp in UTC.
+     */
+    occurred_at: string;
+    /**
+     * Whether the role was granted or revoked.
+     */
+    action: HistoryAction;
+    /**
+     * The realm: the partner, or the platform organisation for platform staff.
+     */
+    partner_id: string;
+    /**
+     * The person the grant is held by.
+     */
+    user_id: string;
+    /**
+     * The membership the grant is held through.
+     */
+    membership_id: string;
+    /**
+     * The role.
+     */
+    role_id: string;
+    /**
+     * The role's name at the time.
+     */
+    role_name: string;
+    /**
+     * Where the grant applies.
+     */
+    scope: AccessScope;
+    /**
+     * Who acted; `null` when the platform did.
+     */
+    actor_user_id?: string | null;
+};
+
+/**
+ * A page of the access history, newest first.
+ */
+export type AccessHistoryList = {
+    /**
+     * The entries of the page.
+     */
+    items: Array<AccessHistoryEntry>;
+    /**
+     * The cursor of the next page; `null` on the last one.
+     */
+    next_cursor?: string | null;
+};
+
+/**
+ * What happened to a grant in the access history: `granted` or `revoked`. Clients must tolerate values they do not know.
+ */
+export type HistoryAction = 'granted' | 'revoked';
+
+/**
+ * A named set of permissions, owned by the platform or by one partner. `maintained` roles (`SUPER_ADMIN`, `OWNER`) are kept by the platform and offer neither editing nor deletion; `default` roles (a partner's `MANAGER`, `STAFF`, `DISPATCHER` and `KITCHEN`, the `AGENT` role of each agent-based Service, and the platform's narrower staff roles) are tuned but neither renamed nor deleted; `custom` roles belong to the realm that defined them.
+ */
+export type AccessRole = {
+    /**
+     * Unique identifier of the role.
+     */
+    id: string;
+    /**
+     * The role's name, unique within its owner regardless of case.
+     */
+    name: string;
+    /**
+     * `maintained`, `default` or `custom`.
+     */
+    kind: RoleKind;
+    /**
+     * `true` for the roles the platform keeps (`SUPER_ADMIN`, `OWNER`): a console offers neither editing nor deletion.
+     */
+    maintained: boolean;
+    /**
+     * Whether the permissions may be changed: every role but a maintained one.
+     */
+    permissions_editable: boolean;
+    /**
+     * Whether the role may be renamed and deleted: custom roles, and deleted only while nobody holds them.
+     */
+    deletable: boolean;
+    /**
+     * The permissions, sorted.
+     */
+    permissions: Array<string>;
+    /**
+     * How many grants of the role exist, enabled members or not.
+     */
+    holders: number;
+    /**
+     * Raised on every change; the entity tag of reads and the `If-Match` of changes.
+     */
+    version: number;
+    /**
+     * When the role was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * When the role last changed, as an RFC 3339 timestamp in UTC.
+     */
+    updated_at: string;
+    /**
+     * The partner that owns the role; `null` for a platform role.
+     */
+    partner_id?: string | null;
+    /**
+     * The Service an `AGENT` role was created with; `null` otherwise.
+     */
+    service_id?: string | null;
+};
+
+/**
+ * The request body of `POST /v1/partners/{partner_id}/roles` and `POST /v1/platform/roles`: a new custom role. Every permission must be in the catalogue and the owner's pool, inside the partner's entitlements, and held by who acts.
+ */
+export type AccessRoleCreate = {
+    /**
+     * The role's name, unique within its owner regardless of case; `OWNER` and `SUPER_ADMIN` are reserved.
+     */
+    name: string;
+    /**
+     * The permissions the role holds.
+     */
+    permissions: Array<string>;
+};
+
+/**
+ * The request body of the role changes: absent members are kept. A maintained role is refused (`role_maintained`); a default role takes new permissions but keeps its name.
+ */
+export type AccessRoleUpdate = {
+    /**
+     * A new name, for custom roles only.
+     */
+    name?: string | null;
+    /**
+     * The whole new set of permissions, replacing the old one.
+     */
+    permissions?: Array<string> | null;
+};
+
+/**
+ * The roles of one owner, the platform or a partner, each with how many hold it.
+ */
+export type AccessRoleList = {
+    /**
+     * Maintained and default roles first, then the owner's own by name.
+     */
+    items: Array<AccessRole>;
+};
+
+/**
+ * What a role is: `maintained` (kept by the platform), `default` (a tunable role every partner receives) or `custom` (the realm's own). Clients must tolerate values they do not know.
+ */
+export type RoleKind = 'maintained' | 'default' | 'custom';
+
+/**
+ * Where a grant applies: `platform` (platform staff only), `partner` (the whole partner and everything in it), `location` (one Location) or `service` (one Service). The identifiers that do not apply to the kind are `null`.
+ */
+export type AccessScope = {
+    /**
+     * The kind of scope.
+     */
+    kind: ScopeKind;
+    /**
+     * The Location, for `location`.
+     */
+    location_id?: string | null;
+    /**
+     * The partner, for every kind but `platform`.
+     */
+    partner_id?: string | null;
+    /**
+     * The Service, for `service`.
+     */
+    service_id?: string | null;
+};
+
+/**
+ * The kind of scope a grant is held at: `platform`, `partner`, `location` or `service`. Clients must tolerate values they do not know.
+ */
+export type ScopeKind = 'platform' | 'partner' | 'location' | 'service';
+
+/**
+ * The request body of `PUT /v1/partners/{partner_id}/members/{membership_id}/access`: the member's whole access as one role, at the whole partner when no Location or Service is named, or at each one named. The difference from the current grants is applied as grants and revocations.
+ */
+export type AccessSet = {
+    /**
+     * The role, a role of the partner held by who acts.
+     */
+    role_id: string;
+    /**
+     * The Locations the role applies at; none named, and no Service, means the whole partner.
+     */
+    location_ids?: Array<string>;
+    /**
+     * The Services the role applies at.
+     */
+    service_ids?: Array<string>;
+};
+
+/**
+ * A partner's entitlements: the permissions its roles may contain (the partner pool less what the platform withholds). Every role of the partner is cut to them at once when they shrink.
+ */
+export type Entitlements = {
+    /**
+     * The partner.
+     */
+    partner_id: string;
+    /**
+     * The permissions the partner's roles may contain, sorted.
+     */
+    granted: Array<string>;
+    /**
+     * What the platform withholds from the partner, sorted.
+     */
+    withheld: Array<string>;
+};
+
+/**
+ * The request body of `PUT /v1/partners/{partner_id}/entitlements`: the whole set of permissions to withhold from the partner.
+ */
+export type EntitlementsUpdate = {
+    /**
+     * The permissions to withhold, from the partner pool; never `partner:access` (`partner_cannot_sign_in`).
+     */
+    withheld: Array<string>;
+};
+
+/**
+ * Whether a membership admits its holder: `enabled`, or `disabled` (the member cannot enter the realm and keeps their grants for re-enabling). Clients must tolerate values they do not know.
+ */
+export type MembershipStatus = 'enabled' | 'disabled';
+
+/**
+ * One permission of the catalogue, `<entity>:<action>`, with the pools that may hold it.
+ */
+export type Permission = {
+    /**
+     * The permission's name, `<entity>:<action>`.
+     */
+    name: string;
+    /**
+     * What the permission allows, in a sentence a role editor shows.
+     */
+    summary: string;
+    /**
+     * Whether a partner's roles may contain it.
+     */
+    partner: boolean;
+    /**
+     * Whether platform roles may contain it.
+     */
+    platform: boolean;
+};
+
+/**
+ * The permissions a role editor offers for one pool.
+ */
+export type PermissionList = {
+    /**
+     * The pool listed.
+     */
+    pool: PermissionPool;
+    /**
+     * The permissions, sorted by name.
+     */
+    items: Array<Permission>;
+};
+
+/**
+ * Who may hold a permission: `platform` (platform roles), `partner` (a partner's roles) or `customer`. Clients must tolerate values they do not know.
+ */
+export type PermissionPool = 'platform' | 'partner' | 'customer';
+
+/**
+ * The request body of `POST /v1/platform/staff`: the person to invite into the platform. The membership grants nothing until a role is granted through a four-eyes proposal.
+ */
+export type PlatformStaffInvite = {
+    /**
+     * The email address to send the invitation to.
+     */
+    email: string;
+    /**
+     * The name the member will be shown under.
+     */
+    display_name?: string | null;
+};
+
+/**
+ * A member of a partner's team, or of the platform's staff, with their status and every grant. `role` is the most senior default role held, or `custom`; the grants carry the whole truth.
+ */
+export type TeamMember = {
+    /**
+     * Unique identifier of the membership.
+     */
+    id: string;
+    /**
+     * The partner, or the platform organisation for platform staff.
+     */
+    partner_id: string;
+    /**
+     * The person.
+     */
+    user: User;
+    /**
+     * Whether the membership admits the member.
+     */
+    status: MembershipStatus;
+    /**
+     * The most senior default role held, or `custom`.
+     */
+    role: MembershipRole;
+    /**
+     * Every grant, each with its scope and the permissions held there.
+     */
+    grants: Array<AccessGrant>;
+    /**
+     * When the membership was created, as an RFC 3339 timestamp in UTC.
+     */
+    created_at: string;
+    /**
+     * When the membership was disabled, while it is; `null` otherwise.
+     */
+    disabled_at?: string | null;
+    /**
+     * How the member is shown in this realm: the name set for the membership, else the user's own.
+     */
+    display_name?: string | null;
+};
+
+/**
+ * A team: the members of a partner, or the platform's staff.
+ */
+export type TeamMemberList = {
+    /**
+     * The members, oldest first, each with every grant.
+     */
+    items: Array<TeamMember>;
+};
+
+/**
+ * The request body of the member changes: how the member is shown in this realm.
+ */
+export type TeamMemberUpdate = {
+    /**
+     * The name the member is shown under here, or `null` for the user's own.
+     */
+    display_name?: string | null;
+};
+
+/**
+ * A four-eyes proposal: an act on a platform membership that a different platform member must approve before it runs. It expires undecided after seventy-two hours and is voided when what it names changes first.
+ */
+export type Approval = {
+    /**
+     * Unique identifier of the proposal.
+     */
+    id: string;
+    /**
+     * The act proposed.
+     */
+    action: ApprovalAction;
+    /**
+     * The platform membership the act is about.
+     */
+    membership_id: string;
+    /**
+     * The act's parameters, frozen when proposed: `role_id` for a grant, `grant_id` for a revocation, nothing else for the other acts.
+     */
+    parameters: unknown;
+    /**
+     * The platform member who proposed it.
+     */
+    proposed_by: string;
+    /**
+     * When it was proposed, as an RFC 3339 timestamp in UTC.
+     */
+    proposed_at: string;
+    /**
+     * When it expires undecided, seventy-two hours after it was proposed.
+     */
+    expires_at: string;
+    /**
+     * Where the proposal stands.
+     */
+    status: ApprovalStatus;
+    /**
+     * `true` when it ran at once because no other platform member could decide it; the audit log says so.
+     */
+    sole_decider: boolean;
+    /**
+     * When it was decided; `null` while pending.
+     */
+    decided_at?: string | null;
+    /**
+     * The platform member who decided it; `null` while pending.
+     */
+    decided_by?: string | null;
+    /**
+     * Why, as the decider said.
+     */
+    decision_reason?: string | null;
+    /**
+     * Why, as the proposer said.
+     */
+    reason?: string | null;
+};
+
+/**
+ * An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member. Clients must tolerate values they do not know.
+ */
+export type ApprovalAction = 'grant_platform_role' | 'revoke_platform_role' | 'reset_platform_two_step' | 'disable_platform_member';
+
+/**
+ * The request body of `POST /v1/platform/approvals`: the act, the platform membership it is about and its parameters.
+ */
+export type ApprovalCreate = {
+    /**
+     * The act proposed.
+     */
+    action: ApprovalAction;
+    /**
+     * The platform membership the act is about.
+     */
+    membership_id: string;
+    /**
+     * For `revoke_platform_role`: the grant to revoke.
+     */
+    grant_id?: string | null;
+    /**
+     * Why, shown to whoever decides.
+     */
+    reason?: string | null;
+    /**
+     * For `grant_platform_role`: the platform role to grant.
+     */
+    role_id?: string | null;
+};
+
+/**
+ * The optional request body of the decisions on a proposal.
+ */
+export type ApprovalDecision = {
+    /**
+     * Why, as the decider says; the audit log keeps it.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Four-eyes proposals, newest first.
+ */
+export type ApprovalList = {
+    /**
+     * The proposals.
+     */
+    items: Array<Approval>;
+};
+
+/**
+ * Where a proposal stands: `pending`, `approved`, `rejected`, `voided` (what it named changed, or its proposer left) or `expired` (undecided after seventy-two hours; never stored, a pending proposal past its expiry reads so). Clients must tolerate values they do not know.
+ */
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'voided' | 'expired';
+
+/**
+ * Where a partner's consent to be viewed stands: `pending`, `approved` (for twenty-four hours), `rejected`, `revoked` (withdrawn by an owner, ending the sessions under it) or `expired`. Clients must tolerate values they do not know.
+ */
+export type ConsentStatus = 'pending' | 'approved' | 'rejected' | 'revoked' | 'expired';
+
+/**
+ * Requests to view a partner's console and the consents given, newest first.
+ */
+export type ImpersonationConsentList = {
+    /**
+     * The requests and consents.
+     */
+    items: Array<ImpersonationConsent>;
+};
+
+/**
+ * A started or continued impersonation: the session, and an access token for the Partner console as the owner who consented, with the platform member named in its `act` claim.
+ */
+export type ImpersonationAccess = {
+    /**
+     * The impersonation session.
+     */
+    session: ImpersonationSession;
+    /**
+     * The access token for the Partner console. Changes answer `403` (`impersonation_read_only`) unless the consent allows them.
+     */
+    access_token: string;
+    /**
+     * Always `Bearer`.
+     */
+    token_type: 'Bearer';
+    /**
+     * Seconds until the token expires, never past the session's end; mint another at `POST /v1/platform/impersonation/sessions/{impersonation_id}/token` while the session runs.
+     */
+    expires_in: number;
+};
+
+/**
+ * A platform member's request to view a partner's console, and the owner's decision on it. An approved consent lasts twenty-four hours, viewing only unless changes were asked for and allowed.
+ */
+export type ImpersonationConsent = {
+    /**
+     * Unique identifier of the request.
+     */
+    id: string;
+    /**
+     * The partner asked.
+     */
+    partner_id: string;
+    /**
+     * The platform member asking.
+     */
+    requested_by: string;
+    /**
+     * Why they ask, shown to the partner's owners.
+     */
+    reason: string;
+    /**
+     * Whether changes were asked for too.
+     */
+    writes_requested: boolean;
+    /**
+     * When they asked, as an RFC 3339 timestamp in UTC.
+     */
+    requested_at: string;
+    /**
+     * Where the consent stands.
+     */
+    status: ConsentStatus;
+    /**
+     * Whether changes are allowed; viewing only otherwise.
+     */
+    writes_allowed: boolean;
+    /**
+     * When an owner decided; `null` while pending.
+     */
+    decided_at?: string | null;
+    /**
+     * The owner who decided; `null` while pending.
+     */
+    decided_by?: string | null;
+    /**
+     * When an approved consent ends; `null` otherwise.
+     */
+    expires_at?: string | null;
+};
+
+/**
+ * The optional request body of an owner's approval of a request to view the console.
+ */
+export type ImpersonationConsentApproval = {
+    /**
+     * `true` allows changes too, only when they were asked for; viewing only otherwise.
+     */
+    writes_allowed?: boolean;
+};
+
+/**
+ * The request body of `POST /v1/platform/impersonation/consents`: the partner to view and why.
+ */
+export type ImpersonationConsentCreate = {
+    /**
+     * The partner whose console to view.
+     */
+    partner_id: string;
+    /**
+     * Why, shown to the partner's owners; required.
+     */
+    reason: string;
+    /**
+     * `true` asks to change things too; viewing only otherwise.
+     */
+    writes?: boolean;
+};
+
+/**
+ * A platform member viewing a partner's console as the owner who consented: at most sixty minutes, never past the consent, readable by the platform and by the partner while it runs and after.
+ */
+export type ImpersonationSession = {
+    /**
+     * Unique identifier of the session.
+     */
+    id: string;
+    /**
+     * The consent it runs under.
+     */
+    consent_id: string;
+    /**
+     * The partner viewed.
+     */
+    partner_id: string;
+    /**
+     * The platform member viewing.
+     */
+    member_user_id: string;
+    /**
+     * The owner viewed as.
+     */
+    subject_user_id: string;
+    /**
+     * The member's reason.
+     */
+    reason: string;
+    /**
+     * Whether changes are allowed.
+     */
+    writes_allowed: boolean;
+    /**
+     * When it started, as an RFC 3339 timestamp in UTC.
+     */
+    started_at: string;
+    /**
+     * When it ends at the latest.
+     */
+    expires_at: string;
+    /**
+     * Whether it runs now.
+     */
+    live: boolean;
+    /**
+     * Why it ended: `ended` (by the member), `expired`, `consent_revoked` or `offboarded`; `null` while it runs.
+     */
+    end_reason?: 'ended' | 'expired' | 'consent_revoked' | 'offboarded' | null;
+    /**
+     * When it ended; `null` while it runs.
+     */
+    ended_at?: string | null;
+};
+
+/**
+ * The request body of `POST /v1/platform/impersonation/sessions`: the approved consent to view under.
+ */
+export type ImpersonationSessionCreate = {
+    /**
+     * The approved consent, asked for by the caller.
+     */
+    consent_id: string;
+    /**
+     * Why now, when it differs from the consent request's reason.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Impersonation sessions, newest first.
+ */
+export type ImpersonationSessionList = {
+    /**
+     * The sessions.
+     */
+    items: Array<ImpersonationSession>;
 };
 
 /**
@@ -6283,9 +7509,13 @@ export type SubmitLocationPingsErrors = {
      */
     400: Problem;
     /**
-     * No valid development credential was sent in `X-Dev-Api-Key` (`unauthenticated`).
+     * No valid service token was sent (`unauthenticated`); a person's access token is refused the same way.
      */
     401: Problem;
+    /**
+     * A service token of another job than `simulator` (`forbidden`).
+     */
+    403: Problem;
     /**
      * The batch is well formed but cannot be processed (`unprocessable`), for example because a ping references an agent that does not exist. The `errors` member points at the offending pings.
      */
@@ -6418,7 +7648,7 @@ export type StreamEventsResponse = StreamEventsResponses[keyof StreamEventsRespo
 
 export type RequestOtpData = {
     /**
-     * The channel to deliver the code through and the identifier to send it to.
+     * The channel to deliver the code through, the identifier to send it to and the surface it signs in to.
      */
     body: OtpRequest;
     path?: never;
@@ -6428,7 +7658,7 @@ export type RequestOtpData = {
 
 export type RequestOtpErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel. The `errors` member points at the offending field.
+     * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
      */
     400: Problem;
     /**
@@ -6462,7 +7692,7 @@ export type RequestOtpResponse = RequestOtpResponses[keyof RequestOtpResponses];
 
 export type VerifyOtpData = {
     /**
-     * The challenge from `POST /v1/auth/otp/request` and the code that was delivered for it.
+     * The challenge from `POST /v1/auth/otp/request`, the code that was delivered for it, the surface and the delivery.
      */
     body: OtpVerifyRequest;
     headers?: {
@@ -6483,19 +7713,19 @@ export type VerifyOtpData = {
 
 export type VerifyOtpErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID or a code that is not six digits.
+     * The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID, a code that is not six digits, `delivery_required` on `/delivery` when an audience is named without a delivery, or `audience_not_allowed` on `/audience`.
      */
     400: Problem;
     /**
-     * The code was not accepted. `invalid_code` when it does not match the challenge or the challenge does not exist; `code_expired` when the challenge is past `expires_at`.
+     * The code was not accepted (`invalid_code` when it does not match the challenge, `code_expired` when the challenge is unknown, used or past `expires_at`), or a right code asked for the Agent app by somebody who is not an agent (`authentication_failed`).
      */
     401: Problem;
     /**
-     * The challenge is locked after too many wrong codes (`too_many_attempts`). Request a new code.
+     * The challenge is locked after too many wrong codes (`too_many_attempts`), or the sign-in throttle holds the identifier or the client (`too_many_requests`, with `Retry-After`).
      */
     429: Problem;
     /**
-     * Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -6511,13 +7741,17 @@ export type VerifyOtpResponses = {
      * The code was accepted and a session was created.
      */
     200: TokenResponse;
+    /**
+     * The credential was right and the account has two-step sign-in on. No session exists yet; send an authenticator or recovery code with the `challenge_id` to `POST /v1/auth/two-step/verify`.
+     */
+    202: TwoStepChallenge;
 };
 
 export type VerifyOtpResponse = VerifyOtpResponses[keyof VerifyOtpResponses];
 
 export type SignInWithPasswordData = {
     /**
-     * The email address and the password.
+     * The email address, the password, the surface and the delivery.
      */
     body: PasswordSignInRequest;
     headers?: {
@@ -6538,15 +7772,19 @@ export type SignInWithPasswordData = {
 
 export type SignInWithPasswordErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example an `email` that is not an email address.
+     * The body failed validation (`validation_failed`), for example an `email` that is not an email address, `delivery_required` on `/delivery` when an audience is named without a delivery, or `audience_not_allowed` on `/audience`.
      */
     400: Problem;
     /**
-     * The email address or the password is wrong, or the user has no password (`unauthenticated`).
+     * The sign-in did not succeed (`authentication_failed`); the answer is the same whatever the reason.
      */
     401: Problem;
     /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when sign-in attempts are rate limited, returned as an RFC 9457 problem details document.
+     * The sign-in throttle holds the identifier on this surface, or the client (`too_many_requests`).
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -6562,6 +7800,10 @@ export type SignInWithPasswordResponses = {
      * The credentials were accepted and a session was created.
      */
     200: TokenResponse;
+    /**
+     * The credential was right and the account has two-step sign-in on. No session exists yet; send an authenticator or recovery code with the `challenge_id` to `POST /v1/auth/two-step/verify`.
+     */
+    202: TwoStepChallenge;
 };
 
 export type SignInWithPasswordResponse = SignInWithPasswordResponses[keyof SignInWithPasswordResponses];
@@ -6586,9 +7828,13 @@ export type ChangePasswordErrors = {
      */
     401: Problem;
     /**
-     * The user has a password and `current_password` is missing or does not match it (`forbidden`).
+     * The user has a password and `current_password` is missing or does not match it (`forbidden`), or a first password was sent without a fresh proof (`step_up_required`).
      */
     403: Problem;
+    /**
+     * Too many wrong current passwords (`too_many_requests`).
+     */
+    429: Problem;
     /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -6603,7 +7849,7 @@ export type ChangePasswordError = ChangePasswordErrors[keyof ChangePasswordError
 
 export type ChangePasswordResponses = {
     /**
-     * The password was set.
+     * The password was set. After a change every session of the user has ended, this one included.
      */
     204: void;
 };
@@ -6612,7 +7858,7 @@ export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswor
 
 export type RefreshSessionData = {
     /**
-     * The refresh token, for native clients only. Browsers send no body.
+     * The refresh token for body delivery, or the surface whose cookie carries it. A browser that signed in without an audience sends no body.
      */
     body?: RefreshRequest;
     path?: never;
@@ -6622,7 +7868,7 @@ export type RefreshSessionData = {
 
 export type RefreshSessionErrors = {
     /**
-     * No refresh token was sent, or it is unknown, expired, already used or revoked (`unauthenticated`). Sign in again.
+     * No refresh token was sent, or it is unknown or spent, or the session ended (`unauthenticated`). Sign in again.
      */
     401: Problem;
     /**
@@ -6647,7 +7893,10 @@ export type RefreshSessionResponses = {
 export type RefreshSessionResponse = RefreshSessionResponses[keyof RefreshSessionResponses];
 
 export type SignOutData = {
-    body?: never;
+    /**
+     * Optional. `everywhere` to end every session; the surface or the refresh token when the access token has expired.
+     */
+    body?: SignOutRequest;
     path?: never;
     query?: never;
     url: '/v1/auth/sign-out';
@@ -6655,9 +7904,9 @@ export type SignOutData = {
 
 export type SignOutErrors = {
     /**
-     * No valid access token was sent (`unauthenticated`).
+     * The body is not a readable `SignOutRequest` (`validation_failed`).
      */
-    401: Problem;
+    400: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -6672,7 +7921,7 @@ export type SignOutError = SignOutErrors[keyof SignOutErrors];
 
 export type SignOutResponses = {
     /**
-     * The session was revoked.
+     * The session (or every session) ended, or there was nothing to end.
      */
     204: void;
 };
@@ -6688,7 +7937,7 @@ export type GetMeData = {
 
 export type GetMeErrors = {
     /**
-     * No valid access token was sent (`unauthenticated`).
+     * No valid access token was sent, or its Mission Control session has ended (`unauthenticated`).
      */
     401: Problem;
     /**
@@ -6705,12 +7954,600 @@ export type GetMeError = GetMeErrors[keyof GetMeErrors];
 
 export type GetMeResponses = {
     /**
-     * The signed-in user with their memberships and platform roles.
+     * The signed-in user, the surface and what they hold there.
      */
     200: Me;
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type VerifyTwoStepData = {
+    /**
+     * The challenge from the sign-in and the code that completes it.
+     */
+    body: TwoStepVerifyRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/two-step/verify';
+};
+
+export type VerifyTwoStepErrors = {
+    /**
+     * Malformed body.
+     */
+    400: Problem;
+    /**
+     * The code is wrong or the challenge does not exist (`invalid_code`), or the challenge expired or was already used (`code_expired`).
+     */
+    401: Problem;
+    /**
+     * `too_many_attempts`, or `too_many_requests` while the throttle holds the identifier or the source.
+     */
+    429: Problem;
+    /**
+     * A store is unavailable, or no two-step key is configured.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyTwoStepError = VerifyTwoStepErrors[keyof VerifyTwoStepErrors];
+
+export type VerifyTwoStepResponses = {
+    /**
+     * Signed in.
+     */
+    200: TokenResponse;
+};
+
+export type VerifyTwoStepResponse = VerifyTwoStepResponses[keyof VerifyTwoStepResponses];
+
+export type BeginTwoStepData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/two-step/setup';
+};
+
+export type BeginTwoStepErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `conflict`: two-step sign-in is already on.
+     */
+    409: Problem;
+    /**
+     * `two_step_unavailable`: this deployment holds no two-step key; or a store is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type BeginTwoStepError = BeginTwoStepErrors[keyof BeginTwoStepErrors];
+
+export type BeginTwoStepResponses = {
+    /**
+     * The secret to add to the app.
+     */
+    200: TwoStepSetup;
+};
+
+export type BeginTwoStepResponse = BeginTwoStepResponses[keyof BeginTwoStepResponses];
+
+export type ConfirmTwoStepData = {
+    /**
+     * A code from the authenticator app, proving it holds the new secret.
+     */
+    body: CodeConfirmRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/two-step/confirm';
+};
+
+export type ConfirmTwoStepErrors = {
+    /**
+     * `validation_failed` with `code_invalid` on `/code`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `conflict`: two-step sign-in is already on.
+     */
+    409: Problem;
+    /**
+     * `two_step_unavailable`, or a store is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ConfirmTwoStepError = ConfirmTwoStepErrors[keyof ConfirmTwoStepErrors];
+
+export type ConfirmTwoStepResponses = {
+    /**
+     * Two-step sign-in is on.
+     */
+    200: RecoveryCodes;
+};
+
+export type ConfirmTwoStepResponse = ConfirmTwoStepResponses[keyof ConfirmTwoStepResponses];
+
+export type ReplaceRecoveryCodesData = {
+    /**
+     * The password again.
+     */
+    body: PasswordProof;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/two-step/recovery-codes';
+};
+
+export type ReplaceRecoveryCodesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: the password is wrong (it counts in the throttle).
+     */
+    403: Problem;
+    /**
+     * `conflict`: two-step sign-in is off.
+     */
+    409: Problem;
+    /**
+     * `too_many_requests`.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReplaceRecoveryCodesError = ReplaceRecoveryCodesErrors[keyof ReplaceRecoveryCodesErrors];
+
+export type ReplaceRecoveryCodesResponses = {
+    /**
+     * The new codes; the old ones no longer work.
+     */
+    200: RecoveryCodes;
+};
+
+export type ReplaceRecoveryCodesResponse = ReplaceRecoveryCodesResponses[keyof ReplaceRecoveryCodesResponses];
+
+export type DisableTwoStepData = {
+    /**
+     * The password again.
+     */
+    body: PasswordProof;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/two-step/disable';
+};
+
+export type DisableTwoStepErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: the password is wrong (it counts in the throttle).
+     */
+    403: Problem;
+    /**
+     * `conflict`: two-step sign-in is off already.
+     */
+    409: Problem;
+    /**
+     * `too_many_requests`.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DisableTwoStepError = DisableTwoStepErrors[keyof DisableTwoStepErrors];
+
+export type DisableTwoStepResponses = {
+    /**
+     * Two-step sign-in is off.
+     */
+    204: void;
+};
+
+export type DisableTwoStepResponse = DisableTwoStepResponses[keyof DisableTwoStepResponses];
+
+export type StepUpData = {
+    /**
+     * Exactly one proof of the signed-in person.
+     */
+    body: StepUpRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/step-up';
+};
+
+export type StepUpErrors = {
+    /**
+     * Not exactly one proof, or `code_invalid` on `/code`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: the password or authenticator code is wrong (it counts in the throttle).
+     */
+    403: Problem;
+    /**
+     * `too_many_requests` or `too_many_attempts`.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StepUpError = StepUpErrors[keyof StepUpErrors];
+
+export type StepUpResponses = {
+    /**
+     * Proven for ten minutes.
+     */
+    204: void;
+};
+
+export type StepUpResponse = StepUpResponses[keyof StepUpResponses];
+
+export type SendStepUpCodeData = {
+    /**
+     * Which of the account's own addresses to send the code to.
+     */
+    body: StepUpCodeRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/step-up/code';
+};
+
+export type SendStepUpCodeErrors = {
+    /**
+     * The account has no such address.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `too_many_requests`: a code was sent less than a minute ago.
+     */
+    429: Problem;
+    /**
+     * A store or the delivery provider is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendStepUpCodeError = SendStepUpCodeErrors[keyof SendStepUpCodeErrors];
+
+export type SendStepUpCodeResponses = {
+    /**
+     * A code is on its way.
+     */
+    202: OtpChallenge;
+};
+
+export type SendStepUpCodeResponse = SendStepUpCodeResponses[keyof SendStepUpCodeResponses];
+
+export type RequestPasswordResetData = {
+    /**
+     * The account's email address and the console asking.
+     */
+    body: PasswordResetLinkRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/password/reset-request';
+};
+
+export type RequestPasswordResetErrors = {
+    /**
+     * Malformed email, or `audience_not_allowed` on `/audience` (the Agent app has no password link).
+     */
+    400: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestPasswordResetError = RequestPasswordResetErrors[keyof RequestPasswordResetErrors];
+
+export type RequestPasswordResetResponses = {
+    /**
+     * Accepted.
+     */
+    202: unknown;
+};
+
+export type ResetPasswordData = {
+    /**
+     * The token from the link, the console and the new password.
+     */
+    body: PasswordReset;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/password/reset';
+};
+
+export type ResetPasswordErrors = {
+    /**
+     * `validation_failed` with `password_weak` on `/new_password`.
+     */
+    400: Problem;
+    /**
+     * `link_invalid`: expired, used, replaced, or asked at the other console.
+     */
+    410: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResetPasswordError = ResetPasswordErrors[keyof ResetPasswordErrors];
+
+export type ResetPasswordResponses = {
+    /**
+     * Password set; sign in with it.
+     */
+    204: void;
+};
+
+export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
+
+export type CancelIdentifierChangeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/identifier-change';
+};
+
+export type CancelIdentifierChangeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelIdentifierChangeError = CancelIdentifierChangeErrors[keyof CancelIdentifierChangeErrors];
+
+export type CancelIdentifierChangeResponses = {
+    /**
+     * Cancelled, or nothing was pending.
+     */
+    204: void;
+};
+
+export type CancelIdentifierChangeResponse = CancelIdentifierChangeResponses[keyof CancelIdentifierChangeResponses];
+
+export type BeginIdentifierChangeData = {
+    /**
+     * The new email address or phone number.
+     */
+    body: IdentifierChangeRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/identifier-change';
+};
+
+export type BeginIdentifierChangeErrors = {
+    /**
+     * Malformed address, or the account's own.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `step_up_required`.
+     */
+    403: Problem;
+    /**
+     * A store or the delivery provider is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type BeginIdentifierChangeError = BeginIdentifierChangeErrors[keyof BeginIdentifierChangeErrors];
+
+export type BeginIdentifierChangeResponses = {
+    /**
+     * A code is on its way to the new address.
+     */
+    202: IdentifierChange;
+};
+
+export type BeginIdentifierChangeResponse = BeginIdentifierChangeResponses[keyof BeginIdentifierChangeResponses];
+
+export type ConfirmIdentifierChangeData = {
+    /**
+     * The code sent to the new address.
+     */
+    body: CodeConfirmRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/identifier-change/confirm';
+};
+
+export type ConfirmIdentifierChangeErrors = {
+    /**
+     * `validation_failed` with `code_invalid` on `/code`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `identifier_taken`.
+     */
+    409: Problem;
+    /**
+     * `too_many_attempts`.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ConfirmIdentifierChangeError = ConfirmIdentifierChangeErrors[keyof ConfirmIdentifierChangeErrors];
+
+export type ConfirmIdentifierChangeResponses = {
+    /**
+     * Changed.
+     */
+    200: User;
+};
+
+export type ConfirmIdentifierChangeResponse = ConfirmIdentifierChangeResponses[keyof ConfirmIdentifierChangeResponses];
+
+export type MintServiceTokenData = {
+    /**
+     * The job's credential.
+     */
+    body: ServiceTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/service-tokens';
+};
+
+export type MintServiceTokenErrors = {
+    /**
+     * Malformed body.
+     */
+    400: Problem;
+    /**
+     * `authentication_failed`: an unknown or revoked credential.
+     */
+    401: Problem;
+    /**
+     * `too_many_requests`.
+     */
+    429: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MintServiceTokenError = MintServiceTokenErrors[keyof MintServiceTokenErrors];
+
+export type MintServiceTokenResponses = {
+    /**
+     * The token.
+     */
+    200: ServiceToken;
+};
+
+export type MintServiceTokenResponse = MintServiceTokenResponses[keyof MintServiceTokenResponses];
 
 export type GetJwksData = {
     body?: never;
@@ -6791,7 +8628,7 @@ export type ListPartnersErrors = {
      */
     401: Problem;
     /**
-     * The caller is not in the platform realm (`forbidden`).
+     * The caller is not in the platform realm (`forbidden`), or lacks `partner:read` (`access_denied`).
      */
     403: Problem;
     /**
@@ -6842,7 +8679,7 @@ export type CreatePartnerData = {
 
 export type CreatePartnerErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example a missing `name` or a malformed `contact_email`.
+     * The body failed validation (`validation_failed`), for example a missing `name`, a malformed `contact_email` or a missing owner field, or a withheld permission the catalogue does not have (`unknown_permission`).
      */
     400: Problem;
     /**
@@ -6850,9 +8687,13 @@ export type CreatePartnerErrors = {
      */
     401: Problem;
     /**
-     * Somebody who is not platform staff named an `owner` (`forbidden`).
+     * An `owner` or `withheld_permissions` sent by somebody who is not platform staff (`forbidden`), or platform staff without `partner:write` and `staff:write` (`access_denied`).
      */
     403: Problem;
+    /**
+     * The entitlements would withhold `partner:access` (`partner_cannot_sign_in`) or a permission outside the partner pool (`permission_not_grantable`); nothing was created.
+     */
+    409: Problem;
     /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -6887,7 +8728,7 @@ export type GetPartnerFiltersErrors = {
      */
     401: Problem;
     /**
-     * The caller is not in the platform realm (`forbidden`).
+     * The caller is not in the platform realm (`forbidden`), or lacks `partner:read` (`access_denied`).
      */
     403: Problem;
     /**
@@ -7032,7 +8873,7 @@ export type UpdatePartnerErrors = {
      */
     401: Problem;
     /**
-     * The caller's role does not allow the change (`forbidden`), for example a member who is neither owner nor manager, or a `status` sent by anyone outside the platform realm.
+     * The caller lacks the permission for a member in the body (`access_denied`), or sent `status` from outside the platform realm (`forbidden`).
      */
     403: Problem;
     /**
@@ -7086,6 +8927,10 @@ export type GetPartnerActivationErrors = {
      */
     401: Problem;
     /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
     404: Problem;
@@ -7131,6 +8976,10 @@ export type GetPartnerStandingErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
     /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
@@ -7185,7 +9034,7 @@ export type PutPartnerLogoErrors = {
      */
     401: Problem;
     /**
-     * The role does not brand the Partner.
+     * The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -7246,7 +9095,7 @@ export type PutPartnerBannerErrors = {
      */
     401: Problem;
     /**
-     * The role does not brand the Partner.
+     * The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -7299,6 +9148,10 @@ export type ListPartnerDocumentsErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
     /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
@@ -7353,7 +9206,7 @@ export type CreatePartnerDocumentErrors = {
      */
     401: Problem;
     /**
-     * The role does not file documents.
+     * The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -7411,7 +9264,7 @@ export type RemovePartnerDocumentErrors = {
      */
     401: Problem;
     /**
-     * The role does not remove documents.
+     * The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -7464,6 +9317,10 @@ export type GetPartnerDocumentErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown partner or document.
      */
@@ -7650,6 +9507,10 @@ export type GetPayoutAccountErrors = {
      */
     401: Problem;
     /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown partner, or no account stated yet.
      */
     404: Problem;
@@ -7703,7 +9564,7 @@ export type PutPayoutAccountErrors = {
      */
     401: Problem;
     /**
-     * The role does not change the account.
+     * The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -7803,6 +9664,10 @@ export type GetPartnerPlanErrors = {
      */
     401: Problem;
     /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
     404: Problem;
@@ -7856,7 +9721,7 @@ export type PutPartnerPlanErrors = {
      */
     401: Problem;
     /**
-     * Not the owner, or a move by somebody who is not platform staff.
+     * The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).
      */
     403: Problem;
     /**
@@ -7919,7 +9784,7 @@ export type GetPlanImpactErrors = {
      */
     401: Problem;
     /**
-     * Not the owner.
+     * The caller lacks `plan:write` (`access_denied`; platform staff need `partner:read`).
      */
     403: Problem;
     /**
@@ -7968,6 +9833,10 @@ export type ListLocationsErrors = {
      * No valid access token was sent (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` (`access_denied`), or holds it at no Location (`no_location_assigned`).
+     */
+    403: Problem;
     /**
      * The partner does not exist or is not visible to the caller (`not_found`).
      */
@@ -8018,7 +9887,7 @@ export type CreateLocationErrors = {
      */
     401: Problem;
     /**
-     * The caller is a member but neither owner nor manager (`forbidden`).
+     * The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -8076,7 +9945,7 @@ export type DeleteLocationErrors = {
      */
     401: Problem;
     /**
-     * The role does not delete Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8135,6 +10004,10 @@ export type GetLocationErrors = {
      * No valid access token was sent (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
     /**
      * The partner is not visible to the caller, or the location does not exist or belongs to another partner (`not_found`).
      */
@@ -8200,7 +10073,7 @@ export type UpdateLocationErrors = {
      */
     401: Problem;
     /**
-     * The caller is a member but neither owner nor manager (`forbidden`).
+     * The caller lacks `location:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -8258,6 +10131,10 @@ export type ListLocationBinErrors = {
      */
     401: Problem;
     /**
+     * The caller holds `location:read` at no Location (`access_denied`).
+     */
+    403: Problem;
+    /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
     404: Problem;
@@ -8307,6 +10184,10 @@ export type GetLocationActivationErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown partner or location.
      */
@@ -8365,7 +10246,7 @@ export type PutLocationFulfilmentErrors = {
      */
     401: Problem;
     /**
-     * The role does not change Locations, or `not_in_plan` for the platform fleet.
+     * The caller lacks `location:write` at this Location (`access_denied`), or the platform fleet is not in the plan (`not_in_plan`).
      */
     403: Problem;
     /**
@@ -8430,7 +10311,7 @@ export type PutLocationOrderSettingsErrors = {
      */
     401: Problem;
     /**
-     * The role does not change Locations, or a platform staff's setting.
+     * The caller lacks `location:write` at this Location (`access_denied`), or a member changed a setting that is platform staff's.
      */
     403: Problem;
     /**
@@ -8495,7 +10376,7 @@ export type PutLocationListingErrors = {
      */
     401: Problem;
     /**
-     * The role does not change Locations, or highlights set by a member.
+     * The caller lacks `location:write` at this Location (`access_denied`), or a member set the highlights, which are platform staff's.
      */
     403: Problem;
     /**
@@ -8553,7 +10434,7 @@ export type ResumeLocationErrors = {
      */
     401: Problem;
     /**
-     * The role does not resume Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8614,7 +10495,7 @@ export type PauseLocationErrors = {
      */
     401: Problem;
     /**
-     * The role does not pause Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8668,7 +10549,7 @@ export type RestoreLocationErrors = {
      */
     401: Problem;
     /**
-     * The role does not restore Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8733,7 +10614,7 @@ export type PutLocationLogoErrors = {
      */
     401: Problem;
     /**
-     * The role does not brand Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8798,7 +10679,7 @@ export type PutLocationBannerErrors = {
      */
     401: Problem;
     /**
-     * The role does not brand Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8855,6 +10736,10 @@ export type ListLocationHolidaysErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown partner or location.
      */
@@ -8914,7 +10799,7 @@ export type CloseLocationForHolidayErrors = {
      */
     401: Problem;
     /**
-     * The role does not change Locations.
+     * The caller lacks `location:write` at this Location (`access_denied`).
      */
     403: Problem;
     /**
@@ -8968,6 +10853,10 @@ export type ListMembershipsErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `staff:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
      * The partner does not exist or is not visible to the caller (`not_found`).
      */
     404: Problem;
@@ -9014,7 +10903,7 @@ export type RemoveMembershipErrors = {
      */
     401: Problem;
     /**
-     * The caller is not an owner of the partner (`forbidden`).
+     * The caller lacks `staff:write` (`access_denied`).
      */
     403: Problem;
     /**
@@ -9064,7 +10953,7 @@ export type ListInvitationsErrors = {
      */
     401: Problem;
     /**
-     * The caller is a member but neither owner nor manager (`forbidden`).
+     * The caller lacks `staff:read` (`access_denied`).
      */
     403: Problem;
     /**
@@ -9109,7 +10998,7 @@ export type CreateInvitationData = {
 
 export type CreateInvitationErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example an `email` that is not an email address or an unknown `role`.
+     * The body failed validation (`validation_failed`), for example an `email` that is not an email address, no role, or `custom` as `role`; or the scope has the wrong shape for the role (`invalid_scope`).
      */
     400: Problem;
     /**
@@ -9117,7 +11006,7 @@ export type CreateInvitationErrors = {
      */
     401: Problem;
     /**
-     * The caller is neither owner nor manager, or is a manager granting `owner` (`forbidden`).
+     * The caller lacks `staff:write` (`access_denied`), or the role holds a permission the caller does not hold (`permission_escalation`).
      */
     403: Problem;
     /**
@@ -9125,7 +11014,7 @@ export type CreateInvitationErrors = {
      */
     404: Problem;
     /**
-     * The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`).
+     * The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`); or a Location or Service of another partner was named (`cross_tenant_scope`).
      */
     409: Problem;
     /**
@@ -9171,7 +11060,7 @@ export type RevokeInvitationErrors = {
      */
     401: Problem;
     /**
-     * The caller is a member but neither owner nor manager (`forbidden`).
+     * The caller lacks `staff:write` (`access_denied`).
      */
     403: Problem;
     /**
@@ -9205,7 +11094,7 @@ export type RevokeInvitationResponse = RevokeInvitationResponses[keyof RevokeInv
 
 export type AcceptInvitationData = {
     /**
-     * The details of the user to create, used only when the address has no user yet.
+     * The details of the user to create, a password for a user who has none, and the delivery of the session's refresh token.
      */
     body?: InvitationAcceptRequest;
     headers?: {
@@ -9259,6 +11148,10 @@ export type AcceptInvitationResponses = {
      * The invitation was accepted; the body carries the session and the membership.
      */
     200: InvitationAccepted;
+    /**
+     * The invitation was accepted and the membership exists, but the invitee has two-step sign-in on; complete the sign-in at `POST /v1/auth/two-step/verify`.
+     */
+    202: InvitationSecondStep;
 };
 
 export type AcceptInvitationResponse = AcceptInvitationResponses[keyof AcceptInvitationResponses];
@@ -9280,6 +11173,10 @@ export type ListServicesErrors = {
      * No valid access token was sent (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).
+     */
+    403: Problem;
     /**
      * The partner does not exist or is not visible to the caller (`not_found`).
      */
@@ -9330,7 +11227,7 @@ export type CreateServiceErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager, or `not_in_plan`: the plan does not include the kind.
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`), or the plan does not include the kind (`not_in_plan`).
      */
     403: Problem;
     /**
@@ -9392,6 +11289,10 @@ export type GetServiceErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).
+     */
+    403: Problem;
+    /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
     404: Problem;
@@ -9449,7 +11350,7 @@ export type UpdateServiceErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager, or `not_in_plan` on enabling.
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`), or the plan lacks the kind being enabled (`not_in_plan`).
      */
     403: Problem;
     /**
@@ -9510,7 +11411,7 @@ export type UpsertServiceErrors = {
      */
     401: Problem;
     /**
-     * The caller is a member but neither owner nor manager (`forbidden`).
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`), the partner is not entitled to it (`not_enabled_for_partner`), or the plan lacks the kind being enabled (`not_in_plan`).
      */
     403: Problem;
     /**
@@ -9577,7 +11478,7 @@ export type DeleteServiceLocationErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager.
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -9634,6 +11535,10 @@ export type GetServiceLocationErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).
+     */
+    403: Problem;
     /**
      * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
      */
@@ -9696,7 +11601,7 @@ export type PutServiceLocationErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager.
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -9754,6 +11659,10 @@ export type GetDeliveryPricingErrors = {
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
+    /**
+     * The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).
+     */
+    403: Problem;
     /**
      * Unknown, not visible, or no pricing yet.
      */
@@ -9816,7 +11725,7 @@ export type PutDeliveryPricingErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager.
+     * The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -9891,6 +11800,10 @@ export type QuoteDeliveryErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).
+     */
+    403: Problem;
+    /**
      * Unknown, not visible, or no pricing yet.
      */
     404: Problem;
@@ -9922,6 +11835,2747 @@ export type QuoteDeliveryResponses = {
 };
 
 export type QuoteDeliveryResponse = QuoteDeliveryResponses[keyof QuoteDeliveryResponses];
+
+export type ListPermissionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The pool, `platform` by default.
+         */
+        pool?: PermissionPool;
+    };
+    url: '/v1/permissions';
+};
+
+export type ListPermissionsErrors = {
+    /**
+     * An unknown pool.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied` without `role:read`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPermissionsError = ListPermissionsErrors[keyof ListPermissionsErrors];
+
+export type ListPermissionsResponses = {
+    /**
+     * The permissions of the pool.
+     */
+    200: PermissionList;
+};
+
+export type ListPermissionsResponse = ListPermissionsResponses[keyof ListPermissionsResponses];
+
+export type ListPartnerAccessHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only this person.
+         */
+        user_id?: string;
+        /**
+         * Only this membership.
+         */
+        membership_id?: string;
+        /**
+         * A filter tree as JSON over user, membership, role, action and occurred_at.
+         */
+        filter?: string;
+        /**
+         * Sort keys (default `-occurred_at`).
+         */
+        sort?: string;
+        /**
+         * Page size (default 25).
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/access-history';
+};
+
+export type ListPartnerAccessHistoryErrors = {
+    /**
+     * A parameter was refused.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerAccessHistoryError = ListPartnerAccessHistoryErrors[keyof ListPartnerAccessHistoryErrors];
+
+export type ListPartnerAccessHistoryResponses = {
+    /**
+     * A page of history.
+     */
+    200: AccessHistoryList;
+};
+
+export type ListPartnerAccessHistoryResponse = ListPartnerAccessHistoryResponses[keyof ListPartnerAccessHistoryResponses];
+
+export type GetEntitlementsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/entitlements';
+};
+
+export type GetEntitlementsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetEntitlementsError = GetEntitlementsErrors[keyof GetEntitlementsErrors];
+
+export type GetEntitlementsResponses = {
+    /**
+     * The entitlements.
+     */
+    200: Entitlements;
+};
+
+export type GetEntitlementsResponse = GetEntitlementsResponses[keyof GetEntitlementsResponses];
+
+export type UpdateEntitlementsData = {
+    /**
+     * The whole set of permissions to withhold.
+     */
+    body: EntitlementsUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/entitlements';
+};
+
+export type UpdateEntitlementsErrors = {
+    /**
+     * An unknown permission (`unknown_permission`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied` without `partner:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner.
+     */
+    404: Problem;
+    /**
+     * `partner_cannot_sign_in` or `permission_not_grantable`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateEntitlementsError = UpdateEntitlementsErrors[keyof UpdateEntitlementsErrors];
+
+export type UpdateEntitlementsResponses = {
+    /**
+     * The entitlements after the change.
+     */
+    200: Entitlements;
+};
+
+export type UpdateEntitlementsResponse = UpdateEntitlementsResponses[keyof UpdateEntitlementsResponses];
+
+export type ListPartnerImpersonationConsentsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/impersonation/consents';
+};
+
+export type ListPartnerImpersonationConsentsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not an owner.
+     */
+    403: Problem;
+    /**
+     * Unknown partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerImpersonationConsentsError = ListPartnerImpersonationConsentsErrors[keyof ListPartnerImpersonationConsentsErrors];
+
+export type ListPartnerImpersonationConsentsResponses = {
+    /**
+     * The requests and consents.
+     */
+    200: ImpersonationConsentList;
+};
+
+export type ListPartnerImpersonationConsentsResponse = ListPartnerImpersonationConsentsResponses[keyof ListPartnerImpersonationConsentsResponses];
+
+export type ApproveImpersonationConsentData = {
+    /**
+     * Optionally, whether changes are allowed too.
+     */
+    body?: ImpersonationConsentApproval;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The request to view the partner's console, which must be the partner's.
+         */
+        consent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/approve';
+};
+
+export type ApproveImpersonationConsentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not an owner, or while being viewed.
+     */
+    403: Problem;
+    /**
+     * Unknown request.
+     */
+    404: Problem;
+    /**
+     * Decided already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveImpersonationConsentError = ApproveImpersonationConsentErrors[keyof ApproveImpersonationConsentErrors];
+
+export type ApproveImpersonationConsentResponses = {
+    /**
+     * Consented.
+     */
+    200: ImpersonationConsent;
+};
+
+export type ApproveImpersonationConsentResponse = ApproveImpersonationConsentResponses[keyof ApproveImpersonationConsentResponses];
+
+export type RejectImpersonationConsentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The request to view the partner's console, which must be the partner's.
+         */
+        consent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/reject';
+};
+
+export type RejectImpersonationConsentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not an owner, or while being viewed.
+     */
+    403: Problem;
+    /**
+     * Unknown request.
+     */
+    404: Problem;
+    /**
+     * Decided already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RejectImpersonationConsentError = RejectImpersonationConsentErrors[keyof RejectImpersonationConsentErrors];
+
+export type RejectImpersonationConsentResponses = {
+    /**
+     * Refused.
+     */
+    200: ImpersonationConsent;
+};
+
+export type RejectImpersonationConsentResponse = RejectImpersonationConsentResponses[keyof RejectImpersonationConsentResponses];
+
+export type RevokeImpersonationConsentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The request to view the partner's console, which must be the partner's.
+         */
+        consent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/impersonation/consents/{consent_id}/revoke';
+};
+
+export type RevokeImpersonationConsentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not an owner, or while being viewed.
+     */
+    403: Problem;
+    /**
+     * Unknown consent.
+     */
+    404: Problem;
+    /**
+     * Not an approved consent.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RevokeImpersonationConsentError = RevokeImpersonationConsentErrors[keyof RevokeImpersonationConsentErrors];
+
+export type RevokeImpersonationConsentResponses = {
+    /**
+     * Withdrawn.
+     */
+    200: ImpersonationConsent;
+};
+
+export type RevokeImpersonationConsentResponse = RevokeImpersonationConsentResponses[keyof RevokeImpersonationConsentResponses];
+
+export type ListPartnerImpersonationsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/impersonation/sessions';
+};
+
+export type ListPartnerImpersonationsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not an owner.
+     */
+    403: Problem;
+    /**
+     * Unknown partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerImpersonationsError = ListPartnerImpersonationsErrors[keyof ListPartnerImpersonationsErrors];
+
+export type ListPartnerImpersonationsResponses = {
+    /**
+     * The sessions.
+     */
+    200: ImpersonationSessionList;
+};
+
+export type ListPartnerImpersonationsResponse = ListPartnerImpersonationsResponses[keyof ListPartnerImpersonationsResponses];
+
+export type ListTeamMembersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only enabled or disabled members.
+         */
+        status?: MembershipStatus;
+        /**
+         * Only members holding this role somewhere.
+         */
+        role_id?: string;
+        /**
+         * Only members holding a grant at this Location.
+         */
+        location_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/members';
+};
+
+export type ListTeamMembersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListTeamMembersError = ListTeamMembersErrors[keyof ListTeamMembersErrors];
+
+export type ListTeamMembersResponses = {
+    /**
+     * The members.
+     */
+    200: TeamMemberList;
+};
+
+export type ListTeamMembersResponse = ListTeamMembersResponses[keyof ListTeamMembersResponses];
+
+export type RemoveTeamMemberData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}';
+};
+
+export type RemoveTeamMemberErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveTeamMemberError = RemoveTeamMemberErrors[keyof RemoveTeamMemberErrors];
+
+export type RemoveTeamMemberResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type RemoveTeamMemberResponse = RemoveTeamMemberResponses[keyof RemoveTeamMemberResponses];
+
+export type GetTeamMemberData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}';
+};
+
+export type GetTeamMemberErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetTeamMemberError = GetTeamMemberErrors[keyof GetTeamMemberErrors];
+
+export type GetTeamMemberResponses = {
+    /**
+     * The member.
+     */
+    200: TeamMember;
+};
+
+export type GetTeamMemberResponse = GetTeamMemberResponses[keyof GetTeamMemberResponses];
+
+export type UpdateTeamMemberData = {
+    /**
+     * How the member is shown here.
+     */
+    body: TeamMemberUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}';
+};
+
+export type UpdateTeamMemberErrors = {
+    /**
+     * Malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateTeamMemberError = UpdateTeamMemberErrors[keyof UpdateTeamMemberErrors];
+
+export type UpdateTeamMemberResponses = {
+    /**
+     * The member after the change.
+     */
+    200: TeamMember;
+};
+
+export type UpdateTeamMemberResponse = UpdateTeamMemberResponses[keyof UpdateTeamMemberResponses];
+
+export type SetMemberAccessData = {
+    /**
+     * The member's whole access: one role, at the whole partner or at the Locations and Services named.
+     */
+    body: AccessSet;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/access';
+};
+
+export type SetMemberAccessErrors = {
+    /**
+     * Malformed body, or `invalid_scope`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner, membership or role.
+     */
+    404: Problem;
+    /**
+     * `cross_tenant_scope` or `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetMemberAccessError = SetMemberAccessErrors[keyof SetMemberAccessErrors];
+
+export type SetMemberAccessResponses = {
+    /**
+     * The member's grants after the change.
+     */
+    200: AccessGrantList;
+};
+
+export type SetMemberAccessResponse = SetMemberAccessResponses[keyof SetMemberAccessResponses];
+
+export type DisableTeamMemberData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/disable';
+};
+
+export type DisableTeamMemberErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * `cannot_disable_self` or `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DisableTeamMemberError = DisableTeamMemberErrors[keyof DisableTeamMemberErrors];
+
+export type DisableTeamMemberResponses = {
+    /**
+     * The member, disabled.
+     */
+    200: TeamMember;
+};
+
+export type DisableTeamMemberResponse = DisableTeamMemberResponses[keyof DisableTeamMemberResponses];
+
+export type EnableTeamMemberData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/enable';
+};
+
+export type EnableTeamMemberErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EnableTeamMemberError = EnableTeamMemberErrors[keyof EnableTeamMemberErrors];
+
+export type EnableTeamMemberResponses = {
+    /**
+     * The member, enabled.
+     */
+    200: TeamMember;
+};
+
+export type EnableTeamMemberResponse = EnableTeamMemberResponses[keyof EnableTeamMemberResponses];
+
+export type CreateMemberGrantData = {
+    /**
+     * The role and where it applies.
+     */
+    body: AccessGrantCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/grants';
+};
+
+export type CreateMemberGrantErrors = {
+    /**
+     * Malformed body, or `invalid_scope`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner, membership or role.
+     */
+    404: Problem;
+    /**
+     * `cross_tenant_role` or `cross_tenant_scope`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateMemberGrantError = CreateMemberGrantErrors[keyof CreateMemberGrantErrors];
+
+export type CreateMemberGrantResponses = {
+    /**
+     * The grant.
+     */
+    201: AccessGrant;
+};
+
+export type CreateMemberGrantResponse = CreateMemberGrantResponses[keyof CreateMemberGrantResponses];
+
+export type RevokeMemberGrantData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+        /**
+         * The grant, which must be held through the membership in the path.
+         */
+        grant_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/grants/{grant_id}';
+};
+
+export type RevokeMemberGrantErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner, membership or grant.
+     */
+    404: Problem;
+    /**
+     * `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RevokeMemberGrantError = RevokeMemberGrantErrors[keyof RevokeMemberGrantErrors];
+
+export type RevokeMemberGrantResponses = {
+    /**
+     * Revoked; the history keeps it.
+     */
+    204: void;
+};
+
+export type RevokeMemberGrantResponse = RevokeMemberGrantResponses[keyof RevokeMemberGrantResponses];
+
+export type ResetMemberTwoStepData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/members/{membership_id}/two-step/reset';
+};
+
+export type ResetMemberTwoStepErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or membership.
+     */
+    404: Problem;
+    /**
+     * `two_step_self`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResetMemberTwoStepError = ResetMemberTwoStepErrors[keyof ResetMemberTwoStepErrors];
+
+export type ResetMemberTwoStepResponses = {
+    /**
+     * Two-step sign-in is off for the member.
+     */
+    204: void;
+};
+
+export type ResetMemberTwoStepResponse = ResetMemberTwoStepResponses[keyof ResetMemberTwoStepResponses];
+
+export type ListPartnerPermissionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/permissions';
+};
+
+export type ListPartnerPermissionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `role:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerPermissionsError = ListPartnerPermissionsErrors[keyof ListPartnerPermissionsErrors];
+
+export type ListPartnerPermissionsResponses = {
+    /**
+     * The grantable permissions.
+     */
+    200: PermissionList;
+};
+
+export type ListPartnerPermissionsResponse = ListPartnerPermissionsResponses[keyof ListPartnerPermissionsResponses];
+
+export type ListPartnerRolesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/roles';
+};
+
+export type ListPartnerRolesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `role:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerRolesError = ListPartnerRolesErrors[keyof ListPartnerRolesErrors];
+
+export type ListPartnerRolesResponses = {
+    /**
+     * The roles.
+     */
+    200: AccessRoleList;
+};
+
+export type ListPartnerRolesResponse = ListPartnerRolesResponses[keyof ListPartnerRolesResponses];
+
+export type CreatePartnerRoleData = {
+    /**
+     * The new role.
+     */
+    body: AccessRoleCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/roles';
+};
+
+export type CreatePartnerRoleErrors = {
+    /**
+     * Malformed body, or `unknown_permission`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller.
+     */
+    404: Problem;
+    /**
+     * `outside_entitlements`, `permission_not_grantable`, `role_name_reserved` or a name in use.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerRoleError = CreatePartnerRoleErrors[keyof CreatePartnerRoleErrors];
+
+export type CreatePartnerRoleResponses = {
+    /**
+     * The role.
+     */
+    201: AccessRole;
+};
+
+export type CreatePartnerRoleResponse = CreatePartnerRoleResponses[keyof CreatePartnerRoleResponses];
+
+export type DeletePartnerRoleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/roles/{role_id}';
+};
+
+export type DeletePartnerRoleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or role, another partner's role included.
+     */
+    404: Problem;
+    /**
+     * `role_maintained` or `role_in_use`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePartnerRoleError = DeletePartnerRoleErrors[keyof DeletePartnerRoleErrors];
+
+export type DeletePartnerRoleResponses = {
+    /**
+     * Deleted; the access history that names it stays.
+     */
+    204: void;
+};
+
+export type DeletePartnerRoleResponse = DeletePartnerRoleResponses[keyof DeletePartnerRoleResponses];
+
+export type GetPartnerRoleData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/roles/{role_id}';
+};
+
+export type GetPartnerRoleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `role:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or role.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerRoleError = GetPartnerRoleErrors[keyof GetPartnerRoleErrors];
+
+export type GetPartnerRoleResponses = {
+    /**
+     * The role.
+     */
+    200: AccessRole;
+};
+
+export type GetPartnerRoleResponse = GetPartnerRoleResponses[keyof GetPartnerRoleResponses];
+
+export type UpdatePartnerRoleData = {
+    /**
+     * The members to change; absent members are kept.
+     */
+    body: AccessRoleUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/roles/{role_id}';
+};
+
+export type UpdatePartnerRoleErrors = {
+    /**
+     * Malformed body, or `unknown_permission`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or role.
+     */
+    404: Problem;
+    /**
+     * `role_maintained`, `outside_entitlements`, `role_name_reserved` or a name in use.
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches.
+     */
+    412: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePartnerRoleError = UpdatePartnerRoleErrors[keyof UpdatePartnerRoleErrors];
+
+export type UpdatePartnerRoleResponses = {
+    /**
+     * The role after the change.
+     */
+    200: AccessRole;
+};
+
+export type UpdatePartnerRoleResponse = UpdatePartnerRoleResponses[keyof UpdatePartnerRoleResponses];
+
+export type ListAccessHistoryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this realm: a partner, or the platform organisation.
+         */
+        partner_id?: string;
+        /**
+         * Only this person.
+         */
+        user_id?: string;
+        /**
+         * Only this membership.
+         */
+        membership_id?: string;
+        /**
+         * A filter tree as JSON over user, membership, role, partner, action and occurred_at.
+         */
+        filter?: string;
+        /**
+         * Sort keys (default `-occurred_at`).
+         */
+        sort?: string;
+        /**
+         * Page size (default 25).
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/access-history';
+};
+
+export type ListAccessHistoryErrors = {
+    /**
+     * A parameter was refused.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAccessHistoryError = ListAccessHistoryErrors[keyof ListAccessHistoryErrors];
+
+export type ListAccessHistoryResponses = {
+    /**
+     * A page of history.
+     */
+    200: AccessHistoryList;
+};
+
+export type ListAccessHistoryResponse = ListAccessHistoryResponses[keyof ListAccessHistoryResponses];
+
+export type ListApprovalsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only proposals in this state.
+         */
+        status?: ApprovalStatus;
+    };
+    url: '/v1/platform/approvals';
+};
+
+export type ListApprovalsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListApprovalsError = ListApprovalsErrors[keyof ListApprovalsErrors];
+
+export type ListApprovalsResponses = {
+    /**
+     * The proposals.
+     */
+    200: ApprovalList;
+};
+
+export type ListApprovalsResponse = ListApprovalsResponses[keyof ListApprovalsResponses];
+
+export type ProposeApprovalData = {
+    /**
+     * The act, the platform membership it is about and its parameters.
+     */
+    body: ApprovalCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/approvals';
+};
+
+export type ProposeApprovalErrors = {
+    /**
+     * Malformed body, or a missing parameter for the action.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`; `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown membership, role or grant.
+     */
+    404: Problem;
+    /**
+     * `cross_tenant_role`, `two_step_self`, `cannot_disable_self`, `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ProposeApprovalError = ProposeApprovalErrors[keyof ProposeApprovalErrors];
+
+export type ProposeApprovalResponses = {
+    /**
+     * Proposed; or done at once when nobody else could decide.
+     */
+    201: Approval;
+};
+
+export type ProposeApprovalResponse = ProposeApprovalResponses[keyof ProposeApprovalResponses];
+
+export type GetApprovalData = {
+    body?: never;
+    path: {
+        /**
+         * The proposal.
+         */
+        approval_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/approvals/{approval_id}';
+};
+
+export type GetApprovalErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown proposal.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetApprovalError = GetApprovalErrors[keyof GetApprovalErrors];
+
+export type GetApprovalResponses = {
+    /**
+     * The proposal.
+     */
+    200: Approval;
+};
+
+export type GetApprovalResponse = GetApprovalResponses[keyof GetApprovalResponses];
+
+export type ApproveApprovalData = {
+    /**
+     * Optionally, why.
+     */
+    body?: ApprovalDecision;
+    path: {
+        /**
+         * The proposal.
+         */
+        approval_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/approvals/{approval_id}/approve';
+};
+
+export type ApproveApprovalErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `self_approval`.
+     */
+    403: Problem;
+    /**
+     * Unknown proposal.
+     */
+    404: Problem;
+    /**
+     * `approval_decided`, `approval_voided`, or what the act refuses (`last_owner`).
+     */
+    409: Problem;
+    /**
+     * `approval_expired`.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveApprovalError = ApproveApprovalErrors[keyof ApproveApprovalErrors];
+
+export type ApproveApprovalResponses = {
+    /**
+     * Approved and done.
+     */
+    200: Approval;
+};
+
+export type ApproveApprovalResponse = ApproveApprovalResponses[keyof ApproveApprovalResponses];
+
+export type RejectApprovalData = {
+    /**
+     * Optionally, why.
+     */
+    body?: ApprovalDecision;
+    path: {
+        /**
+         * The proposal.
+         */
+        approval_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/approvals/{approval_id}/reject';
+};
+
+export type RejectApprovalErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown proposal.
+     */
+    404: Problem;
+    /**
+     * `approval_decided`.
+     */
+    409: Problem;
+    /**
+     * `approval_expired`.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RejectApprovalError = RejectApprovalErrors[keyof RejectApprovalErrors];
+
+export type RejectApprovalResponses = {
+    /**
+     * Rejected.
+     */
+    200: Approval;
+};
+
+export type RejectApprovalResponse = RejectApprovalResponses[keyof RejectApprovalResponses];
+
+export type ListImpersonationConsentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+    };
+    url: '/v1/platform/impersonation/consents';
+};
+
+export type ListImpersonationConsentsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListImpersonationConsentsError = ListImpersonationConsentsErrors[keyof ListImpersonationConsentsErrors];
+
+export type ListImpersonationConsentsResponses = {
+    /**
+     * The consents.
+     */
+    200: ImpersonationConsentList;
+};
+
+export type ListImpersonationConsentsResponse = ListImpersonationConsentsResponses[keyof ListImpersonationConsentsResponses];
+
+export type RequestImpersonationConsentData = {
+    /**
+     * The partner and why.
+     */
+    body: ImpersonationConsentCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/impersonation/consents';
+};
+
+export type RequestImpersonationConsentErrors = {
+    /**
+     * Malformed body or reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `impersonate`.
+     */
+    403: Problem;
+    /**
+     * Unknown Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestImpersonationConsentError = RequestImpersonationConsentErrors[keyof RequestImpersonationConsentErrors];
+
+export type RequestImpersonationConsentResponses = {
+    /**
+     * Asked.
+     */
+    201: ImpersonationConsent;
+};
+
+export type RequestImpersonationConsentResponse = RequestImpersonationConsentResponses[keyof RequestImpersonationConsentResponses];
+
+export type ListImpersonationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+    };
+    url: '/v1/platform/impersonation/sessions';
+};
+
+export type ListImpersonationsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListImpersonationsError = ListImpersonationsErrors[keyof ListImpersonationsErrors];
+
+export type ListImpersonationsResponses = {
+    /**
+     * The sessions.
+     */
+    200: ImpersonationSessionList;
+};
+
+export type ListImpersonationsResponse = ListImpersonationsResponses[keyof ListImpersonationsResponses];
+
+export type StartImpersonationData = {
+    /**
+     * The approved consent to view under.
+     */
+    body: ImpersonationSessionCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/impersonation/sessions';
+};
+
+export type StartImpersonationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `impersonate`; `consent_required`.
+     */
+    403: Problem;
+    /**
+     * Unknown consent.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartImpersonationError = StartImpersonationErrors[keyof StartImpersonationErrors];
+
+export type StartImpersonationResponses = {
+    /**
+     * Started.
+     */
+    201: ImpersonationAccess;
+};
+
+export type StartImpersonationResponse = StartImpersonationResponses[keyof StartImpersonationResponses];
+
+export type EndImpersonationData = {
+    body?: never;
+    path: {
+        /**
+         * The impersonation session, which must be the caller's.
+         */
+        impersonation_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/impersonation/sessions/{impersonation_id}/end';
+};
+
+export type EndImpersonationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a session of the caller's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EndImpersonationError = EndImpersonationErrors[keyof EndImpersonationErrors];
+
+export type EndImpersonationResponses = {
+    /**
+     * Ended.
+     */
+    200: ImpersonationSession;
+};
+
+export type EndImpersonationResponse = EndImpersonationResponses[keyof EndImpersonationResponses];
+
+export type RenewImpersonationTokenData = {
+    body?: never;
+    path: {
+        /**
+         * The impersonation session, which must be the caller's.
+         */
+        impersonation_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/impersonation/sessions/{impersonation_id}/token';
+};
+
+export type RenewImpersonationTokenErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `consent_required`: the session ended.
+     */
+    403: Problem;
+    /**
+     * Not a session of the caller's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RenewImpersonationTokenError = RenewImpersonationTokenErrors[keyof RenewImpersonationTokenErrors];
+
+export type RenewImpersonationTokenResponses = {
+    /**
+     * A token.
+     */
+    200: ImpersonationAccess;
+};
+
+export type RenewImpersonationTokenResponse = RenewImpersonationTokenResponses[keyof RenewImpersonationTokenResponses];
+
+export type ListPlatformInvitationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/invitations';
+};
+
+export type ListPlatformInvitationsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformInvitationsError = ListPlatformInvitationsErrors[keyof ListPlatformInvitationsErrors];
+
+export type ListPlatformInvitationsResponses = {
+    /**
+     * The invitations.
+     */
+    200: InvitationList;
+};
+
+export type ListPlatformInvitationsResponse = ListPlatformInvitationsResponses[keyof ListPlatformInvitationsResponses];
+
+export type RevokePlatformInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * The platform invitation.
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/invitations/{invitation_id}';
+};
+
+export type RevokePlatformInvitationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown invitation.
+     */
+    404: Problem;
+    /**
+     * The invitation is not pending.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RevokePlatformInvitationError = RevokePlatformInvitationErrors[keyof RevokePlatformInvitationErrors];
+
+export type RevokePlatformInvitationResponses = {
+    /**
+     * Revoked.
+     */
+    204: void;
+};
+
+export type RevokePlatformInvitationResponse = RevokePlatformInvitationResponses[keyof RevokePlatformInvitationResponses];
+
+export type ListPlatformRolesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/roles';
+};
+
+export type ListPlatformRolesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied` without `role:read`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformRolesError = ListPlatformRolesErrors[keyof ListPlatformRolesErrors];
+
+export type ListPlatformRolesResponses = {
+    /**
+     * The roles.
+     */
+    200: AccessRoleList;
+};
+
+export type ListPlatformRolesResponse = ListPlatformRolesResponses[keyof ListPlatformRolesResponses];
+
+export type CreatePlatformRoleData = {
+    /**
+     * The new role.
+     */
+    body: AccessRoleCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/roles';
+};
+
+export type CreatePlatformRoleErrors = {
+    /**
+     * Malformed body, or `unknown_permission`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * `permission_not_grantable`, `role_name_reserved` or a name in use.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePlatformRoleError = CreatePlatformRoleErrors[keyof CreatePlatformRoleErrors];
+
+export type CreatePlatformRoleResponses = {
+    /**
+     * The role.
+     */
+    201: AccessRole;
+};
+
+export type CreatePlatformRoleResponse = CreatePlatformRoleResponses[keyof CreatePlatformRoleResponses];
+
+export type DeletePlatformRoleData = {
+    body?: never;
+    path: {
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/roles/{role_id}';
+};
+
+export type DeletePlatformRoleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or a Partner's role.
+     */
+    404: Problem;
+    /**
+     * `role_maintained` or `role_in_use`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePlatformRoleError = DeletePlatformRoleErrors[keyof DeletePlatformRoleErrors];
+
+export type DeletePlatformRoleResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeletePlatformRoleResponse = DeletePlatformRoleResponses[keyof DeletePlatformRoleResponses];
+
+export type GetPlatformRoleData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/roles/{role_id}';
+};
+
+export type GetPlatformRoleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or a Partner's role.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformRoleError = GetPlatformRoleErrors[keyof GetPlatformRoleErrors];
+
+export type GetPlatformRoleResponses = {
+    /**
+     * The role.
+     */
+    200: AccessRole;
+};
+
+export type GetPlatformRoleResponse = GetPlatformRoleResponses[keyof GetPlatformRoleResponses];
+
+export type UpdatePlatformRoleData = {
+    /**
+     * The members to change; absent members are kept.
+     */
+    body: AccessRoleUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The role.
+         */
+        role_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/roles/{role_id}';
+};
+
+export type UpdatePlatformRoleErrors = {
+    /**
+     * Malformed body, or `unknown_permission`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` or `permission_escalation`.
+     */
+    403: Problem;
+    /**
+     * Unknown, or a Partner's role.
+     */
+    404: Problem;
+    /**
+     * `role_maintained`, `permission_not_grantable`, `role_name_reserved` or a name in use.
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches.
+     */
+    412: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePlatformRoleError = UpdatePlatformRoleErrors[keyof UpdatePlatformRoleErrors];
+
+export type UpdatePlatformRoleResponses = {
+    /**
+     * The role after the change.
+     */
+    200: AccessRole;
+};
+
+export type UpdatePlatformRoleResponse = UpdatePlatformRoleResponses[keyof UpdatePlatformRoleResponses];
+
+export type ListPlatformStaffData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only enabled or disabled members.
+         */
+        status?: MembershipStatus;
+        /**
+         * Only members holding this platform role.
+         */
+        role_id?: string;
+    };
+    url: '/v1/platform/staff';
+};
+
+export type ListPlatformStaffErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformStaffError = ListPlatformStaffErrors[keyof ListPlatformStaffErrors];
+
+export type ListPlatformStaffResponses = {
+    /**
+     * The platform members.
+     */
+    200: TeamMemberList;
+};
+
+export type ListPlatformStaffResponse = ListPlatformStaffResponses[keyof ListPlatformStaffResponses];
+
+export type InvitePlatformStaffData = {
+    /**
+     * The person to invite.
+     */
+    body: PlatformStaffInvite;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/staff';
+};
+
+export type InvitePlatformStaffErrors = {
+    /**
+     * Malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Already a member or already invited.
+     */
+    409: Problem;
+    /**
+     * A store or mail delivery is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type InvitePlatformStaffError = InvitePlatformStaffErrors[keyof InvitePlatformStaffErrors];
+
+export type InvitePlatformStaffResponses = {
+    /**
+     * The invitation; the email is on its way.
+     */
+    201: Invitation;
+};
+
+export type InvitePlatformStaffResponse = InvitePlatformStaffResponses[keyof InvitePlatformStaffResponses];
+
+export type RemovePlatformStaffData = {
+    body?: never;
+    path: {
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/staff/{membership_id}';
+};
+
+export type RemovePlatformStaffErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown membership.
+     */
+    404: Problem;
+    /**
+     * `last_owner`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemovePlatformStaffError = RemovePlatformStaffErrors[keyof RemovePlatformStaffErrors];
+
+export type RemovePlatformStaffResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type RemovePlatformStaffResponse = RemovePlatformStaffResponses[keyof RemovePlatformStaffResponses];
+
+export type GetPlatformStaffData = {
+    body?: never;
+    path: {
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/staff/{membership_id}';
+};
+
+export type GetPlatformStaffErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:read`.
+     */
+    403: Problem;
+    /**
+     * Unknown membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformStaffError = GetPlatformStaffErrors[keyof GetPlatformStaffErrors];
+
+export type GetPlatformStaffResponses = {
+    /**
+     * The member.
+     */
+    200: TeamMember;
+};
+
+export type GetPlatformStaffResponse = GetPlatformStaffResponses[keyof GetPlatformStaffResponses];
+
+export type UpdatePlatformStaffData = {
+    /**
+     * How the member is shown here.
+     */
+    body: TeamMemberUpdate;
+    path: {
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/staff/{membership_id}';
+};
+
+export type UpdatePlatformStaffErrors = {
+    /**
+     * Malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePlatformStaffError = UpdatePlatformStaffErrors[keyof UpdatePlatformStaffErrors];
+
+export type UpdatePlatformStaffResponses = {
+    /**
+     * The member after the change.
+     */
+    200: TeamMember;
+};
+
+export type UpdatePlatformStaffResponse = UpdatePlatformStaffResponses[keyof UpdatePlatformStaffResponses];
+
+export type EnablePlatformStaffData = {
+    body?: never;
+    path: {
+        /**
+         * The membership, which must belong to the realm in the path.
+         */
+        membership_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/staff/{membership_id}/enable';
+};
+
+export type EnablePlatformStaffErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `staff:write`.
+     */
+    403: Problem;
+    /**
+     * Unknown membership.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EnablePlatformStaffError = EnablePlatformStaffErrors[keyof EnablePlatformStaffErrors];
+
+export type EnablePlatformStaffResponses = {
+    /**
+     * The member, enabled.
+     */
+    200: TeamMember;
+};
+
+export type EnablePlatformStaffResponse = EnablePlatformStaffResponses[keyof EnablePlatformStaffResponses];
 
 export type ListAuditEntriesData = {
     body?: never;
@@ -10127,7 +14781,7 @@ export type DeleteCampaignSlotErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `promo-slot:write`
      */
     403: Problem;
     /**
@@ -10186,6 +14840,10 @@ export type GetCampaignSlotErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `promo-slot:read`
+     */
+    403: Problem;
     /**
      * Unknown slot
      */
@@ -10251,7 +14909,7 @@ export type UpdateCampaignSlotErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `promo-slot:write`
      */
     403: Problem;
     /**
@@ -10300,6 +14958,10 @@ export type ListCountriesErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -10344,7 +15006,7 @@ export type CreateCountryErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10399,6 +15061,10 @@ export type GetCountryErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
     /**
      * Unknown country
      */
@@ -10464,7 +15130,7 @@ export type UpdateCountryErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10525,7 +15191,7 @@ export type PutCountryDefaultServiceAreaErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10574,6 +15240,10 @@ export type GetCountryHolidaysErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
     /**
      * Unknown country
      */
@@ -10628,7 +15298,7 @@ export type PutCountryHolidaysErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10685,7 +15355,7 @@ export type SetCountryOrdersErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10734,6 +15404,10 @@ export type GetCountryPolicyErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
     /**
      * Unknown country
      */
@@ -10788,7 +15462,7 @@ export type PutCountryPolicyErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10838,6 +15512,10 @@ export type ListCountryPolicyVersionsErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
+    /**
      * Unknown country
      */
     404: Problem;
@@ -10883,6 +15561,10 @@ export type GetCountryScheduleErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `city:read`
+     */
+    403: Problem;
     /**
      * Unknown country
      */
@@ -10937,7 +15619,7 @@ export type PutCountryScheduleErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -10994,7 +15676,7 @@ export type SetCountrySignInErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -11051,7 +15733,7 @@ export type SetCountryStatusErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `city:write`
      */
     403: Problem;
     /**
@@ -11100,6 +15782,10 @@ export type ListCurrenciesErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `currency:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -11144,7 +15830,7 @@ export type CreateCurrencyErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `currency:write`
      */
     403: Problem;
     /**
@@ -11199,6 +15885,10 @@ export type GetCurrencyErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `currency:read`
+     */
+    403: Problem;
     /**
      * Unknown currency
      */
@@ -11264,7 +15954,7 @@ export type UpdateCurrencyErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `currency:write`
      */
     403: Problem;
     /**
@@ -11326,6 +16016,10 @@ export type GetLocationPolicyErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown partner or location
      */
     404: Problem;
@@ -11383,7 +16077,7 @@ export type PutLocationPolicyErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager
+     * The caller lacks `location:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -11437,6 +16131,10 @@ export type GetLocationEffectivePolicyErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown partner or location
      */
     404: Problem;
@@ -11487,6 +16185,10 @@ export type ListLocationPolicyVersionsErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown partner or location
      */
     404: Problem;
@@ -11536,6 +16238,10 @@ export type GetLocationScheduleErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown partner or location
      */
@@ -11594,7 +16300,7 @@ export type PutLocationScheduleErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager
+     * The caller lacks `location:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -11647,6 +16353,10 @@ export type GetLocationEffectiveScheduleErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown partner or location
      */
@@ -11707,6 +16417,10 @@ export type GetLocationTradingErrors = {
      */
     401: Problem;
     /**
+     * The caller lacks `location:read` at this Location (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown partner or location
      */
     404: Problem;
@@ -11752,6 +16466,10 @@ export type GetPartnerPolicyErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown, or not visible to the caller
      */
@@ -11806,7 +16524,7 @@ export type PutPartnerPolicyErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager
+     * The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -11856,6 +16574,10 @@ export type ListPartnerPolicyVersionsErrors = {
      */
     401: Problem;
     /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
      * Unknown, or not visible to the caller
      */
     404: Problem;
@@ -11901,6 +16623,10 @@ export type GetPartnerScheduleErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * Platform staff without `partner:read` (`access_denied`).
+     */
+    403: Problem;
     /**
      * Unknown, or not visible to the caller
      */
@@ -11955,7 +16681,7 @@ export type PutPartnerScheduleErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager
+     * The caller lacks `location:write` across the partner (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
      */
     403: Problem;
     /**
@@ -12017,6 +16743,10 @@ export type ListServiceAreasErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -12061,7 +16791,7 @@ export type CreateServiceAreaErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12171,6 +16901,10 @@ export type GetServiceAreaErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
+    /**
      * Unknown area
      */
     404: Problem;
@@ -12235,7 +16969,7 @@ export type UpdateServiceAreaErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12302,6 +17036,10 @@ export type ListCampaignSlotsErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `promo-slot:read`
+     */
+    403: Problem;
+    /**
      * Unknown area
      */
     404: Problem;
@@ -12355,7 +17093,7 @@ export type CreateCampaignSlotErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `promo-slot:write`
      */
     403: Problem;
     /**
@@ -12408,6 +17146,10 @@ export type GetDisplayGridErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
     /**
      * Unknown area
      */
@@ -12462,7 +17204,7 @@ export type PutDisplayGridErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12519,7 +17261,7 @@ export type DivideServiceAreaErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12580,7 +17322,7 @@ export type PlanServiceAreaDivisionErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12638,7 +17380,7 @@ export type DeleteServiceAreaFenceErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12699,7 +17441,7 @@ export type PutServiceAreaFenceErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12757,6 +17499,10 @@ export type GetServiceAreaImpactErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
+    /**
      * Unknown area
      */
     404: Problem;
@@ -12810,7 +17556,7 @@ export type MergeServiceAreasErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12868,6 +17614,10 @@ export type GetServiceAreaPolicyErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
+    /**
      * Unknown area
      */
     404: Problem;
@@ -12921,7 +17671,7 @@ export type PutServiceAreaPolicyErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -12975,6 +17725,10 @@ export type ListServiceAreaPolicyVersionsErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
+    /**
      * Unknown area
      */
     404: Problem;
@@ -13024,6 +17778,10 @@ export type GetServiceAreaScheduleErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
     /**
      * Unknown area
      */
@@ -13078,7 +17836,7 @@ export type PutServiceAreaScheduleErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -13135,7 +17893,7 @@ export type SetServiceAreaStatusErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -13196,7 +17954,7 @@ export type PutServiceAreaVerticalOrderErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -13249,6 +18007,10 @@ export type ListServiceAreaVerticalsErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `zone:read`
+     */
+    403: Problem;
     /**
      * Unknown area
      */
@@ -13303,7 +18065,7 @@ export type PutServiceAreaVerticalsErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `zone:write`
      */
     403: Problem;
     /**
@@ -13381,6 +18143,10 @@ export type ListServiceTypesErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `location-type:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -13425,7 +18191,7 @@ export type CreateServiceTypeErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -13484,6 +18250,10 @@ export type GetServiceTypeErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `location-type:read`
+     */
+    403: Problem;
     /**
      * Unknown service type
      */
@@ -13549,7 +18319,7 @@ export type UpdateServiceTypeErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -13610,7 +18380,7 @@ export type SetServiceTypeStatusErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -13659,6 +18429,10 @@ export type ListSettingsErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `setting:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -13701,7 +18475,7 @@ export type ResetSettingErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `setting:write`
      */
     403: Problem;
     /**
@@ -13750,6 +18524,10 @@ export type GetSettingErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `setting:read`
+     */
+    403: Problem;
     /**
      * No setting with that key is declared
      */
@@ -13804,7 +18582,7 @@ export type PutSettingErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `setting:write`
      */
     403: Problem;
     /**
@@ -13882,6 +18660,10 @@ export type ListStoreTypesErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `location-type:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -13926,7 +18708,7 @@ export type CreateStoreTypeErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -13985,6 +18767,10 @@ export type GetStoreTypeErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `location-type:read`
+     */
+    403: Problem;
     /**
      * Unknown store type
      */
@@ -14050,7 +18836,7 @@ export type UpdateStoreTypeErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -14111,7 +18897,7 @@ export type SetStoreTypeStatusErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `location-type:write`
      */
     403: Problem;
     /**
@@ -14160,6 +18946,10 @@ export type ListVerticalsErrors = {
      */
     401: Problem;
     /**
+     * `access_denied`: a Mission Control token without `vertical:read`
+     */
+    403: Problem;
+    /**
      * A store is unavailable
      */
     503: Problem;
@@ -14204,7 +18994,7 @@ export type CreateVerticalErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `vertical:write`
      */
     403: Problem;
     /**
@@ -14263,6 +19053,10 @@ export type GetVerticalErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `vertical:read`
+     */
+    403: Problem;
     /**
      * Unknown Vertical
      */
@@ -14328,7 +19122,7 @@ export type UpdateVerticalErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `vertical:write`
      */
     403: Problem;
     /**
@@ -14389,7 +19183,7 @@ export type PutVerticalCategoriesErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `vertical:write`
      */
     403: Problem;
     /**
@@ -14446,7 +19240,7 @@ export type PutVerticalImageErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `vertical:write`
      */
     403: Problem;
     /**
@@ -14499,6 +19293,10 @@ export type GetVerticalReachErrors = {
      * No valid token
      */
     401: Problem;
+    /**
+     * `access_denied`: a Mission Control token without `vertical:read`
+     */
+    403: Problem;
     /**
      * Unknown Vertical
      */
@@ -14553,7 +19351,7 @@ export type SetVerticalStatusErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff
+     * Not platform staff, or `access_denied` without `vertical:write`
      */
     403: Problem;
     /**
@@ -14700,7 +19498,7 @@ export type CreateAssetGrantErrors = {
      */
     401: Problem;
     /**
-     * Not platform staff, or a Partner purpose on the platform route
+     * Not platform staff, `access_denied` without the owning capability's permission, or a Partner purpose on the platform route
      */
     403: Problem;
     /**
@@ -14787,7 +19585,7 @@ export type DiscardAssetErrors = {
      */
     401: Problem;
     /**
-     * Not allowed to write the asset's owner
+     * `access_denied` without the permission that writes the file
      */
     403: Problem;
     /**
@@ -14894,7 +19692,7 @@ export type ConfirmAssetErrors = {
      */
     401: Problem;
     /**
-     * Not allowed to write the asset's owner
+     * `access_denied` without the permission that writes the file
      */
     403: Problem;
     /**
@@ -14955,7 +19753,7 @@ export type CreateAssetCropErrors = {
      */
     401: Problem;
     /**
-     * Not allowed to write the asset's owner
+     * `access_denied` without the permission that writes the file
      */
     403: Problem;
     /**
@@ -15120,7 +19918,7 @@ export type CreatePartnerAssetGrantErrors = {
      */
     401: Problem;
     /**
-     * Neither owner nor manager, or a platform purpose on the Partner route
+     * `access_denied` without the permission that writes the file, or a platform purpose on the Partner route
      */
     403: Problem;
     /**

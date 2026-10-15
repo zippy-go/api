@@ -4,7 +4,7 @@ parameters:
 get:
   operationId: getPlanImpact
   summary: Preview what a plan change would stop
-  description: 'What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. The owner and platform staff.'
+  description: 'What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. `plan:write` (platform staff: `partner:read`).'
   tags:
     - Plans
   security:
@@ -36,7 +36,7 @@ get:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not the owner.
+      description: 'The caller lacks `plan:write` (`access_denied`; platform staff need `partner:read`).'
       content:
         application/problem+json:
           schema:

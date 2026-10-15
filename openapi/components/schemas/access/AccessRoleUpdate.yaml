@@ -1,0 +1,23 @@
+type: object
+description: 'The request body of the role changes: absent members are kept. A maintained role is refused (`role_maintained`); a default role takes new permissions but keeps its name.'
+properties:
+  name:
+    type:
+      - string
+      - 'null'
+    description: A new name, for custom roles only.
+  permissions:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+    description: The whole new set of permissions, replacing the old one.
+examples:
+  - name: Evening shift lead
+    permissions:
+      - partner:access
+      - location:read
+      - order:read
+      - order:manage
+      - dispatch:read

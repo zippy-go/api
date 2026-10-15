@@ -26,8 +26,8 @@
     },
     "role": {
       "type": "string",
-      "enum": ["owner", "manager", "dispatcher", "kitchen", "staff"],
-      "description": "The role of the new membership.",
+      "enum": ["owner", "manager", "dispatcher", "kitchen", "staff", "custom"],
+      "description": "The role label of the new membership: the default role first granted, or `custom` for a role the partner defined or access held only at chosen Locations or Services. Consumers must tolerate values they do not know.",
       "examples": ["owner"]
     }
   }

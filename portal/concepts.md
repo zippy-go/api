@@ -113,13 +113,31 @@ work the same way as for one-off purchases.
 ## Platform realm
 
 The platform realm is the operations side of ZippyGo: the people who
-activate and suspend partners and look across all of them. A user is in
-the realm when they hold platform roles, which `GET /v1/me` lists in
-`platform_roles` and the access token carries in `platform`. Operations
+activate and suspend partners and look across all of them. They sign in
+to Mission Control, the surface whose tokens carry `aud` `platform`, with
+a password and a second factor. A user is in the realm when they hold a
+platform membership; what they may do is the permissions of their
+platform roles, which `GET /v1/me` lists on Mission Control. Operations
 that are open to the realm only, such as `GET /v1/partners`, say so in the
-reference and answer `403` (`forbidden`) for everyone else. A platform
-user also reads any partner's locations, members, invitations and
-services, without being a member.
+reference and answer `403` (`forbidden`) for everyone else, or
+`access_denied` naming the permission a platform member lacks. A platform
+member with the permission also reads any partner's locations, members,
+invitations and services, without being a member.
+
+## Roles, grants and permissions
+
+A permission names one act, such as `location:write`. A role is a named
+set of permissions owned by the platform or by one partner: every partner
+receives the maintained `OWNER` role, the default roles `MANAGER`,
+`STAFF`, `DISPATCHER` and `KITCHEN`, which it may tune, and an `AGENT`
+role with each agent-based Service, and may define its own. The platform
+keeps `SUPER_ADMIN` and narrower default roles for its staff. A grant gives a member a role at a scope: the whole
+partner, one Location or one Service. What a member may do at a place is
+what the grants covering it allow, within the partner's entitlements, the
+permissions the platform lets the partner's roles contain. Nobody hands
+out more than they hold. The `Access` tag of the reference has the
+operations; the `role` label that memberships carry is a summary of the
+grants, never the authority.
 
 ## Service area
 

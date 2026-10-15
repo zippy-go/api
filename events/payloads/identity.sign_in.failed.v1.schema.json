@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/identity.sign_in.failed.v1.schema.json",
+  "title": "IdentitySignInFailedPayload",
+  "description": "Payload of `identity.sign_in.failed` version 1: a failed attempt to sign in or to prove the signed-in person, for detecting credential stuffing. The answer to the caller is the same whatever the reason; this event carries the true one. The envelope's `partner_id` is `null`. Never carries an email address, a phone number, a password or a code. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "identifier_hash",
+    "audience",
+    "reason",
+    "source"
+  ],
+  "properties": {
+    "identifier_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the normalised identifier (email address, phone number or service credential), in lower-case hex: the same identifier always gives the same digest, so repeated attempts can be told apart without naming it.",
+      "examples": [
+        "3f1d5c8a9b0e2d4f6a7c8b9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b"
+      ]
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "partner",
+        "platform",
+        "agent",
+        "customer",
+        "service"
+      ],
+      "description": "The surface the attempt was for; `service` for a service credential. Consumers must tolerate values they do not know.",
+      "examples": [
+        "partner"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "unknown_account",
+        "no_password",
+        "wrong_password",
+        "wrong_code",
+        "wrong_second_factor",
+        "disabled",
+        "surface_not_held",
+        "rate_limited",
+        "wrong_current_password",
+        "wrong_password_proof",
+        "wrong_authenticator_proof",
+        "unknown_credential"
+      ],
+      "description": "Why it failed: no account for the identifier, an account without a password, a wrong password, a wrong one-time code, a wrong second step, a disabled account, a surface the account may not enter, an attempt refused by the throttle, a wrong current password when changing it, a wrong password or authenticator code when stepping up, or an unknown service credential. Consumers must tolerate values they do not know.",
+      "examples": [
+        "wrong_password"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The client address the attempt came from, read behind the trusted proxies.",
+      "examples": [
+        "203.0.113.9"
+      ]
+    }
+  }
+}

@@ -1,0 +1,46 @@
+type: object
+description: What the account says about its own credentials, for the account page of every console.
+required:
+  - password_set
+  - two_step_enabled
+  - two_step_setup_required
+properties:
+  password_set:
+    type: boolean
+    description: Whether a password is set; a user without one signs in with one-time codes.
+  two_step_enabled:
+    type: boolean
+    description: Whether two-step sign-in is on.
+  two_step_setup_required:
+    type: boolean
+    description: '`true` while this session reaches the two-step set-up only: platform staff set up a second factor before Mission Control opens.'
+  password_changed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the password was last set, as an RFC 3339 timestamp in UTC; `null` without a password.
+  pending_email:
+    type:
+      - string
+      - 'null'
+    description: A new email address waiting for its code while a change is pending; `null` otherwise.
+  pending_phone:
+    type:
+      - string
+      - 'null'
+    description: A new phone number waiting for its code while a change is pending; `null` otherwise.
+  recovery_codes_remaining:
+    type:
+      - integer
+      - 'null'
+    description: How many recovery codes are left while two-step sign-in is on; `null` while it is off.
+    minimum: 0
+examples:
+  - password_set: true
+    two_step_enabled: true
+    two_step_setup_required: false
+    password_changed_at: 2026-10-14T08:10:00Z
+    recovery_codes_remaining: 10
+    pending_email: null
+    pending_phone: null

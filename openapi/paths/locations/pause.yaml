@@ -12,7 +12,7 @@ parameters:
 post:
   operationId: pauseLocation
   summary: Pause a location
-  description: 'Pauses the Location for one minute to a day with a reason, recording who; it takes orders again at that moment by itself. Pausing is operational: an active store paused for the evening is still active. Owners and managers.'
+  description: "Pauses the Location for one minute to a day with a reason, recording who; it takes orders again at that moment by itself. Pausing is operational: an active store paused for the evening is still active. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not pause Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:
@@ -76,7 +76,7 @@ post:
 delete:
   operationId: resumeLocation
   summary: Resume a paused location
-  description: Resumes a paused Location now. Owners and managers.
+  description: "Resumes a paused Location now. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -95,7 +95,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not resume Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

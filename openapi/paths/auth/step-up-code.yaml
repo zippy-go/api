@@ -1,0 +1,65 @@
+# Path item for /v1/auth/step-up/code. Referenced from openapi.yaml.
+post:
+  operationId: sendStepUpCode
+  summary: Send a code that proves it is you
+  description: Sends a one-time code proving the signed-in person to the account's own email or phone, for `POST /v1/auth/step-up`.
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Which of the account's own addresses to send the code to.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/StepUpCodeRequest.yaml
+  responses:
+    '202':
+      description: A code is on its way.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/OtpChallenge.yaml
+    '400':
+      description: The account has no such address.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: '`too_many_requests`: a code was sent less than a minute ago.'
+      headers:
+        Retry-After:
+          description: The number of seconds to wait before trying again.
+          schema:
+            type: integer
+            minimum: 0
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store or the delivery provider is unavailable.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

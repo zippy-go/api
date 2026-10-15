@@ -1,0 +1,39 @@
+type: object
+description: The user's platform membership as `GET /v1/me` shows it on Mission Control, with every grant and the permissions it carries.
+required:
+  - membership_id
+  - grants
+properties:
+  membership_id:
+    type: string
+    format: uuid
+    description: The platform membership.
+  grants:
+    type: array
+    items:
+      $ref: ../access/AccessGrant.yaml
+    description: Every platform grant, each with its role and the permissions of that role.
+examples:
+  - membership_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a34
+    grants:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a75
+        role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a74
+        role_name: Operations lead
+        role_kind: custom
+        scope:
+          kind: platform
+          partner_id: null
+          location_id: null
+          service_id: null
+        permissions:
+          - approval:decide
+          - audit:read
+          - partner:read
+          - partner:write
+          - platform:access
+          - role:read
+          - role:write
+          - staff:read
+          - staff:write
+        granted_at: 2026-10-14T07:00:00Z
+        granted_by: null

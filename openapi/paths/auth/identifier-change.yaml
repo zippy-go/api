@@ -1,0 +1,88 @@
+# Path item for /v1/auth/identifier-change. Referenced from openapi.yaml.
+post:
+  operationId: beginIdentifierChange
+  summary: Start changing the sign-in address
+  description: 'Starts changing the sign-in email or phone: needs a fresh proof (`POST /v1/auth/step-up`; with the authenticator for a Mission Control email), then sends a code to the new address. The account is unchanged until the code passes; the pending address shows on `GET /v1/me`.'
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The new email address or phone number.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/IdentifierChangeRequest.yaml
+  responses:
+    '202':
+      description: A code is on its way to the new address.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/IdentifierChange.yaml
+    '400':
+      description: Malformed address, or the account's own.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`step_up_required`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store or the delivery provider is unavailable.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: cancelIdentifierChange
+  summary: Cancel a pending address change
+  description: 'Cancels a pending change: the old address stands and the code sent is useless.'
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  responses:
+    '204':
+      description: Cancelled, or nothing was pending.
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

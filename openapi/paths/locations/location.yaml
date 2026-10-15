@@ -12,7 +12,7 @@ parameters:
 get:
   operationId: getLocation
   summary: Get a location
-  description: Returns one of the partner's locations. Any member of the partner and the platform realm may read it.
+  description: Returns one of the partner's locations. Reading it needs `location:read` at the Location, or across the partner.
   tags:
     - Locations
   security:
@@ -36,6 +36,12 @@ get:
           $ref: ../../components/headers/ETag.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The caller lacks `location:read` at this Location (`access_denied`).
       content:
         application/problem+json:
           schema:
@@ -65,8 +71,9 @@ patch:
     Changes the members of the location that are present in the body,
     including `status`, and returns the location with what it reads as, the
     services on there, what it is doing now, its blockers and warnings.
-    Owners and managers may update locations; other members receive `403`
-    (`forbidden`). `status` follows the lifecycle: going live is refused with
+    It needs `location:write` at the location (platform staff
+    `location:write` platform-wide); other members receive `403`
+    (`access_denied`). `status` follows the lifecycle: going live is refused with
     `409` (`activation_blocked`) naming every blocker (read them first with
     `GET .../activation`); asked while the partner is pending, it is
     remembered and the location goes live with the partner's activation.
@@ -112,7 +119,7 @@ patch:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is a member but neither owner nor manager (`forbidden`).
+      description: The caller lacks `location:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`).
       content:
         application/problem+json:
           schema:
@@ -156,7 +163,7 @@ patch:
 delete:
   operationId: deleteLocation
   summary: Delete a location into the bin
-  description: 'Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. Owners and managers.'
+  description: "Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -171,7 +178,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not delete Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

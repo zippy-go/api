@@ -22,18 +22,21 @@ the token signing keys at `/.well-known/jwks.json`.
 
 ## Authentication
 
-Requests carry an access token issued by ZippyGo: sign in with a one-time
-code or a password, send `Authorization: Bearer <access_token>` and
-refresh the token before it expires, after 15 minutes.
+Requests carry an access token issued by ZippyGo for one surface (the
+Partner console, Mission Control or the Agent app): sign in with a
+one-time code or a password, naming the surface, send
+`Authorization: Bearer <access_token>` and refresh the token before it
+expires, after 15 minutes.
 [Authentication](/authentication) walks through the flows, the token
 lifetimes, how browsers and native apps handle the refresh token and how
 to verify tokens yourself.
 
 Server-to-server integrations will use partner-scoped API keys in the
 `X-Api-Key` header (`ApiKey` in the reference); the operations that issue
-keys are not released yet. `POST /v1/fleet/location-pings` still takes
-the temporary development credential in the `X-Dev-Api-Key` header
-(`DevApiKey`) until agents' devices get credentials of their own.
+keys are not released yet. Background jobs authenticate with service
+tokens minted from their credential at `POST /v1/auth/service-tokens`;
+the simulator's token is the only credential `POST /v1/fleet/location-pings`
+takes.
 
 Health checks need no credentials:
 

@@ -1,0 +1,81 @@
+type: object
+description: "A platform member viewing a partner's console as the owner who consented: at most sixty minutes, never past the consent, readable by the platform and by the partner while it runs and after."
+required:
+  - id
+  - consent_id
+  - partner_id
+  - member_user_id
+  - subject_user_id
+  - reason
+  - writes_allowed
+  - started_at
+  - expires_at
+  - live
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the session.
+  consent_id:
+    type: string
+    format: uuid
+    description: The consent it runs under.
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner viewed.
+  member_user_id:
+    type: string
+    format: uuid
+    description: The platform member viewing.
+  subject_user_id:
+    type: string
+    format: uuid
+    description: The owner viewed as.
+  reason:
+    type: string
+    description: The member's reason.
+  writes_allowed:
+    type: boolean
+    description: Whether changes are allowed.
+  started_at:
+    type: string
+    format: date-time
+    description: When it started, as an RFC 3339 timestamp in UTC.
+  expires_at:
+    type: string
+    format: date-time
+    description: When it ends at the latest.
+  live:
+    type: boolean
+    description: Whether it runs now.
+  end_reason:
+    type:
+      - string
+      - 'null'
+    enum:
+      - ended
+      - expired
+      - consent_revoked
+      - offboarded
+      - null
+    description: 'Why it ended: `ended` (by the member), `expired`, `consent_revoked` or `offboarded`; `null` while it runs.'
+  ended_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it ended; `null` while it runs.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a82
+    consent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    member_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+    subject_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    reason: The owner reports that a Location's hours do not save
+    writes_allowed: false
+    started_at: 2026-10-15T09:15:00Z
+    expires_at: 2026-10-15T10:15:00Z
+    live: true
+    ended_at: null
+    end_reason: null

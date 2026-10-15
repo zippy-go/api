@@ -1,0 +1,110 @@
+# Path item for /v1/platform/roles. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformRoles
+  summary: List the platform roles
+  description: "The platform's roles with how many hold each; `role:read`. `SUPER_ADMIN` is maintained: a console offers neither editing nor deletion."
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The roles.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/AccessRoleList.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or `access_denied` without `role:read`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createPlatformRole
+  summary: Define a platform role
+  description: Defines a platform role from the platform pool, holding only what who acts holds; `role:write`. `SUPER_ADMIN` is a reserved name, refused before the ceiling.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The new role.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/access/AccessRoleCreate.yaml
+  responses:
+    '201':
+      description: The role.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/AccessRole.yaml
+    '400':
+      description: Malformed body, or `unknown_permission`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied` or `permission_escalation`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`permission_not_grantable`, `role_name_reserved` or a name in use.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

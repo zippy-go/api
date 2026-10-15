@@ -1,0 +1,70 @@
+type: object
+description: A platform member's request to view a partner's console, and the owner's decision on it. An approved consent lasts twenty-four hours, viewing only unless changes were asked for and allowed.
+required:
+  - id
+  - partner_id
+  - requested_by
+  - reason
+  - writes_requested
+  - requested_at
+  - status
+  - writes_allowed
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the request.
+  partner_id:
+    type: string
+    format: uuid
+    description: The partner asked.
+  requested_by:
+    type: string
+    format: uuid
+    description: The platform member asking.
+  reason:
+    type: string
+    description: Why they ask, shown to the partner's owners.
+  writes_requested:
+    type: boolean
+    description: Whether changes were asked for too.
+  requested_at:
+    type: string
+    format: date-time
+    description: When they asked, as an RFC 3339 timestamp in UTC.
+  status:
+    $ref: ./ConsentStatus.yaml
+    description: Where the consent stands.
+  writes_allowed:
+    type: boolean
+    description: Whether changes are allowed; viewing only otherwise.
+  decided_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When an owner decided; `null` while pending.
+  decided_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The owner who decided; `null` while pending.
+  expires_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When an approved consent ends; `null` otherwise.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    requested_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+    reason: The owner reports that a Location's hours do not save
+    writes_requested: false
+    requested_at: 2026-10-15T09:00:00Z
+    status: approved
+    writes_allowed: false
+    decided_at: 2026-10-15T09:10:00Z
+    decided_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    expires_at: 2026-10-16T09:10:00Z

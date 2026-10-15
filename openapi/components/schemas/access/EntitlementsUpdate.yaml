@@ -1,0 +1,15 @@
+type: object
+description: 'The request body of `PUT /v1/partners/{partner_id}/entitlements`: the whole set of permissions to withhold from the partner.'
+required:
+  - withheld
+properties:
+  withheld:
+    type: array
+    items:
+      type: string
+    description: The permissions to withhold, from the partner pool; never `partner:access` (`partner_cannot_sign_in`).
+    examples:
+      - - promotion:write
+examples:
+  - withheld:
+      - promotion:write

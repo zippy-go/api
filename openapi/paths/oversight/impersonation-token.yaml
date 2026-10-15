@@ -1,0 +1,55 @@
+# Path item for /v1/platform/impersonation/sessions/{impersonation_id}/token. Referenced from openapi.yaml.
+parameters:
+  - name: impersonation_id
+    in: path
+    required: true
+    description: The impersonation session, which must be the caller's.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a82
+post:
+  operationId: renewImpersonationToken
+  summary: Renew an impersonation token
+  description: A fresh token for a running session of the caller's; `impersonate`.
+  tags:
+    - Oversight
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: A token.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/ImpersonationAccess.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`consent_required`: the session ended.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Not a session of the caller's.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

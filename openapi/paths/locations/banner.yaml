@@ -12,7 +12,7 @@ parameters:
 put:
   operationId: putLocationBanner
   summary: Set or clear a location's banner
-  description: "Applies the Location's banner as soon as it is stored, or removes it with `null`: a confirmed `location_banner` asset, twice as wide as tall. Owners and managers."
+  description: "Applies the Location's banner as soon as it is stored, or removes it with `null`: a confirmed `location_banner` asset, twice as wide as tall. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not brand Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

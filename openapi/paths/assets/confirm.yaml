@@ -11,7 +11,7 @@ parameters:
 post:
   operationId: confirmAsset
   summary: Confirms an upload
-  description: 'Confirms an upload: the platform asks the destination to describe the file and takes every fact from that answer. Owners and managers of the Partner, or platform staff.'
+  description: "Confirms an upload: the platform asks the destination to describe the file and takes every fact from that answer. With the permission that writes the file: the owning capability's for a platform asset, `partner:profile:write` for a Partner's (`location:write` at the Location for a Location's), `partner:write` for platform staff on a Partner's."
   tags:
     - Assets
   security:
@@ -43,7 +43,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not allowed to write the asset's owner
+      description: '`access_denied` without the permission that writes the file'
       content:
         application/problem+json:
           schema:

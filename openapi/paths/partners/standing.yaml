@@ -22,6 +22,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Platform staff without `partner:read` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:

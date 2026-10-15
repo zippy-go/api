@@ -1,0 +1,27 @@
+type: object
+description: "The request body of `POST /v1/partners/{partner_id}/roles` and `POST /v1/platform/roles`: a new custom role. Every permission must be in the catalogue and the owner's pool, inside the partner's entitlements, and held by who acts."
+required:
+  - name
+  - permissions
+properties:
+  name:
+    type: string
+    description: The role's name, unique within its owner regardless of case; `OWNER` and `SUPER_ADMIN` are reserved.
+    examples:
+      - Shift lead
+  permissions:
+    type: array
+    items:
+      type: string
+    description: The permissions the role holds.
+    examples:
+      - - partner:access
+        - location:read
+        - order:read
+examples:
+  - name: Shift lead
+    permissions:
+      - partner:access
+      - location:read
+      - order:read
+      - order:manage

@@ -5,12 +5,15 @@ post:
   operationId: createInvitation
   summary: Invite a user
   description: |
-    Creates an invitation to join the partner with the given role and sends
-    an email to the address with a link that accepts it. Owners and
-    managers may invite; only an owner may grant the role `owner`, and a
-    manager who tries receives `403` (`forbidden`). An address that already
-    belongs to a member, or that has a pending invitation for this partner,
-    answers `409` (`conflict`). Publishes `identity.invitation.sent`.
+    Creates an invitation to join the partner with a role, at the whole
+    partner or at the Locations and Services named, and sends an email to
+    the address with a link that accepts it. Inviting needs `staff:write`,
+    and nobody hands out a role holding more than they hold: such a role
+    answers `403` (`permission_escalation`). The owner role covers the whole
+    partner (`invalid_scope` with places); a place of another partner
+    answers `409` (`cross_tenant_scope`). An address that already belongs
+    to a member, or that has a pending invitation for this partner, answers
+    `409` (`conflict`). Publishes `identity.invitation.sent`.
   tags:
     - Invitations
   security:
@@ -30,7 +33,7 @@ post:
           schema:
             $ref: ../../components/schemas/invitations/Invitation.yaml
     '400':
-      description: The body failed validation (`validation_failed`), for example an `email` that is not an email address or an unknown `role`.
+      description: The body failed validation (`validation_failed`), for example an `email` that is not an email address, no role, or `custom` as `role`; or the scope has the wrong shape for the role (`invalid_scope`).
       content:
         application/problem+json:
           schema:
@@ -42,7 +45,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is neither owner nor manager, or is a manager granting `owner` (`forbidden`).
+      description: The caller lacks `staff:write` (`access_denied`), or the role holds a permission the caller does not hold (`permission_escalation`).
       content:
         application/problem+json:
           schema:
@@ -54,7 +57,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '409':
-      description: The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`).
+      description: The email address already belongs to a member of the partner, or a pending invitation for it exists (`conflict`); or a Location or Service of another partner was named (`cross_tenant_scope`).
       content:
         application/problem+json:
           schema:
@@ -76,8 +79,8 @@ get:
   summary: List invitations
   description: |
     Returns the partner's invitations in every status, newest first.
-    Owners, managers and the platform realm may read them; other members
-    receive `403` (`forbidden`), because invitations carry email addresses.
+    Reading them needs `staff:read`, because invitations carry email
+    addresses; other members receive `403` (`access_denied`).
     The list is not paginated.
   tags:
     - Invitations
@@ -97,7 +100,7 @@ get:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is a member but neither owner nor manager (`forbidden`).
+      description: The caller lacks `staff:read` (`access_denied`).
       content:
         application/problem+json:
           schema:

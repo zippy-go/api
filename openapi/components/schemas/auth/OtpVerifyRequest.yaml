@@ -1,6 +1,6 @@
 type: object
 description: >-
-  The request body of `POST /v1/auth/otp/verify`: the challenge and the code that was delivered for it.
+  The request body of `POST /v1/auth/otp/verify`: the challenge, the code that was delivered for it, and how the session's refresh token travels.
 required:
   - challenge_id
   - code
@@ -19,6 +19,18 @@ properties:
     description: The six-digit code, sent as a string so that leading zeros are kept.
     examples:
       - '123456'
+  audience:
+    oneOf:
+      - $ref: ./Audience.yaml
+      - type: 'null'
+    description: The surface the code was asked for. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`); without it the client keeps the step 1 behaviour.
+  delivery:
+    oneOf:
+      - $ref: ./Delivery.yaml
+      - type: 'null'
+    description: How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
 examples:
   - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
     code: '123456'
+    audience: partner
+    delivery: cookie

@@ -1,0 +1,7 @@
+type: string
+description: 'What happened to a grant in the access history: `granted` or `revoked`. Clients must tolerate values they do not know.'
+enum:
+  - granted
+  - revoked
+examples:
+  - granted

@@ -1,0 +1,25 @@
+type: object
+description: The permissions a role editor offers for one pool.
+required:
+  - pool
+  - items
+properties:
+  pool:
+    $ref: ./PermissionPool.yaml
+    description: The pool listed.
+  items:
+    type: array
+    items:
+      $ref: ./Permission.yaml
+    description: The permissions, sorted by name.
+examples:
+  - pool: partner
+    items:
+      - name: location:read
+        summary: See Locations
+        partner: true
+        platform: true
+      - name: location:write
+        summary: Add and change Locations
+        partner: true
+        platform: true

@@ -3,27 +3,33 @@ post:
   operationId: refreshSession
   summary: Refresh the session
   description: |
-    Issues a new access token for the current session and rotates the
-    refresh token. Where the refresh token travels depends on the client:
+    Issues a new access token for the current session, on the session's
+    surface, and rotates the refresh token. The session keeps the delivery it
+    was created with, whatever the request carries:
 
-    - Browsers received it at sign-in in an `httpOnly` cookie named
-      `zg_refresh`, scoped to the path `/v1/auth`. They send no body, or an
-      empty object, and the response sets a new cookie; `refresh_token` in
-      the body stays `null`.
-    - Native clients sent `X-Client-Type: native` when signing in and
-      received `refresh_token` in the body. They send it back here in
-      `refresh_token` and receive the new one in the body.
+    - Cookie delivery: the refresh token is in the surface's `httpOnly`
+      cookie (`zg_refresh_partner`, `zg_refresh_platform` or
+      `zg_refresh_agent`), scoped to `/v1/auth`. Send `{ "audience": "<surface>" }`
+      so the right cookie is read; the response sets the new one and
+      `refresh_token` stays `null`. A browser that signed in without an
+      audience sends no body and uses the `zg_refresh` cookie.
+    - Body delivery: send the refresh token in `refresh_token` and receive the
+      new one in the body.
 
-    Every refresh token can be used once. Presenting a token that was
-    already used revokes the whole session, as a defence against a stolen
-    token, and the user has to sign in again. A missing, unknown, expired
-    or revoked token answers `401` (`unauthenticated`).
+    Every refresh token can be used once. The token spent by the latest
+    rotation is forgiven for fifteen seconds and answers with the same
+    successor, so two tabs refreshing at once do not sign the user out; an
+    older token revokes the whole session, as a defence against a stolen
+    token, and the user has to sign in again. A missing, unknown or spent
+    token, and a session that ended (signed out, revoked, idle or past its
+    absolute lifetime, or on a surface the user may no longer enter), answer
+    `401` (`unauthenticated`).
   tags:
     - Auth
   security: []
   requestBody:
     required: false
-    description: The refresh token, for native clients only. Browsers send no body.
+    description: The refresh token for body delivery, or the surface whose cookie carries it. A browser that signed in without an audience sends no body.
     content:
       application/json:
         schema:
@@ -33,7 +39,7 @@ post:
       description: A new access token and a new refresh token were issued; the previous refresh token is no longer valid.
       headers:
         Set-Cookie:
-          description: For browsers, the new refresh token as `zg_refresh=<token>; Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent for native clients.
+          description: With cookie delivery, the new refresh token in the surface's cookie, `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
           schema:
             type: string
       content:
@@ -41,10 +47,10 @@ post:
           schema:
             $ref: ../../components/schemas/auth/TokenResponse.yaml
     '401':
-      description: No refresh token was sent, or it is unknown, expired, already used or revoked (`unauthenticated`). Sign in again.
+      description: No refresh token was sent, or it is unknown or spent, or the session ended (`unauthenticated`). Sign in again.
       headers:
         Set-Cookie:
-          description: For browsers, clears the `zg_refresh` cookie when the token it carried was rejected.
+          description: With cookie delivery, clears the cookie whose token was refused.
           schema:
             type: string
       content:

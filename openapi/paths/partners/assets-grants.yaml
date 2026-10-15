@@ -4,7 +4,7 @@ parameters:
 post:
   operationId: createPartnerAssetGrant
   summary: A grant for a Partner's purpose (document, logo, banner) or one of its Locations'...
-  description: A grant for a Partner's purpose (document, logo, banner) or one of its Locations' (logo, banner); owners and managers of the Partner, or platform staff. A Location of another Partner is not found.
+  description: "A grant for a Partner's purpose (document, logo, banner), with `partner:profile:write` (platform staff: `partner:write`), or one of its Locations' (logo, banner), with `location:write` at the Location (platform staff: platform-wide). A Location of another Partner is not found."
   tags:
     - Assets
   security:
@@ -36,7 +36,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager, or a platform purpose on the Partner route
+      description: '`access_denied` without the permission that writes the file, or a platform purpose on the Partner route'
       content:
         application/problem+json:
           schema:

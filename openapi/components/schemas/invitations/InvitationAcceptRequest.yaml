@@ -1,9 +1,10 @@
 type: object
 description: |
-  The request body of `POST /v1/invitations/{token}/accept`. Both members
-  are used only when the call creates the user; a person who already has an
-  account keeps their name and password, and may send an empty body or
-  none at all.
+  The request body of `POST /v1/invitations/{token}/accept`. `display_name`
+  is used only when the call creates the user and `password` only when the
+  user has no password yet; a person who already has an account keeps
+  their name and password, and may send an empty body or none at all.
+  `delivery` says how the new session's refresh token travels.
 properties:
   display_name:
     type: string
@@ -15,9 +16,16 @@ properties:
   password:
     type: string
     minLength: 12
-    description: A password for the new user, at least 12 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
+    description: A password for a user who has none yet, 12 to 200 characters, so that they can also sign in with `POST /v1/auth/password/sign-in`. Without it the user signs in with one-time codes until they set one.
     examples:
       - example-passphrase-2026
+  delivery:
+    oneOf:
+      - $ref: ../auth/Delivery.yaml
+      - type: 'null'
+    description: >-
+      How the refresh token of the new session travels, `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform, the Partner console otherwise. Omitted, the client keeps the step 1 behaviour: the `zg_refresh` cookie unless it sends `X-Client-Type: native`.
 examples:
   - display_name: User 21
     password: example-passphrase-2026
+    delivery: cookie

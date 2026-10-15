@@ -1,0 +1,8 @@
+type: object
+description: The optional request body of an owner's approval of a request to view the console.
+properties:
+  writes_allowed:
+    type: boolean
+    description: '`true` allows changes too, only when they were asked for; viewing only otherwise.'
+examples:
+  - writes_allowed: false

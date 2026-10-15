@@ -1,24 +1,43 @@
 type: object
 description: >-
-  The response of `GET /v1/me`: the signed-in user, their memberships and their platform roles.
+  The response of `GET /v1/me`: the signed-in user, the surface the token is for, the account's credentials, and what the user holds on that surface only. On the Partner console `memberships` lists every enabled partner membership with its grants; on Mission Control `platform` is the platform membership and `platform_roles` its role names; on the Agent app `agent_memberships` lists the Services the person works for. The other members are empty on each surface.
 required:
   - user
+  - audience
+  - account
   - memberships
   - platform_roles
+  - agent_memberships
 properties:
   user:
     $ref: ./User.yaml
     description: The user the access token belongs to.
+  audience:
+    $ref: ./Audience.yaml
+    description: The surface the access token is for.
+  account:
+    $ref: ./MeAccount.yaml
+    description: The account's credentials and second factor, for the account page.
   memberships:
     type: array
-    description: One entry per partner the user belongs to, with the role held there. Empty for a user who has not created or joined a partner yet.
+    description: On the Partner console, one entry per partner the user belongs to and may enter, each with every grant and the permissions held at its scope. Empty on the other surfaces, and for a user who has not created or joined a partner yet.
     items:
-      $ref: ../memberships/Membership.yaml
+      $ref: ./MeMembership.yaml
+  platform:
+    oneOf:
+      - $ref: ./MePlatform.yaml
+      - type: 'null'
+    description: On Mission Control, the platform membership with its grants; `null` on the other surfaces.
   platform_roles:
     type: array
-    description: The user's roles in the platform realm, the operations side of ZippyGo; empty for everyone else. The role names are documented when platform operations endpoints are released.
+    description: On Mission Control, the names of the user's platform roles; empty on the other surfaces and for everyone outside the platform realm.
     items:
       type: string
+  agent_memberships:
+    type: array
+    description: On the Agent app, every agent membership, one per Service; empty on the other surfaces.
+    items:
+      $ref: ./MeAgentMembership.yaml
 examples:
   - user:
       id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
@@ -26,6 +45,15 @@ examples:
       phone: null
       display_name: User 20
       created_at: 2026-10-14T08:00:00Z
+    audience: partner
+    account:
+      password_set: true
+      two_step_enabled: false
+      two_step_setup_required: false
+      password_changed_at: 2026-10-14T08:10:00Z
+      recovery_codes_remaining: null
+      pending_email: null
+      pending_phone: null
     memberships:
       - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a30
         partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -35,6 +63,41 @@ examples:
           phone: null
           display_name: User 20
           created_at: 2026-10-14T08:00:00Z
-        role: owner
+        role: manager
         created_at: 2026-10-14T08:05:00Z
+        partner_name: Example Partner
+        partner_kind: organisation
+        partner_status: active
+        console_access: true
+        grants:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a76
+            role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a77
+            role_name: MANAGER
+            role_kind: default
+            scope:
+              kind: partner
+              partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+              location_id: null
+              service_id: null
+            permissions:
+              - agent:manage
+              - agent:read
+              - catalog:read
+              - catalog:stock
+              - catalog:write
+              - dispatch:manage
+              - dispatch:read
+              - location:read
+              - location:write
+              - order:manage
+              - order:read
+              - partner:access
+              - payout:read
+              - promotion:read
+              - promotion:write
+              - review:read
+            granted_at: 2026-10-14T08:05:00Z
+            granted_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+    platform: null
     platform_roles: []
+    agent_memberships: []

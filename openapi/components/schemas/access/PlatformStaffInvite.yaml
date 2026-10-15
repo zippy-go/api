@@ -1,0 +1,20 @@
+type: object
+description: 'The request body of `POST /v1/platform/staff`: the person to invite into the platform. The membership grants nothing until a role is granted through a four-eyes proposal.'
+required:
+  - email
+properties:
+  email:
+    type: string
+    description: The email address to send the invitation to.
+    examples:
+      - ops@example.com
+  display_name:
+    type:
+      - string
+      - 'null'
+    description: The name the member will be shown under.
+    examples:
+      - User 26
+examples:
+  - email: ops@example.com
+    display_name: User 26

@@ -1,0 +1,39 @@
+type: object
+description: 'A started or continued impersonation: the session, and an access token for the Partner console as the owner who consented, with the platform member named in its `act` claim.'
+required:
+  - session
+  - access_token
+  - token_type
+  - expires_in
+properties:
+  session:
+    $ref: ./ImpersonationSession.yaml
+    description: The impersonation session.
+  access_token:
+    type: string
+    description: The access token for the Partner console. Changes answer `403` (`impersonation_read_only`) unless the consent allows them.
+  token_type:
+    type: string
+    const: Bearer
+    description: Always `Bearer`.
+  expires_in:
+    type: integer
+    description: Seconds until the token expires, never past the session's end; mint another at `POST /v1/platform/impersonation/sessions/{impersonation_id}/token` while the session runs.
+    minimum: 0
+examples:
+  - session:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a82
+      consent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      member_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+      subject_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      reason: The owner reports that a Location's hours do not save
+      writes_allowed: false
+      started_at: 2026-10-15T09:15:00Z
+      expires_at: 2026-10-15T10:15:00Z
+      live: true
+      ended_at: null
+      end_reason: null
+    access_token: example
+    token_type: Bearer
+    expires_in: 1

@@ -22,6 +22,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Platform staff without `partner:read` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:
@@ -49,7 +55,7 @@ get:
 post:
   operationId: createPartnerDocument
   summary: File a document
-  description: "Files a compliance document, pending review: the file is uploaded first under the `partner_document` purpose (private storage) and confirmed. Owners and managers, or platform staff on the Partner's behalf."
+  description: "Files a compliance document, pending review: the file is uploaded first under the `partner_document` purpose (private storage) and confirmed. `partner:profile:write`, or platform staff with `partner:write` on the Partner's behalf."
   tags:
     - Partner documents
   security:
@@ -81,7 +87,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not file documents.
+      description: 'The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

@@ -12,7 +12,7 @@ parameters:
 put:
   operationId: putLocationLogo
   summary: Set or clear a location's tile
-  description: "Applies the Location's tile as soon as it is stored, or removes it with `null`: a confirmed `location_logo` asset, square. Owners and managers."
+  description: "Applies the Location's tile as soon as it is stored, or removes it with `null`: a confirmed `location_logo` asset, square. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not brand Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

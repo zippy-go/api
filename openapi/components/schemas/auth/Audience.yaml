@@ -1,0 +1,10 @@
+type: string
+description: "The surface a session, and every access token of it, is issued for, carried in the token's `aud` claim: `partner` for the Partner console, `platform` for Mission Control, `agent` for the Agent app, `customer` for the Customer app (not signed in to here yet) and `service` for the service tokens of background jobs. A token is refused by every surface it does not name. Clients must tolerate values they do not know, because a new surface is an additive change."
+enum:
+  - partner
+  - platform
+  - agent
+  - customer
+  - service
+examples:
+  - partner

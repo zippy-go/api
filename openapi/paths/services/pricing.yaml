@@ -38,6 +38,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown, not visible, or no pricing yet.
       content:
@@ -71,7 +77,7 @@ get:
 put:
   operationId: putDeliveryPricing
   summary: Version a delivery service's pricing
-  description: "Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. Owners and managers; platform staff with a reason."
+  description: "Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. `service:write`; platform staff with `partner:write` and a reason."
   tags:
     - Services
   security:
@@ -103,7 +109,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Neither owner nor manager.
+      description: 'The caller lacks `service:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

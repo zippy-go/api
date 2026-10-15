@@ -3,10 +3,15 @@ post:
   operationId: createPartner
   summary: Create a partner
   description: |
-    Creates a partner and makes the caller its first owner: a membership
-    with the role `owner` is created in the same request. Any signed-in
-    user may create a partner. The partner starts with the status `pending`
-    and the platform realm activates it.
+    Creates a partner together with its roles (the maintained `OWNER` and
+    the default roles) and its first owner, in one request. From the
+    Partner console the caller becomes the owner: a membership holding the
+    `OWNER` role is created with it. Platform staff onboarding a partner
+    name the `owner` instead (an existing user is attached and told, a new
+    person is invited by email) and may withhold permissions from the
+    partner's entitlements; that needs `partner:write` and `staff:write`.
+    The partner starts with the status `pending` and the platform realm
+    activates it.
 
     The caller's access token does not carry the new membership until it is
     refreshed; `GET /v1/me` reflects it at once. Publishes the events
@@ -43,7 +48,7 @@ post:
           schema:
             $ref: ../../components/schemas/partners/Partner.yaml
     '400':
-      description: The body failed validation (`validation_failed`), for example a missing `name` or a malformed `contact_email`.
+      description: The body failed validation (`validation_failed`), for example a missing `name`, a malformed `contact_email` or a missing owner field, or a withheld permission the catalogue does not have (`unknown_permission`).
       content:
         application/problem+json:
           schema:
@@ -55,7 +60,13 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Somebody who is not platform staff named an `owner` (`forbidden`).
+      description: An `owner` or `withheld_permissions` sent by somebody who is not platform staff (`forbidden`), or platform staff without `partner:write` and `staff:write` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The entitlements would withhold `partner:access` (`partner_cannot_sign_in`) or a permission outside the partner pool (`permission_not_grantable`); nothing was created.
       content:
         application/problem+json:
           schema:
@@ -168,7 +179,7 @@ get:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The caller is not in the platform realm (`forbidden`).
+      description: The caller is not in the platform realm (`forbidden`), or lacks `partner:read` (`access_denied`).
       content:
         application/problem+json:
           schema:

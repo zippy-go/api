@@ -1,14 +1,21 @@
 type: object
 description: |
-  The request body of `POST /v1/auth/refresh`. Native clients send the
-  refresh token they received at sign-in; browsers send no body at all,
-  because their refresh token travels in the `zg_refresh` cookie.
+  The request body of `POST /v1/auth/refresh`. A client with body delivery
+  sends the refresh token it holds; a browser with cookie delivery sends
+  the surface whose cookie carries it (`audience`), or no body at all when
+  it signed in without an audience and keeps the `zg_refresh` cookie.
 properties:
   refresh_token:
     type: string
     minLength: 1
-    description: The refresh token from the `refresh_token` member of the last `TokenResponse`. Each token can be used once; the response carries its replacement.
+    description: The refresh token from the `refresh_token` member of the last `TokenResponse`, for clients with body delivery. Each token can be used once; the response carries its replacement.
     examples:
       - c2FtcGxlLXJlZnJlc2gtdG9rZW4
+  audience:
+    oneOf:
+      - $ref: ./Audience.yaml
+      - type: 'null'
+    description: For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`).
 examples:
   - refresh_token: c2FtcGxlLXJlZnJlc2gtdG9rZW4
+  - audience: platform

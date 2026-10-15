@@ -20,7 +20,7 @@ parameters:
 post:
   operationId: closeLocationForHoliday
   summary: Close a location for a holiday
-  description: "Marks a public holiday closed at the Location in one act: a closed-all-day closure named after the holiday, added to the Location's own schedule. A holiday already covered says so. Owners and managers."
+  description: "Marks a public holiday closed at the Location in one act: a closed-all-day closure named after the holiday, added to the Location's own schedule. A holiday already covered says so. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -45,7 +45,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not change Locations.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`).'
       content:
         application/problem+json:
           schema:

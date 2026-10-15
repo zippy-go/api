@@ -34,7 +34,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: Not platform staff, or a Partner purpose on the platform route
+      description: 'Not platform staff, `access_denied` without the owning capability''s permission, or a Partner purpose on the platform route'
       content:
         application/problem+json:
           schema:

@@ -1,0 +1,29 @@
+type: object
+description: 'The request body of `POST /v1/auth/step-up`: exactly one proof of the signed-in person, either `password`, or `authenticator_code`, or `challenge_id` with `code` from `POST /v1/auth/step-up/code`.'
+properties:
+  authenticator_code:
+    type:
+      - string
+      - 'null'
+    description: Six digits from the authenticator app, while two-step sign-in is on.
+  challenge_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The `challenge_id` of a code sent by `POST /v1/auth/step-up/code`, together with `code`.
+  code:
+    type:
+      - string
+      - 'null'
+    description: The six-digit code sent by `POST /v1/auth/step-up/code`, together with `challenge_id`.
+  password:
+    type:
+      - string
+      - 'null'
+    description: The account's password.
+examples:
+  - password: example-passphrase-2026
+    authenticator_code: null
+    challenge_id: null
+    code: null

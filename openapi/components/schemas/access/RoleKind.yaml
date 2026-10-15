@@ -1,0 +1,8 @@
+type: string
+description: "What a role is: `maintained` (kept by the platform), `default` (a tunable role every partner receives) or `custom` (the realm's own). Clients must tolerate values they do not know."
+enum:
+  - maintained
+  - default
+  - custom
+examples:
+  - default

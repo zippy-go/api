@@ -10,13 +10,15 @@ post:
     that buffered pings while it had no connectivity can submit them in one
     batch.
 
-    The operation authenticates with the temporary development credential
-    only (`DevApiKey`, sent in the `X-Dev-Api-Key` header); the identity
-    module replaces that credential in a later step.
+    The operation authenticates with a service token of the job
+    `simulator` (`Bearer`, minted at `POST /v1/auth/service-tokens`), the
+    only credential it takes. A person's access token answers `401`
+    (`unauthenticated`) and a service token of another job `403`
+    (`forbidden`).
   tags:
     - Fleet
   security:
-    - DevApiKey: []
+    - Bearer: []
   requestBody:
     required: true
     description: The pings to apply, 1 to 500 per request.
@@ -38,7 +40,13 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '401':
-      description: No valid development credential was sent in `X-Dev-Api-Key` (`unauthenticated`).
+      description: No valid service token was sent (`unauthenticated`); a person's access token is refused the same way.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: A service token of another job than `simulator` (`forbidden`).
       content:
         application/problem+json:
           schema:

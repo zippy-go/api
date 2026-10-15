@@ -1,0 +1,67 @@
+type: object
+description: 'One entry of the access history: a role granted or revoked, by whom, to whom, at what scope. The history is append-only and outlives the roles and memberships it names.'
+required:
+  - id
+  - occurred_at
+  - action
+  - partner_id
+  - user_id
+  - membership_id
+  - role_id
+  - role_name
+  - scope
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier of the entry.
+  occurred_at:
+    type: string
+    format: date-time
+    description: When it happened, as an RFC 3339 timestamp in UTC.
+  action:
+    $ref: ./HistoryAction.yaml
+    description: Whether the role was granted or revoked.
+  partner_id:
+    type: string
+    format: uuid
+    description: 'The realm: the partner, or the platform organisation for platform staff.'
+  user_id:
+    type: string
+    format: uuid
+    description: The person the grant is held by.
+  membership_id:
+    type: string
+    format: uuid
+    description: The membership the grant is held through.
+  role_id:
+    type: string
+    format: uuid
+    description: The role.
+  role_name:
+    type: string
+    description: The role's name at the time.
+  scope:
+    $ref: ./AccessScope.yaml
+    description: Where the grant applies.
+  actor_user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who acted; `null` when the platform did.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a72
+    occurred_at: 2026-10-15T09:00:00Z
+    action: granted
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a25
+    membership_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a32
+    role_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    role_name: STAFF
+    scope:
+      kind: location
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+      service_id: null
+    actor_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20

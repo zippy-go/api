@@ -1,0 +1,124 @@
+# Path item for /v1/partners/{partner_id}/entitlements. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getEntitlements
+  summary: Read a partner's entitlements
+  description: "The partner's entitlements: what its roles may contain and what the platform withholds. Members with `role:read`; platform staff with `partner:read`."
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The entitlements.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/Entitlements.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: updateEntitlements
+  summary: Replace what a partner is withheld
+  description: Replaces what the platform withholds from the partner; platform staff with `partner:write`. Every role of the partner loses what is withheld at once, and the audit log records it.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The whole set of permissions to withhold.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/access/EntitlementsUpdate.yaml
+  responses:
+    '200':
+      description: The entitlements after the change.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/Entitlements.yaml
+    '400':
+      description: An unknown permission (`unknown_permission`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or `access_denied` without `partner:write`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown partner.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`partner_cannot_sign_in` or `permission_not_grantable`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

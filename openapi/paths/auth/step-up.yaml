@@ -1,0 +1,58 @@
+# Path item for /v1/auth/step-up. Referenced from openapi.yaml.
+post:
+  operationId: stepUp
+  summary: Prove it is you again
+  description: |-
+    Proves the signed-in person afresh, with exactly one of: the password, an authenticator code, or a code from `POST /v1/auth/step-up/code`. The proof stands ten minutes, for this session only; sensitive acts refused as `step_up_required` pass after it. Signing in is a proof too: a session's own sign-in stands as its step-up for its first ten minutes, as made with the factor proven last.
+
+    The acts that ask for it today: setting a first password (`POST /v1/auth/password` without a current password) and starting an address change (`POST /v1/auth/identifier-change`, where a Mission Control email change needs the proof made with the authenticator). A wrong password or authenticator code counts in the sign-in throttle.
+  tags:
+    - Auth
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Exactly one proof of the signed-in person.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/StepUpRequest.yaml
+  responses:
+    '204':
+      description: Proven for ten minutes.
+    '400':
+      description: Not exactly one proof, or `code_invalid` on `/code`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: the password or authenticator code is wrong (it counts in the throttle).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: '`too_many_requests` or `too_many_attempts`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

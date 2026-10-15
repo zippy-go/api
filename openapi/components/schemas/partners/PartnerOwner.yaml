@@ -1,12 +1,12 @@
 type: object
-description: The administrator Mission Control names when it onboards a Partner, the `PartnerOwner` schema.
+description: 'The administrator Mission Control names when it onboards a Partner, its first owner: an existing user is attached and told, a new person is invited by email.'
 required:
   - email
   - display_name
 properties:
   email:
     type: string
-    description: The administrator's email address; the invitation goes there, also when the address already belongs to a member of another Partner.
+    description: "The administrator's email address: an existing user's is attached at once and told there, a new person's invitation goes there."
     examples:
       - owner@example.com
   display_name:

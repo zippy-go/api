@@ -4,7 +4,7 @@ parameters:
 put:
   operationId: putPartnerLogo
   summary: Set or clear the partner's logo
-  description: "Applies the Partner's logo as soon as it is stored, or removes it with `null`: a confirmed `partner_logo` asset, square. Owners and managers, or platform staff."
+  description: "Applies the Partner's logo as soon as it is stored, or removes it with `null`: a confirmed `partner_logo` asset, square. `partner:profile:write`, or platform staff with `partner:write`."
   tags:
     - Partners
   security:
@@ -36,7 +36,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not brand the Partner.
+      description: 'The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

@@ -30,6 +30,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Platform staff without `partner:read` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown partner or document.
       content:
@@ -57,7 +63,7 @@ get:
 delete:
   operationId: removePartnerDocument
   summary: Take a document off file
-  description: Takes a document off file; owners and managers, or platform staff.
+  description: "Takes a document off file; `partner:profile:write`, or platform staff with `partner:write`."
   tags:
     - Partner documents
   security:
@@ -72,7 +78,7 @@ delete:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not remove documents.
+      description: 'The caller lacks `partner:profile:write` (`access_denied`; platform staff need `partner:write`).'
       content:
         application/problem+json:
           schema:

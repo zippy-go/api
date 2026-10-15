@@ -1,0 +1,124 @@
+# Path item for /v1/partners/{partner_id}/roles. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerRoles
+  summary: List a partner's roles
+  description: The partner's roles with how many hold each; `role:read`.
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The roles.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/AccessRoleList.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied` without `role:read`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createPartnerRole
+  summary: Define a partner role
+  description: "Defines a role of the partner: every permission known, inside the partner's entitlements and held by who acts. `role:write`; platform staff `partner:role:write`."
+  tags:
+    - Access
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The new role.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/access/AccessRoleCreate.yaml
+  responses:
+    '201':
+      description: The role.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/access/AccessRole.yaml
+    '400':
+      description: Malformed body, or `unknown_permission`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`access_denied` or `permission_escalation`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`outside_entitlements`, `permission_not_grantable`, `role_name_reserved` or a name in use.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

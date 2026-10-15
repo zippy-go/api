@@ -12,7 +12,7 @@ parameters:
 put:
   operationId: putLocationOrderSettings
   summary: Change how a store takes orders
-  description: Changes how the store takes orders; absent members are kept. The slot length, the cap per slot, the auto-reject window and prescriptions are platform staff's; slot settings sent while scheduled orders are off are refused; the window is at most seven days. Owners and managers.
+  description: "Changes how the store takes orders; absent members are kept. The slot length, the cap per slot, the auto-reject window and prescriptions are platform staff's; slot settings sent while scheduled orders are off are refused; the window is at most seven days. `location:write` at the Location."
   tags:
     - Locations
   security:
@@ -44,7 +44,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: The role does not change Locations, or a platform staff's setting.
+      description: 'The caller lacks `location:write` at this Location (`access_denied`), or a member changed a setting that is platform staff''s.'
       content:
         application/problem+json:
           schema:

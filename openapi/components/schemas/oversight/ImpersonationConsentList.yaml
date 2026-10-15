@@ -1,0 +1,23 @@
+type: object
+description: Requests to view a partner's console and the consents given, newest first.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ImpersonationConsent.yaml
+    description: The requests and consents.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        requested_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+        reason: The owner reports that a Location's hours do not save
+        writes_requested: false
+        requested_at: 2026-10-15T09:00:00Z
+        status: approved
+        writes_allowed: false
+        decided_at: 2026-10-15T09:10:00Z
+        decided_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        expires_at: 2026-10-16T09:10:00Z

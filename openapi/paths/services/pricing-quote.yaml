@@ -58,6 +58,12 @@ get:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'The caller lacks `service:read` (`access_denied`; platform staff need `partner:read`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: Unknown, not visible, or no pricing yet.
       content:

@@ -3,18 +3,29 @@ post:
   operationId: verifyOtp
   summary: Verify a one-time code and sign in
   description: |
-    Exchanges a one-time code for a session. On success the response is a
-    `TokenResponse`: the access token, the signed-in user and, for native
-    clients, the refresh token; browsers receive the refresh token in the
-    `zg_refresh` cookie instead (see the `Auth` tag). The first successful
-    verification for an identifier creates the user, with the email address
-    or the phone number the code was sent to.
+    Exchanges a one-time code for a session on the surface the code was
+    asked for. Name the surface in `audience` and say how the refresh token
+    travels in `delivery`: `cookie` sets it in the surface's `httpOnly`
+    cookie, `body` returns it in `refresh_token`. A client that names no
+    audience keeps the step 1 behaviour (the `zg_refresh` cookie, or the
+    body with `X-Client-Type: native`). The first successful verification
+    for an identifier creates the user, with the email address or the phone
+    number the code was sent to.
 
-    A wrong code, or a challenge that does not exist, answers `401`
-    (`invalid_code`); a correct code presented after `expires_at` answers
-    `401` (`code_expired`). Request a new code in both cases. After too many
-    wrong codes for one challenge the challenge is locked and every further
-    attempt answers `429` (`too_many_attempts`).
+    The Agent app admits agents only, people who hold an agent membership in
+    a Service: a right code for `audience` `agent` from anybody else, or for
+    an identifier nobody has, answers `401` (`authentication_failed`) and
+    creates nobody.
+
+    When the account has two-step sign-in on, a right code answers `202`
+    with a `TwoStepChallenge` instead of a session: complete the sign-in at
+    `POST /v1/auth/two-step/verify`.
+
+    A wrong code answers `401` (`invalid_code`); an unknown, used or expired
+    challenge answers `401` (`code_expired`). Request a new code in both
+    cases. Five wrong codes lock the challenge (`429`, `too_many_attempts`),
+    and wrong codes also count in the sign-in throttle of the identifier and
+    the client.
   tags:
     - Auth
   security: []
@@ -22,7 +33,7 @@ post:
     - $ref: ../../components/parameters/ClientTypeHeader.yaml
   requestBody:
     required: true
-    description: The challenge from `POST /v1/auth/otp/request` and the code that was delivered for it.
+    description: The challenge from `POST /v1/auth/otp/request`, the code that was delivered for it, the surface and the delivery.
     content:
       application/json:
         schema:
@@ -33,33 +44,39 @@ post:
       headers:
         Set-Cookie:
           description: >-
-            For browsers (no `X-Client-Type: native` header), the refresh token as `zg_refresh=<token>; Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent for native clients.
+            With cookie delivery, the refresh token in the cookie of the surface signed in to: `zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent` (`zg_refresh` for a client that named no audience and sent no `X-Client-Type: native`), as `<name>=<token>; Path=/v1/auth; Max-Age=<seconds>; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
           schema:
             type: string
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/auth/TokenResponse.yaml
+    '202':
+      description: The credential was right and the account has two-step sign-in on. No session exists yet; send an authenticator or recovery code with the `challenge_id` to `POST /v1/auth/two-step/verify`.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/TwoStepChallenge.yaml
     '400':
-      description: The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID or a code that is not six digits.
+      description: The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID, a code that is not six digits, `delivery_required` on `/delivery` when an audience is named without a delivery, or `audience_not_allowed` on `/audience`.
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '401':
-      description: The code was not accepted. `invalid_code` when it does not match the challenge or the challenge does not exist; `code_expired` when the challenge is past `expires_at`.
+      description: The code was not accepted (`invalid_code` when it does not match the challenge, `code_expired` when the challenge is unknown, used or past `expires_at`), or a right code asked for the Agent app by somebody who is not an agent (`authentication_failed`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '429':
-      description: The challenge is locked after too many wrong codes (`too_many_attempts`). Request a new code.
+      description: The challenge is locked after too many wrong codes (`too_many_attempts`), or the sign-in throttle holds the identifier or the client (`too_many_requests`, with `Retry-After`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '4XX':
-      description: Another client error, such as `415` for a body that is not JSON, returned as an RFC 9457 problem details document.
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
       content:
         application/problem+json:
           schema:

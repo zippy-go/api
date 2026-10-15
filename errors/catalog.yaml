@@ -28,6 +28,24 @@ errors:
           The password sent when setting or changing a password, or when
           choosing one while accepting an invitation, does not meet the
           policy. The `errors` entry points at the field that carried it.
+      - code: delivery_required
+        message: "Say how the tokens travel: cookie or body."
+        description: >-
+          A sign-in that names its audience must state the delivery of its
+          refresh token, `cookie` for browsers or `body` for apps; it binds
+          to the session for good.
+      - code: code_invalid
+        message: The code does not match, or has expired.
+        description: >-
+          A code sent to prove a new address, an authenticator code
+          confirming a set-up, or a one-time code proving the signed-in
+          person did not pass.
+      - code: audience_not_allowed
+        message: This way of signing in is not offered to that surface.
+        description: >-
+          The audience does not admit the credential or the operation, such
+          as a one-time code for Mission Control, a password link for the
+          Agent app, or a sign-in to the Customer app here.
       - code: malformed_identifier
         message: The identifier is not a well-formed id.
         description: >-
@@ -113,6 +131,25 @@ errors:
       A live stream was opened naming a channel no defined channel produces.
       The `errors` member points at the position of each unknown name.
 
+  - code: unknown_permission
+    status: 400
+    title: Unknown permission
+    message: "{permission} is not a permission of the catalogue."
+    retryable: false
+    description: >-
+      A role or an envelope names a permission the catalogue does not have.
+      The `detail` names it; `GET /v1/permissions` lists the catalogue.
+
+  - code: invalid_scope
+    status: 400
+    title: Invalid scope
+    message: "Invalid scope: {reason}."
+    retryable: false
+    description: >-
+      A grant's scope has the wrong shape for its role: a platform role is
+      held platform-wide, the owner role covers the whole Partner, an AGENT
+      role is held at its own Service.
+
   - code: unauthenticated
     status: 401
     title: Unauthenticated
@@ -141,6 +178,16 @@ errors:
       The one-time code was correct but its challenge is past `expires_at`.
       Request a new code with `POST /v1/auth/otp/request`.
 
+  - code: authentication_failed
+    status: 401
+    title: Authentication failed
+    message: "The sign-in did not succeed. Check the details and try again."
+    retryable: false
+    description: >-
+      The sign-in did not succeed. The same answer covers an unknown
+      account, a wrong password or code, a disabled account and a surface
+      the account may not enter, so nothing about the account is revealed.
+
   - code: forbidden
     status: 403
     title: Forbidden
@@ -160,6 +207,91 @@ errors:
       The partner's plan does not include what was asked for, a kind of
       service or the platform fleet; the detail names the lowest plan that
       does. Platform staff move a partner's plan.
+
+  - code: access_denied
+    status: 403
+    title: Access denied
+    message: "You do not have {permission} here; an owner can grant it."
+    retryable: false
+    description: >-
+      The member's grants lack the permission the operation needs at that
+      place; an owner can grant it. The `detail` names the permission.
+
+  - code: not_enabled_for_partner
+    status: 403
+    title: Not enabled for the partner
+    message: "{permission} is not switched on for this partner; ask ZippyGo to enable it."
+    retryable: false
+    description: >-
+      The permission the operation needs is outside the Partner's
+      entitlements; an owner asks the platform to switch it on. The `detail`
+      names the permission.
+
+  - code: permission_escalation
+    status: 403
+    title: Permission escalation
+    message: "You cannot hand out {permission}: you do not hold it yourself."
+    retryable: false
+    description: >-
+      Nobody hands out more than they hold: the acting member does not
+      personally hold a permission of the role they define, change or grant.
+      The `detail` names it.
+
+  - code: no_location_assigned
+    status: 403
+    title: No location assigned
+    message: "No location is assigned to you yet; an owner can assign one."
+    retryable: false
+    description: >-
+      The member's grants cover no Location of the Partner; an owner assigns
+      one.
+
+  - code: step_up_required
+    status: 403
+    title: Step-up required
+    message: "Confirm it is you: enter your password or a code, then repeat the request."
+    retryable: false
+    description: >-
+      A sensitive act needs a fresh proof of the signed-in person: their
+      password, an authenticator code or a one-time code, made in this
+      session within the last ten minutes. Prove it and repeat the request;
+      the session continues.
+
+  - code: two_step_setup_required
+    status: 403
+    title: Two-step set-up required
+    message: "Set up two-step sign-in with an authenticator app before anything else."
+    retryable: false
+    description: >-
+      Platform staff reach Mission Control only with a second factor. Until
+      an authenticator code proves one, the session reaches the two-step
+      set-up and nothing else.
+
+  - code: self_approval
+    status: 403
+    title: Not your own proposal
+    message: "You proposed this; a different platform member decides it."
+    retryable: false
+    description: >-
+      The proposer of an act cannot approve it, the super admin included.
+
+  - code: consent_required
+    status: 403
+    title: Consent required
+    message: "An owner of the partner has not consented in the last 24 hours; ask for consent first."
+    retryable: false
+    description: >-
+      Viewing a Partner's console needs the consent of one of its owners,
+      given within the last twenty-four hours; ask for it first.
+
+  - code: impersonation_read_only
+    status: 403
+    title: Viewing only
+    message: "The partner consented to viewing only; nothing can be changed here."
+    retryable: false
+    description: >-
+      The Partner consented to viewing, not to changes; the impersonation
+      session cannot write.
 
   - code: not_found
     status: 404
@@ -326,6 +458,143 @@ errors:
       that had a different method, path or body. Use a new key for a new
       request.
 
+  - code: permission_not_grantable
+    status: 409
+    title: Permission not grantable
+    message: "{permission} cannot be granted to the {pool} pool."
+    retryable: false
+    description: >-
+      The permission exists but not in the pool of the role's owner:
+      `partner:access` and `agent:access` never in a platform role, the
+      platform's own permissions never in a Partner's role or envelope.
+
+  - code: partner_cannot_sign_in
+    status: 409
+    title: Partner cannot sign in
+    message: "The entitlements must keep partner:access, or nobody could sign in."
+    retryable: false
+    description: >-
+      The envelope would withhold `partner:access`, leaving the Partner's
+      people no way in. Nothing was written.
+
+  - code: outside_entitlements
+    status: 409
+    title: Outside entitlements
+    message: "{permission} is outside the partner's entitlements."
+    retryable: false
+    description: >-
+      A Partner's role may only contain permissions inside the Partner's
+      entitlement envelope. The `detail` names the one outside it.
+
+  - code: cross_tenant_role
+    status: 409
+    title: Cross-tenant role
+    message: "The role belongs to another tenant than the member."
+    retryable: false
+    description: >-
+      A member holds only roles their own realm owns: platform staff
+      platform roles, a Partner's staff that Partner's roles.
+
+  - code: cross_tenant_scope
+    status: 409
+    title: Cross-tenant scope
+    message: "The scope is outside the partner, or names a place the partner does not have."
+    retryable: false
+    description: >-
+      The grant's scope is outside the member's Partner, or names a Location
+      or a Service the Partner does not have.
+
+  - code: role_maintained
+    status: 409
+    title: Role maintained by the platform
+    message: "{role} is maintained by {owner} and cannot be changed that way."
+    retryable: false
+    description: >-
+      The role is kept by the platform: `SUPER_ADMIN` and `OWNER` are
+      neither edited nor deleted, default roles are tuned but neither
+      renamed nor deleted.
+
+  - code: role_name_reserved
+    status: 409
+    title: Role name reserved
+    message: "{name} is reserved for the role the platform maintains."
+    retryable: false
+    description: >-
+      The name belongs to a maintained role: `SUPER_ADMIN` among platform
+      roles, `OWNER` within a Partner.
+
+  - code: role_in_use
+    status: 409
+    title: Role in use
+    message: "The role is held by {count} member(s); revoke it from them first."
+    retryable: false
+    description: >-
+      A role is not deleted while any grant of it exists, enabled member or
+      not; the `detail` says how many hold it. Revoke first.
+
+  - code: last_owner
+    status: 409
+    title: Last owner
+    message: "This is the last enabled owner; grant the owner role to another member first."
+    retryable: false
+    description: >-
+      The act would leave the Partner without an enabled holder of its owner
+      role (or the platform without an enabled `SUPER_ADMIN`). Grant the
+      role to another member first.
+
+  - code: cannot_disable_self
+    status: 409
+    title: Cannot disable yourself
+    message: "You cannot disable your own membership."
+    retryable: false
+    description: >-
+      Nobody disables their own membership.
+
+  - code: two_step_self
+    status: 409
+    title: Not your own two-step
+    message: "You cannot reset your own two-step sign-in; turn it off from your account."
+    retryable: false
+    description: >-
+      An administrator turns two-step sign-in off for somebody else, never
+      for themselves; they turn their own off with their password.
+
+  - code: identifier_taken
+    status: 409
+    title: Address already in use
+    message: "That address is already used by another account."
+    retryable: false
+    description: >-
+      The new email address or phone number, proven by its code, already
+      signs in another account.
+
+  - code: approval_required
+    status: 409
+    title: Approval required
+    message: "{action} needs a second pair of eyes: propose it at POST /v1/platform/approvals."
+    retryable: false
+    description: >-
+      The act needs a second pair of eyes: propose it at POST
+      /v1/platform/approvals, and a different platform member holding
+      approval:decide and the act's permission decides.
+
+  - code: approval_voided
+    status: 409
+    title: Proposal voided
+    message: "What this proposal names changed since; propose it again."
+    retryable: false
+    description: >-
+      What the proposal names changed after it was proposed, or its proposer
+      left; a new proposal is needed.
+
+  - code: approval_decided
+    status: 409
+    title: Proposal already decided
+    message: "This proposal was already decided."
+    retryable: false
+    description: >-
+      The proposal was already approved, rejected or voided.
+
   - code: precondition_failed
     status: 412
     title: Precondition failed
@@ -354,6 +623,24 @@ errors:
     description: >-
       The major version called is past its sunset. The `detail` names its
       replacement.
+
+  - code: link_invalid
+    status: 410
+    title: Link no longer valid
+    message: "The link has expired or was already used; ask for a new one from the sign-in page."
+    retryable: false
+    description: >-
+      The password link has expired, was already used, was replaced by a
+      newer one, or belongs to another console.
+
+  - code: approval_expired
+    status: 410
+    title: Proposal expired
+    message: "This proposal expired after seventy-two hours; propose it again."
+    retryable: false
+    description: >-
+      Nobody decided the proposal within seventy-two hours; propose it
+      again.
 
   - code: unsupported_media_type
     status: 415
@@ -423,3 +710,12 @@ errors:
       The API or a dependency it needs is temporarily unavailable, for
       example during maintenance. The response carries a `Retry-After`
       header when the duration is known.
+
+  - code: two_step_unavailable
+    status: 503
+    title: Two-step sign-in unavailable
+    message: "Two-step sign-in cannot be set up on this deployment."
+    retryable: false
+    description: >-
+      This deployment holds no two-step key, so an authenticator cannot be
+      set up here.

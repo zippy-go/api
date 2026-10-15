@@ -1,0 +1,17 @@
+type: object
+description: 'The request body of `POST /v1/platform/impersonation/sessions`: the approved consent to view under.'
+required:
+  - consent_id
+properties:
+  consent_id:
+    type: string
+    format: uuid
+    description: The approved consent, asked for by the caller.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why now, when it differs from the consent request's reason.
+examples:
+  - consent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    reason: null

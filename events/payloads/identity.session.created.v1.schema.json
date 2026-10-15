@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/identity.session.created.v1.schema.json",
   "title": "IdentitySessionCreatedPayload",
-  "description": "Payload of `identity.session.created` version 1: a user signed in and a session was created; the session id is the `sid` claim of the access tokens issued for it. Refreshing a session does not publish this event. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "description": "Payload of `identity.session.created` version 1: a user signed in and a session was created; the session id is the `sid` claim of the access tokens issued for it. Refreshing a session does not publish this event. The envelope's `partner_id` is `null`. `audience`, `client` and `method` are optional additions, present for every session created since they were added. Consumers must ignore fields they do not know; new optional fields are an additive change.",
   "type": "object",
   "required": ["user_id", "session_id"],
   "properties": {
@@ -17,6 +17,24 @@
       "format": "uuid",
       "description": "The session that was created, the `sid` claim of its access tokens.",
       "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22"]
+    },
+    "audience": {
+      "type": "string",
+      "enum": ["partner", "platform", "agent", "customer"],
+      "description": "The surface signed in to. Consumers must tolerate values they do not know.",
+      "examples": ["partner"]
+    },
+    "client": {
+      "type": "string",
+      "enum": ["browser", "native"],
+      "description": "The kind of client: `browser` when the refresh token travels in a cookie, `native` when it travels in the body. Consumers must tolerate values they do not know.",
+      "examples": ["browser"]
+    },
+    "method": {
+      "type": "string",
+      "enum": ["password", "code", "authenticator", "recovery_code", "invitation", "proven"],
+      "description": "How the person proved it was them: a password, a one-time code, a first factor then an authenticator code, a first factor then a recovery code, an accepted invitation, or `proven` for a session opened for a person another flow already proved. Consumers must tolerate values they do not know.",
+      "examples": ["password"]
     }
   }
 }

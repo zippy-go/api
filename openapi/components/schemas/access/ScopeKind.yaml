@@ -1,0 +1,9 @@
+type: string
+description: 'The kind of scope a grant is held at: `platform`, `partner`, `location` or `service`. Clients must tolerate values they do not know.'
+enum:
+  - platform
+  - partner
+  - location
+  - service
+examples:
+  - location

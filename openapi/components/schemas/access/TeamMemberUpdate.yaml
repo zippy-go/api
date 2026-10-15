@@ -1,0 +1,12 @@
+type: object
+description: 'The request body of the member changes: how the member is shown in this realm.'
+properties:
+  display_name:
+    type:
+      - string
+      - 'null'
+    description: The name the member is shown under here, or `null` for the user's own.
+    examples:
+      - User 25 (front counter)
+examples:
+  - display_name: User 25 (front counter)

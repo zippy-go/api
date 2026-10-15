@@ -1,0 +1,10 @@
+type: string
+description: "Where a partner's consent to be viewed stands: `pending`, `approved` (for twenty-four hours), `rejected`, `revoked` (withdrawn by an owner, ending the sessions under it) or `expired`. Clients must tolerate values they do not know."
+enum:
+  - pending
+  - approved
+  - rejected
+  - revoked
+  - expired
+examples:
+  - approved
