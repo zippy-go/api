@@ -129,7 +129,7 @@ properties:
       - 'null'
     description: The GSTIN, for an organisation registered for GST.
     examples:
-      - 36AAACB1234C1Z5
+      - 36AAACB1234C1ZG
   launched_at:
     type:
       - string
@@ -215,7 +215,7 @@ examples:
           whatsapp: false
     banner_asset_id: null
     description: null
-    gstin: 36AAACB1234C1Z5
+    gstin: 36AAACB1234C1ZG
     launched_at: null
     logo_asset_id: null
     pan: AAACB1234C

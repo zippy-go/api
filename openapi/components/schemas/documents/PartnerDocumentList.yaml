@@ -21,7 +21,7 @@ examples:
         kind: gst_registration
         asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55
         label: null
-        number: 36AAACB1234C1Z5
+        number: 36AAACB1234C1ZG
         issued_on: 2025-04-01
         expires_on: null
         review: pending
