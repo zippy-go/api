@@ -1,0 +1,45 @@
+type: object
+description: "What the platform keeps of a card: its brand, the last four digits, the expiry and whether the provider can hold it. Never the number."
+required:
+  - brand
+  - last4
+  - exp_month
+  - exp_year
+  - holdable
+properties:
+  brand:
+    type: string
+    description: The card network, lower case.
+    examples:
+      - visa
+  last4:
+    type: string
+    description: The last four digits.
+    pattern: ^[0-9]{4}$
+    examples:
+      - "4242"
+  exp_month:
+    type: integer
+    description: The expiry month, 1 to 12.
+    minimum: 1
+    maximum: 12
+    examples:
+      - 12
+  exp_year:
+    type: integer
+    description: The expiry year, four digits.
+    minimum: 2000
+    maximum: 2100
+    examples:
+      - 2029
+  holdable:
+    type: boolean
+    description: Whether the provider can hold this card until the Location accepts; a card that cannot be held is charged at checkout and refunded if the order does not go ahead.
+    examples:
+      - true
+examples:
+  - brand: visa
+    last4: "4242"
+    exp_month: 12
+    exp_year: 2029
+    holdable: true

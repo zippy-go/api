@@ -1,0 +1,74 @@
+# Path item for /v1/platform/finance/alerts. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: listFinanceAlerts
+  summary: What the nightly checks found
+  description: "The differences the nightly checks raised, newest first: the provider's records against the payments and the ledger, every Wallet against its entries and against the ledger. Listed until resolved. `ledger:read`."
+  parameters:
+    - name: status
+      in: query
+      required: false
+      description: Only alerts in this status; `open` by default.
+      schema:
+        $ref: ../../components/schemas/payments/FinanceAlertStatus.yaml
+    - name: kind
+      in: query
+      required: false
+      description: Only alerts of this kind.
+      schema:
+        $ref: ../../components/schemas/payments/FinanceAlertKind.yaml
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 25 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of alerts.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/FinanceAlertPage.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

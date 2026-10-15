@@ -1,0 +1,55 @@
+# Path item for /v1/payments/notices/{provider}. Referenced from openapi.yaml.
+post:
+  tags:
+    - Payments
+  security: []
+  operationId: receiveProviderNotice
+  summary: A notice from the payment provider
+  description: 'Where the payment provider tells the platform that a payment was held, captured, refused or expired, that a refund completed or failed, or that a card was saved. Accepted only with a valid signature over the exact body (the simulated provider signs with `X-Simulated-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256 of "t.body">` and a key shared with the platform, within five minutes); the amount and currency are checked against the records; a notice seen before is answered as a replay and changes nothing. A notice about an order that already ended releases or refunds what it reports rather than reviving the order.'
+  parameters:
+    - name: provider
+      in: path
+      required: true
+      description: "The provider: `simulated`."
+      schema:
+        type: string
+        enum:
+          - simulated
+  requestBody:
+    required: true
+    description: The provider's notice, in its own shape.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payments/ProviderNotice.yaml
+  responses:
+    "200":
+      description: Taken, or a replay that changed nothing.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/ProviderNoticeReceipt.yaml
+    "400":
+      description: "`notice_rejected`: the signature, the amount or the currency did not check out, or the notice is not the provider's; nothing changed."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: Not the platform's provider (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

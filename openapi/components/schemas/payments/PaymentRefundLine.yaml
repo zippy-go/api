@@ -1,0 +1,22 @@
+type: object
+description: A line of the order a refund gives back, as the ordering capability names it.
+required:
+  - line_id
+  - quantity
+properties:
+  line_id:
+    type: string
+    description: The order line.
+    minLength: 1
+    maxLength: 64
+    examples:
+      - line-3
+  quantity:
+    type: integer
+    description: How many of it.
+    minimum: 1
+    examples:
+      - 1
+examples:
+  - line_id: line-3
+    quantity: 1

@@ -1,0 +1,20 @@
+type: string
+description: "What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet)."
+enum:
+  - provider_clearing
+  - cash_in_transit
+  - order_clearing
+  - commission_revenue
+  - delivery_fee_revenue
+  - gst_payable
+  - tips_payable
+  - promotions_expense
+  - refunds_expense
+  - wallet_adjustments
+  - card_holds
+  - card_holds_contra
+  - partner_payable
+  - customer_wallet_paid
+  - customer_wallet_promotional
+examples:
+  - partner_payable

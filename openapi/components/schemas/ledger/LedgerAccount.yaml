@@ -1,0 +1,99 @@
+type: object
+description: A ledger account with what was posted to it. Its balance is the sum of its postings, shown in its normal direction.
+required:
+  - id
+  - code
+  - kind
+  - class
+  - normal_balance
+  - name
+  - partner_id
+  - customer_id
+  - currency
+  - debits
+  - credits
+  - balance
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The account.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+  code:
+    type: string
+    description: "The account's code: its kind, and for a party's account the party, such as `partner_payable:<partner_id>`."
+    examples:
+      - provider_clearing
+  kind:
+    $ref: ../ledger/LedgerAccountKind.yaml
+    description: What it records.
+  class:
+    $ref: ../ledger/LedgerAccountClass.yaml
+    description: Its class.
+  normal_balance:
+    $ref: ../ledger/LedgerSide.yaml
+    description: The side it grows by.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Provider clearing
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner, for a Partner's account.
+    examples:
+      - null
+  customer_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The customer, for a Wallet account.
+    examples:
+      - null
+  currency:
+    type: string
+    description: The currency.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  debits:
+    $ref: ../common/Money.yaml
+    description: Everything debited to it.
+  credits:
+    $ref: ../common/Money.yaml
+    description: Everything credited to it.
+  balance:
+    $ref: ../common/Money.yaml
+    description: Debits less credits for a debit account, credits less debits for a credit account.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was opened.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+    code: provider_clearing
+    kind: provider_clearing
+    class: asset
+    normal_balance: debit
+    name: Provider clearing
+    partner_id: null
+    customer_id: null
+    currency: INR
+    debits:
+      minor_units: 32000
+      currency: INR
+    credits:
+      minor_units: 0
+      currency: INR
+    balance:
+      minor_units: 32000
+      currency: INR
+    created_at: 2026-10-16T09:00:00Z

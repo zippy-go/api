@@ -1,0 +1,41 @@
+type: object
+description: A page of ledger accounts.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ../ledger/LedgerAccount.yaml
+      description: An account.
+    description: The accounts on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+        code: provider_clearing
+        kind: provider_clearing
+        class: asset
+        normal_balance: debit
+        name: Provider clearing
+        partner_id: null
+        customer_id: null
+        currency: INR
+        debits:
+          minor_units: 32000
+          currency: INR
+        credits:
+          minor_units: 0
+          currency: INR
+        balance:
+          minor_units: 32000
+          currency: INR
+        created_at: 2026-10-16T09:00:00Z
+    next_cursor: null

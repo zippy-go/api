@@ -1,0 +1,8 @@
+type: string
+description: "Whether an order's money has been split: not yet (`pending`), split at acceptance (`split`), or split and reversed because the accepted order was cancelled (`reversed`)."
+enum:
+  - pending
+  - split
+  - reversed
+examples:
+  - split

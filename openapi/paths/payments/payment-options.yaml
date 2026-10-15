@@ -1,0 +1,88 @@
+# Path item for /v1/customer/payment-options. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: getPaymentOptions
+  summary: The ways to pay an amount at a Location
+  description: "What checkout offers for an amount at a Location: the Wallet first when it is on and holds something, then UPI, the customer's saved cards and a new card, and cash on delivery or on collection where the Location takes it and the order qualifies. Every way not offered carries its reason (`upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`). With no payment provider, UPI and cards are not offered and say so. Ordering asks the same when it prices checkout."
+  parameters:
+    - name: location_id
+      in: query
+      required: true
+      description: The Location the order is placed at.
+      schema:
+        type: string
+        format: uuid
+    - name: amount_minor
+      in: query
+      required: true
+      description: The amount to pay in minor units of the Location's currency, tax included.
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    - name: use_wallet
+      in: query
+      required: false
+      description: Whether the Wallet pays first; `true` by default.
+      schema:
+        type: boolean
+        default: true
+    - name: fulfilment
+      in: query
+      required: false
+      description: "`delivery` (default), `pickup` or `dine_in`: cash on delivery and cash on collection are separate choices of the Location, and a dine-in bill is not paid in cash here (`cod_not_offered`)."
+      schema:
+        $ref: ../../components/schemas/storefront/FulfilmentMethod.yaml
+    - name: scheduled
+      in: query
+      required: false
+      description: Whether the order is scheduled into a slot; a scheduled order is never paid in cash (`cod_not_offered`).
+      schema:
+        type: boolean
+        default: false
+  responses:
+    "200":
+      description: The ways to pay, each with the reason when it is not offered.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/PaymentOptions.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such Location (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

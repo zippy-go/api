@@ -1,0 +1,41 @@
+type: object
+description: A refund Mission Control makes on a payment. It goes to the original UPI or card payment first, up to what it was charged less what was refunded to it, and the rest to the Wallet; refunds together never exceed what was paid.
+required:
+  - amount_minor
+  - reason
+  - note
+properties:
+  amount_minor:
+    type: integer
+    description: The amount in minor units of the payment's currency.
+    format: int64
+    minimum: 1
+    examples:
+      - 9000
+  reason:
+    $ref: ../payments/PaymentRefundReason.yaml
+    description: Why; one of support's reasons.
+  note:
+    type: string
+    description: Support's note, required, kept for Mission Control and never shown to the customer.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Fries missing from the bag.
+  payer:
+    $ref: ../payments/PaymentRefundPayer.yaml
+    description: Who bears it; the Partner by default, the platform when support says so.
+  lines:
+    type: array
+    items:
+      $ref: ../payments/PaymentRefundLine.yaml
+      description: A line given back.
+    description: The order lines it gives back, when it names them.
+examples:
+  - amount_minor: 9000
+    reason: missing_items
+    note: Fries missing from the bag.
+    payer: partner
+    lines:
+      - line_id: line-3
+        quantity: 1

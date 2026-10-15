@@ -1,0 +1,7 @@
+type: string
+description: Debit or credit. Assets, expenses and the memorandum `card_holds` grow by debits; liabilities, revenue and `card_holds_contra` by credits.
+enum:
+  - debit
+  - credit
+examples:
+  - debit

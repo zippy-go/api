@@ -1,0 +1,54 @@
+type: object
+description: "Adding money to the Wallet by UPI or card: from ₹100.00 to ₹10,000.00, while the Wallet stays at most ₹50,000.00. It is added to the paid balance when the provider confirms it."
+required:
+  - amount_minor
+  - method
+properties:
+  amount_minor:
+    type: integer
+    description: The amount in paise.
+    format: int64
+    minimum: 1
+    examples:
+      - 100000
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: "`upi` or `card`."
+  flow:
+    $ref: ../payments/PaymentFlow.yaml
+    description: For UPI, `upi_intent` (default) or `upi_collect`.
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A saved card or UPI ID to pay with.
+    examples:
+      - null
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID a collect request goes to; kept only by the provider.
+    maxLength: 256
+    examples:
+      - null
+  save_method:
+    type: boolean
+    description: Save the card or UPI ID for next time once paid.
+    examples:
+      - false
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the provider's page sends the customer back; its origin must be one of the platform's own apps.
+    format: uri
+    maxLength: 2048
+    examples:
+      - http://localhost:3000/account/wallet
+examples:
+  - amount_minor: 100000
+    method: upi
+    flow: upi_intent
+    return_url: http://localhost:3000/account/wallet

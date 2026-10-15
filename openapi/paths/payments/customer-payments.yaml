@@ -1,0 +1,75 @@
+# Path item for /v1/customer/payments. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: listCustomerPayments
+  summary: The customer's payments
+  description: "The signed-in customer's payments, newest first: their orders' and their Wallet top-ups. `order_id` narrows the list to one order's."
+  parameters:
+    - name: order_id
+      in: query
+      required: false
+      description: Only this order's payments.
+      schema:
+        type: string
+        format: uuid
+    - name: purpose
+      in: query
+      required: false
+      description: Only payments of this purpose.
+      schema:
+        $ref: ../../components/schemas/payments/PaymentPurpose.yaml
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 25 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of payments.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/PaymentPage.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -22,6 +22,15 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: top_up_out_of_range
+        message: A top-up is from ₹100.00 to ₹10,000.00.
+        description: A Wallet top-up below the least or above the most one top-up may add (`wallet.top_up_min_minor`, `wallet.top_up_max_minor`).
+      - code: upi_id_invalid
+        message: A UPI ID is a name, an @ and the bank's handle, such as name@okhdfc.
+        description: A UPI ID of the wrong shape, for a collect request or to be saved.
+      - code: return_url_not_allowed
+        message: The return address must be one of ZippyGo's own apps.
+        description: A `return_url` whose origin is not one of the platform's own apps, so the provider's page cannot send a customer anywhere else.
       - code: password_weak
         message: The password must be at least 12 characters long.
         description: >-
@@ -956,6 +965,102 @@ errors:
     description: >-
       The customer keeps the most addresses an account may hold; remove one
       before adding another.
+
+  - code: payment_method_not_offered
+    status: 409
+    title: Way to pay not offered
+    message: The store does not take {method} for this order.
+    retryable: false
+    description: The chosen way to pay is not offered for this order; the detail says why. Where the payments capability knows the reason, the `errors` member names it with a field-level code, the reasons the ways to pay (`GET /v1/customer/payment-options`) give; the other ways remain.
+    details:
+      - code: upi_over_limit
+        message: UPI pays up to the provider's limit; pay the rest by card.
+        description: The amount left to pay is above the provider's UPI limit (`payments.upi_limit_minor`); refused before any request is made.
+      - code: cod_withheld
+        message: Cash is not offered after two cash orders were refused at the door; it returns after 90 days.
+        description: The customer had two or more cash orders refused at the door, or not collected, in the last 90 days (`payments.cash_refusals_max`, `payments.cash_refusals_days`).
+      - code: cod_not_offered
+        message: Cash is not offered for this order.
+        description: A scheduled order, a subscription, a dine-in bill, or a delivery no Provider that collects cash can carry.
+      - code: cod_not_accepted
+        message: This store does not take cash.
+        description: The Location takes no cash on delivery, or on collection for a pickup.
+      - code: provider_unavailable
+        message: Paying by UPI or card is not available right now.
+        description: The platform has no payment provider configured, or the provider is not answering; cash and the Wallet still pay.
+      - code: card_expired
+        message: This card has expired.
+        description: A saved card past its expiry month.
+
+  - code: payment_not_pending
+    status: 409
+    title: Payment not waiting
+    message: The payment is {status}; it does not wait for another try.
+    retryable: false
+    description: A new try was asked for on a payment that is confirmed, settled, released or failed, or whose order's time to pay is up.
+
+  - code: cod_over_limit
+    status: 409
+    title: Cash over the limit
+    message: Cash orders are up to {limit}.
+    retryable: false
+    description: The order's total is above the most a cash order may be; the other ways to pay remain.
+
+  - code: refund_exceeds_paid
+    status: 409
+    title: Refund exceeds what was paid
+    message: At most {amount} can be refunded.
+    retryable: false
+    description: The refund asks for more than is left to refund on the order (or of a line, or a fee); the detail names the most.
+
+  - code: not_refundable
+    status: 409
+    title: Nothing to refund
+    message: Nothing was taken on this payment, so there is nothing to refund.
+    retryable: false
+    description: "A refund was asked for on a payment that has taken nothing yet: still waiting, only held, released, or cash not collected."
+
+  - code: refund_already_sent
+    status: 409
+    title: Refund already sent
+    message: The refund is already on its way to your account.
+    retryable: false
+    description: The customer asked to take a refund in the Wallet after its source part was sent to the provider.
+
+  - code: notice_rejected
+    status: 400
+    title: Notice rejected
+    message: "{reason}"
+    retryable: false
+    description: A notice to the payment notice endpoint whose signature, timestamp, amount or currency did not check out, or which names nothing the platform asked the provider for. Nothing changed.
+
+  - code: wallet_cap_exceeded
+    status: 409
+    title: Wallet ceiling reached
+    message: The Wallet holds at most {cap}; you can add up to {fits}.
+    retryable: false
+    description: A top-up or a credit would take the Wallet above its ceiling (`wallet.balance_cap_minor`); the detail offers what fits.
+
+  - code: withdrawal_exceeds_available
+    status: 409
+    title: More than the paid balance
+    message: At most {amount} can be sent back; promotional money is spent on ZippyGo and cannot be paid out.
+    retryable: false
+    description: A withdrawal asked for more than the paid balance that no order holds.
+
+  - code: withdrawal_source_unavailable
+    status: 409
+    title: No source to send it back to
+    message: "{amount} cannot go back to where it came from; it can be sent to a UPI ID you name in a later release."
+    retryable: false
+    description: Paid money from a cash order, or older than the provider allows a refund (`wallet.withdrawal_source_days`), goes to a UPI ID the customer names, which payouts bring later.
+
+  - code: correction_exceeds_available
+    status: 409
+    title: Correction exceeds what is available
+    message: At most {amount} can be taken from this balance.
+    retryable: false
+    description: A correction down asked for more than is available in the balance it corrects.
 
   - code: internal
     status: 500

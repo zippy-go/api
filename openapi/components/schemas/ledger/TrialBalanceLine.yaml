@@ -1,0 +1,63 @@
+type: object
+description: One account of the trial balance.
+required:
+  - account_id
+  - code
+  - name
+  - kind
+  - class
+  - normal_balance
+  - debits
+  - credits
+  - balance
+properties:
+  account_id:
+    type: string
+    format: uuid
+    description: The account.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+  code:
+    type: string
+    description: Its code.
+    examples:
+      - provider_clearing
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Provider clearing
+  kind:
+    $ref: ../ledger/LedgerAccountKind.yaml
+    description: What it records.
+  class:
+    $ref: ../ledger/LedgerAccountClass.yaml
+    description: Its class.
+  normal_balance:
+    $ref: ../ledger/LedgerSide.yaml
+    description: The side it grows by.
+  debits:
+    $ref: ../common/Money.yaml
+    description: Everything debited to it.
+  credits:
+    $ref: ../common/Money.yaml
+    description: Everything credited to it.
+  balance:
+    $ref: ../common/Money.yaml
+    description: Its balance in its normal direction.
+examples:
+  - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+    code: provider_clearing
+    name: Provider clearing
+    kind: provider_clearing
+    class: asset
+    normal_balance: debit
+    debits:
+      minor_units: 32000
+      currency: INR
+    credits:
+      minor_units: 0
+      currency: INR
+    balance:
+      minor_units: 32000
+      currency: INR

@@ -1,0 +1,78 @@
+# Path item for /v1/customer/payment-methods. Referenced from openapi.yaml.
+get:
+  tags: &a1
+    - Payments
+  security: &a2
+    - Bearer: []
+  operationId: listSavedPaymentMethods
+  summary: The customer's saved cards and UPI IDs
+  description: "The cards and UPI IDs the customer saved, the default first: a card by brand, last four digits and expiry, saying when it expires within 60 days or has expired; a UPI ID by its last part. Never another customer's."
+  responses:
+    "200":
+      description: The saved methods.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/SavedPaymentMethodList.yaml
+    "401": &a3
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403": &a4
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX: &a5
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default: &a6
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  tags: *a1
+  security: *a2
+  operationId: savePaymentMethod
+  summary: Save a card or a UPI ID
+  description: "Saves a UPI ID for collect requests at once, kept as the provider's token; or begins saving a card without an order: the answer names the provider's form, where the number is typed, and the card is saved when the provider confirms (`GET /v1/customer/payment-method-setups/{setup_id}`). Requires `Idempotency-Key`, so a press whose answer was lost, pressed again, saves one card."
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: A card or a UPI ID.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payments/PaymentMethodCreate.yaml
+  responses:
+    "201":
+      description: "The setup: saved at once for a UPI ID, the provider's form to open for a card."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/PaymentMethodSetup.yaml
+    "400":
+      description: "`validation_failed`: `idempotency_key_missing`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401": *a3
+    "403": *a4
+    "409":
+      description: "`payment_method_not_offered` with `provider_unavailable`: the platform has no payment provider."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX: *a5
+    default: *a6

@@ -1,0 +1,238 @@
+type: object
+description: "A payment: an order's money or a Wallet top-up, with the Wallet's, the provider's and the cash parts, every try at the provider and every refund. Card data never appears: a card is its brand, last four digits and expiry."
+required:
+  - id
+  - purpose
+  - order_id
+  - customer_id
+  - partner_id
+  - location_id
+  - status
+  - method
+  - amount
+  - wallet
+  - provider
+  - cash
+  - captured
+  - refunded
+  - refundable
+  - next_action
+  - failure
+  - attempts
+  - refunds
+  - expires_at
+  - created_at
+  - updated_at
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  purpose:
+    $ref: ../payments/PaymentPurpose.yaml
+    description: An order or a Wallet top-up.
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order, for an order's payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer who pays.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order's Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order's Location.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  status:
+    $ref: ../payments/PaymentStatus.yaml
+    description: Where it stands.
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: How the rest is paid after the Wallet.
+  amount:
+    $ref: ../common/Money.yaml
+    description: "The whole amount: the Wallet's, the provider's and the cash parts together."
+  wallet:
+    $ref: ../payments/PaymentWalletPart.yaml
+    description: The Wallet's part.
+  provider:
+    oneOf:
+      - $ref: ../payments/PaymentProviderPart.yaml
+      - type: "null"
+    description: The provider's part, paid by UPI or card.
+  cash:
+    oneOf:
+      - $ref: ../payments/PaymentCashPart.yaml
+      - type: "null"
+    description: The cash part.
+  captured:
+    $ref: ../common/Money.yaml
+    description: What has been taken, every part together.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What refunds gave back, every part together.
+  refundable:
+    $ref: ../common/Money.yaml
+    description: What can still be refunded.
+  next_action:
+    oneOf:
+      - $ref: ../payments/PaymentNextAction.yaml
+      - type: "null"
+    description: What the customer does next, while the payment requires it.
+  failure:
+    oneOf:
+      - $ref: ../payments/PaymentFailure.yaml
+      - type: "null"
+    description: Why the last try did not succeed.
+  attempts:
+    type: array
+    items:
+      $ref: ../payments/PaymentAttempt.yaml
+      description: One try.
+    description: Every try at the provider, newest first.
+  refunds:
+    type: array
+    items:
+      $ref: ../payments/PaymentRefund.yaml
+      description: One refund.
+    description: Every refund, newest first.
+  expires_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When an unpaid payment stops waiting: the order's time to pay."
+    examples:
+      - 2026-10-16T09:15:00Z
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-16T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-16T09:01:00Z
+  version:
+    type: integer
+    description: Rises with every change.
+    minimum: 1
+    examples:
+      - 3
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    purpose: order
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    status: confirmed
+    method: card
+    amount:
+      minor_units: 52000
+      currency: INR
+    wallet:
+      amount:
+        minor_units: 20000
+        currency: INR
+      held:
+        minor_units: 20000
+        currency: INR
+      spent:
+        minor_units: 0
+        currency: INR
+      spent_promotional:
+        minor_units: 0
+        currency: INR
+      spent_paid:
+        minor_units: 0
+        currency: INR
+      released:
+        minor_units: 0
+        currency: INR
+      refunded:
+        minor_units: 0
+        currency: INR
+    provider:
+      method: card
+      amount:
+        minor_units: 32000
+        currency: INR
+      authorized:
+        minor_units: 32000
+        currency: INR
+      captured:
+        minor_units: 0
+        currency: INR
+      released:
+        minor_units: 0
+        currency: INR
+      refunded:
+        minor_units: 0
+        currency: INR
+      capture_mode: at_acceptance
+      upi_reference: null
+      upi_handle: null
+      card: &a1
+        brand: visa
+        last4: "4242"
+        exp_month: 12
+        exp_year: 2029
+        holdable: true
+    cash: null
+    captured:
+      minor_units: 0
+      currency: INR
+    refunded:
+      minor_units: 0
+      currency: INR
+    refundable:
+      minor_units: 0
+      currency: INR
+    next_action: null
+    failure: null
+    attempts:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+        method: card
+        flow: card
+        status: authorized
+        amount:
+          minor_units: 32000
+          currency: INR
+        provider_reference: simpay_01
+        upi_reference: null
+        upi_handle: null
+        card: *a1
+        failure: null
+        created_at: 2026-10-16T09:00:00Z
+        expires_at: 2026-10-16T09:15:00Z
+        completed_at: 2026-10-16T09:01:00Z
+    refunds: []
+    expires_at: 2026-10-16T09:15:00Z
+    created_at: 2026-10-16T09:00:00Z
+    updated_at: 2026-10-16T09:01:00Z
+    version: 3

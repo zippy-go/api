@@ -1,0 +1,94 @@
+type: object
+description: "The ways a customer may pay an amount at a Location: the Wallet first when it is on, then UPI, saved cards and a new card, and cash on delivery where the Location takes it and the order qualifies, each with the reason when it is not offered."
+required:
+  - amount
+  - wallet
+  - remaining
+  - methods
+  - provider
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The amount to pay.
+  wallet:
+    $ref: ../payments/WalletApplication.yaml
+    description: What the Wallet pays.
+  remaining:
+    $ref: ../common/Money.yaml
+    description: What is left for a method to pay.
+  methods:
+    type: array
+    items:
+      $ref: ../payments/PaymentChoice.yaml
+      description: A way to pay.
+    description: UPI, card, cash and the Wallet alone, in checkout's order.
+  provider:
+    oneOf:
+      - $ref: ../payments/PaymentProviderInfo.yaml
+      - type: "null"
+    description: The provider; `null` when the platform has none, and UPI and cards are not offered.
+examples:
+  - amount:
+      minor_units: 52000
+      currency: INR
+    wallet:
+      enabled: true
+      balance:
+        minor_units: 20000
+        currency: INR
+      available:
+        minor_units: 20000
+        currency: INR
+      applies:
+        minor_units: 20000
+        currency: INR
+    remaining:
+      minor_units: 32000
+      currency: INR
+    methods:
+      - method: upi
+        available: true
+        refusal: null
+        capture_mode: at_checkout
+        limit:
+          minor_units: 10000000
+          currency: INR
+        saved: []
+      - method: card
+        available: true
+        refusal: null
+        capture_mode: at_acceptance
+        limit: null
+        saved:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d31
+            kind: card
+            card:
+              brand: visa
+              last4: "4242"
+              exp_month: 12
+              exp_year: 2029
+              holdable: true
+            upi_handle: null
+            is_default: true
+            expires_soon: false
+            expired: false
+            created_at: 2026-10-16T09:00:00Z
+      - method: cash
+        available: true
+        refusal: null
+        capture_mode: null
+        limit:
+          minor_units: 200000
+          currency: INR
+        saved: []
+      - method: wallet
+        available: false
+        refusal:
+          code: wallet_empty
+          message: The Wallet pays ₹200.00 of this order; choose how to pay the rest.
+        capture_mode: null
+        limit: null
+        saved: []
+    provider:
+      name: simulated
+      sandbox: true

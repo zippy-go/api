@@ -1,0 +1,81 @@
+type: object
+description: "A withdrawal made: the entries it wrote and the refunds sent to the sources, newest paid money first."
+required:
+  - amount
+  - entries
+  - refunds
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The whole withdrawal.
+  entries:
+    type: array
+    items:
+      $ref: ../wallet/WalletEntry.yaml
+      description: An entry.
+    description: The withdrawal entries, one per source.
+  refunds:
+    type: array
+    items:
+      $ref: ../payments/PaymentRefund.yaml
+      description: A refund.
+    description: The refunds sent back to the sources.
+examples:
+  - amount:
+      minor_units: 70000
+      currency: INR
+    entries:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+        kind: withdrawal
+        balance: paid
+        amount:
+          minor_units: -70000
+          currency: INR
+        held:
+          minor_units: 0
+          currency: INR
+        balance_after:
+          minor_units: 0
+          currency: INR
+        held_after:
+          minor_units: 0
+          currency: INR
+        reason: Sent back to your UPI account
+        note: null
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+        payment_id: null
+        refund_id: null
+        payer: null
+        by_user_id: null
+        created_at: 2026-10-16T09:00:00Z
+    refunds:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d21
+        payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+        order_id: null
+        amount:
+          minor_units: 70000
+          currency: INR
+        to_source:
+          minor_units: 70000
+          currency: INR
+        to_wallet:
+          minor_units: 0
+          currency: INR
+        to_wallet_paid:
+          minor_units: 0
+          currency: INR
+        to_wallet_promotional:
+          minor_units: 0
+          currency: INR
+        source_status: sent
+        can_switch_to_wallet: false
+        stage: unsettled
+        payer: null
+        reason: wallet_withdrawal
+        note: null
+        lines: []
+        provider_reference: null
+        created_at: 2026-10-16T09:20:00Z
+        send_after: null
+        sent_at: 2026-10-16T09:20:00Z
+        completed_at: null

@@ -1,0 +1,28 @@
+type: object
+description: Saving a card or a UPI ID without an order. A UPI ID is saved at once; a card is entered on the provider's form and saved when the provider confirms.
+required:
+  - kind
+properties:
+  kind:
+    $ref: ../payments/SavedMethodKind.yaml
+    description: A card or a UPI ID.
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID, such as `name@okhdfc`, for a UPI ID; kept only by the provider.
+    maxLength: 256
+    examples:
+      - name@okhdfc
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the provider's card form sends the customer back; its origin must be one of the platform's own apps.
+    format: uri
+    maxLength: 2048
+    examples:
+      - http://localhost:3000/account/payment-methods
+examples:
+  - kind: upi
+    upi_id: name@okhdfc

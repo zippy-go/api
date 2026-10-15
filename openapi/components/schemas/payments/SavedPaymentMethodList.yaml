@@ -1,0 +1,26 @@
+type: object
+description: The customer's saved cards and UPI IDs, the default first. With nothing saved the list is empty; a method can be saved while paying.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ../payments/SavedPaymentMethod.yaml
+      description: A saved method.
+    description: The saved methods.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d31
+        kind: card
+        card:
+          brand: visa
+          last4: "4242"
+          exp_month: 12
+          exp_year: 2029
+          holdable: true
+        upi_handle: null
+        is_default: true
+        expires_soon: false
+        expired: false
+        created_at: 2026-10-16T09:00:00Z

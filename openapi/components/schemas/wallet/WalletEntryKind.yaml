@@ -1,0 +1,13 @@
+type: string
+description: "What changed the Wallet: a top-up, a credit (from Mission Control or a reward), a refund, a hold for an order, the spend of that hold at acceptance, its release, a withdrawal of paid money to its source, or a correction."
+enum:
+  - top_up
+  - credit
+  - refund
+  - hold
+  - spend
+  - release
+  - withdrawal
+  - correction
+examples:
+  - credit

@@ -1,0 +1,7 @@
+type: string
+description: "Who bears a refund of a settled order: the Partner, deducted from what it is owed, or the platform."
+enum:
+  - partner
+  - platform
+examples:
+  - partner

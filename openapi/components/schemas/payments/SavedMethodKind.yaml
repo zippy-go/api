@@ -1,0 +1,7 @@
+type: string
+description: "What a saved method is: a card, kept as the provider's token, or a UPI ID for collect requests."
+enum:
+  - card
+  - upi
+examples:
+  - card

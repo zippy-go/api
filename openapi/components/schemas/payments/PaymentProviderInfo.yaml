@@ -1,0 +1,19 @@
+type: object
+description: The payment provider the platform pays through.
+required:
+  - name
+  - sandbox
+properties:
+  name:
+    type: string
+    description: "The provider: `simulated` on a developer's machine and in the sandbox."
+    examples:
+      - simulated
+  sandbox:
+    type: boolean
+    description: Whether no real money moves.
+    examples:
+      - true
+examples:
+  - name: simulated
+    sandbox: true

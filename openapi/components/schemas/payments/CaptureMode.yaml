@@ -1,0 +1,7 @@
+type: string
+description: "When a payment's provider part is taken: when the Location accepts (a card the issuer lets the provider hold), or at checkout (UPI, and a card that cannot be held, which is refunded if the order does not go ahead)."
+enum:
+  - at_acceptance
+  - at_checkout
+examples:
+  - at_acceptance

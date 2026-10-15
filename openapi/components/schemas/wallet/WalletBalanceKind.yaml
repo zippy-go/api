@@ -1,0 +1,7 @@
+type: string
+description: "Which of the Wallet's two balances: the customer's own money (`paid`: top-ups, refunds taken in the Wallet, refunds of cash orders, source refunds the provider refused), which may go back to its source, or money given (`promotional`: credit from Mission Control, rewards), spent first and never paid out."
+enum:
+  - paid
+  - promotional
+examples:
+  - paid

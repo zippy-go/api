@@ -12140,6 +12140,1694 @@ export type StoreSearchResult = {
 };
 
 /**
+ * How the rest of an order is paid once the Wallet has paid its part: by UPI, by a card, in cash on delivery or on collection, or by the Wallet alone when it covers everything.
+ */
+export type PaymentMethodKind = 'upi' | 'card' | 'cash' | 'wallet';
+
+/**
+ * Where a payment stands. `requires_payment`: the customer has something to approve at the provider, or must try again. `confirmed`: what checkout needs is secured by the provider's word (a card held, a UPI payment made), by the Wallet's hold or by the cash to collect, so the order may be placed. `settled`: the order's amount was fixed at acceptance: the card charged, the Wallet spent, UPI kept and anything not kept refunded, the cash to collect set. `released`: the order did not go ahead: every hold was released and anything taken refunded. `failed`: no payment succeeded in the order's time, or the charge at acceptance was refused.
+ */
+export type PaymentStatus = 'requires_payment' | 'confirmed' | 'settled' | 'released' | 'failed';
+
+/**
+ * What a payment is for: an order, or a top-up of the customer's Wallet.
+ */
+export type PaymentPurpose = 'order' | 'wallet_top_up';
+
+/**
+ * How an attempt reaches the customer: a UPI app opened on the device (`upi_intent`), a collect request to a UPI ID (`upi_collect`), or the provider's card form (`card`).
+ */
+export type PaymentFlow = 'upi_intent' | 'upi_collect' | 'card';
+
+/**
+ * Where one try at the provider stands: waiting for the customer (`pending`), a card held (`authorized`), money taken (`captured`), refused by the bank or the provider (`failed`), not answered in time (`expired`), or a hold given back (`released`).
+ */
+export type AttemptStatus = 'pending' | 'authorized' | 'captured' | 'failed' | 'expired' | 'released';
+
+/**
+ * When a payment's provider part is taken: when the Location accepts (a card the issuer lets the provider hold), or at checkout (UPI, and a card that cannot be held, which is refunded if the order does not go ahead).
+ */
+export type CaptureMode = 'at_acceptance' | 'at_checkout';
+
+/**
+ * What the customer does next: open `url` in this browser or app (`redirect`: the provider's card form, or a UPI app), or approve the collect request waiting in their UPI app (`approve_in_app`).
+ */
+export type NextActionKind = 'redirect' | 'approve_in_app';
+
+/**
+ * Where the part of a refund that goes back to the original UPI or card payment stands. `none`: nothing goes to the source. `pending`: decided, not yet sent to the provider; the customer may still take it in the Wallet at once. `sent`: on its way; it usually arrives within 5 working days. `succeeded`: the provider completed it. `moved_to_wallet`: the provider refused it and the amount went to the Wallet's paid balance. `switched_to_wallet`: the customer took it in the Wallet before it was sent.
+ */
+export type PaymentRefundSourceStatus = 'none' | 'pending' | 'sent' | 'succeeded' | 'moved_to_wallet' | 'switched_to_wallet';
+
+/**
+ * Whether a refund gives back money the order never kept (`unsettled`: a decline, a cancellation, an expiry, lines left out at acceptance, a payment confirmed after the order ended) or money of an order already settled (`settled`: a refund after acceptance, charged to its payer).
+ */
+export type PaymentRefundStage = 'unsettled' | 'settled';
+
+/**
+ * Who bears a refund of a settled order: the Partner, deducted from what it is owed, or the platform.
+ */
+export type PaymentRefundPayer = 'partner' | 'platform';
+
+/**
+ * Why money goes back. Support's reasons: late preparation, accepted in error, incorrect order, missing items, an allergen or dietary request ignored, late delivery, delivery to the wrong address, damaged on arrival, the agent's behaviour, a promo code or discount issue, a technical issue, a billing discrepancy, the customer asked to cancel, other. The platform's own: the order was declined, cancelled or expired, lines were left out at acceptance, a payment was confirmed after its order ended, a Wallet withdrawal.
+ */
+export type PaymentRefundReason = 'late_prep_time' | 'accepted_in_error' | 'incorrect_order' | 'missing_items' | 'allergen_ignored' | 'late_delivery' | 'wrong_address' | 'damaged_on_arrival' | 'agent_behaviour' | 'promo_issue' | 'technical_issue' | 'billing_discrepancy' | 'customer_asked_to_cancel' | 'other' | 'declined' | 'cancelled' | 'expired' | 'lines_left_out' | 'paid_after_end' | 'wallet_withdrawal';
+
+/**
+ * What a saved method is: a card, kept as the provider's token, or a UPI ID for collect requests.
+ */
+export type SavedMethodKind = 'card' | 'upi';
+
+/**
+ * Where saving a card without an order stands: waiting for the customer at the provider's form (`pending`), saved (`saved`), or refused or abandoned (`failed`).
+ */
+export type MethodSetupStatus = 'pending' | 'saved' | 'failed';
+
+/**
+ * What a nightly check found. `provider_missing`: a payment or refund recorded here that the provider has no record of. `unrecorded_at_provider`: the provider holds a payment or refund nobody here recorded. `amount_mismatch`: the provider and the records disagree on an amount. `ledger_mismatch`: the ledger's provider clearing disagrees with what was taken and given back. `wallet_mismatch`: a Wallet's balances are not the sum of its entries. `wallet_liability_mismatch`: the Wallets together disagree with the Wallet liability in the ledger.
+ */
+export type FinanceAlertKind = 'provider_missing' | 'unrecorded_at_provider' | 'amount_mismatch' | 'ledger_mismatch' | 'wallet_mismatch' | 'wallet_liability_mismatch';
+
+/**
+ * An alert is listed until somebody resolves it with a note.
+ */
+export type FinanceAlertStatus = 'open' | 'resolved';
+
+/**
+ * What the platform keeps of a card: its brand, the last four digits, the expiry and whether the provider can hold it. Never the number.
+ */
+export type CardSummary = {
+    /**
+     * The card network, lower case.
+     */
+    brand: string;
+    /**
+     * The last four digits.
+     */
+    last4: string;
+    /**
+     * The expiry month, 1 to 12.
+     */
+    exp_month: number;
+    /**
+     * The expiry year, four digits.
+     */
+    exp_year: number;
+    /**
+     * Whether the provider can hold this card until the Location accepts; a card that cannot be held is charged at checkout and refunded if the order does not go ahead.
+     */
+    holdable: boolean;
+};
+
+/**
+ * What the customer does next to finish a payment. The order is placed from the provider's word, never from the browser coming back.
+ */
+export type PaymentNextAction = {
+    /**
+     * Open the page, or approve in the UPI app.
+     */
+    kind: NextActionKind;
+    /**
+     * The page to open: the provider's form, or the UPI app. For `approve_in_app` it is `null` with a real provider; the simulated provider answers its page standing in for the UPI app.
+     */
+    url: string | null;
+    /**
+     * When this request stops working: a UPI request after 5 minutes, a card form when the order's time is up.
+     */
+    expires_at: string | null;
+    /**
+     * A sentence a screen may show as it is.
+     */
+    message: string;
+};
+
+/**
+ * Why the last try did not succeed, in the bank's or the provider's words where they are meant for the customer.
+ */
+export type PaymentFailure = {
+    /**
+     * The provider's reason: `declined`, `expired`, `insufficient_funds`, `failed`, `capture_refused` and others; clients show `message`.
+     */
+    code: string;
+    /**
+     * A sentence a screen may show as it is.
+     */
+    message: string;
+    /**
+     * When it happened.
+     */
+    at: string;
+};
+
+/**
+ * The Wallet's part of a payment: held when the order is placed, spent when the Location accepts (the promotional balance first), released otherwise.
+ */
+export type PaymentWalletPart = {
+    /**
+     * What the Wallet pays of the order.
+     */
+    amount: Money;
+    /**
+     * What is held now.
+     */
+    held: Money;
+    /**
+     * What was spent at acceptance.
+     */
+    spent: Money;
+    /**
+     * Of what was spent, from the promotional balance.
+     */
+    spent_promotional: Money;
+    /**
+     * Of what was spent, from the paid balance.
+     */
+    spent_paid: Money;
+    /**
+     * What was released back to the Wallet without being spent.
+     */
+    released: Money;
+    /**
+     * What refunds returned to the Wallet from what it spent.
+     */
+    refunded: Money;
+};
+
+/**
+ * The part of a payment the provider takes, by UPI or by card.
+ */
+export type PaymentProviderPart = {
+    /**
+     * `upi` or `card`.
+     */
+    method: PaymentMethodKind;
+    /**
+     * What the provider is asked for.
+     */
+    amount: Money;
+    /**
+     * What a card hold secures now.
+     */
+    authorized: Money;
+    /**
+     * What the provider has taken.
+     */
+    captured: Money;
+    /**
+     * What of a card hold was given back without being taken.
+     */
+    released: Money;
+    /**
+     * What refunds sent back to this payment.
+     */
+    refunded: Money;
+    /**
+     * When the provider part is taken.
+     */
+    capture_mode: CaptureMode;
+    /**
+     * The UPI transaction reference, once paid; shown on the receipt.
+     */
+    upi_reference: string | null;
+    /**
+     * The last part of the UPI ID that paid, never the whole ID.
+     */
+    upi_handle: string | null;
+    /**
+     * The card, when paid by card.
+     */
+    card: CardSummary | null;
+};
+
+/**
+ * The cash part of an order paid on delivery or on collection: nothing is taken at checkout; the amount to collect becomes what will be sent when the Location accepts.
+ */
+export type PaymentCashPart = {
+    /**
+     * The amount to collect.
+     */
+    amount: Money;
+    /**
+     * What was collected.
+     */
+    collected: Money;
+    /**
+     * When it was collected.
+     */
+    collected_at: string | null;
+};
+
+/**
+ * One try at the provider: a UPI request or a card form. A payment keeps every try, newest first.
+ */
+export type PaymentAttempt = {
+    /**
+     * The attempt.
+     */
+    id: string;
+    /**
+     * `upi` or `card`.
+     */
+    method: PaymentMethodKind;
+    /**
+     * How it reached the customer.
+     */
+    flow: PaymentFlow;
+    /**
+     * Where it stands.
+     */
+    status: AttemptStatus;
+    /**
+     * What it asked for.
+     */
+    amount: Money;
+    /**
+     * The provider's own reference.
+     */
+    provider_reference: string | null;
+    /**
+     * The UPI transaction reference, once paid.
+     */
+    upi_reference: string | null;
+    /**
+     * The last part of the UPI ID, never the whole ID.
+     */
+    upi_handle: string | null;
+    /**
+     * The card, for a card attempt.
+     */
+    card: CardSummary | null;
+    /**
+     * Why it did not succeed.
+     */
+    failure: PaymentFailure | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it stops working.
+     */
+    expires_at: string | null;
+    /**
+     * When it reached its end.
+     */
+    completed_at: string | null;
+};
+
+/**
+ * A line of the order a refund gives back, as the ordering capability names it.
+ */
+export type PaymentRefundLine = {
+    /**
+     * The order line.
+     */
+    line_id: string;
+    /**
+     * How many of it.
+     */
+    quantity: number;
+};
+
+/**
+ * One refund, its own record: what goes back to the original UPI or card payment, what goes to the Wallet and to which balance, why, who pays, and where the source part stands.
+ */
+export type PaymentRefund = {
+    /**
+     * The refund.
+     */
+    id: string;
+    /**
+     * The payment it gives back.
+     */
+    payment_id: string;
+    /**
+     * The order, for an order's payment.
+     */
+    order_id: string | null;
+    /**
+     * The whole refund.
+     */
+    amount: Money;
+    /**
+     * What goes back to the original UPI or card payment, never more than it was charged less what was refunded to it.
+     */
+    to_source: Money;
+    /**
+     * What goes to the Wallet.
+     */
+    to_wallet: Money;
+    /**
+     * Of what goes to the Wallet, to the paid balance.
+     */
+    to_wallet_paid: Money;
+    /**
+     * Of what goes to the Wallet, to the promotional balance, where it was spent from.
+     */
+    to_wallet_promotional: Money;
+    /**
+     * Where the source part stands.
+     */
+    source_status: PaymentRefundSourceStatus;
+    /**
+     * Whether the customer may still take the source part in the Wallet at once.
+     */
+    can_switch_to_wallet: boolean;
+    /**
+     * Money the order never kept, or money of a settled order.
+     */
+    stage: PaymentRefundStage;
+    /**
+     * Who bears a refund of a settled order; `null` otherwise.
+     */
+    payer: PaymentRefundPayer | null;
+    /**
+     * Why.
+     */
+    reason: PaymentRefundReason;
+    /**
+     * Support's note; Mission Control only, `null` for the customer.
+     */
+    note: string | null;
+    /**
+     * The order lines it gives back, when it names them.
+     */
+    lines: Array<PaymentRefundLine>;
+    /**
+     * The provider's reference of the source refund, once sent.
+     */
+    provider_reference: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When a pending source refund is sent to the provider, unless the customer takes it in the Wallet first.
+     */
+    send_after: string | null;
+    /**
+     * When it was sent to the provider.
+     */
+    sent_at: string | null;
+    /**
+     * When the provider completed it, or it went to the Wallet.
+     */
+    completed_at: string | null;
+};
+
+/**
+ * A payment: an order's money or a Wallet top-up, with the Wallet's, the provider's and the cash parts, every try at the provider and every refund. Card data never appears: a card is its brand, last four digits and expiry.
+ */
+export type Payment = {
+    /**
+     * The payment.
+     */
+    id: string;
+    /**
+     * An order or a Wallet top-up.
+     */
+    purpose: PaymentPurpose;
+    /**
+     * The order, for an order's payment.
+     */
+    order_id: string | null;
+    /**
+     * The customer who pays.
+     */
+    customer_id: string;
+    /**
+     * The order's Partner.
+     */
+    partner_id: string | null;
+    /**
+     * The order's Location.
+     */
+    location_id: string | null;
+    /**
+     * Where it stands.
+     */
+    status: PaymentStatus;
+    /**
+     * How the rest is paid after the Wallet.
+     */
+    method: PaymentMethodKind;
+    /**
+     * The whole amount: the Wallet's, the provider's and the cash parts together.
+     */
+    amount: Money;
+    /**
+     * The Wallet's part.
+     */
+    wallet: PaymentWalletPart;
+    /**
+     * The provider's part, paid by UPI or card.
+     */
+    provider: PaymentProviderPart | null;
+    /**
+     * The cash part.
+     */
+    cash: PaymentCashPart | null;
+    /**
+     * What has been taken, every part together.
+     */
+    captured: Money;
+    /**
+     * What refunds gave back, every part together.
+     */
+    refunded: Money;
+    /**
+     * What can still be refunded.
+     */
+    refundable: Money;
+    /**
+     * What the customer does next, while the payment requires it.
+     */
+    next_action: PaymentNextAction | null;
+    /**
+     * Why the last try did not succeed.
+     */
+    failure: PaymentFailure | null;
+    /**
+     * Every try at the provider, newest first.
+     */
+    attempts: Array<PaymentAttempt>;
+    /**
+     * Every refund, newest first.
+     */
+    refunds: Array<PaymentRefund>;
+    /**
+     * When an unpaid payment stops waiting: the order's time to pay.
+     */
+    expires_at: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Rises with every change.
+     */
+    version: number;
+};
+
+/**
+ * A page of payments, newest first.
+ */
+export type PaymentPage = {
+    /**
+     * The payments on this page.
+     */
+    items: Array<Payment>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A new try for a payment that requires one: UPI or a card, within the order's time.
+ */
+export type PaymentAttemptRequest = {
+    /**
+     * `upi` or `card`.
+     */
+    method: PaymentMethodKind;
+    /**
+     * For UPI, `upi_intent` (the default: open a UPI app) or `upi_collect` (a collect request to `upi_id` or the saved UPI ID); a card is always `card`.
+     */
+    flow?: PaymentFlow;
+    /**
+     * A saved card or UPI ID of the customer to pay with.
+     */
+    saved_method_id?: string | null;
+    /**
+     * The UPI ID a collect request goes to, such as `name@okhdfc`; kept only by the provider.
+     */
+    upi_id?: string | null;
+    /**
+     * Save the card or UPI ID for next time once the payment succeeds.
+     */
+    save_method?: boolean;
+    /**
+     * Where the provider's page sends the customer back, with `payment_id` and `attempt_id` added; its origin must be one of the platform's own apps (`return_url_not_allowed`).
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A try made: the payment as it stands and what the customer does next.
+ */
+export type PaymentAttemptStarted = {
+    /**
+     * The payment.
+     */
+    payment: Payment;
+    /**
+     * The new try.
+     */
+    attempt: PaymentAttempt;
+    /**
+     * What the customer does next; `null` when nothing is needed.
+     */
+    next_action: PaymentNextAction | null;
+};
+
+/**
+ * A refund Mission Control makes on a payment. It goes to the original UPI or card payment first, up to what it was charged less what was refunded to it, and the rest to the Wallet; refunds together never exceed what was paid.
+ */
+export type PaymentRefundRequest = {
+    /**
+     * The amount in minor units of the payment's currency.
+     */
+    amount_minor: number;
+    /**
+     * Why; one of support's reasons.
+     */
+    reason: PaymentRefundReason;
+    /**
+     * Support's note, required, kept for Mission Control and never shown to the customer.
+     */
+    note: string;
+    /**
+     * Who bears it; the Partner by default, the platform when support says so.
+     */
+    payer?: PaymentRefundPayer;
+    /**
+     * The order lines it gives back, when it names them.
+     */
+    lines?: Array<PaymentRefundLine>;
+};
+
+/**
+ * Why a way to pay is not offered for this order, with a sentence checkout may show as it is.
+ */
+export type PaymentRefusal = {
+    /**
+     * The reason: `upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`, `wallet_empty`, `wallet_off`, `nothing_left_to_pay`.
+     */
+    code: string;
+    /**
+     * A sentence a screen may show as it is.
+     */
+    message: string;
+};
+
+/**
+ * The payment provider the platform pays through.
+ */
+export type PaymentProviderInfo = {
+    /**
+     * The provider: `simulated` on a developer's machine and in the sandbox.
+     */
+    name: string;
+    /**
+     * Whether no real money moves.
+     */
+    sandbox: boolean;
+};
+
+/**
+ * A card or UPI ID the customer saved, kept as the provider's token. A card is its brand, last four digits and expiry; a UPI ID its last part.
+ */
+export type SavedPaymentMethod = {
+    /**
+     * The saved method.
+     */
+    id: string;
+    /**
+     * A card or a UPI ID.
+     */
+    kind: SavedMethodKind;
+    /**
+     * The card, for a card.
+     */
+    card: CardSummary | null;
+    /**
+     * The last part of the UPI ID, for a UPI ID, such as `@okhdfc`.
+     */
+    upi_handle: string | null;
+    /**
+     * Offered first at checkout.
+     */
+    is_default: boolean;
+    /**
+     * A card expiring within 60 days.
+     */
+    expires_soon: boolean;
+    /**
+     * A card past its expiry month; it is not offered at checkout.
+     */
+    expired: boolean;
+    /**
+     * When it was saved.
+     */
+    created_at: string;
+};
+
+/**
+ * The customer's saved cards and UPI IDs, the default first. With nothing saved the list is empty; a method can be saved while paying.
+ */
+export type SavedPaymentMethodList = {
+    /**
+     * The saved methods.
+     */
+    items: Array<SavedPaymentMethod>;
+};
+
+/**
+ * One way to pay offered at checkout, or not offered with the reason.
+ */
+export type PaymentChoice = {
+    /**
+     * The way to pay.
+     */
+    method: PaymentMethodKind;
+    /**
+     * Whether it can pay this order.
+     */
+    available: boolean;
+    /**
+     * Why not, when it cannot.
+     */
+    refusal: PaymentRefusal | null;
+    /**
+     * When a card or UPI is taken; `null` for cash and the Wallet.
+     */
+    capture_mode: CaptureMode | null;
+    /**
+     * The most it may pay, where there is a ceiling: the provider's UPI limit, the cash limit.
+     */
+    limit: Money | null;
+    /**
+     * The customer's saved cards or UPI IDs for this method, the default first; expired cards are left out.
+     */
+    saved: Array<SavedPaymentMethod>;
+};
+
+/**
+ * What the Wallet pays of an order: as much as is available when the customer leaves it on.
+ */
+export type WalletApplication = {
+    /**
+     * Whether the customer leaves the Wallet on for this order.
+     */
+    enabled: boolean;
+    /**
+     * The Wallet's balance, paid and promotional together.
+     */
+    balance: Money;
+    /**
+     * The balance less what other orders hold.
+     */
+    available: Money;
+    /**
+     * What the Wallet pays of this order.
+     */
+    applies: Money;
+};
+
+/**
+ * The ways a customer may pay an amount at a Location: the Wallet first when it is on, then UPI, saved cards and a new card, and cash on delivery where the Location takes it and the order qualifies, each with the reason when it is not offered.
+ */
+export type PaymentOptions = {
+    /**
+     * The amount to pay.
+     */
+    amount: Money;
+    /**
+     * What the Wallet pays.
+     */
+    wallet: WalletApplication;
+    /**
+     * What is left for a method to pay.
+     */
+    remaining: Money;
+    /**
+     * UPI, card, cash and the Wallet alone, in checkout's order.
+     */
+    methods: Array<PaymentChoice>;
+    /**
+     * The provider; `null` when the platform has none, and UPI and cards are not offered.
+     */
+    provider: PaymentProviderInfo | null;
+};
+
+/**
+ * Saving a card or a UPI ID without an order. A UPI ID is saved at once; a card is entered on the provider's form and saved when the provider confirms.
+ */
+export type PaymentMethodCreate = {
+    /**
+     * A card or a UPI ID.
+     */
+    kind: SavedMethodKind;
+    /**
+     * The UPI ID, such as `name@okhdfc`, for a UPI ID; kept only by the provider.
+     */
+    upi_id?: string | null;
+    /**
+     * Where the provider's card form sends the customer back; its origin must be one of the platform's own apps.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * Saving a card without an order: the provider's form to open, then the saved card once the provider confirms.
+ */
+export type PaymentMethodSetup = {
+    /**
+     * The setup.
+     */
+    id: string;
+    /**
+     * A card.
+     */
+    kind: SavedMethodKind;
+    /**
+     * Where it stands.
+     */
+    status: MethodSetupStatus;
+    /**
+     * The provider's form, while pending.
+     */
+    next_action: PaymentNextAction | null;
+    /**
+     * The saved card, once saved.
+     */
+    method: SavedPaymentMethod | null;
+    /**
+     * When it began.
+     */
+    created_at: string;
+    /**
+     * When the form stops working.
+     */
+    expires_at: string;
+};
+
+/**
+ * A notice the payment provider sends, in its own shape, verified by its signature header before anything is read. The platform acts on the provider's word only: the notice names a payment, a refund or a saved card whose amount and currency are checked against the records, and a notice seen before changes nothing.
+ */
+export type ProviderNotice = {
+    [key: string]: unknown;
+};
+
+/**
+ * The answer to the provider: the notice was taken, or was a replay that changed nothing.
+ */
+export type ProviderNoticeReceipt = {
+    /**
+     * Always `true`: the notice was taken.
+     */
+    received: boolean;
+    /**
+     * Whether the notice had been seen before; nothing changed.
+     */
+    replay: boolean;
+};
+
+/**
+ * How a Location takes cash: on delivery, on collection, and a lower ceiling of its own beneath the platform's. UPI, cards and the Wallet are offered wherever the platform has a provider.
+ */
+export type LocationPaymentSettings = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Cash is taken at the door.
+     */
+    cash_on_delivery: boolean;
+    /**
+     * Cash is taken at the counter on collection.
+     */
+    cash_on_collection: boolean;
+    /**
+     * The Location's own ceiling per order, below the platform's; `null` for the platform's.
+     */
+    cash_limit: Money | null;
+    /**
+     * The platform's ceiling per order (`payments.cash_limit_minor`).
+     */
+    platform_cash_limit: Money;
+    /**
+     * The ceiling that applies: the lower of the two.
+     */
+    effective_cash_limit: Money;
+    /**
+     * Rises with every change; the `ETag`.
+     */
+    version: number;
+    /**
+     * When it last changed; `null` while the Location keeps the defaults.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * How the Location takes cash, written as a whole.
+ */
+export type LocationPaymentSettingsUpdate = {
+    /**
+     * Cash is taken at the door.
+     */
+    cash_on_delivery: boolean;
+    /**
+     * Cash is taken at the counter on collection.
+     */
+    cash_on_collection: boolean;
+    /**
+     * The Location's own ceiling per order in minor units, at most the platform's; `null` for the platform's.
+     */
+    cash_limit_minor?: number | null;
+};
+
+/**
+ * What a finance alert names.
+ */
+export type FinanceAlertSubject = {
+    /**
+     * The order.
+     */
+    order_id: string | null;
+    /**
+     * The payment.
+     */
+    payment_id: string | null;
+    /**
+     * The refund.
+     */
+    refund_id: string | null;
+    /**
+     * The customer, for a Wallet.
+     */
+    customer_id: string | null;
+    /**
+     * The ledger account.
+     */
+    account_code: string | null;
+    /**
+     * The provider's reference.
+     */
+    provider_reference: string | null;
+};
+
+/**
+ * A difference a nightly check found, listed in Mission Control's Finance section until somebody resolves it.
+ */
+export type FinanceAlert = {
+    /**
+     * The alert.
+     */
+    id: string;
+    /**
+     * What was found.
+     */
+    kind: FinanceAlertKind;
+    /**
+     * Open or resolved.
+     */
+    status: FinanceAlertStatus;
+    /**
+     * What it names.
+     */
+    subject: FinanceAlertSubject;
+    /**
+     * The difference, where it is an amount.
+     */
+    difference: Money | null;
+    /**
+     * What disagrees, as a sentence.
+     */
+    detail: string;
+    /**
+     * When the check raised it.
+     */
+    raised_at: string;
+    /**
+     * When it was resolved.
+     */
+    resolved_at: string | null;
+    /**
+     * Who resolved it.
+     */
+    resolved_by: string | null;
+    /**
+     * The note it was resolved with.
+     */
+    resolution: string | null;
+};
+
+/**
+ * A page of finance alerts, newest first.
+ */
+export type FinanceAlertPage = {
+    /**
+     * The alerts on this page.
+     */
+    items: Array<FinanceAlert>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Resolving an alert, with what was done.
+ */
+export type FinanceAlertResolve = {
+    /**
+     * What was done about it.
+     */
+    note: string;
+};
+
+/**
+ * One run of the checks that compare the provider's records with the payments and the ledger, and every Wallet with its entries and with the ledger.
+ */
+export type ReconciliationRun = {
+    /**
+     * When it started.
+     */
+    started_at: string;
+    /**
+     * When it finished.
+     */
+    finished_at: string;
+    /**
+     * The start of the window it compared, two days back by default.
+     */
+    since: string;
+    /**
+     * Payments compared.
+     */
+    payments_checked: number;
+    /**
+     * Refunds compared.
+     */
+    refunds_checked: number;
+    /**
+     * Wallets added up again.
+     */
+    wallets_checked: number;
+    /**
+     * New alerts.
+     */
+    alerts_raised: number;
+};
+
+/**
+ * Which of the Wallet's two balances: the customer's own money (`paid`: top-ups, refunds taken in the Wallet, refunds of cash orders, source refunds the provider refused), which may go back to its source, or money given (`promotional`: credit from Mission Control, rewards), spent first and never paid out.
+ */
+export type WalletBalanceKind = 'paid' | 'promotional';
+
+/**
+ * What changed the Wallet: a top-up, a credit (from Mission Control or a reward), a refund, a hold for an order, the spend of that hold at acceptance, its release, a withdrawal of paid money to its source, or a correction.
+ */
+export type WalletEntryKind = 'top_up' | 'credit' | 'refund' | 'hold' | 'spend' | 'release' | 'withdrawal' | 'correction';
+
+/**
+ * Who pays for credit given: the platform, or a named Partner, settled when it is given.
+ */
+export type WalletPayerKind = 'platform' | 'partner';
+
+/**
+ * Who pays for credit given.
+ */
+export type WalletPayer = {
+    /**
+     * The platform or a Partner.
+     */
+    kind: WalletPayerKind;
+    /**
+     * The Partner, when a Partner pays.
+     */
+    partner_id: string | null;
+};
+
+/**
+ * One of the Wallet's balances: what it holds, what orders hold of it, and what is available.
+ */
+export type WalletSubBalance = {
+    /**
+     * The balance: the sum of its entries.
+     */
+    balance: Money;
+    /**
+     * What open orders hold of it.
+     */
+    held: Money;
+    /**
+     * The balance less what is held.
+     */
+    available: Money;
+};
+
+/**
+ * A customer's Wallet in rupees: the two balances, paid and promotional, what is held for open orders and what is available. Every figure is the sum of its entries; nothing expires.
+ */
+export type Wallet = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The Wallet's currency.
+     */
+    currency: string;
+    /**
+     * Both balances together.
+     */
+    balance: Money;
+    /**
+     * What open orders hold, both balances together.
+     */
+    held: Money;
+    /**
+     * What can be spent now.
+     */
+    available: Money;
+    /**
+     * The customer's own money.
+     */
+    paid: WalletSubBalance;
+    /**
+     * Money given, spent first.
+     */
+    promotional: WalletSubBalance;
+    /**
+     * Rises with every entry; the `ETag`.
+     */
+    version: number;
+    /**
+     * When it last changed; `null` for a Wallet that never moved.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * One entry of the Wallet's ledger: never edited or removed; a mistake is corrected by a new entry.
+ */
+export type WalletEntry = {
+    /**
+     * The entry.
+     */
+    id: string;
+    /**
+     * What changed the Wallet.
+     */
+    kind: WalletEntryKind;
+    /**
+     * The balance it touched.
+     */
+    balance: WalletBalanceKind;
+    /**
+     * What it added to the balance (negative when it took away); zero for a hold and a release.
+     */
+    amount: Money;
+    /**
+     * What it added to the held amount (negative when a hold was spent or released).
+     */
+    held: Money;
+    /**
+     * The balance after it.
+     */
+    balance_after: Money;
+    /**
+     * The held amount after it.
+     */
+    held_after: Money;
+    /**
+     * Why, in words the customer reads.
+     */
+    reason: string;
+    /**
+     * Support's note; the customer reads a credit's note as a message and never a correction's.
+     */
+    note: string | null;
+    /**
+     * The order it belongs to.
+     */
+    order_id: string | null;
+    /**
+     * The payment it belongs to: the top-up, or the order's payment.
+     */
+    payment_id: string | null;
+    /**
+     * The refund it came from.
+     */
+    refund_id: string | null;
+    /**
+     * Who pays for a credit.
+     */
+    payer: WalletPayer | null;
+    /**
+     * The person who made it, for a credit or a correction.
+     */
+    by_user_id: string | null;
+    /**
+     * When.
+     */
+    created_at: string;
+};
+
+/**
+ * A page of Wallet entries, newest first.
+ */
+export type WalletEntryPage = {
+    /**
+     * The entries on this page.
+     */
+    items: Array<WalletEntry>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * The two balances at an instant.
+ */
+export type WalletBalances = {
+    /**
+     * The paid balance.
+     */
+    paid: Money;
+    /**
+     * The promotional balance.
+     */
+    promotional: Money;
+};
+
+/**
+ * A calendar month of the Wallet in the market's clock: the opening and closing balances and every entry of the month, oldest first.
+ */
+export type WalletStatement = {
+    /**
+     * The month, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * The Wallet's currency.
+     */
+    currency: string;
+    /**
+     * The balances when the month began.
+     */
+    opening: WalletBalances;
+    /**
+     * The balances when it ended, or now for the month under way.
+     */
+    closing: WalletBalances;
+    /**
+     * Every entry of the month, oldest first.
+     */
+    entries: Array<WalletEntry>;
+};
+
+/**
+ * Adding money to the Wallet by UPI or card: from ₹100.00 to ₹10,000.00, while the Wallet stays at most ₹50,000.00. It is added to the paid balance when the provider confirms it.
+ */
+export type WalletTopUpRequest = {
+    /**
+     * The amount in paise.
+     */
+    amount_minor: number;
+    /**
+     * `upi` or `card`.
+     */
+    method: PaymentMethodKind;
+    /**
+     * For UPI, `upi_intent` (default) or `upi_collect`.
+     */
+    flow?: PaymentFlow;
+    /**
+     * A saved card or UPI ID to pay with.
+     */
+    saved_method_id?: string | null;
+    /**
+     * The UPI ID a collect request goes to; kept only by the provider.
+     */
+    upi_id?: string | null;
+    /**
+     * Save the card or UPI ID for next time once paid.
+     */
+    save_method?: boolean;
+    /**
+     * Where the provider's page sends the customer back; its origin must be one of the platform's own apps.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * Sending paid money back where it came from: a top-up to the UPI account or card it was paid with, a refund taken in the Wallet to the order's original payment, while the provider still allows a refund against it. Needs a fresh step-up.
+ */
+export type WalletWithdrawalRequest = {
+    /**
+     * The amount in paise, at most the paid balance that is not held.
+     */
+    amount_minor: number;
+};
+
+/**
+ * A withdrawal made: the entries it wrote and the refunds sent to the sources, newest paid money first.
+ */
+export type WalletWithdrawal = {
+    /**
+     * The whole withdrawal.
+     */
+    amount: Money;
+    /**
+     * The withdrawal entries, one per source.
+     */
+    entries: Array<WalletEntry>;
+    /**
+     * The refunds sent back to the sources.
+     */
+    refunds: Array<PaymentRefund>;
+};
+
+/**
+ * Credit Mission Control gives a customer: at least ₹1.00, to the promotional balance, with a reason the customer reads, a note the customer reads as a message, and who pays for it, settled when it is given. A credit tied to an order suggests that order's Partner as payer.
+ */
+export type WalletCreditRequest = {
+    /**
+     * The amount in paise, at least 100.
+     */
+    amount_minor: number;
+    /**
+     * Why, in at most 40 characters the customer reads.
+     */
+    reason: string;
+    /**
+     * A message the customer reads.
+     */
+    note: string;
+    /**
+     * Who pays for it.
+     */
+    payer: WalletPayer;
+    /**
+     * The order it is for, when there is one.
+     */
+    order_id?: string | null;
+};
+
+/**
+ * A correction of one balance, up or down, written as a new entry: never more down than is available in that balance. The customer sees the reason and never the note.
+ */
+export type WalletCorrectionRequest = {
+    /**
+     * The balance it corrects.
+     */
+    balance: WalletBalanceKind;
+    /**
+     * The correction in paise: positive adds, negative takes away; never zero.
+     */
+    amount_minor: number;
+    /**
+     * Why, in at most 40 characters the customer reads.
+     */
+    reason: string;
+    /**
+     * Support's note, never shown to the customer.
+     */
+    note: string;
+};
+
+/**
+ * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet).
+ */
+export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional';
+
+/**
+ * The account's class: an asset, a liability, revenue, an expense, or a memorandum account that records a promise (a card hold) without moving money.
+ */
+export type LedgerAccountClass = 'asset' | 'liability' | 'revenue' | 'expense' | 'memorandum';
+
+/**
+ * Debit or credit. Assets, expenses and the memorandum `card_holds` grow by debits; liabilities, revenue and `card_holds_contra` by credits.
+ */
+export type LedgerSide = 'debit' | 'credit';
+
+/**
+ * What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected.
+ */
+export type LedgerEntryKind = 'payment_captured' | 'card_held' | 'card_hold_released' | 'order_split' | 'order_split_reversed' | 'refund_issued' | 'refund_to_wallet' | 'wallet_credit' | 'wallet_correction';
+
+/**
+ * A ledger account with what was posted to it. Its balance is the sum of its postings, shown in its normal direction.
+ */
+export type LedgerAccount = {
+    /**
+     * The account.
+     */
+    id: string;
+    /**
+     * The account's code: its kind, and for a party's account the party, such as `partner_payable:<partner_id>`.
+     */
+    code: string;
+    /**
+     * What it records.
+     */
+    kind: LedgerAccountKind;
+    /**
+     * Its class.
+     */
+    class: LedgerAccountClass;
+    /**
+     * The side it grows by.
+     */
+    normal_balance: LedgerSide;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The Partner, for a Partner's account.
+     */
+    partner_id: string | null;
+    /**
+     * The customer, for a Wallet account.
+     */
+    customer_id: string | null;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Everything debited to it.
+     */
+    debits: Money;
+    /**
+     * Everything credited to it.
+     */
+    credits: Money;
+    /**
+     * Debits less credits for a debit account, credits less debits for a credit account.
+     */
+    balance: Money;
+    /**
+     * When it was opened.
+     */
+    created_at: string;
+};
+
+/**
+ * A page of ledger accounts.
+ */
+export type LedgerAccountPage = {
+    /**
+     * The accounts on this page.
+     */
+    items: Array<LedgerAccount>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One side of a journal entry: an account debited or credited by an amount.
+ */
+export type LedgerPosting = {
+    /**
+     * The account.
+     */
+    account_id: string;
+    /**
+     * The account's code.
+     */
+    account_code: string;
+    /**
+     * The account's name.
+     */
+    account_name: string;
+    /**
+     * Debit or credit.
+     */
+    side: LedgerSide;
+    /**
+     * The amount, always positive.
+     */
+    amount: Money;
+};
+
+/**
+ * A journal entry: immutable, its debits equal to its credits, which the database enforces when the entry is written. It names the event that caused it.
+ */
+export type LedgerEntry = {
+    /**
+     * The entry.
+     */
+    id: string;
+    /**
+     * What it records.
+     */
+    kind: LedgerEntryKind;
+    /**
+     * What it records, as a sentence.
+     */
+    description: string;
+    /**
+     * The currency of every posting.
+     */
+    currency: string;
+    /**
+     * The order.
+     */
+    order_id: string | null;
+    /**
+     * The payment.
+     */
+    payment_id: string | null;
+    /**
+     * The refund.
+     */
+    refund_id: string | null;
+    /**
+     * The Partner.
+     */
+    partner_id: string | null;
+    /**
+     * The customer.
+     */
+    customer_id: string | null;
+    /**
+     * The event it was posted from; an event is posted once.
+     */
+    source_event_id: string;
+    /**
+     * The postings, debits first.
+     */
+    postings: Array<LedgerPosting>;
+    /**
+     * The debits together.
+     */
+    total_debits: Money;
+    /**
+     * The credits together, always equal to the debits.
+     */
+    total_credits: Money;
+    /**
+     * When the money moved.
+     */
+    occurred_at: string;
+    /**
+     * When it was posted.
+     */
+    posted_at: string;
+};
+
+/**
+ * A page of journal entries, newest first.
+ */
+export type LedgerEntryPage = {
+    /**
+     * The entries on this page.
+     */
+    items: Array<LedgerEntry>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Whether an order's money has been split: not yet (`pending`), split at acceptance (`split`), or split and reversed because the accepted order was cancelled (`reversed`).
+ */
+export type OrderSplitStatus = 'pending' | 'split' | 'reversed';
+
+/**
+ * An order's money as the ledger holds it: what the customer paid, what the Partner keeps after the commission and its GST, what the platform and the platform fleet take, the tips owed to agents, the refunds and who bore them, and every journal entry of the order.
+ */
+export type OrderMoneySplit = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string | null;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Whether the money is split.
+     */
+    status: OrderSplitStatus;
+    /**
+     * What the customer paid: taken by UPI or card, spent from the Wallet, collected in cash, less what never was kept.
+     */
+    paid: Money;
+    /**
+     * The items the Location sends, tax included.
+     */
+    items: Money;
+    /**
+     * The delivery fee, tax included.
+     */
+    delivery_fee: Money;
+    /**
+     * The tip for the platform fleet's agent.
+     */
+    tip: Money;
+    /**
+     * Other fees the order carries, such as cutlery.
+     */
+    other_fees: Money;
+    /**
+     * What the Partner is owed: the items less the commission and its GST, with its own delivery fee and fees.
+     */
+    partner_share: Money;
+    /**
+     * The platform's commission.
+     */
+    commission: Money;
+    /**
+     * The commission rate in basis points, by the Partner's plan.
+     */
+    commission_rate_bp: number;
+    /**
+     * The Partner's plan the rate came from.
+     */
+    plan: string | null;
+    /**
+     * GST on the commission.
+     */
+    commission_gst: Money;
+    /**
+     * The platform fleet's delivery fee, net of GST.
+     */
+    delivery_fee_revenue: Money;
+    /**
+     * GST included in the platform fleet's delivery fee.
+     */
+    delivery_fee_gst: Money;
+    /**
+     * Tips owed to the platform fleet's agents.
+     */
+    tips_payable: Money;
+    /**
+     * Refunds of the settled order.
+     */
+    refunded: Money;
+    /**
+     * Of those, what the Partner bore.
+     */
+    refunded_by_partner: Money;
+    /**
+     * Of those, what the platform bore.
+     */
+    refunded_by_platform: Money;
+    /**
+     * Every journal entry of the order, oldest first.
+     */
+    entries: Array<LedgerEntry>;
+    /**
+     * Whether every entry's debits equal its credits; always `true`, enforced when written.
+     */
+    balanced: boolean;
+};
+
+/**
+ * One account of the trial balance.
+ */
+export type TrialBalanceLine = {
+    /**
+     * The account.
+     */
+    account_id: string;
+    /**
+     * Its code.
+     */
+    code: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it records.
+     */
+    kind: LedgerAccountKind;
+    /**
+     * Its class.
+     */
+    class: LedgerAccountClass;
+    /**
+     * The side it grows by.
+     */
+    normal_balance: LedgerSide;
+    /**
+     * Everything debited to it.
+     */
+    debits: Money;
+    /**
+     * Everything credited to it.
+     */
+    credits: Money;
+    /**
+     * Its balance in its normal direction.
+     */
+    balance: Money;
+};
+
+/**
+ * Every account with its debits and credits at an instant, and the proof that the journal balances: the debits together equal the credits together.
+ */
+export type TrialBalance = {
+    /**
+     * The instant it was taken at.
+     */
+    at: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Every account that was posted to, by code.
+     */
+    lines: Array<TrialBalanceLine>;
+    /**
+     * Every debit together.
+     */
+    total_debits: Money;
+    /**
+     * Every credit together.
+     */
+    total_credits: Money;
+    /**
+     * Whether the debits equal the credits; always `true`.
+     */
+    balanced: boolean;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -30195,3 +31883,1943 @@ export type SuggestNamesResponses = {
 };
 
 export type SuggestNamesResponse = SuggestNamesResponses[keyof SuggestNamesResponses];
+
+export type GetPaymentOptionsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The Location the order is placed at.
+         */
+        location_id: string;
+        /**
+         * The amount to pay in minor units of the Location's currency, tax included.
+         */
+        amount_minor: number;
+        /**
+         * Whether the Wallet pays first; `true` by default.
+         */
+        use_wallet?: boolean;
+        /**
+         * `delivery` (default), `pickup` or `dine_in`: cash on delivery and cash on collection are separate choices of the Location, and a dine-in bill is not paid in cash here (`cod_not_offered`).
+         */
+        fulfilment?: FulfilmentMethod;
+        /**
+         * Whether the order is scheduled into a slot; a scheduled order is never paid in cash (`cod_not_offered`).
+         */
+        scheduled?: boolean;
+    };
+    url: '/v1/customer/payment-options';
+};
+
+export type GetPaymentOptionsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPaymentOptionsError = GetPaymentOptionsErrors[keyof GetPaymentOptionsErrors];
+
+export type GetPaymentOptionsResponses = {
+    /**
+     * The ways to pay, each with the reason when it is not offered.
+     */
+    200: PaymentOptions;
+};
+
+export type GetPaymentOptionsResponse = GetPaymentOptionsResponses[keyof GetPaymentOptionsResponses];
+
+export type ListCustomerPaymentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this order's payments.
+         */
+        order_id?: string;
+        /**
+         * Only payments of this purpose.
+         */
+        purpose?: PaymentPurpose;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/payments';
+};
+
+export type ListCustomerPaymentsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerPaymentsError = ListCustomerPaymentsErrors[keyof ListCustomerPaymentsErrors];
+
+export type ListCustomerPaymentsResponses = {
+    /**
+     * A page of payments.
+     */
+    200: PaymentPage;
+};
+
+export type ListCustomerPaymentsResponse = ListCustomerPaymentsResponses[keyof ListCustomerPaymentsResponses];
+
+export type GetCustomerPaymentData = {
+    body?: never;
+    path: {
+        /**
+         * The payment.
+         */
+        payment_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/payments/{payment_id}';
+};
+
+export type GetCustomerPaymentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such payment of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerPaymentError = GetCustomerPaymentErrors[keyof GetCustomerPaymentErrors];
+
+export type GetCustomerPaymentResponses = {
+    /**
+     * The payment.
+     */
+    200: Payment;
+};
+
+export type GetCustomerPaymentResponse = GetCustomerPaymentResponses[keyof GetCustomerPaymentResponses];
+
+export type StartPaymentAttemptData = {
+    /**
+     * The method and how it reaches the customer.
+     */
+    body: PaymentAttemptRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The payment.
+         */
+        payment_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/payments/{payment_id}/attempts';
+};
+
+export type StartPaymentAttemptErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such payment of the customer, or no such saved method (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `payment_not_pending`: the payment does not wait for a try (it is confirmed, settled, released or failed); `payment_method_not_offered` with `upi_over_limit`, `provider_unavailable` or `card_expired`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartPaymentAttemptError = StartPaymentAttemptErrors[keyof StartPaymentAttemptErrors];
+
+export type StartPaymentAttemptResponses = {
+    /**
+     * The new try and what the customer does next.
+     */
+    201: PaymentAttemptStarted;
+};
+
+export type StartPaymentAttemptResponse = StartPaymentAttemptResponses[keyof StartPaymentAttemptResponses];
+
+export type TakeRefundInWalletData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The refund.
+         */
+        refund_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/refunds/{refund_id}/to-wallet';
+};
+
+export type TakeRefundInWalletErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, or a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such refund of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `refund_already_sent`: the refund is already on its way to the account; or nothing of it goes to the source (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type TakeRefundInWalletError = TakeRefundInWalletErrors[keyof TakeRefundInWalletErrors];
+
+export type TakeRefundInWalletResponses = {
+    /**
+     * The refund, its source part now in the Wallet.
+     */
+    200: PaymentRefund;
+};
+
+export type TakeRefundInWalletResponse = TakeRefundInWalletResponses[keyof TakeRefundInWalletResponses];
+
+export type ListSavedPaymentMethodsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/payment-methods';
+};
+
+export type ListSavedPaymentMethodsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSavedPaymentMethodsError = ListSavedPaymentMethodsErrors[keyof ListSavedPaymentMethodsErrors];
+
+export type ListSavedPaymentMethodsResponses = {
+    /**
+     * The saved methods.
+     */
+    200: SavedPaymentMethodList;
+};
+
+export type ListSavedPaymentMethodsResponse = ListSavedPaymentMethodsResponses[keyof ListSavedPaymentMethodsResponses];
+
+export type SavePaymentMethodData = {
+    /**
+     * A card or a UPI ID.
+     */
+    body: PaymentMethodCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/payment-methods';
+};
+
+export type SavePaymentMethodErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `payment_method_not_offered` with `provider_unavailable`: the platform has no payment provider.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SavePaymentMethodError = SavePaymentMethodErrors[keyof SavePaymentMethodErrors];
+
+export type SavePaymentMethodResponses = {
+    /**
+     * The setup: saved at once for a UPI ID, the provider's form to open for a card.
+     */
+    201: PaymentMethodSetup;
+};
+
+export type SavePaymentMethodResponse = SavePaymentMethodResponses[keyof SavePaymentMethodResponses];
+
+export type RemoveSavedPaymentMethodData = {
+    body?: never;
+    path: {
+        /**
+         * The saved method.
+         */
+        method_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/payment-methods/{method_id}';
+};
+
+export type RemoveSavedPaymentMethodErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such saved method of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveSavedPaymentMethodError = RemoveSavedPaymentMethodErrors[keyof RemoveSavedPaymentMethodErrors];
+
+export type RemoveSavedPaymentMethodResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type RemoveSavedPaymentMethodResponse = RemoveSavedPaymentMethodResponses[keyof RemoveSavedPaymentMethodResponses];
+
+export type SetDefaultPaymentMethodData = {
+    body?: never;
+    path: {
+        /**
+         * The saved method.
+         */
+        method_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/payment-methods/{method_id}/default';
+};
+
+export type SetDefaultPaymentMethodErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such saved method of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetDefaultPaymentMethodError = SetDefaultPaymentMethodErrors[keyof SetDefaultPaymentMethodErrors];
+
+export type SetDefaultPaymentMethodResponses = {
+    /**
+     * The saved method, now the default.
+     */
+    200: SavedPaymentMethod;
+};
+
+export type SetDefaultPaymentMethodResponse = SetDefaultPaymentMethodResponses[keyof SetDefaultPaymentMethodResponses];
+
+export type GetPaymentMethodSetupData = {
+    body?: never;
+    path: {
+        /**
+         * The setup.
+         */
+        setup_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/payment-method-setups/{setup_id}';
+};
+
+export type GetPaymentMethodSetupErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such setup of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPaymentMethodSetupError = GetPaymentMethodSetupErrors[keyof GetPaymentMethodSetupErrors];
+
+export type GetPaymentMethodSetupResponses = {
+    /**
+     * The setup.
+     */
+    200: PaymentMethodSetup;
+};
+
+export type GetPaymentMethodSetupResponse = GetPaymentMethodSetupResponses[keyof GetPaymentMethodSetupResponses];
+
+export type GetWalletData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/wallet';
+};
+
+export type GetWalletErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetWalletError = GetWalletErrors[keyof GetWalletErrors];
+
+export type GetWalletResponses = {
+    /**
+     * The Wallet.
+     */
+    200: Wallet;
+};
+
+export type GetWalletResponse = GetWalletResponses[keyof GetWalletResponses];
+
+export type ListWalletEntriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only entries of this kind.
+         */
+        kind?: WalletEntryKind;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/wallet/entries';
+};
+
+export type ListWalletEntriesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListWalletEntriesError = ListWalletEntriesErrors[keyof ListWalletEntriesErrors];
+
+export type ListWalletEntriesResponses = {
+    /**
+     * A page of entries.
+     */
+    200: WalletEntryPage;
+};
+
+export type ListWalletEntriesResponse = ListWalletEntriesResponses[keyof ListWalletEntriesResponses];
+
+export type GetWalletStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The month, `YYYY-MM`.
+         */
+        month: string;
+    };
+    query?: never;
+    url: '/v1/customer/wallet/statements/{month}';
+};
+
+export type GetWalletStatementErrors = {
+    /**
+     * `validation_failed`: not a month, or a month still to come.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetWalletStatementError = GetWalletStatementErrors[keyof GetWalletStatementErrors];
+
+export type GetWalletStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: WalletStatement;
+};
+
+export type GetWalletStatementResponse = GetWalletStatementResponses[keyof GetWalletStatementResponses];
+
+export type TopUpWalletData = {
+    /**
+     * The amount and how it is paid.
+     */
+    body: WalletTopUpRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/wallet/top-ups';
+};
+
+export type TopUpWalletErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, `top_up_out_of_range`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such saved method of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `wallet_cap_exceeded`: the Wallet would hold more than ₹50,000.00; the detail offers what fits. `payment_method_not_offered` with `provider_unavailable`, `upi_over_limit` or `card_expired`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type TopUpWalletError = TopUpWalletErrors[keyof TopUpWalletErrors];
+
+export type TopUpWalletResponses = {
+    /**
+     * The top-up's payment and what the customer does next.
+     */
+    201: PaymentAttemptStarted;
+};
+
+export type TopUpWalletResponse = TopUpWalletResponses[keyof TopUpWalletResponses];
+
+export type WithdrawFromWalletData = {
+    /**
+     * The amount.
+     */
+    body: WalletWithdrawalRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/wallet/withdrawals';
+};
+
+export type WithdrawFromWalletErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface; `step_up_required`: the session has no fresh proof.
+     */
+    403: Problem;
+    /**
+     * `withdrawal_exceeds_available`: more than the paid balance not held, the detail saying the most; `withdrawal_source_unavailable`: the paid money cannot go back to a source.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WithdrawFromWalletError = WithdrawFromWalletErrors[keyof WithdrawFromWalletErrors];
+
+export type WithdrawFromWalletResponses = {
+    /**
+     * The withdrawal: its entries and the refunds sent.
+     */
+    201: WalletWithdrawal;
+};
+
+export type WithdrawFromWalletResponse = WithdrawFromWalletResponses[keyof WithdrawFromWalletResponses];
+
+export type ReceiveProviderNoticeData = {
+    /**
+     * The provider's notice, in its own shape.
+     */
+    body: ProviderNotice;
+    path: {
+        /**
+         * The provider: `simulated`.
+         */
+        provider: 'simulated';
+    };
+    query?: never;
+    url: '/v1/payments/notices/{provider}';
+};
+
+export type ReceiveProviderNoticeErrors = {
+    /**
+     * `notice_rejected`: the signature, the amount or the currency did not check out, or the notice is not the provider's; nothing changed.
+     */
+    400: Problem;
+    /**
+     * Not the platform's provider (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReceiveProviderNoticeError = ReceiveProviderNoticeErrors[keyof ReceiveProviderNoticeErrors];
+
+export type ReceiveProviderNoticeResponses = {
+    /**
+     * Taken, or a replay that changed nothing.
+     */
+    200: ProviderNoticeReceipt;
+};
+
+export type ReceiveProviderNoticeResponse = ReceiveProviderNoticeResponses[keyof ReceiveProviderNoticeResponses];
+
+export type GetLocationPaymentSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/payment-settings';
+};
+
+export type GetLocationPaymentSettingsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The member lacks `location:read` at the Location (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Partner or Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationPaymentSettingsError = GetLocationPaymentSettingsErrors[keyof GetLocationPaymentSettingsErrors];
+
+export type GetLocationPaymentSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: LocationPaymentSettings;
+};
+
+export type GetLocationPaymentSettingsResponse = GetLocationPaymentSettingsResponses[keyof GetLocationPaymentSettingsResponses];
+
+export type SetLocationPaymentSettingsData = {
+    /**
+     * The settings as a whole.
+     */
+    body: LocationPaymentSettingsUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/payment-settings';
+};
+
+export type SetLocationPaymentSettingsErrors = {
+    /**
+     * `validation_failed`: a ceiling above the platform's, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The member lacks `location:write` at the Location (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Partner or Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the settings changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetLocationPaymentSettingsError = SetLocationPaymentSettingsErrors[keyof SetLocationPaymentSettingsErrors];
+
+export type SetLocationPaymentSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: LocationPaymentSettings;
+};
+
+export type SetLocationPaymentSettingsResponse = SetLocationPaymentSettingsResponses[keyof SetLocationPaymentSettingsResponses];
+
+export type ListPlatformPaymentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this order's payments.
+         */
+        order_id?: string;
+        /**
+         * Only this customer's payments.
+         */
+        customer_id?: string;
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * Only payments in this status.
+         */
+        status?: PaymentStatus;
+        /**
+         * Only payments by this method.
+         */
+        method?: PaymentMethodKind;
+        /**
+         * Only payments of this purpose.
+         */
+        purpose?: PaymentPurpose;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/payments';
+};
+
+export type ListPlatformPaymentsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformPaymentsError = ListPlatformPaymentsErrors[keyof ListPlatformPaymentsErrors];
+
+export type ListPlatformPaymentsResponses = {
+    /**
+     * A page of payments.
+     */
+    200: PaymentPage;
+};
+
+export type ListPlatformPaymentsResponse = ListPlatformPaymentsResponses[keyof ListPlatformPaymentsResponses];
+
+export type GetPlatformPaymentData = {
+    body?: never;
+    path: {
+        /**
+         * The payment.
+         */
+        payment_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/payments/{payment_id}';
+};
+
+export type GetPlatformPaymentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such payment (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformPaymentError = GetPlatformPaymentErrors[keyof GetPlatformPaymentErrors];
+
+export type GetPlatformPaymentResponses = {
+    /**
+     * The payment.
+     */
+    200: Payment;
+};
+
+export type GetPlatformPaymentResponse = GetPlatformPaymentResponses[keyof GetPlatformPaymentResponses];
+
+export type RefundPaymentData = {
+    /**
+     * The amount, the reason, the note and the payer.
+     */
+    body: PaymentRefundRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The payment.
+         */
+        payment_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/payments/{payment_id}/refunds';
+};
+
+export type RefundPaymentErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), the member lacks `order:refund` (`access_denied`), or the session has no fresh proof (`step_up_required`).
+     */
+    403: Problem;
+    /**
+     * No such payment (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `refund_exceeds_paid`: more than is left to refund; `not_refundable`: nothing was taken yet.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RefundPaymentError = RefundPaymentErrors[keyof RefundPaymentErrors];
+
+export type RefundPaymentResponses = {
+    /**
+     * The refund.
+     */
+    201: PaymentRefund;
+};
+
+export type RefundPaymentResponse = RefundPaymentResponses[keyof RefundPaymentResponses];
+
+export type GetCustomerWalletData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/wallet';
+};
+
+export type GetCustomerWalletErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `wallet:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerWalletError = GetCustomerWalletErrors[keyof GetCustomerWalletErrors];
+
+export type GetCustomerWalletResponses = {
+    /**
+     * The Wallet.
+     */
+    200: Wallet;
+};
+
+export type GetCustomerWalletResponse = GetCustomerWalletResponses[keyof GetCustomerWalletResponses];
+
+export type ListCustomerWalletEntriesData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: {
+        /**
+         * Only entries of this kind.
+         */
+        kind?: WalletEntryKind;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/customers/{customer_id}/wallet/entries';
+};
+
+export type ListCustomerWalletEntriesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `wallet:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerWalletEntriesError = ListCustomerWalletEntriesErrors[keyof ListCustomerWalletEntriesErrors];
+
+export type ListCustomerWalletEntriesResponses = {
+    /**
+     * A page of entries.
+     */
+    200: WalletEntryPage;
+};
+
+export type ListCustomerWalletEntriesResponse = ListCustomerWalletEntriesResponses[keyof ListCustomerWalletEntriesResponses];
+
+export type CreditCustomerWalletData = {
+    /**
+     * The amount, the reason, the note and the payer.
+     */
+    body: WalletCreditRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/wallet/credits';
+};
+
+export type CreditCustomerWalletErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, an amount under ₹1.00, a reason over 40 characters, a Partner payer without its Partner, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `wallet:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such customer or Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `wallet_cap_exceeded`: the Wallet would hold more than its ceiling.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreditCustomerWalletError = CreditCustomerWalletErrors[keyof CreditCustomerWalletErrors];
+
+export type CreditCustomerWalletResponses = {
+    /**
+     * The credit's entry.
+     */
+    201: WalletEntry;
+};
+
+export type CreditCustomerWalletResponse = CreditCustomerWalletResponses[keyof CreditCustomerWalletResponses];
+
+export type CorrectCustomerWalletData = {
+    /**
+     * The balance, the amount, the reason and the note.
+     */
+    body: WalletCorrectionRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/wallet/corrections';
+};
+
+export type CorrectCustomerWalletErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`, a zero amount, a reason over 40 characters, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `wallet:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `correction_exceeds_available`: more down than is available in the balance.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CorrectCustomerWalletError = CorrectCustomerWalletErrors[keyof CorrectCustomerWalletErrors];
+
+export type CorrectCustomerWalletResponses = {
+    /**
+     * The correction's entry.
+     */
+    201: WalletEntry;
+};
+
+export type CorrectCustomerWalletResponse = CorrectCustomerWalletResponses[keyof CorrectCustomerWalletResponses];
+
+export type ListFinanceAlertsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only alerts in this status; `open` by default.
+         */
+        status?: FinanceAlertStatus;
+        /**
+         * Only alerts of this kind.
+         */
+        kind?: FinanceAlertKind;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/finance/alerts';
+};
+
+export type ListFinanceAlertsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListFinanceAlertsError = ListFinanceAlertsErrors[keyof ListFinanceAlertsErrors];
+
+export type ListFinanceAlertsResponses = {
+    /**
+     * A page of alerts.
+     */
+    200: FinanceAlertPage;
+};
+
+export type ListFinanceAlertsResponse = ListFinanceAlertsResponses[keyof ListFinanceAlertsResponses];
+
+export type ResolveFinanceAlertData = {
+    /**
+     * What was done.
+     */
+    body: FinanceAlertResolve;
+    path: {
+        /**
+         * The alert.
+         */
+        alert_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/finance/alerts/{alert_id}/resolve';
+};
+
+export type ResolveFinanceAlertErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such alert (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The alert is resolved already (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolveFinanceAlertError = ResolveFinanceAlertErrors[keyof ResolveFinanceAlertErrors];
+
+export type ResolveFinanceAlertResponses = {
+    /**
+     * The alert, resolved.
+     */
+    200: FinanceAlert;
+};
+
+export type ResolveFinanceAlertResponse = ResolveFinanceAlertResponses[keyof ResolveFinanceAlertResponses];
+
+export type RunReconciliationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/finance/reconciliations';
+};
+
+export type RunReconciliationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The payment provider did not answer (`unavailable`).
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RunReconciliationError = RunReconciliationErrors[keyof RunReconciliationErrors];
+
+export type RunReconciliationResponses = {
+    /**
+     * What the run checked and raised.
+     */
+    200: ReconciliationRun;
+};
+
+export type RunReconciliationResponse = RunReconciliationResponses[keyof RunReconciliationResponses];
+
+export type ListLedgerAccountsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only accounts of this kind.
+         */
+        kind?: LedgerAccountKind;
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * Only this customer's accounts.
+         */
+        customer_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/ledger/accounts';
+};
+
+export type ListLedgerAccountsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLedgerAccountsError = ListLedgerAccountsErrors[keyof ListLedgerAccountsErrors];
+
+export type ListLedgerAccountsResponses = {
+    /**
+     * A page of accounts.
+     */
+    200: LedgerAccountPage;
+};
+
+export type ListLedgerAccountsResponse = ListLedgerAccountsResponses[keyof ListLedgerAccountsResponses];
+
+export type GetLedgerAccountData = {
+    body?: never;
+    path: {
+        /**
+         * The account.
+         */
+        account_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/ledger/accounts/{account_id}';
+};
+
+export type GetLedgerAccountErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such account (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLedgerAccountError = GetLedgerAccountErrors[keyof GetLedgerAccountErrors];
+
+export type GetLedgerAccountResponses = {
+    /**
+     * The account.
+     */
+    200: LedgerAccount;
+};
+
+export type GetLedgerAccountResponse = GetLedgerAccountResponses[keyof GetLedgerAccountResponses];
+
+export type ListLedgerEntriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only entries posting to this account.
+         */
+        account_id?: string;
+        /**
+         * Only this order's entries.
+         */
+        order_id?: string;
+        /**
+         * Only this payment's entries.
+         */
+        payment_id?: string;
+        /**
+         * Only this customer's entries.
+         */
+        customer_id?: string;
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * Only entries of this kind.
+         */
+        kind?: LedgerEntryKind;
+        /**
+         * Only entries posted at or after this instant.
+         */
+        from?: string;
+        /**
+         * Only entries posted before this instant.
+         */
+        until?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/ledger/entries';
+};
+
+export type ListLedgerEntriesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLedgerEntriesError = ListLedgerEntriesErrors[keyof ListLedgerEntriesErrors];
+
+export type ListLedgerEntriesResponses = {
+    /**
+     * A page of entries.
+     */
+    200: LedgerEntryPage;
+};
+
+export type ListLedgerEntriesResponse = ListLedgerEntriesResponses[keyof ListLedgerEntriesResponses];
+
+export type GetLedgerEntryData = {
+    body?: never;
+    path: {
+        /**
+         * The entry.
+         */
+        entry_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/ledger/entries/{entry_id}';
+};
+
+export type GetLedgerEntryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such entry (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLedgerEntryError = GetLedgerEntryErrors[keyof GetLedgerEntryErrors];
+
+export type GetLedgerEntryResponses = {
+    /**
+     * The entry.
+     */
+    200: LedgerEntry;
+};
+
+export type GetLedgerEntryResponse = GetLedgerEntryResponses[keyof GetLedgerEntryResponses];
+
+export type GetOrderMoneySplitData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/ledger/orders/{order_id}';
+};
+
+export type GetOrderMoneySplitErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOrderMoneySplitError = GetOrderMoneySplitErrors[keyof GetOrderMoneySplitErrors];
+
+export type GetOrderMoneySplitResponses = {
+    /**
+     * The split.
+     */
+    200: OrderMoneySplit;
+};
+
+export type GetOrderMoneySplitResponse = GetOrderMoneySplitResponses[keyof GetOrderMoneySplitResponses];
+
+export type GetTrialBalanceData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The instant; now by default.
+         */
+        at?: string;
+    };
+    url: '/v1/platform/ledger/trial-balance';
+};
+
+export type GetTrialBalanceErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetTrialBalanceError = GetTrialBalanceErrors[keyof GetTrialBalanceErrors];
+
+export type GetTrialBalanceResponses = {
+    /**
+     * The trial balance.
+     */
+    200: TrialBalance;
+};
+
+export type GetTrialBalanceResponse = GetTrialBalanceResponses[keyof GetTrialBalanceResponses];

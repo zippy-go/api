@@ -1,0 +1,27 @@
+type: object
+description: Why the last try did not succeed, in the bank's or the provider's words where they are meant for the customer.
+required:
+  - code
+  - message
+  - at
+properties:
+  code:
+    type: string
+    description: "The provider's reason: `declined`, `expired`, `insufficient_funds`, `failed`, `capture_refused` and others; clients show `message`."
+    examples:
+      - declined
+  message:
+    type: string
+    description: A sentence a screen may show as it is.
+    examples:
+      - Your bank declined the payment.
+  at:
+    type: string
+    format: date-time
+    description: When it happened.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - code: declined
+    message: Your bank declined the payment.
+    at: 2026-10-16T09:00:00Z

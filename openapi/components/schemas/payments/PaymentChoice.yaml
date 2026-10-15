@@ -1,0 +1,59 @@
+type: object
+description: One way to pay offered at checkout, or not offered with the reason.
+required:
+  - method
+  - available
+  - refusal
+  - capture_mode
+  - limit
+  - saved
+properties:
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: The way to pay.
+  available:
+    type: boolean
+    description: Whether it can pay this order.
+    examples:
+      - true
+  refusal:
+    oneOf:
+      - $ref: ../payments/PaymentRefusal.yaml
+      - type: "null"
+    description: Why not, when it cannot.
+  capture_mode:
+    oneOf:
+      - $ref: ../payments/CaptureMode.yaml
+      - type: "null"
+    description: When a card or UPI is taken; `null` for cash and the Wallet.
+  limit:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "The most it may pay, where there is a ceiling: the provider's UPI limit, the cash limit."
+  saved:
+    type: array
+    items:
+      $ref: ../payments/SavedPaymentMethod.yaml
+      description: A saved method.
+    description: The customer's saved cards or UPI IDs for this method, the default first; expired cards are left out.
+examples:
+  - method: card
+    available: true
+    refusal: null
+    capture_mode: at_acceptance
+    limit: null
+    saved:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d31
+        kind: card
+        card:
+          brand: visa
+          last4: "4242"
+          exp_month: 12
+          exp_year: 2029
+          holdable: true
+        upi_handle: null
+        is_default: true
+        expires_soon: false
+        expired: false
+        created_at: 2026-10-16T09:00:00Z

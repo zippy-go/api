@@ -1,0 +1,66 @@
+type: object
+description: "How a Location takes cash: on delivery, on collection, and a lower ceiling of its own beneath the platform's. UPI, cards and the Wallet are offered wherever the platform has a provider."
+required:
+  - location_id
+  - cash_on_delivery
+  - cash_on_collection
+  - cash_limit
+  - platform_cash_limit
+  - effective_cash_limit
+  - version
+  - updated_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  cash_on_delivery:
+    type: boolean
+    description: Cash is taken at the door.
+    examples:
+      - true
+  cash_on_collection:
+    type: boolean
+    description: Cash is taken at the counter on collection.
+    examples:
+      - false
+  cash_limit:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The Location's own ceiling per order, below the platform's; `null` for the platform's.
+  platform_cash_limit:
+    $ref: ../common/Money.yaml
+    description: The platform's ceiling per order (`payments.cash_limit_minor`).
+  effective_cash_limit:
+    $ref: ../common/Money.yaml
+    description: "The ceiling that applies: the lower of the two."
+  version:
+    type: integer
+    description: Rises with every change; the `ETag`.
+    minimum: 1
+    examples:
+      - 1
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it last changed; `null` while the Location keeps the defaults.
+    examples:
+      - null
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    cash_on_delivery: true
+    cash_on_collection: false
+    cash_limit: null
+    platform_cash_limit:
+      minor_units: 200000
+      currency: INR
+    effective_cash_limit:
+      minor_units: 200000
+      currency: INR
+    version: 2
+    updated_at: 2026-10-16T09:00:00Z

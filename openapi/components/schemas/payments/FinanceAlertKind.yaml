@@ -1,0 +1,11 @@
+type: string
+description: "What a nightly check found. `provider_missing`: a payment or refund recorded here that the provider has no record of. `unrecorded_at_provider`: the provider holds a payment or refund nobody here recorded. `amount_mismatch`: the provider and the records disagree on an amount. `ledger_mismatch`: the ledger's provider clearing disagrees with what was taken and given back. `wallet_mismatch`: a Wallet's balances are not the sum of its entries. `wallet_liability_mismatch`: the Wallets together disagree with the Wallet liability in the ledger."
+enum:
+  - provider_missing
+  - unrecorded_at_provider
+  - amount_mismatch
+  - ledger_mismatch
+  - wallet_mismatch
+  - wallet_liability_mismatch
+examples:
+  - amount_mismatch

@@ -1,0 +1,20 @@
+type: object
+description: Who pays for credit given.
+required:
+  - kind
+  - partner_id
+properties:
+  kind:
+    $ref: ../wallet/WalletPayerKind.yaml
+    description: The platform or a Partner.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner, when a Partner pays.
+    examples:
+      - null
+examples:
+  - kind: platform
+    partner_id: null

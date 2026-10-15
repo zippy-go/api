@@ -1,0 +1,61 @@
+# Path item for /v1/customer/wallet/withdrawals. Referenced from openapi.yaml.
+post:
+  tags:
+    - Wallet
+  security:
+    - Bearer: []
+  operationId: withdrawFromWallet
+  summary: Send paid money back to its source
+  description: "Sends part of the paid balance that is not held back where it came from, newest paid money first: a top-up to the UPI account or card it was paid with, a refund taken in the Wallet to the order's original payment, while the provider still allows a refund against it (180 days). Promotional money never leaves ZippyGo. Money from cash orders, or older than the provider allows, goes to a UPI ID the customer names, a later step (`withdrawal_source_unavailable`). Needs a fresh step-up of this session (`step_up_required`): a customer proves it by signing in again with a code. Requires `Idempotency-Key`."
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The amount.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/wallet/WalletWithdrawalRequest.yaml
+  responses:
+    "201":
+      description: "The withdrawal: its entries and the refunds sent."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/wallet/WalletWithdrawal.yaml
+    "400":
+      description: "`validation_failed`: `idempotency_key_missing`, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface; `step_up_required`: the session has no fresh proof."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`withdrawal_exceeds_available`: more than the paid balance not held, the detail saying the most; `withdrawal_source_unavailable`: the paid money cannot go back to a source."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

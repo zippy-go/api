@@ -1,0 +1,36 @@
+type: object
+description: "A correction of one balance, up or down, written as a new entry: never more down than is available in that balance. The customer sees the reason and never the note."
+required:
+  - balance
+  - amount_minor
+  - reason
+  - note
+properties:
+  balance:
+    $ref: ../wallet/WalletBalanceKind.yaml
+    description: The balance it corrects.
+  amount_minor:
+    type: integer
+    description: "The correction in paise: positive adds, negative takes away; never zero."
+    format: int64
+    examples:
+      - -5000
+  reason:
+    type: string
+    description: Why, in at most 40 characters the customer reads.
+    minLength: 1
+    maxLength: 40
+    examples:
+      - Credited twice by mistake
+  note:
+    type: string
+    description: Support's note, never shown to the customer.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Duplicate credit on 2026-10-15.
+examples:
+  - balance: promotional
+    amount_minor: -5000
+    reason: Credited twice by mistake
+    note: Duplicate credit on 2026-10-15.

@@ -1,0 +1,45 @@
+type: object
+description: "A new try for a payment that requires one: UPI or a card, within the order's time."
+required:
+  - method
+properties:
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: "`upi` or `card`."
+  flow:
+    $ref: ../payments/PaymentFlow.yaml
+    description: "For UPI, `upi_intent` (the default: open a UPI app) or `upi_collect` (a collect request to `upi_id` or the saved UPI ID); a card is always `card`."
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A saved card or UPI ID of the customer to pay with.
+    examples:
+      - null
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID a collect request goes to, such as `name@okhdfc`; kept only by the provider.
+    maxLength: 256
+    examples:
+      - null
+  save_method:
+    type: boolean
+    description: Save the card or UPI ID for next time once the payment succeeds.
+    examples:
+      - false
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the provider's page sends the customer back, with `payment_id` and `attempt_id` added; its origin must be one of the platform's own apps (`return_url_not_allowed`).
+    format: uri
+    maxLength: 2048
+    examples:
+      - http://localhost:3000/checkout/return
+examples:
+  - method: upi
+    flow: upi_intent
+    return_url: http://localhost:3000/checkout/return

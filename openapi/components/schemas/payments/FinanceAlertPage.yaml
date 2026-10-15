@@ -1,0 +1,22 @@
+type: object
+description: A page of finance alerts, newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ../payments/FinanceAlert.yaml
+      description: An alert.
+    description: The alerts on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items: []
+    next_cursor: null

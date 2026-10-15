@@ -464,3 +464,66 @@ events:
       address or the words.
     payload_schema: ./payloads/notifications.message.failed.v1.schema.json
     example: ./examples/notifications.message.failed.v1.json
+
+  - type: payments.payment.authorized
+    version: 1
+    domain: payments
+    description: "A payment is confirmed: what checkout needs is secured by the provider's word (a card held, a UPI payment made), by the Wallet's hold or by the cash to collect, so the order may be placed. Ordering places the order on it. The envelope's `partner_id` is the order's Partner, `null` for a top-up."
+    payload_schema: ./payloads/payments.payment.authorized.v1.schema.json
+    example: ./examples/payments.payment.authorized.v1.json
+
+  - type: payments.payment.captured
+    version: 1
+    domain: payments
+    description: "Money was taken: a UPI payment made, a card charged at acceptance or at checkout, the Wallet's hold spent at acceptance (the promotional balance first), cash collected, or a top-up paid. Each field is what this capture took, by part; the ledger posts it at once. The envelope's `partner_id` is the order's Partner, `null` for a top-up."
+    payload_schema: ./payloads/payments.payment.captured.v1.schema.json
+    example: ./examples/payments.payment.captured.v1.json
+
+  - type: payments.payment.failed
+    version: 1
+    domain: payments
+    description: A try at the provider did not succeed (declined, refused, expired), or the charge at acceptance was refused. `final` says whether the payment can still be tried again within the order's time; a final failure releases the Wallet's hold. The envelope's `partner_id` is the order's Partner, `null` for a top-up.
+    payload_schema: ./payloads/payments.payment.failed.v1.schema.json
+    example: ./examples/payments.payment.failed.v1.json
+
+  - type: payments.payment.released
+    version: 1
+    domain: payments
+    description: "Holds were given back without taking money: a card hold voided, the Wallet's hold returned, the cash to collect cancelled, because the order was declined, cancelled or expired, or because less was kept at acceptance. The envelope's `partner_id` is the order's Partner."
+    payload_schema: ./payloads/payments.payment.released.v1.schema.json
+    example: ./examples/payments.payment.released.v1.json
+
+  - type: payments.refund.issued
+    version: 1
+    domain: payments
+    description: "A refund was made: what goes back to the original UPI or card payment and what goes to the Wallet, by balance; whether it gives back money the order never kept (`unsettled`) or money of a settled order (`settled`) and who bears it. The ledger posts it at once; the source part is sent to the provider when the customer can no longer take it in the Wallet. The envelope's `partner_id` is the order's Partner."
+    payload_schema: ./payloads/payments.refund.issued.v1.schema.json
+    example: ./examples/payments.refund.issued.v1.json
+
+  - type: payments.refund.settled
+    version: 1
+    domain: payments
+    description: "The source part of a refund reached its end: the provider completed it, or it went to the Wallet's paid balance instead, because the provider refused it or the customer took it there before it was sent. The ledger moves what went to the Wallet. The envelope's `partner_id` is the order's Partner."
+    payload_schema: ./payloads/payments.refund.settled.v1.schema.json
+    example: ./examples/payments.refund.settled.v1.json
+
+  - type: wallet.entry.recorded
+    version: 1
+    domain: wallet
+    description: "A customer's Wallet changed: a top-up, a credit, a refund, a hold for an order, its spend or release, a withdrawal or a correction, as one entry of one balance. The customer's channel carries `wallet.changed` to read again. The ledger posts credits and corrections from it; the other kinds are posted from the payments events that caused them. The envelope's `partner_id` is `null`, or the Partner that pays for a credit."
+    payload_schema: ./payloads/wallet.entry.recorded.v1.schema.json
+    example: ./examples/wallet.entry.recorded.v1.json
+
+  - type: ledger.entry.posted
+    version: 1
+    domain: ledger
+    description: "A journal entry was posted: its kind, what it is about and its postings, the debits equal to the credits. The envelope's `partner_id` is the Partner the entry is about, `null` otherwise."
+    payload_schema: ./payloads/ledger.entry.posted.v1.schema.json
+    example: ./examples/ledger.entry.posted.v1.json
+
+  - type: payments.alert.raised
+    version: 1
+    domain: payments
+    description: "A nightly check found a difference: a payment or refund the provider does not know, one it holds that nobody recorded, an amount the two disagree on, the ledger's provider clearing against the payments, or a Wallet against its entries or the ledger. Listed in Mission Control's Finance section until resolved. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.alert.raised.v1.schema.json
+    example: ./examples/payments.alert.raised.v1.json

@@ -1,0 +1,10 @@
+type: string
+description: "The account's class: an asset, a liability, revenue, an expense, or a memorandum account that records a promise (a card hold) without moving money."
+enum:
+  - asset
+  - liability
+  - revenue
+  - expense
+  - memorandum
+examples:
+  - liability

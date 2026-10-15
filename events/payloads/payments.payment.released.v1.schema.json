@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.payment.released.v1.schema.json",
+  "title": "PaymentsPaymentReleasedPayload",
+  "description": "Payload of `payments.payment.released` version 1. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "payment_id",
+    "purpose",
+    "order_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "method",
+    "status",
+    "version",
+    "cause",
+    "provider",
+    "wallet",
+    "cash"
+  ],
+  "properties": {
+    "payment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The payment."
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "order",
+        "wallet_top_up"
+      ],
+      "description": "An order's payment or a Wallet top-up."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order, for an order's payment."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer who pays."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Partner; `null` for a top-up."
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Location; `null` for a top-up."
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        "wallet"
+      ],
+      "description": "How the rest is paid after the Wallet."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requires_payment",
+        "confirmed",
+        "settled",
+        "released",
+        "failed"
+      ],
+      "description": "The payment's status after the change."
+    },
+    "version": {
+      "type": "integer",
+      "description": "The payment's version after the change, rising with every change.",
+      "minimum": 1
+    },
+    "cause": {
+      "type": "string",
+      "enum": [
+        "declined",
+        "cancelled",
+        "expired",
+        "window_passed",
+        "acceptance"
+      ],
+      "description": "Why: the order was declined, cancelled or expired, its payment window passed, or less was kept at acceptance."
+    },
+    "provider": {
+      "$ref": "#/$defs/money",
+      "description": "What of a card hold was given back."
+    },
+    "wallet": {
+      "$ref": "#/$defs/money",
+      "description": "What of the Wallet's hold was returned."
+    },
+    "cash": {
+      "$ref": "#/$defs/money",
+      "description": "What cash no longer needs collecting."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

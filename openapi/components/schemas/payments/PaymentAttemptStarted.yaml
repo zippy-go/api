@@ -1,0 +1,131 @@
+type: object
+description: "A try made: the payment as it stands and what the customer does next."
+required:
+  - payment
+  - attempt
+  - next_action
+properties:
+  payment:
+    $ref: ../payments/Payment.yaml
+    description: The payment.
+  attempt:
+    $ref: ../payments/PaymentAttempt.yaml
+    description: The new try.
+  next_action:
+    oneOf:
+      - $ref: ../payments/PaymentNextAction.yaml
+      - type: "null"
+    description: What the customer does next; `null` when nothing is needed.
+examples:
+  - payment:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+      purpose: order
+      order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+      customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+      status: requires_payment
+      method: card
+      amount:
+        minor_units: 52000
+        currency: INR
+      wallet:
+        amount:
+          minor_units: 20000
+          currency: INR
+        held:
+          minor_units: 20000
+          currency: INR
+        spent:
+          minor_units: 0
+          currency: INR
+        spent_promotional:
+          minor_units: 0
+          currency: INR
+        spent_paid:
+          minor_units: 0
+          currency: INR
+        released:
+          minor_units: 0
+          currency: INR
+        refunded:
+          minor_units: 0
+          currency: INR
+      provider:
+        method: card
+        amount:
+          minor_units: 32000
+          currency: INR
+        authorized:
+          minor_units: 32000
+          currency: INR
+        captured:
+          minor_units: 0
+          currency: INR
+        released:
+          minor_units: 0
+          currency: INR
+        refunded:
+          minor_units: 0
+          currency: INR
+        capture_mode: at_acceptance
+        upi_reference: null
+        upi_handle: null
+        card: &a1
+          brand: visa
+          last4: "4242"
+          exp_month: 12
+          exp_year: 2029
+          holdable: true
+      cash: null
+      captured:
+        minor_units: 0
+        currency: INR
+      refunded:
+        minor_units: 0
+        currency: INR
+      refundable:
+        minor_units: 0
+        currency: INR
+      next_action: &a3
+        kind: redirect
+        url: https://payments.sandbox.zippygo.example/sim/provider/pay/simpay_01
+        expires_at: 2026-10-16T09:05:00Z
+        message: Approve the payment on the provider's page.
+      failure: null
+      attempts:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+          method: card
+          flow: card
+          status: authorized
+          amount: &a2
+            minor_units: 32000
+            currency: INR
+          provider_reference: simpay_01
+          upi_reference: null
+          upi_handle: null
+          card: *a1
+          failure: null
+          created_at: 2026-10-16T09:00:00Z
+          expires_at: 2026-10-16T09:15:00Z
+          completed_at: 2026-10-16T09:01:00Z
+      refunds: []
+      expires_at: 2026-10-16T09:15:00Z
+      created_at: 2026-10-16T09:00:00Z
+      updated_at: 2026-10-16T09:01:00Z
+      version: 3
+    attempt:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+      method: card
+      flow: card
+      status: pending
+      amount: *a2
+      provider_reference: simpay_01
+      upi_reference: null
+      upi_handle: null
+      card: *a1
+      failure: null
+      created_at: 2026-10-16T09:00:00Z
+      expires_at: 2026-10-16T09:15:00Z
+      completed_at: null
+    next_action: *a3

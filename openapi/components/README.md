@@ -97,6 +97,23 @@ components/
                    page: StorePage, StorePagePartner, StoreLive, StoreHoursDay, StoreFulfilment, StoreMenuRef, StoreCategoryTab; search:
                    SearchResult, SearchStoreHit, SearchStore, SearchProductHit, SearchSuggestion, SearchSuggestionKind,
                    SearchSuggestionList, StoreSearchResult, SearchSynonymGroup, SearchSynonymGroupList, SearchSynonymGroupCreate
+    payments/      Payments: Payment, PaymentPurpose, PaymentStatus, PaymentMethodKind, PaymentWalletPart,
+                   PaymentProviderPart, PaymentCashPart, CaptureMode, CardSummary, PaymentAttempt, PaymentFlow,
+                   AttemptStatus, PaymentNextAction, NextActionKind, PaymentFailure, PaymentPage, PaymentAttemptRequest,
+                   PaymentAttemptStarted; refunds: PaymentRefund, PaymentRefundRequest, PaymentRefundLine,
+                   PaymentRefundReason, PaymentRefundPayer, PaymentRefundStage, PaymentRefundSourceStatus; the ways to
+                   pay: PaymentOptions, PaymentChoice, PaymentRefusal, WalletApplication, PaymentProviderInfo; saved
+                   methods: SavedPaymentMethod, SavedPaymentMethodList, SavedMethodKind, PaymentMethodCreate,
+                   PaymentMethodSetup, MethodSetupStatus; the provider's notices: ProviderNotice, ProviderNoticeReceipt;
+                   a Location's cash: LocationPaymentSettings, LocationPaymentSettingsUpdate; the nightly checks:
+                   FinanceAlert, FinanceAlertKind, FinanceAlertStatus, FinanceAlertSubject, FinanceAlertPage,
+                   FinanceAlertResolve, ReconciliationRun
+    wallet/        The Wallet: Wallet, WalletSubBalance, WalletBalanceKind, WalletBalances, WalletEntry, WalletEntryKind,
+                   WalletEntryPage, WalletPayer, WalletPayerKind, WalletStatement, WalletTopUpRequest,
+                   WalletWithdrawalRequest, WalletWithdrawal, WalletCreditRequest, WalletCorrectionRequest
+    ledger/        The ledger: LedgerAccount, LedgerAccountKind, LedgerAccountClass, LedgerSide, LedgerAccountPage,
+                   LedgerEntry, LedgerEntryKind, LedgerPosting, LedgerEntryPage, OrderMoneySplit, OrderSplitStatus,
+                   TrialBalance, TrialBalanceLine
     <domain>/      One folder per further domain, one file per schema
   parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath,
                    IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader

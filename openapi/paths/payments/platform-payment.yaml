@@ -1,0 +1,60 @@
+# Path item for /v1/platform/payments/{payment_id}. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: getPlatformPayment
+  summary: One payment
+  description: A payment with its parts, every try at the provider and every refund with support's note and its payer. `order:read`.
+  parameters:
+    - name: payment_id
+      in: path
+      required: true
+      description: The payment.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: The payment.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/Payment.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such payment (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.payment.captured.v1.schema.json",
+  "title": "PaymentsPaymentCapturedPayload",
+  "description": "Payload of `payments.payment.captured` version 1. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "payment_id",
+    "purpose",
+    "order_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "method",
+    "status",
+    "version",
+    "cause",
+    "provider",
+    "wallet_promotional",
+    "wallet_paid",
+    "cash",
+    "released",
+    "captured_total",
+    "attempt_id",
+    "provider_reference",
+    "upi_reference"
+  ],
+  "properties": {
+    "payment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The payment."
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "order",
+        "wallet_top_up"
+      ],
+      "description": "An order's payment or a Wallet top-up."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order, for an order's payment."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer who pays."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Partner; `null` for a top-up."
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Location; `null` for a top-up."
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        "wallet"
+      ],
+      "description": "How the rest is paid after the Wallet."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requires_payment",
+        "confirmed",
+        "settled",
+        "released",
+        "failed"
+      ],
+      "description": "The payment's status after the change."
+    },
+    "version": {
+      "type": "integer",
+      "description": "The payment's version after the change, rising with every change.",
+      "minimum": 1
+    },
+    "cause": {
+      "type": "string",
+      "enum": [
+        "upi_paid",
+        "acceptance",
+        "charged_at_checkout",
+        "hold_expiring",
+        "cash_collected",
+        "top_up"
+      ],
+      "description": "What took the money: a UPI payment (`upi_paid`), a card charged when the Location accepted (`acceptance`), a card that cannot be held charged at checkout (`charged_at_checkout`), the Wallet spent at acceptance (also `acceptance`), a hold charged before it would lapse (`hold_expiring`), cash collected (`cash_collected`), a top-up paid (`top_up`)."
+    },
+    "provider": {
+      "$ref": "#/$defs/money",
+      "description": "What the provider took in this capture."
+    },
+    "wallet_promotional": {
+      "$ref": "#/$defs/money",
+      "description": "What was spent from the Wallet's promotional balance."
+    },
+    "wallet_paid": {
+      "$ref": "#/$defs/money",
+      "description": "What was spent from the Wallet's paid balance."
+    },
+    "cash": {
+      "$ref": "#/$defs/money",
+      "description": "What was collected in cash."
+    },
+    "released": {
+      "$ref": "#/$defs/money",
+      "description": "What of a card hold was given back with this capture, when less was charged than held."
+    },
+    "captured_total": {
+      "$ref": "#/$defs/money",
+      "description": "Everything taken on the payment so far."
+    },
+    "attempt_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The provider try, when the provider took money."
+    },
+    "provider_reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The provider's reference of that try."
+    },
+    "upi_reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The UPI transaction reference, for UPI."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

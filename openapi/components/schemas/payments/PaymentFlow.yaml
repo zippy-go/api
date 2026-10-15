@@ -1,0 +1,8 @@
+type: string
+description: "How an attempt reaches the customer: a UPI app opened on the device (`upi_intent`), a collect request to a UPI ID (`upi_collect`), or the provider's card form (`card`)."
+enum:
+  - upi_intent
+  - upi_collect
+  - card
+examples:
+  - upi_intent

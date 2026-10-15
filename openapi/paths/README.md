@@ -126,6 +126,19 @@ paths/
   catalog/store*.yaml           GET /v1/storefront/stores/{location_id} (store page), menu, menu/categories/{category_id},
                                 items/{item_id}, search, search/suggestions (tags Store pages and Search)
   catalog/search*.yaml          GET /v1/storefront/search, /v1/storefront/search/suggestions (tag Search)
+  payments/payment-options.yaml GET /v1/customer/payment-options
+  payments/customer-payment*.yaml GET /v1/customer/payments (+ {payment_id}; attempts, POST)
+  payments/customer-refund-to-wallet.yaml POST /v1/customer/refunds/{refund_id}/to-wallet
+  payments/payment-method*.yaml GET, POST /v1/customer/payment-methods (+ {method_id}, DELETE; default, PUT);
+                                payment-method-setup.yaml GET /v1/customer/payment-method-setups/{setup_id}
+  payments/provider-notices.yaml POST /v1/payments/notices/{provider}
+  payments/location-payment-settings.yaml GET, PUT .../locations/{location_id}/payment-settings
+  payments/platform-payment*.yaml GET /v1/platform/payments (+ {payment_id}; refunds, POST)
+  payments/finance-*.yaml       GET /v1/platform/finance/alerts (+ {alert_id}/resolve, POST), POST /v1/platform/finance/reconciliations
+  wallet/wallet*.yaml           GET /v1/customer/wallet, entries, statements/{month}; POST top-ups, withdrawals
+  wallet/platform-customer-wallet*.yaml GET /v1/platform/customers/{customer_id}/wallet, entries; POST credits, corrections
+  ledger/*.yaml                 GET /v1/platform/ledger/accounts (+ {account_id}), entries (+ {entry_id}), orders/{order_id},
+                                trial-balance
   orders/orders.yaml            /v1/orders            (collection, planned)
   orders/order.yaml             /v1/orders/{order_id} (single resource, planned)
   notifications/me-push.yaml    GET, PUT, DELETE /v1/me/push (+ me-push-opened.yaml, POST /v1/me/push/opened)

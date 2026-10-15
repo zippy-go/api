@@ -1,0 +1,25 @@
+type: string
+description: "Why money goes back. Support's reasons: late preparation, accepted in error, incorrect order, missing items, an allergen or dietary request ignored, late delivery, delivery to the wrong address, damaged on arrival, the agent's behaviour, a promo code or discount issue, a technical issue, a billing discrepancy, the customer asked to cancel, other. The platform's own: the order was declined, cancelled or expired, lines were left out at acceptance, a payment was confirmed after its order ended, a Wallet withdrawal."
+enum:
+  - late_prep_time
+  - accepted_in_error
+  - incorrect_order
+  - missing_items
+  - allergen_ignored
+  - late_delivery
+  - wrong_address
+  - damaged_on_arrival
+  - agent_behaviour
+  - promo_issue
+  - technical_issue
+  - billing_discrepancy
+  - customer_asked_to_cancel
+  - other
+  - declined
+  - cancelled
+  - expired
+  - lines_left_out
+  - paid_after_end
+  - wallet_withdrawal
+examples:
+  - missing_items

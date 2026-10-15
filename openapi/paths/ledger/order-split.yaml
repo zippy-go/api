@@ -1,0 +1,54 @@
+# Path item for /v1/platform/ledger/orders/{order_id}. Referenced from openapi.yaml.
+get:
+  tags:
+    - Ledger
+  security:
+    - Bearer: []
+  operationId: getOrderMoneySplit
+  summary: An order's money split
+  description: "What an order's money became: what the customer paid, the Partner's share after the commission by its plan and the GST on it, the platform fleet's delivery fee and its GST, the tips owed to agents, the refunds and who bore them, with every journal entry of the order. An order the ledger has not seen answers with nothing split. `ledger:read`."
+  parameters:
+    - name: order_id
+      in: path
+      required: true
+      description: The order.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: The split.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/ledger/OrderMoneySplit.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `ledger:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

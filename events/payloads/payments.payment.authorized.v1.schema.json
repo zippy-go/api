@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.payment.authorized.v1.schema.json",
+  "title": "PaymentsPaymentAuthorizedPayload",
+  "description": "Payload of `payments.payment.authorized` version 1. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "payment_id",
+    "purpose",
+    "order_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "method",
+    "status",
+    "version",
+    "amount",
+    "wallet_held",
+    "provider_authorized",
+    "provider_captured",
+    "cash_to_collect",
+    "capture_mode",
+    "attempt_id",
+    "provider_reference"
+  ],
+  "properties": {
+    "payment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The payment."
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "order",
+        "wallet_top_up"
+      ],
+      "description": "An order's payment or a Wallet top-up."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order, for an order's payment."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer who pays."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Partner; `null` for a top-up."
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Location; `null` for a top-up."
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        "wallet"
+      ],
+      "description": "How the rest is paid after the Wallet."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requires_payment",
+        "confirmed",
+        "settled",
+        "released",
+        "failed"
+      ],
+      "description": "The payment's status after the change."
+    },
+    "version": {
+      "type": "integer",
+      "description": "The payment's version after the change, rising with every change.",
+      "minimum": 1
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "The whole amount."
+    },
+    "wallet_held": {
+      "$ref": "#/$defs/money",
+      "description": "What the Wallet holds for it."
+    },
+    "provider_authorized": {
+      "$ref": "#/$defs/money",
+      "description": "What a card hold secures, to be charged when the Location accepts."
+    },
+    "provider_captured": {
+      "$ref": "#/$defs/money",
+      "description": "What the provider already took: a UPI payment, or a card that cannot be held."
+    },
+    "cash_to_collect": {
+      "$ref": "#/$defs/money",
+      "description": "The cash to collect on delivery or collection."
+    },
+    "capture_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "at_acceptance",
+        "at_checkout",
+        null
+      ],
+      "description": "When the provider part is taken; `null` without one."
+    },
+    "attempt_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The try that succeeded; `null` when no provider was needed."
+    },
+    "provider_reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The provider's reference of that try."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

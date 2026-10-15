@@ -1,0 +1,68 @@
+type: object
+description: A card or UPI ID the customer saved, kept as the provider's token. A card is its brand, last four digits and expiry; a UPI ID its last part.
+required:
+  - id
+  - kind
+  - card
+  - upi_handle
+  - is_default
+  - expires_soon
+  - expired
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The saved method.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d31
+  kind:
+    $ref: ../payments/SavedMethodKind.yaml
+    description: A card or a UPI ID.
+  card:
+    oneOf:
+      - $ref: ../payments/CardSummary.yaml
+      - type: "null"
+    description: The card, for a card.
+  upi_handle:
+    type:
+      - string
+      - "null"
+    description: The last part of the UPI ID, for a UPI ID, such as `@okhdfc`.
+    examples:
+      - null
+  is_default:
+    type: boolean
+    description: Offered first at checkout.
+    examples:
+      - true
+  expires_soon:
+    type: boolean
+    description: A card expiring within 60 days.
+    examples:
+      - false
+  expired:
+    type: boolean
+    description: A card past its expiry month; it is not offered at checkout.
+    examples:
+      - false
+  created_at:
+    type: string
+    format: date-time
+    description: When it was saved.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d31
+    kind: card
+    card:
+      brand: visa
+      last4: "4242"
+      exp_month: 12
+      exp_year: 2029
+      holdable: true
+    upi_handle: null
+    is_default: true
+    expires_soon: false
+    expired: false
+    created_at: 2026-10-16T09:00:00Z

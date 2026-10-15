@@ -1,0 +1,57 @@
+type: object
+description: "Saving a card without an order: the provider's form to open, then the saved card once the provider confirms."
+required:
+  - id
+  - kind
+  - status
+  - next_action
+  - method
+  - created_at
+  - expires_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The setup.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d41
+  kind:
+    $ref: ../payments/SavedMethodKind.yaml
+    description: A card.
+  status:
+    $ref: ../payments/MethodSetupStatus.yaml
+    description: Where it stands.
+  next_action:
+    oneOf:
+      - $ref: ../payments/PaymentNextAction.yaml
+      - type: "null"
+    description: The provider's form, while pending.
+  method:
+    oneOf:
+      - $ref: ../payments/SavedPaymentMethod.yaml
+      - type: "null"
+    description: The saved card, once saved.
+  created_at:
+    type: string
+    format: date-time
+    description: When it began.
+    examples:
+      - 2026-10-16T09:00:00Z
+  expires_at:
+    type: string
+    format: date-time
+    description: When the form stops working.
+    examples:
+      - 2026-10-16T09:15:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d41
+    kind: card
+    status: pending
+    next_action:
+      kind: redirect
+      url: https://payments.sandbox.zippygo.example/sim/provider/pay/simpay_01
+      expires_at: 2026-10-16T09:05:00Z
+      message: Approve the payment on the provider's page.
+    method: null
+    created_at: 2026-10-16T09:00:00Z
+    expires_at: 2026-10-16T09:15:00Z

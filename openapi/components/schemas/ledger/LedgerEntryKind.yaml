@@ -1,0 +1,14 @@
+type: string
+description: "What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected."
+enum:
+  - payment_captured
+  - card_held
+  - card_hold_released
+  - order_split
+  - order_split_reversed
+  - refund_issued
+  - refund_to_wallet
+  - wallet_credit
+  - wallet_correction
+examples:
+  - order_split

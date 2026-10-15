@@ -1,0 +1,80 @@
+type: object
+description: The part of a payment the provider takes, by UPI or by card.
+required:
+  - method
+  - amount
+  - authorized
+  - captured
+  - released
+  - refunded
+  - capture_mode
+  - upi_reference
+  - upi_handle
+  - card
+properties:
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: "`upi` or `card`."
+  amount:
+    $ref: ../common/Money.yaml
+    description: What the provider is asked for.
+  authorized:
+    $ref: ../common/Money.yaml
+    description: What a card hold secures now.
+  captured:
+    $ref: ../common/Money.yaml
+    description: What the provider has taken.
+  released:
+    $ref: ../common/Money.yaml
+    description: What of a card hold was given back without being taken.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What refunds sent back to this payment.
+  capture_mode:
+    $ref: ../payments/CaptureMode.yaml
+    description: When the provider part is taken.
+  upi_reference:
+    type:
+      - string
+      - "null"
+    description: The UPI transaction reference, once paid; shown on the receipt.
+    examples:
+      - null
+  upi_handle:
+    type:
+      - string
+      - "null"
+    description: The last part of the UPI ID that paid, never the whole ID.
+    examples:
+      - null
+  card:
+    oneOf:
+      - $ref: ../payments/CardSummary.yaml
+      - type: "null"
+    description: The card, when paid by card.
+examples:
+  - method: card
+    amount:
+      minor_units: 32000
+      currency: INR
+    authorized:
+      minor_units: 32000
+      currency: INR
+    captured:
+      minor_units: 0
+      currency: INR
+    released:
+      minor_units: 0
+      currency: INR
+    refunded:
+      minor_units: 0
+      currency: INR
+    capture_mode: at_acceptance
+    upi_reference: null
+    upi_handle: null
+    card:
+      brand: visa
+      last4: "4242"
+      exp_month: 12
+      exp_year: 2029
+      holdable: true

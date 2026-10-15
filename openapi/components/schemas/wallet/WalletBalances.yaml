@@ -1,0 +1,19 @@
+type: object
+description: The two balances at an instant.
+required:
+  - paid
+  - promotional
+properties:
+  paid:
+    $ref: ../common/Money.yaml
+    description: The paid balance.
+  promotional:
+    $ref: ../common/Money.yaml
+    description: The promotional balance.
+examples:
+  - paid:
+      minor_units: 30000
+      currency: INR
+    promotional:
+      minor_units: 5000
+      currency: INR

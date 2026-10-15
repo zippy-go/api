@@ -1,0 +1,162 @@
+type: object
+description: "One refund, its own record: what goes back to the original UPI or card payment, what goes to the Wallet and to which balance, why, who pays, and where the source part stands."
+required:
+  - id
+  - payment_id
+  - order_id
+  - amount
+  - to_source
+  - to_wallet
+  - to_wallet_paid
+  - to_wallet_promotional
+  - source_status
+  - can_switch_to_wallet
+  - stage
+  - payer
+  - reason
+  - note
+  - lines
+  - provider_reference
+  - created_at
+  - send_after
+  - sent_at
+  - completed_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The refund.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d21
+  payment_id:
+    type: string
+    format: uuid
+    description: The payment it gives back.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order, for an order's payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  amount:
+    $ref: ../common/Money.yaml
+    description: The whole refund.
+  to_source:
+    $ref: ../common/Money.yaml
+    description: What goes back to the original UPI or card payment, never more than it was charged less what was refunded to it.
+  to_wallet:
+    $ref: ../common/Money.yaml
+    description: What goes to the Wallet.
+  to_wallet_paid:
+    $ref: ../common/Money.yaml
+    description: Of what goes to the Wallet, to the paid balance.
+  to_wallet_promotional:
+    $ref: ../common/Money.yaml
+    description: Of what goes to the Wallet, to the promotional balance, where it was spent from.
+  source_status:
+    $ref: ../payments/PaymentRefundSourceStatus.yaml
+    description: Where the source part stands.
+  can_switch_to_wallet:
+    type: boolean
+    description: Whether the customer may still take the source part in the Wallet at once.
+    examples:
+      - true
+  stage:
+    $ref: ../payments/PaymentRefundStage.yaml
+    description: Money the order never kept, or money of a settled order.
+  payer:
+    oneOf:
+      - $ref: ../payments/PaymentRefundPayer.yaml
+      - type: "null"
+    description: Who bears a refund of a settled order; `null` otherwise.
+  reason:
+    $ref: ../payments/PaymentRefundReason.yaml
+    description: Why.
+  note:
+    type:
+      - string
+      - "null"
+    description: Support's note; Mission Control only, `null` for the customer.
+    maxLength: 1000
+    examples:
+      - null
+  lines:
+    type: array
+    items:
+      $ref: ../payments/PaymentRefundLine.yaml
+      description: A line given back.
+    description: The order lines it gives back, when it names them.
+  provider_reference:
+    type:
+      - string
+      - "null"
+    description: The provider's reference of the source refund, once sent.
+    examples:
+      - null
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-16T09:20:00Z
+  send_after:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When a pending source refund is sent to the provider, unless the customer takes it in the Wallet first.
+    examples:
+      - 2026-10-16T09:35:00Z
+  sent_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was sent to the provider.
+    examples:
+      - null
+  completed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the provider completed it, or it went to the Wallet.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d21
+    payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    amount:
+      minor_units: 9000
+      currency: INR
+    to_source:
+      minor_units: 9000
+      currency: INR
+    to_wallet:
+      minor_units: 0
+      currency: INR
+    to_wallet_paid:
+      minor_units: 0
+      currency: INR
+    to_wallet_promotional:
+      minor_units: 0
+      currency: INR
+    source_status: pending
+    can_switch_to_wallet: true
+    stage: settled
+    payer: partner
+    reason: missing_items
+    note: null
+    lines:
+      - line_id: line-3
+        quantity: 1
+    provider_reference: null
+    created_at: 2026-10-16T09:20:00Z
+    send_after: 2026-10-16T09:35:00Z
+    sent_at: null
+    completed_at: null

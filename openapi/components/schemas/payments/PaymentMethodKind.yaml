@@ -1,0 +1,9 @@
+type: string
+description: "How the rest of an order is paid once the Wallet has paid its part: by UPI, by a card, in cash on delivery or on collection, or by the Wallet alone when it covers everything."
+enum:
+  - upi
+  - card
+  - cash
+  - wallet
+examples:
+  - upi

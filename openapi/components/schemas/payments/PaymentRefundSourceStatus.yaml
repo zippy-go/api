@@ -1,0 +1,11 @@
+type: string
+description: "Where the part of a refund that goes back to the original UPI or card payment stands. `none`: nothing goes to the source. `pending`: decided, not yet sent to the provider; the customer may still take it in the Wallet at once. `sent`: on its way; it usually arrives within 5 working days. `succeeded`: the provider completed it. `moved_to_wallet`: the provider refused it and the amount went to the Wallet's paid balance. `switched_to_wallet`: the customer took it in the Wallet before it was sent."
+enum:
+  - none
+  - pending
+  - sent
+  - succeeded
+  - moved_to_wallet
+  - switched_to_wallet
+examples:
+  - pending

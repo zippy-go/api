@@ -1,0 +1,36 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f31",
+  "type": "wallet.entry.recorded",
+  "version": 1,
+  "occurred_at": "2026-10-16T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "entry_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10",
+    "kind": "credit",
+    "balance": "promotional",
+    "amount": {
+      "minor_units": 5000,
+      "currency": "INR"
+    },
+    "held": {
+      "minor_units": 0,
+      "currency": "INR"
+    },
+    "balance_after": {
+      "minor_units": 5000,
+      "currency": "INR"
+    },
+    "held_after": {
+      "minor_units": 0,
+      "currency": "INR"
+    },
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "payment_id": null,
+    "refund_id": null,
+    "payer": "platform",
+    "payer_partner_id": null,
+    "wallet_version": 1
+  }
+}

@@ -1,0 +1,37 @@
+type: object
+description: What the customer does next to finish a payment. The order is placed from the provider's word, never from the browser coming back.
+required:
+  - kind
+  - url
+  - expires_at
+  - message
+properties:
+  kind:
+    $ref: ../payments/NextActionKind.yaml
+    description: Open the page, or approve in the UPI app.
+  url:
+    type:
+      - string
+      - "null"
+    description: "The page to open: the provider's form, or the UPI app. For `approve_in_app` it is `null` with a real provider; the simulated provider answers its page standing in for the UPI app."
+    format: uri
+    examples:
+      - https://payments.sandbox.zippygo.example/sim/provider/pay/simpay_01
+  expires_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When this request stops working: a UPI request after 5 minutes, a card form when the order's time is up."
+    examples:
+      - 2026-10-16T09:05:00Z
+  message:
+    type: string
+    description: A sentence a screen may show as it is.
+    examples:
+      - Approve the payment on the provider's page.
+examples:
+  - kind: redirect
+    url: https://payments.sandbox.zippygo.example/sim/provider/pay/simpay_01
+    expires_at: 2026-10-16T09:05:00Z
+    message: Approve the payment on the provider's page.

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.refund.issued.v1.schema.json",
+  "title": "PaymentsRefundIssuedPayload",
+  "description": "Payload of `payments.refund.issued` version 1. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "refund_id",
+    "payment_id",
+    "purpose",
+    "order_id",
+    "customer_id",
+    "partner_id",
+    "amount",
+    "to_source",
+    "to_wallet_paid",
+    "to_wallet_promotional",
+    "stage",
+    "payer",
+    "reason",
+    "source_status",
+    "method"
+  ],
+  "properties": {
+    "refund_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The refund."
+    },
+    "payment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The payment it gives back."
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "order",
+        "wallet_top_up"
+      ],
+      "description": "An order's payment or a Wallet top-up."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order, for an order's payment."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order's Partner."
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "The whole refund."
+    },
+    "to_source": {
+      "$ref": "#/$defs/money",
+      "description": "What goes back to the original UPI or card payment."
+    },
+    "to_wallet_paid": {
+      "$ref": "#/$defs/money",
+      "description": "What goes to the Wallet's paid balance."
+    },
+    "to_wallet_promotional": {
+      "$ref": "#/$defs/money",
+      "description": "What goes to the Wallet's promotional balance, where it was spent from."
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "unsettled",
+        "settled"
+      ],
+      "description": "Money the order never kept, or money of a settled order."
+    },
+    "payer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "partner",
+        "platform",
+        null
+      ],
+      "description": "Who bears a refund of a settled order."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why, a `PaymentRefundReason` of the API."
+    },
+    "source_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pending",
+        "sent",
+        "succeeded",
+        "moved_to_wallet",
+        "switched_to_wallet"
+      ],
+      "description": "Where the source part stands."
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        "wallet"
+      ],
+      "description": "How the payment was made."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

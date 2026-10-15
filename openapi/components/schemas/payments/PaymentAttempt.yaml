@@ -1,0 +1,109 @@
+type: object
+description: "One try at the provider: a UPI request or a card form. A payment keeps every try, newest first."
+required:
+  - id
+  - method
+  - flow
+  - status
+  - amount
+  - provider_reference
+  - upi_reference
+  - upi_handle
+  - card
+  - failure
+  - created_at
+  - expires_at
+  - completed_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The attempt.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+  method:
+    $ref: ../payments/PaymentMethodKind.yaml
+    description: "`upi` or `card`."
+  flow:
+    $ref: ../payments/PaymentFlow.yaml
+    description: How it reached the customer.
+  status:
+    $ref: ../payments/AttemptStatus.yaml
+    description: Where it stands.
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it asked for.
+  provider_reference:
+    type:
+      - string
+      - "null"
+    description: The provider's own reference.
+    examples:
+      - simpay_01
+  upi_reference:
+    type:
+      - string
+      - "null"
+    description: The UPI transaction reference, once paid.
+    examples:
+      - null
+  upi_handle:
+    type:
+      - string
+      - "null"
+    description: The last part of the UPI ID, never the whole ID.
+    examples:
+      - null
+  card:
+    oneOf:
+      - $ref: ../payments/CardSummary.yaml
+      - type: "null"
+    description: The card, for a card attempt.
+  failure:
+    oneOf:
+      - $ref: ../payments/PaymentFailure.yaml
+      - type: "null"
+    description: Why it did not succeed.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-16T09:00:00Z
+  expires_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it stops working.
+    examples:
+      - 2026-10-16T09:15:00Z
+  completed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it reached its end.
+    examples:
+      - 2026-10-16T09:01:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+    method: card
+    flow: card
+    status: authorized
+    amount:
+      minor_units: 32000
+      currency: INR
+    provider_reference: simpay_01
+    upi_reference: null
+    upi_handle: null
+    card:
+      brand: visa
+      last4: "4242"
+      exp_month: 12
+      exp_year: 2029
+      holdable: true
+    failure: null
+    created_at: 2026-10-16T09:00:00Z
+    expires_at: 2026-10-16T09:15:00Z
+    completed_at: 2026-10-16T09:01:00Z

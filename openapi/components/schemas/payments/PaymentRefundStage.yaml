@@ -1,0 +1,7 @@
+type: string
+description: "Whether a refund gives back money the order never kept (`unsettled`: a decline, a cancellation, an expiry, lines left out at acceptance, a payment confirmed after the order ended) or money of an order already settled (`settled`: a refund after acceptance, charged to its payer)."
+enum:
+  - unsettled
+  - settled
+examples:
+  - settled

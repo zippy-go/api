@@ -1,0 +1,61 @@
+type: object
+description: One run of the checks that compare the provider's records with the payments and the ledger, and every Wallet with its entries and with the ledger.
+required:
+  - started_at
+  - finished_at
+  - since
+  - payments_checked
+  - refunds_checked
+  - wallets_checked
+  - alerts_raised
+properties:
+  started_at:
+    type: string
+    format: date-time
+    description: When it started.
+    examples:
+      - 2026-10-16T09:00:00Z
+  finished_at:
+    type: string
+    format: date-time
+    description: When it finished.
+    examples:
+      - 2026-10-16T09:01:00Z
+  since:
+    type: string
+    format: date-time
+    description: The start of the window it compared, two days back by default.
+    examples:
+      - 2026-10-14T09:00:00Z
+  payments_checked:
+    type: integer
+    description: Payments compared.
+    minimum: 0
+    examples:
+      - 12
+  refunds_checked:
+    type: integer
+    description: Refunds compared.
+    minimum: 0
+    examples:
+      - 3
+  wallets_checked:
+    type: integer
+    description: Wallets added up again.
+    minimum: 0
+    examples:
+      - 5
+  alerts_raised:
+    type: integer
+    description: New alerts.
+    minimum: 0
+    examples:
+      - 0
+examples:
+  - started_at: 2026-10-16T09:00:00Z
+    finished_at: 2026-10-16T09:01:00Z
+    since: 2026-10-14T09:00:00Z
+    payments_checked: 12
+    refunds_checked: 3
+    wallets_checked: 5
+    alerts_raised: 0

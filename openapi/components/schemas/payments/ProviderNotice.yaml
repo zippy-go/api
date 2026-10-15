@@ -1,0 +1,14 @@
+type: object
+description: "A notice the payment provider sends, in its own shape, verified by its signature header before anything is read. The platform acts on the provider's word only: the notice names a payment, a refund or a saved card whose amount and currency are checked against the records, and a notice seen before changes nothing."
+additionalProperties: true
+examples:
+  - id: simevt_01
+    type: payment.captured
+    created_at: 2026-10-16T09:00:00Z
+    data:
+      payment:
+        id: simpay_01
+        merchant_reference: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d11
+        amount: 32000
+        currency: INR
+        status: captured

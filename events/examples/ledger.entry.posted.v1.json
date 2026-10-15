@@ -1,0 +1,37 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f31",
+  "type": "ledger.entry.posted",
+  "version": 1,
+  "occurred_at": "2026-10-16T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "entry_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01",
+    "kind": "payment_captured",
+    "currency": "INR",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "payment_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01",
+    "refund_id": null,
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10",
+    "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+    "source_event_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f32",
+    "postings": [
+      {
+        "account_code": "provider_clearing",
+        "side": "debit",
+        "amount": {
+          "minor_units": 32000,
+          "currency": "INR"
+        }
+      },
+      {
+        "account_code": "order_clearing",
+        "side": "credit",
+        "amount": {
+          "minor_units": 32000,
+          "currency": "INR"
+        }
+      }
+    ]
+  }
+}

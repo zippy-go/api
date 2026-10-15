@@ -1,0 +1,26 @@
+type: object
+description: "One of the Wallet's balances: what it holds, what orders hold of it, and what is available."
+required:
+  - balance
+  - held
+  - available
+properties:
+  balance:
+    $ref: ../common/Money.yaml
+    description: "The balance: the sum of its entries."
+  held:
+    $ref: ../common/Money.yaml
+    description: What open orders hold of it.
+  available:
+    $ref: ../common/Money.yaml
+    description: The balance less what is held.
+examples:
+  - balance:
+      minor_units: 30000
+      currency: INR
+    held:
+      minor_units: 0
+      currency: INR
+    available:
+      minor_units: 30000
+      currency: INR

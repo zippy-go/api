@@ -1,0 +1,29 @@
+type: object
+description: "The cash part of an order paid on delivery or on collection: nothing is taken at checkout; the amount to collect becomes what will be sent when the Location accepts."
+required:
+  - amount
+  - collected
+  - collected_at
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The amount to collect.
+  collected:
+    $ref: ../common/Money.yaml
+    description: What was collected.
+  collected_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was collected.
+    examples:
+      - null
+examples:
+  - amount:
+      minor_units: 42000
+      currency: INR
+    collected:
+      minor_units: 0
+      currency: INR
+    collected_at: null

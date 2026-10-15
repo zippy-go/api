@@ -83,6 +83,15 @@ with the identifiers when it is needed.
 | `catalog.brand.changed` | 1 | A brand of a store's own list changed. Payload: `location_id`, `brand_id`, `change`, `revision`. |
 | `catalog.menu.published` | 1 | A store's menu was rebuilt into a new published document. Payload: `location_id`, `version`, `revision`, `published_at`, `items`. |
 | `catalog.search.missed` | 1 | A search found nothing, recorded without the customer's identity. Not scoped to a partner. Payload: `words`, `service_area_id`, `vertical_id`, `location_id`, `searched_at`. |
+| `payments.payment.authorized` | 1 | A payment is confirmed: a card held, a UPI payment made, the Wallet's hold or the cash to collect secures what checkout needs, so the order may be placed. Payload: `payment_id`, `purpose`, `order_id`, `customer_id`, `method`, `status`, `amount`, `wallet_held`, `provider_authorized`, `provider_captured`, `cash_to_collect`, `capture_mode`, `version`. |
+| `payments.payment.captured` | 1 | Money was taken, by part: UPI paid, a card charged, the Wallet spent, cash collected, a top-up paid. Payload: `payment_id`, `cause`, `provider`, `wallet_promotional`, `wallet_paid`, `cash`, `released`, `captured_total`. |
+| `payments.payment.failed` | 1 | A try at the provider failed or expired, or the charge at acceptance was refused. Payload: `payment_id`, `attempt_id`, `reason`, `message`, `final`. |
+| `payments.payment.released` | 1 | Holds were given back without taking money. Payload: `payment_id`, `cause`, `provider`, `wallet`, `cash`. |
+| `payments.refund.issued` | 1 | A refund was made, to the source and to the Wallet by balance. Payload: `refund_id`, `payment_id`, `order_id`, `amount`, `to_source`, `to_wallet_paid`, `to_wallet_promotional`, `stage`, `payer`, `reason`, `source_status`. |
+| `payments.refund.settled` | 1 | A source refund reached its end: completed, or moved to the Wallet. Payload: `refund_id`, `payment_id`, `outcome`, `to_source`, `to_wallet`. |
+| `wallet.entry.recorded` | 1 | A customer's Wallet changed by one entry of one balance. Not scoped to a partner unless a Partner pays for a credit. Payload: `entry_id`, `customer_id`, `kind`, `balance`, `amount`, `held`, `balance_after`, `held_after`, `order_id`, `refund_id`, `payer`. |
+| `ledger.entry.posted` | 1 | A journal entry was posted, its debits equal to its credits. Payload: `entry_id`, `kind`, `currency`, `order_id`, `payment_id`, `source_event_id`, `postings`. |
+| `payments.alert.raised` | 1 | A nightly check found a difference. Not scoped to a partner. Payload: `alert_id`, `kind`, `order_id`, `payment_id`, `customer_id`, `difference`. |
 
 ## Consuming events
 

@@ -1,0 +1,7 @@
+type: string
+description: "What a payment is for: an order, or a top-up of the customer's Wallet."
+enum:
+  - order
+  - wallet_top_up
+examples:
+  - order

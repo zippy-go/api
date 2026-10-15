@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.alert.raised.v1.schema.json",
+  "title": "PaymentsAlertRaisedPayload",
+  "description": "Payload of `payments.alert.raised` version 1. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "alert_id",
+    "kind",
+    "order_id",
+    "payment_id",
+    "refund_id",
+    "customer_id",
+    "account_code",
+    "difference"
+  ],
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The alert."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "provider_missing",
+        "unrecorded_at_provider",
+        "amount_mismatch",
+        "ledger_mismatch",
+        "wallet_mismatch",
+        "wallet_liability_mismatch"
+      ],
+      "description": "What was found."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order."
+    },
+    "payment_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The payment."
+    },
+    "refund_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The refund."
+    },
+    "customer_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The customer, for a Wallet."
+    },
+    "account_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The ledger account."
+    },
+    "difference": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The difference, where it is an amount."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

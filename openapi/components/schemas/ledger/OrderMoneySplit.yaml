@@ -1,0 +1,199 @@
+type: object
+description: "An order's money as the ledger holds it: what the customer paid, what the Partner keeps after the commission and its GST, what the platform and the platform fleet take, the tips owed to agents, the refunds and who bore them, and every journal entry of the order."
+required:
+  - order_id
+  - partner_id
+  - currency
+  - status
+  - paid
+  - items
+  - delivery_fee
+  - tip
+  - other_fees
+  - partner_share
+  - commission
+  - commission_rate_bp
+  - plan
+  - commission_gst
+  - delivery_fee_revenue
+  - delivery_fee_gst
+  - tips_payable
+  - refunded
+  - refunded_by_partner
+  - refunded_by_platform
+  - entries
+  - balanced
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  currency:
+    type: string
+    description: The currency.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  status:
+    $ref: ../ledger/OrderSplitStatus.yaml
+    description: Whether the money is split.
+  paid:
+    $ref: ../common/Money.yaml
+    description: "What the customer paid: taken by UPI or card, spent from the Wallet, collected in cash, less what never was kept."
+  items:
+    $ref: ../common/Money.yaml
+    description: The items the Location sends, tax included.
+  delivery_fee:
+    $ref: ../common/Money.yaml
+    description: The delivery fee, tax included.
+  tip:
+    $ref: ../common/Money.yaml
+    description: The tip for the platform fleet's agent.
+  other_fees:
+    $ref: ../common/Money.yaml
+    description: Other fees the order carries, such as cutlery.
+  partner_share:
+    $ref: ../common/Money.yaml
+    description: "What the Partner is owed: the items less the commission and its GST, with its own delivery fee and fees."
+  commission:
+    $ref: ../common/Money.yaml
+    description: The platform's commission.
+  commission_rate_bp:
+    type: integer
+    description: The commission rate in basis points, by the Partner's plan.
+    minimum: 0
+    examples:
+      - 800
+  plan:
+    type:
+      - string
+      - "null"
+    description: The Partner's plan the rate came from.
+    examples:
+      - pro
+  commission_gst:
+    $ref: ../common/Money.yaml
+    description: GST on the commission.
+  delivery_fee_revenue:
+    $ref: ../common/Money.yaml
+    description: The platform fleet's delivery fee, net of GST.
+  delivery_fee_gst:
+    $ref: ../common/Money.yaml
+    description: GST included in the platform fleet's delivery fee.
+  tips_payable:
+    $ref: ../common/Money.yaml
+    description: Tips owed to the platform fleet's agents.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: Refunds of the settled order.
+  refunded_by_partner:
+    $ref: ../common/Money.yaml
+    description: Of those, what the Partner bore.
+  refunded_by_platform:
+    $ref: ../common/Money.yaml
+    description: Of those, what the platform bore.
+  entries:
+    type: array
+    items:
+      $ref: ../ledger/LedgerEntry.yaml
+      description: An entry.
+    description: Every journal entry of the order, oldest first.
+  balanced:
+    type: boolean
+    description: Whether every entry's debits equal its credits; always `true`, enforced when written.
+    examples:
+      - true
+examples:
+  - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    currency: INR
+    status: split
+    paid:
+      minor_units: 52000
+      currency: INR
+    items:
+      minor_units: 47000
+      currency: INR
+    delivery_fee:
+      minor_units: 3000
+      currency: INR
+    tip:
+      minor_units: 2000
+      currency: INR
+    other_fees:
+      minor_units: 0
+      currency: INR
+    partner_share:
+      minor_units: 42564
+      currency: INR
+    commission:
+      minor_units: 3760
+      currency: INR
+    commission_rate_bp: 800
+    plan: pro
+    commission_gst:
+      minor_units: 676
+      currency: INR
+    delivery_fee_revenue:
+      minor_units: 2542
+      currency: INR
+    delivery_fee_gst:
+      minor_units: 458
+      currency: INR
+    tips_payable:
+      minor_units: 2000
+      currency: INR
+    refunded:
+      minor_units: 0
+      currency: INR
+    refunded_by_partner:
+      minor_units: 0
+      currency: INR
+    refunded_by_platform:
+      minor_units: 0
+      currency: INR
+    entries:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+        kind: payment_captured
+        description: UPI payment captured for an order
+        currency: INR
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+        payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+        refund_id: null
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+        source_event_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f31
+        postings:
+          - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+            account_code: provider_clearing
+            account_name: Provider clearing
+            side: debit
+            amount:
+              minor_units: 32000
+              currency: INR
+          - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f12
+            account_code: order_clearing
+            account_name: Orders awaiting their split
+            side: credit
+            amount:
+              minor_units: 32000
+              currency: INR
+        total_debits:
+          minor_units: 32000
+          currency: INR
+        total_credits:
+          minor_units: 32000
+          currency: INR
+        occurred_at: 2026-10-16T09:00:00Z
+        posted_at: 2026-10-16T09:00:00Z
+    balanced: true

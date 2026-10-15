@@ -1,0 +1,7 @@
+type: string
+description: An alert is listed until somebody resolves it with a note.
+enum:
+  - open
+  - resolved
+examples:
+  - open

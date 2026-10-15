@@ -1,0 +1,46 @@
+# Path item for /v1/platform/finance/reconciliations. Referenced from openapi.yaml.
+post:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: runReconciliation
+  summary: Run the nightly checks now
+  description: "Runs at once the checks that run every night at 03:30 in Asia/Kolkata: the provider's payments and refunds of the last two days against the records and the ledger, and every Wallet against its entries and the ledger. Raises an alert for each difference not already open. `ledger:write`."
+  responses:
+    "200":
+      description: What the run checked and raised.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/ReconciliationRun.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `ledger:write` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "503":
+      description: The payment provider did not answer (`unavailable`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

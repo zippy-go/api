@@ -1,0 +1,88 @@
+type: object
+description: A difference a nightly check found, listed in Mission Control's Finance section until somebody resolves it.
+required:
+  - id
+  - kind
+  - status
+  - subject
+  - difference
+  - detail
+  - raised_at
+  - resolved_at
+  - resolved_by
+  - resolution
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The alert.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21
+  kind:
+    $ref: ../payments/FinanceAlertKind.yaml
+    description: What was found.
+  status:
+    $ref: ../payments/FinanceAlertStatus.yaml
+    description: Open or resolved.
+  subject:
+    $ref: ../payments/FinanceAlertSubject.yaml
+    description: What it names.
+  difference:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The difference, where it is an amount.
+  detail:
+    type: string
+    description: What disagrees, as a sentence.
+    examples:
+      - The provider captured ₹320.00; the records say ₹300.00.
+  raised_at:
+    type: string
+    format: date-time
+    description: When the check raised it.
+    examples:
+      - 2026-10-16T09:00:00Z
+  resolved_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was resolved.
+    examples:
+      - null
+  resolved_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who resolved it.
+    examples:
+      - null
+  resolution:
+    type:
+      - string
+      - "null"
+    description: The note it was resolved with.
+    maxLength: 1000
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21
+    kind: amount_mismatch
+    status: open
+    subject:
+      order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+      payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+      refund_id: null
+      customer_id: null
+      account_code: null
+      provider_reference: simpay_01
+    difference:
+      minor_units: 2000
+      currency: INR
+    detail: The provider captured ₹320.00; the records say ₹300.00.
+    raised_at: 2026-10-16T09:00:00Z
+    resolved_at: null
+    resolved_by: null
+    resolution: null

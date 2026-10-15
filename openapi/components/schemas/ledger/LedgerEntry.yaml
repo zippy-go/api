@@ -1,0 +1,143 @@
+type: object
+description: "A journal entry: immutable, its debits equal to its credits, which the database enforces when the entry is written. It names the event that caused it."
+required:
+  - id
+  - kind
+  - description
+  - currency
+  - order_id
+  - payment_id
+  - refund_id
+  - partner_id
+  - customer_id
+  - source_event_id
+  - postings
+  - total_debits
+  - total_credits
+  - occurred_at
+  - posted_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The entry.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+  kind:
+    $ref: ../ledger/LedgerEntryKind.yaml
+    description: What it records.
+  description:
+    type: string
+    description: What it records, as a sentence.
+    examples:
+      - UPI payment captured for an order
+  currency:
+    type: string
+    description: The currency of every posting.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  payment_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  refund_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The refund.
+    examples:
+      - null
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  customer_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+  source_event_id:
+    type: string
+    format: uuid
+    description: The event it was posted from; an event is posted once.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f31
+  postings:
+    type: array
+    items:
+      $ref: ../ledger/LedgerPosting.yaml
+      description: A posting.
+    description: The postings, debits first.
+  total_debits:
+    $ref: ../common/Money.yaml
+    description: The debits together.
+  total_credits:
+    $ref: ../common/Money.yaml
+    description: The credits together, always equal to the debits.
+  occurred_at:
+    type: string
+    format: date-time
+    description: When the money moved.
+    examples:
+      - 2026-10-16T09:00:00Z
+  posted_at:
+    type: string
+    format: date-time
+    description: When it was posted.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+    kind: payment_captured
+    description: UPI payment captured for an order
+    currency: INR
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    refund_id: null
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+    source_event_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f31
+    postings:
+      - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+        account_code: provider_clearing
+        account_name: Provider clearing
+        side: debit
+        amount:
+          minor_units: 32000
+          currency: INR
+      - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f12
+        account_code: order_clearing
+        account_name: Orders awaiting their split
+        side: credit
+        amount:
+          minor_units: 32000
+          currency: INR
+    total_debits:
+      minor_units: 32000
+      currency: INR
+    total_credits:
+      minor_units: 32000
+      currency: INR
+    occurred_at: 2026-10-16T09:00:00Z
+    posted_at: 2026-10-16T09:00:00Z

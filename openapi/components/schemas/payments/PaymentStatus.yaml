@@ -1,0 +1,10 @@
+type: string
+description: "Where a payment stands. `requires_payment`: the customer has something to approve at the provider, or must try again. `confirmed`: what checkout needs is secured by the provider's word (a card held, a UPI payment made), by the Wallet's hold or by the cash to collect, so the order may be placed. `settled`: the order's amount was fixed at acceptance: the card charged, the Wallet spent, UPI kept and anything not kept refunded, the cash to collect set. `released`: the order did not go ahead: every hold was released and anything taken refunded. `failed`: no payment succeeded in the order's time, or the charge at acceptance was refused."
+enum:
+  - requires_payment
+  - confirmed
+  - settled
+  - released
+  - failed
+examples:
+  - confirmed

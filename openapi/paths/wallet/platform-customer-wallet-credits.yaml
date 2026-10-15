@@ -1,0 +1,74 @@
+# Path item for /v1/platform/customers/{customer_id}/wallet/credits. Referenced from openapi.yaml.
+post:
+  tags:
+    - Wallet
+  security:
+    - Bearer: []
+  operationId: creditCustomerWallet
+  summary: Give a customer credit
+  description: "Adds credit to a customer's promotional balance: at least ₹1.00, with a reason of at most 40 characters and a note the customer reads, and who pays for it, the platform or a named Partner, settled when it is given. The customer is told. `wallet:write`; requires `Idempotency-Key`, so a retried credit is given once. Written to the audit log."
+  parameters:
+    - name: customer_id
+      in: path
+      required: true
+      description: The customer.
+      schema:
+        type: string
+        format: uuid
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The amount, the reason, the note and the payer.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/wallet/WalletCreditRequest.yaml
+  responses:
+    "201":
+      description: The credit's entry.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/wallet/WalletEntry.yaml
+    "400":
+      description: "`validation_failed`: `idempotency_key_missing`, an amount under ₹1.00, a reason over 40 characters, a Partner payer without its Partner, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `wallet:write` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such customer or Partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`wallet_cap_exceeded`: the Wallet would hold more than its ceiling."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

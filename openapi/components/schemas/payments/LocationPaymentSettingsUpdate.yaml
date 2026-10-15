@@ -1,0 +1,29 @@
+type: object
+description: How the Location takes cash, written as a whole.
+required:
+  - cash_on_delivery
+  - cash_on_collection
+properties:
+  cash_on_delivery:
+    type: boolean
+    description: Cash is taken at the door.
+    examples:
+      - true
+  cash_on_collection:
+    type: boolean
+    description: Cash is taken at the counter on collection.
+    examples:
+      - false
+  cash_limit_minor:
+    type:
+      - integer
+      - "null"
+    description: The Location's own ceiling per order in minor units, at most the platform's; `null` for the platform's.
+    format: int64
+    minimum: 1
+    examples:
+      - null
+examples:
+  - cash_on_delivery: true
+    cash_on_collection: false
+    cash_limit_minor: 150000

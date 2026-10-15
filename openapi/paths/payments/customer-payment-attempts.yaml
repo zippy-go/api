@@ -1,0 +1,74 @@
+# Path item for /v1/customer/payments/{payment_id}/attempts. Referenced from openapi.yaml.
+post:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: startPaymentAttempt
+  summary: Try a payment again
+  description: "A new try at the provider for a payment that requires one: the UPI request expired or was declined, or the card was refused, and the order's time is not up. UPI or a card, a saved one or a new one; the Wallet's hold is unchanged. An amount above the provider's UPI limit is refused before any request is made. Requires `Idempotency-Key`: a repeat answers the same try."
+  parameters:
+    - name: payment_id
+      in: path
+      required: true
+      description: The payment.
+      schema:
+        type: string
+        format: uuid
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The method and how it reaches the customer.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payments/PaymentAttemptRequest.yaml
+  responses:
+    "201":
+      description: The new try and what the customer does next.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/PaymentAttemptStarted.yaml
+    "400":
+      description: "`validation_failed`: `idempotency_key_missing`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such payment of the customer, or no such saved method (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`payment_not_pending`: the payment does not wait for a try (it is confirmed, settled, released or failed); `payment_method_not_offered` with `upi_over_limit`, `provider_unavailable` or `card_expired`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

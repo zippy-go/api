@@ -1,0 +1,67 @@
+# Path item for /v1/customer/wallet/top-ups. Referenced from openapi.yaml.
+post:
+  tags:
+    - Wallet
+  security:
+    - Bearer: []
+  operationId: topUpWallet
+  summary: Add money to the Wallet
+  description: A top-up by UPI or card, from ₹100.00 to ₹10,000.00, while the Wallet stays at most ₹50,000.00 (`wallet_cap_exceeded`, offering what fits). It is a payment taken at once (a card is charged, not held), added to the paid balance only when the provider confirms; a top-up the provider refuses adds nothing and says why. Requires `Idempotency-Key`.
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The amount and how it is paid.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/wallet/WalletTopUpRequest.yaml
+  responses:
+    "201":
+      description: The top-up's payment and what the customer does next.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/PaymentAttemptStarted.yaml
+    "400":
+      description: "`validation_failed`: `idempotency_key_missing`, `top_up_out_of_range`, `upi_id_invalid`, `return_url_not_allowed`, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such saved method of the customer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`wallet_cap_exceeded`: the Wallet would hold more than ₹50,000.00; the detail offers what fits. `payment_method_not_offered` with `provider_unavailable`, `upi_over_limit` or `card_expired`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

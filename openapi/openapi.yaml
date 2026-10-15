@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.14.0
+  version: 0.15.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -240,6 +240,12 @@ tags:
       own words sent to the Locations named, the send log with who saw it,
       a Location's inbox shared by everybody who signs in to it, and how a
       Location's screen presents a notice.
+  - name: Payments
+    description: "How a customer's money reaches ZippyGo and goes back, through one payment provider behind a port: a simulated provider with sandbox semantics on a developer's machine and in the sandbox, a Razorpay-class gateway with marketplace split settlement once chosen, and no UPI or card payments where none is configured. UPI is paid at once; a card is held at checkout and charged when the Location accepts, for what it will send, and released when it declines; the Wallet pays first; cash on delivery is taken within a ceiling. The provider's word decides: every notice is verified and seen once, every money move is recorded before it is attempted with a key that makes the provider do it once, and a sweeper finishes what an interruption left. Refunds go back to the payment they came from, never more than was taken, the rest to the Wallet. Card data never reaches the platform: a card is its brand, last four digits, expiry and the provider's token. Every night the provider's records are compared with the payments and the ledger."
+  - name: Wallet
+    description: "A customer's money on ZippyGo in rupees, a ledger that explains itself: every balance is the sum of its entries, each with its reason, never edited, nothing expiring. Two balances: paid (the customer's own money, which may go back to its source) and promotional (money given, spent first and never paid out). The Wallet pays first and cannot be spent twice: held when an order is placed, spent when the Location accepts, returned otherwise. It is checked every night against its entries and against the ledger."
+  - name: Ledger
+    description: "The double-entry journal every money move is posted to from the moment it is confirmed: immutable, every entry's debits equal to its credits, enforced by the database when it is written. Accounts for every customer's Wallet, every Partner's payable, the platform's commission and delivery fee revenue, GST payable, tips owed to the platform fleet, money at the provider and cash in transit. An order's money is split when the Location accepts: the Partner's share after the commission by its plan and the GST on it, the delivery fee and tips to the platform fleet. Mission Control reads accounts, entries, an order's split and the trial balance with `ledger:read`."
   - name: Orders
     description: Commercial purchases placed by customers.
   - name: Deliveries
@@ -739,6 +745,71 @@ paths:
     $ref: ./paths/catalog/search.yaml
   /v1/storefront/search/suggestions:
     $ref: ./paths/catalog/search-suggestions.yaml
+
+  /v1/customer/payment-options:
+    $ref: ./paths/payments/payment-options.yaml
+  /v1/customer/payments:
+    $ref: ./paths/payments/customer-payments.yaml
+  /v1/customer/payments/{payment_id}:
+    $ref: ./paths/payments/customer-payment.yaml
+  /v1/customer/payments/{payment_id}/attempts:
+    $ref: ./paths/payments/customer-payment-attempts.yaml
+  /v1/customer/refunds/{refund_id}/to-wallet:
+    $ref: ./paths/payments/customer-refund-to-wallet.yaml
+  /v1/customer/payment-methods:
+    $ref: ./paths/payments/payment-methods.yaml
+  /v1/customer/payment-methods/{method_id}:
+    $ref: ./paths/payments/payment-method.yaml
+  /v1/customer/payment-methods/{method_id}/default:
+    $ref: ./paths/payments/payment-method-default.yaml
+  /v1/customer/payment-method-setups/{setup_id}:
+    $ref: ./paths/payments/payment-method-setup.yaml
+  /v1/customer/wallet:
+    $ref: ./paths/wallet/wallet.yaml
+  /v1/customer/wallet/entries:
+    $ref: ./paths/wallet/wallet-entries.yaml
+  /v1/customer/wallet/statements/{month}:
+    $ref: ./paths/wallet/wallet-statement.yaml
+  /v1/customer/wallet/top-ups:
+    $ref: ./paths/wallet/wallet-top-ups.yaml
+  /v1/customer/wallet/withdrawals:
+    $ref: ./paths/wallet/wallet-withdrawals.yaml
+  /v1/payments/notices/{provider}:
+    $ref: ./paths/payments/provider-notices.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/payment-settings:
+    $ref: ./paths/payments/location-payment-settings.yaml
+  /v1/platform/payments:
+    $ref: ./paths/payments/platform-payments.yaml
+  /v1/platform/payments/{payment_id}:
+    $ref: ./paths/payments/platform-payment.yaml
+  /v1/platform/payments/{payment_id}/refunds:
+    $ref: ./paths/payments/platform-payment-refunds.yaml
+  /v1/platform/customers/{customer_id}/wallet:
+    $ref: ./paths/wallet/platform-customer-wallet.yaml
+  /v1/platform/customers/{customer_id}/wallet/entries:
+    $ref: ./paths/wallet/platform-customer-wallet-entries.yaml
+  /v1/platform/customers/{customer_id}/wallet/credits:
+    $ref: ./paths/wallet/platform-customer-wallet-credits.yaml
+  /v1/platform/customers/{customer_id}/wallet/corrections:
+    $ref: ./paths/wallet/platform-customer-wallet-corrections.yaml
+  /v1/platform/finance/alerts:
+    $ref: ./paths/payments/finance-alerts.yaml
+  /v1/platform/finance/alerts/{alert_id}/resolve:
+    $ref: ./paths/payments/finance-alert-resolve.yaml
+  /v1/platform/finance/reconciliations:
+    $ref: ./paths/payments/finance-reconciliations.yaml
+  /v1/platform/ledger/accounts:
+    $ref: ./paths/ledger/accounts.yaml
+  /v1/platform/ledger/accounts/{account_id}:
+    $ref: ./paths/ledger/account.yaml
+  /v1/platform/ledger/entries:
+    $ref: ./paths/ledger/entries.yaml
+  /v1/platform/ledger/entries/{entry_id}:
+    $ref: ./paths/ledger/entry.yaml
+  /v1/platform/ledger/orders/{order_id}:
+    $ref: ./paths/ledger/order-split.yaml
+  /v1/platform/ledger/trial-balance:
+    $ref: ./paths/ledger/trial-balance.yaml
 
 components:
   securitySchemes:
@@ -1839,3 +1910,153 @@ components:
       $ref: ./components/schemas/catalog/SearchSuggestionList.yaml
     StoreSearchResult:
       $ref: ./components/schemas/catalog/StoreSearchResult.yaml
+    PaymentMethodKind:
+      $ref: ./components/schemas/payments/PaymentMethodKind.yaml
+    PaymentStatus:
+      $ref: ./components/schemas/payments/PaymentStatus.yaml
+    PaymentPurpose:
+      $ref: ./components/schemas/payments/PaymentPurpose.yaml
+    PaymentFlow:
+      $ref: ./components/schemas/payments/PaymentFlow.yaml
+    AttemptStatus:
+      $ref: ./components/schemas/payments/AttemptStatus.yaml
+    CaptureMode:
+      $ref: ./components/schemas/payments/CaptureMode.yaml
+    NextActionKind:
+      $ref: ./components/schemas/payments/NextActionKind.yaml
+    PaymentRefundSourceStatus:
+      $ref: ./components/schemas/payments/PaymentRefundSourceStatus.yaml
+    PaymentRefundStage:
+      $ref: ./components/schemas/payments/PaymentRefundStage.yaml
+    PaymentRefundPayer:
+      $ref: ./components/schemas/payments/PaymentRefundPayer.yaml
+    PaymentRefundReason:
+      $ref: ./components/schemas/payments/PaymentRefundReason.yaml
+    SavedMethodKind:
+      $ref: ./components/schemas/payments/SavedMethodKind.yaml
+    MethodSetupStatus:
+      $ref: ./components/schemas/payments/MethodSetupStatus.yaml
+    FinanceAlertKind:
+      $ref: ./components/schemas/payments/FinanceAlertKind.yaml
+    FinanceAlertStatus:
+      $ref: ./components/schemas/payments/FinanceAlertStatus.yaml
+    CardSummary:
+      $ref: ./components/schemas/payments/CardSummary.yaml
+    PaymentNextAction:
+      $ref: ./components/schemas/payments/PaymentNextAction.yaml
+    PaymentFailure:
+      $ref: ./components/schemas/payments/PaymentFailure.yaml
+    PaymentWalletPart:
+      $ref: ./components/schemas/payments/PaymentWalletPart.yaml
+    PaymentProviderPart:
+      $ref: ./components/schemas/payments/PaymentProviderPart.yaml
+    PaymentCashPart:
+      $ref: ./components/schemas/payments/PaymentCashPart.yaml
+    PaymentAttempt:
+      $ref: ./components/schemas/payments/PaymentAttempt.yaml
+    PaymentRefundLine:
+      $ref: ./components/schemas/payments/PaymentRefundLine.yaml
+    PaymentRefund:
+      $ref: ./components/schemas/payments/PaymentRefund.yaml
+    Payment:
+      $ref: ./components/schemas/payments/Payment.yaml
+    PaymentPage:
+      $ref: ./components/schemas/payments/PaymentPage.yaml
+    PaymentAttemptRequest:
+      $ref: ./components/schemas/payments/PaymentAttemptRequest.yaml
+    PaymentAttemptStarted:
+      $ref: ./components/schemas/payments/PaymentAttemptStarted.yaml
+    PaymentRefundRequest:
+      $ref: ./components/schemas/payments/PaymentRefundRequest.yaml
+    PaymentRefusal:
+      $ref: ./components/schemas/payments/PaymentRefusal.yaml
+    PaymentProviderInfo:
+      $ref: ./components/schemas/payments/PaymentProviderInfo.yaml
+    SavedPaymentMethod:
+      $ref: ./components/schemas/payments/SavedPaymentMethod.yaml
+    SavedPaymentMethodList:
+      $ref: ./components/schemas/payments/SavedPaymentMethodList.yaml
+    PaymentChoice:
+      $ref: ./components/schemas/payments/PaymentChoice.yaml
+    WalletApplication:
+      $ref: ./components/schemas/payments/WalletApplication.yaml
+    PaymentOptions:
+      $ref: ./components/schemas/payments/PaymentOptions.yaml
+    PaymentMethodCreate:
+      $ref: ./components/schemas/payments/PaymentMethodCreate.yaml
+    PaymentMethodSetup:
+      $ref: ./components/schemas/payments/PaymentMethodSetup.yaml
+    ProviderNotice:
+      $ref: ./components/schemas/payments/ProviderNotice.yaml
+    ProviderNoticeReceipt:
+      $ref: ./components/schemas/payments/ProviderNoticeReceipt.yaml
+    LocationPaymentSettings:
+      $ref: ./components/schemas/payments/LocationPaymentSettings.yaml
+    LocationPaymentSettingsUpdate:
+      $ref: ./components/schemas/payments/LocationPaymentSettingsUpdate.yaml
+    FinanceAlertSubject:
+      $ref: ./components/schemas/payments/FinanceAlertSubject.yaml
+    FinanceAlert:
+      $ref: ./components/schemas/payments/FinanceAlert.yaml
+    FinanceAlertPage:
+      $ref: ./components/schemas/payments/FinanceAlertPage.yaml
+    FinanceAlertResolve:
+      $ref: ./components/schemas/payments/FinanceAlertResolve.yaml
+    ReconciliationRun:
+      $ref: ./components/schemas/payments/ReconciliationRun.yaml
+    WalletBalanceKind:
+      $ref: ./components/schemas/wallet/WalletBalanceKind.yaml
+    WalletEntryKind:
+      $ref: ./components/schemas/wallet/WalletEntryKind.yaml
+    WalletPayerKind:
+      $ref: ./components/schemas/wallet/WalletPayerKind.yaml
+    WalletPayer:
+      $ref: ./components/schemas/wallet/WalletPayer.yaml
+    WalletSubBalance:
+      $ref: ./components/schemas/wallet/WalletSubBalance.yaml
+    Wallet:
+      $ref: ./components/schemas/wallet/Wallet.yaml
+    WalletEntry:
+      $ref: ./components/schemas/wallet/WalletEntry.yaml
+    WalletEntryPage:
+      $ref: ./components/schemas/wallet/WalletEntryPage.yaml
+    WalletBalances:
+      $ref: ./components/schemas/wallet/WalletBalances.yaml
+    WalletStatement:
+      $ref: ./components/schemas/wallet/WalletStatement.yaml
+    WalletTopUpRequest:
+      $ref: ./components/schemas/wallet/WalletTopUpRequest.yaml
+    WalletWithdrawalRequest:
+      $ref: ./components/schemas/wallet/WalletWithdrawalRequest.yaml
+    WalletWithdrawal:
+      $ref: ./components/schemas/wallet/WalletWithdrawal.yaml
+    WalletCreditRequest:
+      $ref: ./components/schemas/wallet/WalletCreditRequest.yaml
+    WalletCorrectionRequest:
+      $ref: ./components/schemas/wallet/WalletCorrectionRequest.yaml
+    LedgerAccountKind:
+      $ref: ./components/schemas/ledger/LedgerAccountKind.yaml
+    LedgerAccountClass:
+      $ref: ./components/schemas/ledger/LedgerAccountClass.yaml
+    LedgerSide:
+      $ref: ./components/schemas/ledger/LedgerSide.yaml
+    LedgerEntryKind:
+      $ref: ./components/schemas/ledger/LedgerEntryKind.yaml
+    LedgerAccount:
+      $ref: ./components/schemas/ledger/LedgerAccount.yaml
+    LedgerAccountPage:
+      $ref: ./components/schemas/ledger/LedgerAccountPage.yaml
+    LedgerPosting:
+      $ref: ./components/schemas/ledger/LedgerPosting.yaml
+    LedgerEntry:
+      $ref: ./components/schemas/ledger/LedgerEntry.yaml
+    LedgerEntryPage:
+      $ref: ./components/schemas/ledger/LedgerEntryPage.yaml
+    OrderSplitStatus:
+      $ref: ./components/schemas/ledger/OrderSplitStatus.yaml
+    OrderMoneySplit:
+      $ref: ./components/schemas/ledger/OrderMoneySplit.yaml
+    TrialBalanceLine:
+      $ref: ./components/schemas/ledger/TrialBalanceLine.yaml
+    TrialBalance:
+      $ref: ./components/schemas/ledger/TrialBalance.yaml

@@ -1,0 +1,19 @@
+type: object
+description: "The answer to the provider: the notice was taken, or was a replay that changed nothing."
+required:
+  - received
+  - replay
+properties:
+  received:
+    type: boolean
+    description: "Always `true`: the notice was taken."
+    examples:
+      - true
+  replay:
+    type: boolean
+    description: Whether the notice had been seen before; nothing changed.
+    examples:
+      - false
+examples:
+  - received: true
+    replay: false

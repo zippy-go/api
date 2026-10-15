@@ -1,0 +1,63 @@
+type: object
+description: What a finance alert names.
+required:
+  - order_id
+  - payment_id
+  - refund_id
+  - customer_id
+  - account_code
+  - provider_reference
+properties:
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  payment_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  refund_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The refund.
+    examples:
+      - null
+  customer_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The customer, for a Wallet.
+    examples:
+      - null
+  account_code:
+    type:
+      - string
+      - "null"
+    description: The ledger account.
+    examples:
+      - null
+  provider_reference:
+    type:
+      - string
+      - "null"
+    description: The provider's reference.
+    examples:
+      - simpay_01
+examples:
+  - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    refund_id: null
+    customer_id: null
+    account_code: null
+    provider_reference: simpay_01

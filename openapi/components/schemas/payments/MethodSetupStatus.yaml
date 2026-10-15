@@ -1,0 +1,8 @@
+type: string
+description: "Where saving a card without an order stands: waiting for the customer at the provider's form (`pending`), saved (`saved`), or refused or abandoned (`failed`)."
+enum:
+  - pending
+  - saved
+  - failed
+examples:
+  - saved

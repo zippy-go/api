@@ -1,0 +1,7 @@
+type: string
+description: "Who pays for credit given: the platform, or a named Partner, settled when it is given."
+enum:
+  - platform
+  - partner
+examples:
+  - platform

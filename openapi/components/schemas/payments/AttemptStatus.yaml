@@ -1,0 +1,11 @@
+type: string
+description: "Where one try at the provider stands: waiting for the customer (`pending`), a card held (`authorized`), money taken (`captured`), refused by the bank or the provider (`failed`), not answered in time (`expired`), or a hold given back (`released`)."
+enum:
+  - pending
+  - authorized
+  - captured
+  - failed
+  - expired
+  - released
+examples:
+  - captured

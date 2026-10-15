@@ -1,0 +1,14 @@
+type: object
+description: "Sending paid money back where it came from: a top-up to the UPI account or card it was paid with, a refund taken in the Wallet to the order's original payment, while the provider still allows a refund against it. Needs a fresh step-up."
+required:
+  - amount_minor
+properties:
+  amount_minor:
+    type: integer
+    description: The amount in paise, at most the paid balance that is not held.
+    format: int64
+    minimum: 1
+    examples:
+      - 70000
+examples:
+  - amount_minor: 70000

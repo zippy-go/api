@@ -6,6 +6,68 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-16
+
+Step 3, money: payments against a simulated provider with sandbox semantics,
+the Wallet with its two balances, and the double-entry ledger with every
+order's money split. Follows the notifications slice's 0.14.0; the orders
+slice of step 3 takes the other free minor when it merges. Additive only.
+
+### Added
+
+- The `Payments` operations for customers: the ways to pay an amount at a
+  Location (`GET /v1/customer/payment-options`, `PaymentOptions` with a
+  `PaymentChoice` per method and the reason when one is not offered), the
+  customer's payments (`GET /v1/customer/payments`, `GET .../{payment_id}`,
+  `Payment` with its Wallet, provider and cash parts, every try and every
+  refund; reading one still waiting also asks the provider, at most every 5
+  seconds), a new try within the order's time
+  (`POST .../{payment_id}/attempts`, `PaymentAttemptStarted` with the
+  `PaymentNextAction`), taking a source refund in the Wallet before it is
+  sent (`POST /v1/customer/refunds/{refund_id}/to-wallet`), and saved cards
+  and UPI IDs kept as the provider's tokens (`GET`, `POST
+  /v1/customer/payment-methods`, `DELETE .../{method_id}`, `PUT
+  .../{method_id}/default`, `GET /v1/customer/payment-method-setups/{setup_id}`).
+- The `Wallet` operations for customers: the Wallet with its paid and
+  promotional balances (`GET /v1/customer/wallet`), its entries
+  (`GET .../entries`), a month's statement (`GET .../statements/{month}`),
+  a top-up by UPI or card (`POST .../top-ups`) and a withdrawal of paid money
+  to its source behind a fresh step-up (`POST .../withdrawals`).
+- The provider's notices, `POST /v1/payments/notices/{provider}`, accepted
+  only with a valid signature, checked against the records and seen once.
+- How a Location takes cash, `GET`, `PUT
+  /v1/partners/{partner_id}/locations/{location_id}/payment-settings`
+  (`location:read`, `location:write`).
+- Mission Control: every payment (`GET /v1/platform/payments`,
+  `GET .../{payment_id}`, `order:read`), a refund to the source first and
+  the rest to the Wallet behind a fresh step-up
+  (`POST .../{payment_id}/refunds`, `order:refund`); a customer's Wallet,
+  its entries, credit given and corrections (`/v1/platform/customers/{customer_id}/wallet`,
+  `.../entries`, `.../credits`, `.../corrections`, `wallet:read`,
+  `wallet:write`); what the nightly checks found and running them now
+  (`GET /v1/platform/finance/alerts`, `POST .../{alert_id}/resolve`,
+  `POST /v1/platform/finance/reconciliations`); and the `Ledger`
+  operations: accounts, entries, an order's money split and the trial
+  balance (`/v1/platform/ledger/accounts`, `.../entries`,
+  `.../orders/{order_id}`, `.../trial-balance`) with the new permissions
+  `ledger:read` and `ledger:write`.
+- The problem codes `payment_method_not_offered` (409, with the field codes
+  `upi_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`,
+  `provider_unavailable` and `card_expired`), `cod_over_limit`,
+  `payment_not_pending`, `refund_exceeds_paid`, `not_refundable`,
+  `refund_already_sent`, `wallet_cap_exceeded`,
+  `withdrawal_exceeds_available`, `withdrawal_source_unavailable` and
+  `correction_exceeds_available` (409) and `notice_rejected` (400), and
+  the field codes `top_up_out_of_range`, `upi_id_invalid` and
+  `return_url_not_allowed` under `validation_failed`. The entries
+  `payment_method_not_offered`, `cod_over_limit` and `refund_exceeds_paid`
+  carry the same status, title and message as the orders slice's.
+- The events `payments.payment.authorized`, `payments.payment.captured`,
+  `payments.payment.failed`, `payments.payment.released`,
+  `payments.refund.issued`, `payments.refund.settled`,
+  `wallet.entry.recorded`, `ledger.entry.posted` and
+  `payments.alert.raised`, version 1, with their payloads and examples.
+
 ## [0.14.0] - 2026-10-16
 
 Step 3, notifications and live channels: every message leaves through one

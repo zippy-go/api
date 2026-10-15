@@ -1,0 +1,39 @@
+type: object
+description: "One side of a journal entry: an account debited or credited by an amount."
+required:
+  - account_id
+  - account_code
+  - account_name
+  - side
+  - amount
+properties:
+  account_id:
+    type: string
+    format: uuid
+    description: The account.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+  account_code:
+    type: string
+    description: The account's code.
+    examples:
+      - provider_clearing
+  account_name:
+    type: string
+    description: The account's name.
+    examples:
+      - Provider clearing
+  side:
+    $ref: ../ledger/LedgerSide.yaml
+    description: Debit or credit.
+  amount:
+    $ref: ../common/Money.yaml
+    description: The amount, always positive.
+examples:
+  - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+    account_code: provider_clearing
+    account_name: Provider clearing
+    side: debit
+    amount:
+      minor_units: 32000
+      currency: INR

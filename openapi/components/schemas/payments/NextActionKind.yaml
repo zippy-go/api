@@ -1,0 +1,7 @@
+type: string
+description: "What the customer does next: open `url` in this browser or app (`redirect`: the provider's card form, or a UPI app), or approve the collect request waiting in their UPI app (`approve_in_app`)."
+enum:
+  - redirect
+  - approve_in_app
+examples:
+  - redirect

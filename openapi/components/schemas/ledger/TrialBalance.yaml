@@ -1,0 +1,80 @@
+type: object
+description: "Every account with its debits and credits at an instant, and the proof that the journal balances: the debits together equal the credits together."
+required:
+  - at
+  - currency
+  - lines
+  - total_debits
+  - total_credits
+  - balanced
+properties:
+  at:
+    type: string
+    format: date-time
+    description: The instant it was taken at.
+    examples:
+      - 2026-10-16T09:00:00Z
+  currency:
+    type: string
+    description: The currency.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  lines:
+    type: array
+    items:
+      $ref: ../ledger/TrialBalanceLine.yaml
+      description: An account.
+    description: Every account that was posted to, by code.
+  total_debits:
+    $ref: ../common/Money.yaml
+    description: Every debit together.
+  total_credits:
+    $ref: ../common/Money.yaml
+    description: Every credit together.
+  balanced:
+    type: boolean
+    description: Whether the debits equal the credits; always `true`.
+    examples:
+      - true
+examples:
+  - at: 2026-10-16T09:00:00Z
+    currency: INR
+    lines:
+      - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11
+        code: provider_clearing
+        name: Provider clearing
+        kind: provider_clearing
+        class: asset
+        normal_balance: debit
+        debits:
+          minor_units: 32000
+          currency: INR
+        credits:
+          minor_units: 0
+          currency: INR
+        balance:
+          minor_units: 32000
+          currency: INR
+      - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f12
+        code: order_clearing
+        name: Orders awaiting their split
+        kind: order_clearing
+        class: liability
+        normal_balance: credit
+        debits:
+          minor_units: 0
+          currency: INR
+        credits:
+          minor_units: 32000
+          currency: INR
+        balance:
+          minor_units: 32000
+          currency: INR
+    total_debits:
+      minor_units: 32000
+      currency: INR
+    total_credits:
+      minor_units: 32000
+      currency: INR
+    balanced: true

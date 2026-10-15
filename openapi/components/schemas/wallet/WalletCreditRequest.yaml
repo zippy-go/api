@@ -1,0 +1,48 @@
+type: object
+description: "Credit Mission Control gives a customer: at least ₹1.00, to the promotional balance, with a reason the customer reads, a note the customer reads as a message, and who pays for it, settled when it is given. A credit tied to an order suggests that order's Partner as payer."
+required:
+  - amount_minor
+  - reason
+  - note
+  - payer
+properties:
+  amount_minor:
+    type: integer
+    description: The amount in paise, at least 100.
+    format: int64
+    minimum: 1
+    examples:
+      - 5000
+  reason:
+    type: string
+    description: Why, in at most 40 characters the customer reads.
+    minLength: 1
+    maxLength: 40
+    examples:
+      - Late delivery
+  note:
+    type: string
+    description: A message the customer reads.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Sorry your biryani was late; this one is on us.
+  payer:
+    $ref: ../wallet/WalletPayer.yaml
+    description: Who pays for it.
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order it is for, when there is one.
+    examples:
+      - null
+examples:
+  - amount_minor: 5000
+    reason: Late delivery
+    note: Sorry your biryani was late; this one is on us.
+    payer:
+      kind: platform
+      partner_id: null
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01

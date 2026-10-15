@@ -1,0 +1,60 @@
+# Path item for /v1/customer/payments/{payment_id}. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: getCustomerPayment
+  summary: One of the customer's payments
+  description: "A payment with its parts, its tries, its refunds and what to do next. While it requires payment, reading it also asks the provider, at most every 5 seconds, so a lost notice delays the order by seconds, not minutes: this is the read a checkout makes when the customer comes back from the provider's page. Another customer's payment is not found."
+  parameters:
+    - name: payment_id
+      in: path
+      required: true
+      description: The payment.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: The payment.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/Payment.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such payment of the customer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

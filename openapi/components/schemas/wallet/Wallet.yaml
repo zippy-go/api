@@ -1,0 +1,88 @@
+type: object
+description: "A customer's Wallet in rupees: the two balances, paid and promotional, what is held for open orders and what is available. Every figure is the sum of its entries; nothing expires."
+required:
+  - customer_id
+  - currency
+  - balance
+  - held
+  - available
+  - paid
+  - promotional
+  - version
+  - updated_at
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+  currency:
+    type: string
+    description: The Wallet's currency.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  balance:
+    $ref: ../common/Money.yaml
+    description: Both balances together.
+  held:
+    $ref: ../common/Money.yaml
+    description: What open orders hold, both balances together.
+  available:
+    $ref: ../common/Money.yaml
+    description: What can be spent now.
+  paid:
+    $ref: ../wallet/WalletSubBalance.yaml
+    description: The customer's own money.
+  promotional:
+    $ref: ../wallet/WalletSubBalance.yaml
+    description: Money given, spent first.
+  version:
+    type: integer
+    description: Rises with every entry; the `ETag`.
+    minimum: 0
+    examples:
+      - 7
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it last changed; `null` for a Wallet that never moved.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+    currency: INR
+    balance:
+      minor_units: 35000
+      currency: INR
+    held:
+      minor_units: 0
+      currency: INR
+    available:
+      minor_units: 35000
+      currency: INR
+    paid:
+      balance:
+        minor_units: 30000
+        currency: INR
+      held:
+        minor_units: 0
+        currency: INR
+      available:
+        minor_units: 30000
+        currency: INR
+    promotional:
+      balance:
+        minor_units: 5000
+        currency: INR
+      held:
+        minor_units: 0
+        currency: INR
+      available:
+        minor_units: 5000
+        currency: INR
+    version: 7
+    updated_at: 2026-10-16T09:00:00Z

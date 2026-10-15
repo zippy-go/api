@@ -1,0 +1,33 @@
+type: object
+description: "What the Wallet pays of an order: as much as is available when the customer leaves it on."
+required:
+  - enabled
+  - balance
+  - available
+  - applies
+properties:
+  enabled:
+    type: boolean
+    description: Whether the customer leaves the Wallet on for this order.
+    examples:
+      - true
+  balance:
+    $ref: ../common/Money.yaml
+    description: The Wallet's balance, paid and promotional together.
+  available:
+    $ref: ../common/Money.yaml
+    description: The balance less what other orders hold.
+  applies:
+    $ref: ../common/Money.yaml
+    description: What the Wallet pays of this order.
+examples:
+  - enabled: true
+    balance:
+      minor_units: 20000
+      currency: INR
+    available:
+      minor_units: 20000
+      currency: INR
+    applies:
+      minor_units: 20000
+      currency: INR

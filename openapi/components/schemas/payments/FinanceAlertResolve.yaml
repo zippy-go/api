@@ -1,0 +1,14 @@
+type: object
+description: Resolving an alert, with what was done.
+required:
+  - note
+properties:
+  note:
+    type: string
+    description: What was done about it.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Refund re-sent by hand.
+examples:
+  - note: Refund re-sent by hand.
