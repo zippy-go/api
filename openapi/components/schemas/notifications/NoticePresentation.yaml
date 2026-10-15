@@ -1,0 +1,40 @@
+type: object
+description: |
+  How a Location's screen presents a notice, the `NoticePresentation`
+  schema: where it appears, and whether it waits to be acknowledged or
+  clears itself after a short while showing the time remaining. Platform
+  configuration, set in Mission Control, not a preference the Location sets
+  for itself. A Location configured with nothing reads as prominent and
+  waiting. A notice that clears itself stays unread in the inbox until
+  somebody reads it there.
+required:
+  - placement
+  - waits
+  - configured
+  - version
+  - updated_at
+properties:
+  placement:
+    $ref: ./NoticePlacement.yaml
+  waits:
+    type: boolean
+    description: Whether a notice stays until acknowledged; `false` clears it after a short while.
+  configured:
+    type: boolean
+    description: "`false` while nothing was set and the defaults apply."
+  version:
+    type: integer
+    minimum: 0
+    description: Raised by one on every change, `0` while never set; the entity tag of reads.
+  updated_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was last set.
+examples:
+  - placement: prominent
+    waits: true
+    configured: false
+    version: 0
+    updated_at: null

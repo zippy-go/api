@@ -1,0 +1,74 @@
+# Path item for /v1/platform/messages/{message_id}/resend. Referenced from openapi.yaml.
+parameters:
+  - name: message_id
+    in: path
+    required: true
+    description: 'The message.'
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+post:
+  operationId: resendMessage
+  summary: Send a message again
+  description: |
+    Queues a new message to the same recipient by the same channel, composed
+    from the same template version and data: a failed message tried again, or
+    a message sent once more. The new message names the old in `resend_of`, and
+    the audit log names the operator. Nothing of a prescription is ever
+    composed into a message, so none is resent. `notification:manage`.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  responses:
+    '201':
+      description: 'The new message, queued.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/DeliveryLogEntry.yaml
+    '400':
+      description: '`validation_failed`: a malformed message id.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notification:manage` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: 'No such message (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`conflict`: the message''s words were let go after 30 days and its recipient cannot be told again from them.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

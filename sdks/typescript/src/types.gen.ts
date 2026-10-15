@@ -4567,6 +4567,718 @@ export type EventList = {
 };
 
 /**
+ * How the customer is reached, per channel, the `CustomerNotificationPreferences`
+ * schema. Messages about an order, a payment, a refund or the account always
+ * send, whatever the marketing consent says; marketing goes only by the
+ * channels the customer agreed to. Push reaches every device signed in and
+ * registered; a customer with none is told by WhatsApp when they opted in to
+ * order updates there, else by SMS; email goes where an email is on file.
+ *
+ */
+export type CustomerNotificationPreferences = {
+    /**
+     * Whether the customer opted in to order updates on WhatsApp. WhatsApp is never used without it.
+     */
+    whatsapp_updates: boolean;
+    /**
+     * When the customer opted in; `null` while they have not.
+     */
+    whatsapp_opted_in_at: string | null;
+    /**
+     * Whether the SMS provider reported the number on the national do-not-disturb register. Marketing SMS stops; order messages still arrive.
+     */
+    sms_do_not_disturb: boolean;
+    /**
+     * When the provider first reported it.
+     */
+    sms_do_not_disturb_since: string | null;
+    /**
+     * Whether the profile holds an email, where receipts and other email rows go.
+     */
+    email_on_file: boolean;
+    /**
+     * How many of the customer's signed-in devices are registered for pushes.
+     */
+    push_devices: number;
+    marketing: MarketingConsent;
+    /**
+     * Raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+};
+
+/**
+ * Changes how the customer is reached, the request of `PUT /v1/customer/notification-preferences`. Marketing consent is its own act (`PUT /v1/customer/consent`).
+ */
+export type CustomerNotificationPreferencesUpdate = {
+    /**
+     * Opt in to order updates on WhatsApp, or out of them.
+     */
+    whatsapp_updates: boolean;
+};
+
+/**
+ * One message of the delivery log, the `DeliveryLogEntry` schema: what it
+ * told, by which channel, to whom, with which template version, and what
+ * became of it. Times are when it was queued, sent and, where the provider
+ * reports it, delivered or read. The composed words are kept 30 days and the
+ * entry 90.
+ *
+ */
+export type DeliveryLogEntry = {
+    /**
+     * The message.
+     */
+    id: string;
+    /**
+     * What it tells of, the event type it was composed from (`ordering.order.accepted`), or `notifications.notice.sent`, or `notifications.message.resent`.
+     */
+    event: string;
+    /**
+     * The event it was composed from, when one.
+     */
+    event_id: string | null;
+    /**
+     * The template it was composed with, by name.
+     */
+    template: string;
+    /**
+     * The version of the template; a message keeps the version it was composed with.
+     */
+    template_version: number;
+    /**
+     * The language it was composed in (`en`, `te`, `hi`).
+     */
+    language: string;
+    channel: NotificationChannel;
+    /**
+     * `true` for messages about an order, a payment, a refund, a notice or the account, which send whatever the marketing consent says.
+     */
+    transactional: boolean;
+    recipient: MessageRecipient;
+    /**
+     * The order it is about, when one.
+     */
+    order_id: string | null;
+    /**
+     * The Location it is about, when one.
+     */
+    location_id: string | null;
+    /**
+     * The Partner it is about, when one.
+     */
+    partner_id: string | null;
+    /**
+     * The Agent it is about, when one (Agents are told from a later step).
+     */
+    agent_id: string | null;
+    status: MessageStatus;
+    /**
+     * Why it was skipped or failed, with the provider's own words when the provider refused it.
+     */
+    reason: string | null;
+    /**
+     * How many times the sender tried it.
+     */
+    attempts: number;
+    /**
+     * The provider it went through (`local`, `smtp`, `msg91`, `fcm`).
+     */
+    provider: string | null;
+    /**
+     * The provider's reference for the send, where it gives one.
+     */
+    provider_ref: string | null;
+    /**
+     * For a push, every device it went to and what became of each; empty otherwise.
+     */
+    devices: Array<MessageDevice>;
+    /**
+     * When it was queued, with the change it tells of.
+     */
+    queued_at: string;
+    /**
+     * The earliest moment it may be sent.
+     */
+    not_before: string;
+    /**
+     * When the provider accepted it.
+     */
+    sent_at: string | null;
+    /**
+     * When it was delivered, where the channel reports it (the local stand-ins deliver at once).
+     */
+    delivered_at: string | null;
+    /**
+     * When it was first read or opened, where the channel reports it.
+     */
+    read_at: string | null;
+    /**
+     * When it was given up.
+     */
+    failed_at: string | null;
+    /**
+     * The words it was composed with; `null` after 30 days.
+     */
+    text: MessageText | null;
+    /**
+     * The message it resends, for a resend from Mission Control.
+     */
+    resend_of: string | null;
+};
+
+/**
+ * A page of the delivery log, the response of `GET /v1/platform/messages`.
+ */
+export type DeliveryLogPage = {
+    /**
+     * The messages on this page, newest first unless sorted otherwise.
+     */
+    items: Array<DeliveryLogEntry>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+     */
+    next_cursor: string | null;
+    /**
+     * Facet counts, present when `facets` was asked for (`channel`, `status`, `recipient_kind`).
+     */
+    facets?: Array<Facet>;
+};
+
+/**
+ * A notice in a Location's inbox, shared by everybody who signs in to the Location.
+ */
+export type InboxNotice = {
+    /**
+     * The notice.
+     */
+    notice_id: string;
+    /**
+     * Its title.
+     */
+    title: string;
+    /**
+     * Its message.
+     */
+    message: string;
+    /**
+     * When it was sent.
+     */
+    sent_at: string;
+    /**
+     * When it leaves the inbox by itself, seven days after sending.
+     */
+    expires_at: string;
+    /**
+     * When somebody at the Location first saw it; `null` while it is unread.
+     */
+    first_seen_at: string | null;
+};
+
+/**
+ * One device a push went to and what the provider made of it.
+ */
+export type MessageDevice = {
+    /**
+     * The device identity the session named, else the registration.
+     */
+    device: string;
+    platform: PushPlatform;
+    /**
+     * `sent`, `unregistered` (the provider says the registration is gone; it was dropped), `failed` (refused) or `pending` (to be tried again).
+     */
+    outcome: 'sent' | 'unregistered' | 'failed' | 'pending';
+    /**
+     * The provider's reference for the send, where it gives one.
+     */
+    provider_ref: string | null;
+};
+
+/**
+ * Who a message is for, with the number or address masked to its last characters.
+ */
+export type MessageRecipient = {
+    kind: RecipientKind;
+    /**
+     * The customer, for a customer's message.
+     */
+    user_id: string | null;
+    /**
+     * The Location, for a Location's devices or one of its contacts.
+     */
+    location_id: string | null;
+    /**
+     * The address masked to its last characters (`…3210`, `a…@example.com`) or the devices it went to.
+     */
+    label: string;
+};
+
+/**
+ * Where a message is: `queued` waiting for its moment or its turn, `sending` claimed by the sender, `sent` accepted by the channel's provider, `skipped` not sent on purpose (no credentials in this environment, a reserved address, no live device, an order answered before its reminder), `failed` refused by the provider or still undeliverable after the retries at 1, 5 and 30 minutes. Clients must tolerate values they do not know.
+ */
+export type MessageStatus = 'queued' | 'sending' | 'sent' | 'skipped' | 'failed';
+
+/**
+ * The words a message was composed with, kept 30 days; nothing of a prescription is ever composed into a message.
+ */
+export type MessageText = {
+    /**
+     * The email subject or the push title; `null` for SMS and WhatsApp.
+     */
+    subject: string | null;
+    /**
+     * The text as the recipient reads it.
+     */
+    body: string;
+};
+
+/**
+ * One notice as sent, the `Notice` schema: who sent it, when, its words, the
+ * Locations named and how many it reached, and how many have seen and
+ * cleared it. A notice cannot be recalled. Each Location keeps it seven days
+ * from sending, whether or not anybody clears it.
+ *
+ */
+export type Notice = {
+    /**
+     * The notice.
+     */
+    id: string;
+    /**
+     * Its title.
+     */
+    title: string;
+    /**
+     * Its message.
+     */
+    message: string;
+    /**
+     * The template its words started from, when one.
+     */
+    template_id: string | null;
+    /**
+     * The platform member who sent it.
+     */
+    sent_by: string;
+    /**
+     * Their name at the time.
+     */
+    sent_by_label: string | null;
+    /**
+     * When it was sent.
+     */
+    sent_at: string;
+    /**
+     * When it leaves every inbox, seven days after sending.
+     */
+    expires_at: string;
+    /**
+     * How many Locations the request named.
+     */
+    locations_named: number;
+    /**
+     * How many it was stored for; archived and unknown ones are not counted.
+     */
+    locations_reached: number;
+    /**
+     * How many of those have seen it.
+     */
+    seen: number;
+    /**
+     * How many of those have cleared it.
+     */
+    cleared: number;
+};
+
+/**
+ * The notices to clear from the inbox, the request of `POST .../notices/clear`. Name them in `notice_ids`, or send `all` true to clear the whole inbox; one of the two is required (`selection_required`). Only the Location's own notices are cleared.
+ */
+export type NoticeClear = {
+    /**
+     * The notices to clear.
+     */
+    notice_ids?: Array<string>;
+    /**
+     * Clear every notice of the inbox.
+     */
+    all?: boolean;
+};
+
+/**
+ * One Location's copy of a notice, as the send log keeps it.
+ */
+export type NoticeDelivery = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * When it was stored in the Location's inbox, before anybody was told.
+     */
+    stored_at: string;
+    /**
+     * When somebody at the Location first saw it; `null` while not yet seen.
+     */
+    first_seen_at: string | null;
+    /**
+     * When the Location cleared it from its inbox.
+     */
+    cleared_at: string | null;
+};
+
+/**
+ * A notice with every Location it reached, seen or not yet seen, the response of `GET /v1/platform/notices/{notice_id}`.
+ */
+export type NoticeDetail = {
+    notice: Notice;
+    /**
+     * Every Location it was stored for.
+     */
+    deliveries: Array<NoticeDelivery>;
+};
+
+/**
+ * A page of a Location's inbox, the response of `GET /v1/partners/{partner_id}/locations/{location_id}/notices`, with how many are unread and how many the page is not showing.
+ */
+export type NoticeInbox = {
+    /**
+     * The notices on this page, newest first, or oldest first with `order=oldest`.
+     */
+    items: Array<InboxNotice>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+     */
+    next_cursor: string | null;
+    /**
+     * How many notices the inbox holds now (the filter applied).
+     */
+    total: number;
+    /**
+     * How many of the inbox's notices nobody has seen yet.
+     */
+    unread: number;
+    /**
+     * How many notices matching the request this page does not show.
+     */
+    not_shown: number;
+};
+
+/**
+ * A page of notices sent, newest first, the response of `GET /v1/platform/notices`.
+ */
+export type NoticeList = {
+    /**
+     * The notices on this page.
+     */
+    items: Array<Notice>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Where a Location's screen presents a notice: `prominent` (over the screen) or `corner` (a corner of it).
+ */
+export type NoticePlacement = 'prominent' | 'corner';
+
+/**
+ * How a Location's screen presents a notice, the `NoticePresentation`
+ * schema: where it appears, and whether it waits to be acknowledged or
+ * clears itself after a short while showing the time remaining. Platform
+ * configuration, set in Mission Control, not a preference the Location sets
+ * for itself. A Location configured with nothing reads as prominent and
+ * waiting. A notice that clears itself stays unread in the inbox until
+ * somebody reads it there.
+ *
+ */
+export type NoticePresentation = {
+    placement: NoticePlacement;
+    /**
+     * Whether a notice stays until acknowledged; `false` clears it after a short while.
+     */
+    waits: boolean;
+    /**
+     * `false` while nothing was set and the defaults apply.
+     */
+    configured: boolean;
+    /**
+     * Raised by one on every change, `0` while never set; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * When it was last set.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * Sets how a Location's screen presents a notice, the request of `PUT .../notice-presentation`.
+ */
+export type NoticePresentationInput = {
+    placement: NoticePlacement;
+    /**
+     * Whether a notice stays until acknowledged.
+     */
+    waits: boolean;
+};
+
+/**
+ * The notices to mark seen, the request of `POST .../notices/seen`; without `notice_ids` every notice of the inbox is marked. Only the Location's own notices are touched, and a notice already seen keeps its first sighting.
+ */
+export type NoticeSelection = {
+    /**
+     * The notices to mark; absent for all of them.
+     */
+    notice_ids?: Array<string>;
+};
+
+/**
+ * A notice to send, the request of `POST /v1/platform/notices`. It carries
+ * its own words, never a template to resolve later, and names Locations,
+ * never a group: a group is a way of choosing Locations, resolved by the
+ * console before the request. A blank title or message, whitespace only
+ * included, is refused (`blank_text`).
+ *
+ */
+export type NoticeSend = {
+    /**
+     * The title each Location reads.
+     */
+    title: string;
+    /**
+     * The message each Location reads.
+     */
+    message: string;
+    /**
+     * The Locations to send it to. One archived since it was chosen, or unknown, is skipped, not counted and not an error.
+     */
+    location_ids: Array<string>;
+    /**
+     * The template the words started from, kept for the record only.
+     */
+    template_id?: string | null;
+};
+
+/**
+ * What sending a notice did, the response of `POST /v1/platform/notices`.
+ */
+export type NoticeSent = {
+    notice: Notice;
+    /**
+     * The Locations named that were skipped, with why.
+     */
+    skipped: Array<NoticeSkip>;
+};
+
+/**
+ * A Location a notice was not sent to, and why.
+ */
+export type NoticeSkip = {
+    /**
+     * The Location named.
+     */
+    location_id: string;
+    /**
+     * `archived` (archived since it was chosen) or `unknown` (no such Location).
+     */
+    reason: 'archived' | 'unknown';
+};
+
+/**
+ * A starting point for a notice, kept by name in Mission Control, the
+ * `NoticeTemplate` schema. Choosing one fills a notice's title and message,
+ * which stay editable; the notice carries its own words, so changing a
+ * template never changes what a Location was told. A template is withdrawn
+ * from the send picker (`offered: false`) rather than deleted.
+ *
+ */
+export type NoticeTemplate = {
+    /**
+     * The template.
+     */
+    id: string;
+    /**
+     * Its name, unique without regard to case.
+     */
+    name: string;
+    /**
+     * The title a notice starts from.
+     */
+    title: string;
+    /**
+     * The message a notice starts from.
+     */
+    message: string;
+    /**
+     * Whether the send picker offers it; a template not offered keeps its words and can be offered again.
+     */
+    offered: boolean;
+    /**
+     * Raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A new notice template, the request of `POST /v1/platform/notice-templates`. A name that differs from another only in case is refused (`409`, `notice_template_name_taken`); a blank name, title or message is refused (`blank_text`).
+ */
+export type NoticeTemplateInput = {
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The title a notice starts from.
+     */
+    title: string;
+    /**
+     * The message a notice starts from.
+     */
+    message: string;
+    /**
+     * Whether the send picker offers it.
+     */
+    offered?: boolean;
+};
+
+/**
+ * Notice templates by name, the response of `GET /v1/platform/notice-templates`.
+ */
+export type NoticeTemplateList = {
+    /**
+     * The templates, by name.
+     */
+    items: Array<NoticeTemplate>;
+};
+
+/**
+ * Changes a notice template, the request of `PATCH /v1/platform/notice-templates/{template_id}`; members left out keep their value. Withdraw a template with `offered` false.
+ */
+export type NoticeTemplateUpdate = {
+    /**
+     * Its new name.
+     */
+    name?: string;
+    /**
+     * Its new title.
+     */
+    title?: string;
+    /**
+     * Its new message.
+     */
+    message?: string;
+    /**
+     * Whether the send picker offers it.
+     */
+    offered?: boolean;
+};
+
+/**
+ * How many notices were cleared; `0` when none of those named is in the Location's inbox.
+ */
+export type NoticesCleared = {
+    /**
+     * The notices cleared by this request.
+     */
+    cleared: number;
+};
+
+/**
+ * How many notices were marked seen now; `0` when every one named had been seen already, or none of them is the Location's.
+ */
+export type NoticesMarked = {
+    /**
+     * The notices marked seen by this request.
+     */
+    marked: number;
+};
+
+/**
+ * The channel a message leaves by: `push` to the Customer, Partner and Agent apps and the web consoles, `sms` under a registered DLT template, `whatsapp` through an approved Business template to a customer who opted in, `email`. A Location's notices have an inbox of their own. Clients must tolerate values they do not know.
+ */
+export type NotificationChannel = 'push' | 'sms' | 'whatsapp' | 'email';
+
+/**
+ * Tells the platform a push was opened on this device, the request of `POST /v1/me/push/opened`; the delivery log records the first opening as the message's `read_at`.
+ */
+export type PushOpened = {
+    /**
+     * The `message_id` the push carried in its data.
+     */
+    message_id: string;
+};
+
+/**
+ * What kind of device a push registration is for: `android` and `ios` for the apps, `web` for a browser (the Storefront and the consoles). Every platform receives pushes through Firebase Cloud Messaging; clients must tolerate values they do not know.
+ */
+export type PushPlatform = 'android' | 'ios' | 'web';
+
+/**
+ * The push registration of the calling session's device, the `PushRegistration` schema.
+ */
+export type PushRegistration = {
+    /**
+     * The registration.
+     */
+    id: string;
+    audience: Audience;
+    platform: PushPlatform;
+    /**
+     * The device identity the session was opened with, when the client named one; pushes filed by the local stand-in are addressed to it.
+     */
+    device_id: string | null;
+    /**
+     * The Location a Partner device is set to; `null` for every other surface and for a member's device that follows every Location they reach.
+     */
+    location_id: string | null;
+    /**
+     * When the device first registered in this session.
+     */
+    created_at: string;
+    /**
+     * When the registration last changed (a new token, another Location).
+     */
+    updated_at: string;
+};
+
+/**
+ * Registers the device of the calling session for pushes, the request of
+ * `PUT /v1/me/push`. The registration belongs to the session: signing the
+ * device out, ending the session or its expiry stops its pushes. A token
+ * another session registered moves to this one.
+ *
+ */
+export type PushRegistrationInput = {
+    /**
+     * The push token the device's messaging library gave it (a Firebase Cloud Messaging registration token).
+     */
+    token: string;
+    platform: PushPlatform;
+    /**
+     * On a Partner token only: the Location the console or app is set to, so the device is pushed about that Location alone. Absent or `null`, a member's device is pushed about every Location their grants cover. Refused on other surfaces, and `404` for a Location the member does not reach.
+     */
+    location_id?: string | null;
+};
+
+/**
+ * Who a message is for: `customer` (a customer's devices, number or email), `location` (every device signed in to a Location, resolved when the message is sent) or `contact` (a person a Location lists as a contact, by the channel they agreed to).
+ */
+export type RecipientKind = 'customer' | 'location' | 'contact';
+
+/**
  * A stream of server-sent events, as defined by the WHATWG HTML standard,
  * with the media type `text/event-stream`. Each frame is an `event:` line
  * naming the event type, a `data:` line carrying JSON (empty for
@@ -23517,6 +24229,12 @@ export type GetLiveConfigResponse = GetLiveConfigResponses[keyof GetLiveConfigRe
 
 export type OpenLiveStreamData = {
     body?: never;
+    headers?: {
+        /**
+         * The `id` of the last frame received; `EventSource` sends it by itself when it reconnects. The missed signals of the stream's channels are sent first, while the platform still holds them.
+         */
+        'Last-Event-ID'?: string;
+    };
     path?: never;
     query: {
         /**
@@ -23531,6 +24249,10 @@ export type OpenLiveStreamData = {
          * The access token, for clients that cannot set the Authorization header (EventSource)
          */
         access_token?: string;
+        /**
+         * The `id` of the last frame received before the connection was lost, for clients that open a new connection rather than letting `EventSource` reconnect; the `Last-Event-ID` header wins when both are sent.
+         */
+        last_event_id?: string;
     };
     url: '/v1/live/stream';
 };
@@ -23576,6 +24298,1273 @@ export type OpenLiveStreamResponses = {
 };
 
 export type OpenLiveStreamResponse = OpenLiveStreamResponses[keyof OpenLiveStreamResponses];
+
+export type DeletePushRegistrationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me/push';
+};
+
+export type DeletePushRegistrationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePushRegistrationError = DeletePushRegistrationErrors[keyof DeletePushRegistrationErrors];
+
+export type DeletePushRegistrationResponses = {
+    /**
+     * No registration remains for this session.
+     */
+    204: void;
+};
+
+export type DeletePushRegistrationResponse = DeletePushRegistrationResponses[keyof DeletePushRegistrationResponses];
+
+export type GetPushRegistrationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me/push';
+};
+
+export type GetPushRegistrationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The session has no push registration (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPushRegistrationError = GetPushRegistrationErrors[keyof GetPushRegistrationErrors];
+
+export type GetPushRegistrationResponses = {
+    /**
+     * The registration.
+     */
+    200: PushRegistration;
+};
+
+export type GetPushRegistrationResponse = GetPushRegistrationResponses[keyof GetPushRegistrationResponses];
+
+export type PutPushRegistrationData = {
+    /**
+     * The device's push token and platform.
+     */
+    body: PushRegistrationInput;
+    path?: never;
+    query?: never;
+    url: '/v1/me/push';
+};
+
+export type PutPushRegistrationErrors = {
+    /**
+     * `validation_failed`: a missing or overlong token, an unknown platform, or `location_id` on a surface that has no Locations.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a service token.
+     */
+    403: Problem;
+    /**
+     * A Location the member does not reach (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPushRegistrationError = PutPushRegistrationErrors[keyof PutPushRegistrationErrors];
+
+export type PutPushRegistrationResponses = {
+    /**
+     * The registration as kept.
+     */
+    200: PushRegistration;
+};
+
+export type PutPushRegistrationResponse = PutPushRegistrationResponses[keyof PutPushRegistrationResponses];
+
+export type ReportPushOpenedData = {
+    /**
+     * The message the push carried.
+     */
+    body: PushOpened;
+    path?: never;
+    query?: never;
+    url: '/v1/me/push/opened';
+};
+
+export type ReportPushOpenedErrors = {
+    /**
+     * `validation_failed`: a malformed message id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReportPushOpenedError = ReportPushOpenedErrors[keyof ReportPushOpenedErrors];
+
+export type ReportPushOpenedResponses = {
+    /**
+     * Recorded, or nothing to record.
+     */
+    204: void;
+};
+
+export type ReportPushOpenedResponse = ReportPushOpenedResponses[keyof ReportPushOpenedResponses];
+
+export type GetCustomerNotificationPreferencesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/notification-preferences';
+};
+
+export type GetCustomerNotificationPreferencesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerNotificationPreferencesError = GetCustomerNotificationPreferencesErrors[keyof GetCustomerNotificationPreferencesErrors];
+
+export type GetCustomerNotificationPreferencesResponses = {
+    /**
+     * The preferences.
+     */
+    200: CustomerNotificationPreferences;
+};
+
+export type GetCustomerNotificationPreferencesResponse = GetCustomerNotificationPreferencesResponses[keyof GetCustomerNotificationPreferencesResponses];
+
+export type PutCustomerNotificationPreferencesData = {
+    /**
+     * The WhatsApp opt-in.
+     */
+    body: CustomerNotificationPreferencesUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/notification-preferences';
+};
+
+export type PutCustomerNotificationPreferencesErrors = {
+    /**
+     * `validation_failed`: `whatsapp_updates` missing.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `precondition_failed`: the preferences changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCustomerNotificationPreferencesError = PutCustomerNotificationPreferencesErrors[keyof PutCustomerNotificationPreferencesErrors];
+
+export type PutCustomerNotificationPreferencesResponses = {
+    /**
+     * The preferences as written.
+     */
+    200: CustomerNotificationPreferences;
+};
+
+export type PutCustomerNotificationPreferencesResponse = PutCustomerNotificationPreferencesResponses[keyof PutCustomerNotificationPreferencesResponses];
+
+export type ListMessagesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only messages to this person: a customer.
+         */
+        user_id?: string;
+        /**
+         * Only messages about this order.
+         */
+        order_id?: string;
+        /**
+         * Only messages about this Location, its devices and contacts included.
+         */
+        location_id?: string;
+        /**
+         * Only messages about this partner.
+         */
+        partner_id?: string;
+        /**
+         * Only messages about this Agent.
+         */
+        agent_id?: string;
+        /**
+         * Only this channel.
+         */
+        channel?: NotificationChannel;
+        /**
+         * Only this outcome.
+         */
+        status?: MessageStatus;
+        /**
+         * Only messages composed from this event type, for example `ordering.order.accepted`.
+         */
+        event?: string;
+        /**
+         * Only messages of this template, for example `order.accepted`.
+         */
+        template?: string;
+        /**
+         * Only messages queued at or after this instant.
+         */
+        from?: string;
+        /**
+         * Only messages queued at or before this instant.
+         */
+        to?: string;
+        /**
+         * A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/platform/messages/filters`.
+         */
+        filter?: string;
+        /**
+         * Sort keys, comma separated, `-` for descending; `-queued_at` by default.
+         */
+        sort?: string;
+        /**
+         * Enumeration fields to count alongside the page, comma separated (`channel`, `status`, `recipient_kind`).
+         */
+        facets?: string;
+        /**
+         * The maximum number of messages to return per page.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page. Omit it for the first page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/messages';
+};
+
+export type ListMessagesErrors = {
+    /**
+     * A parameter was refused (`validation_failed`); `errors` names each with its field-level code, such as `cursor_invalid` or `filter_field_unknown`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:read` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListMessagesError = ListMessagesErrors[keyof ListMessagesErrors];
+
+export type ListMessagesResponses = {
+    /**
+     * A page of messages.
+     */
+    200: DeliveryLogPage;
+};
+
+export type ListMessagesResponse = ListMessagesResponses[keyof ListMessagesResponses];
+
+export type GetMessageFiltersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/messages/filters';
+};
+
+export type GetMessageFiltersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:read` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMessageFiltersError = GetMessageFiltersErrors[keyof GetMessageFiltersErrors];
+
+export type GetMessageFiltersResponses = {
+    /**
+     * The filter declaration.
+     */
+    200: FilterSchema;
+};
+
+export type GetMessageFiltersResponse = GetMessageFiltersResponses[keyof GetMessageFiltersResponses];
+
+export type GetMessageData = {
+    body?: never;
+    path: {
+        /**
+         * The message.
+         */
+        message_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/messages/{message_id}';
+};
+
+export type GetMessageErrors = {
+    /**
+     * `validation_failed`: a malformed message id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:read` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such message (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMessageError = GetMessageErrors[keyof GetMessageErrors];
+
+export type GetMessageResponses = {
+    /**
+     * The message.
+     */
+    200: DeliveryLogEntry;
+};
+
+export type GetMessageResponse = GetMessageResponses[keyof GetMessageResponses];
+
+export type ResendMessageData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The message.
+         */
+        message_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/messages/{message_id}/resend';
+};
+
+export type ResendMessageErrors = {
+    /**
+     * `validation_failed`: a malformed message id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:manage` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such message (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the message's words were let go after 30 days and its recipient cannot be told again from them.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResendMessageError = ResendMessageErrors[keyof ResendMessageErrors];
+
+export type ResendMessageResponses = {
+    /**
+     * The new message, queued.
+     */
+    201: DeliveryLogEntry;
+};
+
+export type ResendMessageResponse = ResendMessageResponses[keyof ResendMessageResponses];
+
+export type ListNoticeTemplatesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only the templates offered (`true`) or withdrawn (`false`).
+         */
+        offered?: boolean;
+    };
+    url: '/v1/platform/notice-templates';
+};
+
+export type ListNoticeTemplatesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or neither `notice:send` nor `notification:manage` is held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListNoticeTemplatesError = ListNoticeTemplatesErrors[keyof ListNoticeTemplatesErrors];
+
+export type ListNoticeTemplatesResponses = {
+    /**
+     * The templates.
+     */
+    200: NoticeTemplateList;
+};
+
+export type ListNoticeTemplatesResponse = ListNoticeTemplatesResponses[keyof ListNoticeTemplatesResponses];
+
+export type CreateNoticeTemplateData = {
+    /**
+     * The template.
+     */
+    body: NoticeTemplateInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/platform/notice-templates';
+};
+
+export type CreateNoticeTemplateErrors = {
+    /**
+     * `validation_failed`: a blank or overlong name, title or message (`blank_text`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:manage` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `notice_template_name_taken`: another template has that name, whatever its case.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateNoticeTemplateError = CreateNoticeTemplateErrors[keyof CreateNoticeTemplateErrors];
+
+export type CreateNoticeTemplateResponses = {
+    /**
+     * The template.
+     */
+    201: NoticeTemplate;
+};
+
+export type CreateNoticeTemplateResponse = CreateNoticeTemplateResponses[keyof CreateNoticeTemplateResponses];
+
+export type GetNoticeTemplateData = {
+    body?: never;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/notice-templates/{template_id}';
+};
+
+export type GetNoticeTemplateErrors = {
+    /**
+     * `validation_failed`: a malformed template id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or neither permission is held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetNoticeTemplateError = GetNoticeTemplateErrors[keyof GetNoticeTemplateErrors];
+
+export type GetNoticeTemplateResponses = {
+    /**
+     * The template.
+     */
+    200: NoticeTemplate;
+};
+
+export type GetNoticeTemplateResponse = GetNoticeTemplateResponses[keyof GetNoticeTemplateResponses];
+
+export type UpdateNoticeTemplateData = {
+    /**
+     * The members to change.
+     */
+    body: NoticeTemplateUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/notice-templates/{template_id}';
+};
+
+export type UpdateNoticeTemplateErrors = {
+    /**
+     * `validation_failed`: a blank or overlong member (`blank_text`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notification:manage` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `notice_template_name_taken`: another template has that name, whatever its case.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`: the template changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateNoticeTemplateError = UpdateNoticeTemplateErrors[keyof UpdateNoticeTemplateErrors];
+
+export type UpdateNoticeTemplateResponses = {
+    /**
+     * The template as changed.
+     */
+    200: NoticeTemplate;
+};
+
+export type UpdateNoticeTemplateResponse = UpdateNoticeTemplateResponses[keyof UpdateNoticeTemplateResponses];
+
+export type ListNoticesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The maximum number of notices to return per page.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page. Omit it for the first page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/notices';
+};
+
+export type ListNoticesErrors = {
+    /**
+     * A parameter was refused (`validation_failed`), such as `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notice:send` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListNoticesError = ListNoticesErrors[keyof ListNoticesErrors];
+
+export type ListNoticesResponses = {
+    /**
+     * A page of notices.
+     */
+    200: NoticeList;
+};
+
+export type ListNoticesResponse = ListNoticesResponses[keyof ListNoticesResponses];
+
+export type SendNoticeData = {
+    /**
+     * The notice and the Locations to send it to.
+     */
+    body: NoticeSend;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/platform/notices';
+};
+
+export type SendNoticeErrors = {
+    /**
+     * `validation_failed`: a blank or overlong title or message (`blank_text`), or no Locations.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notice:send` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendNoticeError = SendNoticeErrors[keyof SendNoticeErrors];
+
+export type SendNoticeResponses = {
+    /**
+     * The notice as sent, with the Locations skipped.
+     */
+    201: NoticeSent;
+};
+
+export type SendNoticeResponse = SendNoticeResponses[keyof SendNoticeResponses];
+
+export type GetNoticeData = {
+    body?: never;
+    path: {
+        /**
+         * The notice.
+         */
+        notice_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/notices/{notice_id}';
+};
+
+export type GetNoticeErrors = {
+    /**
+     * `validation_failed`: a malformed notice id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or `notice:send` is not held (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such notice (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetNoticeError = GetNoticeErrors[keyof GetNoticeErrors];
+
+export type GetNoticeResponses = {
+    /**
+     * The notice and its Locations.
+     */
+    200: NoticeDetail;
+};
+
+export type GetNoticeResponse = GetNoticeResponses[keyof GetNoticeResponses];
+
+export type ListLocationNoticesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * Only the notices seen (`true`) or unread (`false`).
+         */
+        seen?: boolean;
+        /**
+         * `newest` first (the default) or `oldest` first.
+         */
+        order?: 'newest' | 'oldest';
+        /**
+         * The maximum number of notices to return per page.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page. Omit it for the first page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notices';
+};
+
+export type ListLocationNoticesErrors = {
+    /**
+     * A parameter was refused (`validation_failed`), such as `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `notice:read` at this Location (`access_denied`); platform staff read with `notice:send` and change nothing (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or a Location of another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationNoticesError = ListLocationNoticesErrors[keyof ListLocationNoticesErrors];
+
+export type ListLocationNoticesResponses = {
+    /**
+     * A page of the inbox.
+     */
+    200: NoticeInbox;
+};
+
+export type ListLocationNoticesResponse = ListLocationNoticesResponses[keyof ListLocationNoticesResponses];
+
+export type MarkLocationNoticesSeenData = {
+    /**
+     * The notices to mark, or none for all.
+     */
+    body: NoticeSelection;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notices/seen';
+};
+
+export type MarkLocationNoticesSeenErrors = {
+    /**
+     * `validation_failed`: a malformed notice id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `notice:read` at this Location (`access_denied`); platform staff read with `notice:send` and change nothing (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or a Location of another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkLocationNoticesSeenError = MarkLocationNoticesSeenErrors[keyof MarkLocationNoticesSeenErrors];
+
+export type MarkLocationNoticesSeenResponses = {
+    /**
+     * How many were marked now.
+     */
+    200: NoticesMarked;
+};
+
+export type MarkLocationNoticesSeenResponse = MarkLocationNoticesSeenResponses[keyof MarkLocationNoticesSeenResponses];
+
+export type ClearLocationNoticesData = {
+    /**
+     * The notices to clear, or all.
+     */
+    body: NoticeClear;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notices/clear';
+};
+
+export type ClearLocationNoticesErrors = {
+    /**
+     * `validation_failed`: neither `notice_ids` nor `all` (`selection_required`), or a malformed id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `notice:read` at this Location (`access_denied`); platform staff read with `notice:send` and change nothing (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or a Location of another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ClearLocationNoticesError = ClearLocationNoticesErrors[keyof ClearLocationNoticesErrors];
+
+export type ClearLocationNoticesResponses = {
+    /**
+     * How many were cleared.
+     */
+    200: NoticesCleared;
+};
+
+export type ClearLocationNoticesResponse = ClearLocationNoticesResponses[keyof ClearLocationNoticesResponses];
+
+export type ClearLocationNoticeData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The notice.
+         */
+        notice_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notices/{notice_id}';
+};
+
+export type ClearLocationNoticeErrors = {
+    /**
+     * `validation_failed`: a malformed notice id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `notice:read` at this Location (`access_denied`); platform staff read with `notice:send` and change nothing (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or a Location of another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ClearLocationNoticeError = ClearLocationNoticeErrors[keyof ClearLocationNoticeErrors];
+
+export type ClearLocationNoticeResponses = {
+    /**
+     * How many were cleared: one or none.
+     */
+    200: NoticesCleared;
+};
+
+export type ClearLocationNoticeResponse = ClearLocationNoticeResponses[keyof ClearLocationNoticeResponses];
+
+export type GetNoticePresentationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notice-presentation';
+};
+
+export type GetNoticePresentationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or a Location of another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetNoticePresentationError = GetNoticePresentationErrors[keyof GetNoticePresentationErrors];
+
+export type GetNoticePresentationResponses = {
+    /**
+     * The presentation.
+     */
+    200: NoticePresentation;
+};
+
+export type GetNoticePresentationResponse = GetNoticePresentationResponses[keyof GetNoticePresentationResponses];
+
+export type PutNoticePresentationData = {
+    /**
+     * The presentation.
+     */
+    body: NoticePresentationInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/notice-presentation';
+};
+
+export type PutNoticePresentationErrors = {
+    /**
+     * `validation_failed`: an unknown placement or a missing member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A Partner's own people (`forbidden`), or platform staff without `location:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the presentation changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutNoticePresentationError = PutNoticePresentationErrors[keyof PutNoticePresentationErrors];
+
+export type PutNoticePresentationResponses = {
+    /**
+     * The presentation as set.
+     */
+    200: NoticePresentation;
+};
+
+export type PutNoticePresentationResponse = PutNoticePresentationResponses[keyof PutNoticePresentationResponses];
 
 export type CreateAssetGrantData = {
     /**

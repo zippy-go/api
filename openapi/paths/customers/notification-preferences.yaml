@@ -1,0 +1,115 @@
+# Path item for /v1/customer/notification-preferences. Referenced from openapi.yaml.
+get:
+  operationId: getCustomerNotificationPreferences
+  summary: Read how the customer is reached
+  description: |
+    How the customer is reached, per channel: whether they opted in to order
+    updates on WhatsApp, whether the SMS provider reported the number on the
+    do-not-disturb register, whether an email is on file, how many devices are
+    registered for pushes, and the marketing consent per channel (changed with
+    `PUT /v1/customer/consent`). Messages about an order, a payment, a refund
+    or the account send whatever the marketing consent says.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: 'The preferences.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/CustomerNotificationPreferences.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putCustomerNotificationPreferences
+  summary: Change how the customer is reached
+  description: |
+    Opts the customer in to order updates on WhatsApp, or out of them. Without
+    the opt-in WhatsApp is never used: a customer with no device registered for
+    pushes is told by SMS. `If-Match` guards against a stale screen.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: 'The WhatsApp opt-in.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/CustomerNotificationPreferencesUpdate.yaml
+  responses:
+    '200':
+      description: 'The preferences as written.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/CustomerNotificationPreferences.yaml
+    '400':
+      description: '`validation_failed`: `whatsapp_updates` missing.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`precondition_failed`: the preferences changed since the `If-Match` version.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

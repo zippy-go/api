@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.13.0
+  version: 0.14.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -223,6 +223,23 @@ tags:
     description: "What the storefront draws for one store, signed out: the store page (open or shut, its hours, the reference to its published menu), the published menu with its version as the entity tag, a large category's further pages and an item sheet. Public; no credential."
   - name: Search
     description: "Finding stores and products by typing, across the stores of the customer's city and inside one store, forgiving misspellings and the common spellings of Indian dishes, with names suggested as the customer types. The ranking is published: a store whose name matches exactly what was typed comes first; the rest are ordered open before closed, then nearer the customer's pin before farther, then by how well the words matched; no store is ranked higher for a fee. The searches are public; the synonym groups are Mission Control's."
+  - name: Notifications
+    description: |
+      How the platform tells people what happened. Every message leaves
+      through one outbox, queued with the change that causes it, and one
+      sender, by push, SMS under DLT, WhatsApp to a customer who opted in, or
+      email; each channel has a local stand-in that files its copy in the
+      local message inbox. A signed-in device registers for pushes
+      (`/v1/me/push`); a customer chooses whether order updates may use
+      WhatsApp; Mission Control reads every message in the delivery log and
+      sends one again.
+  - name: Notices
+    description: |
+      Notices Mission Control sends to Locations: templates kept by name as
+      a starting point and withdrawn rather than deleted, a notice with its
+      own words sent to the Locations named, the send log with who saw it,
+      a Location's inbox shared by everybody who signs in to it, and how a
+      Location's screen presents a notice.
   - name: Orders
     description: Commercial purchases placed by customers.
   - name: Deliveries
@@ -561,6 +578,40 @@ paths:
     $ref: ./paths/live/config.yaml
   /v1/live/stream:
     $ref: ./paths/live/stream.yaml
+  # Step 3 notifications: push registration, a customer's channel preferences, the delivery
+  # log, notices to Locations and a Location's inbox
+  /v1/me/push:
+    $ref: ./paths/notifications/me-push.yaml
+  /v1/me/push/opened:
+    $ref: ./paths/notifications/me-push-opened.yaml
+  /v1/customer/notification-preferences:
+    $ref: ./paths/customers/notification-preferences.yaml
+  /v1/platform/messages:
+    $ref: ./paths/notifications/messages.yaml
+  /v1/platform/messages/filters:
+    $ref: ./paths/notifications/messages-filters.yaml
+  /v1/platform/messages/{message_id}:
+    $ref: ./paths/notifications/message.yaml
+  /v1/platform/messages/{message_id}/resend:
+    $ref: ./paths/notifications/message-resend.yaml
+  /v1/platform/notice-templates:
+    $ref: ./paths/notifications/notice-templates.yaml
+  /v1/platform/notice-templates/{template_id}:
+    $ref: ./paths/notifications/notice-template.yaml
+  /v1/platform/notices:
+    $ref: ./paths/notifications/notices.yaml
+  /v1/platform/notices/{notice_id}:
+    $ref: ./paths/notifications/notice.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/notices:
+    $ref: ./paths/notifications/location-notices.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/notices/seen:
+    $ref: ./paths/notifications/location-notices-seen.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/notices/clear:
+    $ref: ./paths/notifications/location-notices-clear.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/notices/{notice_id}:
+    $ref: ./paths/notifications/location-notice.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/notice-presentation:
+    $ref: ./paths/notifications/notice-presentation.yaml
   /v1/assets/grants:
     $ref: ./paths/assets/grants.yaml
   /v1/assets/purposes:
@@ -1155,6 +1206,75 @@ components:
       $ref: ./components/schemas/events/Event.yaml
     EventList:
       $ref: ./components/schemas/events/EventList.yaml
+    # Notifications
+    CustomerNotificationPreferences:
+      $ref: ./components/schemas/notifications/CustomerNotificationPreferences.yaml
+    CustomerNotificationPreferencesUpdate:
+      $ref: ./components/schemas/notifications/CustomerNotificationPreferencesUpdate.yaml
+    DeliveryLogEntry:
+      $ref: ./components/schemas/notifications/DeliveryLogEntry.yaml
+    DeliveryLogPage:
+      $ref: ./components/schemas/notifications/DeliveryLogPage.yaml
+    InboxNotice:
+      $ref: ./components/schemas/notifications/InboxNotice.yaml
+    MessageDevice:
+      $ref: ./components/schemas/notifications/MessageDevice.yaml
+    MessageRecipient:
+      $ref: ./components/schemas/notifications/MessageRecipient.yaml
+    MessageStatus:
+      $ref: ./components/schemas/notifications/MessageStatus.yaml
+    MessageText:
+      $ref: ./components/schemas/notifications/MessageText.yaml
+    Notice:
+      $ref: ./components/schemas/notifications/Notice.yaml
+    NoticeClear:
+      $ref: ./components/schemas/notifications/NoticeClear.yaml
+    NoticeDelivery:
+      $ref: ./components/schemas/notifications/NoticeDelivery.yaml
+    NoticeDetail:
+      $ref: ./components/schemas/notifications/NoticeDetail.yaml
+    NoticeInbox:
+      $ref: ./components/schemas/notifications/NoticeInbox.yaml
+    NoticeList:
+      $ref: ./components/schemas/notifications/NoticeList.yaml
+    NoticePlacement:
+      $ref: ./components/schemas/notifications/NoticePlacement.yaml
+    NoticePresentation:
+      $ref: ./components/schemas/notifications/NoticePresentation.yaml
+    NoticePresentationInput:
+      $ref: ./components/schemas/notifications/NoticePresentationInput.yaml
+    NoticeSelection:
+      $ref: ./components/schemas/notifications/NoticeSelection.yaml
+    NoticeSend:
+      $ref: ./components/schemas/notifications/NoticeSend.yaml
+    NoticeSent:
+      $ref: ./components/schemas/notifications/NoticeSent.yaml
+    NoticeSkip:
+      $ref: ./components/schemas/notifications/NoticeSkip.yaml
+    NoticeTemplate:
+      $ref: ./components/schemas/notifications/NoticeTemplate.yaml
+    NoticeTemplateInput:
+      $ref: ./components/schemas/notifications/NoticeTemplateInput.yaml
+    NoticeTemplateList:
+      $ref: ./components/schemas/notifications/NoticeTemplateList.yaml
+    NoticeTemplateUpdate:
+      $ref: ./components/schemas/notifications/NoticeTemplateUpdate.yaml
+    NoticesCleared:
+      $ref: ./components/schemas/notifications/NoticesCleared.yaml
+    NoticesMarked:
+      $ref: ./components/schemas/notifications/NoticesMarked.yaml
+    NotificationChannel:
+      $ref: ./components/schemas/notifications/NotificationChannel.yaml
+    PushOpened:
+      $ref: ./components/schemas/notifications/PushOpened.yaml
+    PushPlatform:
+      $ref: ./components/schemas/notifications/PushPlatform.yaml
+    PushRegistration:
+      $ref: ./components/schemas/notifications/PushRegistration.yaml
+    PushRegistrationInput:
+      $ref: ./components/schemas/notifications/PushRegistrationInput.yaml
+    RecipientKind:
+      $ref: ./components/schemas/notifications/RecipientKind.yaml
     # Live
     ServerSentEventStream:
       $ref: ./components/schemas/live/ServerSentEventStream.yaml

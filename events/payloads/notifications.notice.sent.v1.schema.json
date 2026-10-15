@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/notifications.notice.sent.v1.schema.json",
+  "title": "NotificationsNoticeSentPayload",
+  "description": "Payload of `notifications.notice.sent` version 1: Mission Control sent a notice and it was stored for every Location it reached, before any Location was told. The envelope's `partner_id` is `null`. The words are read from `GET /v1/platform/notices/{notice_id}`, never carried here. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "notice_id",
+    "location_ids",
+    "locations_named",
+    "locations_reached",
+    "sent_by",
+    "sent_at"
+  ],
+  "properties": {
+    "notice_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The notice.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01"
+      ]
+    },
+    "location_ids": {
+      "type": "array",
+      "description": "The Locations it was stored for.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "locations_named": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many Locations the request named."
+    },
+    "locations_reached": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many it was stored for; archived and unknown ones are not counted."
+    },
+    "template_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The template its words started from, when one."
+    },
+    "sent_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who sent it."
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was sent."
+    }
+  }
+}

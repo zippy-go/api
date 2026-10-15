@@ -1,0 +1,11 @@
+type: object
+description: Tells the platform a push was opened on this device, the request of `POST /v1/me/push/opened`; the delivery log records the first opening as the message's `read_at`.
+required:
+  - message_id
+properties:
+  message_id:
+    type: string
+    format: uuid
+    description: The `message_id` the push carried in its data.
+examples:
+  - message_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01

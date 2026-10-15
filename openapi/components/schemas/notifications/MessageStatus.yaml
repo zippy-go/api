@@ -1,0 +1,10 @@
+type: string
+description: "Where a message is: `queued` waiting for its moment or its turn, `sending` claimed by the sender, `sent` accepted by the channel's provider, `skipped` not sent on purpose (no credentials in this environment, a reserved address, no live device, an order answered before its reminder), `failed` refused by the provider or still undeliverable after the retries at 1, 5 and 30 minutes. Clients must tolerate values they do not know."
+enum:
+  - queued
+  - sending
+  - sent
+  - skipped
+  - failed
+examples:
+  - sent

@@ -1,0 +1,12 @@
+type: object
+description: Notice templates by name, the response of `GET /v1/platform/notice-templates`.
+required:
+  - items
+properties:
+  items:
+    type: array
+    description: The templates, by name.
+    items:
+      $ref: ./NoticeTemplate.yaml
+examples:
+  - items: []

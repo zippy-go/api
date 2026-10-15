@@ -50,6 +50,13 @@ components/
                    AccessGrantList, AccessSet, Entitlements, EntitlementsUpdate, TeamMember, TeamMemberList,
                    TeamMemberUpdate, MembershipStatus, PlatformStaffInvite, AccessHistoryEntry, AccessHistoryList,
                    HistoryAction
+    notifications/ Telling people: PushPlatform, PushRegistration, PushRegistrationInput, PushOpened,
+                   CustomerNotificationPreferences, CustomerNotificationPreferencesUpdate; the delivery log:
+                   NotificationChannel, MessageStatus, RecipientKind, MessageRecipient, MessageDevice, MessageText,
+                   DeliveryLogEntry, DeliveryLogPage; notices: NoticeTemplate, NoticeTemplateInput,
+                   NoticeTemplateUpdate, NoticeTemplateList, NoticeSend, NoticeSent, NoticeSkip, Notice, NoticeList,
+                   NoticeDelivery, NoticeDetail, InboxNotice, NoticeInbox, NoticeSelection, NoticeClear, NoticesMarked,
+                   NoticesCleared, NoticePlacement, NoticePresentation, NoticePresentationInput
     oversight/     Four eyes and consented viewing: Approval, ApprovalAction, ApprovalStatus, ApprovalCreate,
                    ApprovalDecision, ApprovalList, ImpersonationConsent, ConsentStatus, ImpersonationConsentCreate,
                    ImpersonationConsentApproval, ImpersonationConsentList, ImpersonationSession,

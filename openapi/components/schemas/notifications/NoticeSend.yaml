@@ -1,0 +1,47 @@
+type: object
+description: |
+  A notice to send, the request of `POST /v1/platform/notices`. It carries
+  its own words, never a template to resolve later, and names Locations,
+  never a group: a group is a way of choosing Locations, resolved by the
+  console before the request. A blank title or message, whitespace only
+  included, is refused (`blank_text`).
+required:
+  - title
+  - message
+  - location_ids
+properties:
+  title:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: The title each Location reads.
+    examples:
+      - Agents are running late
+  message:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: The message each Location reads.
+    examples:
+      - Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+  location_ids:
+    type: array
+    minItems: 1
+    maxItems: 1000
+    uniqueItems: true
+    description: The Locations to send it to. One archived since it was chosen, or unknown, is skipped, not counted and not an error.
+    items:
+      type: string
+      format: uuid
+  template_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The template the words started from, kept for the record only.
+examples:
+  - title: Agents are running late
+    message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+    location_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a41

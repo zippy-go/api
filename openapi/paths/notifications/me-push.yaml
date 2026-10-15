@@ -1,0 +1,140 @@
+# Path item for /v1/me/push. Referenced from openapi.yaml.
+get:
+  operationId: getPushRegistration
+  summary: Read this device's push registration
+  description: |
+    The push registration of the calling session's device, or `404` when it has none.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: 'The registration.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/PushRegistration.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: 'The session has no push registration (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putPushRegistration
+  summary: Register this device for pushes
+  description: |
+    Registers the device the calling session is signed in from for pushes, on
+    any surface: the Customer app and the Storefront, the Partner console and
+    app, the Agent app, Mission Control. The registration belongs to the
+    session: signing the device out, ending the session or its expiry stops its
+    pushes, and a token the push provider reports as gone is dropped. A token
+    another session registered moves to this one; a new token replaces the
+    session's old one. A push goes to every live device of its recipient: a
+    customer's phones and browsers, and for a Location every device signed in
+    to it. On a Partner token, `location_id` names the Location the device is
+    set to (`404` for a Location the member does not reach); refused on other
+    surfaces.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: 'The device''s push token and platform.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/PushRegistrationInput.yaml
+  responses:
+    '200':
+      description: 'The registration as kept.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/PushRegistration.yaml
+    '400':
+      description: '`validation_failed`: a missing or overlong token, an unknown platform, or `location_id` on a surface that has no Locations.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a service token.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: 'A Location the member does not reach (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: deletePushRegistration
+  summary: Stop pushes to this device
+  description: |
+    Removes the push registration of the calling session's device; answers `204` whether or not it had one.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  responses:
+    '204':
+      description: 'No registration remains for this session.'
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

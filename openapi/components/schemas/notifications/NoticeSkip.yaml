@@ -1,0 +1,19 @@
+type: object
+description: A Location a notice was not sent to, and why.
+required:
+  - location_id
+  - reason
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location named.
+  reason:
+    type: string
+    description: "`archived` (archived since it was chosen) or `unknown` (no such Location)."
+    enum:
+      - archived
+      - unknown
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a42
+    reason: archived

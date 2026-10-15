@@ -1,0 +1,48 @@
+type: object
+description: The push registration of the calling session's device, the `PushRegistration` schema.
+required:
+  - id
+  - audience
+  - platform
+  - device_id
+  - location_id
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The registration.
+  audience:
+    $ref: ../auth/Audience.yaml
+  platform:
+    $ref: ./PushPlatform.yaml
+  device_id:
+    type:
+      - string
+      - 'null'
+    description: The device identity the session was opened with, when the client named one; pushes filed by the local stand-in are addressed to it.
+    examples:
+      - pixel-9-asha
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location a Partner device is set to; `null` for every other surface and for a member's device that follows every Location they reach.
+  created_at:
+    type: string
+    format: date-time
+    description: When the device first registered in this session.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the registration last changed (a new token, another Location).
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b10
+    audience: customer
+    platform: android
+    device_id: pixel-9-asha
+    location_id: null
+    created_at: 2026-10-16T09:00:00Z
+    updated_at: 2026-10-16T09:00:00Z

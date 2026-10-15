@@ -1,0 +1,126 @@
+# Path item for /v1/platform/notices. Referenced from openapi.yaml.
+get:
+  operationId: listNotices
+  summary: List the notices sent
+  description: |
+    The notices sent, newest first, each with how many Locations it reached and how many have seen and cleared it. `notice:send`.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: 'The maximum number of notices to return per page.'
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: 'The `next_cursor` of the previous page. Omit it for the first page.'
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    '200':
+      description: 'A page of notices.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticeList.yaml
+    '400':
+      description: 'A parameter was refused (`validation_failed`), such as `cursor_invalid`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notice:send` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: sendNotice
+  summary: Send a notice to Locations
+  description: |
+    Sends a notice with its own words to the Locations named. Each Location's
+    copy is stored before anybody is told, so a Location that was not listening
+    finds it on its next read; then the Location's notices channel carries
+    `notice.sent` with the notice id (refetch the inbox), and its signed-in
+    devices are pushed. A Location archived since it was chosen, or unknown, is
+    skipped, not counted and not an error. A blank title or message, whitespace
+    only included, is refused and nothing is sent. A notice cannot be recalled;
+    each Location keeps it seven days from sending. `notice:send`.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: 'The notice and the Locations to send it to.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/NoticeSend.yaml
+  responses:
+    '201':
+      description: 'The notice as sent, with the Locations skipped.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticeSent.yaml
+    '400':
+      description: '`validation_failed`: a blank or overlong title or message (`blank_text`), or no Locations.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notice:send` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

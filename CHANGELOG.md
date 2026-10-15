@@ -6,6 +6,79 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-16
+
+Step 3, notifications and live channels: every message leaves through one
+outbox and one sender, by push, SMS under DLT, WhatsApp to a customer who
+opted in, or email, each with a local stand-in; what each order event tells
+the customer and the Partner's staff; the delivery log in Mission Control;
+notices to Locations with a Location's inbox; and the live channels a
+customer and a Location's staff listen on, resumable with `Last-Event-ID`.
+Numbered after 0.13.0; the step 3 orders and money slices take the next
+minors as they merge. Additive only.
+
+### Added
+
+- Push registration for the calling session's device, on every surface
+  (`GET`, `PUT`, `DELETE /v1/me/push`, `PushRegistration`,
+  `PushRegistrationInput`, `PushPlatform`), with `location_id` for a Partner
+  device set to one Location, and `POST /v1/me/push/opened`
+  (`PushOpened`) to record that a push was read. A push goes to every live
+  device of its recipient; signing a device out stops its pushes.
+- How a customer is reached, per channel
+  (`GET`, `PUT /v1/customer/notification-preferences`,
+  `CustomerNotificationPreferences`,
+  `CustomerNotificationPreferencesUpdate`): the opt-in to order updates on
+  WhatsApp, the SMS do-not-disturb flag, whether an email is on file, the
+  devices registered for pushes and the marketing consent (still written
+  with `PUT /v1/customer/consent`). Transactional messages send whatever
+  the marketing consent says.
+- The delivery log for Mission Control with `notification:read`:
+  `GET /v1/platform/messages` (`DeliveryLogPage`, `DeliveryLogEntry`,
+  `NotificationChannel`, `MessageStatus`, `MessageRecipient`,
+  `RecipientKind`, `MessageDevice`, `MessageText`) searchable by person,
+  order, Location, partner, Agent, channel, outcome, event and template,
+  `GET /v1/platform/messages/filters`, `GET /v1/platform/messages/{message_id}`,
+  and `POST /v1/platform/messages/{message_id}/resend` with
+  `notification:manage`, audited.
+- Notices to Locations (tag `Notices`): templates kept by name and
+  withdrawn rather than deleted (`GET`, `POST /v1/platform/notice-templates`,
+  `GET`, `PATCH /v1/platform/notice-templates/{template_id}`,
+  `NoticeTemplate`, `NoticeTemplateInput`, `NoticeTemplateUpdate`,
+  `NoticeTemplateList`), sending with `notice:send`
+  (`POST /v1/platform/notices`, `NoticeSend`, `NoticeSent`, `NoticeSkip`)
+  and the send log with who saw each notice (`GET /v1/platform/notices`,
+  `GET /v1/platform/notices/{notice_id}`, `Notice`, `NoticeList`,
+  `NoticeDetail`, `NoticeDelivery`); a Location's inbox with `notice:read`
+  at the Location (`GET .../locations/{location_id}/notices`,
+  `POST .../notices/seen`, `POST .../notices/clear`,
+  `DELETE .../notices/{notice_id}`, `InboxNotice`, `NoticeInbox`,
+  `NoticeSelection`, `NoticeClear`, `NoticesMarked`, `NoticesCleared`);
+  and how the Location's screen presents a notice, set by Mission Control
+  with `location:write` (`GET`, `PUT .../notice-presentation`,
+  `NoticePresentation`, `NoticePresentationInput`, `NoticePlacement`).
+- The permissions `notice:read` (partner pool), `notice:send` and
+  `notification:read` (platform pool), served by `GET /v1/permissions`.
+- The problem code `notice_template_name_taken` (409) and the field codes
+  `blank_text` and `selection_required`.
+- The events `notifications.notice.sent` and `notifications.message.failed`.
+- `GET /v1/live/stream` resumes: signals carry an `id` and the opening
+  frames the position the stream opened at; a reconnect with
+  `Last-Event-ID` (or `last_event_id`) receives the missed signals of its
+  channels instead of a `resync`, while the platform still holds them.
+
+### Changed
+
+- The live channels answer from the token's surface and what its holder
+  holds now, checked when the stream opens and every 30 seconds: a
+  customer's own orders channel and the channel of an order they placed; a
+  Location's notices with `notice:read`, its orders, kitchen and tables with
+  `order:read` and its catalogue with `catalog:read` at the Location; a
+  partner's agents with `dispatch:read`; the network's orders and agents
+  with `order:read` and `agent:read` for Mission Control. A permission no
+  longer held closes the stream with `revoked`. Descriptions only; the
+  shapes are unchanged.
+
 ## [0.13.0] - 2026-10-15
 
 Step 2, customer fixes: a Partner's own storefront, and the refresh grace

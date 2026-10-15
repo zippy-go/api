@@ -1,0 +1,82 @@
+type: object
+description: |
+  One notice as sent, the `Notice` schema: who sent it, when, its words, the
+  Locations named and how many it reached, and how many have seen and
+  cleared it. A notice cannot be recalled. Each Location keeps it seven days
+  from sending, whether or not anybody clears it.
+required:
+  - id
+  - title
+  - message
+  - template_id
+  - sent_by
+  - sent_by_label
+  - sent_at
+  - expires_at
+  - locations_named
+  - locations_reached
+  - seen
+  - cleared
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The notice.
+  title:
+    type: string
+    description: Its title.
+  message:
+    type: string
+    description: Its message.
+  template_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The template its words started from, when one.
+  sent_by:
+    type: string
+    format: uuid
+    description: The platform member who sent it.
+  sent_by_label:
+    type:
+      - string
+      - 'null'
+    description: Their name at the time.
+  sent_at:
+    type: string
+    format: date-time
+    description: When it was sent.
+  expires_at:
+    type: string
+    format: date-time
+    description: When it leaves every inbox, seven days after sending.
+  locations_named:
+    type: integer
+    minimum: 0
+    description: How many Locations the request named.
+  locations_reached:
+    type: integer
+    minimum: 0
+    description: How many it was stored for; archived and unknown ones are not counted.
+  seen:
+    type: integer
+    minimum: 0
+    description: How many of those have seen it.
+  cleared:
+    type: integer
+    minimum: 0
+    description: How many of those have cleared it.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+    title: Agents are running late
+    message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+    template_id: null
+    sent_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+    sent_by_label: Platform admin
+    sent_at: 2026-10-16T12:00:00Z
+    expires_at: 2026-10-23T12:00:00Z
+    locations_named: 2
+    locations_reached: 2
+    seen: 1
+    cleared: 0

@@ -1,0 +1,32 @@
+type: object
+description: Who a message is for, with the number or address masked to its last characters.
+required:
+  - kind
+  - user_id
+  - location_id
+  - label
+properties:
+  kind:
+    $ref: ./RecipientKind.yaml
+  user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The customer, for a customer's message.
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location, for a Location's devices or one of its contacts.
+  label:
+    type: string
+    description: The address masked to its last characters (`…3210`, `a…@example.com`) or the devices it went to.
+    examples:
+      - …3210
+examples:
+  - kind: customer
+    user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a77
+    location_id: null
+    label: …3210

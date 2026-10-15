@@ -1,0 +1,33 @@
+type: object
+description: One device a push went to and what the provider made of it.
+required:
+  - device
+  - platform
+  - outcome
+  - provider_ref
+properties:
+  device:
+    type: string
+    description: The device identity the session named, else the registration.
+    examples:
+      - pixel-9-asha
+  platform:
+    $ref: ./PushPlatform.yaml
+  outcome:
+    type: string
+    description: "`sent`, `unregistered` (the provider says the registration is gone; it was dropped), `failed` (refused) or `pending` (to be tried again)."
+    enum:
+      - sent
+      - unregistered
+      - failed
+      - pending
+  provider_ref:
+    type:
+      - string
+      - 'null'
+    description: The provider's reference for the send, where it gives one.
+examples:
+  - device: pixel-9-asha
+    platform: android
+    outcome: sent
+    provider_ref: projects/zippygo/messages/0:1760600000000000

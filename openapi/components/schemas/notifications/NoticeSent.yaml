@@ -1,0 +1,28 @@
+type: object
+description: What sending a notice did, the response of `POST /v1/platform/notices`.
+required:
+  - notice
+  - skipped
+properties:
+  notice:
+    $ref: ./Notice.yaml
+  skipped:
+    type: array
+    description: The Locations named that were skipped, with why.
+    items:
+      $ref: ./NoticeSkip.yaml
+examples:
+  - notice:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+      title: Agents are running late
+      message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+      template_id: null
+      sent_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+      sent_by_label: Platform admin
+      sent_at: 2026-10-16T12:00:00Z
+      expires_at: 2026-10-23T12:00:00Z
+      locations_named: 2
+      locations_reached: 2
+      seen: 0
+      cleared: 0
+    skipped: []

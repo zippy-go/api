@@ -1,0 +1,11 @@
+type: object
+description: How many notices were marked seen now; `0` when every one named had been seen already, or none of them is the Location's.
+required:
+  - marked
+properties:
+  marked:
+    type: integer
+    minimum: 0
+    description: The notices marked seen by this request.
+examples:
+  - marked: 1

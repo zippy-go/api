@@ -1,0 +1,163 @@
+# Path item for /v1/platform/messages. Referenced from openapi.yaml.
+get:
+  operationId: listMessages
+  summary: List the delivery log
+  description: |
+    Every message the platform sent or meant to send, newest first: its event,
+    channel, recipient with the number or address masked to its last
+    characters, template and version, outcome, attempts, provider reference and
+    the provider's reason when it refused, and when it was queued, sent and,
+    where the provider reports it, delivered or read. Search by person, order,
+    Location, partner, Agent, channel, outcome, event and template with the
+    named parameters, or with the full grammar in `filter` (see
+    `GET /v1/platform/messages/filters`). Entries are kept 90 days and their
+    composed words 30. Mission Control only, with `notification:read`.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  parameters:
+    - name: user_id
+      in: query
+      required: false
+      description: 'Only messages to this person: a customer.'
+      schema:
+        type: string
+        format: uuid
+    - name: order_id
+      in: query
+      required: false
+      description: 'Only messages about this order.'
+      schema:
+        type: string
+        format: uuid
+    - name: location_id
+      in: query
+      required: false
+      description: 'Only messages about this Location, its devices and contacts included.'
+      schema:
+        type: string
+        format: uuid
+    - name: partner_id
+      in: query
+      required: false
+      description: 'Only messages about this partner.'
+      schema:
+        type: string
+        format: uuid
+    - name: agent_id
+      in: query
+      required: false
+      description: 'Only messages about this Agent.'
+      schema:
+        type: string
+        format: uuid
+    - name: channel
+      in: query
+      required: false
+      description: 'Only this channel.'
+      schema:
+        $ref: ../../components/schemas/notifications/NotificationChannel.yaml
+    - name: status
+      in: query
+      required: false
+      description: 'Only this outcome.'
+      schema:
+        $ref: ../../components/schemas/notifications/MessageStatus.yaml
+    - name: event
+      in: query
+      required: false
+      description: 'Only messages composed from this event type, for example `ordering.order.accepted`.'
+      schema:
+        type: string
+    - name: template
+      in: query
+      required: false
+      description: 'Only messages of this template, for example `order.accepted`.'
+      schema:
+        type: string
+    - name: from
+      in: query
+      required: false
+      description: 'Only messages queued at or after this instant.'
+      schema:
+        type: string
+        format: date-time
+    - name: to
+      in: query
+      required: false
+      description: 'Only messages queued at or before this instant.'
+      schema:
+        type: string
+        format: date-time
+    - name: filter
+      in: query
+      required: false
+      description: 'A filter tree as JSON, URL-encoded; the fields and operators are those of `GET /v1/platform/messages/filters`.'
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: 'Sort keys, comma separated, `-` for descending; `-queued_at` by default.'
+      schema:
+        type: string
+    - name: facets
+      in: query
+      required: false
+      description: 'Enumeration fields to count alongside the page, comma separated (`channel`, `status`, `recipient_kind`).'
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: 'The maximum number of messages to return per page.'
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: 'The `next_cursor` of the previous page. Omit it for the first page.'
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    '200':
+      description: 'A page of messages.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/DeliveryLogPage.yaml
+    '400':
+      description: 'A parameter was refused (`validation_failed`); `errors` names each with its field-level code, such as `cursor_invalid` or `filter_field_unknown`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notification:read` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

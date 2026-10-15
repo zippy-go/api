@@ -1,0 +1,9 @@
+type: string
+description: "The channel a message leaves by: `push` to the Customer, Partner and Agent apps and the web consoles, `sms` under a registered DLT template, `whatsapp` through an approved Business template to a customer who opted in, `email`. A Location's notices have an inbox of their own. Clients must tolerate values they do not know."
+enum:
+  - push
+  - sms
+  - whatsapp
+  - email
+examples:
+  - sms

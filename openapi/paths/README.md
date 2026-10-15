@@ -25,6 +25,7 @@ paths/
   auth/customer-codes.yaml      POST /v1/auth/customer/codes (+ customer-verify.yaml, customer-register.yaml)
   customers/profile.yaml        GET, PATCH /v1/customer/profile
   customers/consent.yaml        PUT /v1/customer/consent
+  customers/notification-preferences.yaml GET, PUT /v1/customer/notification-preferences
   customers/addresses.yaml      GET, POST /v1/customer/addresses (+ address.yaml, PATCH, DELETE .../{address_id};
                                 address-selected.yaml, PUT .../{address_id}/selected)
   customers/location.yaml       GET /v1/customer/location
@@ -127,6 +128,14 @@ paths/
   catalog/search*.yaml          GET /v1/storefront/search, /v1/storefront/search/suggestions (tag Search)
   orders/orders.yaml            /v1/orders            (collection, planned)
   orders/order.yaml             /v1/orders/{order_id} (single resource, planned)
+  notifications/me-push.yaml    GET, PUT, DELETE /v1/me/push (+ me-push-opened.yaml, POST /v1/me/push/opened)
+  notifications/messages.yaml   GET /v1/platform/messages (+ messages-filters.yaml, message.yaml,
+                                message-resend.yaml, POST .../{message_id}/resend)
+  notifications/notice-templates.yaml GET, POST /v1/platform/notice-templates (+ notice-template.yaml)
+  notifications/notices.yaml    GET, POST /v1/platform/notices (+ notice.yaml, GET .../{notice_id})
+  notifications/location-notices.yaml GET /v1/partners/{partner_id}/locations/{location_id}/notices
+                                (+ location-notices-seen.yaml, location-notices-clear.yaml, location-notice.yaml)
+  notifications/notice-presentation.yaml GET, PUT .../locations/{location_id}/notice-presentation
 ```
 
 Rules:

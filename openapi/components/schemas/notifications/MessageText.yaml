@@ -1,0 +1,21 @@
+type: object
+description: The words a message was composed with, kept 30 days; nothing of a prescription is ever composed into a message.
+required:
+  - subject
+  - body
+properties:
+  subject:
+    type:
+      - string
+      - 'null'
+    description: The email subject or the push title; `null` for SMS and WhatsApp.
+    examples:
+      - Accepted, ready about 18:40
+  body:
+    type: string
+    description: The text as the recipient reads it.
+    examples:
+      - Dev Kitchen Gachibowli accepted your order. Track it at http://localhost:3000/orders/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+examples:
+  - subject: null
+    body: 'ZippyGo: Dev Kitchen Gachibowli accepted your order, ready about 18:40.'

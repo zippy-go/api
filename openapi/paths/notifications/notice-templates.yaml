@@ -1,0 +1,117 @@
+# Path item for /v1/platform/notice-templates. Referenced from openapi.yaml.
+get:
+  operationId: listNoticeTemplates
+  summary: List the notice templates
+  description: |
+    The notice templates by name. With `offered=true` only those the send
+    picker offers, which is how the console fills it: the server is what
+    filters the offered list. `notice:send` or `notification:manage`.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  parameters:
+    - name: offered
+      in: query
+      required: false
+      description: 'Only the templates offered (`true`) or withdrawn (`false`).'
+      schema:
+        type: boolean
+  responses:
+    '200':
+      description: 'The templates.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticeTemplateList.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or neither `notice:send` nor `notification:manage` is held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createNoticeTemplate
+  summary: Write a notice template
+  description: |
+    Writes a template: a name, a title and a message, offered unless said
+    otherwise. A name differing from another only in case is refused
+    (`notice_template_name_taken`), and so is a blank name, title or message
+    (`blank_text`). `notification:manage`.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: 'The template.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/NoticeTemplateInput.yaml
+  responses:
+    '201':
+      description: 'The template.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticeTemplate.yaml
+    '400':
+      description: '`validation_failed`: a blank or overlong name, title or message (`blank_text`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notification:manage` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`notice_template_name_taken`: another template has that name, whatever its case.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

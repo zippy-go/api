@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bca02",
+  "type": "notifications.message.failed",
+  "version": 1,
+  "occurred_at": "2026-10-16T13:06:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": null,
+  "payload": {
+    "message_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "channel": "sms",
+    "template": "order.accepted",
+    "template_version": 1,
+    "event": "ordering.order.accepted",
+    "recipient_kind": "customer",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90",
+    "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40",
+    "attempts": 1,
+    "reason": "the provider refused the number as invalid"
+  }
+}

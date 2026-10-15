@@ -1,0 +1,30 @@
+type: object
+description: |
+  Registers the device of the calling session for pushes, the request of
+  `PUT /v1/me/push`. The registration belongs to the session: signing the
+  device out, ending the session or its expiry stops its pushes. A token
+  another session registered moves to this one.
+required:
+  - token
+  - platform
+properties:
+  token:
+    type: string
+    minLength: 1
+    maxLength: 4096
+    description: The push token the device's messaging library gave it (a Firebase Cloud Messaging registration token).
+    examples:
+      - fcm-token-from-the-device
+  platform:
+    $ref: ./PushPlatform.yaml
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: "On a Partner token only: the Location the console or app is set to, so the device is pushed about that Location alone. Absent or `null`, a member's device is pushed about every Location their grants cover. Refused on other surfaces, and `404` for a Location the member does not reach."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+examples:
+  - token: fcm-token-from-the-device
+    platform: android

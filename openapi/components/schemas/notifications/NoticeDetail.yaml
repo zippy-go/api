@@ -1,0 +1,33 @@
+type: object
+description: A notice with every Location it reached, seen or not yet seen, the response of `GET /v1/platform/notices/{notice_id}`.
+required:
+  - notice
+  - deliveries
+properties:
+  notice:
+    $ref: ./Notice.yaml
+  deliveries:
+    type: array
+    description: Every Location it was stored for.
+    items:
+      $ref: ./NoticeDelivery.yaml
+examples:
+  - notice:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+      title: Agents are running late
+      message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+      template_id: null
+      sent_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+      sent_by_label: Platform admin
+      sent_at: 2026-10-16T12:00:00Z
+      expires_at: 2026-10-23T12:00:00Z
+      locations_named: 1
+      locations_reached: 1
+      seen: 1
+      cleared: 0
+    deliveries:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        stored_at: 2026-10-16T12:00:00Z
+        first_seen_at: 2026-10-16T12:03:10Z
+        cleared_at: null

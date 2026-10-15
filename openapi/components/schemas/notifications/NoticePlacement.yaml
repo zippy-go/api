@@ -1,0 +1,7 @@
+type: string
+description: "Where a Location's screen presents a notice: `prominent` (over the screen) or `corner` (a corner of it)."
+enum:
+  - prominent
+  - corner
+examples:
+  - prominent

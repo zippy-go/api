@@ -33,7 +33,8 @@ data:
 
 ```
 
-Frames carry no `id` field. The shapes of the data are schemas in the
+Frames of `GET /v1/live/agents` and `GET /v1/live/events` carry no `id`
+field; the signals of `GET /v1/live/stream` do (see below). The shapes of the data are schemas in the
 reference (`AgentSnapshot`, `AgentPositionUpdate`, `AgentStatusUpdate` and
 `Event`), so the generated SDKs have types for them. Clients must ignore
 event types and fields they do not know; adding them is not a breaking
@@ -55,12 +56,22 @@ hear the public channels (`broadcast`, `store-<location_id>-menu`).
 | `broadcast`                               | Anyone                                         |
 | `store-{location_id}-menu`                | Anyone                                         |
 | `private-broadcast`                       | Any signed-in person                           |
-| `private-customer-{customer_id}-orders`   | That customer                                  |
+| `private-customer-{customer_id}-orders`   | That customer, with a customer token           |
 | `private-order-{order_id}`                | The customer who placed it                     |
-| `private-location-{location_id}-orders`, `-notices`, `-catalog`, `-kitchen`, `-tables` | Members of the location's partner |
-| `private-partner-{partner_id}-agents`     | Members of the partner                         |
-| `private-agents`, `private-orders`        | Platform staff (the network)                   |
+| `private-location-{location_id}-notices`  | Members of the location's partner with `notice:read` there |
+| `private-location-{location_id}-orders`, `-kitchen`, `-tables` | Members of the location's partner with `order:read` there |
+| `private-location-{location_id}-catalog`  | Members of the location's partner with `catalog:read` there |
+| `private-partner-{partner_id}-agents`     | Members of the partner with `dispatch:read`    |
+| `private-orders`                          | Platform staff with `order:read` (the network) |
+| `private-agents`                          | Platform staff with `agent:read` (the network) |
 | `private-agent-{agent_id}-tasks`          | That agent                                     |
+
+The token's surface decides the population: a customer token hears
+customer channels only, a Partner token a partner's channels only, a
+Mission Control token the network only, never a single location. A
+location of another partner answers `404`, like one that does not exist.
+What a member holds is read when the stream opens and again every 30
+seconds; a permission no longer held closes the stream with `revoked`.
 
 | Event            | Data                                                        | When                                              |
 | ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
@@ -108,7 +119,15 @@ same shape as the items of `GET /v1/events`.
 
 - A `heartbeat` frame arrives every 15 seconds. Treat 45 seconds without
   any frame (three missed heartbeats) as a lost connection and reconnect.
-- Missed frames are not replayed: frames carry no `id` and the
+- `GET /v1/live/stream` resumes. Its signals carry an `id`, and the frames
+  that open it carry the position it opened at. Reconnect with the last
+  `id` you received in the `Last-Event-ID` header, which `EventSource`
+  sends by itself, or in `last_event_id`: the signals of your channels you
+  missed come first, with their ids, and no `resync` is sent for those
+  channels. When the platform no longer holds that position (it keeps the
+  latest ten thousand signals), the stream starts again with a `snapshot`
+  or `resync` per channel. Agent positions are never replayed.
+- The other two streams do not replay: their frames carry no `id` and the
   `Last-Event-ID` request header is ignored. After a reconnect, the agent
   stream sends a fresh `snapshot` to start from; for the event stream,
   fetch what was missed with `GET /v1/events?after=<id>`, where `<id>` is

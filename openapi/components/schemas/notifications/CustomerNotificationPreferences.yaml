@@ -1,0 +1,63 @@
+type: object
+description: |
+  How the customer is reached, per channel, the `CustomerNotificationPreferences`
+  schema. Messages about an order, a payment, a refund or the account always
+  send, whatever the marketing consent says; marketing goes only by the
+  channels the customer agreed to. Push reaches every device signed in and
+  registered; a customer with none is told by WhatsApp when they opted in to
+  order updates there, else by SMS; email goes where an email is on file.
+required:
+  - whatsapp_updates
+  - whatsapp_opted_in_at
+  - sms_do_not_disturb
+  - sms_do_not_disturb_since
+  - email_on_file
+  - push_devices
+  - marketing
+  - version
+properties:
+  whatsapp_updates:
+    type: boolean
+    description: Whether the customer opted in to order updates on WhatsApp. WhatsApp is never used without it.
+  whatsapp_opted_in_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the customer opted in; `null` while they have not.
+  sms_do_not_disturb:
+    type: boolean
+    description: Whether the SMS provider reported the number on the national do-not-disturb register. Marketing SMS stops; order messages still arrive.
+  sms_do_not_disturb_since:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the provider first reported it.
+  email_on_file:
+    type: boolean
+    description: Whether the profile holds an email, where receipts and other email rows go.
+  push_devices:
+    type: integer
+    minimum: 0
+    description: How many of the customer's signed-in devices are registered for pushes.
+  marketing:
+    $ref: ../customers/MarketingConsent.yaml
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by one on every change; the entity tag of reads.
+examples:
+  - whatsapp_updates: true
+    whatsapp_opted_in_at: 2026-10-16T09:00:00Z
+    sms_do_not_disturb: false
+    sms_do_not_disturb_since: null
+    email_on_file: true
+    push_devices: 2
+    marketing:
+      email: true
+      push: false
+      sms: false
+      whatsapp: false
+      agreed_at: 2026-10-15T09:00:00Z
+    version: 2

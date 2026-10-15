@@ -1,0 +1,14 @@
+type: object
+description: Sets how a Location's screen presents a notice, the request of `PUT .../notice-presentation`.
+required:
+  - placement
+  - waits
+properties:
+  placement:
+    $ref: ./NoticePlacement.yaml
+  waits:
+    type: boolean
+    description: Whether a notice stays until acknowledged.
+examples:
+  - placement: corner
+    waits: false

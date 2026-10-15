@@ -1,0 +1,23 @@
+type: object
+description: Changes a notice template, the request of `PATCH /v1/platform/notice-templates/{template_id}`; members left out keep their value. Withdraw a template with `offered` false.
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: Its new name.
+  title:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: Its new title.
+  message:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: Its new message.
+  offered:
+    type: boolean
+    description: Whether the send picker offers it.
+examples:
+  - offered: false

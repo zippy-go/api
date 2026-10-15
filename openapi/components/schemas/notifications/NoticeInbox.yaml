@@ -1,0 +1,37 @@
+type: object
+description: A page of a Location's inbox, the response of `GET /v1/partners/{partner_id}/locations/{location_id}/notices`, with how many are unread and how many the page is not showing.
+required:
+  - items
+  - next_cursor
+  - total
+  - unread
+  - not_shown
+properties:
+  items:
+    type: array
+    description: The notices on this page, newest first, or oldest first with `order=oldest`.
+    items:
+      $ref: ./InboxNotice.yaml
+  next_cursor:
+    type:
+      - string
+      - 'null'
+    description: An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+  total:
+    type: integer
+    minimum: 0
+    description: How many notices the inbox holds now (the filter applied).
+  unread:
+    type: integer
+    minimum: 0
+    description: How many of the inbox's notices nobody has seen yet.
+  not_shown:
+    type: integer
+    minimum: 0
+    description: How many notices matching the request this page does not show.
+examples:
+  - items: []
+    next_cursor: null
+    total: 0
+    unread: 0
+    not_shown: 0

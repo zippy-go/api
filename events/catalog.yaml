@@ -442,3 +442,25 @@ events:
       `null`.
     payload_schema: ./payloads/catalog.search.missed.v1.schema.json
     example: ./examples/catalog.search.missed.v1.json
+
+  - type: notifications.notice.sent
+    version: 1
+    domain: notifications
+    description: >-
+      Mission Control sent a notice; it was stored for every Location it
+      reached before any was told. Each Location's notices channel then
+      carries `notice.sent` with the notice id, and the Location's signed-in
+      devices are pushed. The envelope's `partner_id` is `null`.
+    payload_schema: ./payloads/notifications.notice.sent.v1.schema.json
+    example: ./examples/notifications.notice.sent.v1.json
+
+  - type: notifications.message.failed
+    version: 1
+    domain: notifications
+    description: >-
+      A message was given up: its provider refused it, or it was still
+      undeliverable after the retries at 1, 5 and 30 minutes. Operations
+      watch the share of failures per channel. Never the number, the
+      address or the words.
+    payload_schema: ./payloads/notifications.message.failed.v1.schema.json
+    example: ./examples/notifications.message.failed.v1.json

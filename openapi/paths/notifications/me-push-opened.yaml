@@ -1,0 +1,46 @@
+# Path item for /v1/me/push/opened. Referenced from openapi.yaml.
+post:
+  operationId: reportPushOpened
+  summary: Report that a push was opened
+  description: |
+    Tells the platform that a push this person received was opened, so the
+    delivery log shows it read. The first opening is kept; a message that was
+    not addressed to the caller is ignored. Answers `204` either way.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: 'The message the push carried.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/PushOpened.yaml
+  responses:
+    '204':
+      description: 'Recorded, or nothing to record.'
+    '400':
+      description: '`validation_failed`: a malformed message id.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

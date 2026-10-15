@@ -1,0 +1,14 @@
+type: object
+description: The notices to mark seen, the request of `POST .../notices/seen`; without `notice_ids` every notice of the inbox is marked. Only the Location's own notices are touched, and a notice already seen keeps its first sighting.
+properties:
+  notice_ids:
+    type: array
+    maxItems: 500
+    uniqueItems: true
+    description: The notices to mark; absent for all of them.
+    items:
+      type: string
+      format: uuid
+examples:
+  - notice_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01

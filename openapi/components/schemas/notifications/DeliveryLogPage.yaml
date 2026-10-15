@@ -1,0 +1,24 @@
+type: object
+description: A page of the delivery log, the response of `GET /v1/platform/messages`.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    description: The messages on this page, newest first unless sorted otherwise.
+    items:
+      $ref: ./DeliveryLogEntry.yaml
+  next_cursor:
+    type:
+      - string
+      - 'null'
+    description: An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+  facets:
+    type: array
+    description: Facet counts, present when `facets` was asked for (`channel`, `status`, `recipient_kind`).
+    items:
+      $ref: ../common/Facet.yaml
+examples:
+  - items: []
+    next_cursor: null

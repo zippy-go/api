@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/notifications.message.failed.v1.schema.json",
+  "title": "NotificationsMessageFailedPayload",
+  "description": "Payload of `notifications.message.failed` version 1: a message was given up, refused by its channel's provider or still undeliverable after the retries at 1, 5 and 30 minutes. The envelope's `partner_id` is the partner the message is about, else `null`. Never the number, the address or the words; the delivery log has the rest. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "message_id",
+    "channel",
+    "template",
+    "template_version",
+    "event",
+    "recipient_kind",
+    "attempts",
+    "reason"
+  ],
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The message, in the delivery log."
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "push",
+        "sms",
+        "whatsapp",
+        "email"
+      ],
+      "description": "The channel it went by."
+    },
+    "template": {
+      "type": "string",
+      "description": "The template it was composed with.",
+      "examples": [
+        "order.accepted"
+      ]
+    },
+    "template_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The template's version."
+    },
+    "event": {
+      "type": "string",
+      "description": "The event type it told of.",
+      "examples": [
+        "ordering.order.accepted"
+      ]
+    },
+    "recipient_kind": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "location",
+        "contact"
+      ],
+      "description": "Who it was for."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order it was about, when one."
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Location it was about, when one."
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many times it was tried."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why it failed, with the provider's own words when it refused.",
+      "examples": [
+        "the provider refused the number as invalid"
+      ]
+    }
+  }
+}

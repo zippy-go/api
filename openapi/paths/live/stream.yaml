@@ -8,29 +8,53 @@ get:
     vocabulary (see Live streams on the portal). A name no channel produces
     is `400` (`channel_unknown`) with `errors` by position. Private channels
     are authorised when the stream opens, against the caller's own facts,
-    never cached: an open naming a channel the caller may not hear is
-    refused as a whole (`401`, `403` or `404`, `errors` pointing at the
-    refused channel's position), so the client drops it and opens again.
-    Public channels (`broadcast`, `store-{location_id}-menu`) need no
-    credential.
+    never cached, and again every 30 seconds while it stays open: an open
+    naming a channel the caller may not hear is refused as a whole (`401`,
+    `403` or `404`, `errors` pointing at the refused channel's position), so
+    the client drops it and opens again. Public channels (`broadcast`,
+    `store-{location_id}-menu`) need no credential.
+
+    Who hears what follows the token's surface (`aud`) and what its holder
+    holds now. A customer token hears `private-broadcast`, its own
+    `private-customer-{customer_id}-orders` and the
+    `private-order-{order_id}` of an order it placed; a Partner token hears a
+    Location's channels only for a Location of a partner it belongs to (any
+    other is `404`, like one that does not exist), the notices with
+    `notice:read` there, the orders, kitchen and tables with `order:read`
+    there, the catalogue with `catalog:read` there, and its partner's
+    agents with `dispatch:read` in the partner; a Mission Control token
+    hears the network's orders (`private-orders`) with `order:read` and
+    agents (`private-agents`) with `agent:read`, and never a single
+    Location; an Agent token hears its own task channel. Anything else is
+    `403`.
 
     | Event            | Data                 | When                                                        |
     | ---------------- | -------------------- | ----------------------------------------------------------- |
     | `snapshot`       | `AgentsSnapshot`     | On open, per agent channel                                  |
-    | `resync`         | `Resync`             | On open, per other channel; after a fan-out outage          |
+    | `resync`         | `Resync`             | On open, per other channel, unless resumed; after a fan-out outage |
     | `signal`         | `Signal`             | Something changed; refetch it unless you hold the version   |
     | `agent.position` | `AgentPositionFrame` | An agent moved                                              |
     | `agent.status`   | `AgentStatusFrame`   | An agent went online or offline                             |
     | `heartbeat`      | empty                | Every 15 seconds                                            |
     | `close`          | `Close`              | The platform ends the stream: `token_expired`, `revoked`, `replaced` |
 
-    Frames carry no `id` and missed frames are not replayed: after a
-    reconnect the stream starts again with a `snapshot` or `resync` per
-    channel. The stream lives no longer than the access token; a revoked
-    session or a removed membership closes it within a minute; a connection
-    with the same `client_id`, or the fifth connection of a session, replaces
-    the oldest. Treat 45 seconds without a frame as a lost connection and
-    reconnect with backoff.
+    Signals carry an `id`, the position of the signal in the platform's
+    fan-out, and the frames that open a stream carry the position it opened
+    at. A client that reconnects with the last `id` it received, in the
+    `Last-Event-ID` header (which `EventSource` sends by itself) or in
+    `last_event_id`, resumes: the signals of its channels it missed are sent
+    first, with their ids, and no `resync` is sent for those channels. When
+    the position is no longer held (the platform keeps the latest ten
+    thousand signals), or the id is not one it gave, the stream starts
+    again with a `snapshot` or `resync` per channel, as for a new client.
+    Agent positions are never replayed: an agent channel always opens with
+    a fresh `snapshot`.
+
+    The stream lives no longer than the access token; a revoked session, a
+    removed membership or a permission no longer held closes it within a
+    minute with `revoked`; a connection with the same `client_id`, or the
+    fifth connection of a session, replaces the oldest. Treat 45 seconds
+    without a frame as a lost connection and reconnect with backoff.
   tags:
     - Live
   security:
@@ -55,6 +79,20 @@ get:
       description: The access token, for clients that cannot set the Authorization header (EventSource)
       schema:
         type: string
+    - name: last_event_id
+      in: query
+      required: false
+      description: The `id` of the last frame received before the connection was lost, for clients that open a new connection rather than letting `EventSource` reconnect; the `Last-Event-ID` header wins when both are sent.
+      schema:
+        type: string
+        maxLength: 64
+    - name: Last-Event-ID
+      in: header
+      required: false
+      description: The `id` of the last frame received; `EventSource` sends it by itself when it reconnects. The missed signals of the stream's channels are sent first, while the platform still holds them.
+      schema:
+        type: string
+        maxLength: 64
   responses:
     '200':
       description: 'Server-sent events: `snapshot` or `resync` per channel, then `signal`, `agent.position`, `agent.status`, `heartbeat` and finally `close`'
@@ -64,9 +102,11 @@ get:
             $ref: ../../components/schemas/live/ServerSentEventStream.yaml
           example: |
             event: resync
+            id: 1760605200000-0
             data: {"channel":"broadcast"}
 
             event: signal
+            id: 1760605201234-0
             data: {"channel":"broadcast","kind":"vertical.transitioned","subject":{"kind":"vertical","id":"01a13a48-9e00-7000-8000-00000000b001"},"status":"inactive"}
 
             event: heartbeat

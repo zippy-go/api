@@ -1,0 +1,41 @@
+# Path item for /v1/platform/messages/filters. Referenced from openapi.yaml.
+get:
+  operationId: getMessageFilters
+  summary: Describe the delivery log's filters
+  description: |
+    The fields the delivery log can be filtered and sorted by, with their operators. `notification:read`.
+  tags:
+    - Notifications
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: 'The filter declaration.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/FilterSchema.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'Not a Mission Control token (`forbidden`), or `notification:read` is not held (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

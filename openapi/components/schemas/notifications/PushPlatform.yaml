@@ -1,0 +1,8 @@
+type: string
+description: "What kind of device a push registration is for: `android` and `ios` for the apps, `web` for a browser (the Storefront and the consoles). Every platform receives pushes through Firebase Cloud Messaging; clients must tolerate values they do not know."
+enum:
+  - android
+  - ios
+  - web
+examples:
+  - android

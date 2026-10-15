@@ -242,6 +242,17 @@ errors:
       - code: pre_order_notice_invalid
         message: Pre-order notice is 24, 48 or 72 hours.
         description: A pre-order-only item's notice outside the three choices.
+      - code: blank_text
+        message: Must hold more than whitespace.
+        description: >-
+          A notice's title or message, or a notice template's name, title or
+          message, that is empty or whitespace only; a notice is refused
+          rather than sent empty.
+      - code: selection_required
+        message: Name the notices, or ask for all of them.
+        description: >-
+          Clearing a Location's notices named none and did not ask for all;
+          the entry points at the request body.
 
   - code: channel_unknown
     status: 400
@@ -431,6 +442,16 @@ errors:
     description: >-
       The store exists and is live but has published nothing yet; its page
       says so where the menu will be rather than pretend to load one.
+
+  - code: notice_template_name_taken
+    status: 409
+    title: Notice template name taken
+    message: A notice template is already named "{name}".
+    retryable: false
+    description: >-
+      Another notice template has that name, whatever its case: two
+      templates never share a name differing only in case. Choose another
+      name, or change the template that has it.
 
   - code: method_not_allowed
     status: 405

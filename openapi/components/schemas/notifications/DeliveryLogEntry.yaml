@@ -1,0 +1,201 @@
+type: object
+description: |
+  One message of the delivery log, the `DeliveryLogEntry` schema: what it
+  told, by which channel, to whom, with which template version, and what
+  became of it. Times are when it was queued, sent and, where the provider
+  reports it, delivered or read. The composed words are kept 30 days and the
+  entry 90.
+required:
+  - id
+  - event
+  - event_id
+  - template
+  - template_version
+  - language
+  - channel
+  - transactional
+  - recipient
+  - order_id
+  - location_id
+  - partner_id
+  - agent_id
+  - status
+  - reason
+  - attempts
+  - provider
+  - provider_ref
+  - devices
+  - queued_at
+  - not_before
+  - sent_at
+  - delivered_at
+  - read_at
+  - failed_at
+  - text
+  - resend_of
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The message.
+  event:
+    type: string
+    description: What it tells of, the event type it was composed from (`ordering.order.accepted`), or `notifications.notice.sent`, or `notifications.message.resent`.
+    examples:
+      - ordering.order.accepted
+  event_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The event it was composed from, when one.
+  template:
+    type: string
+    description: The template it was composed with, by name.
+    examples:
+      - order.accepted
+  template_version:
+    type: integer
+    minimum: 1
+    description: The version of the template; a message keeps the version it was composed with.
+  language:
+    type: string
+    description: The language it was composed in (`en`, `te`, `hi`).
+    examples:
+      - en
+  channel:
+    $ref: ./NotificationChannel.yaml
+  transactional:
+    type: boolean
+    description: "`true` for messages about an order, a payment, a refund, a notice or the account, which send whatever the marketing consent says."
+  recipient:
+    $ref: ./MessageRecipient.yaml
+  order_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The order it is about, when one.
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location it is about, when one.
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Partner it is about, when one.
+  agent_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Agent it is about, when one (Agents are told from a later step).
+  status:
+    $ref: ./MessageStatus.yaml
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why it was skipped or failed, with the provider's own words when the provider refused it.
+    examples:
+      - the provider refused the number as invalid
+  attempts:
+    type: integer
+    minimum: 0
+    description: How many times the sender tried it.
+  provider:
+    type:
+      - string
+      - 'null'
+    description: The provider it went through (`local`, `smtp`, `msg91`, `fcm`).
+  provider_ref:
+    type:
+      - string
+      - 'null'
+    description: The provider's reference for the send, where it gives one.
+  devices:
+    type: array
+    description: For a push, every device it went to and what became of each; empty otherwise.
+    items:
+      $ref: ./MessageDevice.yaml
+  queued_at:
+    type: string
+    format: date-time
+    description: When it was queued, with the change it tells of.
+  not_before:
+    type: string
+    format: date-time
+    description: The earliest moment it may be sent.
+  sent_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the provider accepted it.
+  delivered_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was delivered, where the channel reports it (the local stand-ins deliver at once).
+  read_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was first read or opened, where the channel reports it.
+  failed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was given up.
+  text:
+    oneOf:
+      - $ref: ./MessageText.yaml
+      - type: 'null'
+    description: The words it was composed with; `null` after 30 days.
+  resend_of:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The message it resends, for a resend from Mission Control.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    event: ordering.order.accepted
+    event_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    template: order.accepted
+    template_version: 1
+    language: en
+    channel: sms
+    transactional: true
+    recipient:
+      kind: customer
+      user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a77
+      location_id: null
+      label: …3210
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    agent_id: null
+    status: sent
+    reason: null
+    attempts: 1
+    provider: local
+    provider_ref: null
+    devices: []
+    queued_at: 2026-10-16T13:05:00Z
+    not_before: 2026-10-16T13:05:00Z
+    sent_at: 2026-10-16T13:05:01Z
+    delivered_at: 2026-10-16T13:05:01Z
+    read_at: null
+    failed_at: null
+    text:
+      subject: null
+      body: 'ZippyGo: Dev Kitchen Gachibowli accepted your order, ready about 18:40.'
+    resend_of: null

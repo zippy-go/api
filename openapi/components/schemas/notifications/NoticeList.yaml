@@ -1,0 +1,19 @@
+type: object
+description: A page of notices sent, newest first, the response of `GET /v1/platform/notices`.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    description: The notices on this page.
+    items:
+      $ref: ./Notice.yaml
+  next_cursor:
+    type:
+      - string
+      - 'null'
+    description: An opaque cursor to pass as `cursor` for the next page, or `null` when this is the last page.
+examples:
+  - items: []
+    next_cursor: null

@@ -1,0 +1,134 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/notice-presentation. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: 'The Location, which must belong to the partner in the path.'
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: getNoticePresentation
+  summary: Read how the Location presents a notice
+  description: |
+    Where the Location's screen presents a notice and whether it waits to be acknowledged; prominent and waiting while nothing was set. `notice:read` at the Location, or platform staff with `location:read`.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: 'The presentation.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticePresentation.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'The caller lacks the permission (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: 'Unknown partner or Location, or a Location of another partner (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putNoticePresentation
+  summary: Set how the Location presents a notice
+  description: |
+    Sets where the Location's screen presents a notice and whether it waits to
+    be acknowledged or clears itself after a short while, showing the time
+    remaining. Platform configuration: Mission Control sets it where the
+    Location's other configuration is set, with `location:write`; a Partner's
+    own people cannot (`forbidden`). `If-Match` guards against a stale screen.
+  tags:
+    - Notices
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: 'The presentation.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/notifications/NoticePresentationInput.yaml
+  responses:
+    '200':
+      description: 'The presentation as set.'
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/notifications/NoticePresentation.yaml
+    '400':
+      description: '`validation_failed`: an unknown placement or a missing member.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: 'A Partner''s own people (`forbidden`), or platform staff without `location:write` (`access_denied`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: 'Unknown partner or Location (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`precondition_failed`: the presentation changed since the `If-Match` version.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

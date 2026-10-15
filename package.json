@@ -1,6 +1,6 @@
 {
   "name": "@zippy-go/api-contract",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "description": "ZippyGo API contract: OpenAPI document, event schemas, generated SDKs and the developer portal",
   "license": "MIT",

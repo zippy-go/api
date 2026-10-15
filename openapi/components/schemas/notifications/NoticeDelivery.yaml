@@ -1,0 +1,39 @@
+type: object
+description: One Location's copy of a notice, as the send log keeps it.
+required:
+  - location_id
+  - partner_id
+  - stored_at
+  - first_seen_at
+  - cleared_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+  stored_at:
+    type: string
+    format: date-time
+    description: When it was stored in the Location's inbox, before anybody was told.
+  first_seen_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When somebody at the Location first saw it; `null` while not yet seen.
+  cleared_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the Location cleared it from its inbox.
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    stored_at: 2026-10-16T12:00:00Z
+    first_seen_at: 2026-10-16T12:03:10Z
+    cleared_at: null

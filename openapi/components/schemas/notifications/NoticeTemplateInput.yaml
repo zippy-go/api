@@ -1,0 +1,30 @@
+type: object
+description: A new notice template, the request of `POST /v1/platform/notice-templates`. A name that differs from another only in case is refused (`409`, `notice_template_name_taken`); a blank name, title or message is refused (`blank_text`).
+required:
+  - name
+  - title
+  - message
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: Its name.
+  title:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: The title a notice starts from.
+  message:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: The message a notice starts from.
+  offered:
+    type: boolean
+    default: true
+    description: Whether the send picker offers it.
+examples:
+  - name: Agent delays
+    title: Agents are running late
+    message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.

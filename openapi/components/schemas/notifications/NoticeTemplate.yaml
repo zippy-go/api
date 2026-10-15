@@ -1,0 +1,66 @@
+type: object
+description: |
+  A starting point for a notice, kept by name in Mission Control, the
+  `NoticeTemplate` schema. Choosing one fills a notice's title and message,
+  which stay editable; the notice carries its own words, so changing a
+  template never changes what a Location was told. A template is withdrawn
+  from the send picker (`offered: false`) rather than deleted.
+required:
+  - id
+  - name
+  - title
+  - message
+  - offered
+  - version
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The template.
+  name:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: Its name, unique without regard to case.
+    examples:
+      - Agent delays
+  title:
+    type: string
+    minLength: 1
+    maxLength: 80
+    description: The title a notice starts from.
+    examples:
+      - Agents are running late
+  message:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: The message a notice starts from.
+    examples:
+      - Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+  offered:
+    type: boolean
+    description: Whether the send picker offers it; a template not offered keeps its words and can be offered again.
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by one on every change; the entity tag of reads.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was written.
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    name: Agent delays
+    title: Agents are running late
+    message: Heavy rain in the city. Agents are taking longer to reach stores; please keep orders warm.
+    offered: true
+    version: 1
+    created_at: 2026-10-16T08:00:00Z
+    updated_at: 2026-10-16T08:00:00Z
