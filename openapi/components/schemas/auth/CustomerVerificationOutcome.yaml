@@ -1,0 +1,7 @@
+type: string
+description: How a verified code turned out, the `CustomerVerificationOutcome` schema.
+enum:
+  - signed_in
+  - registration_required
+examples:
+  - signed_in

@@ -1,0 +1,51 @@
+type: object
+description: 'A registration in progress, the `CustomerRegistration` schema: proof, for thirty minutes, that this device holds the number. Nothing about it is stored until it completes.'
+required:
+  - registration_token
+  - expires_at
+  - mobile
+  - country
+  - entry
+  - needs
+  - optional
+properties:
+  registration_token:
+    type: string
+    description: The signed registration context for `POST /v1/auth/customer/register`; it is not an access token and is refused as one.
+  expires_at:
+    type: string
+    format: date-time
+    description: When it stops working.
+  mobile:
+    type: string
+    description: The number proven, E.164.
+    examples:
+      - '+919876543210'
+  country:
+    type: string
+    description: The market of the number (alpha-2).
+    examples:
+      - IN
+  entry:
+    $ref: ./RegistrationEntry.yaml
+    description: What the registration serves.
+  needs:
+    type: array
+    items:
+      $ref: ./RegistrationStep.yaml
+    description: 'The steps that must be completed: the profile.'
+  optional:
+    type: array
+    items:
+      $ref: ./RegistrationStep.yaml
+    description: 'The steps that may be completed now or later: a first address.'
+examples:
+  - registration_token: eyJ0eXAiOiJyZWcrand0IiwiYWxnIjoiRWREU0EifQ.e30.c2lnbmF0dXJl
+    expires_at: 2026-10-15T09:30:00Z
+    mobile: '+919876543210'
+    country: IN
+    entry: delivery
+    needs:
+      - profile
+    optional:
+      - address

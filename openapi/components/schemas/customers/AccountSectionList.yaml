@@ -1,0 +1,32 @@
+type: object
+description: The account's sections and its summary, the `AccountSectionList` schema.
+required:
+  - sections
+  - summary
+properties:
+  sections:
+    type: array
+    items:
+      $ref: ./AccountSection.yaml
+    description: Every section, in order, the set-apart one last but one and signing out last.
+  summary:
+    $ref: ./AccountSummary.yaml
+    description: The summary that answers without a click.
+examples:
+  - sections:
+      - key: my_details
+        title: My details
+        built: true
+        step: null
+        description: Your name, email and date of birth.
+        set_apart: false
+      - key: orders
+        title: Orders
+        built: false
+        step: 3
+        description: Your orders, the live one first, each with its receipt, help and reorder. Arrives with ordering in step 3.
+        set_apart: false
+    summary:
+      address_count: 1
+      session_count: 2
+      marketing_on: false

@@ -1,0 +1,11 @@
+type: string
+description: "How a visitor was placed, the `PlaceResolution` schema: inside a fence; the nearest fence within the caller's cap; a zone the visitor chose that still serves; the country's default service area when nothing is within the cap or no point was given; the platform's fallback when the country answers nothing; or `none`, an explicitly empty answer, when nothing resolves at all. Only `inside` is exact."
+enum:
+  - inside
+  - nearest
+  - chosen
+  - country_default
+  - platform_fallback
+  - none
+examples:
+  - inside

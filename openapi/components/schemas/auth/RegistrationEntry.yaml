@@ -1,0 +1,8 @@
+type: string
+description: 'What a registration serves, the `RegistrationEntry` schema: the delivery storefront, a pickup, or a table code scanned for dine-in.'
+enum:
+  - delivery
+  - pickup
+  - dine_in
+examples:
+  - delivery

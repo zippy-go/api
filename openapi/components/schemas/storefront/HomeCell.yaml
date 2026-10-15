@@ -1,0 +1,50 @@
+type: object
+description: One cell of the opening screen, the `HomeCell` schema.
+required:
+  - id
+  - kind
+  - column
+  - available
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives edits.
+  kind:
+    $ref: ./HomeCellKind.yaml
+    description: What it shows.
+  column:
+    type: integer
+    description: The column it starts at, zero based.
+    minimum: 0
+    examples:
+      - 0
+  available:
+    type: boolean
+    description: 'Whether the tile navigates: the Vertical trades in this zone. A Vertical that does not is drawn dimmed and announced as disabled. Always `true` for a banner.'
+  campaign:
+    oneOf:
+      - $ref: ./CampaignBanner.yaml
+      - type: 'null'
+    description: The banner of a campaign cell.
+  vertical_code:
+    type:
+      - string
+      - 'null'
+    description: Its code.
+    examples:
+      - FOOD
+  vertical_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Vertical of a Vertical tile.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a16
+    kind: vertical
+    column: 0
+    vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+    vertical_code: FOOD
+    available: true
+    campaign: null

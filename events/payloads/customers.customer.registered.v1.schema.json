@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.customer.registered.v1.schema.json",
+  "title": "CustomersCustomerRegisteredPayload",
+  "description": "Payload of `customers.customer.registered` version 1: a customer account was opened, a registration completed. The envelope's `partner_id` is `null`, because a customer is not scoped to a partner. The payload carries no phone number, email address or address. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": ["user_id", "entry", "channel", "new_user"],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (the user).",
+      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20"]
+    },
+    "entry": {
+      "type": "string",
+      "enum": ["delivery", "pickup", "dine_in"],
+      "description": "What the registration served: the delivery storefront, a pickup, or a table code scanned for dine-in.",
+      "examples": ["delivery"]
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["phone"],
+      "description": "How the customer signed up: a one-time code to the number.",
+      "examples": ["phone"]
+    },
+    "new_user": {
+      "type": "boolean",
+      "description": "Whether the user was created by this registration; `false` for a person who already held a membership, such as a Partner owner who shops or an Agent who orders lunch.",
+      "examples": [true]
+    }
+  }
+}

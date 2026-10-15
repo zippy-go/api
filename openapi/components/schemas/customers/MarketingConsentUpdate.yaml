@@ -1,0 +1,25 @@
+type: object
+description: 'Request body of `PUT /v1/customer/consent`: the whole set, every channel named.'
+required:
+  - email
+  - push
+  - sms
+  - whatsapp
+properties:
+  email:
+    type: boolean
+    description: Offers by email.
+  push:
+    type: boolean
+    description: Offers by push notification.
+  sms:
+    type: boolean
+    description: Offers by SMS.
+  whatsapp:
+    type: boolean
+    description: Offers on WhatsApp.
+examples:
+  - email: true
+    push: true
+    sms: false
+    whatsapp: false

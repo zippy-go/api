@@ -1,0 +1,89 @@
+type: object
+description: "A Vertical's stores as cards, the `StoreCardList` schema: open stores lead, then those opening later, then those temporarily offline; within each, nearest first with a pin and by name without one."
+required:
+  - place
+  - area
+  - vertical
+  - open_count
+  - stores
+properties:
+  place:
+    $ref: ./StorefrontPlace.yaml
+    description: Where the visitor is placed.
+  area:
+    $ref: ./StorefrontZone.yaml
+    description: "The area listed: the city of the zone, so a store across a zone's fence is not hidden."
+  vertical:
+    $ref: ./StorefrontVerticalRef.yaml
+    description: The Vertical.
+  open_count:
+    type: integer
+    description: How many of the stores are open now.
+    minimum: 0
+    examples:
+      - 3
+  stores:
+    type: array
+    items:
+      $ref: ./StoreCard.yaml
+    description: The stores.
+examples:
+  - place:
+      resolution: inside
+      zone:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        name: Gachibowli
+        kind: zone
+        path: /IN/hyderabad/gachibowli
+        city: Hyderabad
+        country: IN
+        time_zone: Asia/Kolkata
+      distance_metres: 0
+      pin:
+        lat: 17.4401
+        lng: 78.3489
+      cap_metres: 25000
+    area:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a11
+      name: Hyderabad
+      kind: city
+      path: /IN/hyderabad
+      city: Hyderabad
+      country: IN
+      time_zone: Asia/Kolkata
+    vertical:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+      code: FOOD
+      name: Food & Drinks
+      trades_here: true
+    open_count: 1
+    stores:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        name: Dev Kitchen Gachibowli
+        partner_name: ZippyGo Dev Partner
+        partner_kind: organisation
+        logo_url: null
+        banner_url: null
+        zone_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        shelves:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+            label: Biryani
+            icon_url: null
+        state: open
+        state_until: 2026-10-15T17:30:00Z
+        offline_message: null
+        preparation_minutes: 20
+        distance_metres: 1200
+        delivers_to_pin: true
+        fulfilment:
+          - delivery
+          - pickup
+        is_new: true
+        highlights: []
+        delivery_fee:
+          minor_units: 3000
+          currency: INR
+        minimum_order: null
+        delivery_minutes: 30
+        catalogue: null

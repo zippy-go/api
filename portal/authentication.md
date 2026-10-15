@@ -23,6 +23,7 @@ Every session is for one surface, and so is every token it issues:
 | Partner console | `partner`  | One-time code or password, then two-step sign-in when it is on | 14 days / 90 days |
 | Mission Control | `platform` | Password and a second factor, platform staff only | 60 minutes / 12 hours |
 | Agent app       | `agent`    | One-time code, agents only                 | 30 days / 180 days                  |
+| Customer app and Storefront | `customer` | One-time code to the mobile number, never a password | 60 days / 1 year |
 
 The Agent app admits agents only: people who hold an agent membership in
 a Service. Anybody else signing in to it gets the answer every failed
@@ -49,6 +50,40 @@ sign-in: without `audience` the answer is `400` `validation_failed` with
 `delivery_required`. Since 0.10.0 there is no sign-in without a surface: the
 `zg_refresh` cookie, the `X-Client-Type` header and the password sign-in
 that opened Mission Control for platform staff unasked are gone.
+
+## Customers
+
+Customers sign in to the Customer app and the Storefront with a one-time
+code to their mobile number, by SMS or on WhatsApp, and never have a
+password. The same three steps serve a returning customer and a new one.
+
+1. `POST /v1/auth/customer/codes` with the number as typed (a bare
+   ten-digit Indian number gets +91) and, optionally, `channel`
+   (`whatsapp` falls back to SMS when the number has no WhatsApp) and the
+   `device` the client names. The answer is `202` with `challenge_id`,
+   `expires_at` and `resend_at`, the same whether or not the number has an
+   account. A code again for the same number inside a minute is `429`
+   `otp_too_soon`; past the number's ten a day, the device's five or the
+   source's two hundred an hour, `429` `otp_daily_limit`, never saying
+   which. A market closed to sign-in is `409` `sign_in_closed`.
+2. `POST /v1/auth/customer/verify` with the challenge, the code and
+   `delivery`. A registered number answers `outcome: signed_in` with the
+   session; a new number answers `outcome: registration_required` with a
+   `registration_token` valid thirty minutes, and nothing about the person
+   is stored until they register. Every failure is the same `401`
+   `otp_invalid`.
+3. `POST /v1/auth/customer/register` with the registration token, a given
+   name, an optional email and, optionally, a first address and the
+   `delivery`: the account, its first address and its session are written
+   at once. When another device registered the number meanwhile, the answer
+   is that account's session with `existing_account: true`.
+
+The Storefront states `delivery: cookie` and its refresh token lives in
+`zg_refresh_customer`; the app states `body`. Renew with
+`POST /v1/auth/refresh` (`audience: customer` for the cookie), end with
+`POST /v1/auth/sign-out`; `everywhere` ends every customer session of the
+customer. The account itself is under `/v1/customer`, and every operation
+there acts on the session's own customer.
 
 ## One-time codes
 

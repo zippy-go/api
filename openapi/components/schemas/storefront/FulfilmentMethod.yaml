@@ -1,0 +1,8 @@
+type: string
+description: A way a store fulfils orders, the `FulfilmentMethod` schema.
+enum:
+  - delivery
+  - pickup
+  - dine_in
+examples:
+  - delivery

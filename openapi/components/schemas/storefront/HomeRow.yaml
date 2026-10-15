@@ -1,0 +1,30 @@
+type: object
+description: One row of the opening screen, the `HomeRow` schema.
+required:
+  - id
+  - kind
+  - cells
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Identity that outlives edits.
+  kind:
+    $ref: ./HomeRowKind.yaml
+    description: The kind, which fixes the capacity.
+  cells:
+    type: array
+    items:
+      $ref: ./HomeCell.yaml
+    description: The cells in column order.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a15
+    kind: default
+    cells:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a16
+        kind: vertical
+        column: 0
+        vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+        vertical_code: FOOD
+        available: true
+        campaign: null

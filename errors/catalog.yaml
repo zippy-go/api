@@ -126,6 +126,43 @@ errors:
       - code: ifsc_invalid
         message: An IFSC is four letters, a zero and six letters or digits, such as HDFC0001234.
         description: An Indian Financial System Code of the wrong shape on a payout account.
+      - code: invalid_mobile
+        message: "The number is not a mobile number: ten digits, or the country code and the number."
+        description: >-
+          A customer's number that does not read as a number of the stated
+          market, checked before anything is sent.
+      - code: not_a_mobile
+        message: The number is not a mobile line; codes go to mobile numbers only.
+        description: >-
+          A customer's number that reads as a landline or a special number of
+          the market, which cannot receive a code.
+      - code: date_of_birth_future
+        message: The date of birth is in the future.
+        description: A customer's date of birth after today, at registration or in a profile edit.
+      - code: too_young
+        message: An account opens at sixteen or older.
+        description: >-
+          A customer's date of birth less than sixteen years ago: the account
+          threshold, not the age-restricted-goods threshold, which is a rule of
+          each order.
+      - code: terms_not_accepted
+        message: The terms must be accepted to open an account.
+        description: A registration whose terms box was sent unticked; an account nobody agreed to is never opened.
+      - code: consent_channel_missing
+        message: "Consent is written for every channel at once: email, push, SMS and WhatsApp."
+        description: >-
+          A marketing consent naming fewer than all four channels; each
+          missing channel is named, rather than an absent one being read as a
+          refusal.
+      - code: postal_code_invalid
+        message: A PIN code is six digits.
+        description: An Indian address whose PIN code is not six digits.
+      - code: pin_far_from_address
+        message: The pin is more than two kilometres from the address typed; confirm the pin.
+        description: >-
+          A customer's address whose map pin lies more than two kilometres from
+          where its locality and PIN code geocode; the pin, not the text,
+          decides where an agent goes.
 
   - code: channel_unknown
     status: 400
@@ -695,6 +732,65 @@ errors:
       Too many wrong one-time codes were tried against one challenge and
       the challenge is locked. Retrying with the same challenge cannot
       succeed; request a new code with `POST /v1/auth/otp/request`.
+
+  - code: otp_invalid
+    status: 401
+    title: Code not valid
+    message: That code is not valid. Check it, or ask for a new one.
+    retryable: false
+    description: >-
+      A customer's one-time code did not pass. One answer covers an unknown
+      or expired challenge, a code already used, a code issued for another
+      purpose, too many attempts and a wrong code, so nothing about the
+      challenge is revealed. Ask for a new code.
+
+  - code: otp_too_soon
+    status: 429
+    title: Code asked too soon
+    message: A code was just sent. Ask for another in {retry_after} seconds.
+    retryable: true
+    description: >-
+      A code was sent to this number for the same purpose a moment ago.
+      `Retry-After` says how many seconds to wait; a code for another purpose
+      is not held back.
+
+  - code: otp_daily_limit
+    status: 429
+    title: Too many codes
+    message: Too many codes were asked for. Try again later.
+    retryable: true
+    description: >-
+      Too many codes were asked for: to this number today, from this device
+      or from this source. `Retry-After` says how many seconds to wait; the
+      answer never says which limit was reached.
+
+  - code: registration_expired
+    status: 401
+    title: Registration expired
+    message: The registration has expired. Ask for a new code to start again.
+    retryable: false
+    description: >-
+      The registration token is not one, was tampered with or is past its
+      thirty minutes. Ask for a new code; nothing was kept from the abandoned
+      registration.
+
+  - code: account_blocked
+    status: 403
+    title: Account blocked
+    message: This account is blocked. {support}
+    retryable: false
+    description: >-
+      The customer account behind the number is blocked. The detail says how
+      to reach support; no session was issued.
+
+  - code: addresses_full
+    status: 409
+    title: Too many addresses
+    message: An account keeps at most {limit} addresses; remove one before adding another.
+    retryable: false
+    description: >-
+      The customer keeps the most addresses an account may hold; remove one
+      before adding another.
 
   - code: internal
     status: 500

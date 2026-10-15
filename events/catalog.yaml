@@ -46,6 +46,19 @@ events:
     payload_schema: ./payloads/identity.user.registered.v1.schema.json
     example: ./examples/identity.user.registered.v1.json
 
+  - type: customers.customer.registered
+    version: 1
+    domain: customers
+    description: >-
+      A customer account was opened: a registration completed with a code to
+      the number, in the same transaction as the account. The envelope's
+      `partner_id` is `null`; the payload carries no phone number, email
+      address or address. A new user is also announced by
+      `identity.user.registered`; a person who already held a membership
+      opens a customer account without one.
+    payload_schema: ./payloads/customers.customer.registered.v1.schema.json
+    example: ./examples/customers.customer.registered.v1.json
+
   - type: identity.session.created
     version: 1
     domain: identity

@@ -1,0 +1,58 @@
+type: object
+description: A campaign banner showing now, the `CampaignBanner` schema.
+required:
+  - id
+  - headline
+  - colour
+  - shape
+  - white_text_readable
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The campaign slot.
+  headline:
+    type: string
+    description: The headline.
+    examples:
+      - Sweets for Diwali, delivered
+  colour:
+    type: string
+    description: The background colour as a hex triplet.
+    examples:
+      - '#b23a00'
+  shape:
+    $ref: ../reference/SlotShape.yaml
+    description: Banner (two cells) or compact (one).
+  white_text_readable:
+    type: boolean
+    description: Whether white text reads on the colour.
+  artwork_url:
+    type:
+      - string
+      - 'null'
+    description: The artwork, a rendition relative to the API host.
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55/renditions/hero
+  link:
+    oneOf:
+      - $ref: ../reference/SlotLink.yaml
+      - type: 'null'
+    description: Where tapping it goes; an announcement when `null`.
+  paragraph:
+    type:
+      - string
+      - 'null'
+    description: The paragraph under it.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a14
+    headline: Sweets for Diwali, delivered
+    paragraph: Order from the city's bakeries before the festival rush.
+    colour: '#b23a00'
+    shape: banner
+    artwork_url: null
+    white_text_readable: true
+    link:
+      kind: vertical
+      targets:
+        - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12

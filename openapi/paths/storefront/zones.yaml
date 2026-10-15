@@ -1,0 +1,38 @@
+# Path item for /v1/storefront/zones. Referenced from openapi.yaml.
+get:
+  operationId: listStorefrontZones
+  summary: List the zones a visitor may pick
+  description: 'The zones a visitor may pick: every zone that serves now (fenced, active with every ancestor, in an active country), by city and name.'
+  tags:
+    - Storefront
+  security: []
+  responses:
+    '200':
+      description: Every zone that serves now.
+      headers:
+        Cache-Control:
+          description: '`public, max-age=60`.'
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/storefront/StorefrontZoneList.yaml
+    '503':
+      description: A store is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

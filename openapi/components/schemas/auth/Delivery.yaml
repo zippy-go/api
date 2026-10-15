@@ -1,5 +1,5 @@
 type: string
-description: "How a session's refresh token travels, stated by the client when it signs in and bound to the session for good. `cookie`: browsers keep it in an `httpOnly` cookie named for the surface (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`), scoped to `/v1/auth`, and never see it. `body`: apps receive it in `refresh_token` and keep it in the platform keystore. The access token always travels as a bearer header."
+description: "How a session's refresh token travels, stated by the client when it signs in and bound to the session for good. `cookie`: browsers keep it in an `httpOnly` cookie named for the surface (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`, `zg_refresh_customer`), scoped to `/v1/auth`, and never see it. `body`: apps receive it in `refresh_token` and keep it in the platform keystore. The access token always travels as a bearer header."
 enum:
   - cookie
   - body

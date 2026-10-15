@@ -1,0 +1,31 @@
+type: object
+description: 'Whether a pin can be served, the `Serviceability` schema: what an order will check, asked before a pin is confirmed.'
+required:
+  - serviceable
+properties:
+  serviceable:
+    type: boolean
+    description: Inside a serving zone, every ancestor active, the country active and accepting orders.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why not, as a sentence a screen may show as is; `null` when serviceable.
+    examples:
+      - Orders are paused in this country at the moment.
+  zone:
+    oneOf:
+      - $ref: ./StorefrontZone.yaml
+      - type: 'null'
+    description: The zone the pin lies in, when it lies in one.
+examples:
+  - serviceable: false
+    reason: Orders are paused in this country at the moment.
+    zone:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+      name: Gachibowli
+      kind: zone
+      path: /IN/hyderabad/gachibowli
+      city: Hyderabad
+      country: IN
+      time_zone: Asia/Kolkata

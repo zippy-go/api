@@ -1,0 +1,66 @@
+type: object
+description: Request body of `POST /v1/auth/customer/register`.
+required:
+  - registration_token
+  - given_name
+  - delivery
+properties:
+  registration_token:
+    type: string
+    description: The registration token from the verification.
+  given_name:
+    type: string
+    description: The given name, 1 to 60 characters.
+    examples:
+      - Asha
+  delivery:
+    $ref: ./Delivery.yaml
+    description: How the refresh token travels, required, as at the verification.
+  address:
+    oneOf:
+      - $ref: ../customers/CustomerAddressInput.yaml
+      - type: 'null'
+    description: A first address, selected; it may be added later instead.
+  date_of_birth:
+    type:
+      - string
+      - 'null'
+    format: date
+    description: 'The date of birth: never in the future, never under sixteen.'
+    examples:
+      - 1994-05-01
+  device:
+    oneOf:
+      - $ref: ./DeviceIdentity.yaml
+      - type: 'null'
+    description: The device, when the client names it.
+  email:
+    type:
+      - string
+      - 'null'
+    description: 'An email for recovery: stored lower-cased and unverified until a code proves it.'
+  family_name:
+    type:
+      - string
+      - 'null'
+    description: The family name; single names are ordinary.
+  language:
+    oneOf:
+      - $ref: ../customers/CustomerLanguage.yaml
+      - type: 'null'
+    description: English, Telugu or Hindi; the device's (`Accept-Language`) when it is one of them, else English.
+  marketing_opt_in:
+    type:
+      - boolean
+      - 'null'
+    description: 'The single "send me offers" tick: every channel when ticked; off when absent.'
+  terms_accepted:
+    type:
+      - boolean
+      - 'null'
+    description: The terms box, when the client shows one; sent unticked, the registration is refused.
+examples:
+  - registration_token: eyJ0eXAiOiJyZWcrand0IiwiYWxnIjoiRWREU0EifQ.e30.c2lnbmF0dXJl
+    given_name: Asha
+    email: asha@example.com
+    delivery: cookie

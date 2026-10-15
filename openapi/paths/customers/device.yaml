@@ -1,0 +1,52 @@
+# Path item for /v1/customer/devices/{device_id}. Referenced from openapi.yaml.
+parameters:
+  - name: device_id
+    in: path
+    required: true
+    description: The device identifier the client named when it signed in.
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 128
+    example: web-3f2a9c1d8e7b6a50
+delete:
+  operationId: endCustomerDevice
+  summary: Sign a device out
+  description: Ends every session of one of the customer's devices, by the identifier the client named.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  responses:
+    '204':
+      description: Every session of the device ended.
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: "`not_found`: no live session of the customer's on that device."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,44 @@
+type: object
+description: 'The device a client names, the `DeviceIdentity` schema: an identifier the client generates once and keeps, with what it says about itself. It labels sessions and will route pushes; it is never a credential and grants nothing.'
+required:
+  - id
+properties:
+  id:
+    type: string
+    description: 'The identifier the client generated: 1 to 128 letters, digits, dots, dashes, colons or underscores.'
+    examples:
+      - 0f6c1e8a-3b7d-4f0e-9c2a-5d8e7f1a2b3c
+  app_version:
+    type:
+      - string
+      - 'null'
+    description: The app or storefront version.
+    examples:
+      - 1.4.0
+  model:
+    type:
+      - string
+      - 'null'
+    description: The device model.
+    examples:
+      - Pixel 9
+  os_version:
+    type:
+      - string
+      - 'null'
+    description: The operating system version.
+    examples:
+      - '16'
+  platform:
+    type:
+      - string
+      - 'null'
+    description: 'The platform: `ios`, `android`, `web` or what the client says.'
+    examples:
+      - android
+examples:
+  - id: web-3f2a9c1d8e7b6a50
+    platform: web
+    model: null
+    app_version: 0.12.0
+    os_version: null

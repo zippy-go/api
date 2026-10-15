@@ -1,0 +1,41 @@
+type: object
+description: 'A section of the account, the `AccountSection` schema: an unbuilt one says so before it is opened, and what it will do.'
+required:
+  - key
+  - title
+  - built
+  - description
+  - set_apart
+properties:
+  key:
+    $ref: ./AccountSectionKey.yaml
+    description: The section.
+  title:
+    type: string
+    description: Its title.
+    examples:
+      - Orders
+  built:
+    type: boolean
+    description: Whether it works today.
+  description:
+    type: string
+    description: What it does, or will do.
+  set_apart:
+    type: boolean
+    description: Whether it is set apart from the rest (deleting the account).
+  step:
+    type:
+      - integer
+      - 'null'
+    description: The step of the delivery plan that brings it, when it is not built and a step is planned.
+    minimum: 0
+    examples:
+      - 3
+examples:
+  - key: orders
+    title: Orders
+    built: false
+    step: 3
+    description: Your orders, the live one first, each with its receipt, help and reorder. Arrives with ordering in step 3.
+    set_apart: false

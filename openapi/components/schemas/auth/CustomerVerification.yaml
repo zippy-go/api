@@ -1,0 +1,31 @@
+type: object
+description: 'A verified code, the `CustomerVerification` schema: a session for a registered number, a registration for a new one.'
+required:
+  - outcome
+properties:
+  outcome:
+    $ref: ./CustomerVerificationOutcome.yaml
+    description: Which of the two it is.
+  registration:
+    oneOf:
+      - $ref: ./CustomerRegistration.yaml
+      - type: 'null'
+    description: The registration, when one is required.
+  session:
+    oneOf:
+      - $ref: ./CustomerSession.yaml
+      - type: 'null'
+    description: The session, when signed in.
+examples:
+  - outcome: registration_required
+    session: null
+    registration:
+      registration_token: eyJ0eXAiOiJyZWcrand0IiwiYWxnIjoiRWREU0EifQ.e30.c2lnbmF0dXJl
+      expires_at: 2026-10-15T09:30:00Z
+      mobile: '+919876543210'
+      country: IN
+      entry: delivery
+      needs:
+        - profile
+      optional:
+        - address

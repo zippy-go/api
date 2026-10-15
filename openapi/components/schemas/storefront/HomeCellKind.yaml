@@ -1,0 +1,7 @@
+type: string
+description: What a cell of the opening screen shows, the `HomeCellKind` schema.
+enum:
+  - vertical
+  - campaign
+examples:
+  - vertical

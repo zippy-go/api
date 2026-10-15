@@ -1,0 +1,47 @@
+type: object
+description: 'Where a visitor is placed, the `StorefrontPlace` schema: the zone the storefront draws, how it was reached and how far the pin is from it.'
+required:
+  - resolution
+properties:
+  resolution:
+    $ref: ./PlaceResolution.yaml
+    description: How the zone was reached.
+  cap_metres:
+    type:
+      - integer
+      - 'null'
+    description: The cap the caller asked with, in metres; `null` when none was given and nearest won at any distance.
+    examples:
+      - 25000
+  distance_metres:
+    type:
+      - integer
+      - 'null'
+    description: "Metres from the pin to the zone's edge: zero inside, the distance for `nearest`, `null` for a default or a chosen zone."
+    examples:
+      - 0
+  pin:
+    oneOf:
+      - $ref: ./GeoPoint.yaml
+      - type: 'null'
+    description: The pin the answer is for, when one was given whole (half a coordinate counts as none).
+  zone:
+    oneOf:
+      - $ref: ./StorefrontZone.yaml
+      - type: 'null'
+    description: The zone or default service area drawn; `null` only when `resolution` is `none`.
+examples:
+  - resolution: inside
+    zone:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+      name: Gachibowli
+      kind: zone
+      path: /IN/hyderabad/gachibowli
+      city: Hyderabad
+      country: IN
+      time_zone: Asia/Kolkata
+    distance_metres: 0
+    pin:
+      lat: 17.4401
+      lng: 78.3489
+    cap_metres: 25000

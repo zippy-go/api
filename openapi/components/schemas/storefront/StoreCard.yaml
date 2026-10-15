@@ -1,0 +1,156 @@
+type: object
+description: 'A store as a card, the `StoreCard` schema: what a customer decides on.'
+required:
+  - location_id
+  - partner_id
+  - name
+  - partner_name
+  - partner_kind
+  - shelves
+  - state
+  - preparation_minutes
+  - fulfilment
+  - is_new
+  - highlights
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store (a Location).
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner it belongs to.
+  name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_name:
+    type: string
+    description: The Partner's name.
+    examples:
+      - ZippyGo Dev Partner
+  partner_kind:
+    type: string
+    description: '`organisation` or `individual`.'
+    examples:
+      - organisation
+  shelves:
+    type: array
+    items:
+      $ref: ./StorefrontCategory.yaml
+    description: The Vertical's categories (shelves) the store sits on.
+  state:
+    $ref: ./StoreState.yaml
+    description: Open, shut by the clock, or offline.
+  preparation_minutes:
+    type: integer
+    description: The minutes the store quotes for preparation now.
+    minimum: 0
+    examples:
+      - 20
+  fulfilment:
+    type: array
+    items:
+      $ref: ./FulfilmentMethod.yaml
+    description: How it fulfils orders.
+  is_new:
+    type: boolean
+    description: '`true` in its first thirty days.'
+  highlights:
+    type: array
+    items:
+      type: string
+    description: The marks platform staff set for its card.
+  banner_url:
+    type:
+      - string
+      - 'null'
+    description: The store's banner, a rendition relative to the API host.
+  catalogue:
+    oneOf:
+      - $ref: ./StoreCatalogueSummary.yaml
+      - type: 'null'
+    description: The catalogue's summary of the published menu; `null` until the catalogue supplies it.
+  delivers_to_pin:
+    type:
+      - boolean
+      - 'null'
+    description: Whether the store delivers to the pin; `null` without a pin. A store out of reach is still listed.
+  delivery_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: 'null'
+    description: The delivery fee from the resolved policy, when one is set.
+  delivery_minutes:
+    type:
+      - integer
+      - 'null'
+    description: The delivery estimate from the resolved policy, in minutes.
+    examples:
+      - 30
+  distance_metres:
+    type:
+      - integer
+      - 'null'
+    description: The straight-line distance from the pin, rounded to 50 metres under a kilometre and to a tenth of a kilometre above; `null` without a pin.
+    examples:
+      - 1200
+  logo_url:
+    type:
+      - string
+      - 'null'
+    description: The store's square mark, a rendition relative to the API host.
+  minimum_order:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: 'null'
+    description: The minimum order from the resolved policy, when one is set.
+  offline_message:
+    type:
+      - string
+      - 'null'
+    description: What the store says while it is offline.
+  state_until:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: 'When the state changes: closing time when open, opening time when shut, back-at time when offline; `null` when unknown.'
+  zone_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The zone the store is in.
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    name: Dev Kitchen Gachibowli
+    partner_name: ZippyGo Dev Partner
+    partner_kind: organisation
+    logo_url: null
+    banner_url: null
+    zone_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    shelves:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+        label: Biryani
+        icon_url: null
+    state: open
+    state_until: 2026-10-15T17:30:00Z
+    offline_message: null
+    preparation_minutes: 20
+    distance_metres: 1200
+    delivers_to_pin: true
+    fulfilment:
+      - delivery
+      - pickup
+    is_new: true
+    highlights: []
+    delivery_fee:
+      minor_units: 3000
+      currency: INR
+    minimum_order: null
+    delivery_minutes: 30
+    catalogue: null

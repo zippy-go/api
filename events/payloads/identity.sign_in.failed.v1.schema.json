@@ -47,9 +47,14 @@
         "wrong_current_password",
         "wrong_password_proof",
         "wrong_authenticator_proof",
-        "unknown_credential"
+        "unknown_credential",
+        "wrong_surface",
+        "wrong_purpose",
+        "used_code",
+        "expired_code",
+        "sign_in_closed"
       ],
-      "description": "Why it failed: no account for the identifier, an account without a password, a wrong password, a wrong one-time code, a wrong second step, a disabled account, a surface the account may not enter, an attempt refused by the throttle, a wrong current password when changing it, a wrong password or authenticator code when stepping up, or an unknown service credential. Consumers must tolerate values they do not know.",
+      "description": "Why it failed: no account for the identifier, an account without a password, a wrong password, a wrong one-time code, a wrong second step, a disabled account, a surface the account may not enter, an attempt refused by the throttle, a wrong current password when changing it, a wrong password or authenticator code when stepping up, or an unknown service credential; for a customer's code, also a code issued for another surface or another purpose, a code already used, an expired code, or a market closed to sign-in. Consumers must tolerate values they do not know.",
       "examples": [
         "wrong_password"
       ]

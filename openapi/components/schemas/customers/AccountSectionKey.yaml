@@ -1,0 +1,21 @@
+type: string
+description: A section of the account, by key, the `AccountSectionKey` schema.
+enum:
+  - my_details
+  - addresses
+  - orders
+  - subscriptions
+  - bookings
+  - favourites
+  - payment_methods
+  - offers_and_wallet
+  - notifications
+  - language
+  - security
+  - download_my_data
+  - support
+  - about
+  - delete_account
+  - sign_out
+examples:
+  - my_details

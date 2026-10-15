@@ -1,0 +1,44 @@
+type: object
+description: "The customer's addresses, the `CustomerAddressList` schema: newest first, exactly one selected whenever any exist."
+required:
+  - addresses
+properties:
+  addresses:
+    type: array
+    items:
+      $ref: ./CustomerAddress.yaml
+    description: The addresses.
+  selected_address_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The selected one; `null` only when there are none.
+examples:
+  - addresses:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+        label: home
+        label_name: null
+        line1: Road No 36
+        line2: null
+        locality: Jubilee Hills
+        city: Hyderabad
+        state: Telangana
+        postal_code: '500033'
+        country: IN
+        lat: 17.4329
+        lng: 78.4075
+        building_type: apartment
+        flat_number: '402'
+        block: B
+        building_name: Lake View Residency
+        floor: '4'
+        landmark: opposite the water tank
+        instructions: null
+        receiver_name: null
+        receiver_phone: null
+        selected: true
+        created_at: 2026-10-15T09:00:00Z
+        updated_at: 2026-10-15T09:00:00Z
+        version: 1
+    selected_address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90

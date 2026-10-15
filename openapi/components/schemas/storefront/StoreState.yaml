@@ -1,0 +1,8 @@
+type: string
+description: 'What a store is doing now, the `StoreState` schema: open, shut by the clock (listed under "Opening later"), or taken offline (listed under "Temporarily offline").'
+enum:
+  - open
+  - closed
+  - offline
+examples:
+  - open

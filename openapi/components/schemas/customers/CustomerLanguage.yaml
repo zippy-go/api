@@ -1,0 +1,8 @@
+type: string
+description: "A customer's language, the `CustomerLanguage` schema: English, Telugu or Hindi. Screens and messages use it where a translation exists and English otherwise."
+enum:
+  - en
+  - te
+  - hi
+examples:
+  - en

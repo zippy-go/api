@@ -1,0 +1,52 @@
+type: object
+description: A service area as the storefront names it, the `StorefrontZone` schema.
+required:
+  - id
+  - name
+  - kind
+  - path
+  - country
+  - time_zone
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The service area.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Gachibowli
+  kind:
+    $ref: ../reference/AreaKind.yaml
+    description: 'What it is: a zone, or a city for a default service area.'
+  path:
+    type: string
+    description: Its place in the geography tree.
+    examples:
+      - /IN/hyderabad/gachibowli
+  country:
+    type: string
+    description: Its country (alpha-2).
+    examples:
+      - IN
+  time_zone:
+    type: string
+    description: Its time zone, the clock its stores' hours read in.
+    examples:
+      - Asia/Kolkata
+  city:
+    type:
+      - string
+      - 'null'
+    description: The city it belongs to, or its own name for a city.
+    examples:
+      - Hyderabad
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    name: Gachibowli
+    kind: zone
+    path: /IN/hyderabad/gachibowli
+    city: Hyderabad
+    country: IN
+    time_zone: Asia/Kolkata

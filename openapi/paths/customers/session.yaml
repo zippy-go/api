@@ -1,0 +1,51 @@
+# Path item for /v1/customer/sessions/{session_id}. Referenced from openapi.yaml.
+parameters:
+  - name: session_id
+    in: path
+    required: true
+    description: The session, which must be one of the customer's own.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22
+delete:
+  operationId: endCustomerSession
+  summary: End a session
+  description: Ends one of the customer's sessions; it stops at its next refresh at the latest. Signing out every session is `POST /v1/auth/sign-out` with `everywhere`.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  responses:
+    '204':
+      description: Ended; it stops at its next refresh at the latest.
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: "`not_found`: no such live session of the customer's."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

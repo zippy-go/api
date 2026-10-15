@@ -1,0 +1,8 @@
+type: string
+description: 'How a code actually travelled, the `CodeVia` schema: the channel asked for, or SMS when WhatsApp could not deliver, or email for a verified address.'
+enum:
+  - sms
+  - whatsapp
+  - email
+examples:
+  - sms

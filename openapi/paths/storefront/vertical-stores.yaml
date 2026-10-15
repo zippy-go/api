@@ -1,0 +1,91 @@
+# Path item for /v1/storefront/verticals/{vertical}/stores. Referenced from openapi.yaml.
+parameters:
+  - name: vertical
+    in: path
+    required: true
+    description: The Vertical's stable code (`FOOD`) or its id.
+    schema:
+      type: string
+      minLength: 1
+    example: FOOD
+get:
+  operationId: listVerticalStores
+  summary: List a Vertical's stores
+  description: "A Vertical's stores as cards, for where the visitor is placed: every live store trading in it in the zone's city, open first, then opening later, then temporarily offline, nearest first with a pin; each with its distance from the pin and whether it delivers there. A list with a pin is private; one without is public for a minute."
+  tags:
+    - Storefront
+  security: []
+  parameters:
+    - name: lat
+      in: query
+      required: false
+      description: Latitude of the pin; half a coordinate counts as none.
+      schema:
+        type: number
+    - name: lng
+      in: query
+      required: false
+      description: Longitude of the pin.
+      schema:
+        type: number
+    - name: cap
+      in: query
+      required: false
+      description: How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+      schema:
+        type: integer
+    - name: zone_id
+      in: query
+      required: false
+      description: A zone the visitor chose or the device remembers; used while it still serves.
+      schema:
+        type: string
+        format: uuid
+    - name: country
+      in: query
+      required: false
+      description: The visitor's country (alpha-2), used when no pin is given.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: The stores as cards.
+      headers:
+        Cache-Control:
+          description: '`private, no-store` when the request carries a pin (the answer carries distances); `public, max-age=60` otherwise.'
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/storefront/StoreCardList.yaml
+    '400':
+      description: '`validation_failed`: a pin out of range, a negative cap, `malformed_identifier` on `zone_id`, or nothing that places the visitor.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: '`not_found`: no such Vertical, or it is archived.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,85 @@
+type: object
+description: 'An address suggestion, the `AddressSuggestion` schema: words to pre-fill an address form with, never stored by the platform; the pin, not the words, decides where an agent goes.'
+required:
+  - id
+  - label
+  - line1
+  - city
+  - country
+  - lat
+  - lng
+  - provider
+properties:
+  id:
+    type: string
+    description: A stable id of the suggestion within its provider.
+    examples:
+      - hyd-jubilee-hills
+  label:
+    type: string
+    description: The suggestion as one line.
+    examples:
+      - Jubilee Hills, Hyderabad, Telangana 500033
+  line1:
+    type: string
+    description: The first address line it suggests.
+    examples:
+      - Jubilee Hills
+  city:
+    type: string
+    description: The city.
+    examples:
+      - Hyderabad
+  country:
+    type: string
+    description: The country (alpha-2).
+    examples:
+      - IN
+  lat:
+    type: number
+    description: Latitude of the place.
+    examples:
+      - 17.4326
+  lng:
+    type: number
+    description: Longitude of the place.
+    examples:
+      - 78.4071
+  provider:
+    type: string
+    description: 'Which provider answered: `local` (the bundled table) or `google`.'
+    examples:
+      - local
+  locality:
+    type:
+      - string
+      - 'null'
+    description: The locality.
+    examples:
+      - Jubilee Hills
+  postal_code:
+    type:
+      - string
+      - 'null'
+    description: The PIN code.
+    examples:
+      - '500033'
+  state:
+    type:
+      - string
+      - 'null'
+    description: The state.
+    examples:
+      - Telangana
+examples:
+  - id: hyd-jubilee-hills
+    label: Jubilee Hills, Hyderabad, Telangana 500033
+    line1: Jubilee Hills
+    locality: Jubilee Hills
+    city: Hyderabad
+    state: Telangana
+    postal_code: '500033'
+    country: IN
+    lat: 17.4326
+    lng: 78.4071
+    provider: local

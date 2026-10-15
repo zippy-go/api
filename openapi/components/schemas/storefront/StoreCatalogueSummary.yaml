@@ -1,0 +1,20 @@
+type: object
+description: What the catalogue says about a store's published menu, the `StoreCatalogueSummary` schema. Supplied by the catalogue's published document; `null` until it is wired.
+required:
+  - menu_version
+  - item_count
+properties:
+  menu_version:
+    type: integer
+    description: The published menu's version.
+    examples:
+      - 12
+  item_count:
+    type: integer
+    description: Items on the menu.
+    minimum: 0
+    examples:
+      - 48
+examples:
+  - menu_version: 12
+    item_count: 48

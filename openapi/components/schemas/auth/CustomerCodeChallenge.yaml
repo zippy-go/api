@@ -1,0 +1,28 @@
+type: object
+description: 'A code on its way, the `CustomerCodeChallenge` schema: the same facts whether or not the number has an account.'
+required:
+  - challenge_id
+  - expires_at
+  - resend_at
+  - channel
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: Send this back with the code.
+  expires_at:
+    type: string
+    format: date-time
+    description: When the code stops working (five minutes).
+  resend_at:
+    type: string
+    format: date-time
+    description: When another code may be asked for this number.
+  channel:
+    $ref: ./CodeVia.yaml
+    description: 'How the code travelled: `sms`, or `whatsapp` when asked for and the number is on it.'
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+    expires_at: 2026-10-15T09:05:00Z
+    resend_at: 2026-10-15T09:01:00Z
+    channel: sms

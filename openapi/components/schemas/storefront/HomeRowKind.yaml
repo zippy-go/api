@@ -1,0 +1,7 @@
+type: string
+description: The kind of a row of the opening screen, the `HomeRowKind` schema.
+enum:
+  - default
+  - big
+examples:
+  - default

@@ -1,0 +1,70 @@
+# Path item for /v1/geocoding/suggestions. Referenced from openapi.yaml.
+get:
+  operationId: suggestAddresses
+  summary: Places for what was typed
+  description: "Places matching what was typed into an address search, best first (nearer the pin first when one is given): locally from a bundled table of Hyderabad's localities, by prefix."
+  tags:
+    - Geocoding
+  security: []
+  parameters:
+    - name: q
+      in: query
+      required: true
+      description: The text, 1 to 100 characters.
+      schema:
+        type: string
+    - name: country
+      in: query
+      required: false
+      description: The country searched (alpha-2), India by default.
+      schema:
+        type: string
+    - name: lat
+      in: query
+      required: false
+      description: Latitude to prefer places near.
+      schema:
+        type: number
+    - name: lng
+      in: query
+      required: false
+      description: Longitude to prefer places near.
+      schema:
+        type: number
+    - name: limit
+      in: query
+      required: false
+      description: At most this many, 1 to 10 (default 5).
+      schema:
+        type: integer
+        minimum: 0
+  responses:
+    '200':
+      description: The suggestions, best first.
+      headers:
+        Cache-Control:
+          description: Always `private, no-store`.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/storefront/AddressSuggestionList.yaml
+    '400':
+      description: '`validation_failed`: empty or overlong text.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

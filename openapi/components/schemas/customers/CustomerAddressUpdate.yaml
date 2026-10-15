@@ -1,0 +1,101 @@
+type: object
+description: 'Request body of `PATCH /v1/customer/addresses/{address_id}`: the fields sent; `null` clears an optional one.'
+properties:
+  block:
+    type:
+      - string
+      - 'null'
+    description: Block or tower.
+  building_name:
+    type:
+      - string
+      - 'null'
+    description: Building or society name.
+  building_type:
+    oneOf:
+      - $ref: ./BuildingType.yaml
+      - type: 'null'
+    description: The kind of building.
+  city:
+    type:
+      - string
+      - 'null'
+    description: The city.
+  flat_number:
+    type:
+      - string
+      - 'null'
+    description: Flat or door number.
+  floor:
+    type:
+      - string
+      - 'null'
+    description: Floor.
+  instructions:
+    type:
+      - string
+      - 'null'
+    description: Delivery notes.
+  label:
+    oneOf:
+      - $ref: ./AddressLabel.yaml
+      - type: 'null'
+    description: Home, work or other.
+  label_name:
+    type:
+      - string
+      - 'null'
+    description: The name of an `other` place.
+  landmark:
+    type:
+      - string
+      - 'null'
+    description: A landmark.
+  lat:
+    type:
+      - number
+      - 'null'
+    description: Latitude of a moved pin.
+  line1:
+    type:
+      - string
+      - 'null'
+    description: The address line.
+  line2:
+    type:
+      - string
+      - 'null'
+    description: A second line.
+  lng:
+    type:
+      - number
+      - 'null'
+    description: Longitude of a moved pin.
+  locality:
+    type:
+      - string
+      - 'null'
+    description: The locality.
+  postal_code:
+    type:
+      - string
+      - 'null'
+    description: The PIN code.
+  receiver_name:
+    type:
+      - string
+      - 'null'
+    description: Who accepts a parcel.
+  receiver_phone:
+    type:
+      - string
+      - 'null'
+    description: Their number.
+  state:
+    type:
+      - string
+      - 'null'
+    description: The state.
+examples:
+  - landmark: behind the temple
+    instructions: null

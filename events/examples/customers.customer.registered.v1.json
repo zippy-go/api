@@ -1,0 +1,14 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a91",
+  "type": "customers.customer.registered",
+  "version": 1,
+  "occurred_at": "2026-10-15T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20",
+    "entry": "delivery",
+    "channel": "phone",
+    "new_user": true
+  }
+}

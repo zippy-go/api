@@ -559,7 +559,7 @@ export type RefreshRequest = {
      */
     refresh_token?: string;
     /**
-     * For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`).
+     * For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent` or `zg_refresh_customer`).
      */
     audience?: Audience | null;
 };
@@ -675,12 +675,12 @@ export type Me = {
 };
 
 /**
- * The surface a session, and every access token of it, is issued for, carried in the token's `aud` claim: `partner` for the Partner console, `platform` for Mission Control, `agent` for the Agent app, `customer` for the Customer app (not signed in to here yet) and `service` for the service tokens of background jobs. A token is refused by every surface it does not name. Clients must tolerate values they do not know, because a new surface is an additive change.
+ * The surface a session, and every access token of it, is issued for, carried in the token's `aud` claim: `partner` for the Partner console, `platform` for Mission Control, `agent` for the Agent app, `customer` for the Customer app and the Storefront (signed in with a code to the number, `POST /v1/auth/customer/codes`) and `service` for the service tokens of background jobs. A token is refused by every surface it does not name. Clients must tolerate values they do not know, because a new surface is an additive change.
  */
 export type Audience = 'partner' | 'platform' | 'agent' | 'customer' | 'service';
 
 /**
- * How a session's refresh token travels, stated by the client when it signs in and bound to the session for good. `cookie`: browsers keep it in an `httpOnly` cookie named for the surface (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`), scoped to `/v1/auth`, and never see it. `body`: apps receive it in `refresh_token` and keep it in the platform keystore. The access token always travels as a bearer header.
+ * How a session's refresh token travels, stated by the client when it signs in and bound to the session for good. `cookie`: browsers keep it in an `httpOnly` cookie named for the surface (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`, `zg_refresh_customer`), scoped to `/v1/auth`, and never see it. `body`: apps receive it in `refresh_token` and keep it in the platform keystore. The access token always travels as a bearer header.
  */
 export type Delivery = 'cookie' | 'body';
 
@@ -901,7 +901,7 @@ export type SignOutRequest = {
      */
     audience?: Audience | null;
     /**
-     * `true` ends every session of the user on every surface, not only this one.
+     * `true` ends every session of the user on every surface, not only this one; for a customer session, every customer session of theirs (the customer profile reaches no membership).
      */
     everywhere?: boolean;
     /**
@@ -7332,6 +7332,1369 @@ export type UploadGrant = {
 };
 
 /**
+ * Request body of `POST /v1/auth/customer/codes`.
+ */
+export type CustomerCodeRequest = {
+    /**
+     * The mobile number as typed: ten digits, or with the country code (`+91 98765 43210`).
+     */
+    mobile: string;
+    /**
+     * `sms` (default), or `whatsapp` with SMS behind it when the number has no WhatsApp.
+     */
+    channel?: CustomerCodeChannel | null;
+    /**
+     * The market the number is read against (alpha-2); India by default, whose bare ten-digit numbers get +91.
+     */
+    country?: string | null;
+    /**
+     * The device asking, when the client names it: an identifier it keeps, never a credential.
+     */
+    device?: DeviceIdentity | null;
+};
+
+/**
+ * A code on its way, the `CustomerCodeChallenge` schema: the same facts whether or not the number has an account.
+ */
+export type CustomerCodeChallenge = {
+    /**
+     * Send this back with the code.
+     */
+    challenge_id: string;
+    /**
+     * When the code stops working (five minutes).
+     */
+    expires_at: string;
+    /**
+     * When another code may be asked for this number.
+     */
+    resend_at: string;
+    /**
+     * How the code travelled: `sms`, or `whatsapp` when asked for and the number is on it.
+     */
+    channel: CodeVia;
+};
+
+/**
+ * Request body of `POST /v1/auth/customer/verify`.
+ */
+export type CustomerCodeVerifyRequest = {
+    /**
+     * The challenge from the request step.
+     */
+    challenge_id: string;
+    /**
+     * The six-digit code.
+     */
+    code: string;
+    /**
+     * How the refresh token travels, required: `cookie` (the Storefront) or `body` (the Customer app).
+     */
+    delivery: Delivery;
+    /**
+     * The device, when the client names it.
+     */
+    device?: DeviceIdentity | null;
+    /**
+     * What a registration would serve: `delivery` (default), `pickup` or `dine_in`.
+     */
+    entry?: RegistrationEntry | null;
+};
+
+/**
+ * A verified code, the `CustomerVerification` schema: a session for a registered number, a registration for a new one.
+ */
+export type CustomerVerification = {
+    /**
+     * Which of the two it is.
+     */
+    outcome: CustomerVerificationOutcome;
+    /**
+     * The registration, when one is required.
+     */
+    registration?: CustomerRegistration | null;
+    /**
+     * The session, when signed in.
+     */
+    session?: CustomerSession | null;
+};
+
+/**
+ * How a verified code turned out, the `CustomerVerificationOutcome` schema.
+ */
+export type CustomerVerificationOutcome = 'signed_in' | 'registration_required';
+
+/**
+ * A registration in progress, the `CustomerRegistration` schema: proof, for thirty minutes, that this device holds the number. Nothing about it is stored until it completes.
+ */
+export type CustomerRegistration = {
+    /**
+     * The signed registration context for `POST /v1/auth/customer/register`; it is not an access token and is refused as one.
+     */
+    registration_token: string;
+    /**
+     * When it stops working.
+     */
+    expires_at: string;
+    /**
+     * The number proven, E.164.
+     */
+    mobile: string;
+    /**
+     * The market of the number (alpha-2).
+     */
+    country: string;
+    /**
+     * What the registration serves.
+     */
+    entry: RegistrationEntry;
+    /**
+     * The steps that must be completed: the profile.
+     */
+    needs: Array<RegistrationStep>;
+    /**
+     * The steps that may be completed now or later: a first address.
+     */
+    optional: Array<RegistrationStep>;
+};
+
+/**
+ * A step of a registration, the `RegistrationStep` schema.
+ */
+export type RegistrationStep = 'profile' | 'address';
+
+/**
+ * What a registration serves, the `RegistrationEntry` schema: the delivery storefront, a pickup, or a table code scanned for dine-in.
+ */
+export type RegistrationEntry = 'delivery' | 'pickup' | 'dine_in';
+
+/**
+ * Request body of `POST /v1/auth/customer/register`.
+ */
+export type CustomerRegisterRequest = {
+    /**
+     * The registration token from the verification.
+     */
+    registration_token: string;
+    /**
+     * The given name, 1 to 60 characters.
+     */
+    given_name: string;
+    /**
+     * How the refresh token travels, required, as at the verification.
+     */
+    delivery: Delivery;
+    /**
+     * A first address, selected; it may be added later instead.
+     */
+    address?: CustomerAddressInput | null;
+    /**
+     * The date of birth: never in the future, never under sixteen.
+     */
+    date_of_birth?: string | null;
+    /**
+     * The device, when the client names it.
+     */
+    device?: DeviceIdentity | null;
+    /**
+     * An email for recovery: stored lower-cased and unverified until a code proves it.
+     */
+    email?: string | null;
+    /**
+     * The family name; single names are ordinary.
+     */
+    family_name?: string | null;
+    /**
+     * English, Telugu or Hindi; the device's (`Accept-Language`) when it is one of them, else English.
+     */
+    language?: CustomerLanguage | null;
+    /**
+     * The single "send me offers" tick: every channel when ticked; off when absent.
+     */
+    marketing_opt_in?: boolean | null;
+    /**
+     * The terms box, when the client shows one; sent unticked, the registration is refused.
+     */
+    terms_accepted?: boolean | null;
+};
+
+/**
+ * A session, as the sign-in operations of the Customer app and the Storefront return it, the `CustomerSession` schema. With cookie delivery the refresh token is set in the `zg_refresh_customer` cookie instead and `refresh_token` is `null`.
+ */
+export type CustomerSession = {
+    /**
+     * The access token: a JWT typed `at+jwt`, audience `customer`, for `Authorization: Bearer`.
+     */
+    access_token: string;
+    /**
+     * Always `Bearer`.
+     */
+    token_type: string;
+    /**
+     * Seconds until the access token expires (900).
+     */
+    expires_in: number;
+    /**
+     * Always `customer`.
+     */
+    audience: Audience;
+    /**
+     * The customer's profile.
+     */
+    customer: CustomerProfile;
+    /**
+     * `true` when the number already had an account: always after a verification, and after a registration that met an account another device opened meanwhile (its draft was dropped).
+     */
+    existing_account: boolean;
+    /**
+     * The refresh token when the delivery is `body`; `null` with cookie delivery.
+     */
+    refresh_token?: string | null;
+};
+
+/**
+ * The device a client names, the `DeviceIdentity` schema: an identifier the client generates once and keeps, with what it says about itself. It labels sessions and will route pushes; it is never a credential and grants nothing.
+ */
+export type DeviceIdentity = {
+    /**
+     * The identifier the client generated: 1 to 128 letters, digits, dots, dashes, colons or underscores.
+     */
+    id: string;
+    /**
+     * The app or storefront version.
+     */
+    app_version?: string | null;
+    /**
+     * The device model.
+     */
+    model?: string | null;
+    /**
+     * The operating system version.
+     */
+    os_version?: string | null;
+    /**
+     * The platform: `ios`, `android`, `web` or what the client says.
+     */
+    platform?: string | null;
+};
+
+/**
+ * The channel a customer asks a code on, the `CustomerCodeChannel` schema.
+ */
+export type CustomerCodeChannel = 'sms' | 'whatsapp';
+
+/**
+ * How a code actually travelled, the `CodeVia` schema: the channel asked for, or SMS when WhatsApp could not deliver, or email for a verified address.
+ */
+export type CodeVia = 'sms' | 'whatsapp' | 'email';
+
+/**
+ * The customer's profile, the `CustomerProfile` schema.
+ */
+export type CustomerProfile = {
+    /**
+     * The customer (the user).
+     */
+    user_id: string;
+    /**
+     * The given name.
+     */
+    given_name: string;
+    /**
+     * Whether a code proved the email.
+     */
+    email_verified: boolean;
+    /**
+     * The language screens and messages use.
+     */
+    language: CustomerLanguage;
+    /**
+     * Marketing consent per channel.
+     */
+    marketing: MarketingConsent;
+    /**
+     * What the registration served.
+     */
+    registered_entry: RegistrationEntry;
+    /**
+     * What the account still lacks: `address` until one is saved.
+     */
+    needs: Array<RegistrationStep>;
+    /**
+     * When the account was opened.
+     */
+    created_at: string;
+    /**
+     * When the profile last changed.
+     */
+    updated_at: string;
+    /**
+     * Raised by one on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * The date of birth, when given.
+     */
+    date_of_birth?: string | null;
+    /**
+     * An email for recovery, lower-cased; unverified until a code proves it, and never a way to sign in.
+     */
+    email?: string | null;
+    /**
+     * The family name; single names are ordinary.
+     */
+    family_name?: string | null;
+    /**
+     * The number they sign in with, E.164; changed only through the change of number.
+     */
+    mobile?: string | null;
+    /**
+     * When the terms were accepted, when they were.
+     */
+    terms_accepted_at?: string | null;
+};
+
+/**
+ * Request body of `PATCH /v1/customer/profile`: named fields; one not sent is untouched.
+ */
+export type CustomerProfileUpdate = {
+    /**
+     * A new date of birth, or `null` to clear it.
+     */
+    date_of_birth?: string | null;
+    /**
+     * A new email (unverified from now), or `null` to clear it.
+     */
+    email?: string | null;
+    /**
+     * A new family name, or `null` to clear it.
+     */
+    family_name?: string | null;
+    /**
+     * A new given name.
+     */
+    given_name?: string | null;
+    /**
+     * A new language.
+     */
+    language?: CustomerLanguage | null;
+};
+
+/**
+ * A customer's language, the `CustomerLanguage` schema: English, Telugu or Hindi. Screens and messages use it where a translation exists and English otherwise.
+ */
+export type CustomerLanguage = 'en' | 'te' | 'hi';
+
+/**
+ * Marketing consent per channel, the `MarketingConsent` schema. Transactional messages (codes, order updates) send whatever it says.
+ */
+export type MarketingConsent = {
+    /**
+     * Offers by email.
+     */
+    email: boolean;
+    /**
+     * Offers by push notification.
+     */
+    push: boolean;
+    /**
+     * Offers by SMS.
+     */
+    sms: boolean;
+    /**
+     * Offers on WhatsApp.
+     */
+    whatsapp: boolean;
+    /**
+     * When the set was last agreed; `null` while every channel is off.
+     */
+    agreed_at?: string | null;
+};
+
+/**
+ * Request body of `PUT /v1/customer/consent`: the whole set, every channel named.
+ */
+export type MarketingConsentUpdate = {
+    /**
+     * Offers by email.
+     */
+    email: boolean;
+    /**
+     * Offers by push notification.
+     */
+    push: boolean;
+    /**
+     * Offers by SMS.
+     */
+    sms: boolean;
+    /**
+     * Offers on WhatsApp.
+     */
+    whatsapp: boolean;
+};
+
+/**
+ * An address, the `CustomerAddress` schema: the postal part, the pin the customer confirmed, and what finds the door.
+ */
+export type CustomerAddress = {
+    /**
+     * The address.
+     */
+    id: string;
+    /**
+     * Home, work or other.
+     */
+    label: AddressLabel;
+    /**
+     * The address line.
+     */
+    line1: string;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * The country (alpha-2).
+     */
+    country: string;
+    /**
+     * Latitude of the pin.
+     */
+    lat: number;
+    /**
+     * Longitude of the pin.
+     */
+    lng: number;
+    /**
+     * The kind of building, which decides the fields below.
+     */
+    building_type: BuildingType;
+    /**
+     * Whether it is the selected address, the one the storefront browses from.
+     */
+    selected: boolean;
+    /**
+     * When it was added.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Raised by one on every change.
+     */
+    version: number;
+    /**
+     * Block or tower.
+     */
+    block?: string | null;
+    /**
+     * Building or society name.
+     */
+    building_name?: string | null;
+    /**
+     * Flat or door number.
+     */
+    flat_number?: string | null;
+    /**
+     * Floor, as said.
+     */
+    floor?: string | null;
+    /**
+     * Notes for whoever delivers.
+     */
+    instructions?: string | null;
+    /**
+     * The name of an `other` place.
+     */
+    label_name?: string | null;
+    /**
+     * A landmark that finds the gate.
+     */
+    landmark?: string | null;
+    /**
+     * A second line.
+     */
+    line2?: string | null;
+    /**
+     * The area or locality.
+     */
+    locality?: string | null;
+    /**
+     * The PIN code.
+     */
+    postal_code?: string | null;
+    /**
+     * Who accepts a parcel, when somebody else does.
+     */
+    receiver_name?: string | null;
+    /**
+     * Their number, E.164.
+     */
+    receiver_phone?: string | null;
+    /**
+     * The state.
+     */
+    state?: string | null;
+};
+
+/**
+ * A first address given at registration, or a new one, the `CustomerAddressInput` schema.
+ */
+export type CustomerAddressInput = {
+    /**
+     * Home, work or other.
+     */
+    label: AddressLabel;
+    /**
+     * The address line.
+     */
+    line1: string;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * Latitude of the pin the customer confirmed.
+     */
+    lat: number;
+    /**
+     * Longitude of the pin.
+     */
+    lng: number;
+    /**
+     * The kind of building, which decides the further fields that are kept.
+     */
+    building_type: BuildingType;
+    /**
+     * Block or tower (not kept for an independent house).
+     */
+    block?: string | null;
+    /**
+     * Building or society name (not kept for an independent house).
+     */
+    building_name?: string | null;
+    /**
+     * The country (alpha-2); India by default.
+     */
+    country?: string | null;
+    /**
+     * Flat or door number.
+     */
+    flat_number?: string | null;
+    /**
+     * Floor, as said.
+     */
+    floor?: string | null;
+    /**
+     * Notes for whoever delivers, up to 500 characters.
+     */
+    instructions?: string | null;
+    /**
+     * The name of an `other` place.
+     */
+    label_name?: string | null;
+    /**
+     * A landmark that finds the gate.
+     */
+    landmark?: string | null;
+    /**
+     * A second line.
+     */
+    line2?: string | null;
+    /**
+     * The area or locality.
+     */
+    locality?: string | null;
+    /**
+     * The PIN code: six digits in India.
+     */
+    postal_code?: string | null;
+    /**
+     * Who accepts a parcel, when somebody else does.
+     */
+    receiver_name?: string | null;
+    /**
+     * Their number.
+     */
+    receiver_phone?: string | null;
+    /**
+     * Select it now (a first address is selected whatever this says).
+     */
+    select?: boolean | null;
+    /**
+     * The state.
+     */
+    state?: string | null;
+};
+
+/**
+ * Request body of `PATCH /v1/customer/addresses/{address_id}`: the fields sent; `null` clears an optional one.
+ */
+export type CustomerAddressUpdate = {
+    /**
+     * Block or tower.
+     */
+    block?: string | null;
+    /**
+     * Building or society name.
+     */
+    building_name?: string | null;
+    /**
+     * The kind of building.
+     */
+    building_type?: BuildingType | null;
+    /**
+     * The city.
+     */
+    city?: string | null;
+    /**
+     * Flat or door number.
+     */
+    flat_number?: string | null;
+    /**
+     * Floor.
+     */
+    floor?: string | null;
+    /**
+     * Delivery notes.
+     */
+    instructions?: string | null;
+    /**
+     * Home, work or other.
+     */
+    label?: AddressLabel | null;
+    /**
+     * The name of an `other` place.
+     */
+    label_name?: string | null;
+    /**
+     * A landmark.
+     */
+    landmark?: string | null;
+    /**
+     * Latitude of a moved pin.
+     */
+    lat?: number | null;
+    /**
+     * The address line.
+     */
+    line1?: string | null;
+    /**
+     * A second line.
+     */
+    line2?: string | null;
+    /**
+     * Longitude of a moved pin.
+     */
+    lng?: number | null;
+    /**
+     * The locality.
+     */
+    locality?: string | null;
+    /**
+     * The PIN code.
+     */
+    postal_code?: string | null;
+    /**
+     * Who accepts a parcel.
+     */
+    receiver_name?: string | null;
+    /**
+     * Their number.
+     */
+    receiver_phone?: string | null;
+    /**
+     * The state.
+     */
+    state?: string | null;
+};
+
+/**
+ * The customer's addresses, the `CustomerAddressList` schema: newest first, exactly one selected whenever any exist.
+ */
+export type CustomerAddressList = {
+    /**
+     * The addresses.
+     */
+    addresses: Array<CustomerAddress>;
+    /**
+     * The selected one; `null` only when there are none.
+     */
+    selected_address_id?: string | null;
+};
+
+/**
+ * Where an address is: home, work or another place, the `AddressLabel` schema.
+ */
+export type AddressLabel = 'home' | 'work' | 'other';
+
+/**
+ * The kind of building, the `BuildingType` schema, which decides the further fields that apply: every type takes the flat or door number and the floor; an apartment, an office, a hostel and another building also take the block or tower and the building or society name; an independent house takes neither. A field that does not apply is not stored.
+ */
+export type BuildingType = 'apartment' | 'independent_house' | 'office' | 'hostel' | 'other';
+
+/**
+ * A session holding the account, the `CustomerSessionSummary` schema.
+ */
+export type CustomerSessionSummary = {
+    /**
+     * The session.
+     */
+    id: string;
+    /**
+     * Whether it is the session asking.
+     */
+    current: boolean;
+    /**
+     * A browser or an app.
+     */
+    client: SessionClient;
+    /**
+     * Whether the client named its device; an unrecognised session is still listed.
+     */
+    recognised: boolean;
+    /**
+     * When it started.
+     */
+    started_at: string;
+    /**
+     * When it was last refreshed.
+     */
+    last_active_at: string;
+    /**
+     * When it ends without a refresh.
+     */
+    expires_at: string;
+    /**
+     * The device it was opened from, as the client named it; `null` when it named none.
+     */
+    device?: DeviceIdentity | null;
+    /**
+     * The address it was last used from.
+     */
+    last_address?: string | null;
+};
+
+/**
+ * The sessions holding the account, the `CustomerSessionList` schema, newest first.
+ */
+export type CustomerSessionList = {
+    /**
+     * The live sessions.
+     */
+    sessions: Array<CustomerSessionSummary>;
+};
+
+/**
+ * The kind of client holding a session, the `SessionClient` schema.
+ */
+export type SessionClient = 'browser' | 'native';
+
+/**
+ * Where the customer browses from, the `CustomerLocation` schema: the selected address's pin, placed as the storefront places any pin; explicitly empty without an address.
+ */
+export type CustomerLocation = {
+    /**
+     * How its pin was placed; `resolution` is `none` without an address.
+     */
+    place: StorefrontPlace;
+    /**
+     * The selected address; `null` when there is none.
+     */
+    address_id?: string | null;
+};
+
+/**
+ * A section of the account, the `AccountSection` schema: an unbuilt one says so before it is opened, and what it will do.
+ */
+export type AccountSection = {
+    /**
+     * The section.
+     */
+    key: AccountSectionKey;
+    /**
+     * Its title.
+     */
+    title: string;
+    /**
+     * Whether it works today.
+     */
+    built: boolean;
+    /**
+     * What it does, or will do.
+     */
+    description: string;
+    /**
+     * Whether it is set apart from the rest (deleting the account).
+     */
+    set_apart: boolean;
+    /**
+     * The step of the delivery plan that brings it, when it is not built and a step is planned.
+     */
+    step?: number | null;
+};
+
+/**
+ * A section of the account, by key, the `AccountSectionKey` schema.
+ */
+export type AccountSectionKey = 'my_details' | 'addresses' | 'orders' | 'subscriptions' | 'bookings' | 'favourites' | 'payment_methods' | 'offers_and_wallet' | 'notifications' | 'language' | 'security' | 'download_my_data' | 'support' | 'about' | 'delete_account' | 'sign_out';
+
+/**
+ * The account's sections and its summary, the `AccountSectionList` schema.
+ */
+export type AccountSectionList = {
+    /**
+     * Every section, in order, the set-apart one last but one and signing out last.
+     */
+    sections: Array<AccountSection>;
+    /**
+     * The summary that answers without a click.
+     */
+    summary: AccountSummary;
+};
+
+/**
+ * The account at a glance, the `AccountSummary` schema.
+ */
+export type AccountSummary = {
+    /**
+     * Saved addresses.
+     */
+    address_count: number;
+    /**
+     * Live sessions.
+     */
+    session_count: number;
+    /**
+     * Whether any marketing channel is on.
+     */
+    marketing_on: boolean;
+};
+
+/**
+ * A point on the map, the `GeoPoint` schema.
+ */
+export type GeoPoint = {
+    /**
+     * Latitude in decimal degrees.
+     */
+    lat: number;
+    /**
+     * Longitude in decimal degrees.
+     */
+    lng: number;
+};
+
+/**
+ * How a visitor was placed, the `PlaceResolution` schema: inside a fence; the nearest fence within the caller's cap; a zone the visitor chose that still serves; the country's default service area when nothing is within the cap or no point was given; the platform's fallback when the country answers nothing; or `none`, an explicitly empty answer, when nothing resolves at all. Only `inside` is exact.
+ */
+export type PlaceResolution = 'inside' | 'nearest' | 'chosen' | 'country_default' | 'platform_fallback' | 'none';
+
+/**
+ * A service area as the storefront names it, the `StorefrontZone` schema.
+ */
+export type StorefrontZone = {
+    /**
+     * The service area.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it is: a zone, or a city for a default service area.
+     */
+    kind: AreaKind;
+    /**
+     * Its place in the geography tree.
+     */
+    path: string;
+    /**
+     * Its country (alpha-2).
+     */
+    country: string;
+    /**
+     * Its time zone, the clock its stores' hours read in.
+     */
+    time_zone: string;
+    /**
+     * The city it belongs to, or its own name for a city.
+     */
+    city?: string | null;
+};
+
+/**
+ * Where a visitor is placed, the `StorefrontPlace` schema: the zone the storefront draws, how it was reached and how far the pin is from it.
+ */
+export type StorefrontPlace = {
+    /**
+     * How the zone was reached.
+     */
+    resolution: PlaceResolution;
+    /**
+     * The cap the caller asked with, in metres; `null` when none was given and nearest won at any distance.
+     */
+    cap_metres?: number | null;
+    /**
+     * Metres from the pin to the zone's edge: zero inside, the distance for `nearest`, `null` for a default or a chosen zone.
+     */
+    distance_metres?: number | null;
+    /**
+     * The pin the answer is for, when one was given whole (half a coordinate counts as none).
+     */
+    pin?: GeoPoint | null;
+    /**
+     * The zone or default service area drawn; `null` only when `resolution` is `none`.
+     */
+    zone?: StorefrontZone | null;
+};
+
+/**
+ * Whether a pin can be served, the `Serviceability` schema: what an order will check, asked before a pin is confirmed.
+ */
+export type Serviceability = {
+    /**
+     * Inside a serving zone, every ancestor active, the country active and accepting orders.
+     */
+    serviceable: boolean;
+    /**
+     * Why not, as a sentence a screen may show as is; `null` when serviceable.
+     */
+    reason?: string | null;
+    /**
+     * The zone the pin lies in, when it lies in one.
+     */
+    zone?: StorefrontZone | null;
+};
+
+/**
+ * The zones a visitor may pick, the `StorefrontZoneList` schema.
+ */
+export type StorefrontZoneList = {
+    /**
+     * Every zone that serves now, by city and name.
+     */
+    zones: Array<StorefrontZone>;
+};
+
+/**
+ * The kind of a row of the opening screen, the `HomeRowKind` schema.
+ */
+export type HomeRowKind = 'default' | 'big';
+
+/**
+ * What a cell of the opening screen shows, the `HomeCellKind` schema.
+ */
+export type HomeCellKind = 'vertical' | 'campaign';
+
+/**
+ * A campaign banner showing now, the `CampaignBanner` schema.
+ */
+export type CampaignBanner = {
+    /**
+     * The campaign slot.
+     */
+    id: string;
+    /**
+     * The headline.
+     */
+    headline: string;
+    /**
+     * The background colour as a hex triplet.
+     */
+    colour: string;
+    /**
+     * Banner (two cells) or compact (one).
+     */
+    shape: SlotShape;
+    /**
+     * Whether white text reads on the colour.
+     */
+    white_text_readable: boolean;
+    /**
+     * The artwork, a rendition relative to the API host.
+     */
+    artwork_url?: string | null;
+    /**
+     * Where tapping it goes; an announcement when `null`.
+     */
+    link?: SlotLink | null;
+    /**
+     * The paragraph under it.
+     */
+    paragraph?: string | null;
+};
+
+/**
+ * One cell of the opening screen, the `HomeCell` schema.
+ */
+export type HomeCell = {
+    /**
+     * Identity that outlives edits.
+     */
+    id: string;
+    /**
+     * What it shows.
+     */
+    kind: HomeCellKind;
+    /**
+     * The column it starts at, zero based.
+     */
+    column: number;
+    /**
+     * Whether the tile navigates: the Vertical trades in this zone. A Vertical that does not is drawn dimmed and announced as disabled. Always `true` for a banner.
+     */
+    available: boolean;
+    /**
+     * The banner of a campaign cell.
+     */
+    campaign?: CampaignBanner | null;
+    /**
+     * Its code.
+     */
+    vertical_code?: string | null;
+    /**
+     * The Vertical of a Vertical tile.
+     */
+    vertical_id?: string | null;
+};
+
+/**
+ * One row of the opening screen, the `HomeRow` schema.
+ */
+export type HomeRow = {
+    /**
+     * Identity that outlives edits.
+     */
+    id: string;
+    /**
+     * The kind, which fixes the capacity.
+     */
+    kind: HomeRowKind;
+    /**
+     * The cells in column order.
+     */
+    cells: Array<HomeCell>;
+};
+
+/**
+ * A category of a Vertical, the `StorefrontCategory` schema.
+ */
+export type StorefrontCategory = {
+    /**
+     * The category.
+     */
+    id: string;
+    /**
+     * Its label.
+     */
+    label: string;
+    /**
+     * Its icon, a rendition relative to the API host.
+     */
+    icon_url?: string | null;
+};
+
+/**
+ * A Vertical as the storefront holds it, the `StorefrontVertical` schema: enough to draw it and to open its listing without another request.
+ */
+export type StorefrontVertical = {
+    /**
+     * The Vertical.
+     */
+    id: string;
+    /**
+     * Its stable code.
+     */
+    code: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Product sales or field service.
+     */
+    kind: VerticalKind;
+    /**
+     * Whether it trades in this zone; one that does not is shown, dimmed, and does not navigate.
+     */
+    trades_here: boolean;
+    /**
+     * Its place in the flat list: the zone's order, then the platform's.
+     */
+    position: number;
+    /**
+     * Its categories that are switched on, in the order the operator arranged them.
+     */
+    categories: Array<StorefrontCategory>;
+    /**
+     * Its image, a rendition relative to the API host.
+     */
+    image_url?: string | null;
+};
+
+/**
+ * The opening screen in one answer, the `StorefrontHome` schema.
+ */
+export type StorefrontHome = {
+    /**
+     * The zone drawn and how it was reached. A remembered zone the answer differs from is forgotten on the device.
+     */
+    place: StorefrontPlace;
+    /**
+     * Whether the zone (or the city above it) configured its rows; when `false` the storefront draws its own default arrangement of `verticals`.
+     */
+    configured: boolean;
+    /**
+     * The rows to draw, in order: Vertical tiles and the campaign banners showing now.
+     */
+    rows: Array<HomeRow>;
+    /**
+     * Every Vertical the platform offers, each flagged with whether it trades here; archived ones are absent. Empty only when nothing resolved.
+     */
+    verticals: Array<StorefrontVertical>;
+};
+
+/**
+ * What a store is doing now, the `StoreState` schema: open, shut by the clock (listed under "Opening later"), or taken offline (listed under "Temporarily offline").
+ */
+export type StoreState = 'open' | 'closed' | 'offline';
+
+/**
+ * A way a store fulfils orders, the `FulfilmentMethod` schema.
+ */
+export type FulfilmentMethod = 'delivery' | 'pickup' | 'dine_in';
+
+/**
+ * What the catalogue says about a store's published menu, the `StoreCatalogueSummary` schema. Supplied by the catalogue's published document; `null` until it is wired.
+ */
+export type StoreCatalogueSummary = {
+    /**
+     * The published menu's version.
+     */
+    menu_version: number;
+    /**
+     * Items on the menu.
+     */
+    item_count: number;
+};
+
+/**
+ * A store as a card, the `StoreCard` schema: what a customer decides on.
+ */
+export type StoreCard = {
+    /**
+     * The store (a Location).
+     */
+    location_id: string;
+    /**
+     * The Partner it belongs to.
+     */
+    partner_id: string;
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * `organisation` or `individual`.
+     */
+    partner_kind: string;
+    /**
+     * The Vertical's categories (shelves) the store sits on.
+     */
+    shelves: Array<StorefrontCategory>;
+    /**
+     * Open, shut by the clock, or offline.
+     */
+    state: StoreState;
+    /**
+     * The minutes the store quotes for preparation now.
+     */
+    preparation_minutes: number;
+    /**
+     * How it fulfils orders.
+     */
+    fulfilment: Array<FulfilmentMethod>;
+    /**
+     * `true` in its first thirty days.
+     */
+    is_new: boolean;
+    /**
+     * The marks platform staff set for its card.
+     */
+    highlights: Array<string>;
+    /**
+     * The store's banner, a rendition relative to the API host.
+     */
+    banner_url?: string | null;
+    /**
+     * The catalogue's summary of the published menu; `null` until the catalogue supplies it.
+     */
+    catalogue?: StoreCatalogueSummary | null;
+    /**
+     * Whether the store delivers to the pin; `null` without a pin. A store out of reach is still listed.
+     */
+    delivers_to_pin?: boolean | null;
+    /**
+     * The delivery fee from the resolved policy, when one is set.
+     */
+    delivery_fee?: Money | null;
+    /**
+     * The delivery estimate from the resolved policy, in minutes.
+     */
+    delivery_minutes?: number | null;
+    /**
+     * The straight-line distance from the pin, rounded to 50 metres under a kilometre and to a tenth of a kilometre above; `null` without a pin.
+     */
+    distance_metres?: number | null;
+    /**
+     * The store's square mark, a rendition relative to the API host.
+     */
+    logo_url?: string | null;
+    /**
+     * The minimum order from the resolved policy, when one is set.
+     */
+    minimum_order?: Money | null;
+    /**
+     * What the store says while it is offline.
+     */
+    offline_message?: string | null;
+    /**
+     * When the state changes: closing time when open, opening time when shut, back-at time when offline; `null` when unknown.
+     */
+    state_until?: string | null;
+    /**
+     * The zone the store is in.
+     */
+    zone_id?: string | null;
+};
+
+/**
+ * A Vertical named in a listing, the `StorefrontVerticalRef` schema.
+ */
+export type StorefrontVerticalRef = {
+    /**
+     * The Vertical.
+     */
+    id: string;
+    /**
+     * Its code.
+     */
+    code: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether it trades in the zone.
+     */
+    trades_here: boolean;
+};
+
+/**
+ * A Vertical's stores as cards, the `StoreCardList` schema: open stores lead, then those opening later, then those temporarily offline; within each, nearest first with a pin and by name without one.
+ */
+export type StoreCardList = {
+    /**
+     * Where the visitor is placed.
+     */
+    place: StorefrontPlace;
+    /**
+     * The area listed: the city of the zone, so a store across a zone's fence is not hidden.
+     */
+    area: StorefrontZone;
+    /**
+     * The Vertical.
+     */
+    vertical: StorefrontVerticalRef;
+    /**
+     * How many of the stores are open now.
+     */
+    open_count: number;
+    /**
+     * The stores.
+     */
+    stores: Array<StoreCard>;
+};
+
+/**
+ * An address suggestion, the `AddressSuggestion` schema: words to pre-fill an address form with, never stored by the platform; the pin, not the words, decides where an agent goes.
+ */
+export type AddressSuggestion = {
+    /**
+     * A stable id of the suggestion within its provider.
+     */
+    id: string;
+    /**
+     * The suggestion as one line.
+     */
+    label: string;
+    /**
+     * The first address line it suggests.
+     */
+    line1: string;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * The country (alpha-2).
+     */
+    country: string;
+    /**
+     * Latitude of the place.
+     */
+    lat: number;
+    /**
+     * Longitude of the place.
+     */
+    lng: number;
+    /**
+     * Which provider answered: `local` (the bundled table) or `google`.
+     */
+    provider: string;
+    /**
+     * The locality.
+     */
+    locality?: string | null;
+    /**
+     * The PIN code.
+     */
+    postal_code?: string | null;
+    /**
+     * The state.
+     */
+    state?: string | null;
+};
+
+/**
+ * The words for a pin, the `ReverseGeocode` schema; an empty answer is normal.
+ */
+export type ReverseGeocode = {
+    /**
+     * The suggestion, or `null` when the provider has none.
+     */
+    suggestion?: AddressSuggestion | null;
+};
+
+/**
+ * Places matching what was typed, the `AddressSuggestionList` schema.
+ */
+export type AddressSuggestionList = {
+    /**
+     * The suggestions, best first.
+     */
+    suggestions: Array<AddressSuggestion>;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -7877,6 +9240,10 @@ export type RefreshSessionErrors = {
      * No refresh token was sent, or it is unknown or spent, or the session ended (`unauthenticated`). Sign in again.
      */
     401: Problem;
+    /**
+     * A customer session whose market does not admit sign-in now (`sign_in_closed`); the session is kept.
+     */
+    409: Problem;
     /**
      * Another client error, such as `400` (`validation_failed`) for a malformed body or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -19952,3 +21319,1092 @@ export type CreatePartnerAssetGrantResponses = {
 };
 
 export type CreatePartnerAssetGrantResponse = CreatePartnerAssetGrantResponses[keyof CreatePartnerAssetGrantResponses];
+
+export type RequestCustomerCodeData = {
+    /**
+     * The number as typed, the market it is read against, the channel and the device.
+     */
+    body: CustomerCodeRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/customer/codes';
+};
+
+export type RequestCustomerCodeErrors = {
+    /**
+     * `validation_failed`: `invalid_mobile` or `not_a_mobile` on `/mobile`, or a malformed device.
+     */
+    400: Problem;
+    /**
+     * `sign_in_closed`: the number's market does not admit sign-in now, or the market named is not configured.
+     */
+    409: Problem;
+    /**
+     * `otp_too_soon` (a code for the same purpose a moment ago) or `otp_daily_limit` (the number's day, the device's or the source's window), with `Retry-After`.
+     */
+    429: Problem;
+    /**
+     * A store or the message provider is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestCustomerCodeError = RequestCustomerCodeErrors[keyof RequestCustomerCodeErrors];
+
+export type RequestCustomerCodeResponses = {
+    /**
+     * A code is on its way: the challenge, its expiry and when another may be asked, the same whether or not the number has an account.
+     */
+    202: CustomerCodeChallenge;
+};
+
+export type RequestCustomerCodeResponse = RequestCustomerCodeResponses[keyof RequestCustomerCodeResponses];
+
+export type VerifyCustomerCodeData = {
+    /**
+     * The challenge, the code, the delivery and what a registration would serve.
+     */
+    body: CustomerCodeVerifyRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/customer/verify';
+};
+
+export type VerifyCustomerCodeErrors = {
+    /**
+     * `validation_failed`: `delivery_required` on `/delivery`, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * `otp_invalid`: one answer for an unknown, expired or used code, a code issued for another purpose, too many attempts and a wrong code.
+     */
+    401: Problem;
+    /**
+     * `account_blocked`: the account is blocked; the detail says how to reach support. No session is issued.
+     */
+    403: Problem;
+    /**
+     * `sign_in_closed`: the number's market closed to sign-in.
+     */
+    409: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyCustomerCodeError = VerifyCustomerCodeErrors[keyof VerifyCustomerCodeErrors];
+
+export type VerifyCustomerCodeResponses = {
+    /**
+     * Signed in (`outcome` `signed_in`, the session), or a registration to complete (`outcome` `registration_required`).
+     */
+    200: CustomerVerification;
+};
+
+export type VerifyCustomerCodeResponse = VerifyCustomerCodeResponses[keyof VerifyCustomerCodeResponses];
+
+export type RegisterCustomerData = {
+    /**
+     * The registration token and the profile the platform can stand behind, with an optional first address.
+     */
+    body: CustomerRegisterRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/auth/customer/register';
+};
+
+export type RegisterCustomerErrors = {
+    /**
+     * `validation_failed`: the given name, the email, `date_of_birth_future`, `too_young`, `terms_not_accepted`, the address (`postal_code_invalid`, `pin_far_from_address`, `invalid_mobile`), or `delivery_required`.
+     */
+    400: Problem;
+    /**
+     * `registration_expired`: the token is not a registration token, was tampered with or is past its thirty minutes.
+     */
+    401: Problem;
+    /**
+     * `account_blocked`.
+     */
+    403: Problem;
+    /**
+     * `sign_in_closed`: the number's market closed to sign-in meanwhile.
+     */
+    409: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RegisterCustomerError = RegisterCustomerErrors[keyof RegisterCustomerErrors];
+
+export type RegisterCustomerResponses = {
+    /**
+     * Registered and signed in; `existing_account` is `true` when another device registered the number meanwhile and this draft was dropped.
+     */
+    200: CustomerSession;
+};
+
+export type RegisterCustomerResponse = RegisterCustomerResponses[keyof RegisterCustomerResponses];
+
+export type GetCustomerProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/profile';
+};
+
+export type GetCustomerProfileErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface; these operations belong to the Customer app and the Storefront.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerProfileError = GetCustomerProfileErrors[keyof GetCustomerProfileErrors];
+
+export type GetCustomerProfileResponses = {
+    /**
+     * The profile, with its `ETag`.
+     */
+    200: CustomerProfile;
+};
+
+export type GetCustomerProfileResponse = GetCustomerProfileResponses[keyof GetCustomerProfileResponses];
+
+export type UpdateCustomerProfileData = {
+    /**
+     * The named fields to change; a field not sent is untouched and `null` clears an optional one.
+     */
+    body: CustomerProfileUpdate;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/profile';
+};
+
+export type UpdateCustomerProfileErrors = {
+    /**
+     * `validation_failed`: the given name, the email, `date_of_birth_future` or `too_young`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the profile changed since the version in `If-Match`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCustomerProfileError = UpdateCustomerProfileErrors[keyof UpdateCustomerProfileErrors];
+
+export type UpdateCustomerProfileResponses = {
+    /**
+     * The profile, with its new `ETag`.
+     */
+    200: CustomerProfile;
+};
+
+export type UpdateCustomerProfileResponse = UpdateCustomerProfileResponses[keyof UpdateCustomerProfileResponses];
+
+export type SetCustomerConsentData = {
+    /**
+     * Every channel's consent: email, push, SMS and WhatsApp.
+     */
+    body: MarketingConsentUpdate;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/consent';
+};
+
+export type SetCustomerConsentErrors = {
+    /**
+     * `validation_failed` with `consent_channel_missing` on each channel left out.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetCustomerConsentError = SetCustomerConsentErrors[keyof SetCustomerConsentErrors];
+
+export type SetCustomerConsentResponses = {
+    /**
+     * The consent as written.
+     */
+    200: MarketingConsent;
+};
+
+export type SetCustomerConsentResponse = SetCustomerConsentResponses[keyof SetCustomerConsentResponses];
+
+export type ListCustomerAddressesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/addresses';
+};
+
+export type ListCustomerAddressesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerAddressesError = ListCustomerAddressesErrors[keyof ListCustomerAddressesErrors];
+
+export type ListCustomerAddressesResponses = {
+    /**
+     * The addresses, newest first, with the selected one.
+     */
+    200: CustomerAddressList;
+};
+
+export type ListCustomerAddressesResponse = ListCustomerAddressesResponses[keyof ListCustomerAddressesResponses];
+
+export type AddCustomerAddressData = {
+    /**
+     * The postal part, the pin the customer confirmed and what finds the door.
+     */
+    body: CustomerAddressInput;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/addresses';
+};
+
+export type AddCustomerAddressErrors = {
+    /**
+     * `validation_failed`: the postal part, `postal_code_invalid`, the pin, `pin_far_from_address`, or `invalid_mobile` or `not_a_mobile` for the receiver.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `addresses_full`: the account keeps thirty addresses already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddCustomerAddressError = AddCustomerAddressErrors[keyof AddCustomerAddressErrors];
+
+export type AddCustomerAddressResponses = {
+    /**
+     * The address; the first is selected.
+     */
+    201: CustomerAddress;
+};
+
+export type AddCustomerAddressResponse = AddCustomerAddressResponses[keyof AddCustomerAddressResponses];
+
+export type RemoveCustomerAddressData = {
+    body?: never;
+    path: {
+        /**
+         * The address, which must be the customer's own.
+         */
+        address_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/addresses/{address_id}';
+};
+
+export type RemoveCustomerAddressErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such address of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveCustomerAddressError = RemoveCustomerAddressErrors[keyof RemoveCustomerAddressErrors];
+
+export type RemoveCustomerAddressResponses = {
+    /**
+     * Removed; when it was the selected one, the most recently added of the rest is selected now.
+     */
+    204: void;
+};
+
+export type RemoveCustomerAddressResponse = RemoveCustomerAddressResponses[keyof RemoveCustomerAddressResponses];
+
+export type UpdateCustomerAddressData = {
+    /**
+     * The fields to change; `null` clears an optional one.
+     */
+    body: CustomerAddressUpdate;
+    path: {
+        /**
+         * The address, which must be the customer's own.
+         */
+        address_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/addresses/{address_id}';
+};
+
+export type UpdateCustomerAddressErrors = {
+    /**
+     * `validation_failed`, as for adding one.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such address of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCustomerAddressError = UpdateCustomerAddressErrors[keyof UpdateCustomerAddressErrors];
+
+export type UpdateCustomerAddressResponses = {
+    /**
+     * The address.
+     */
+    200: CustomerAddress;
+};
+
+export type UpdateCustomerAddressResponse = UpdateCustomerAddressResponses[keyof UpdateCustomerAddressResponses];
+
+export type SelectCustomerAddressData = {
+    body?: never;
+    path: {
+        /**
+         * The address, which must be the customer's own.
+         */
+        address_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/addresses/{address_id}/selected';
+};
+
+export type SelectCustomerAddressErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such address of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SelectCustomerAddressError = SelectCustomerAddressErrors[keyof SelectCustomerAddressErrors];
+
+export type SelectCustomerAddressResponses = {
+    /**
+     * The addresses, this one selected.
+     */
+    200: CustomerAddressList;
+};
+
+export type SelectCustomerAddressResponse = SelectCustomerAddressResponses[keyof SelectCustomerAddressResponses];
+
+export type GetCustomerLocationData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The cap in metres, as for the storefront's resolution; the storefront asks with 25000.
+         */
+        cap?: number;
+    };
+    url: '/v1/customer/location';
+};
+
+export type GetCustomerLocationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerLocationError = GetCustomerLocationErrors[keyof GetCustomerLocationErrors];
+
+export type GetCustomerLocationResponses = {
+    /**
+     * The selected address placed, or `none` without an address.
+     */
+    200: CustomerLocation;
+};
+
+export type GetCustomerLocationResponse = GetCustomerLocationResponses[keyof GetCustomerLocationResponses];
+
+export type ListCustomerSessionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/sessions';
+};
+
+export type ListCustomerSessionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerSessionsError = ListCustomerSessionsErrors[keyof ListCustomerSessionsErrors];
+
+export type ListCustomerSessionsResponses = {
+    /**
+     * The live sessions, newest first.
+     */
+    200: CustomerSessionList;
+};
+
+export type ListCustomerSessionsResponse = ListCustomerSessionsResponses[keyof ListCustomerSessionsResponses];
+
+export type EndCustomerSessionData = {
+    body?: never;
+    path: {
+        /**
+         * The session, which must be one of the customer's own.
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/sessions/{session_id}';
+};
+
+export type EndCustomerSessionErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such live session of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EndCustomerSessionError = EndCustomerSessionErrors[keyof EndCustomerSessionErrors];
+
+export type EndCustomerSessionResponses = {
+    /**
+     * Ended; it stops at its next refresh at the latest.
+     */
+    204: void;
+};
+
+export type EndCustomerSessionResponse = EndCustomerSessionResponses[keyof EndCustomerSessionResponses];
+
+export type EndCustomerDeviceData = {
+    body?: never;
+    path: {
+        /**
+         * The device identifier the client named when it signed in.
+         */
+        device_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/devices/{device_id}';
+};
+
+export type EndCustomerDeviceErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no live session of the customer's on that device.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EndCustomerDeviceError = EndCustomerDeviceErrors[keyof EndCustomerDeviceErrors];
+
+export type EndCustomerDeviceResponses = {
+    /**
+     * Every session of the device ended.
+     */
+    204: void;
+};
+
+export type EndCustomerDeviceResponse = EndCustomerDeviceResponses[keyof EndCustomerDeviceResponses];
+
+export type ListCustomerAccountSectionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/sections';
+};
+
+export type ListCustomerAccountSectionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerAccountSectionsError = ListCustomerAccountSectionsErrors[keyof ListCustomerAccountSectionsErrors];
+
+export type ListCustomerAccountSectionsResponses = {
+    /**
+     * The sections in order and the summary.
+     */
+    200: AccountSectionList;
+};
+
+export type ListCustomerAccountSectionsResponse = ListCustomerAccountSectionsResponses[keyof ListCustomerAccountSectionsResponses];
+
+export type ResolveStorefrontPlaceData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Latitude of the pin; half a coordinate counts as none.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+        /**
+         * How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+         */
+        cap?: number;
+        /**
+         * A zone the visitor chose or the device remembers; used while it still serves.
+         */
+        zone_id?: string;
+        /**
+         * The visitor's country (alpha-2), used when no pin is given.
+         */
+        country?: string;
+    };
+    url: '/v1/storefront/resolve';
+};
+
+export type ResolveStorefrontPlaceErrors = {
+    /**
+     * `validation_failed`: a pin out of range, a negative cap, or `malformed_identifier` on `zone_id`.
+     */
+    400: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolveStorefrontPlaceError = ResolveStorefrontPlaceErrors[keyof ResolveStorefrontPlaceErrors];
+
+export type ResolveStorefrontPlaceResponses = {
+    /**
+     * Where the visitor is placed and how.
+     */
+    200: StorefrontPlace;
+};
+
+export type ResolveStorefrontPlaceResponse = ResolveStorefrontPlaceResponses[keyof ResolveStorefrontPlaceResponses];
+
+export type GetServiceabilityData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Latitude in decimal degrees.
+         */
+        lat: number;
+        /**
+         * Longitude in decimal degrees.
+         */
+        lng: number;
+    };
+    url: '/v1/storefront/serviceability';
+};
+
+export type GetServiceabilityErrors = {
+    /**
+     * `validation_failed`: a missing or out-of-range pin.
+     */
+    400: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceabilityError = GetServiceabilityErrors[keyof GetServiceabilityErrors];
+
+export type GetServiceabilityResponses = {
+    /**
+     * Whether an order could be placed at the pin, and why not.
+     */
+    200: Serviceability;
+};
+
+export type GetServiceabilityResponse = GetServiceabilityResponses[keyof GetServiceabilityResponses];
+
+export type ListStorefrontZonesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/storefront/zones';
+};
+
+export type ListStorefrontZonesErrors = {
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStorefrontZonesError = ListStorefrontZonesErrors[keyof ListStorefrontZonesErrors];
+
+export type ListStorefrontZonesResponses = {
+    /**
+     * Every zone that serves now.
+     */
+    200: StorefrontZoneList;
+};
+
+export type ListStorefrontZonesResponse = ListStorefrontZonesResponses[keyof ListStorefrontZonesResponses];
+
+export type GetStorefrontHomeData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Latitude of the pin; half a coordinate counts as none.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+        /**
+         * How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+         */
+        cap?: number;
+        /**
+         * A zone the visitor chose or the device remembers; used while it still serves.
+         */
+        zone_id?: string;
+        /**
+         * The visitor's country (alpha-2), used when no pin is given.
+         */
+        country?: string;
+    };
+    url: '/v1/storefront/home';
+};
+
+export type GetStorefrontHomeErrors = {
+    /**
+     * `validation_failed`: a pin out of range, a negative cap, or `malformed_identifier` on `zone_id`.
+     */
+    400: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStorefrontHomeError = GetStorefrontHomeErrors[keyof GetStorefrontHomeErrors];
+
+export type GetStorefrontHomeResponses = {
+    /**
+     * The opening screen in one answer.
+     */
+    200: StorefrontHome;
+};
+
+export type GetStorefrontHomeResponse = GetStorefrontHomeResponses[keyof GetStorefrontHomeResponses];
+
+export type ListVerticalStoresData = {
+    body?: never;
+    path: {
+        /**
+         * The Vertical's stable code (`FOOD`) or its id.
+         */
+        vertical: string;
+    };
+    query?: {
+        /**
+         * Latitude of the pin; half a coordinate counts as none.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+        /**
+         * How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+         */
+        cap?: number;
+        /**
+         * A zone the visitor chose or the device remembers; used while it still serves.
+         */
+        zone_id?: string;
+        /**
+         * The visitor's country (alpha-2), used when no pin is given.
+         */
+        country?: string;
+    };
+    url: '/v1/storefront/verticals/{vertical}/stores';
+};
+
+export type ListVerticalStoresErrors = {
+    /**
+     * `validation_failed`: a pin out of range, a negative cap, `malformed_identifier` on `zone_id`, or nothing that places the visitor.
+     */
+    400: Problem;
+    /**
+     * `not_found`: no such Vertical, or it is archived.
+     */
+    404: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListVerticalStoresError = ListVerticalStoresErrors[keyof ListVerticalStoresErrors];
+
+export type ListVerticalStoresResponses = {
+    /**
+     * The stores as cards.
+     */
+    200: StoreCardList;
+};
+
+export type ListVerticalStoresResponse = ListVerticalStoresResponses[keyof ListVerticalStoresResponses];
+
+export type ReverseGeocodeData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Latitude in decimal degrees.
+         */
+        lat: number;
+        /**
+         * Longitude in decimal degrees.
+         */
+        lng: number;
+    };
+    url: '/v1/geocoding/reverse';
+};
+
+export type ReverseGeocodeErrors = {
+    /**
+     * `validation_failed`: a missing or out-of-range pin.
+     */
+    400: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReverseGeocodeError = ReverseGeocodeErrors[keyof ReverseGeocodeErrors];
+
+export type ReverseGeocodeResponses = {
+    /**
+     * The suggestion, or none.
+     */
+    200: ReverseGeocode;
+};
+
+export type ReverseGeocodeResponse = ReverseGeocodeResponses[keyof ReverseGeocodeResponses];
+
+export type SuggestAddressesData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The text, 1 to 100 characters.
+         */
+        q: string;
+        /**
+         * The country searched (alpha-2), India by default.
+         */
+        country?: string;
+        /**
+         * Latitude to prefer places near.
+         */
+        lat?: number;
+        /**
+         * Longitude to prefer places near.
+         */
+        lng?: number;
+        /**
+         * At most this many, 1 to 10 (default 5).
+         */
+        limit?: number;
+    };
+    url: '/v1/geocoding/suggestions';
+};
+
+export type SuggestAddressesErrors = {
+    /**
+     * `validation_failed`: empty or overlong text.
+     */
+    400: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SuggestAddressesError = SuggestAddressesErrors[keyof SuggestAddressesErrors];
+
+export type SuggestAddressesResponses = {
+    /**
+     * The suggestions, best first.
+     */
+    200: AddressSuggestionList;
+};
+
+export type SuggestAddressesResponse = SuggestAddressesResponses[keyof SuggestAddressesResponses];

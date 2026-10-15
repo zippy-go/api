@@ -1,0 +1,8 @@
+type: string
+description: 'Where an address is: home, work or another place, the `AddressLabel` schema.'
+enum:
+  - home
+  - work
+  - other
+examples:
+  - home

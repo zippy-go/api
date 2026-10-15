@@ -1,0 +1,57 @@
+# Path item for /v1/storefront/serviceability. Referenced from openapi.yaml.
+get:
+  operationId: getServiceability
+  summary: Ask whether a pin can be served
+  description: "Whether a pin can be served, as an order will check it: inside a serving zone, every ancestor active, the country active and accepting orders; otherwise a sentence says why. Asked before an address's pin is confirmed."
+  tags:
+    - Storefront
+  security: []
+  parameters:
+    - name: lat
+      in: query
+      required: true
+      description: Latitude in decimal degrees.
+      schema:
+        type: number
+    - name: lng
+      in: query
+      required: true
+      description: Longitude in decimal degrees.
+      schema:
+        type: number
+  responses:
+    '200':
+      description: Whether an order could be placed at the pin, and why not.
+      headers:
+        Cache-Control:
+          description: Always `private, no-store`.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/storefront/Serviceability.yaml
+    '400':
+      description: '`validation_failed`: a missing or out-of-range pin.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

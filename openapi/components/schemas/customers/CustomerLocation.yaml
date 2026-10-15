@@ -1,0 +1,31 @@
+type: object
+description: "Where the customer browses from, the `CustomerLocation` schema: the selected address's pin, placed as the storefront places any pin; explicitly empty without an address."
+required:
+  - place
+properties:
+  place:
+    $ref: ../storefront/StorefrontPlace.yaml
+    description: How its pin was placed; `resolution` is `none` without an address.
+  address_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The selected address; `null` when there is none.
+examples:
+  - address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+    place:
+      resolution: inside
+      zone:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a1a
+        name: Madhapur
+        kind: zone
+        path: /IN/hyderabad/madhapur
+        city: Hyderabad
+        country: IN
+        time_zone: Asia/Kolkata
+      distance_metres: 0
+      pin:
+        lat: 17.4329
+        lng: 78.4075
+      cap_metres: 25000

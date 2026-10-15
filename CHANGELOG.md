@@ -6,6 +6,75 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-15
+
+Step 2, customer: customers sign in with a code to their number and keep an
+account, and the storefront places a visitor, composes the opening screen and
+lists a Vertical's stores by distance. Numbered after the catalogue's 0.11.0,
+which merges first (step 2 is built on two branches).
+
+### Added
+
+- Customer sign-in (specification `customer-authentication`, tag `Auth`):
+  `POST /v1/auth/customer/codes` (`CustomerCodeRequest`, `202`
+  `CustomerCodeChallenge`), `POST /v1/auth/customer/verify`
+  (`CustomerCodeVerifyRequest`, `CustomerVerification` with a
+  `CustomerSession` or a `CustomerRegistration`) and
+  `POST /v1/auth/customer/register` (`CustomerRegisterRequest`,
+  `CustomerSession`); the schemas `DeviceIdentity`, `CustomerCodeChannel`,
+  `CodeVia`, `RegistrationEntry`, `RegistrationStep` and
+  `CustomerVerificationOutcome`. A customer session is audience
+  `customer`, its cookie `zg_refresh_customer`, sixty days idle and a year
+  absolute; refresh and sign-out are the existing operations.
+- The customer account (specification `customer-account`, tag
+  `Customer account`): `GET`, `PATCH /v1/customer/profile`
+  (`CustomerProfile`, `CustomerProfileUpdate`, with `ETag` and `If-Match`),
+  `PUT /v1/customer/consent` (`MarketingConsent`,
+  `MarketingConsentUpdate`), `GET`, `POST /v1/customer/addresses`,
+  `PATCH`, `DELETE /v1/customer/addresses/{address_id}`,
+  `PUT /v1/customer/addresses/{address_id}/selected` (`CustomerAddress`,
+  `CustomerAddressInput`, `CustomerAddressUpdate`, `CustomerAddressList`,
+  `AddressLabel`, `BuildingType`), `GET /v1/customer/location`
+  (`CustomerLocation`), `GET /v1/customer/sessions`,
+  `DELETE /v1/customer/sessions/{session_id}`,
+  `DELETE /v1/customer/devices/{device_id}` (`CustomerSessionList`,
+  `CustomerSessionSummary`, `SessionClient`) and
+  `GET /v1/customer/sections` (`AccountSectionList`, `AccountSection`,
+  `AccountSectionKey`, `AccountSummary`).
+- The storefront (specification `storefront-discovery`, tag `Storefront`):
+  `GET /v1/storefront/resolve` (`StorefrontPlace`, `PlaceResolution`,
+  `StorefrontZone`, `GeoPoint`), `GET /v1/storefront/serviceability`
+  (`Serviceability`), `GET /v1/storefront/zones` (`StorefrontZoneList`),
+  `GET /v1/storefront/home` (`StorefrontHome`, `HomeRow`, `HomeRowKind`,
+  `HomeCell`, `HomeCellKind`, `CampaignBanner`, `StorefrontVertical`,
+  `StorefrontCategory`) and `GET /v1/storefront/verticals/{vertical}/stores`
+  (`StoreCardList`, `StoreCard`, `StoreState`, `FulfilmentMethod`,
+  `StorefrontVerticalRef`, `StoreCatalogueSummary`, the last filled once the
+  catalogue's published menu is wired). Every one is public.
+- Geocoding (tag `Geocoding`): `GET /v1/geocoding/reverse`
+  (`ReverseGeocode`) and `GET /v1/geocoding/suggestions`
+  (`AddressSuggestionList`, `AddressSuggestion`), never stored.
+- Error codes `otp_invalid` (401), `otp_too_soon` (429), `otp_daily_limit`
+  (429), `registration_expired` (401), `account_blocked` (403) and
+  `addresses_full` (409); field codes `invalid_mobile`, `not_a_mobile`,
+  `date_of_birth_future`, `too_young`, `terms_not_accepted`,
+  `consent_channel_missing`, `postal_code_invalid` and
+  `pin_far_from_address` under `validation_failed`.
+- The event `customers.customer.registered` (v1); `identity.sign_in.failed`
+  may carry the reasons `wrong_surface`, `wrong_purpose`, `used_code`,
+  `expired_code` and `sign_in_closed` for a customer's code.
+
+### Changed
+
+- `POST /v1/auth/refresh` may answer `409` `sign_in_closed` for a customer
+  session whose market closed to sign-in; the session is kept for when the
+  market opens again.
+- `POST /v1/auth/sign-out` with `everywhere` from a customer session ends
+  every customer session of the customer, not the sessions of the
+  person's memberships.
+- `Audience`, `Delivery`, `RefreshRequest` and `SignOutRequest` describe the
+  customer surface and its cookie.
+
 ## [0.10.0] - 2026-10-15
 
 A breaking minor: it retires the step 1 sign-in that 0.9.0 announced and

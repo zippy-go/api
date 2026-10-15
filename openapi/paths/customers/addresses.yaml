@@ -1,0 +1,98 @@
+# Path item for /v1/customer/addresses. Referenced from openapi.yaml.
+get:
+  operationId: listCustomerAddresses
+  summary: List the customer's addresses
+  description: The customer's addresses, newest first, with the selected one.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The addresses, newest first, with the selected one.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/customers/CustomerAddressList.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: addCustomerAddress
+  summary: Add an address
+  description: 'Adds an address: the postal part, the pin the customer confirmed, what finds the door. The first is selected by construction, a later one when `select` says so. A pin more than two kilometres from where the locality and PIN code lie is refused (`pin_far_from_address`).'
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The postal part, the pin the customer confirmed and what finds the door.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/customers/CustomerAddressInput.yaml
+  responses:
+    '201':
+      description: The address; the first is selected.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/customers/CustomerAddress.yaml
+    '400':
+      description: '`validation_failed`: the postal part, `postal_code_invalid`, the pin, `pin_far_from_address`, or `invalid_mobile` or `not_a_mobile` for the receiver.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`addresses_full`: the account keeps thirty addresses already.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

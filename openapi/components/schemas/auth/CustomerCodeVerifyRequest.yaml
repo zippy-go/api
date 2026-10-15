@@ -1,0 +1,37 @@
+type: object
+description: Request body of `POST /v1/auth/customer/verify`.
+required:
+  - challenge_id
+  - code
+  - delivery
+properties:
+  challenge_id:
+    type: string
+    format: uuid
+    description: The challenge from the request step.
+  code:
+    type: string
+    description: The six-digit code.
+    examples:
+      - '123456'
+  delivery:
+    $ref: ./Delivery.yaml
+    description: 'How the refresh token travels, required: `cookie` (the Storefront) or `body` (the Customer app).'
+  device:
+    oneOf:
+      - $ref: ./DeviceIdentity.yaml
+      - type: 'null'
+    description: The device, when the client names it.
+  entry:
+    oneOf:
+      - $ref: ./RegistrationEntry.yaml
+      - type: 'null'
+    description: 'What a registration would serve: `delivery` (default), `pickup` or `dine_in`.'
+examples:
+  - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
+    code: '123456'
+    delivery: cookie
+    entry: delivery
+    device:
+      id: web-3f2a9c1d8e7b6a50
+      platform: web

@@ -1,0 +1,10 @@
+type: string
+description: 'The kind of building, the `BuildingType` schema, which decides the further fields that apply: every type takes the flat or door number and the floor; an apartment, an office, a hostel and another building also take the block or tower and the building or society name; an independent house takes neither. A field that does not apply is not stored.'
+enum:
+  - apartment
+  - independent_house
+  - office
+  - hostel
+  - other
+examples:
+  - apartment

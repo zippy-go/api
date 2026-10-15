@@ -1,0 +1,93 @@
+type: object
+description: The opening screen in one answer, the `StorefrontHome` schema.
+required:
+  - place
+  - configured
+  - rows
+  - verticals
+properties:
+  place:
+    $ref: ./StorefrontPlace.yaml
+    description: The zone drawn and how it was reached. A remembered zone the answer differs from is forgotten on the device.
+  configured:
+    type: boolean
+    description: Whether the zone (or the city above it) configured its rows; when `false` the storefront draws its own default arrangement of `verticals`.
+  rows:
+    type: array
+    items:
+      $ref: ./HomeRow.yaml
+    description: 'The rows to draw, in order: Vertical tiles and the campaign banners showing now.'
+  verticals:
+    type: array
+    items:
+      $ref: ./StorefrontVertical.yaml
+    description: Every Vertical the platform offers, each flagged with whether it trades here; archived ones are absent. Empty only when nothing resolved.
+examples:
+  - place:
+      resolution: inside
+      zone:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        name: Gachibowli
+        kind: zone
+        path: /IN/hyderabad/gachibowli
+        city: Hyderabad
+        country: IN
+        time_zone: Asia/Kolkata
+      distance_metres: 0
+      pin:
+        lat: 17.4401
+        lng: 78.3489
+      cap_metres: 25000
+    configured: true
+    rows:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a15
+        kind: default
+        cells:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a16
+            kind: vertical
+            column: 0
+            vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+            vertical_code: FOOD
+            available: true
+            campaign: null
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a18
+        kind: default
+        cells:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a17
+            kind: campaign
+            column: 0
+            vertical_id: null
+            vertical_code: null
+            available: true
+            campaign:
+              id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a14
+              headline: Sweets for Diwali, delivered
+              paragraph: Order from the city's bakeries before the festival rush.
+              colour: '#b23a00'
+              shape: banner
+              artwork_url: null
+              white_text_readable: true
+              link:
+                kind: vertical
+                targets:
+                  - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+    verticals:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+        code: FOOD
+        name: Food & Drinks
+        kind: product_sales
+        image_url: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55/renditions/card
+        trades_here: true
+        position: 1
+        categories:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+            label: Biryani
+            icon_url: null
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a19
+        code: PHARMACY
+        name: Health & Pharmacy
+        kind: product_sales
+        image_url: null
+        trades_here: false
+        position: 2
+        categories: []

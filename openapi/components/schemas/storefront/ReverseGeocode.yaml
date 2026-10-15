@@ -1,0 +1,21 @@
+type: object
+description: The words for a pin, the `ReverseGeocode` schema; an empty answer is normal.
+properties:
+  suggestion:
+    oneOf:
+      - $ref: ./AddressSuggestion.yaml
+      - type: 'null'
+    description: The suggestion, or `null` when the provider has none.
+examples:
+  - suggestion:
+      id: hyd-jubilee-hills
+      label: Jubilee Hills, Hyderabad, Telangana 500033
+      line1: Jubilee Hills
+      locality: Jubilee Hills
+      city: Hyderabad
+      state: Telangana
+      postal_code: '500033'
+      country: IN
+      lat: 17.4326
+      lng: 78.4071
+      provider: local

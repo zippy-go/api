@@ -1,0 +1,64 @@
+# Path item for /v1/auth/customer/codes. Referenced from openapi.yaml.
+post:
+  operationId: requestCustomerCode
+  summary: Ask for a code to a customer's number
+  description: "Asks for a one-time code to a customer's number, by SMS or on WhatsApp (SMS behind it). The caller pays first: the source's and the device's allowances are counted before the number is read. The answer is the same three facts whether or not the number has an account. A code again within a minute for the same purpose is `otp_too_soon`; past the number's ten a day, the device's five or the source's two hundred an hour, `otp_daily_limit`, never saying which."
+  tags:
+    - Auth
+  security: []
+  requestBody:
+    required: true
+    description: The number as typed, the market it is read against, the channel and the device.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/CustomerCodeRequest.yaml
+  responses:
+    '202':
+      description: 'A code is on its way: the challenge, its expiry and when another may be asked, the same whether or not the number has an account.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/CustomerCodeChallenge.yaml
+    '400':
+      description: '`validation_failed`: `invalid_mobile` or `not_a_mobile` on `/mobile`, or a malformed device.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: "`sign_in_closed`: the number's market does not admit sign-in now, or the market named is not configured."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '429':
+      description: "`otp_too_soon` (a code for the same purpose a moment ago) or `otp_daily_limit` (the number's day, the device's or the source's window), with `Retry-After`."
+      headers:
+        Retry-After:
+          description: The number of seconds to wait before asking again.
+          schema:
+            type: integer
+            minimum: 0
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store or the message provider is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

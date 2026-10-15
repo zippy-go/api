@@ -1,0 +1,118 @@
+# Path item for /v1/customer/profile. Referenced from openapi.yaml.
+get:
+  operationId: getCustomerProfile
+  summary: Read the customer's profile
+  description: The customer's profile, with its `ETag`.
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The profile, with its `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/customers/CustomerProfile.yaml
+    '304':
+      description: Not modified since the version in `If-None-Match`.
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface; these operations belong to the Customer app and the Storefront.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: '`not_found`: the user has no customer profile.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updateCustomerProfile
+  summary: Edit the customer's profile
+  description: 'Edits the profile: the named fields sent, nothing else; consent has its own operation and the number its own change. A changed email is unverified from now. `If-Match` guards against a stale edit.'
+  tags:
+    - Customer account
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The named fields to change; a field not sent is untouched and `null` clears an optional one.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/customers/CustomerProfileUpdate.yaml
+  responses:
+    '200':
+      description: The profile, with its new `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/customers/CustomerProfile.yaml
+    '400':
+      description: '`validation_failed`: the given name, the email, `date_of_birth_future` or `too_young`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`forbidden`: a token of another surface.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: '`not_found`: the user has no customer profile.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '412':
+      description: '`precondition_failed`: the profile changed since the version in `If-Match`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

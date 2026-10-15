@@ -1,0 +1,30 @@
+type: object
+description: A Vertical named in a listing, the `StorefrontVerticalRef` schema.
+required:
+  - id
+  - code
+  - name
+  - trades_here
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Vertical.
+  code:
+    type: string
+    description: Its code.
+    examples:
+      - FOOD
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Food & Drinks
+  trades_here:
+    type: boolean
+    description: Whether it trades in the zone.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+    code: FOOD
+    name: Food & Drinks
+    trades_here: true

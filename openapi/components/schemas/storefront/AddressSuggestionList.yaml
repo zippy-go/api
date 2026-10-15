@@ -1,0 +1,23 @@
+type: object
+description: Places matching what was typed, the `AddressSuggestionList` schema.
+required:
+  - suggestions
+properties:
+  suggestions:
+    type: array
+    items:
+      $ref: ./AddressSuggestion.yaml
+    description: The suggestions, best first.
+examples:
+  - suggestions:
+      - id: hyd-jubilee-hills
+        label: Jubilee Hills, Hyderabad, Telangana 500033
+        line1: Jubilee Hills
+        locality: Jubilee Hills
+        city: Hyderabad
+        state: Telangana
+        postal_code: '500033'
+        country: IN
+        lat: 17.4326
+        lng: 78.4071
+        provider: local

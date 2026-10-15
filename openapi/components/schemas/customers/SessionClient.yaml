@@ -1,0 +1,7 @@
+type: string
+description: The kind of client holding a session, the `SessionClient` schema.
+enum:
+  - browser
+  - native
+examples:
+  - browser

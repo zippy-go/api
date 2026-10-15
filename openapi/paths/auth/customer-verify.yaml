@@ -1,0 +1,69 @@
+# Path item for /v1/auth/customer/verify. Referenced from openapi.yaml.
+post:
+  operationId: verifyCustomerCode
+  summary: Verify a customer's code
+  description: Verifies a customer's code. A registered number is signed in on the customer surface, delivered as stated (the Storefront's refresh token in the `zg_refresh_customer` cookie, the app's in the body); a new number receives a registration context, valid thirty minutes, and nothing about it is stored. Every failure (an unknown, expired or used code, a code issued for another purpose, too many attempts, a wrong code) answers the same `otp_invalid`.
+  tags:
+    - Auth
+  security: []
+  requestBody:
+    required: true
+    description: The challenge, the code, the delivery and what a registration would serve.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/CustomerCodeVerifyRequest.yaml
+  responses:
+    '200':
+      description: Signed in (`outcome` `signed_in`, the session), or a registration to complete (`outcome` `registration_required`).
+      headers:
+        Set-Cookie:
+          description: With cookie delivery and an account, the refresh token in `zg_refresh_customer`, `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery and for a registration.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/CustomerVerification.yaml
+    '400':
+      description: '`validation_failed`: `delivery_required` on `/delivery`, or a malformed body.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: '`otp_invalid`: one answer for an unknown, expired or used code, a code issued for another purpose, too many attempts and a wrong code.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`account_blocked`: the account is blocked; the detail says how to reach support. No session is issued.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: "`sign_in_closed`: the number's market closed to sign-in."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

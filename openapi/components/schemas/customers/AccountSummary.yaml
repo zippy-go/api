@@ -1,0 +1,22 @@
+type: object
+description: The account at a glance, the `AccountSummary` schema.
+required:
+  - address_count
+  - session_count
+  - marketing_on
+properties:
+  address_count:
+    type: integer
+    description: Saved addresses.
+    minimum: 0
+  session_count:
+    type: integer
+    description: Live sessions.
+    minimum: 0
+  marketing_on:
+    type: boolean
+    description: Whether any marketing channel is on.
+examples:
+  - address_count: 1
+    session_count: 2
+    marketing_on: false

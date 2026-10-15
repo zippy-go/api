@@ -1,0 +1,63 @@
+type: object
+description: A session holding the account, the `CustomerSessionSummary` schema.
+required:
+  - id
+  - current
+  - client
+  - recognised
+  - started_at
+  - last_active_at
+  - expires_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The session.
+  current:
+    type: boolean
+    description: Whether it is the session asking.
+  client:
+    $ref: ./SessionClient.yaml
+    description: A browser or an app.
+  recognised:
+    type: boolean
+    description: Whether the client named its device; an unrecognised session is still listed.
+  started_at:
+    type: string
+    format: date-time
+    description: When it started.
+  last_active_at:
+    type: string
+    format: date-time
+    description: When it was last refreshed.
+  expires_at:
+    type: string
+    format: date-time
+    description: When it ends without a refresh.
+  device:
+    oneOf:
+      - $ref: ../auth/DeviceIdentity.yaml
+      - type: 'null'
+    description: The device it was opened from, as the client named it; `null` when it named none.
+  last_address:
+    type:
+      - string
+      - 'null'
+    description: The address it was last used from.
+    examples:
+      - 203.0.113.9
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a22
+    current: true
+    client: browser
+    device:
+      id: web-3f2a9c1d8e7b6a50
+      platform: web
+      model: null
+      app_version: 0.12.0
+      os_version: null
+    recognised: true
+    last_address: 203.0.113.9
+    started_at: 2026-10-15T09:00:00Z
+    last_active_at: 2026-10-15T09:00:00Z
+    expires_at: 2026-12-14T09:00:00Z

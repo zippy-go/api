@@ -1,0 +1,32 @@
+type: object
+description: 'Request body of `PATCH /v1/customer/profile`: named fields; one not sent is untouched.'
+properties:
+  date_of_birth:
+    type:
+      - string
+      - 'null'
+    format: date
+    description: A new date of birth, or `null` to clear it.
+  email:
+    type:
+      - string
+      - 'null'
+    description: A new email (unverified from now), or `null` to clear it.
+  family_name:
+    type:
+      - string
+      - 'null'
+    description: A new family name, or `null` to clear it.
+  given_name:
+    type:
+      - string
+      - 'null'
+    description: A new given name.
+  language:
+    oneOf:
+      - $ref: ./CustomerLanguage.yaml
+      - type: 'null'
+    description: A new language.
+examples:
+  - family_name: Reddy
+    language: te

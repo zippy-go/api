@@ -15,7 +15,7 @@ properties:
     oneOf:
       - $ref: ./Audience.yaml
       - type: 'null'
-    description: For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`).
+    description: For cookie delivery, the surface whose cookie carries the token (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent` or `zg_refresh_customer`).
 examples:
   - refresh_token: c2FtcGxlLXJlZnJlc2gtdG9rZW4
   - audience: platform

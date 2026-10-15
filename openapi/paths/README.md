@@ -22,6 +22,18 @@ paths/
   auth/password-reset*.yaml     POST /v1/auth/password/reset-request, POST /v1/auth/password/reset
   auth/identifier-change.yaml   POST, DELETE /v1/auth/identifier-change (+ identifier-change-confirm.yaml)
   auth/service-tokens.yaml      POST /v1/auth/service-tokens
+  auth/customer-codes.yaml      POST /v1/auth/customer/codes (+ customer-verify.yaml, customer-register.yaml)
+  customers/profile.yaml        GET, PATCH /v1/customer/profile
+  customers/consent.yaml        PUT /v1/customer/consent
+  customers/addresses.yaml      GET, POST /v1/customer/addresses (+ address.yaml, PATCH, DELETE .../{address_id};
+                                address-selected.yaml, PUT .../{address_id}/selected)
+  customers/location.yaml       GET /v1/customer/location
+  customers/sessions.yaml       GET /v1/customer/sessions (+ session.yaml, DELETE .../{session_id};
+                                device.yaml, DELETE /v1/customer/devices/{device_id})
+  customers/sections.yaml       GET /v1/customer/sections
+  storefront/resolve.yaml       GET /v1/storefront/resolve (+ serviceability.yaml, zones.yaml, home.yaml)
+  storefront/vertical-stores.yaml GET /v1/storefront/verticals/{vertical}/stores
+  geocoding/reverse.yaml        GET /v1/geocoding/reverse (+ suggestions.yaml)
   partners/partners.yaml        POST, GET /v1/partners
   partners/filters.yaml         GET /v1/partners/filters
   partners/summary.yaml         GET /v1/partners/summary

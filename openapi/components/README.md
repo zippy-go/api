@@ -15,7 +15,19 @@ components/
                    Me, MeAccount, MeMembership, MePlatform, MeAgentMembership, MeImpersonation; two-step sign-in: TwoStepChallenge,
                    TwoStepVerifyRequest, TwoStepSetup, CodeConfirmRequest, RecoveryCodes, PasswordProof; password
                    links: PasswordResetLinkRequest, PasswordReset; step-up: StepUpRequest, StepUpCodeRequest;
-                   address changes: IdentifierChangeRequest, IdentifierChange; jobs: ServiceTokenRequest, ServiceToken
+                   address changes: IdentifierChangeRequest, IdentifierChange; jobs: ServiceTokenRequest, ServiceToken;
+                   customers: CustomerCodeRequest, CustomerCodeChannel, DeviceIdentity, CustomerCodeChallenge, CodeVia,
+                   CustomerCodeVerifyRequest, RegistrationEntry, CustomerVerification, CustomerVerificationOutcome,
+                   CustomerRegistration, RegistrationStep, CustomerRegisterRequest, CustomerSession
+    customers/     The customer account: CustomerProfile, CustomerProfileUpdate, CustomerLanguage, MarketingConsent,
+                   MarketingConsentUpdate, CustomerAddress, CustomerAddressInput, CustomerAddressUpdate,
+                   CustomerAddressList, AddressLabel, BuildingType, CustomerSessionSummary, CustomerSessionList,
+                   SessionClient, CustomerLocation, AccountSection, AccountSectionKey, AccountSectionList, AccountSummary
+    storefront/    Before choosing anything: GeoPoint, PlaceResolution, StorefrontZone, StorefrontPlace, Serviceability,
+                   StorefrontZoneList, StorefrontHome, HomeRow, HomeRowKind, HomeCell, HomeCellKind, CampaignBanner,
+                   StorefrontVertical, StorefrontCategory, StoreCardList, StoreCard, StoreState, FulfilmentMethod,
+                   StorefrontVerticalRef, StoreCatalogueSummary; geocoding: AddressSuggestion, ReverseGeocode,
+                   AddressSuggestionList
     partners/      The tenant record: Partner, PartnerKind, PartnerStatus, PartnerCreate, PartnerUpdate, PartnerList,
                    PartnerOwner, Contact, ContactConsent, ContactPurpose, Blocker, PartnerActivation, PartnerStanding,
                    PartnerStandingSummary, PayoutStanding, PictureUpdate

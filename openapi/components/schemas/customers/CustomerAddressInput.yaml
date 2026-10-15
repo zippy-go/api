@@ -1,0 +1,140 @@
+type: object
+description: A first address given at registration, or a new one, the `CustomerAddressInput` schema.
+required:
+  - label
+  - line1
+  - city
+  - lat
+  - lng
+  - building_type
+properties:
+  label:
+    $ref: ./AddressLabel.yaml
+    description: Home, work or other.
+  line1:
+    type: string
+    description: The address line.
+    examples:
+      - Road No 36
+  city:
+    type: string
+    description: The city.
+    examples:
+      - Hyderabad
+  lat:
+    type: number
+    description: Latitude of the pin the customer confirmed.
+    examples:
+      - 17.4326
+  lng:
+    type: number
+    description: Longitude of the pin.
+    examples:
+      - 78.4071
+  building_type:
+    $ref: ./BuildingType.yaml
+    description: The kind of building, which decides the further fields that are kept.
+  block:
+    type:
+      - string
+      - 'null'
+    description: Block or tower (not kept for an independent house).
+  building_name:
+    type:
+      - string
+      - 'null'
+    description: Building or society name (not kept for an independent house).
+  country:
+    type:
+      - string
+      - 'null'
+    description: The country (alpha-2); India by default.
+    examples:
+      - IN
+  flat_number:
+    type:
+      - string
+      - 'null'
+    description: Flat or door number.
+    examples:
+      - '402'
+  floor:
+    type:
+      - string
+      - 'null'
+    description: Floor, as said.
+    examples:
+      - '4'
+  instructions:
+    type:
+      - string
+      - 'null'
+    description: Notes for whoever delivers, up to 500 characters.
+  label_name:
+    type:
+      - string
+      - 'null'
+    description: The name of an `other` place.
+  landmark:
+    type:
+      - string
+      - 'null'
+    description: A landmark that finds the gate.
+    examples:
+      - opposite the water tank
+  line2:
+    type:
+      - string
+      - 'null'
+    description: A second line.
+  locality:
+    type:
+      - string
+      - 'null'
+    description: The area or locality.
+    examples:
+      - Jubilee Hills
+  postal_code:
+    type:
+      - string
+      - 'null'
+    description: 'The PIN code: six digits in India.'
+    examples:
+      - '500033'
+  receiver_name:
+    type:
+      - string
+      - 'null'
+    description: Who accepts a parcel, when somebody else does.
+  receiver_phone:
+    type:
+      - string
+      - 'null'
+    description: Their number.
+  select:
+    type:
+      - boolean
+      - 'null'
+    description: Select it now (a first address is selected whatever this says).
+  state:
+    type:
+      - string
+      - 'null'
+    description: The state.
+    examples:
+      - Telangana
+examples:
+  - label: home
+    line1: Road No 36
+    locality: Jubilee Hills
+    city: Hyderabad
+    state: Telangana
+    postal_code: '500033'
+    lat: 17.4329
+    lng: 78.4075
+    building_type: apartment
+    flat_number: '402'
+    block: B
+    building_name: Lake View Residency
+    floor: '4'
+    landmark: opposite the water tank

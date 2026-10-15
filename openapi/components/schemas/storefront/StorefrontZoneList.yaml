@@ -1,0 +1,19 @@
+type: object
+description: The zones a visitor may pick, the `StorefrontZoneList` schema.
+required:
+  - zones
+properties:
+  zones:
+    type: array
+    items:
+      $ref: ./StorefrontZone.yaml
+    description: Every zone that serves now, by city and name.
+examples:
+  - zones:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        name: Gachibowli
+        kind: zone
+        path: /IN/hyderabad/gachibowli
+        city: Hyderabad
+        country: IN
+        time_zone: Asia/Kolkata

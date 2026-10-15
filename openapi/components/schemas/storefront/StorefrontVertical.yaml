@@ -1,0 +1,61 @@
+type: object
+description: 'A Vertical as the storefront holds it, the `StorefrontVertical` schema: enough to draw it and to open its listing without another request.'
+required:
+  - id
+  - code
+  - name
+  - kind
+  - trades_here
+  - position
+  - categories
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Vertical.
+  code:
+    type: string
+    description: Its stable code.
+    examples:
+      - FOOD
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Food & Drinks
+  kind:
+    $ref: ../reference/VerticalKind.yaml
+    description: Product sales or field service.
+  trades_here:
+    type: boolean
+    description: Whether it trades in this zone; one that does not is shown, dimmed, and does not navigate.
+  position:
+    type: integer
+    description: "Its place in the flat list: the zone's order, then the platform's."
+    minimum: 0
+    examples:
+      - 1
+  categories:
+    type: array
+    items:
+      $ref: ./StorefrontCategory.yaml
+    description: Its categories that are switched on, in the order the operator arranged them.
+  image_url:
+    type:
+      - string
+      - 'null'
+    description: Its image, a rendition relative to the API host.
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55/renditions/card
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+    code: FOOD
+    name: Food & Drinks
+    kind: product_sales
+    image_url: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55/renditions/card
+    trades_here: true
+    position: 1
+    categories:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+        label: Biryani
+        icon_url: null

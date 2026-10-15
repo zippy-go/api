@@ -1,0 +1,7 @@
+type: string
+description: A step of a registration, the `RegistrationStep` schema.
+enum:
+  - profile
+  - address
+examples:
+  - profile

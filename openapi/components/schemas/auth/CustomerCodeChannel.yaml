@@ -1,0 +1,7 @@
+type: string
+description: The channel a customer asks a code on, the `CustomerCodeChannel` schema.
+enum:
+  - sms
+  - whatsapp
+examples:
+  - sms

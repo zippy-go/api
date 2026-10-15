@@ -1,0 +1,24 @@
+type: object
+description: A category of a Vertical, the `StorefrontCategory` schema.
+required:
+  - id
+  - label
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The category.
+  label:
+    type: string
+    description: Its label.
+    examples:
+      - Biryani
+  icon_url:
+    type:
+      - string
+      - 'null'
+    description: Its icon, a rendition relative to the API host.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+    label: Biryani
+    icon_url: null

@@ -1,0 +1,19 @@
+type: object
+description: A point on the map, the `GeoPoint` schema.
+required:
+  - lat
+  - lng
+properties:
+  lat:
+    type: number
+    description: Latitude in decimal degrees.
+    examples:
+      - 17.4401
+  lng:
+    type: number
+    description: Longitude in decimal degrees.
+    examples:
+      - 78.3489
+examples:
+  - lat: 17.4401
+    lng: 78.3489

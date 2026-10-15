@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.10.0
+  version: 0.12.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -57,8 +57,9 @@ tags:
       signed-in user, and service tokens for background jobs.
 
       Every session is for one surface, its audience: `partner` (the
-      Partner console), `platform` (Mission Control) or `agent` (the Agent
-      app). A client names it in `audience` when it signs in, together with
+      Partner console), `platform` (Mission Control), `agent` (the Agent
+      app) or `customer` (the Customer app and the Storefront). A client
+      names it in `audience` when it signs in, together with
       `delivery`: `cookie` for browsers, whose refresh token is kept in an
       `httpOnly` cookie named for the surface (`zg_refresh_partner`,
       `zg_refresh_platform`, `zg_refresh_agent`) and scoped to `/v1/auth`,
@@ -70,9 +71,25 @@ tags:
       idle limit and the session ends at its absolute limit whatever the
       refreshes: fourteen and ninety days on the Partner console, thirty and
       one hundred and eighty days on the Agent app, sixty minutes and twelve
-      hours on Mission Control. Refresh tokens rotate on every use; the
-      token spent by the latest rotation is forgiven for fifteen seconds,
-      an older one revokes the session.
+      hours on Mission Control, sixty days and a year for customers.
+      Refresh tokens rotate on every use; the token spent by the latest
+      rotation is forgiven for fifteen seconds, an older one revokes the
+      session.
+
+      Customers never have a password. They ask for a one-time code to
+      their mobile number (`POST /v1/auth/customer/codes`, by SMS or on
+      WhatsApp with SMS behind it) and verify it
+      (`POST /v1/auth/customer/verify`): a registered number is signed in, a
+      new one receives a registration context, valid thirty minutes, that
+      `POST /v1/auth/customer/register` exchanges for the account and its
+      session. Nothing about a person who verifies and walks away is kept.
+      The market's sign-in gate is consulted when a code is asked for, when
+      it is verified, at registration and at every refresh (`409`,
+      `sign_in_closed`). A customer session's cookie is
+      `zg_refresh_customer`; it renews and ends through
+      `POST /v1/auth/refresh` and `POST /v1/auth/sign-out` with
+      `audience: customer`, and a customer signing out everywhere ends
+      every customer session of theirs.
 
       The sign-in operations return a `TokenResponse`, or `202` with a
       `TwoStepChallenge` when the account has two-step sign-in on. The
@@ -158,6 +175,30 @@ tags:
       platform member as the actor and the owner as the person acted for.
   - name: Assets
     description: "Assets"
+  - name: Customer account
+    description: |
+      What a signed-in customer sees and changes about themselves: the
+      profile, consent per channel, addresses and the selected one, the
+      sessions and devices holding the account, where they browse from and
+      the account's sections. Every operation acts on the session's own
+      customer: no customer identifier appears anywhere, and a token of any
+      other surface is refused (`403`, `forbidden`).
+  - name: Storefront
+    description: |
+      What a visitor sees before choosing anything, with no account: where
+      they are placed (inside a zone's fence, the nearest zone within the
+      caller's cap, a zone they chose, the country's default service area,
+      the platform's fallback, or explicitly nothing), the zones that
+      serve, whether a pin can be served, the opening screen in one
+      request, and a Vertical's stores as cards with their distance from the
+      pin. An answer that carries a pin is private and never stored by a
+      shared cache.
+  - name: Geocoding
+    description: |
+      Words for a pin and places for what was typed, to pre-fill an address
+      form: Google Maps Platform in deployment, a bundled table of
+      Hyderabad's localities locally. Never stored; the pin, not the words,
+      decides where an agent goes.
   - name: Campaign slots
     description: "Promotional slots placed on the opening screen of a service area and everything beneath it."
   - name: Countries
@@ -532,6 +573,46 @@ paths:
     $ref: ./paths/assets/renditions.yaml
   /v1/partners/{partner_id}/assets/grants:
     $ref: ./paths/partners/assets-grants.yaml
+  /v1/auth/customer/codes:
+    $ref: ./paths/auth/customer-codes.yaml
+  /v1/auth/customer/verify:
+    $ref: ./paths/auth/customer-verify.yaml
+  /v1/auth/customer/register:
+    $ref: ./paths/auth/customer-register.yaml
+  /v1/customer/profile:
+    $ref: ./paths/customers/profile.yaml
+  /v1/customer/consent:
+    $ref: ./paths/customers/consent.yaml
+  /v1/customer/addresses:
+    $ref: ./paths/customers/addresses.yaml
+  /v1/customer/addresses/{address_id}:
+    $ref: ./paths/customers/address.yaml
+  /v1/customer/addresses/{address_id}/selected:
+    $ref: ./paths/customers/address-selected.yaml
+  /v1/customer/location:
+    $ref: ./paths/customers/location.yaml
+  /v1/customer/sessions:
+    $ref: ./paths/customers/sessions.yaml
+  /v1/customer/sessions/{session_id}:
+    $ref: ./paths/customers/session.yaml
+  /v1/customer/devices/{device_id}:
+    $ref: ./paths/customers/device.yaml
+  /v1/customer/sections:
+    $ref: ./paths/customers/sections.yaml
+  /v1/storefront/resolve:
+    $ref: ./paths/storefront/resolve.yaml
+  /v1/storefront/serviceability:
+    $ref: ./paths/storefront/serviceability.yaml
+  /v1/storefront/zones:
+    $ref: ./paths/storefront/zones.yaml
+  /v1/storefront/home:
+    $ref: ./paths/storefront/home.yaml
+  /v1/storefront/verticals/{vertical}/stores:
+    $ref: ./paths/storefront/vertical-stores.yaml
+  /v1/geocoding/reverse:
+    $ref: ./paths/geocoding/reverse.yaml
+  /v1/geocoding/suggestions:
+    $ref: ./paths/geocoding/suggestions.yaml
 
 components:
   securitySchemes:
@@ -1262,3 +1343,113 @@ components:
       $ref: ./components/schemas/assets/SignedLink.yaml
     UploadGrant:
       $ref: ./components/schemas/assets/UploadGrant.yaml
+    CustomerCodeRequest:
+      $ref: ./components/schemas/auth/CustomerCodeRequest.yaml
+    CustomerCodeChallenge:
+      $ref: ./components/schemas/auth/CustomerCodeChallenge.yaml
+    CustomerCodeVerifyRequest:
+      $ref: ./components/schemas/auth/CustomerCodeVerifyRequest.yaml
+    CustomerVerification:
+      $ref: ./components/schemas/auth/CustomerVerification.yaml
+    CustomerVerificationOutcome:
+      $ref: ./components/schemas/auth/CustomerVerificationOutcome.yaml
+    CustomerRegistration:
+      $ref: ./components/schemas/auth/CustomerRegistration.yaml
+    RegistrationStep:
+      $ref: ./components/schemas/auth/RegistrationStep.yaml
+    RegistrationEntry:
+      $ref: ./components/schemas/auth/RegistrationEntry.yaml
+    CustomerRegisterRequest:
+      $ref: ./components/schemas/auth/CustomerRegisterRequest.yaml
+    CustomerSession:
+      $ref: ./components/schemas/auth/CustomerSession.yaml
+    DeviceIdentity:
+      $ref: ./components/schemas/auth/DeviceIdentity.yaml
+    CustomerCodeChannel:
+      $ref: ./components/schemas/auth/CustomerCodeChannel.yaml
+    CodeVia:
+      $ref: ./components/schemas/auth/CodeVia.yaml
+    CustomerProfile:
+      $ref: ./components/schemas/customers/CustomerProfile.yaml
+    CustomerProfileUpdate:
+      $ref: ./components/schemas/customers/CustomerProfileUpdate.yaml
+    CustomerLanguage:
+      $ref: ./components/schemas/customers/CustomerLanguage.yaml
+    MarketingConsent:
+      $ref: ./components/schemas/customers/MarketingConsent.yaml
+    MarketingConsentUpdate:
+      $ref: ./components/schemas/customers/MarketingConsentUpdate.yaml
+    CustomerAddress:
+      $ref: ./components/schemas/customers/CustomerAddress.yaml
+    CustomerAddressInput:
+      $ref: ./components/schemas/customers/CustomerAddressInput.yaml
+    CustomerAddressUpdate:
+      $ref: ./components/schemas/customers/CustomerAddressUpdate.yaml
+    CustomerAddressList:
+      $ref: ./components/schemas/customers/CustomerAddressList.yaml
+    AddressLabel:
+      $ref: ./components/schemas/customers/AddressLabel.yaml
+    BuildingType:
+      $ref: ./components/schemas/customers/BuildingType.yaml
+    CustomerSessionSummary:
+      $ref: ./components/schemas/customers/CustomerSessionSummary.yaml
+    CustomerSessionList:
+      $ref: ./components/schemas/customers/CustomerSessionList.yaml
+    SessionClient:
+      $ref: ./components/schemas/customers/SessionClient.yaml
+    CustomerLocation:
+      $ref: ./components/schemas/customers/CustomerLocation.yaml
+    AccountSection:
+      $ref: ./components/schemas/customers/AccountSection.yaml
+    AccountSectionKey:
+      $ref: ./components/schemas/customers/AccountSectionKey.yaml
+    AccountSectionList:
+      $ref: ./components/schemas/customers/AccountSectionList.yaml
+    AccountSummary:
+      $ref: ./components/schemas/customers/AccountSummary.yaml
+    GeoPoint:
+      $ref: ./components/schemas/storefront/GeoPoint.yaml
+    PlaceResolution:
+      $ref: ./components/schemas/storefront/PlaceResolution.yaml
+    StorefrontZone:
+      $ref: ./components/schemas/storefront/StorefrontZone.yaml
+    StorefrontPlace:
+      $ref: ./components/schemas/storefront/StorefrontPlace.yaml
+    Serviceability:
+      $ref: ./components/schemas/storefront/Serviceability.yaml
+    StorefrontZoneList:
+      $ref: ./components/schemas/storefront/StorefrontZoneList.yaml
+    HomeRowKind:
+      $ref: ./components/schemas/storefront/HomeRowKind.yaml
+    HomeCellKind:
+      $ref: ./components/schemas/storefront/HomeCellKind.yaml
+    CampaignBanner:
+      $ref: ./components/schemas/storefront/CampaignBanner.yaml
+    HomeCell:
+      $ref: ./components/schemas/storefront/HomeCell.yaml
+    HomeRow:
+      $ref: ./components/schemas/storefront/HomeRow.yaml
+    StorefrontCategory:
+      $ref: ./components/schemas/storefront/StorefrontCategory.yaml
+    StorefrontVertical:
+      $ref: ./components/schemas/storefront/StorefrontVertical.yaml
+    StorefrontHome:
+      $ref: ./components/schemas/storefront/StorefrontHome.yaml
+    StoreState:
+      $ref: ./components/schemas/storefront/StoreState.yaml
+    FulfilmentMethod:
+      $ref: ./components/schemas/storefront/FulfilmentMethod.yaml
+    StoreCatalogueSummary:
+      $ref: ./components/schemas/storefront/StoreCatalogueSummary.yaml
+    StoreCard:
+      $ref: ./components/schemas/storefront/StoreCard.yaml
+    StorefrontVerticalRef:
+      $ref: ./components/schemas/storefront/StorefrontVerticalRef.yaml
+    StoreCardList:
+      $ref: ./components/schemas/storefront/StoreCardList.yaml
+    AddressSuggestion:
+      $ref: ./components/schemas/storefront/AddressSuggestion.yaml
+    ReverseGeocode:
+      $ref: ./components/schemas/storefront/ReverseGeocode.yaml
+    AddressSuggestionList:
+      $ref: ./components/schemas/storefront/AddressSuggestionList.yaml

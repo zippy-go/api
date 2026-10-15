@@ -8,7 +8,7 @@ properties:
     description: 'For cookie delivery: the surface whose refresh cookie to read and clear.'
   everywhere:
     type: boolean
-    description: '`true` ends every session of the user on every surface, not only this one.'
+    description: '`true` ends every session of the user on every surface, not only this one; for a customer session, every customer session of theirs (the customer profile reaches no membership).'
   refresh_token:
     type:
       - string
