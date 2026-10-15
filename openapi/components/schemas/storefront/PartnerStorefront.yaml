@@ -1,0 +1,82 @@
+type: object
+description: "A Partner's own storefront, the `PartnerStorefront` schema: the Partner's public face, where the visitor is placed, and every live store of the Partner as cards; open stores lead, then those opening later, then those temporarily offline; within each, nearest first with a pin and by name without one."
+required:
+  - partner
+  - place
+  - opens_on
+  - open_count
+  - stores
+properties:
+  partner:
+    $ref: ./StorefrontPartner.yaml
+    description: The Partner.
+  place:
+    $ref: ./StorefrontPlace.yaml
+    description: Where the visitor is placed, as everywhere else.
+  opens_on:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: "The store the storefront opens on: the nearest to the pin, else the first listed; `null` when the Partner has no live store."
+  open_count:
+    type: integer
+    description: How many of the stores are open now.
+    minimum: 0
+    examples:
+      - 3
+  stores:
+    type: array
+    items:
+      $ref: ./StoreCard.yaml
+    description: "The Partner's live stores, across every zone and Vertical."
+examples:
+  - partner:
+      id: 01a13a48-9e00-7000-8000-000000000001
+      name: ZippyGo Dev Partner
+      kind: organisation
+      description: Biryani, curries and tiffin from three Hyderabad kitchens.
+      logo_url: null
+      banner_url: null
+    place:
+      resolution: inside
+      zone:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        name: Gachibowli
+        kind: zone
+        path: /IN/hyderabad/gachibowli
+        city: Hyderabad
+        country: IN
+        time_zone: Asia/Kolkata
+      distance_metres: 0
+      pin:
+        lat: 17.4401
+        lng: 78.3489
+      cap_metres: 25000
+    opens_on: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    open_count: 1
+    stores:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        name: Dev Kitchen Gachibowli
+        partner_name: ZippyGo Dev Partner
+        partner_kind: organisation
+        logo_url: null
+        banner_url: null
+        zone_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        shelves: []
+        state: open
+        state_until: 2026-10-15T17:30:00Z
+        offline_message: null
+        preparation_minutes: 20
+        distance_metres: 0
+        delivers_to_pin: true
+        fulfilment:
+          - delivery
+          - pickup
+        is_new: true
+        highlights: []
+        delivery_fee: null
+        minimum_order: null
+        delivery_minutes: null
+        catalogue: null

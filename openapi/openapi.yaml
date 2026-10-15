@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.12.0
+  version: 0.13.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -613,6 +613,8 @@ paths:
     $ref: ./paths/storefront/home.yaml
   /v1/storefront/verticals/{vertical}/stores:
     $ref: ./paths/storefront/vertical-stores.yaml
+  /v1/storefront/partners/{partner_id}:
+    $ref: ./paths/storefront/partner.yaml
   /v1/geocoding/reverse:
     $ref: ./paths/geocoding/reverse.yaml
   /v1/geocoding/suggestions:
@@ -1520,6 +1522,10 @@ components:
       $ref: ./components/schemas/storefront/StorefrontVerticalRef.yaml
     StoreCardList:
       $ref: ./components/schemas/storefront/StoreCardList.yaml
+    PartnerStorefront:
+      $ref: ./components/schemas/storefront/PartnerStorefront.yaml
+    StorefrontPartner:
+      $ref: ./components/schemas/storefront/StorefrontPartner.yaml
     AddressSuggestion:
       $ref: ./components/schemas/storefront/AddressSuggestion.yaml
     ReverseGeocode:

@@ -1,0 +1,52 @@
+type: object
+description: "A Partner's public face, the `StorefrontPartner` schema: what its own storefront carries in place of the marketplace's."
+required:
+  - id
+  - name
+  - kind
+  - description
+  - logo_url
+  - banner_url
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Partner.
+  name:
+    type: string
+    description: The Partner's name, as the storefront shows it.
+    examples:
+      - ZippyGo Dev Partner
+  kind:
+    type: string
+    description: '`organisation` or `individual`.'
+    examples:
+      - organisation
+  description:
+    type:
+      - string
+      - 'null'
+    description: What the Partner does, in its own words.
+    examples:
+      - Biryani, curries and tiffin from three Hyderabad kitchens.
+  logo_url:
+    type:
+      - string
+      - 'null'
+    description: "The logo's `thumb` rendition, relative to the API's origin; `null` without a logo."
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50/renditions/thumb
+  banner_url:
+    type:
+      - string
+      - 'null'
+    description: "The banner's `hero` rendition, relative to the API's origin; `null` without a banner."
+    examples:
+      - null
+examples:
+  - id: 01a13a48-9e00-7000-8000-000000000001
+    name: ZippyGo Dev Partner
+    kind: organisation
+    description: Biryani, curries and tiffin from three Hyderabad kitchens.
+    logo_url: null
+    banner_url: null

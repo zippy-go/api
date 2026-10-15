@@ -6,6 +6,30 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-15
+
+Step 2, customer fixes: a Partner's own storefront, and the refresh grace
+under concurrency. Follows the catalogue's 0.12.0.
+
+### Added
+
+- `GET /v1/storefront/partners/{partner_id}` (specification
+  `storefront-discovery`, "A Partner's own storefront is the same storefront
+  narrowed to one Partner"; tag `Storefront`, public): the Partner's public
+  face (`StorefrontPartner`: its name, kind, description, logo and banner
+  renditions), where the visitor is placed, and every live store of the
+  Partner as the `StoreCard`s a Vertical's listing gives, open first and
+  nearest first, with `opens_on` naming the nearest (`PartnerStorefront`). A
+  pending, suspended, archived or unknown Partner answers the same `404`.
+
+### Fixed
+
+- The refresh grace of `POST /v1/auth/refresh` holds under concurrency: two
+  refreshes with the same token at the same moment both answer the one
+  successor, on every surface and with either delivery, where the second
+  could read as a replay and end the family. A token older than the latest
+  rotation still ends it. No shape changes.
+
 ## [0.12.0] - 2026-10-15
 
 Step 2, catalogue: a store's catalogue kept in the Partner console and

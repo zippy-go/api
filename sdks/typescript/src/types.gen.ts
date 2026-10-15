@@ -8625,6 +8625,62 @@ export type StoreCardList = {
 };
 
 /**
+ * A Partner's own storefront, the `PartnerStorefront` schema: the Partner's public face, where the visitor is placed, and every live store of the Partner as cards; open stores lead, then those opening later, then those temporarily offline; within each, nearest first with a pin and by name without one.
+ */
+export type PartnerStorefront = {
+    /**
+     * The Partner.
+     */
+    partner: StorefrontPartner;
+    /**
+     * Where the visitor is placed, as everywhere else.
+     */
+    place: StorefrontPlace;
+    /**
+     * The store the storefront opens on: the nearest to the pin, else the first listed; `null` when the Partner has no live store.
+     */
+    opens_on: string | null;
+    /**
+     * How many of the stores are open now.
+     */
+    open_count: number;
+    /**
+     * The Partner's live stores, across every zone and Vertical.
+     */
+    stores: Array<StoreCard>;
+};
+
+/**
+ * A Partner's public face, the `StorefrontPartner` schema: what its own storefront carries in place of the marketplace's.
+ */
+export type StorefrontPartner = {
+    /**
+     * The Partner.
+     */
+    id: string;
+    /**
+     * The Partner's name, as the storefront shows it.
+     */
+    name: string;
+    /**
+     * `organisation` or `individual`.
+     */
+    kind: string;
+    /**
+     * What the Partner does, in its own words.
+     */
+    description: string | null;
+    /**
+     * The logo's `thumb` rendition, relative to the API's origin; `null` without a logo.
+     */
+    logo_url: string | null;
+    /**
+     * The banner's `hero` rendition, relative to the API's origin; `null` without a banner.
+     */
+    banner_url: string | null;
+};
+
+/**
  * An address suggestion, the `AddressSuggestion` schema: words to pre-fill an address form with, never stored by the platform; the pin, not the words, decides where an agent goes.
  */
 export type AddressSuggestion = {
@@ -24989,6 +25045,73 @@ export type ListVerticalStoresResponses = {
 };
 
 export type ListVerticalStoresResponse = ListVerticalStoresResponses[keyof ListVerticalStoresResponses];
+
+export type GetPartnerStorefrontData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Latitude of the pin; half a coordinate counts as none.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+        /**
+         * How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+         */
+        cap?: number;
+        /**
+         * A zone the visitor chose or the device remembers; used while it still serves.
+         */
+        zone_id?: string;
+        /**
+         * The visitor's country (alpha-2), used when no pin is given.
+         */
+        country?: string;
+    };
+    url: '/v1/storefront/partners/{partner_id}';
+};
+
+export type GetPartnerStorefrontErrors = {
+    /**
+     * `validation_failed`: a pin out of range, a negative cap; `malformed_identifier` on `partner_id` or `zone_id`.
+     */
+    400: Problem;
+    /**
+     * `not_found`: no such Partner, or one that is pending, suspended or archived: the same answer for each.
+     */
+    404: Problem;
+    /**
+     * A store is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerStorefrontError = GetPartnerStorefrontErrors[keyof GetPartnerStorefrontErrors];
+
+export type GetPartnerStorefrontResponses = {
+    /**
+     * The Partner's storefront.
+     */
+    200: PartnerStorefront;
+};
+
+export type GetPartnerStorefrontResponse = GetPartnerStorefrontResponses[keyof GetPartnerStorefrontResponses];
 
 export type ReverseGeocodeData = {
     body?: never;

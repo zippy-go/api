@@ -1,0 +1,91 @@
+# Path item for /v1/storefront/partners/{partner_id}. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: The Partner.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000001
+get:
+  operationId: getPartnerStorefront
+  summary: Read a Partner's own storefront
+  description: "A Partner's own storefront (storefront-discovery, ADR 0022): the same storefront narrowed to one Partner. The Partner's public face (its name, kind, description, logo and banner) and every live store of the Partner as the cards a Vertical's listing gives, open first, then opening later, then temporarily offline, nearest first with a pin; each with its distance from the pin, whether it delivers there and whether it is open now. `opens_on` names the store the storefront opens on, the nearest to the pin. The visitor is placed as everywhere else. A pending, suspended, archived or unknown Partner answers the same `404`. An answer with a pin is private; one without is public for a minute."
+  tags:
+    - Storefront
+  security: []
+  parameters:
+    - name: lat
+      in: query
+      required: false
+      description: Latitude of the pin; half a coordinate counts as none.
+      schema:
+        type: number
+    - name: lng
+      in: query
+      required: false
+      description: Longitude of the pin.
+      schema:
+        type: number
+    - name: cap
+      in: query
+      required: false
+      description: How far, in metres, the nearest zone may be before the default answers instead; the storefront asks with 25000. Without it the nearest zone wins at any distance.
+      schema:
+        type: integer
+    - name: zone_id
+      in: query
+      required: false
+      description: A zone the visitor chose or the device remembers; used while it still serves.
+      schema:
+        type: string
+        format: uuid
+    - name: country
+      in: query
+      required: false
+      description: The visitor's country (alpha-2), used when no pin is given.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: The Partner's storefront.
+      headers:
+        Cache-Control:
+          description: '`private, no-store` when the request carries a pin (the answer carries distances); `public, max-age=60` otherwise.'
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/storefront/PartnerStorefront.yaml
+    '400':
+      description: '`validation_failed`: a pin out of range, a negative cap; `malformed_identifier` on `partner_id` or `zone_id`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: '`not_found`: no such Partner, or one that is pending, suspended or archived: the same answer for each.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
