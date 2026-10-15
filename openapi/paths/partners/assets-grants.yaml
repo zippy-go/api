@@ -1,0 +1,73 @@
+# Path item for /v1/partners/{partner_id}/assets/grants. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+post:
+  operationId: createPartnerAssetGrant
+  summary: A grant for a Partner's purpose (document, logo, banner) or one of its Locations'...
+  description: A grant for a Partner's purpose (document, logo, banner) or one of its Locations' (logo, banner); owners and managers of the Partner, or platform staff. A Location of another Partner is not found.
+  tags:
+    - Assets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/assets/PartnerAssetGrantRequest.yaml
+  responses:
+    '201':
+      description: The reservation and the form
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/assets/AssetGrant.yaml
+    '400':
+      description: Malformed body, `unsupported_file_type` or `file_too_large`
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Neither owner nor manager, or a platform purpose on the Partner route
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown partner or Location, or not the caller's
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: No capability grants the purpose yet
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: The destination is not configured here
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

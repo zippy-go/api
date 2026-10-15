@@ -1,0 +1,20 @@
+type: string
+description: A purpose of the closed catalogue.
+enum:
+  - vertical_image
+  - vertical_category_image
+  - campaign_artwork
+  - partner_document
+  - partner_logo
+  - partner_banner
+  - location_logo
+  - location_banner
+  - product_image
+  - catalogue_category_image
+  - review_photo
+  - prescription_file
+  - agent_document
+  - proof_of_delivery_photo
+  - table_code_image
+examples:
+  - vertical_image

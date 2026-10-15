@@ -1,0 +1,41 @@
+type: object
+description: |-
+  Request body of `POST /v1/partners/{partner_id}/assets/grants`, the `PartnerGrantRequest`
+  schema.
+required:
+  - purpose
+  - file_name
+  - content_type
+  - size_bytes
+properties:
+  content_type:
+    type: string
+    description: The file's content type as the client reads it.
+    examples:
+      - image/png
+  file_name:
+    type: string
+    description: The file name as the person has it.
+    examples:
+      - logo.png
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location, for Location purposes.
+  purpose:
+    $ref: ./AssetPurposeCode.yaml
+    description: The purpose; a Partner or Location purpose here.
+  size_bytes:
+    type: integer
+    format: int64
+    description: The file's size in bytes as the client reads it.
+    examples:
+      - 48213
+examples:
+  - content_type: image/png
+    file_name: logo.png
+    location_id: 01a13a48-9e00-7000-8000-00000000a014
+    purpose: vertical_image
+    size_bytes: 48213

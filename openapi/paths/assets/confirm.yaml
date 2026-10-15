@@ -1,0 +1,80 @@
+# Path item for /v1/assets/{asset_id}/confirm. Referenced from openapi.yaml.
+parameters:
+  - name: asset_id
+    in: path
+    required: true
+    description: The asset
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+post:
+  operationId: confirmAsset
+  summary: Confirms an upload
+  description: 'Confirms an upload: the platform asks the destination to describe the file and takes every fact from that answer. Owners and managers of the Partner, or platform staff.'
+  tags:
+    - Assets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/assets/AssetConfirm.yaml
+  responses:
+    '200':
+      description: The stored asset
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/assets/Asset.yaml
+    '400':
+      description: A key outside the authorised folder, `unsupported_file_type` or `file_too_large` as the destination reports it
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not allowed to write the asset's owner
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The destination has not received the file (retry the same grant), the file arrived readable by anyone (ask for a new grant), or the asset is discarded (`asset_not_usable`)
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

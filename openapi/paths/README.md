@@ -40,6 +40,14 @@ paths/
   live/events.yaml              GET /v1/live/events (server-sent events)
   live/stream.yaml              GET /v1/live/stream (server-sent events, the one stream every app holds)
   live/config.yaml              GET /v1/live/config
+  assets/purposes.yaml          GET /v1/assets/purposes
+  assets/grants.yaml            POST /v1/assets/grants
+  partners/assets-grants.yaml   POST /v1/partners/{partner_id}/assets/grants
+  assets/asset.yaml             GET, DELETE /v1/assets/{asset_id}
+  assets/confirm.yaml           POST /v1/assets/{asset_id}/confirm
+  assets/crops.yaml             POST /v1/assets/{asset_id}/crops
+  assets/link.yaml              GET /v1/assets/{asset_id}/link
+  assets/renditions.yaml        GET /v1/assets/{asset_id}/renditions/{name}
   currencies/currencies.yaml    GET, POST /v1/currencies
   currencies/currency.yaml      GET, PATCH /v1/currencies/{code}
   countries/countries.yaml      GET, POST /v1/countries

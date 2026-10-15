@@ -1,0 +1,7 @@
+type: string
+description: Where a purpose's files land.
+enum:
+  - public
+  - private
+examples:
+  - public

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.6.0
+  version: 0.7.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -87,6 +87,8 @@ tags:
     description: The kinds of service a partner runs (product sales, field service, delivery), with their status and configuration.
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
+  - name: Assets
+    description: "Assets"
   - name: Campaign slots
     description: "Promotional slots placed on the opening screen of a service area and everything beneath it."
   - name: Countries
@@ -299,6 +301,22 @@ paths:
     $ref: ./paths/live/config.yaml
   /v1/live/stream:
     $ref: ./paths/live/stream.yaml
+  /v1/assets/grants:
+    $ref: ./paths/assets/grants.yaml
+  /v1/assets/purposes:
+    $ref: ./paths/assets/purposes.yaml
+  /v1/assets/{asset_id}:
+    $ref: ./paths/assets/asset.yaml
+  /v1/assets/{asset_id}/confirm:
+    $ref: ./paths/assets/confirm.yaml
+  /v1/assets/{asset_id}/crops:
+    $ref: ./paths/assets/crops.yaml
+  /v1/assets/{asset_id}/link:
+    $ref: ./paths/assets/link.yaml
+  /v1/assets/{asset_id}/renditions/{name}:
+    $ref: ./paths/assets/renditions.yaml
+  /v1/partners/{partner_id}/assets/grants:
+    $ref: ./paths/partners/assets-grants.yaml
 
 components:
   securitySchemes:
@@ -731,3 +749,33 @@ components:
       $ref: ./components/schemas/live/AgentsSnapshot.yaml
     SignalSubject:
       $ref: ./components/schemas/live/SignalSubject.yaml
+    Asset:
+      $ref: ./components/schemas/assets/Asset.yaml
+    AssetState:
+      $ref: ./components/schemas/assets/AssetState.yaml
+    AssetConfirm:
+      $ref: ./components/schemas/assets/AssetConfirm.yaml
+    AssetCrop:
+      $ref: ./components/schemas/assets/AssetCrop.yaml
+    CropRect:
+      $ref: ./components/schemas/assets/CropRect.yaml
+    AssetDestination:
+      $ref: ./components/schemas/assets/AssetDestination.yaml
+    AssetGrantRequest:
+      $ref: ./components/schemas/assets/AssetGrantRequest.yaml
+    AssetGrant:
+      $ref: ./components/schemas/assets/AssetGrant.yaml
+    AssetGrantor:
+      $ref: ./components/schemas/assets/AssetGrantor.yaml
+    PartnerAssetGrantRequest:
+      $ref: ./components/schemas/assets/PartnerAssetGrantRequest.yaml
+    AssetPurposeCode:
+      $ref: ./components/schemas/assets/AssetPurposeCode.yaml
+    AssetPurpose:
+      $ref: ./components/schemas/assets/AssetPurpose.yaml
+    AssetPurposeList:
+      $ref: ./components/schemas/assets/AssetPurposeList.yaml
+    SignedLink:
+      $ref: ./components/schemas/assets/SignedLink.yaml
+    UploadGrant:
+      $ref: ./components/schemas/assets/UploadGrant.yaml

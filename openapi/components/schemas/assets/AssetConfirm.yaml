@@ -1,0 +1,10 @@
+type: object
+description: Request body of `POST /v1/assets/{asset_id}/confirm`, the `AssetConfirm` schema.
+properties:
+  key:
+    type:
+      - string
+      - 'null'
+    description: The key the destination returned; the grant's when omitted.
+examples:
+  - key: example

@@ -4,6 +4,7 @@ required:
   - postgres
   - valkey
   - outbox
+  - object_storage
 properties:
   postgres:
     $ref: ./DependencyCheck.yaml
@@ -14,6 +15,9 @@ properties:
   outbox:
     $ref: ./OutboxCheck.yaml
     description: The event outbox.
+  object_storage:
+    $ref: ./DependencyCheck.yaml
+    description: Object storage, both buckets answering; degraded rather than down when it does not, since everything but uploads works without it.
 examples:
   - postgres:
       status: ok
@@ -25,3 +29,6 @@ examples:
       status: ok
       pending: 0
       oldest_pending_age_ms: null
+    object_storage:
+      status: ok
+      latency_ms: 4

@@ -1,0 +1,80 @@
+# Path item for /v1/assets/{asset_id}/crops. Referenced from openapi.yaml.
+parameters:
+  - name: asset_id
+    in: path
+    required: true
+    description: The picture, or a crop of it (the crop is cut from the original again)
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+post:
+  operationId: createAssetCrop
+  summary: Cuts a crop from a stored picture
+  description: "Cuts a crop from a stored picture: a new asset deriving from the original, with the rectangle in the original's pixels and the editor's recipe. Owners and managers, or platform staff."
+  tags:
+    - Assets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/assets/AssetCrop.yaml
+  responses:
+    '201':
+      description: The crop
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/assets/Asset.yaml
+    '400':
+      description: Malformed body, or `crop_outside` naming the picture's size
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not allowed to write the asset's owner
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, or not visible to the caller
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: Not a stored raster picture (`asset_not_usable`)
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

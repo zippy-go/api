@@ -1,0 +1,12 @@
+type: string
+description: Who may ask for a grant of a purpose.
+enum:
+  - platform_staff
+  - partner_staff
+  - location_staff
+  - catalogue_staff
+  - customer
+  - agent
+  - platform
+examples:
+  - platform_staff

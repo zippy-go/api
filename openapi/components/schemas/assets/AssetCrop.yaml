@@ -1,0 +1,39 @@
+type: object
+description: Request body of `POST /v1/assets/{asset_id}/crops`, the `AssetCrop` schema.
+required:
+  - x
+  - y
+  - width
+  - height
+properties:
+  height:
+    type: integer
+    format: int32
+    description: Height.
+    minimum: 0
+  recipe:
+    type:
+      - object
+      - 'null'
+    description: The editor's own recipe, kept opaque and handed back.
+  width:
+    type: integer
+    format: int32
+    description: Width.
+    minimum: 0
+  x:
+    type: integer
+    format: int32
+    description: Left edge, in the original's pixels.
+    minimum: 0
+  y:
+    type: integer
+    format: int32
+    description: Top edge.
+    minimum: 0
+examples:
+  - height: 0
+    recipe: {}
+    width: 0
+    x: 0
+    y: 0

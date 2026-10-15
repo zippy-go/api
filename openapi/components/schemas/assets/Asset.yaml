@@ -1,0 +1,177 @@
+type: object
+description: An asset, the `Asset` schema.
+required:
+  - id
+  - purpose
+  - state
+  - destination
+  - bucket
+  - restricted
+  - file_name
+  - requested_by
+  - granted_at
+  - version
+properties:
+  bucket:
+    type: string
+    description: The bucket that holds them, recorded per asset so history never moves.
+    examples:
+      - zippygo-public
+  content_type:
+    type:
+      - string
+      - 'null'
+    description: The content type the destination reported; `null` until stored.
+    examples:
+      - image/png
+  crop:
+    oneOf:
+      - $ref: ./CropRect.yaml
+        description: The rectangle cut from the source, for a crop.
+      - type: 'null'
+    description: The crop.
+  destination:
+    $ref: ./AssetDestination.yaml
+    description: Where its bytes live.
+  discard_reason:
+    type:
+      - string
+      - 'null'
+    description: Why it was discarded.
+  discarded_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was discarded.
+  file_name:
+    type: string
+    description: The safe file name.
+    examples:
+      - logo.png
+  granted_at:
+    type: string
+    format: date-time
+    description: When the grant was issued.
+  height:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: Height in pixels, for a picture.
+    examples:
+      - 447
+    minimum: 0
+  id:
+    type: string
+    format: uuid
+    description: Identifier; what owners hold.
+  location_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Location it belongs to, for Location purposes.
+  owner_user_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Customer or Agent it belongs to, so erasure can find it.
+  partner_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Partner it belongs to, for Partner purposes.
+  purpose:
+    $ref: ./AssetPurposeCode.yaml
+    description: The purpose, which decided every rule.
+  recipe:
+    type:
+      - object
+      - 'null'
+    description: The editor's own recipe, reopened by the editor that wrote it.
+  requested_by:
+    type: string
+    format: uuid
+    description: Who asked for the grant.
+  restricted:
+    type: boolean
+    description: Whether it is read through signed links only.
+  size_bytes:
+    type:
+      - integer
+      - 'null'
+    format: int64
+    description: The size the destination reported; `null` until stored.
+    examples:
+      - 48213
+  source_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The asset this one was cut from, for a crop.
+  state:
+    $ref: ./AssetState.yaml
+    description: Where it is in its life.
+  stored_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the file was confirmed.
+  url:
+    type:
+      - string
+      - 'null'
+    description: |-
+      The address a public, stored asset is read from; `null` while reserved, when discarded
+      or when restricted (use the signed link).
+    examples:
+      - http://localhost:9000/zippygo-public/verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+  version:
+    type: integer
+    format: int64
+    description: The version, raised on every change; the entity tag of reads.
+    examples:
+      - 2
+  width:
+    type:
+      - integer
+      - 'null'
+    format: int32
+    description: Width in pixels, for a picture.
+    examples:
+      - 670
+    minimum: 0
+examples:
+  - bucket: zippygo-public
+    content_type: image/png
+    crop:
+      height: 440
+      width: 440
+      x: 115
+      y: 0
+    destination: public
+    discard_reason: example
+    discarded_at: 2026-10-15T09:00:00Z
+    file_name: logo.png
+    granted_at: 2026-10-15T09:00:00Z
+    height: 447
+    id: 01a13a48-9e00-7000-8000-00000000a014
+    location_id: 01a13a48-9e00-7000-8000-00000000a014
+    owner_user_id: 01a13a48-9e00-7000-8000-00000000a014
+    partner_id: 01a13a48-9e00-7000-8000-00000000a014
+    purpose: vertical_image
+    recipe: {}
+    requested_by: 01a13a48-9e00-7000-8000-00000000a014
+    restricted: true
+    size_bytes: 48213
+    source_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+    state: reserved
+    stored_at: 2026-10-15T09:00:00Z
+    url: http://localhost:9000/zippygo-public/verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+    version: 2
+    width: 670

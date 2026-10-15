@@ -1,0 +1,16 @@
+type: object
+description: A signed link to a restricted file, the `SignedLink` schema.
+required:
+  - url
+  - expires_at
+properties:
+  expires_at:
+    type: string
+    format: date-time
+    description: When it stops working.
+  url:
+    type: string
+    description: The link; works until `expires_at` and never again.
+examples:
+  - expires_at: 2026-10-15T09:00:00Z
+    url: example

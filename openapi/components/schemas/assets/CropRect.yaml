@@ -1,0 +1,41 @@
+type: object
+description: A rectangle in the original's own pixels, the `CropRect` schema.
+required:
+  - x
+  - y
+  - width
+  - height
+properties:
+  height:
+    type: integer
+    format: int32
+    description: Height.
+    examples:
+      - 440
+    minimum: 0
+  width:
+    type: integer
+    format: int32
+    description: Width.
+    examples:
+      - 440
+    minimum: 0
+  x:
+    type: integer
+    format: int32
+    description: Left edge.
+    examples:
+      - 115
+    minimum: 0
+  y:
+    type: integer
+    format: int32
+    description: Top edge.
+    examples:
+      - 0
+    minimum: 0
+examples:
+  - height: 440
+    width: 440
+    x: 115
+    y: 0

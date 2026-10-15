@@ -358,6 +358,10 @@ export type HealthChecks = {
      * The event outbox.
      */
     outbox: OutboxCheck;
+    /**
+     * Object storage, both buckets answering; degraded rather than down when it does not, since everything but uploads works without it.
+     */
+    object_storage: DependencyCheck;
 };
 
 /**
@@ -3913,6 +3917,356 @@ export type SignalSubject = {
      * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`.
      */
     kind: string;
+};
+
+/**
+ * An asset, the `Asset` schema.
+ */
+export type Asset = {
+    /**
+     * The bucket that holds them, recorded per asset so history never moves.
+     */
+    bucket: string;
+    /**
+     * The content type the destination reported; `null` until stored.
+     */
+    content_type?: string | null;
+    /**
+     * The crop.
+     */
+    crop?: CropRect | null;
+    /**
+     * Where its bytes live.
+     */
+    destination: AssetDestination;
+    /**
+     * Why it was discarded.
+     */
+    discard_reason?: string | null;
+    /**
+     * When it was discarded.
+     */
+    discarded_at?: string | null;
+    /**
+     * The safe file name.
+     */
+    file_name: string;
+    /**
+     * When the grant was issued.
+     */
+    granted_at: string;
+    /**
+     * Height in pixels, for a picture.
+     */
+    height?: number | null;
+    /**
+     * Identifier; what owners hold.
+     */
+    id: string;
+    /**
+     * The Location it belongs to, for Location purposes.
+     */
+    location_id?: string | null;
+    /**
+     * The Customer or Agent it belongs to, so erasure can find it.
+     */
+    owner_user_id?: string | null;
+    /**
+     * The Partner it belongs to, for Partner purposes.
+     */
+    partner_id?: string | null;
+    /**
+     * The purpose, which decided every rule.
+     */
+    purpose: AssetPurposeCode;
+    /**
+     * The editor's own recipe, reopened by the editor that wrote it.
+     */
+    recipe?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Who asked for the grant.
+     */
+    requested_by: string;
+    /**
+     * Whether it is read through signed links only.
+     */
+    restricted: boolean;
+    /**
+     * The size the destination reported; `null` until stored.
+     */
+    size_bytes?: number | null;
+    /**
+     * The asset this one was cut from, for a crop.
+     */
+    source_asset_id?: string | null;
+    /**
+     * Where it is in its life.
+     */
+    state: AssetState;
+    /**
+     * When the file was confirmed.
+     */
+    stored_at?: string | null;
+    /**
+     * The address a public, stored asset is read from; `null` while reserved, when discarded
+     * or when restricted (use the signed link).
+     */
+    url?: string | null;
+    /**
+     * The version, raised on every change; the entity tag of reads.
+     */
+    version: number;
+    /**
+     * Width in pixels, for a picture.
+     */
+    width?: number | null;
+};
+
+/**
+ * Where an asset is in its life.
+ */
+export type AssetState = 'reserved' | 'stored' | 'discarded';
+
+/**
+ * Request body of `POST /v1/assets/{asset_id}/confirm`, the `AssetConfirm` schema.
+ */
+export type AssetConfirm = {
+    /**
+     * The key the destination returned; the grant's when omitted.
+     */
+    key?: string | null;
+};
+
+/**
+ * Request body of `POST /v1/assets/{asset_id}/crops`, the `AssetCrop` schema.
+ */
+export type AssetCrop = {
+    /**
+     * Height.
+     */
+    height: number;
+    /**
+     * The editor's own recipe, kept opaque and handed back.
+     */
+    recipe?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Width.
+     */
+    width: number;
+    /**
+     * Left edge, in the original's pixels.
+     */
+    x: number;
+    /**
+     * Top edge.
+     */
+    y: number;
+};
+
+/**
+ * A rectangle in the original's own pixels, the `CropRect` schema.
+ */
+export type CropRect = {
+    /**
+     * Height.
+     */
+    height: number;
+    /**
+     * Width.
+     */
+    width: number;
+    /**
+     * Left edge.
+     */
+    x: number;
+    /**
+     * Top edge.
+     */
+    y: number;
+};
+
+/**
+ * Where a purpose's files land.
+ */
+export type AssetDestination = 'public' | 'private';
+
+/**
+ * Request body of `POST /v1/assets/grants`, the `GrantRequest` schema.
+ */
+export type AssetGrantRequest = {
+    /**
+     * The file's content type as the client reads it.
+     */
+    content_type: string;
+    /**
+     * The file name as the person has it.
+     */
+    file_name: string;
+    /**
+     * The purpose; a platform purpose here.
+     */
+    purpose: AssetPurposeCode;
+    /**
+     * The file's size in bytes as the client reads it.
+     */
+    size_bytes: number;
+};
+
+/**
+ * A grant with its reservation, the `AssetGrant` schema.
+ */
+export type AssetGrant = {
+    /**
+     * The reserved asset.
+     */
+    asset: Asset;
+    /**
+     * The form to post the file with.
+     */
+    upload: UploadGrant;
+};
+
+/**
+ * Who may ask for a grant of a purpose.
+ */
+export type AssetGrantor = 'platform_staff' | 'partner_staff' | 'location_staff' | 'catalogue_staff' | 'customer' | 'agent' | 'platform';
+
+/**
+ * Request body of `POST /v1/partners/{partner_id}/assets/grants`, the `PartnerGrantRequest`
+ * schema.
+ */
+export type PartnerAssetGrantRequest = {
+    /**
+     * The file's content type as the client reads it.
+     */
+    content_type: string;
+    /**
+     * The file name as the person has it.
+     */
+    file_name: string;
+    /**
+     * The Location, for Location purposes.
+     */
+    location_id?: string | null;
+    /**
+     * The purpose; a Partner or Location purpose here.
+     */
+    purpose: AssetPurposeCode;
+    /**
+     * The file's size in bytes as the client reads it.
+     */
+    size_bytes: number;
+};
+
+/**
+ * A purpose of the closed catalogue.
+ */
+export type AssetPurposeCode = 'vertical_image' | 'vertical_category_image' | 'campaign_artwork' | 'partner_document' | 'partner_logo' | 'partner_banner' | 'location_logo' | 'location_banner' | 'product_image' | 'catalogue_category_image' | 'review_photo' | 'prescription_file' | 'agent_document' | 'proof_of_delivery_photo' | 'table_code_image';
+
+/**
+ * A purpose as served, the `AssetPurpose` schema.
+ */
+export type AssetPurpose = {
+    /**
+     * Whether grants can be issued yet: the capability that owns the thing exists.
+     */
+    available: boolean;
+    /**
+     * The code grants name.
+     */
+    code: AssetPurposeCode;
+    /**
+     * The exact MIME types accepted.
+     */
+    content_types: Array<string>;
+    /**
+     * Where its files land.
+     */
+    destination: AssetDestination;
+    /**
+     * The folder its files land in.
+     */
+    folder: string;
+    /**
+     * Who may ask for a grant.
+     */
+    grantor: AssetGrantor;
+    /**
+     * A label.
+     */
+    label: string;
+    /**
+     * The size ceiling in bytes.
+     */
+    max_bytes: number;
+    /**
+     * Whether the file is restricted.
+     */
+    restricted: boolean;
+};
+
+/**
+ * The `AssetPurposeList` schema.
+ */
+export type AssetPurposeList = {
+    /**
+     * Every purpose with its rules.
+     */
+    items: Array<AssetPurpose>;
+};
+
+/**
+ * A signed link to a restricted file, the `SignedLink` schema.
+ */
+export type SignedLink = {
+    /**
+     * When it stops working.
+     */
+    expires_at: string;
+    /**
+     * The link; works until `expires_at` and never again.
+     */
+    url: string;
+};
+
+/**
+ * A grant to post one file straight to the destination, the `UploadGrant` schema.
+ */
+export type UploadGrant = {
+    /**
+     * The exact content type the destination accepts for this grant.
+     */
+    content_type: string;
+    /**
+     * When the grant stops working.
+     */
+    expires_at: string;
+    /**
+     * The form fields to send, every one of them, before the file part.
+     */
+    fields: {
+        [key: string]: unknown;
+    };
+    /**
+     * The name of the file part, sent last.
+     */
+    file_field: string;
+    /**
+     * The object key the destination will hold the file under; confirm with it.
+     */
+    key: string;
+    /**
+     * The largest size the destination accepts for this grant, in bytes.
+     */
+    max_bytes: number;
+    /**
+     * Where to post the form.
+     */
+    url: string;
 };
 
 /**
@@ -10299,3 +10653,479 @@ export type OpenLiveStreamResponses = {
 };
 
 export type OpenLiveStreamResponse = OpenLiveStreamResponses[keyof OpenLiveStreamResponses];
+
+export type CreateAssetGrantData = {
+    /**
+     * The request body.
+     */
+    body: AssetGrantRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/assets/grants';
+};
+
+export type CreateAssetGrantErrors = {
+    /**
+     * Malformed body, `unsupported_file_type` or `file_too_large`
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not platform staff, or a Partner purpose on the platform route
+     */
+    403: Problem;
+    /**
+     * No capability grants the purpose yet
+     */
+    409: Problem;
+    /**
+     * The destination is not configured here
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateAssetGrantError = CreateAssetGrantErrors[keyof CreateAssetGrantErrors];
+
+export type CreateAssetGrantResponses = {
+    /**
+     * The reservation and the form
+     */
+    201: AssetGrant;
+};
+
+export type CreateAssetGrantResponse = CreateAssetGrantResponses[keyof CreateAssetGrantResponses];
+
+export type ListAssetPurposesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/assets/purposes';
+};
+
+export type ListAssetPurposesErrors = {
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAssetPurposesError = ListAssetPurposesErrors[keyof ListAssetPurposesErrors];
+
+export type ListAssetPurposesResponses = {
+    /**
+     * The catalogue
+     */
+    200: AssetPurposeList;
+};
+
+export type ListAssetPurposesResponse = ListAssetPurposesResponses[keyof ListAssetPurposesResponses];
+
+export type DiscardAssetData = {
+    body?: never;
+    path: {
+        /**
+         * The asset
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}';
+};
+
+export type DiscardAssetErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not allowed to write the asset's owner
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DiscardAssetError = DiscardAssetErrors[keyof DiscardAssetErrors];
+
+export type DiscardAssetResponses = {
+    /**
+     * The asset, discarded
+     */
+    200: Asset;
+};
+
+export type DiscardAssetResponse = DiscardAssetResponses[keyof DiscardAssetResponses];
+
+export type GetAssetData = {
+    body?: never;
+    path: {
+        /**
+         * The asset
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}';
+};
+
+export type GetAssetErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAssetError = GetAssetErrors[keyof GetAssetErrors];
+
+export type GetAssetResponses = {
+    /**
+     * The asset
+     */
+    200: Asset;
+};
+
+export type GetAssetResponse = GetAssetResponses[keyof GetAssetResponses];
+
+export type ConfirmAssetData = {
+    /**
+     * The request body.
+     */
+    body: AssetConfirm;
+    path: {
+        /**
+         * The asset
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}/confirm';
+};
+
+export type ConfirmAssetErrors = {
+    /**
+     * A key outside the authorised folder, `unsupported_file_type` or `file_too_large` as the destination reports it
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not allowed to write the asset's owner
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * The destination has not received the file (retry the same grant), the file arrived readable by anyone (ask for a new grant), or the asset is discarded (`asset_not_usable`)
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ConfirmAssetError = ConfirmAssetErrors[keyof ConfirmAssetErrors];
+
+export type ConfirmAssetResponses = {
+    /**
+     * The stored asset
+     */
+    200: Asset;
+};
+
+export type ConfirmAssetResponse = ConfirmAssetResponses[keyof ConfirmAssetResponses];
+
+export type CreateAssetCropData = {
+    /**
+     * The request body.
+     */
+    body: AssetCrop;
+    path: {
+        /**
+         * The picture, or a crop of it (the crop is cut from the original again)
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}/crops';
+};
+
+export type CreateAssetCropErrors = {
+    /**
+     * Malformed body, or `crop_outside` naming the picture's size
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Not allowed to write the asset's owner
+     */
+    403: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * Not a stored raster picture (`asset_not_usable`)
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateAssetCropError = CreateAssetCropErrors[keyof CreateAssetCropErrors];
+
+export type CreateAssetCropResponses = {
+    /**
+     * The crop
+     */
+    201: Asset;
+};
+
+export type CreateAssetCropResponse = CreateAssetCropResponses[keyof CreateAssetCropResponses];
+
+export type GetAssetLinkData = {
+    body?: never;
+    path: {
+        /**
+         * The asset
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}/link';
+};
+
+export type GetAssetLinkErrors = {
+    /**
+     * Malformed identifier
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Unknown, or not visible to the caller
+     */
+    404: Problem;
+    /**
+     * Not a stored file (`asset_not_usable`)
+     */
+    409: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAssetLinkError = GetAssetLinkErrors[keyof GetAssetLinkErrors];
+
+export type GetAssetLinkResponses = {
+    /**
+     * The link
+     */
+    200: SignedLink;
+};
+
+export type GetAssetLinkResponse = GetAssetLinkResponses[keyof GetAssetLinkResponses];
+
+export type GetAssetRenditionData = {
+    body?: never;
+    path: {
+        /**
+         * The picture
+         */
+        asset_id: string;
+        /**
+         * `thumb`, `card` or `hero`
+         */
+        name: string;
+    };
+    query?: never;
+    url: '/v1/assets/{asset_id}/renditions/{name}';
+};
+
+export type GetAssetRenditionErrors = {
+    /**
+     * Malformed identifier or name
+     */
+    400: Problem;
+    /**
+     * Not a stored public picture
+     */
+    404: Problem;
+    /**
+     * A store is unavailable
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAssetRenditionError = GetAssetRenditionErrors[keyof GetAssetRenditionErrors];
+
+export type GetAssetRenditionResponses = {
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAssetRenditionResponse = GetAssetRenditionResponses[keyof GetAssetRenditionResponses];
+
+export type CreatePartnerAssetGrantData = {
+    /**
+     * The request body.
+     */
+    body: PartnerAssetGrantRequest;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/assets/grants';
+};
+
+export type CreatePartnerAssetGrantErrors = {
+    /**
+     * Malformed body, `unsupported_file_type` or `file_too_large`
+     */
+    400: Problem;
+    /**
+     * No valid token
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager, or a platform purpose on the Partner route
+     */
+    403: Problem;
+    /**
+     * Unknown partner or Location, or not the caller's
+     */
+    404: Problem;
+    /**
+     * No capability grants the purpose yet
+     */
+    409: Problem;
+    /**
+     * The destination is not configured here
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerAssetGrantError = CreatePartnerAssetGrantErrors[keyof CreatePartnerAssetGrantErrors];
+
+export type CreatePartnerAssetGrantResponses = {
+    /**
+     * The reservation and the form
+     */
+    201: AssetGrant;
+};
+
+export type CreatePartnerAssetGrantResponse = CreatePartnerAssetGrantResponses[keyof CreatePartnerAssetGrantResponses];

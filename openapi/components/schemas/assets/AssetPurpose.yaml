@@ -1,0 +1,65 @@
+type: object
+description: A purpose as served, the `AssetPurpose` schema.
+required:
+  - code
+  - label
+  - folder
+  - content_types
+  - max_bytes
+  - restricted
+  - grantor
+  - destination
+  - available
+properties:
+  available:
+    type: boolean
+    description: 'Whether grants can be issued yet: the capability that owns the thing exists.'
+  code:
+    $ref: ./AssetPurposeCode.yaml
+    description: The code grants name.
+  content_types:
+    type: array
+    items:
+      type: string
+    description: The exact MIME types accepted.
+    examples:
+      - &a1
+        - image/png
+        - image/jpeg
+        - image/webp
+        - image/svg+xml
+  destination:
+    $ref: ./AssetDestination.yaml
+    description: Where its files land.
+  folder:
+    type: string
+    description: The folder its files land in.
+    examples:
+      - verticals
+  grantor:
+    $ref: ./AssetGrantor.yaml
+    description: Who may ask for a grant.
+  label:
+    type: string
+    description: A label.
+    examples:
+      - Vertical image
+  max_bytes:
+    type: integer
+    format: int64
+    description: The size ceiling in bytes.
+    examples:
+      - 2097152
+  restricted:
+    type: boolean
+    description: Whether the file is restricted.
+examples:
+  - available: true
+    code: vertical_image
+    content_types: *a1
+    destination: public
+    folder: verticals
+    grantor: platform_staff
+    label: Vertical image
+    max_bytes: 2097152
+    restricted: true

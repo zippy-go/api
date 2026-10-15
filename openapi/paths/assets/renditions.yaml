@@ -1,0 +1,56 @@
+# Path item for /v1/assets/{asset_id}/renditions/{name}. Referenced from openapi.yaml.
+parameters:
+  - name: asset_id
+    in: path
+    required: true
+    description: The picture
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a014
+  - name: name
+    in: path
+    required: true
+    description: '`thumb`, `card` or `hero`'
+    schema:
+      type: string
+get:
+  operationId: getAssetRendition
+  summary: A sized rendition of a public picture, `thumb` (160 wide), `card` (480) or `hero`...
+  description: A sized rendition of a public picture, `thumb` (160 wide), `card` (480) or `hero` (1200), cut from the lossless crop, as WebP where the client accepts it; answered with a redirect to the cached file. Public.
+  tags:
+    - Assets
+  security: []
+  responses:
+    '307':
+      description: Redirects to the rendition
+    '400':
+      description: Malformed identifier or name
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Not a stored public picture
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -30,6 +30,9 @@ components/
                    Vertical, VerticalOffer, ReachNode, CampaignSlot, DisplayGrid, ServicePolicy, PolicyLayer,
                    EffectivePolicy, Schedule, ScheduleLayer, EffectiveSchedule, Trading, StoreType, ServiceType,
                    FieldDefinition, Setting and their request bodies (`*Create`, `*Update`, StatusChange, ...)
+    assets/        Digital assets: Asset, AssetState, AssetPurposeCode, AssetPurpose, AssetPurposeList, AssetGrantor,
+                   AssetDestination, AssetGrantRequest, PartnerAssetGrantRequest, AssetGrant, UploadGrant, AssetConfirm,
+                   AssetCrop, CropRect, SignedLink
     <domain>/      One folder per further domain, one file per schema
   parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath, ClientTypeHeader,
                    IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader

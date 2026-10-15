@@ -1,0 +1,8 @@
+type: string
+description: Where an asset is in its life.
+enum:
+  - reserved
+  - stored
+  - discarded
+examples:
+  - reserved

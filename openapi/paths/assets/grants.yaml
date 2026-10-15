@@ -1,0 +1,65 @@
+# Path item for /v1/assets/grants. Referenced from openapi.yaml.
+post:
+  operationId: createAssetGrant
+  summary: A grant for a platform purpose (a Vertical image, a category image, campaign artwork)
+  description: A grant for a platform purpose (a Vertical image, a category image, campaign artwork); platform staff. The answer names where to post the file and the form to post it with.
+  tags:
+    - Assets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request body.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/assets/AssetGrantRequest.yaml
+  responses:
+    '201':
+      description: The reservation and the form
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/assets/AssetGrant.yaml
+    '400':
+      description: Malformed body, `unsupported_file_type` or `file_too_large`
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid token
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff, or a Partner purpose on the platform route
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: No capability grants the purpose yet
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: The destination is not configured here
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

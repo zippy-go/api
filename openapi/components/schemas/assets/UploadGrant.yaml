@@ -1,0 +1,52 @@
+type: object
+description: A grant to post one file straight to the destination, the `UploadGrant` schema.
+required:
+  - url
+  - fields
+  - file_field
+  - key
+  - expires_at
+  - content_type
+  - max_bytes
+properties:
+  content_type:
+    type: string
+    description: The exact content type the destination accepts for this grant.
+    examples:
+      - image/png
+  expires_at:
+    type: string
+    format: date-time
+    description: When the grant stops working.
+  fields:
+    type: object
+    description: The form fields to send, every one of them, before the file part.
+  file_field:
+    type: string
+    description: The name of the file part, sent last.
+    examples:
+      - file
+  key:
+    type: string
+    description: The object key the destination will hold the file under; confirm with it.
+    examples:
+      - verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+  max_bytes:
+    type: integer
+    format: int64
+    description: The largest size the destination accepts for this grant, in bytes.
+    examples:
+      - 2097152
+  url:
+    type: string
+    description: Where to post the form.
+    examples:
+      - http://localhost:9000/zippygo-public
+examples:
+  - content_type: image/png
+    expires_at: 2026-10-15T09:00:00Z
+    fields: {}
+    file_field: file
+    key: verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+    max_bytes: 2097152
+    url: http://localhost:9000/zippygo-public

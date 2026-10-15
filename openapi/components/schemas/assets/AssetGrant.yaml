@@ -1,0 +1,50 @@
+type: object
+description: A grant with its reservation, the `AssetGrant` schema.
+required:
+  - asset
+  - upload
+properties:
+  asset:
+    $ref: ./Asset.yaml
+    description: The reserved asset.
+  upload:
+    $ref: ./UploadGrant.yaml
+    description: The form to post the file with.
+examples:
+  - asset:
+      bucket: zippygo-public
+      content_type: image/png
+      crop:
+        height: 440
+        width: 440
+        x: 115
+        y: 0
+      destination: public
+      discard_reason: example
+      discarded_at: 2026-10-15T09:00:00Z
+      file_name: logo.png
+      granted_at: 2026-10-15T09:00:00Z
+      height: 447
+      id: 01a13a48-9e00-7000-8000-00000000a014
+      location_id: 01a13a48-9e00-7000-8000-00000000a014
+      owner_user_id: 01a13a48-9e00-7000-8000-00000000a014
+      partner_id: 01a13a48-9e00-7000-8000-00000000a014
+      purpose: vertical_image
+      recipe: {}
+      requested_by: 01a13a48-9e00-7000-8000-00000000a014
+      restricted: true
+      size_bytes: 48213
+      source_asset_id: 01a13a48-9e00-7000-8000-00000000a014
+      state: reserved
+      stored_at: 2026-10-15T09:00:00Z
+      url: http://localhost:9000/zippygo-public/verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+      version: 2
+      width: 670
+    upload:
+      content_type: image/png
+      expires_at: 2026-10-15T09:00:00Z
+      fields: {}
+      file_field: file
+      key: verticals/01a13a48-9e00-7000-8000-00000000f001/food.png
+      max_bytes: 2097152
+      url: http://localhost:9000/zippygo-public

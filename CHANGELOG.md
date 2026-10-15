@@ -6,6 +6,30 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-15
+
+### Added
+
+- Digital assets (specification `digital-assets`, tag `Assets`): the
+  catalogue of purposes (`GET /v1/assets/purposes`), each deciding the
+  destination, folder, ceiling, exact types, restriction and who may
+  upload; grants as five-minute presigned forms to post a file straight to
+  object storage (`POST /v1/assets/grants` for platform purposes,
+  `POST /v1/partners/{partner_id}/assets/grants` for a Partner's and its
+  Locations'), refused with `unsupported_file_type` or `file_too_large`
+  before any byte is sent; confirmation reading every fact back from the
+  destination (`POST /v1/assets/{asset_id}/confirm`), `409` until the file
+  lands and `asset_not_usable` once discarded; the asset with its state and
+  address (`GET`, `DELETE /v1/assets/{asset_id}`); lossless crops as
+  recipes (`POST /v1/assets/{asset_id}/crops`, `crop_outside`); ten-minute
+  signed links to restricted files (`GET /v1/assets/{asset_id}/link`);
+  renditions `thumb`, `card` and `hero` by redirect
+  (`GET /v1/assets/{asset_id}/renditions/{name}`, public).
+- `HealthChecks.object_storage`: the object store in the detailed health.
+- A Vertical image, a category icon or a campaign slot's artwork that is
+  not a stored asset of the purpose is refused with `409`
+  (`asset_not_usable`).
+
 ## [0.6.0] - 2026-10-15
 
 ### Added
