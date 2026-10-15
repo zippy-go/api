@@ -10710,6 +10710,10 @@ export type MenuItem = {
      */
     allergens: Array<string>;
     /**
+     * Its search tags, lower case; search files the item under them.
+     */
+    tags: Array<string>;
+    /**
      * Its brand's name.
      */
     brand: string | null;

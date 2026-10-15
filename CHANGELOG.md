@@ -68,6 +68,9 @@ Additive only.
   only on a store's public channel `store-{location_id}-menu`, and
   `catalog.changed` with the kind and id of what changed and the
   catalogue revision on `private-location-{location_id}-catalog`.
+- Refined after the slice was first pushed, additively: `MenuItem.tags`,
+  an item's search tags, on every menu item the store pages and search
+  answer with.
 
 ### Changed
 

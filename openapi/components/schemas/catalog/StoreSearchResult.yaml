@@ -56,6 +56,8 @@ examples:
         dietary:
           - halal
         allergens: []
+        tags:
+          - dum
         brand: null
         pictures:
           - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
