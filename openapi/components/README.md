@@ -12,7 +12,7 @@ components/
                    token signing keys: JsonWebKeySet, JsonWebKey
     auth/          Signing in and sessions: Audience, Delivery, OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
                    PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, SignOutRequest, TokenResponse, User,
-                   Me, MeAccount, MeMembership, MePlatform, MeAgentMembership; two-step sign-in: TwoStepChallenge,
+                   Me, MeAccount, MeMembership, MePlatform, MeAgentMembership, MeImpersonation; two-step sign-in: TwoStepChallenge,
                    TwoStepVerifyRequest, TwoStepSetup, CodeConfirmRequest, RecoveryCodes, PasswordProof; password
                    links: PasswordResetLinkRequest, PasswordReset; step-up: StepUpRequest, StepUpCodeRequest;
                    address changes: IdentifierChangeRequest, IdentifierChange; jobs: ServiceTokenRequest, ServiceToken
@@ -63,7 +63,7 @@ components/
                    AssetDestination, AssetGrantRequest, PartnerAssetGrantRequest, AssetGrant, UploadGrant, AssetConfirm,
                    AssetCrop, CropRect, SignedLink
     <domain>/      One folder per further domain, one file per schema
-  parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath, ClientTypeHeader,
+  parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath,
                    IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader
   headers/         Shared response headers: ETag
   responses/       Shared responses such as the standard error responses (planned)

@@ -4,6 +4,8 @@ description: >-
 required:
   - challenge_id
   - code
+  - audience
+  - delivery
 properties:
   challenge_id:
     type: string
@@ -20,15 +22,11 @@ properties:
     examples:
       - '123456'
   audience:
-    oneOf:
-      - $ref: ./Audience.yaml
-      - type: 'null'
-    description: The surface the code was asked for. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`); without it the client keeps the step 1 behaviour.
+    $ref: ./Audience.yaml
+    description: The surface the code was asked for, required (`validation_failed` with `audience_required` on `/audience`).
   delivery:
-    oneOf:
-      - $ref: ./Delivery.yaml
-      - type: 'null'
-    description: How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
+    $ref: ./Delivery.yaml
+    description: How the session's refresh token travels, required (`delivery_required` on `/delivery`), `cookie` for browsers or `body` for apps; bound to the session for good.
 examples:
   - challenge_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a23
     code: '123456'

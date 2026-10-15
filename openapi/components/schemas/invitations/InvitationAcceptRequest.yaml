@@ -1,10 +1,12 @@
 type: object
 description: |
-  The request body of `POST /v1/invitations/{token}/accept`. `display_name`
-  is used only when the call creates the user and `password` only when the
-  user has no password yet; a person who already has an account keeps
-  their name and password, and may send an empty body or none at all.
-  `delivery` says how the new session's refresh token travels.
+  The request body of `POST /v1/invitations/{token}/accept`. `delivery`,
+  required, says how the new session's refresh token travels.
+  `display_name` is used only when the call creates the user and
+  `password` only when the user has no password yet; a person who already
+  has an account keeps their name and password.
+required:
+  - delivery
 properties:
   display_name:
     type: string
@@ -20,11 +22,9 @@ properties:
     examples:
       - example-passphrase-2026
   delivery:
-    oneOf:
-      - $ref: ../auth/Delivery.yaml
-      - type: 'null'
+    $ref: ../auth/Delivery.yaml
     description: >-
-      How the refresh token of the new session travels, `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform, the Partner console otherwise. Omitted, the client keeps the step 1 behaviour: the `zg_refresh` cookie unless it sends `X-Client-Type: native`.
+      How the refresh token of the new session travels, required (`validation_failed` with `delivery_required` on `/delivery`): `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform (with no role while it waits for approval), the Partner console otherwise.
 examples:
   - display_name: User 21
     password: example-passphrase-2026

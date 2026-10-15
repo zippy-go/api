@@ -35,7 +35,7 @@ post:
           schema:
             $ref: ../../components/schemas/auth/OtpChallenge.yaml
     '400':
-      description: The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
+      description: The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, `audience_required` on `/audience` without a surface, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
       content:
         application/problem+json:
           schema:

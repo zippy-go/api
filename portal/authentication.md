@@ -43,12 +43,12 @@ names its surface in `audience` and says how the refresh token travels in
 - `body`, for mobile and desktop apps: the refresh token comes in
   `refresh_token`; keep it in the platform's secure storage.
 
-The choice is bound to the session for good. A client that names no
-audience keeps the step 1 behaviour: the `zg_refresh` cookie, or the body
-when it sends `X-Client-Type: native`, and a password sign-in that opens
-Mission Control for platform staff and the Partner console for everyone
-else. New clients always name the audience; a later minor retires the
-step 1 behaviour once the web consoles send theirs.
+The choice is bound to the session for good. Both are required on every
+sign-in: without `audience` the answer is `400` `validation_failed` with
+`audience_required` on `/audience`, without `delivery` the same with
+`delivery_required`. Since 0.10.0 there is no sign-in without a surface: the
+`zg_refresh` cookie, the `X-Client-Type` header and the password sign-in
+that opened Mission Control for platform staff unasked are gone.
 
 ## One-time codes
 
@@ -242,10 +242,25 @@ state, with every grant and the permissions it carries.
 
 `POST /v1/auth/sign-out` ends the session of the bearer token, or of the
 refresh cookie or body token when the access token has expired, and clears
-the cookie; with `{"everywhere": true}` it ends every session of the user
-on every surface. It always answers `204`. A Mission Control access token
-stops working on its next request; other access tokens stay valid until
-their `exp`, at most 15 minutes, so discard them.
+the surface's cookie; with `{"everywhere": true}` it ends every session of
+the user on every surface. It answers `204`, whether or not a session was
+left to end. A Mission Control access token stops working on its next
+request; other access tokens stay valid until their `exp`, at most 15
+minutes, so discard them.
+
+## Viewing a Partner's console with consent
+
+Platform staff view a Partner's console as one of its owners only with that
+owner's consent, through a view-as token from
+`POST /v1/platform/impersonation/sessions`. It carries `act` and reaches
+the consented Partner and nothing else: any other Partner of the owner's
+answers `404` as if it did not exist, `GET /v1/me` lists the consented
+membership alone and says who views in `impersonation`, a viewing-only
+consent refuses every change (`403` `impersonation_read_only`), and a
+consent allowing changes still refuses anything outside that Partner,
+the owner's password, two-step, sign-out and new Partners included (`403`
+`forbidden`). The member ends it at
+`POST /v1/platform/impersonation/sessions/{impersonation_id}/end`.
 
 ## Refreshing
 
@@ -409,7 +424,11 @@ operations.
 On the Partner console, everything belongs to a partner. A new user has no
 memberships yet (`GET /v1/me` returns an empty list), creates a partner
 with `POST /v1/partners` and becomes its owner, or joins an existing one
-by accepting an invitation. What a member may do is decided by the roles
+by accepting an invitation. An invitation into the platform opens Mission
+Control even before a role is granted: until a second administrator
+approves the role it was proposed with, the session reaches `GET /v1/me`
+(no roles), the two-step set-up and sign-out, and everything else answers
+`403` `access_denied`. What a member may do is decided by the roles
 they are granted, at the whole partner or at chosen Locations and
 Services; the *Access* tag of the reference has the details.
 [Getting started](/getting-started) continues from there.

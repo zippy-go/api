@@ -22,7 +22,7 @@ and its status is part of the contract.
 
 | Status | Codes |
 | --- | --- |
-| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak`, `gstin_invalid`, `pan_invalid`, `ifsc_invalid`, `delivery_required`, `code_invalid`, `audience_not_allowed` or one of the `filter_*` and `sort_*` codes), `channel_unknown`, `unknown_permission`, `invalid_scope` |
+| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak`, `gstin_invalid`, `pan_invalid`, `ifsc_invalid`, `audience_required`, `delivery_required`, `code_invalid`, `audience_not_allowed` or one of the `filter_*` and `sort_*` codes), `channel_unknown`, `unknown_permission`, `invalid_scope` |
 | 401 | `unauthenticated`, `authentication_failed`, `invalid_code`, `code_expired` |
 | 403 | `forbidden`, `not_in_plan`, `access_denied` and `not_enabled_for_partner` (each naming the permission), `permission_escalation`, `no_location_assigned`, `step_up_required`, `two_step_setup_required`, `self_approval`, `consent_required`, `impersonation_read_only` |
 | 404 | `not_found`, also for another tenant's record, identical to an id that never existed |

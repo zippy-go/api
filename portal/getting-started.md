@@ -59,10 +59,10 @@ Sign in with a one-time code and keep the `access_token` from the response
 ```sh
 curl -X POST https://sandbox.api.zippygo.example/v1/auth/otp/request \
   -H "Content-Type: application/json" \
-  -d '{"channel":"email","identifier":"owner@example.com"}'
+  -d '{"channel":"email","identifier":"owner@example.com","audience":"partner"}'
 curl -X POST https://sandbox.api.zippygo.example/v1/auth/otp/verify \
   -H "Content-Type: application/json" \
-  -d '{"challenge_id":"<challenge_id from the first call>","code":"<code from the email>"}'
+  -d '{"challenge_id":"<challenge_id from the first call>","code":"<code from the email>","audience":"partner","delivery":"body"}'
 ```
 
 Create the partner:

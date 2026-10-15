@@ -13,7 +13,11 @@ post:
     (named by `audience`) or the body's `refresh_token` belongs to. Its
     refresh token can no longer be used; a Mission Control access token is
     refused from the next request, other access tokens stay valid until their
-    `exp`, at most 15 minutes, and clients discard them.
+    `exp`, at most 15 minutes, and clients discard them. Only the cookie of
+    the surface named by `audience`, or the bearer token's, is cleared. A
+    view-as (impersonation) token signs nobody out: `403` (`forbidden`); the
+    platform member ends the view-as session at
+    `POST /v1/platform/impersonation/sessions/{impersonation_id}/end`.
   tags:
     - Auth
   security:
@@ -31,11 +35,17 @@ post:
       description: The session (or every session) ended, or there was nothing to end.
       headers:
         Set-Cookie:
-          description: Clears the refresh cookie (`<name>=; Path=/v1/auth; Max-Age=0; HttpOnly; Secure; SameSite=Strict`).
+          description: Clears the refresh cookie of the surface (`<name>=; Path=/v1/auth; Max-Age=0; HttpOnly; Secure; SameSite=Strict`).
           schema:
             type: string
     '400':
       description: The body is not a readable `SignOutRequest` (`validation_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: A view-as (impersonation) token, which signs nobody out (`forbidden`).
       content:
         application/problem+json:
           schema:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.9.0
+  version: 0.10.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -63,9 +63,10 @@ tags:
       `httpOnly` cookie named for the surface (`zg_refresh_partner`,
       `zg_refresh_platform`, `zg_refresh_agent`) and scoped to `/v1/auth`,
       or `body` for apps, which receive `refresh_token` and keep it in the
-      platform keystore. A client that names no audience keeps the step 1
-      behaviour: the `zg_refresh` cookie, or the body when it sends
-      `X-Client-Type: native`. A refresh token is valid for the surface's
+      platform keystore. Both are required on every sign-in
+      (`audience_required`, `delivery_required`); the step 1 sign-in that
+      named no surface, its `zg_refresh` cookie and the `X-Client-Type`
+      header are retired. A refresh token is valid for the surface's
       idle limit and the session ends at its absolute limit whatever the
       refreshes: fourteen and ninety days on the Partner console, thirty and
       one hundred and eighty days on the Agent app, sixty minutes and twelve
@@ -561,8 +562,6 @@ components:
   parameters:
     PartnerIdQuery:
       $ref: ./components/parameters/PartnerIdQuery.yaml
-    ClientTypeHeader:
-      $ref: ./components/parameters/ClientTypeHeader.yaml
     PartnerIdPath:
       $ref: ./components/parameters/PartnerIdPath.yaml
     IdempotencyKeyHeader:
@@ -678,6 +677,8 @@ components:
       $ref: ./components/schemas/auth/MeAgentMembership.yaml
     MePlatform:
       $ref: ./components/schemas/auth/MePlatform.yaml
+    MeImpersonation:
+      $ref: ./components/schemas/auth/MeImpersonation.yaml
     MeMembership:
       $ref: ./components/schemas/auth/MeMembership.yaml
     # Partners

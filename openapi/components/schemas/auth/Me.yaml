@@ -38,6 +38,11 @@ properties:
     description: On the Agent app, every agent membership, one per Service; empty on the other surfaces.
     items:
       $ref: ./MeAgentMembership.yaml
+  impersonation:
+    oneOf:
+      - $ref: ./MeImpersonation.yaml
+      - type: 'null'
+    description: Under a view-as (impersonation) token, who views which one Partner; `memberships` then lists that Partner alone and the account shows no address change in progress. `null` for the person's own session.
 examples:
   - user:
       id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
@@ -101,3 +106,4 @@ examples:
     platform: null
     platform_roles: []
     agent_memberships: []
+    impersonation: null

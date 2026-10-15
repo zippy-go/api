@@ -208,9 +208,8 @@ export const requestOtp = <ThrowOnError extends boolean = false>(options: Option
  * Exchanges a one-time code for a session on the surface the code was
  * asked for. Name the surface in `audience` and say how the refresh token
  * travels in `delivery`: `cookie` sets it in the surface's `httpOnly`
- * cookie, `body` returns it in `refresh_token`. A client that names no
- * audience keeps the step 1 behaviour (the `zg_refresh` cookie, or the
- * body with `X-Client-Type: native`). The first successful verification
+ * cookie, `body` returns it in `refresh_token`; both are required
+ * (`audience_required`, `delivery_required`). The first successful verification
  * for an identifier creates the user, with the email address or the phone
  * number the code was sent to.
  *
@@ -244,10 +243,8 @@ export const verifyOtp = <ThrowOnError extends boolean = false>(options: Options
  *
  * Exchanges an email address and a password for a session on one surface,
  * named in `audience` (`partner`, `platform` or `agent`), with the refresh
- * token delivered as `delivery` says, as for `POST /v1/auth/otp/verify`. A
- * client that names no audience keeps the step 1 behaviour: it signs in to
- * Mission Control when the account holds platform access and to the
- * Partner console otherwise.
+ * token delivered as `delivery` says, as for `POST /v1/auth/otp/verify`. Both
+ * are required (`audience_required`, `delivery_required`).
  *
  * An unknown email address, a wrong password, a user without a password, a
  * disabled account and a surface the account may not enter all answer
@@ -323,8 +320,7 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
  * cookie (`zg_refresh_partner`, `zg_refresh_platform` or
  * `zg_refresh_agent`), scoped to `/v1/auth`. Send `{ "audience": "<surface>" }`
  * so the right cookie is read; the response sets the new one and
- * `refresh_token` stays `null`. A browser that signed in without an
- * audience sends no body and uses the `zg_refresh` cookie.
+ * `refresh_token` stays `null`.
  * - Body delivery: send the refresh token in `refresh_token` and receive the
  * new one in the body.
  *
@@ -335,15 +331,17 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
  * token, and the user has to sign in again. A missing, unknown or spent
  * token, and a session that ended (signed out, revoked, idle or past its
  * absolute lifetime, or on a surface the user may no longer enter), answer
- * `401` (`unauthenticated`).
+ * `401` (`unauthenticated`). A request with neither a refresh token nor a
+ * surface answers `400` (`validation_failed` with `audience_required` on
+ * `/audience`).
  *
  */
-export const refreshSession = <ThrowOnError extends boolean = false>(options?: Options<RefreshSessionData, ThrowOnError>): RequestResult<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError> => (options?.client ?? client).post<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError>({
+export const refreshSession = <ThrowOnError extends boolean = false>(options: Options<RefreshSessionData, ThrowOnError>): RequestResult<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError> => (options.client ?? client).post<RefreshSessionResponses, RefreshSessionErrors, ThrowOnError>({
     url: '/v1/auth/refresh',
     ...options,
     headers: {
         'Content-Type': 'application/json',
-        ...options?.headers
+        ...options.headers
     }
 });
 
@@ -360,7 +358,11 @@ export const refreshSession = <ThrowOnError extends boolean = false>(options?: O
  * (named by `audience`) or the body's `refresh_token` belongs to. Its
  * refresh token can no longer be used; a Mission Control access token is
  * refused from the next request, other access tokens stay valid until their
- * `exp`, at most 15 minutes, and clients discard them.
+ * `exp`, at most 15 minutes, and clients discard them. Only the cookie of
+ * the surface named by `audience`, or the bearer token's, is cleared. A
+ * view-as (impersonation) token signs nobody out: `403` (`forbidden`); the
+ * platform member ends the view-as session at
+ * `POST /v1/platform/impersonation/sessions/{impersonation_id}/end`.
  *
  */
 export const signOut = <ThrowOnError extends boolean = false>(options?: Options<SignOutData, ThrowOnError>): RequestResult<SignOutResponses, SignOutErrors, ThrowOnError> => (options?.client ?? client).post<SignOutResponses, SignOutErrors, ThrowOnError>({
@@ -1292,10 +1294,14 @@ export const revokeInvitation = <ThrowOnError extends boolean = false>(options: 
  * body may be empty or absent; a `password` is used only when the user
  * has none yet. The membership is created with the invitation's role at
  * its places. The response carries the session, for the surface the
- * invitation was for (Mission Control for an invitation into the platform,
- * the Partner console otherwise) and delivered as `delivery` says or, when
- * it is omitted, as in step 1 (see the `Auth` tag), and the new
- * membership. When the invitee has two-step sign-in on, the answer is
+ * invitation was for, delivered as `delivery` (required) says, and the new
+ * membership. An invitation into the platform opens Mission Control
+ * (audience `platform`, the `zg_refresh_platform` cookie) even while the
+ * person's first role waits for a second administrator's approval: until
+ * then the session reaches `GET /v1/me` (no roles), the two-step set-up
+ * and sign-out, and every other Mission Control operation answers `403`
+ * (`access_denied` naming `platform:access`); it lives on at its refresh
+ * meanwhile. When the invitee has two-step sign-in on, the answer is
  * `202`: the membership exists and the session waits for an authenticator
  * or recovery code at `POST /v1/auth/two-step/verify`.
  *
@@ -1896,7 +1902,7 @@ export const listImpersonations = <ThrowOnError extends boolean = false>(options
 /**
  * Start viewing a partner's console
  *
- * Starts viewing a Partner's console as the owner who consented: the member who asked, `impersonate`, while the consent lasts (`consent_required` otherwise). Sixty minutes at most; the owner is told when it starts and ends.
+ * Starts viewing a Partner's console as the owner who consented: the member who asked, `impersonate`, while the consent lasts (`consent_required` otherwise). Sixty minutes at most; the owner is told when it starts and ends. The view-as token reaches that one Partner and nothing else of the owner's: every other Partner answers `404` as if it did not exist, `GET /v1/me` lists the consented membership alone with `impersonation` saying who views, a viewing-only consent refuses every change (`impersonation_read_only`), and a consent allowing changes still refuses anything outside that Partner, the owner's account included (`forbidden`).
  */
 export const startImpersonation = <ThrowOnError extends boolean = false>(options: Options<StartImpersonationData, ThrowOnError>): RequestResult<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError> => (options.client ?? client).post<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

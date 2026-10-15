@@ -28,12 +28,17 @@ errors:
           The password sent when setting or changing a password, or when
           choosing one while accepting an invitation, does not meet the
           policy. The `errors` entry points at the field that carried it.
+      - code: audience_required
+        message: "Say which surface: partner, platform or agent."
+        description: >-
+          A sign-in names the surface its session is for, and a refresh read
+          from a cookie names whose cookie; the step 1 sign-in without a
+          surface is retired.
       - code: delivery_required
         message: "Say how the tokens travel: cookie or body."
         description: >-
-          A sign-in that names its audience must state the delivery of its
-          refresh token, `cookie` for browsers or `body` for apps; it binds
-          to the session for good.
+          A sign-in states the delivery of its refresh token, `cookie` for
+          browsers or `body` for apps; it binds to the session for good.
       - code: code_invalid
         message: The code does not match, or has expired.
         description: >-

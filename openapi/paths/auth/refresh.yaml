@@ -11,8 +11,7 @@ post:
       cookie (`zg_refresh_partner`, `zg_refresh_platform` or
       `zg_refresh_agent`), scoped to `/v1/auth`. Send `{ "audience": "<surface>" }`
       so the right cookie is read; the response sets the new one and
-      `refresh_token` stays `null`. A browser that signed in without an
-      audience sends no body and uses the `zg_refresh` cookie.
+      `refresh_token` stays `null`.
     - Body delivery: send the refresh token in `refresh_token` and receive the
       new one in the body.
 
@@ -23,13 +22,15 @@ post:
     token, and the user has to sign in again. A missing, unknown or spent
     token, and a session that ended (signed out, revoked, idle or past its
     absolute lifetime, or on a surface the user may no longer enter), answer
-    `401` (`unauthenticated`).
+    `401` (`unauthenticated`). A request with neither a refresh token nor a
+    surface answers `400` (`validation_failed` with `audience_required` on
+    `/audience`).
   tags:
     - Auth
   security: []
   requestBody:
-    required: false
-    description: The refresh token for body delivery, or the surface whose cookie carries it. A browser that signed in without an audience sends no body.
+    required: true
+    description: The refresh token for body delivery, or the surface whose cookie carries it.
     content:
       application/json:
         schema:
@@ -46,6 +47,12 @@ post:
         application/json:
           schema:
             $ref: ../../components/schemas/auth/TokenResponse.yaml
+    '400':
+      description: Neither a refresh token nor the surface whose cookie carries one was sent (`validation_failed` with `audience_required` on `/audience`), or the body is not a readable `RefreshRequest`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '401':
       description: No refresh token was sent, or it is unknown or spent, or the session ended (`unauthenticated`). Sign in again.
       headers:

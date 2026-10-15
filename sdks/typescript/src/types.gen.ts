@@ -456,9 +456,9 @@ export type OtpRequest = {
      */
     identifier: string;
     /**
-     * The surface the code signs in to: `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`validation_failed` with `audience_not_allowed` on `/audience`). Omitted, the code signs in to the Partner console, as in step 1.
+     * The surface the code signs in to, required (`validation_failed` with `audience_required` on `/audience`): `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`audience_not_allowed`).
      */
-    audience?: Audience | null;
+    audience: Audience;
 };
 
 /**
@@ -496,13 +496,13 @@ export type OtpVerifyRequest = {
      */
     code: string;
     /**
-     * The surface the code was asked for. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`); without it the client keeps the step 1 behaviour.
+     * The surface the code was asked for, required (`validation_failed` with `audience_required` on `/audience`).
      */
-    audience?: Audience | null;
+    audience: Audience;
     /**
-     * How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
+     * How the session's refresh token travels, required (`delivery_required` on `/delivery`), `cookie` for browsers or `body` for apps; bound to the session for good.
      */
-    delivery?: Delivery | null;
+    delivery: Delivery;
 };
 
 /**
@@ -518,13 +518,13 @@ export type PasswordSignInRequest = {
      */
     password: string;
     /**
-     * The surface signed in to: `partner`, `platform` or `agent`. With it, `delivery` is required (`validation_failed` with `delivery_required` on `/delivery`). A client that omits it keeps the step 1 behaviour: it signs in to Mission Control when the account holds platform access and to the Partner console otherwise.
+     * The surface signed in to, required (`validation_failed` with `audience_required` on `/audience`): `partner`, `platform` or `agent`.
      */
-    audience?: Audience | null;
+    audience: Audience;
     /**
-     * How the session's refresh token travels, `cookie` for browsers or `body` for apps; bound to the session for good.
+     * How the session's refresh token travels, required (`delivery_required` on `/delivery`), `cookie` for browsers or `body` for apps; bound to the session for good.
      */
-    delivery?: Delivery | null;
+    delivery: Delivery;
 };
 
 /**
@@ -549,8 +549,8 @@ export type PasswordChangeRequest = {
 /**
  * The request body of `POST /v1/auth/refresh`. A client with body delivery
  * sends the refresh token it holds; a browser with cookie delivery sends
- * the surface whose cookie carries it (`audience`), or no body at all when
- * it signed in without an audience and keeps the `zg_refresh` cookie.
+ * the surface whose cookie carries it (`audience`). Neither is
+ * `validation_failed` with `audience_required` on `/audience`.
  *
  */
 export type RefreshRequest = {
@@ -619,7 +619,7 @@ export type TokenResponse = {
      */
     expires_in: number;
     /**
-     * The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body` (or, without an audience, sent `X-Client-Type: native`). `null` with cookie delivery, whose refresh token is in the surface's cookie.
+     * The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body`. `null` with cookie delivery, whose refresh token is in the surface's cookie.
      */
     refresh_token: string | null;
     /**
@@ -668,6 +668,10 @@ export type Me = {
      * On the Agent app, every agent membership, one per Service; empty on the other surfaces.
      */
     agent_memberships: Array<MeAgentMembership>;
+    /**
+     * Under a view-as (impersonation) token, who views which one Partner; `memberships` then lists that Partner alone and the account shows no address change in progress. `null` for the person's own session.
+     */
+    impersonation?: MeImpersonation | null;
 };
 
 /**
@@ -982,6 +986,36 @@ export type MePlatform = {
      * Every platform grant, each with its role and the permissions of that role.
      */
     grants: Array<AccessGrant>;
+};
+
+/**
+ * In `GET /v1/me` under a view-as (impersonation) token: who views, which one Partner, whether changes are allowed and until when. The token reaches that Partner and nothing else of the owner's.
+ */
+export type MeImpersonation = {
+    /**
+     * The impersonation session.
+     */
+    impersonation_id: string;
+    /**
+     * The one Partner the owner's consent covers.
+     */
+    partner_id: string;
+    /**
+     * The platform member viewing.
+     */
+    member_user_id: string;
+    /**
+     * Their name, when they gave one.
+     */
+    member_display_name: string | null;
+    /**
+     * Whether the owner allowed changes; viewing only otherwise.
+     */
+    writes_allowed: boolean;
+    /**
+     * When the view-as token stops working.
+     */
+    expires_at: string;
 };
 
 /**
@@ -1801,11 +1835,11 @@ export type InvitationList = {
 };
 
 /**
- * The request body of `POST /v1/invitations/{token}/accept`. `display_name`
- * is used only when the call creates the user and `password` only when the
- * user has no password yet; a person who already has an account keeps
- * their name and password, and may send an empty body or none at all.
- * `delivery` says how the new session's refresh token travels.
+ * The request body of `POST /v1/invitations/{token}/accept`. `delivery`,
+ * required, says how the new session's refresh token travels.
+ * `display_name` is used only when the call creates the user and
+ * `password` only when the user has no password yet; a person who already
+ * has an account keeps their name and password.
  *
  */
 export type InvitationAcceptRequest = {
@@ -1818,9 +1852,9 @@ export type InvitationAcceptRequest = {
      */
     password?: string;
     /**
-     * How the refresh token of the new session travels, `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform, the Partner console otherwise. Omitted, the client keeps the step 1 behaviour: the `zg_refresh` cookie unless it sends `X-Client-Type: native`.
+     * How the refresh token of the new session travels, required (`validation_failed` with `delivery_required` on `/delivery`): `cookie` (browsers) or `body` (apps). The session is for the surface the invitation was for: Mission Control for an invitation into the platform (with no role while it waits for approval), the Partner console otherwise.
      */
-    delivery?: Delivery | null;
+    delivery: Delivery;
 };
 
 /**
@@ -7303,16 +7337,6 @@ export type UploadGrant = {
 export type PartnerIdQuery = string;
 
 /**
- * How the client keeps its refresh token. Send `native` from a mobile or
- * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
- * then returned in `refresh_token` in the response body. Without the header
- * the client is treated as a browser: the refresh token is set in the
- * `zg_refresh` cookie and `refresh_token` in the body is `null`.
- *
- */
-export type ClientTypeHeader = 'native';
-
-/**
  * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
  */
 export type PartnerIdPath = string;
@@ -7658,7 +7682,7 @@ export type RequestOtpData = {
 
 export type RequestOtpErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
+     * The body failed validation (`validation_failed`), for example an identifier that is not an email address or an E.164 phone number for the channel, `audience_required` on `/audience` without a surface, or `audience_not_allowed` on `/audience` for Mission Control. The `errors` member points at the offending field.
      */
     400: Problem;
     /**
@@ -7695,17 +7719,6 @@ export type VerifyOtpData = {
      * The challenge from `POST /v1/auth/otp/request`, the code that was delivered for it, the surface and the delivery.
      */
     body: OtpVerifyRequest;
-    headers?: {
-        /**
-         * How the client keeps its refresh token. Send `native` from a mobile or
-         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
-         * then returned in `refresh_token` in the response body. Without the header
-         * the client is treated as a browser: the refresh token is set in the
-         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
-         *
-         */
-        'X-Client-Type'?: 'native';
-    };
     path?: never;
     query?: never;
     url: '/v1/auth/otp/verify';
@@ -7713,7 +7726,7 @@ export type VerifyOtpData = {
 
 export type VerifyOtpErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID, a code that is not six digits, `delivery_required` on `/delivery` when an audience is named without a delivery, or `audience_not_allowed` on `/audience`.
+     * The body failed validation (`validation_failed`), for example a `challenge_id` that is not a UUID, a code that is not six digits, `audience_required` on `/audience` and `delivery_required` on `/delivery` when either is missing, or `audience_not_allowed` on `/audience`.
      */
     400: Problem;
     /**
@@ -7754,17 +7767,6 @@ export type SignInWithPasswordData = {
      * The email address, the password, the surface and the delivery.
      */
     body: PasswordSignInRequest;
-    headers?: {
-        /**
-         * How the client keeps its refresh token. Send `native` from a mobile or
-         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
-         * then returned in `refresh_token` in the response body. Without the header
-         * the client is treated as a browser: the refresh token is set in the
-         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
-         *
-         */
-        'X-Client-Type'?: 'native';
-    };
     path?: never;
     query?: never;
     url: '/v1/auth/password/sign-in';
@@ -7772,7 +7774,7 @@ export type SignInWithPasswordData = {
 
 export type SignInWithPasswordErrors = {
     /**
-     * The body failed validation (`validation_failed`), for example an `email` that is not an email address, `delivery_required` on `/delivery` when an audience is named without a delivery, or `audience_not_allowed` on `/audience`.
+     * The body failed validation (`validation_failed`), for example an `email` that is not an email address, `audience_required` on `/audience` and `delivery_required` on `/delivery` when either is missing, or `audience_not_allowed` on `/audience`.
      */
     400: Problem;
     /**
@@ -7858,15 +7860,19 @@ export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswor
 
 export type RefreshSessionData = {
     /**
-     * The refresh token for body delivery, or the surface whose cookie carries it. A browser that signed in without an audience sends no body.
+     * The refresh token for body delivery, or the surface whose cookie carries it.
      */
-    body?: RefreshRequest;
+    body: RefreshRequest;
     path?: never;
     query?: never;
     url: '/v1/auth/refresh';
 };
 
 export type RefreshSessionErrors = {
+    /**
+     * Neither a refresh token nor the surface whose cookie carries one was sent (`validation_failed` with `audience_required` on `/audience`), or the body is not a readable `RefreshRequest`.
+     */
+    400: Problem;
     /**
      * No refresh token was sent, or it is unknown or spent, or the session ended (`unauthenticated`). Sign in again.
      */
@@ -7907,6 +7913,10 @@ export type SignOutErrors = {
      * The body is not a readable `SignOutRequest` (`validation_failed`).
      */
     400: Problem;
+    /**
+     * A view-as (impersonation) token, which signs nobody out (`forbidden`).
+     */
+    403: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
      */
@@ -11096,18 +11106,7 @@ export type AcceptInvitationData = {
     /**
      * The details of the user to create, a password for a user who has none, and the delivery of the session's refresh token.
      */
-    body?: InvitationAcceptRequest;
-    headers?: {
-        /**
-         * How the client keeps its refresh token. Send `native` from a mobile or
-         * desktop app that cannot hold an `httpOnly` cookie: the refresh token is
-         * then returned in `refresh_token` in the response body. Without the header
-         * the client is treated as a browser: the refresh token is set in the
-         * `zg_refresh` cookie and `refresh_token` in the body is `null`.
-         *
-         */
-        'X-Client-Type'?: 'native';
-    };
+    body: InvitationAcceptRequest;
     path: {
         /**
          * The invitation token from the link in the invitation email. It is opaque, single use and never returned by the API.
@@ -11120,7 +11119,7 @@ export type AcceptInvitationData = {
 
 export type AcceptInvitationErrors = {
     /**
-     * The body failed validation (`validation_failed`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
+     * The body failed validation (`validation_failed`), for example no `delivery` (`delivery_required` on `/delivery`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
      */
     400: Problem;
     /**

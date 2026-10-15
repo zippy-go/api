@@ -40,7 +40,7 @@ properties:
       - string
       - 'null'
     description: >-
-      The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body` (or, without an audience, sent `X-Client-Type: native`). `null` with cookie delivery, whose refresh token is in the surface's cookie.
+      The refresh token for `POST /v1/auth/refresh`, present only when the client signed in with `delivery: body`. `null` with cookie delivery, whose refresh token is in the surface's cookie.
     examples:
       - c2FtcGxlLXJlZnJlc2gtdG9rZW4
   user:

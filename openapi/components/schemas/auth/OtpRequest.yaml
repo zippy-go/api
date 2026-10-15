@@ -4,6 +4,7 @@ description: >-
 required:
   - channel
   - identifier
+  - audience
 properties:
   channel:
     $ref: ./OtpChannel.yaml
@@ -16,11 +17,9 @@ properties:
     examples:
       - owner@example.com
   audience:
-    oneOf:
-      - $ref: ./Audience.yaml
-      - type: 'null'
+    $ref: ./Audience.yaml
     description: >-
-      The surface the code signs in to: `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`validation_failed` with `audience_not_allowed` on `/audience`). Omitted, the code signs in to the Partner console, as in step 1.
+      The surface the code signs in to, required (`validation_failed` with `audience_required` on `/audience`): `partner` (the Partner console) or `agent` (the Agent app). Mission Control is never offered a code (`audience_not_allowed`).
 examples:
   - channel: email
     identifier: owner@example.com

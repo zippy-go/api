@@ -6,6 +6,57 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-15
+
+A breaking minor: it retires the step 1 sign-in that 0.9.0 announced and
+the web consoles no longer use. oasdiff reports the removals as breaking;
+the coordinator accepted them under the founder's delegation instead of a
+new major, since no client outside this repository's consoles signs in yet.
+
+### Removed
+
+- The sign-in without a surface. `audience` is required on
+  `POST /v1/auth/otp/request` (`OtpRequest`); `audience` and `delivery` on
+  `POST /v1/auth/otp/verify` and `POST /v1/auth/password/sign-in`;
+  `delivery` on `POST /v1/invitations/{token}/accept`, whose body is now
+  required (the surface is the invitation's). A missing one answers `400`
+  `validation_failed` with `audience_required` (a new field code) or
+  `delivery_required` on its pointer. A refresh read from a cookie names
+  its surface in `audience` (`audience_required` otherwise).
+- The `zg_refresh` cookie, the `X-Client-Type` header (`ClientTypeHeader`)
+  and the password sign-in that opened Mission Control unasked for a
+  holder of platform access. Refresh cookies are always the surface's own
+  (`zg_refresh_partner`, `zg_refresh_platform`, `zg_refresh_agent`), and
+  sign-out and a password change clear that one only.
+
+### Added
+
+- `Me.impersonation` (`MeImpersonation`): under a view-as token, who views,
+  which one Partner, whether changes are allowed and until when.
+- The field code `audience_required`; a `400` on `POST /v1/auth/refresh`
+  for a request with neither a refresh token nor a surface; a `403` on
+  `POST /v1/auth/sign-out` for a view-as token.
+
+### Changed
+
+- A view-as (consented impersonation) token reaches the consented Partner
+  and nothing else of the owner's: any other Partner answers `404` as if it
+  did not exist, `GET /v1/me` lists that membership alone and shows no
+  address change in progress, a viewing-only consent refuses every change
+  (`impersonation_read_only`), and a consent allowing changes still refuses
+  anything outside that Partner (`forbidden`): another Partner, a new one,
+  the owner's password, two-step and sign-out, which no longer signs the
+  owner out everywhere. Before, such a token read every Partner of the
+  owner's and `GET /v1/me` listed all of them.
+- Accepting an invitation into the platform opens Mission Control
+  (audience `platform`, the `zg_refresh_platform` cookie) even while the
+  person's first role waits for a second administrator's approval; it
+  answered with a Partner console session before. Until the role is
+  granted the session reaches `GET /v1/me` (no roles), the two-step set-up
+  and sign-out, every other Mission Control operation answers `403`
+  `access_denied` naming `platform:access`, and the session lives on at
+  its refresh.
+
 ## [0.9.0] - 2026-10-15
 
 ### Added

@@ -49,7 +49,7 @@ get:
 post:
   operationId: startImpersonation
   summary: Start viewing a partner's console
-  description: "Starts viewing a Partner's console as the owner who consented: the member who asked, `impersonate`, while the consent lasts (`consent_required` otherwise). Sixty minutes at most; the owner is told when it starts and ends."
+  description: "Starts viewing a Partner's console as the owner who consented: the member who asked, `impersonate`, while the consent lasts (`consent_required` otherwise). Sixty minutes at most; the owner is told when it starts and ends. The view-as token reaches that one Partner and nothing else of the owner's: every other Partner answers `404` as if it did not exist, `GET /v1/me` lists the consented membership alone with `impersonation` saying who views, a viewing-only consent refuses every change (`impersonation_read_only`), and a consent allowing changes still refuses anything outside that Partner, the owner's account included (`forbidden`)."
   tags:
     - Oversight
   security:

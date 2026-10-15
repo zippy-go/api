@@ -18,7 +18,7 @@ post:
       description: Signed in.
       headers:
         Set-Cookie:
-          description: With cookie delivery, the refresh token in the cookie of the surface signed in to (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`; `zg_refresh` for a client that named no audience), `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
+          description: With cookie delivery, the refresh token in the cookie of the surface signed in to (`zg_refresh_partner`, `zg_refresh_platform` or `zg_refresh_agent`), `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
           schema:
             type: string
       content:

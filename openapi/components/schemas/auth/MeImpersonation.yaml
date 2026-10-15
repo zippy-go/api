@@ -1,0 +1,52 @@
+type: object
+description: >-
+  In `GET /v1/me` under a view-as (impersonation) token: who views, which one Partner, whether
+  changes are allowed and until when. The token reaches that Partner and nothing else of the
+  owner's.
+required:
+  - impersonation_id
+  - partner_id
+  - member_user_id
+  - member_display_name
+  - writes_allowed
+  - expires_at
+properties:
+  impersonation_id:
+    type: string
+    format: uuid
+    description: The impersonation session.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a61
+  partner_id:
+    type: string
+    format: uuid
+    description: The one Partner the owner's consent covers.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  member_user_id:
+    type: string
+    format: uuid
+    description: The platform member viewing.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+  member_display_name:
+    type:
+      - string
+      - 'null'
+    description: Their name, when they gave one.
+    examples:
+      - User 21
+  writes_allowed:
+    type: boolean
+    description: Whether the owner allowed changes; viewing only otherwise.
+  expires_at:
+    type: string
+    format: date-time
+    description: When the view-as token stops working.
+examples:
+  - impersonation_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a61
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    member_user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+    member_display_name: User 21
+    writes_allowed: false
+    expires_at: 2026-10-15T13:00:00Z

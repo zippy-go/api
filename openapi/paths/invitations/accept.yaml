@@ -20,10 +20,14 @@ post:
     body may be empty or absent; a `password` is used only when the user
     has none yet. The membership is created with the invitation's role at
     its places. The response carries the session, for the surface the
-    invitation was for (Mission Control for an invitation into the platform,
-    the Partner console otherwise) and delivered as `delivery` says or, when
-    it is omitted, as in step 1 (see the `Auth` tag), and the new
-    membership. When the invitee has two-step sign-in on, the answer is
+    invitation was for, delivered as `delivery` (required) says, and the new
+    membership. An invitation into the platform opens Mission Control
+    (audience `platform`, the `zg_refresh_platform` cookie) even while the
+    person's first role waits for a second administrator's approval: until
+    then the session reaches `GET /v1/me` (no roles), the two-step set-up
+    and sign-out, and every other Mission Control operation answers `403`
+    (`access_denied` naming `platform:access`); it lives on at its refresh
+    meanwhile. When the invitee has two-step sign-in on, the answer is
     `202`: the membership exists and the session waits for an authenticator
     or recovery code at `POST /v1/auth/two-step/verify`.
 
@@ -35,10 +39,8 @@ post:
   tags:
     - Invitations
   security: []
-  parameters:
-    - $ref: ../../components/parameters/ClientTypeHeader.yaml
   requestBody:
-    required: false
+    required: true
     description: The details of the user to create, a password for a user who has none, and the delivery of the session's refresh token.
     content:
       application/json:
@@ -50,7 +52,7 @@ post:
       headers:
         Set-Cookie:
           description: >-
-            With cookie delivery, the refresh token in the cookie of the invitation's surface (`zg_refresh_partner` or `zg_refresh_platform`; `zg_refresh` when `delivery` is omitted and no `X-Client-Type: native` is sent), `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
+            With cookie delivery, the refresh token in the cookie of the invitation's surface (`zg_refresh_partner` or `zg_refresh_platform`), `Path=/v1/auth; HttpOnly; Secure; SameSite=Strict`. Absent with body delivery.
           schema:
             type: string
       content:
@@ -64,7 +66,7 @@ post:
           schema:
             $ref: ../../components/schemas/invitations/InvitationSecondStep.yaml
     '400':
-      description: The body failed validation (`validation_failed`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
+      description: The body failed validation (`validation_failed`), for example no `delivery` (`delivery_required` on `/delivery`). A `password` that does not meet the policy is reported with the code `password_weak` on the `errors` entry that points at it.
       content:
         application/problem+json:
           schema:
