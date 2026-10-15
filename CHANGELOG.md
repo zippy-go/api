@@ -70,7 +70,9 @@ Additive only.
   catalogue revision on `private-location-{location_id}-catalog`.
 - Refined after the slice was first pushed, additively: `MenuItem.tags`,
   an item's search tags, on every menu item the store pages and search
-  answer with.
+  answer with; `StorePage.partner` (`StorePagePartner`), the store's
+  Partner with its name and logo, so the store page links to the
+  Partner's own storefront.
 
 ### Changed
 

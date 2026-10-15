@@ -1697,6 +1697,8 @@ components:
       $ref: ./components/schemas/catalog/StoreCategoryTab.yaml
     StorePage:
       $ref: ./components/schemas/catalog/StorePage.yaml
+    StorePagePartner:
+      $ref: ./components/schemas/catalog/StorePagePartner.yaml
     SearchProductHit:
       $ref: ./components/schemas/catalog/SearchProductHit.yaml
     SearchStore:

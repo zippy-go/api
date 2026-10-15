@@ -3,6 +3,7 @@ description: "What the storefront draws for one store, open or shut: its card fa
 required:
   - location_id
   - partner_id
+  - partner
   - name
   - description
   - logo
@@ -39,6 +40,9 @@ properties:
     description: Its partner.
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  partner:
+    $ref: ./StorePagePartner.yaml
+    description: Its Partner's name and logo, to link to the Partner's own storefront.
   name:
     type: string
     description: Its name.
@@ -152,6 +156,10 @@ properties:
 examples:
   - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    partner:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      name: ZippyGo Dev Partner
+      logo: null
     name: Dev Kitchen Gachibowli
     description: null
     logo: null

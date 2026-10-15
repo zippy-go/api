@@ -1,0 +1,27 @@
+type: object
+description: The Partner a store belongs to, as the store's page names it, so the page links to the Partner's own storefront.
+required:
+  - id
+  - name
+  - logo
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - ZippyGo Dev Partner
+  logo:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its logo, when it has one.
+examples:
+  - id: 01a13a48-9e00-7000-8000-000000000001
+    name: ZippyGo Dev Partner
+    logo: null

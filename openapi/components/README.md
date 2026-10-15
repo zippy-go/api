@@ -87,7 +87,7 @@ components/
                    CatalogModifierCreate, CatalogModifierUpdate, CatalogModifierAnswers; brands: CatalogBrand, CatalogBrandList,
                    CatalogBrandInput; oversight: CatalogOverview, CatalogOverviewPage; the published menu: MenuDocument,
                    MenuCategory, MenuItem, MenuVariant, MenuAsk, MenuModifier, MenuAnswer, MenuCategoryPage, ItemSheet; the store
-                   page: StorePage, StoreLive, StoreHoursDay, StoreFulfilment, StoreMenuRef, StoreCategoryTab; search:
+                   page: StorePage, StorePagePartner, StoreLive, StoreHoursDay, StoreFulfilment, StoreMenuRef, StoreCategoryTab; search:
                    SearchResult, SearchStoreHit, SearchStore, SearchProductHit, SearchSuggestion, SearchSuggestionKind,
                    SearchSuggestionList, StoreSearchResult, SearchSynonymGroup, SearchSynonymGroupList, SearchSynonymGroupCreate
     <domain>/      One folder per further domain, one file per schema

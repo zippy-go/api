@@ -11036,6 +11036,10 @@ export type StorePage = {
      */
     partner_id: string;
     /**
+     * Its Partner's name and logo, to link to the Partner's own storefront.
+     */
+    partner: StorePagePartner;
+    /**
      * Its name.
      */
     name: string;
@@ -11127,6 +11131,24 @@ export type StorePage = {
      * The strip of its categories, from the published menu.
      */
     categories: Array<StoreCategoryTab>;
+};
+
+/**
+ * The Partner a store belongs to, as the store's page names it, so the page links to the Partner's own storefront.
+ */
+export type StorePagePartner = {
+    /**
+     * The Partner.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its logo, when it has one.
+     */
+    logo: CataloguePicture | null;
 };
 
 /**
