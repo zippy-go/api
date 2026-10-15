@@ -8639,7 +8639,7 @@ export type PartnerStorefront = {
     /**
      * The store the storefront opens on: the nearest to the pin, else the first listed; `null` when the Partner has no live store.
      */
-    opens_on: string | null;
+    opens_on?: string | null;
     /**
      * How many of the stores are open now.
      */
@@ -8669,15 +8669,15 @@ export type StorefrontPartner = {
     /**
      * What the Partner does, in its own words.
      */
-    description: string | null;
+    description?: string | null;
     /**
      * The logo's `thumb` rendition, relative to the API's origin; `null` without a logo.
      */
-    logo_url: string | null;
+    logo_url?: string | null;
     /**
      * The banner's `hero` rendition, relative to the API's origin; `null` without a banner.
      */
-    banner_url: string | null;
+    banner_url?: string | null;
 };
 
 /**

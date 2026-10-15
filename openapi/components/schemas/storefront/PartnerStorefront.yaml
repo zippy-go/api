@@ -3,7 +3,6 @@ description: "A Partner's own storefront, the `PartnerStorefront` schema: the Pa
 required:
   - partner
   - place
-  - opens_on
   - open_count
   - stores
 properties:

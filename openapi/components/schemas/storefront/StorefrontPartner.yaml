@@ -4,9 +4,6 @@ required:
   - id
   - name
   - kind
-  - description
-  - logo_url
-  - banner_url
 properties:
   id:
     type: string
