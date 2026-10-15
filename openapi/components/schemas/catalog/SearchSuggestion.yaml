@@ -1,0 +1,35 @@
+type: object
+description: A name suggested as the customer types.
+required:
+  - kind
+  - name
+  - location_id
+  - item_id
+properties:
+  kind:
+    $ref: ./SearchSuggestionKind.yaml
+    description: What it names.
+  name:
+    type: string
+    description: The name, in the customer's language where the store keeps one.
+    examples:
+      - Hyderabadi Biryani
+  location_id:
+    type: string
+    format: uuid
+    description: The store it belongs to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The product, for a product.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+examples:
+  - kind: product
+    name: Hyderabadi Biryani
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101

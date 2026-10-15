@@ -1,0 +1,76 @@
+type: object
+description: A store that matched, with what the customer needs to choose it.
+required:
+  - location_id
+  - partner_id
+  - name
+  - logo
+  - vertical_ids
+  - live
+  - distance_metres
+  - delivers_here
+  - delivery
+  - pickup
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store; it opens at its page.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  partner_id:
+    type: string
+    format: uuid
+    description: Its partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  logo:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its tile.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its Verticals.
+  live:
+    $ref: ./StoreLive.yaml
+    description: Open, closed with when it opens, or offline.
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The distance from the pin sent; `null` without one.
+    examples:
+      - 1200
+  delivers_here:
+    type: boolean
+    description: Its zone serves the customer's; otherwise it is marked "doesn't deliver here".
+  delivery:
+    type: boolean
+    description: It delivers.
+  pickup:
+    type: boolean
+    description: Orders may be collected, offered where it does not deliver here.
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    name: Dev Kitchen Gachibowli
+    logo: null
+    vertical_ids:
+      - 01a13a48-9e00-7000-8000-00000000b001
+    live:
+      state: online
+      reason: null
+      until: 2026-10-15T17:30:00Z
+    distance_metres: 1200
+    delivers_here: true
+    delivery: true
+    pickup: true

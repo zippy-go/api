@@ -1,0 +1,66 @@
+type: object
+description: An enabled variant on the published menu.
+required:
+  - id
+  - selection
+  - price
+  - offer_price
+  - mrp
+  - available
+  - stock
+  - quantity_left
+  - picture
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+  selection:
+    $ref: ./VariantSelection.yaml
+    description: The value it chooses on each axis.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price, tax included.
+  offer_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The lower price it is offered at.
+  mrp:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The MRP printed on the pack, drawn struck through beside a lower price.
+  available:
+    type: boolean
+    description: It can be had now.
+  stock:
+    $ref: ./StockStatus.yaml
+    description: Its stock.
+  quantity_left:
+    type:
+      - integer
+      - "null"
+    description: How many are left, said only at or below the store's low-stock threshold.
+    examples:
+      - null
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its own picture.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+    selection:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+    price:
+      minor_units: 24900
+      currency: INR
+    offer_price: null
+    mrp: null
+    available: true
+    stock: in_stock
+    quantity_left: null
+    picture: null

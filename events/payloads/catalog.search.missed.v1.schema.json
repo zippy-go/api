@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.search.missed.v1.schema.json",
+  "title": "CatalogSearchMissedPayload",
+  "description": "Payload of `catalog.search.missed` version 1: a search found nothing. The envelope's `partner_id` is `null`, because the search was not a partner's act; the payload carries the words as understood and where they were typed, never who typed them. Optional members are absent or `null` when they do not apply. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "words",
+    "searched_at"
+  ],
+  "properties": {
+    "words": {
+      "type": "string",
+      "minLength": 2,
+      "description": "The words as understood: lower case, accents folded, separated by single spaces.",
+      "examples": [
+        "pulihora"
+      ]
+    },
+    "service_area_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The service area searched from, for a search across stores.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60"
+      ]
+    },
+    "vertical_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The Vertical the search was narrowed to.",
+      "examples": [
+        null
+      ]
+    },
+    "location_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The store, for a search inside one store.",
+      "examples": [
+        null
+      ]
+    },
+    "searched_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the search was made.",
+      "examples": [
+        "2026-10-15T09:00:00Z"
+      ]
+    }
+  }
+}

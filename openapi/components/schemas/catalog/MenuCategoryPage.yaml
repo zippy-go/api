@@ -1,0 +1,168 @@
+type: object
+description: Further items of a large category of the published menu.
+required:
+  - location_id
+  - version
+  - category
+  - items
+  - offset
+  - next_offset
+  - modifiers
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  version:
+    type: integer
+    description: The version of the menu the page is cut from.
+    examples:
+      - 42
+  category:
+    $ref: ./MenuCategory.yaml
+    description: The category, its `items` left empty.
+  items:
+    type: array
+    items:
+      $ref: ./MenuItem.yaml
+    description: The items of this page.
+  offset:
+    type: integer
+    description: The offset of this page.
+    examples:
+      - 30
+  next_offset:
+    type:
+      - integer
+      - "null"
+    description: The offset of the next page; `null` on the last.
+    examples:
+      - null
+  modifiers:
+    type: object
+    description: The questions these items ask and their answers ask in turn, by id.
+    additionalProperties:
+      $ref: ./MenuModifier.yaml
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    version: 42
+    category:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+      parent_id: null
+      name:
+        en: Biryanis
+        te: బిర్యానీలు
+      description: null
+      picture: null
+      hours: null
+      outside_hours: grey
+      item_count: 31
+      items: []
+      next_offset: 30
+    items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        name:
+          en: Hyderabadi Biryani
+          te: హైదరాబాదీ బిర్యానీ
+        description:
+          en: Dum-cooked basmati rice with chicken, saffron and fried onions.
+        food_mark: non_veg
+        spice_level: medium
+        serves: 1
+        dietary:
+          - halal
+        allergens: []
+        brand: null
+        pictures:
+          - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+            thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+            card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+            hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+        from_price:
+          minor_units: 24900
+          currency: INR
+        price_varies: true
+        available: true
+        stock: in_stock
+        axes:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601
+            name:
+              en: Portion
+            values:
+              - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+                name:
+                  en: Half
+              - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc612
+                name:
+                  en: Full
+        variants:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            selection:
+              0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+            price:
+              minor_units: 24900
+              currency: INR
+            offer_price: null
+            mrp: null
+            available: true
+            stock: in_stock
+            quantity_left: null
+            picture: null
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc202
+            selection:
+              0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc612
+            price:
+              minor_units: 39900
+              currency: INR
+            offer_price: null
+            mrp: null
+            available: true
+            stock: in_stock
+            quantity_left: null
+            picture: null
+        asks:
+          - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+            prices:
+              0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102:
+                minor_units: 0
+                currency: INR
+            hidden: []
+        availability:
+          hours: null
+          pre_order_only: false
+          pre_order_notice_hours: null
+          fulfilment: any
+          max_per_order: null
+          daily_limit: null
+          age_restricted: false
+          prescription_required: false
+          preparation_minutes: 20
+          personalisation: false
+    offset: 30
+    next_offset: null
+    modifiers:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        name:
+          en: Choose your raita
+        hint:
+          en: One comes with the biryani
+        min: 0
+        max: 1
+        required: false
+        repeats: false
+        answers:
+          - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+            name:
+              en: Boondi raita
+            description: null
+            food_mark: veg
+            dietary: []
+            picture: null
+            price:
+              minor_units: 4900
+              currency: INR
+            available: false
+            asks: []

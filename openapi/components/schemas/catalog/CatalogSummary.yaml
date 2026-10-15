@@ -1,0 +1,117 @@
+type: object
+description: A store's catalogue at a glance, the answer of `GET .../catalog`.
+required:
+  - location_id
+  - partner_id
+  - catalogue_type
+  - term
+  - profile
+  - currency
+  - time_zone
+  - counts
+  - menu
+  - low_stock_threshold
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  partner_id:
+    type: string
+    format: uuid
+    description: Its partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  catalogue_type:
+    $ref: ../services/CatalogueType.yaml
+    description: The catalogue type.
+  term:
+    $ref: ../reference/CatalogueTerm.yaml
+    description: What screens call the catalogue.
+  profile:
+    $ref: ./CatalogueProfile.yaml
+    description: What items may carry.
+  currency:
+    type: string
+    description: The currency prices are in, the store's.
+    pattern: ^[A-Z]{3}$
+    examples:
+      - INR
+  time_zone:
+    type: string
+    description: The store's clock, for hours and for when sold out for today ends.
+    examples:
+      - Asia/Kolkata
+  counts:
+    $ref: ./CatalogCounts.yaml
+    description: How much is in.
+  menu:
+    $ref: ./MenuState.yaml
+    description: What customers see now.
+  low_stock_threshold:
+    type: integer
+    description: Below this many on hand a variant is marked low in the Partner console and the storefront says how many are left.
+    examples:
+      - 5
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    catalogue_type: food
+    term: menu
+    profile:
+      catalogue_type: food
+      store_type_code: FOOD
+      term: menu
+      capabilities:
+        - variants
+        - modifiers
+        - dietary
+        - allergens
+        - personalisation
+        - preparation_time
+        - availability_windows
+        - age_restriction
+        - quantity_limit
+        - pre_order_only
+        - tax_class
+      food_mark: true
+      mrp: false
+      food_details: true
+      dietary_tags:
+        - vegan
+        - vegetarian
+        - halal
+        - kosher
+      allergen_tags:
+        - contains_nuts
+        - contains_gluten
+        - contains_dairy
+      product_fields: []
+      languages:
+        - en
+        - hi
+        - te
+      tax_classes:
+        - code: merit
+          label: Merit rate
+          rate_percent: 5
+      pre_order_notice_hours:
+        - 24
+        - 48
+        - 72
+    currency: INR
+    time_zone: Asia/Kolkata
+    counts:
+      categories: 4
+      items: 12
+      listed: 10
+      modifiers: 2
+      brands: 0
+    menu:
+      version: 42
+      published_at: 2026-10-15T09:00:00Z
+      pending: false
+      revision: 57
+    low_stock_threshold: 5

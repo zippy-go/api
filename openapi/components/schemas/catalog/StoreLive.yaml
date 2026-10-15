@@ -1,0 +1,29 @@
+type: object
+description: What a store is doing now, for the notice over its page.
+required:
+  - state
+  - reason
+  - until
+properties:
+  state:
+    $ref: ../locations/LocationLiveState.yaml
+    description: "`online`, `closed` by its hours, `offline` while paused."
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why it is not online.
+    examples:
+      - closed
+  until:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When that changes: when it opens or closes next, or the pause ends."
+    examples:
+      - 2026-10-15T09:00:00Z
+examples:
+  - state: closed
+    reason: closed
+    until: 2026-10-16T05:30:00Z

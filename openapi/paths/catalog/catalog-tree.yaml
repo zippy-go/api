@@ -1,0 +1,68 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/tree. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: getCatalogTree
+  summary: Read the catalogue as a tree
+  description: "The catalogue as one tree: categories in the store's order, each with its first fifty items (`next_cursor` pages the rest through `GET .../categories/{category_id}/items`), every question the loaded items ask with its answers, and the row of every item those answers are, so a client opens an item onto its questions, a question onto its answers and an answer onto the questions it asks in turn, three deep, never back into an item above it. `catalog:read`."
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The tree.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/CatalogTree.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

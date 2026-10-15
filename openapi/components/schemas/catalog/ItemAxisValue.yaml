@@ -1,0 +1,19 @@
+type: object
+description: One value of an axis.
+required:
+  - id
+  - name
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The value.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+    name:
+      en: Half

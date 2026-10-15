@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.modifier.changed.v1.schema.json",
+  "title": "CatalogModifierChangedPayload",
+  "description": "Payload of `catalog.modifier.changed` version 1: a question of a store's catalogue changed. The envelope's `partner_id` is the store's partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "modifier_id",
+    "change",
+    "revision"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store whose catalogue changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "modifier_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The question.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301"
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "created",
+        "updated",
+        "deleted",
+        "duplicated",
+        "answers"
+      ],
+      "description": "What kind of change: the question `created`, `updated`, `deleted` or `duplicated` (the copy is the question named), or its `answers`.",
+      "examples": [
+        "answers"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The catalogue's revision after the change, raised by every change; the version of the `catalog.changed` signal on the store's catalogue channel.",
+      "examples": [
+        57
+      ]
+    }
+  }
+}

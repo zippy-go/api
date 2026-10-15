@@ -1,0 +1,56 @@
+type: object
+description: A page of item rows.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CatalogItemRow.yaml
+    description: The rows on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor to pass as `cursor` for the next page, or `null` on the last page.
+    examples:
+      - null
+  facets:
+    type: array
+    items:
+      $ref: ../common/Facet.yaml
+    description: Facet counts, present when `facets` was asked for.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        name:
+          en: Hyderabadi Biryani
+          te: హైదరాబాదీ బిర్యానీ
+        status: active
+        listed: true
+        food_mark: non_veg
+        picture:
+          asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+          thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+          card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+          hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+        from_price:
+          minor_units: 24900
+          currency: INR
+        price_varies: true
+        single_variant_id: null
+        offer_price: null
+        variant_count: 2
+        stock: in_stock
+        sellable: true
+        category_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+        modifiers:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        answer_of: []
+        brand_id: null
+        has_picture: true
+        updated_at: 2026-10-15T09:00:00Z
+        version: 3
+    next_cursor: null

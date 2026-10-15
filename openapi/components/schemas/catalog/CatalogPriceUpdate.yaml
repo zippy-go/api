@@ -1,0 +1,24 @@
+type: object
+description: Request body of `PUT .../variants/{variant_id}/price`, in minor units of the store's currency, tax included.
+required:
+  - price
+properties:
+  price:
+    type: integer
+    description: The price.
+    format: int64
+    minimum: 0
+    examples:
+      - 26900
+  offer_price:
+    type:
+      - integer
+      - "null"
+    description: A lower price it is offered at; `null` or absent removes the offer.
+    format: int64
+    minimum: 0
+    examples:
+      - null
+examples:
+  - price: 26900
+    offer_price: null

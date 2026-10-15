@@ -1,0 +1,8 @@
+type: string
+description: "How an item may leave the store: any way the store offers, delivery only, or collection only."
+enum:
+  - any
+  - delivery_only
+  - pickup_only
+examples:
+  - any

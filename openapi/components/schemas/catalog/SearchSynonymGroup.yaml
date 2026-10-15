@@ -1,0 +1,42 @@
+type: object
+description: "Words that mean the same thing in search: each finds what any other finds, ranked below an exact match."
+required:
+  - id
+  - vertical_id
+  - words
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The group.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc801
+  vertical_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Vertical it applies in; `null` in every Vertical.
+    examples:
+      - null
+  words:
+    type: array
+    items:
+      type: string
+    description: The words, lower case.
+    minItems: 2
+  created_at:
+    type: string
+    format: date-time
+    description: When it was added.
+    examples:
+      - 2026-10-15T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc801
+    vertical_id: null
+    words:
+      - biryani
+      - biriyani
+      - briyani
+    created_at: 2026-10-15T09:00:00Z

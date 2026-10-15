@@ -1,0 +1,72 @@
+type: object
+description: "One row of a variant's price history: what it was, what it became, when, who and how. The item carries only the current figures."
+required:
+  - id
+  - item_id
+  - variant_id
+  - from
+  - to
+  - at
+  - by
+  - via
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The row.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc701
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+  variant_id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+  from:
+    oneOf:
+      - $ref: ./PriceFigures.yaml
+      - type: "null"
+    description: What it was; `null` when the variant was created.
+  to:
+    $ref: ./PriceFigures.yaml
+    description: What it became.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-15T09:00:00Z
+  by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who; `null` for the platform itself.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  via:
+    $ref: ./PriceChangeVia.yaml
+    description: How.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc701
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+    from:
+      price:
+        minor_units: 23900
+        currency: INR
+      offer_price: null
+    to:
+      price:
+        minor_units: 24900
+        currency: INR
+      offer_price: null
+    at: 2026-10-15T09:00:00Z
+    by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    via: quick

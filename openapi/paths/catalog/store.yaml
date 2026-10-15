@@ -1,0 +1,67 @@
+# Path item for /v1/storefront/stores/{location_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store (a Location).
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: getStorePage
+  summary: Read a store's page
+  description: "What the storefront draws for one store, signed out: the same card facts a listing shows, what a card has no room for (its week of hours from today in its clock, where it is, how to ring it, what it says about itself), what it is doing now, and the reference to its published menu with the strip of its categories. A store outside its hours or taken offline answers the same page, its `live` saying when it opens or that it is offline; a store that is deleted or not live is not found; a store that has published nothing answers `menu: null`. With a pin the page carries the distance and is private to the one who asked; without one it is public and cached for thirty seconds."
+  tags:
+    - Store pages
+  security: []
+  parameters:
+    - name: lat
+      in: query
+      required: false
+      description: The latitude of the customer's pin, for distances; sent with `lng`.
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      example: 17.4435
+    - name: lng
+      in: query
+      required: false
+      description: The longitude of the customer's pin; sent with `lat`.
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      example: 78.3772
+  responses:
+    "200":
+      description: The store page.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/StorePage.yaml
+    "400":
+      description: A latitude without a longitude or one out of range (`validation_failed`), or a malformed identifier (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The store does not exist, is deleted, or is not live (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

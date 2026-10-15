@@ -1,0 +1,37 @@
+type: object
+description: A category in the strip under the store's header.
+required:
+  - id
+  - parent_id
+  - name
+  - item_count
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The category.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its parent.
+    examples:
+      - null
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  item_count:
+    type: integer
+    description: How many items it holds.
+    examples:
+      - 1
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+    parent_id: null
+    name:
+      en: Biryanis
+      te: బిర్యానీలు
+    item_count: 1

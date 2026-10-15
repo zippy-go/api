@@ -1,0 +1,6 @@
+type: object
+description: The value a variant chooses on each axis, axis id to value id; empty for the one variant of an item with no axes. In requests the keys and values may also be the English names of the axis and the value.
+additionalProperties:
+  type: string
+examples:
+  - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611

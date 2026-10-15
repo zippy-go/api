@@ -1,0 +1,39 @@
+type: object
+description: A page of catalogues, most recently changed first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CatalogOverview.yaml
+    description: The catalogues on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        location_name: Dev Kitchen Gachibowli
+        partner_name: ZippyGo Dev Partner
+        catalogue_type: food
+        term: menu
+        counts:
+          categories: 4
+          items: 12
+          listed: 10
+          modifiers: 2
+          brands: 0
+        menu:
+          version: 42
+          published_at: 2026-10-15T09:00:00Z
+          pending: false
+          revision: 57
+        updated_at: 2026-10-15T09:00:00Z
+    next_cursor: null

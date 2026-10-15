@@ -1,0 +1,72 @@
+type: object
+description: A store's catalogue as Mission Control oversees it.
+required:
+  - location_id
+  - partner_id
+  - location_name
+  - partner_name
+  - catalogue_type
+  - term
+  - counts
+  - menu
+  - updated_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  partner_id:
+    type: string
+    format: uuid
+    description: Its partner; open the catalogue through the partner routes with a Mission Control token.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_name:
+    type: string
+    description: The partner's name.
+    examples:
+      - ZippyGo Dev Partner
+  catalogue_type:
+    $ref: ../services/CatalogueType.yaml
+    description: The catalogue type.
+  term:
+    $ref: ../reference/CatalogueTerm.yaml
+    description: What it is called.
+  counts:
+    $ref: ./CatalogCounts.yaml
+    description: How much of it is in.
+  menu:
+    $ref: ./MenuState.yaml
+    description: What customers see now.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the catalogue last changed.
+    examples:
+      - 2026-10-15T09:00:00Z
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    location_name: Dev Kitchen Gachibowli
+    partner_name: ZippyGo Dev Partner
+    catalogue_type: food
+    term: menu
+    counts:
+      categories: 4
+      items: 12
+      listed: 10
+      modifiers: 2
+      brands: 0
+    menu:
+      version: 42
+      published_at: 2026-10-15T09:00:00Z
+      pending: false
+      revision: 57
+    updated_at: 2026-10-15T09:00:00Z

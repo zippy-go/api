@@ -1,0 +1,9 @@
+type: string
+description: How hot a dish is, as the menu says it.
+enum:
+  - none
+  - mild
+  - medium
+  - hot
+examples:
+  - medium

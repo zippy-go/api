@@ -1,0 +1,10 @@
+type: string
+description: "How a price was set: when the variant was `created`, by the item `editor`, by a `quick` change where the price is read, by a `bulk` act, or by an `import`."
+enum:
+  - created
+  - editor
+  - quick
+  - bulk
+  - import
+examples:
+  - quick

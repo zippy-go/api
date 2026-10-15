@@ -1,0 +1,14 @@
+type: object
+description: Request body of the brand writes.
+required:
+  - name
+properties:
+  name:
+    type: string
+    description: Its name, unique in the store.
+    minLength: 1
+    maxLength: 120
+    examples:
+      - Amul
+examples:
+  - name: Amul

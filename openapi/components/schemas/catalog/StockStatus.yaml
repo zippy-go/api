@@ -1,0 +1,8 @@
+type: string
+description: "Whether a variant can be had: `in_stock`, `out_of_stock` until switched back, or `sold_out_today`, back in stock by itself at 00:00 in the store's clock."
+enum:
+  - in_stock
+  - out_of_stock
+  - sold_out_today
+examples:
+  - sold_out_today

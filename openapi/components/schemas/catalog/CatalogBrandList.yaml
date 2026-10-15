@@ -1,0 +1,17 @@
+type: object
+description: A store's brands, by name.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CatalogBrand.yaml
+    description: The brands.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc401
+        name: Amul
+        item_count: 40
+        created_at: 2026-10-15T09:00:00Z
+        updated_at: 2026-10-15T09:00:00Z

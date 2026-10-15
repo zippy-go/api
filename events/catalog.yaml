@@ -377,3 +377,68 @@ events:
       once. The envelope's `partner_id` is the partner.
     payload_schema: ./payloads/access.envelope.changed.v1.schema.json
     example: ./examples/access.envelope.changed.v1.json
+
+  - type: catalog.item.changed
+    version: 1
+    domain: catalog
+    description: >-
+      An item of a store's catalogue was created, changed, deleted or
+      duplicated, or its stock, prices, questions or categories changed;
+      the store's menu is republished within about a second. The
+      envelope's `partner_id` is the store's partner; the store's
+      catalogue channel carries `catalog.changed`.
+    payload_schema: ./payloads/catalog.item.changed.v1.schema.json
+    example: ./examples/catalog.item.changed.v1.json
+
+  - type: catalog.category.changed
+    version: 1
+    domain: catalog
+    description: >-
+      A category of a store's catalogue was created, changed, deleted,
+      duplicated or reordered, or the items on it changed. The
+      envelope's `partner_id` is the store's partner.
+    payload_schema: ./payloads/catalog.category.changed.v1.schema.json
+    example: ./examples/catalog.category.changed.v1.json
+
+  - type: catalog.modifier.changed
+    version: 1
+    domain: catalog
+    description: >-
+      A question (a modifier) of a store's catalogue was created,
+      changed, deleted or duplicated, or its answers changed. The
+      envelope's `partner_id` is the store's partner.
+    payload_schema: ./payloads/catalog.modifier.changed.v1.schema.json
+    example: ./examples/catalog.modifier.changed.v1.json
+
+  - type: catalog.brand.changed
+    version: 1
+    domain: catalog
+    description: >-
+      A brand of a store's own list was created, renamed (and so renamed
+      on every item carrying it) or deleted (leaving its items without a
+      brand). The envelope's `partner_id` is the store's partner.
+    payload_schema: ./payloads/catalog.brand.changed.v1.schema.json
+    example: ./examples/catalog.brand.changed.v1.json
+
+  - type: catalog.menu.published
+    version: 1
+    domain: catalog
+    description: >-
+      A store's menu was rebuilt into a new published document, within
+      about a second of the changes it carries; its version only rises.
+      The envelope's `partner_id` is the store's partner; the store's
+      public channel carries `menu.published` with the version only, and
+      search re-indexes the store from the document.
+    payload_schema: ./payloads/catalog.menu.published.v1.schema.json
+    example: ./examples/catalog.menu.published.v1.json
+
+  - type: catalog.search.missed
+    version: 1
+    domain: catalog
+    description: >-
+      A customer's search found nothing, across a service area or inside
+      one store; kept without the customer's identity so synonym groups
+      and catalogues can be improved. The envelope's `partner_id` is
+      `null`.
+    payload_schema: ./payloads/catalog.search.missed.v1.schema.json
+    example: ./examples/catalog.search.missed.v1.json

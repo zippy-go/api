@@ -1,0 +1,28 @@
+type: object
+description: A variant's price history, newest first.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CatalogPriceChange.yaml
+    description: The rows.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc701
+        item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+        from:
+          price:
+            minor_units: 23900
+            currency: INR
+          offer_price: null
+        to:
+          price:
+            minor_units: 24900
+            currency: INR
+          offer_price: null
+        at: 2026-10-15T09:00:00Z
+        by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        via: quick

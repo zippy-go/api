@@ -1,0 +1,115 @@
+type: object
+description: "A question: a name, a hint, a rule of least, most, required and repeats, and answers that are the store's own items."
+required:
+  - id
+  - location_id
+  - name
+  - hint
+  - min
+  - max
+  - required
+  - repeats
+  - status
+  - answers
+  - asked_by
+  - version
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The question.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  hint:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: A hint under it.
+  min:
+    type: integer
+    description: The least answers it asks for.
+    examples:
+      - 0
+  max:
+    type: integer
+    description: The most it takes; 0 is no ceiling.
+    examples:
+      - 1
+  required:
+    type: boolean
+    description: It asks for at least one answer.
+  repeats:
+    type: boolean
+    description: An answer may be chosen more than once.
+  status:
+    $ref: ./CatalogItemStatus.yaml
+    description: "`inactive` is asked by nobody on the menu."
+  answers:
+    type: array
+    items:
+      $ref: ./ModifierAnswer.yaml
+    description: Its answers, in order.
+  asked_by:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items asking it.
+  version:
+    type: integer
+    description: The version; the entity tag.
+    examples:
+      - 1
+  created_at:
+    type: string
+    format: date-time
+    description: When it was created.
+    examples:
+      - 2026-10-15T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-15T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    name:
+      en: Choose your raita
+    hint:
+      en: One comes with the biryani
+    min: 0
+    max: 1
+    required: false
+    repeats: false
+    status: active
+    answers:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        name:
+          en: Boondi raita
+        food_mark: veg
+        price: null
+        item_price:
+          minor_units: 4900
+          currency: INR
+        offered: true
+        position: 0
+        sellable: true
+        asks: []
+    asked_by:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    version: 1
+    created_at: 2026-10-15T09:00:00Z
+    updated_at: 2026-10-15T09:00:00Z

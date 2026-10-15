@@ -4,7 +4,7 @@ parameters:
 post:
   operationId: createPartnerAssetGrant
   summary: A grant for a Partner's purpose (document, logo, banner) or one of its Locations'...
-  description: "A grant for a Partner's purpose (document, logo, banner), with `partner:profile:write` (platform staff: `partner:write`), or one of its Locations' (logo, banner), with `location:write` at the Location (platform staff: platform-wide). A Location of another Partner is not found."
+  description: "A grant for a Partner's purpose (document, logo, banner), with `partner:profile:write` (platform staff: `partner:write`), or one of its Locations' (logo, banner), with `location:write` at the Location, or a store's catalogue pictures (`product_image` for items and variants, `catalogue_category_image` for categories), with `catalog:write` at the Location (platform staff: platform-wide). A Location of another Partner is not found."
   tags:
     - Assets
   security:

@@ -1,0 +1,83 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}/answers. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  - name: modifier_id
+    in: path
+    required: true
+    description: The question, which must be one of the store's.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+put:
+  operationId: putCatalogModifierAnswers
+  summary: Set a question's answers
+  description: "Replaces the answers, in their order: each an item of the store offered once, with an optional price that replaces the item's own when chosen here, and whether it is offered. A chain of questions deeper than three, or an item reached again through its own questions, is refused. `catalog:write`."
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The answers, in order.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/catalog/CatalogModifierAnswers.yaml
+  responses:
+    "200":
+      description: The question.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/CatalogModifier.yaml
+    "400":
+      description: "The body failed validation (`validation_failed`): `answer_repeated`, `modifier_rule_unsatisfiable`, or an unknown or deleted item."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`modifier_cycle`, `modifier_too_deep`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

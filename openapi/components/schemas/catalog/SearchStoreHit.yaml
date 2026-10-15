@@ -1,0 +1,60 @@
+type: object
+description: A store found by its name or by what it sells, with its products that matched.
+required:
+  - store
+  - products
+  - product_count
+  - name_matched
+properties:
+  store:
+    $ref: ./SearchStore.yaml
+    description: The store.
+  products:
+    type: array
+    items:
+      $ref: ./SearchProductHit.yaml
+    description: The products that matched, best first, six at most.
+  product_count:
+    type: integer
+    description: How many of its products matched in all ("See all").
+    examples:
+      - 1
+  name_matched:
+    type: boolean
+    description: The store's own name matched.
+examples:
+  - store:
+      location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+      name: Dev Kitchen Gachibowli
+      logo: null
+      vertical_ids:
+        - 01a13a48-9e00-7000-8000-00000000b001
+      live:
+        state: online
+        reason: null
+        until: 2026-10-15T17:30:00Z
+      distance_metres: 1200
+      delivers_here: true
+      delivery: true
+      pickup: true
+    products:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        name:
+          en: Hyderabadi Biryani
+          te: హైదరాబాదీ బిర్యానీ
+        food_mark: non_veg
+        price:
+          minor_units: 24900
+          currency: INR
+        offer_price: null
+        picture:
+          asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+          thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+          card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+          hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+        available: true
+        age_restricted: false
+        prescription_required: false
+    product_count: 1
+    name_matched: false

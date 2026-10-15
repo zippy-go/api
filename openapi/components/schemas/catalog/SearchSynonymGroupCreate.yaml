@@ -1,0 +1,29 @@
+type: object
+description: Request body of `POST /v1/platform/search/synonyms`.
+required:
+  - words
+properties:
+  words:
+    type: array
+    items:
+      type: string
+      minLength: 2
+      maxLength: 40
+    description: Two to twenty words, in any script.
+    minItems: 2
+    maxItems: 20
+    examples:
+      - - puttu
+        - pittu
+  vertical_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Vertical it applies in; `null` or absent in every Vertical.
+    examples:
+      - null
+examples:
+  - words:
+      - puttu
+      - pittu

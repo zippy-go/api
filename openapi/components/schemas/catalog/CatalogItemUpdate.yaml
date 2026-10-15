@@ -1,0 +1,104 @@
+type: object
+description: "Request body of `PATCH .../catalog/items/{item_id}`: the members present change, absent ones stay. `variants` replaces the list: a variant named by `id` keeps its stock and its price history, one left out is removed, one without an `id` is new; a price that changed makes one history row marked `editor`."
+properties:
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  status:
+    $ref: ./CatalogItemStatus.yaml
+    description: On sale or off sale.
+  listed:
+    type: boolean
+    description: On the menu in its own right; an item that is not is only an answer to questions and sits on no category.
+  brand_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its brand, one of the store's, where the type carries brands.
+    examples:
+      - null
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: Its veg or non-veg mark, required where the type carries the food mark.
+  spice_level:
+    oneOf:
+      - $ref: ./SpiceLevel.yaml
+      - type: "null"
+    description: How hot it is, where the type carries food details.
+  serves:
+    type:
+      - integer
+      - "null"
+    description: How many it serves, 1 to 20, where the type carries food details.
+    minimum: 1
+    maximum: 20
+    examples:
+      - 1
+  dietary:
+    type: array
+    items:
+      type: string
+    description: Dietary tags from the type's closed set.
+    examples:
+      - - halal
+  allergens:
+    type: array
+    items:
+      type: string
+    description: Allergen tags from the type's closed set.
+    examples:
+      - []
+  tags:
+    type: array
+    items:
+      type: string
+    description: Words customers find it by, lower case.
+    examples:
+      - - biryani
+        - dum
+  attributes:
+    type: object
+    description: Values of the typed fields the type declares (`profile.product_fields`), key to value.
+    additionalProperties: true
+    examples:
+      - {}
+  pictures:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its gallery as asset ids, the card first.
+    maxItems: 10
+  axes:
+    type: array
+    items:
+      $ref: ./ItemAxisInput.yaml
+    description: The axes it is sold along.
+    maxItems: 3
+  variants:
+    type: array
+    items:
+      $ref: ./CatalogVariantInput.yaml
+    description: Its variants.
+    minItems: 1
+    maxItems: 100
+  availability:
+    $ref: ./ItemAvailabilityInput.yaml
+    description: When and how it may be ordered.
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The categories it sits on; it keeps its place on those it stays on.
+examples:
+  - description:
+      en: Slow-cooked over the dum.

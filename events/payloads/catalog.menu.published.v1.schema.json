@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.menu.published.v1.schema.json",
+  "title": "CatalogMenuPublishedPayload",
+  "description": "Payload of `catalog.menu.published` version 1: a store's menu was rebuilt into a new published document. The envelope's `partner_id` is the store's partner. Readers fetch the document at `GET /v1/storefront/stores/{location_id}/menu?version=<version>`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "version",
+    "revision",
+    "published_at",
+    "items"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The new version of the published menu, which only rises.",
+      "examples": [
+        42
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The catalogue revision the document was built from.",
+      "examples": [
+        57
+      ]
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the document was published.",
+      "examples": [
+        "2026-10-15T09:00:00Z"
+      ]
+    },
+    "items": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many items the published menu carries.",
+      "examples": [
+        12
+      ]
+    }
+  }
+}

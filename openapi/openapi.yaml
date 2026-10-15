@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.11.0
+  version: 0.12.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -218,7 +218,11 @@ tags:
   - name: Verticals
     description: "The categories of trade customers browse, with their categories, images and the service areas they reach."
   - name: Catalog
-    description: Products, modifiers, availability and pricing.
+    description: "A store's catalogue as its staff keep it: categories, items sold as variants, questions (modifiers) whose answers are items, brands, stock and prices with their history, edited as a tree, a list and a form. Every save is live: within about a second the store's menu is rebuilt into one published document (see Store pages). Reading needs `catalog:read` at the Location, changing anything customers see `catalog:write`, marking stock `catalog:stock` (which `catalog:write` covers). Platform staff read every catalogue with `catalog:oversee` and change none in this version."
+  - name: Store pages
+    description: "What the storefront draws for one store, signed out: the store page (open or shut, its hours, the reference to its published menu), the published menu with its version as the entity tag, a large category's further pages and an item sheet. Public; no credential."
+  - name: Search
+    description: "Finding stores and products by typing, across the stores of the customer's city and inside one store, forgiving misspellings and the common spellings of Indian dishes, with names suggested as the customer types. The ranking is published: a store whose name matches exactly what was typed comes first; the rest are ordered open before closed, then nearer the customer's pin before farther, then by how well the words matched; no store is ranked higher for a fee. The searches are public; the synonym groups are Mission Control's."
   - name: Orders
     description: Commercial purchases placed by customers.
   - name: Deliveries
@@ -613,6 +617,75 @@ paths:
     $ref: ./paths/geocoding/reverse.yaml
   /v1/geocoding/suggestions:
     $ref: ./paths/geocoding/suggestions.yaml
+  # Step 2 catalogue: the catalogue, Mission Control oversight, store pages and search
+  /v1/partners/{partner_id}/locations/{location_id}/catalog:
+    $ref: ./paths/catalog/catalog.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/tree:
+    $ref: ./paths/catalog/catalog-tree.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories:
+    $ref: ./paths/catalog/categories.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories/order:
+    $ref: ./paths/catalog/categories-order.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}:
+    $ref: ./paths/catalog/category.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/items:
+    $ref: ./paths/catalog/category-items.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/duplicate:
+    $ref: ./paths/catalog/category-duplicate.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items:
+    $ref: ./paths/catalog/items.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/filters:
+    $ref: ./paths/catalog/items-filters.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/bulk:
+    $ref: ./paths/catalog/items-bulk.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}:
+    $ref: ./paths/catalog/item.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/duplicate:
+    $ref: ./paths/catalog/item-duplicate.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/modifiers:
+    $ref: ./paths/catalog/item-modifiers.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/stock:
+    $ref: ./paths/catalog/item-stock.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/stock:
+    $ref: ./paths/catalog/variant-stock.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/price:
+    $ref: ./paths/catalog/variant-price.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/price-history:
+    $ref: ./paths/catalog/variant-price-history.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers:
+    $ref: ./paths/catalog/modifiers.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}:
+    $ref: ./paths/catalog/modifier.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}/answers:
+    $ref: ./paths/catalog/modifier-answers.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}/duplicate:
+    $ref: ./paths/catalog/modifier-duplicate.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/brands:
+    $ref: ./paths/catalog/brands.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/brands/{brand_id}:
+    $ref: ./paths/catalog/brand.yaml
+  /v1/platform/catalogs:
+    $ref: ./paths/catalog/oversight.yaml
+  /v1/platform/search/synonyms:
+    $ref: ./paths/catalog/synonyms.yaml
+  /v1/platform/search/synonyms/{group_id}:
+    $ref: ./paths/catalog/synonym.yaml
+  /v1/storefront/stores/{location_id}:
+    $ref: ./paths/catalog/store.yaml
+  /v1/storefront/stores/{location_id}/menu:
+    $ref: ./paths/catalog/store-menu.yaml
+  /v1/storefront/stores/{location_id}/menu/categories/{category_id}:
+    $ref: ./paths/catalog/store-menu-category.yaml
+  /v1/storefront/stores/{location_id}/items/{item_id}:
+    $ref: ./paths/catalog/store-item.yaml
+  /v1/storefront/stores/{location_id}/search:
+    $ref: ./paths/catalog/store-search.yaml
+  /v1/storefront/stores/{location_id}/search/suggestions:
+    $ref: ./paths/catalog/store-suggestions.yaml
+  /v1/storefront/search:
+    $ref: ./paths/catalog/search.yaml
+  /v1/storefront/search/suggestions:
+    $ref: ./paths/catalog/search-suggestions.yaml
 
 components:
   securitySchemes:
@@ -1453,3 +1526,188 @@ components:
       $ref: ./components/schemas/storefront/ReverseGeocode.yaml
     AddressSuggestionList:
       $ref: ./components/schemas/storefront/AddressSuggestionList.yaml
+    # Catalog
+    FoodMark:
+      $ref: ./components/schemas/catalog/FoodMark.yaml
+    SpiceLevel:
+      $ref: ./components/schemas/catalog/SpiceLevel.yaml
+    CatalogItemStatus:
+      $ref: ./components/schemas/catalog/CatalogItemStatus.yaml
+    StockStatus:
+      $ref: ./components/schemas/catalog/StockStatus.yaml
+    ItemStockSummary:
+      $ref: ./components/schemas/catalog/ItemStockSummary.yaml
+    ItemFulfilment:
+      $ref: ./components/schemas/catalog/ItemFulfilment.yaml
+    OutsideHours:
+      $ref: ./components/schemas/catalog/OutsideHours.yaml
+    TaxClass:
+      $ref: ./components/schemas/catalog/TaxClass.yaml
+    PriceChangeVia:
+      $ref: ./components/schemas/catalog/PriceChangeVia.yaml
+    ItemBulkAction:
+      $ref: ./components/schemas/catalog/ItemBulkAction.yaml
+    SearchSuggestionKind:
+      $ref: ./components/schemas/catalog/SearchSuggestionKind.yaml
+    LocalizedText:
+      $ref: ./components/schemas/catalog/LocalizedText.yaml
+    CataloguePicture:
+      $ref: ./components/schemas/catalog/CataloguePicture.yaml
+    CatalogueTaxClass:
+      $ref: ./components/schemas/catalog/CatalogueTaxClass.yaml
+    CatalogueProfile:
+      $ref: ./components/schemas/catalog/CatalogueProfile.yaml
+    CatalogCounts:
+      $ref: ./components/schemas/catalog/CatalogCounts.yaml
+    MenuState:
+      $ref: ./components/schemas/catalog/MenuState.yaml
+    CatalogSummary:
+      $ref: ./components/schemas/catalog/CatalogSummary.yaml
+    CatalogCategory:
+      $ref: ./components/schemas/catalog/CatalogCategory.yaml
+    CatalogCategoryList:
+      $ref: ./components/schemas/catalog/CatalogCategoryList.yaml
+    CatalogCategoryCreate:
+      $ref: ./components/schemas/catalog/CatalogCategoryCreate.yaml
+    CatalogCategoryUpdate:
+      $ref: ./components/schemas/catalog/CatalogCategoryUpdate.yaml
+    CatalogCategoryOrder:
+      $ref: ./components/schemas/catalog/CatalogCategoryOrder.yaml
+    CatalogCategoryItems:
+      $ref: ./components/schemas/catalog/CatalogCategoryItems.yaml
+    ItemAxisValue:
+      $ref: ./components/schemas/catalog/ItemAxisValue.yaml
+    ItemAxis:
+      $ref: ./components/schemas/catalog/ItemAxis.yaml
+    ItemAxisValueInput:
+      $ref: ./components/schemas/catalog/ItemAxisValueInput.yaml
+    ItemAxisInput:
+      $ref: ./components/schemas/catalog/ItemAxisInput.yaml
+    VariantSelection:
+      $ref: ./components/schemas/catalog/VariantSelection.yaml
+    CatalogVariant:
+      $ref: ./components/schemas/catalog/CatalogVariant.yaml
+    CatalogVariantInput:
+      $ref: ./components/schemas/catalog/CatalogVariantInput.yaml
+    ItemAvailability:
+      $ref: ./components/schemas/catalog/ItemAvailability.yaml
+    ItemAvailabilityInput:
+      $ref: ./components/schemas/catalog/ItemAvailabilityInput.yaml
+    AnswerOverride:
+      $ref: ./components/schemas/catalog/AnswerOverride.yaml
+    AnswerOverrideInput:
+      $ref: ./components/schemas/catalog/AnswerOverrideInput.yaml
+    ModifierUse:
+      $ref: ./components/schemas/catalog/ModifierUse.yaml
+    ModifierUseInput:
+      $ref: ./components/schemas/catalog/ModifierUseInput.yaml
+    CatalogItemModifiers:
+      $ref: ./components/schemas/catalog/CatalogItemModifiers.yaml
+    CatalogItem:
+      $ref: ./components/schemas/catalog/CatalogItem.yaml
+    CatalogItemCreate:
+      $ref: ./components/schemas/catalog/CatalogItemCreate.yaml
+    CatalogItemUpdate:
+      $ref: ./components/schemas/catalog/CatalogItemUpdate.yaml
+    CatalogItemRow:
+      $ref: ./components/schemas/catalog/CatalogItemRow.yaml
+    CatalogItemPage:
+      $ref: ./components/schemas/catalog/CatalogItemPage.yaml
+    TreeAnswer:
+      $ref: ./components/schemas/catalog/TreeAnswer.yaml
+    TreeModifier:
+      $ref: ./components/schemas/catalog/TreeModifier.yaml
+    TreeCategory:
+      $ref: ./components/schemas/catalog/TreeCategory.yaml
+    CatalogTree:
+      $ref: ./components/schemas/catalog/CatalogTree.yaml
+    CatalogStockUpdate:
+      $ref: ./components/schemas/catalog/CatalogStockUpdate.yaml
+    CatalogPriceUpdate:
+      $ref: ./components/schemas/catalog/CatalogPriceUpdate.yaml
+    PriceFigures:
+      $ref: ./components/schemas/catalog/PriceFigures.yaml
+    CatalogPriceChange:
+      $ref: ./components/schemas/catalog/CatalogPriceChange.yaml
+    CatalogPriceChangeList:
+      $ref: ./components/schemas/catalog/CatalogPriceChangeList.yaml
+    ModifierAnswer:
+      $ref: ./components/schemas/catalog/ModifierAnswer.yaml
+    CatalogModifier:
+      $ref: ./components/schemas/catalog/CatalogModifier.yaml
+    CatalogModifierList:
+      $ref: ./components/schemas/catalog/CatalogModifierList.yaml
+    ModifierAnswerInput:
+      $ref: ./components/schemas/catalog/ModifierAnswerInput.yaml
+    CatalogModifierCreate:
+      $ref: ./components/schemas/catalog/CatalogModifierCreate.yaml
+    CatalogModifierUpdate:
+      $ref: ./components/schemas/catalog/CatalogModifierUpdate.yaml
+    CatalogModifierAnswers:
+      $ref: ./components/schemas/catalog/CatalogModifierAnswers.yaml
+    CatalogBrand:
+      $ref: ./components/schemas/catalog/CatalogBrand.yaml
+    CatalogBrandList:
+      $ref: ./components/schemas/catalog/CatalogBrandList.yaml
+    CatalogBrandInput:
+      $ref: ./components/schemas/catalog/CatalogBrandInput.yaml
+    CatalogItemBulk:
+      $ref: ./components/schemas/catalog/CatalogItemBulk.yaml
+    BulkRefusal:
+      $ref: ./components/schemas/catalog/BulkRefusal.yaml
+    CatalogItemBulkOutcome:
+      $ref: ./components/schemas/catalog/CatalogItemBulkOutcome.yaml
+    CatalogOverview:
+      $ref: ./components/schemas/catalog/CatalogOverview.yaml
+    CatalogOverviewPage:
+      $ref: ./components/schemas/catalog/CatalogOverviewPage.yaml
+    SearchSynonymGroup:
+      $ref: ./components/schemas/catalog/SearchSynonymGroup.yaml
+    SearchSynonymGroupList:
+      $ref: ./components/schemas/catalog/SearchSynonymGroupList.yaml
+    SearchSynonymGroupCreate:
+      $ref: ./components/schemas/catalog/SearchSynonymGroupCreate.yaml
+    MenuAsk:
+      $ref: ./components/schemas/catalog/MenuAsk.yaml
+    MenuVariant:
+      $ref: ./components/schemas/catalog/MenuVariant.yaml
+    MenuAnswer:
+      $ref: ./components/schemas/catalog/MenuAnswer.yaml
+    MenuModifier:
+      $ref: ./components/schemas/catalog/MenuModifier.yaml
+    MenuItem:
+      $ref: ./components/schemas/catalog/MenuItem.yaml
+    MenuCategory:
+      $ref: ./components/schemas/catalog/MenuCategory.yaml
+    MenuDocument:
+      $ref: ./components/schemas/catalog/MenuDocument.yaml
+    MenuCategoryPage:
+      $ref: ./components/schemas/catalog/MenuCategoryPage.yaml
+    ItemSheet:
+      $ref: ./components/schemas/catalog/ItemSheet.yaml
+    StoreFulfilment:
+      $ref: ./components/schemas/catalog/StoreFulfilment.yaml
+    StoreLive:
+      $ref: ./components/schemas/catalog/StoreLive.yaml
+    StoreHoursDay:
+      $ref: ./components/schemas/catalog/StoreHoursDay.yaml
+    StoreMenuRef:
+      $ref: ./components/schemas/catalog/StoreMenuRef.yaml
+    StoreCategoryTab:
+      $ref: ./components/schemas/catalog/StoreCategoryTab.yaml
+    StorePage:
+      $ref: ./components/schemas/catalog/StorePage.yaml
+    SearchProductHit:
+      $ref: ./components/schemas/catalog/SearchProductHit.yaml
+    SearchStore:
+      $ref: ./components/schemas/catalog/SearchStore.yaml
+    SearchStoreHit:
+      $ref: ./components/schemas/catalog/SearchStoreHit.yaml
+    SearchResult:
+      $ref: ./components/schemas/catalog/SearchResult.yaml
+    SearchSuggestion:
+      $ref: ./components/schemas/catalog/SearchSuggestion.yaml
+    SearchSuggestionList:
+      $ref: ./components/schemas/catalog/SearchSuggestionList.yaml
+    StoreSearchResult:
+      $ref: ./components/schemas/catalog/StoreSearchResult.yaml

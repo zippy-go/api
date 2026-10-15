@@ -1,0 +1,27 @@
+type: object
+description: "What an item does to one answer of a question it asks, for itself alone: its own price for the answer, or hiding it."
+required:
+  - item_id
+  - price
+  - hidden
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The answer, an item the question offers.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+  price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: This item's price for the answer; `null` keeps the question's.
+  hidden:
+    type: boolean
+    description: Not offered under this item.
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    price:
+      minor_units: 0
+      currency: INR
+    hidden: false

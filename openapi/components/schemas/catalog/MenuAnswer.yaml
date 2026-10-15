@@ -1,0 +1,66 @@
+type: object
+description: "An answer of a question on the published menu: the item at the question's price, whether it can be had, and the questions it asks in turn."
+required:
+  - item_id
+  - name
+  - description
+  - food_mark
+  - dietary
+  - picture
+  - price
+  - available
+  - asks
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: Its own mark, drawn beside the answer.
+  dietary:
+    type: array
+    items:
+      type: string
+    description: Its dietary tags.
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its card picture.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price at this question.
+  available:
+    type: boolean
+    description: It can be had now; an answer that cannot is drawn greyed.
+  asks:
+    type: array
+    items:
+      $ref: ./MenuAsk.yaml
+    description: The questions it asks in turn, with its own prices and hidden answers.
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    name:
+      en: Boondi raita
+    description: null
+    food_mark: veg
+    dietary: []
+    picture: null
+    price:
+      minor_units: 4900
+      currency: INR
+    available: false
+    asks: []

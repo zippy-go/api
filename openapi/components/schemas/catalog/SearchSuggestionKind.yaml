@@ -1,0 +1,7 @@
+type: string
+description: "What a suggestion names: a `store`, which opens the store, or a `product`, whose name is searched for."
+enum:
+  - store
+  - product
+examples:
+  - product

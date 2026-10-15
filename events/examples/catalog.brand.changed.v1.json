@@ -1,0 +1,14 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc904",
+  "type": "catalog.brand.changed",
+  "version": 1,
+  "occurred_at": "2026-10-15T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40",
+    "brand_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc401",
+    "change": "renamed",
+    "revision": 60
+  }
+}

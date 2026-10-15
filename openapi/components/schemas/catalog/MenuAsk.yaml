@@ -1,0 +1,31 @@
+type: object
+description: A question an item asks on the published menu, with the answers it prices or hides for itself; the question itself is in the document's `modifiers`.
+required:
+  - modifier_id
+  - prices
+  - hidden
+properties:
+  modifier_id:
+    type: string
+    format: uuid
+    description: The question.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+  prices:
+    type: object
+    description: This item's price for an answer, by the answer's item id; an answer not named keeps the question's price.
+    additionalProperties:
+      $ref: ../common/Money.yaml
+  hidden:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The answers this item hides.
+examples:
+  - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    prices:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102:
+        minor_units: 0
+        currency: INR
+    hidden: []

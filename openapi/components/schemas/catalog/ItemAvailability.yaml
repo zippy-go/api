@@ -1,0 +1,82 @@
+type: object
+description: When and how an item may be ordered, where its catalogue type allows each; ordering refuses a basket line outside these and the storefront says why.
+required:
+  - hours
+  - pre_order_only
+  - pre_order_notice_hours
+  - fulfilment
+  - max_per_order
+  - daily_limit
+  - age_restricted
+  - prescription_required
+  - preparation_minutes
+  - personalisation
+properties:
+  hours:
+    oneOf:
+      - type: array
+        items:
+          $ref: ../reference/DaySchedule.yaml
+        description: The days and windows it is sold.
+      - type: "null"
+    description: Its own hours within its categories'; a day not listed is not sold; `null` follows its categories.
+  pre_order_only:
+    type: boolean
+    description: Sold only ahead of time.
+  pre_order_notice_hours:
+    type:
+      - integer
+      - "null"
+    description: "The notice a pre-order needs: 24, 48 or 72 hours."
+    examples:
+      - null
+  fulfilment:
+    $ref: ./ItemFulfilment.yaml
+    description: How it may leave the store.
+  max_per_order:
+    type:
+      - integer
+      - "null"
+    description: The most one order may take, 1 to 99.
+    minimum: 1
+    maximum: 99
+    examples:
+      - null
+  daily_limit:
+    type:
+      - integer
+      - "null"
+    description: The most sold in a day, counted by ordering, 1 to 10000.
+    minimum: 1
+    maximum: 10000
+    examples:
+      - null
+  age_restricted:
+    type: boolean
+    description: Sold to adults only, marked 18+ (alcohol, tobacco, knives).
+  prescription_required:
+    type: boolean
+    description: Sold only against a prescription, at a store whose order settings accept prescriptions.
+  preparation_minutes:
+    type:
+      - integer
+      - "null"
+    description: Its own preparation time in minutes, 1 to 240.
+    minimum: 1
+    maximum: 240
+    examples:
+      - 20
+  personalisation:
+    type: boolean
+    description: The customer may attach a personal message.
+examples:
+  - hours: null
+    pre_order_only: false
+    pre_order_notice_hours: null
+    fulfilment: any
+    max_per_order: null
+    daily_limit: null
+    age_restricted: false
+    prescription_required: false
+    preparation_minutes: 20
+    personalisation: false

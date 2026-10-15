@@ -1,0 +1,21 @@
+type: object
+description: A question an item asks, as sent.
+required:
+  - modifier_id
+properties:
+  modifier_id:
+    type: string
+    format: uuid
+    description: The question.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+  overrides:
+    type: array
+    items:
+      $ref: ./AnswerOverrideInput.yaml
+    description: What the item does to the question's answers; none when absent.
+examples:
+  - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    overrides:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        price: 0

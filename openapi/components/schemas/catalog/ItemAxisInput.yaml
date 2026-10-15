@@ -1,0 +1,30 @@
+type: object
+description: "An axis as sent: an `id` keeps an axis the item already has."
+required:
+  - name
+  - values
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The axis, to keep one.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name, unique on the item.
+  values:
+    type: array
+    items:
+      $ref: ./ItemAxisValueInput.yaml
+    description: Its values, at least two.
+    minItems: 2
+    maxItems: 20
+examples:
+  - name:
+      en: Portion
+    values:
+      - name:
+          en: Half
+      - name:
+          en: Full

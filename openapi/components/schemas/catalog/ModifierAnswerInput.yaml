@@ -1,0 +1,25 @@
+type: object
+description: "An answer as sent: an item of the store, offered once per question."
+required:
+  - item_id
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+  price:
+    type:
+      - integer
+      - "null"
+    description: The price when chosen here, in minor units; `null` or absent keeps the item's own.
+    format: int64
+    minimum: 0
+    examples:
+      - null
+  offered:
+    type: boolean
+    description: Offered; `true` when absent.
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102

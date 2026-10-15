@@ -1,0 +1,128 @@
+type: object
+description: "What a store's catalogue type lets its items carry: the store type's catalogue block as platform staff keep it, with the defaults every type gets. The item form draws only what the profile allows; an item using anything else is refused naming it (`capability_not_allowed`)."
+required:
+  - catalogue_type
+  - store_type_code
+  - term
+  - capabilities
+  - food_mark
+  - mrp
+  - food_details
+  - dietary_tags
+  - allergen_tags
+  - product_fields
+  - languages
+  - tax_classes
+  - pre_order_notice_hours
+properties:
+  catalogue_type:
+    $ref: ../services/CatalogueType.yaml
+    description: The catalogue type of the product-sales Service switched on at the store.
+  store_type_code:
+    type:
+      - string
+      - "null"
+    description: The reference store type it is (`FOOD`, `BAKERY`, `DRINKS`, `MARKETS`, `PHARMACY`, `RETAIL`), `null` for `general`.
+    examples:
+      - FOOD
+  term:
+    $ref: ../reference/CatalogueTerm.yaml
+    description: "What screens call the catalogue: `menu` or `products`."
+  capabilities:
+    type: array
+    items:
+      $ref: ../reference/CatalogueCapability.yaml
+    description: What items may use; a section the type does not allow is absent from the item form.
+  food_mark:
+    type: boolean
+    description: Every item carries a veg or non-veg mark.
+  mrp:
+    type: boolean
+    description: Variants may carry the MRP printed on the pack, and are never priced above it.
+  food_details:
+    type: boolean
+    description: Items may say their spice level and how many they serve.
+  dietary_tags:
+    type: array
+    items:
+      type: string
+    description: The closed set dietary tags are drawn from.
+    examples:
+      - - vegan
+        - vegetarian
+  allergen_tags:
+    type: array
+    items:
+      type: string
+    description: The closed set allergen tags are drawn from.
+    examples:
+      - - contains_nuts
+  product_fields:
+    type: array
+    items:
+      $ref: ../reference/ProductField.yaml
+    description: The typed fields an item of this type records in `attributes`.
+  languages:
+    type: array
+    items:
+      type: string
+    description: The languages wording is kept in.
+    examples:
+      - - en
+        - hi
+        - te
+  tax_classes:
+    type: array
+    items:
+      $ref: ./CatalogueTaxClass.yaml
+    description: The tax classes a variant may name, with today's rates.
+  pre_order_notice_hours:
+    type: array
+    items:
+      type: integer
+    description: The notice a pre-order-only item may ask for, in hours.
+    examples:
+      - - 24
+        - 48
+        - 72
+examples:
+  - catalogue_type: food
+    store_type_code: FOOD
+    term: menu
+    capabilities:
+      - variants
+      - modifiers
+      - dietary
+      - allergens
+      - personalisation
+      - preparation_time
+      - availability_windows
+      - age_restriction
+      - quantity_limit
+      - pre_order_only
+      - tax_class
+    food_mark: true
+    mrp: false
+    food_details: true
+    dietary_tags:
+      - vegan
+      - vegetarian
+      - halal
+      - kosher
+    allergen_tags:
+      - contains_nuts
+      - contains_gluten
+      - contains_dairy
+    product_fields: []
+    languages:
+      - en
+      - hi
+      - te
+    tax_classes:
+      - code: merit
+        label: Merit rate
+        rate_percent: 5
+    pre_order_notice_hours:
+      - 24
+      - 48
+      - 72

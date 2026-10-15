@@ -1,0 +1,112 @@
+# Path item for /v1/storefront/search. Referenced from openapi.yaml.
+get:
+  operationId: searchStores
+  summary: Search stores and products
+  description: "Finds stores by their name and by what they sell, across the stores of the customer's city, grouped by store: each store with its products that matched (six at most, best first) and how many matched in all. Every word typed is found as a whole word, as the start of a word, or as a near miss with the first letter right; words in a synonym group find each other, ranked below an exact match; when no store matches every word of two or more, all but one are enough (`relaxed`). The ranking is published: a store whose name matches exactly what was typed comes first; the rest are ordered open before closed, then nearer the pin before farther, then by how well the words matched; no store is ranked higher for a fee. A store whose zone does not serve the customer's is still shown, marked by `delivers_here`. A search that finds nothing is recorded, without the customer's identity."
+  tags:
+    - Search
+  security: []
+  parameters:
+    - name: q
+      in: query
+      required: true
+      description: What was typed, at most 100 characters; fewer than two letters finds nothing.
+      schema:
+        type: string
+        maxLength: 100
+      example: biriyani
+    - name: service_area_id
+      in: query
+      required: true
+      description: The service area the customer is in, normally the zone of their pin or selected address; the search covers the stores of its city, those whose zone serves it first.
+      schema:
+        type: string
+        format: uuid
+      example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60
+    - name: lat
+      in: query
+      required: false
+      description: The latitude of the customer's pin, for distances; sent with `lng`.
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      example: 17.4435
+    - name: lng
+      in: query
+      required: false
+      description: The longitude of the customer's pin; sent with `lat`.
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      example: 78.3772
+    - name: vertical_id
+      in: query
+      required: false
+      description: Only stores trading in this Vertical.
+      schema:
+        type: string
+        format: uuid
+    - name: veg
+      in: query
+      required: false
+      description: Only products marked veg, and stores with one that matched.
+      schema:
+        type: boolean
+    - name: min_price
+      in: query
+      required: false
+      description: Only products costing at least this, in minor units.
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+    - name: max_price
+      in: query
+      required: false
+      description: Only products costing at most this, in minor units.
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+    - name: open_now
+      in: query
+      required: false
+      description: Only stores open now.
+      schema:
+        type: boolean
+    - name: limit
+      in: query
+      required: false
+      description: How many stores. 1 to 50, 24 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 24
+  responses:
+    "200":
+      description: What was found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SearchResult.yaml
+    "400":
+      description: A missing `q` or `service_area_id`, an unknown service area, a latitude without a longitude, or a malformed identifier (`validation_failed`, `malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

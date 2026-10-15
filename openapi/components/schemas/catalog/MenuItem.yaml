@@ -1,0 +1,184 @@
+type: object
+description: An item on the published menu, as a card and its sheet draw it.
+required:
+  - id
+  - name
+  - description
+  - food_mark
+  - spice_level
+  - serves
+  - dietary
+  - allergens
+  - brand
+  - pictures
+  - from_price
+  - price_varies
+  - available
+  - stock
+  - axes
+  - variants
+  - asks
+  - availability
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: Its veg or non-veg mark.
+  spice_level:
+    oneOf:
+      - $ref: ./SpiceLevel.yaml
+      - type: "null"
+    description: How hot it is.
+  serves:
+    type:
+      - integer
+      - "null"
+    description: How many it serves.
+    examples:
+      - 1
+  dietary:
+    type: array
+    items:
+      type: string
+    description: Its dietary tags.
+  allergens:
+    type: array
+    items:
+      type: string
+    description: Its allergen tags.
+  brand:
+    type:
+      - string
+      - "null"
+    description: Its brand's name.
+    examples:
+      - null
+  pictures:
+    type: array
+    items:
+      $ref: ./CataloguePicture.yaml
+    description: Its gallery; the first is its card.
+  from_price:
+    $ref: ../common/Money.yaml
+    description: The least an enabled variant costs, before offers.
+  price_varies:
+    type: boolean
+    description: Its variants cost different amounts, so the card reads "from".
+  available:
+    type: boolean
+    description: A customer can order it now; sold out is said, not hidden.
+  stock:
+    $ref: ./ItemStockSummary.yaml
+    description: Its stock across its variants.
+  axes:
+    type: array
+    items:
+      $ref: ./ItemAxis.yaml
+    description: The axes its sheet draws as chips.
+  variants:
+    type: array
+    items:
+      $ref: ./MenuVariant.yaml
+    description: Its enabled variants.
+  asks:
+    type: array
+    items:
+      $ref: ./MenuAsk.yaml
+    description: The questions it asks, in order.
+  availability:
+    $ref: ./ItemAvailability.yaml
+    description: When and how it may be ordered.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    name:
+      en: Hyderabadi Biryani
+      te: హైదరాబాదీ బిర్యానీ
+    description:
+      en: Dum-cooked basmati rice with chicken, saffron and fried onions.
+    food_mark: non_veg
+    spice_level: medium
+    serves: 1
+    dietary:
+      - halal
+    allergens: []
+    brand: null
+    pictures:
+      - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+        thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+        card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+        hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+    from_price:
+      minor_units: 24900
+      currency: INR
+    price_varies: true
+    available: true
+    stock: in_stock
+    axes:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601
+        name:
+          en: Portion
+        values:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+            name:
+              en: Half
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc612
+            name:
+              en: Full
+    variants:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+        selection:
+          0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+        price:
+          minor_units: 24900
+          currency: INR
+        offer_price: null
+        mrp: null
+        available: true
+        stock: in_stock
+        quantity_left: null
+        picture: null
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc202
+        selection:
+          0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc612
+        price:
+          minor_units: 39900
+          currency: INR
+        offer_price: null
+        mrp: null
+        available: true
+        stock: in_stock
+        quantity_left: null
+        picture: null
+    asks:
+      - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        prices:
+          0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102:
+            minor_units: 0
+            currency: INR
+        hidden: []
+    availability:
+      hours: null
+      pre_order_only: false
+      pre_order_notice_hours: null
+      fulfilment: any
+      max_per_order: null
+      daily_limit: null
+      age_restricted: false
+      prescription_required: false
+      preparation_minutes: 20
+      personalisation: false

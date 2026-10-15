@@ -1,0 +1,17 @@
+type: object
+description: "A value of an axis as sent: an `id` keeps a value the item already has."
+required:
+  - name
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The value, to keep one.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name, unique on the axis.
+examples:
+  - name:
+      en: Half

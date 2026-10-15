@@ -1,0 +1,134 @@
+type: object
+description: "A store's catalogue as one tree: categories in order with their first items, every question those items ask with its answers, and the row of every item reachable, so a client opens an item onto its questions, a question onto its answers and an answer onto the questions it asks in turn, three deep, never back into an item above it."
+required:
+  - location_id
+  - revision
+  - menu_version
+  - categories
+  - modifiers
+  - items
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  revision:
+    type: integer
+    description: The catalogue's revision.
+    examples:
+      - 57
+  menu_version:
+    type:
+      - integer
+      - "null"
+    description: The published menu's version; `null` before the first.
+    examples:
+      - 42
+  categories:
+    type: array
+    items:
+      $ref: ./TreeCategory.yaml
+    description: The categories in the store's order, sub-categories after their parent.
+  modifiers:
+    type: object
+    description: The questions, by id.
+    additionalProperties:
+      $ref: ./TreeModifier.yaml
+  items:
+    type: object
+    description: "The item rows, by id: every item on a loaded page of a category and every answer reachable from them."
+    additionalProperties:
+      $ref: ./CatalogItemRow.yaml
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    revision: 57
+    menu_version: 42
+    categories:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+        parent_id: null
+        name:
+          en: Biryanis
+        hidden: false
+        outside_hours: grey
+        hours: null
+        picture: null
+        position: 0
+        item_count: 1
+        item_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        next_cursor: null
+    modifiers:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        name:
+          en: Choose your raita
+        hint: null
+        min: 0
+        max: 1
+        required: false
+        repeats: false
+        status: active
+        answers:
+          - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+            price: null
+            offered: true
+            position: 0
+    items:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        name:
+          en: Hyderabadi Biryani
+          te: హైదరాబాదీ బిర్యానీ
+        status: active
+        listed: true
+        food_mark: non_veg
+        picture:
+          asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+          thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+          card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+          hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+        from_price:
+          minor_units: 24900
+          currency: INR
+        price_varies: true
+        single_variant_id: null
+        offer_price: null
+        variant_count: 2
+        stock: in_stock
+        sellable: true
+        category_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+        modifiers:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        answer_of: []
+        brand_id: null
+        has_picture: true
+        updated_at: 2026-10-15T09:00:00Z
+        version: 3
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102:
+        id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        name:
+          en: Boondi raita
+        status: active
+        listed: false
+        food_mark: veg
+        picture: null
+        from_price:
+          minor_units: 4900
+          currency: INR
+        price_varies: false
+        single_variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc203
+        offer_price: null
+        variant_count: 1
+        stock: in_stock
+        sellable: true
+        category_ids: []
+        modifiers: []
+        answer_of:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        brand_id: null
+        has_picture: false
+        updated_at: 2026-10-15T09:00:00Z
+        version: 1

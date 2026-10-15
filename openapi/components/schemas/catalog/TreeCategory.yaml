@@ -1,0 +1,88 @@
+type: object
+description: A category in the catalogue tree, with its first fifty items.
+required:
+  - id
+  - parent_id
+  - name
+  - hidden
+  - outside_hours
+  - hours
+  - picture
+  - position
+  - item_count
+  - item_ids
+  - next_cursor
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The category.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its parent.
+    examples:
+      - null
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  hidden:
+    type: boolean
+    description: Hidden from customers.
+  outside_hours:
+    $ref: ./OutsideHours.yaml
+    description: What it does outside its hours.
+  hours:
+    oneOf:
+      - type: array
+        items:
+          $ref: ../reference/DaySchedule.yaml
+        description: The days and windows it is sold.
+      - type: "null"
+    description: Its own hours; `null` follows the store.
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its picture.
+  position:
+    type: integer
+    description: Its place in the store's order.
+    examples:
+      - 0
+  item_count:
+    type: integer
+    description: How many items it holds.
+    examples:
+      - 1
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its first fifty items in its order; their rows are in the tree's `items`.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: Passed as `cursor` to `GET .../categories/{category_id}/items` for the rest; `null` when all are here.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+    parent_id: null
+    name:
+      en: Biryanis
+    hidden: false
+    outside_hours: grey
+    hours: null
+    picture: null
+    position: 0
+    item_count: 1
+    item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    next_cursor: null

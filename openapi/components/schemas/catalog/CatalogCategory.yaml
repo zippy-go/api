@@ -1,0 +1,146 @@
+type: object
+description: A category of a store's catalogue. It owns the order of the items on it, may nest one level under another, and a category holding categories holds no items of its own.
+required:
+  - id
+  - location_id
+  - parent_id
+  - name
+  - description
+  - picture
+  - position
+  - hidden
+  - hours
+  - outside_hours
+  - item_ids
+  - item_count
+  - child_ids
+  - version
+  - created_at
+  - updated_at
+  - created_by
+  - updated_by
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The category.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The category it sits under, one level deep at most; `null` at the top.
+    examples:
+      - null
+  hidden:
+    type: boolean
+    description: Hidden from customers altogether.
+  hours:
+    oneOf:
+      - type: array
+        items:
+          $ref: ../reference/DaySchedule.yaml
+        description: The days and windows it is sold.
+      - type: "null"
+    description: "Its own hours: a day not listed is not sold; `null` follows the store."
+  outside_hours:
+    $ref: ./OutsideHours.yaml
+    description: What it does outside its hours.
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its picture.
+  position:
+    type: integer
+    description: Where it stands in the store's order, from 0.
+    examples:
+      - 0
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its items, in its order.
+  item_count:
+    type: integer
+    description: How many items it holds.
+    examples:
+      - 1
+  child_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its sub-categories, in order.
+  version:
+    type: integer
+    description: The version, raised by every change; the entity tag.
+    examples:
+      - 2
+  created_at:
+    type: string
+    format: date-time
+    description: When it was created.
+    examples:
+      - 2026-10-15T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-15T09:00:00Z
+  created_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who created it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  updated_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who last changed it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    parent_id: null
+    name:
+      en: Biryanis
+      te: బిర్యానీలు
+    description: null
+    picture: null
+    position: 0
+    hidden: false
+    hours: null
+    outside_hours: grey
+    item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    item_count: 1
+    child_ids: []
+    version: 2
+    created_at: 2026-10-15T09:00:00Z
+    updated_at: 2026-10-15T09:00:00Z
+    created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20

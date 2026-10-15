@@ -1,0 +1,10 @@
+type: string
+description: "What a bulk act does to every selected item: set its `stock`, put it on a `category`, make it ask `modifiers`, `delete` it, or set whether it is `listed`."
+enum:
+  - stock
+  - category
+  - modifiers
+  - delete
+  - listed
+examples:
+  - stock

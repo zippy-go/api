@@ -1,0 +1,15 @@
+type: object
+description: "Request body of `PUT .../catalog/categories/{category_id}/items`: the items on the category, in its order."
+required:
+  - item_ids
+properties:
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items, in order.
+    maxItems: 2000
+examples:
+  - item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101

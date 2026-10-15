@@ -1,0 +1,40 @@
+type: object
+description: "Request body of `POST .../catalog/items/bulk`: one act on up to 500 items."
+required:
+  - action
+  - item_ids
+properties:
+  action:
+    $ref: ./ItemBulkAction.yaml
+    description: What to do.
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items.
+    minItems: 1
+    maxItems: 500
+  stock:
+    $ref: ./StockStatus.yaml
+    description: The stock, for `stock`.
+  category_id:
+    type: string
+    format: uuid
+    description: The category to put them on, last, for `category`.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+  modifier_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The questions they ask after their own, for `modifiers`.
+  listed:
+    type: boolean
+    description: Whether they are listed, for `listed`.
+examples:
+  - action: stock
+    item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    stock: sold_out_today

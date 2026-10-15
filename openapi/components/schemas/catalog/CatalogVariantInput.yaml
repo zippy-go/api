@@ -1,0 +1,75 @@
+type: object
+description: A variant as sent. Prices are in minor units of the store's currency, tax included. A variant named by `id` keeps its stock and its price history.
+required:
+  - price
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The variant, to keep one.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+  selection:
+    $ref: ./VariantSelection.yaml
+    description: The value it chooses on each axis, by id or English name; empty for the one variant of an item with no axes.
+  price:
+    type: integer
+    description: Its price in minor units, tax included.
+    format: int64
+    minimum: 0
+    examples:
+      - 24900
+  offer_price:
+    type:
+      - integer
+      - "null"
+    description: A lower price it is offered at, below `price`.
+    format: int64
+    minimum: 0
+    examples:
+      - null
+  mrp:
+    type:
+      - integer
+      - "null"
+    description: The MRP printed on the pack, where the type carries MRP; `price` may not exceed it.
+    format: int64
+    minimum: 0
+    examples:
+      - null
+  tax_class:
+    oneOf:
+      - $ref: ./TaxClass.yaml
+      - type: "null"
+    description: Its tax class; `null` inherits the Vertical's default.
+  sku:
+    type:
+      - string
+      - "null"
+    description: The store's own code for it.
+    maxLength: 64
+    examples:
+      - null
+  enabled:
+    type: boolean
+    description: Sold at all; `true` when absent.
+  picture_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "Its picture: a stored `product_image` asset of this store, or a crop of one."
+    examples:
+      - null
+  quantity:
+    type:
+      - integer
+      - "null"
+    description: How many are on hand, where the type tracks inventory.
+    minimum: 0
+    examples:
+      - null
+examples:
+  - selection:
+      Portion: Half
+    price: 24900

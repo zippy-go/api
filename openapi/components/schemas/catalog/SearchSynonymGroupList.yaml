@@ -1,0 +1,19 @@
+type: object
+description: Every synonym group.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./SearchSynonymGroup.yaml
+    description: The groups.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc801
+        vertical_id: null
+        words:
+          - biryani
+          - biriyani
+          - briyani
+        created_at: 2026-10-15T09:00:00Z

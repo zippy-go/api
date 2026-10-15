@@ -1,0 +1,31 @@
+type: object
+description: A question an item asks, with the answers it prices or hides for itself.
+required:
+  - modifier_id
+  - name
+  - overrides
+properties:
+  modifier_id:
+    type: string
+    format: uuid
+    description: The question.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+  name:
+    $ref: ./LocalizedText.yaml
+    description: The question's name.
+  overrides:
+    type: array
+    items:
+      $ref: ./AnswerOverride.yaml
+    description: What the item does to the question's answers.
+examples:
+  - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    name:
+      en: Choose your raita
+    overrides:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        price:
+          minor_units: 0
+          currency: INR
+        hidden: false

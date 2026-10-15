@@ -1,0 +1,9 @@
+type: string
+description: "India's GST classes: `nil_rated` (0 %), `merit` (5 %), `standard` (18 %) and `demerit` (40 %), the rates in force on 2026-10-15. Prices include the tax; the amount is worked out at the time of an order from the class and the rate then in force, never stored on the item. A variant without a class inherits its Vertical's default."
+enum:
+  - nil_rated
+  - merit
+  - standard
+  - demerit
+examples:
+  - merit

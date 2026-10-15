@@ -1,0 +1,63 @@
+type: object
+description: An item's availability as sent; absent members keep what is stored (`false`, `any` or `null` on a new item).
+properties:
+  hours:
+    oneOf:
+      - type: array
+        items:
+          $ref: ../reference/DaySchedule.yaml
+        description: The days and windows it is sold.
+      - type: "null"
+    description: Its own hours within its categories'; `null` follows its categories.
+  pre_order_only:
+    type: boolean
+    description: Sold only ahead of time.
+  pre_order_notice_hours:
+    type:
+      - integer
+      - "null"
+    description: "The notice a pre-order needs: 24, 48 or 72 hours."
+    examples:
+      - 48
+  fulfilment:
+    $ref: ./ItemFulfilment.yaml
+    description: How it may leave the store.
+  max_per_order:
+    type:
+      - integer
+      - "null"
+    description: The most one order may take, 1 to 99.
+    minimum: 1
+    maximum: 99
+    examples:
+      - 3
+  daily_limit:
+    type:
+      - integer
+      - "null"
+    description: The most sold in a day, 1 to 10000.
+    minimum: 1
+    maximum: 10000
+    examples:
+      - 40
+  age_restricted:
+    type: boolean
+    description: Sold to adults only.
+  prescription_required:
+    type: boolean
+    description: Sold only against a prescription.
+  preparation_minutes:
+    type:
+      - integer
+      - "null"
+    description: Its own preparation time in minutes, 1 to 240.
+    minimum: 1
+    maximum: 240
+    examples:
+      - 20
+  personalisation:
+    type: boolean
+    description: The customer may attach a personal message.
+examples:
+  - max_per_order: 3
+    daily_limit: 40

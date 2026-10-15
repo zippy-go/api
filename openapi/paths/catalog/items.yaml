@@ -1,0 +1,220 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/items. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: listCatalogItems
+  summary: List a store's items
+  description: "Every item of the store as a row of the list view: its price, its categories, what it asks, its stock and its standing, filtered with the named parameters or the grammar of `GET .../items/filters`, sorted with up to three keys (`name` by default) and paged with `limit` and `cursor`. `catalog:read`."
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: Only items whose English name contains this text, case-insensitively.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: category_id
+      in: query
+      required: false
+      description: Only items on this category.
+      schema:
+        type: string
+        format: uuid
+    - name: status
+      in: query
+      required: false
+      description: Only items on sale (`active`) or off sale (`inactive`).
+      schema:
+        $ref: ../../components/schemas/catalog/CatalogItemStatus.yaml
+    - name: listed
+      in: query
+      required: false
+      description: Only items that are, or are not, on the menu in their own right.
+      schema:
+        type: boolean
+    - name: stock
+      in: query
+      required: false
+      description: Only items with a variant in this state.
+      schema:
+        $ref: ../../components/schemas/catalog/StockStatus.yaml
+    - name: has_picture
+      in: query
+      required: false
+      description: Only items with, or without, a picture.
+      schema:
+        type: boolean
+    - name: food_mark
+      in: query
+      required: false
+      description: Only items with this mark.
+      schema:
+        $ref: ../../components/schemas/catalog/FoodMark.yaml
+    - name: brand_id
+      in: query
+      required: false
+      description: Only items of this brand.
+      schema:
+        type: string
+        format: uuid
+    - name: filter
+      in: query
+      required: false
+      description: A filter tree as JSON, URL-encoded; the fields and operators are those of `GET .../items/filters`.
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: "Up to three sort keys, comma separated, each optionally prefixed with `-` to descend: `name`, `updated_at`, `created_at`, `from_price`. `name` by default; the id breaks ties."
+      schema:
+        type: string
+    - name: facets
+      in: query
+      required: false
+      description: "Fields to count values of, comma separated: `status`, `listed`, `food_mark`."
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of items.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/CatalogItemPage.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createCatalogItem
+  summary: Add an item
+  description: "Adds an item sold as one or more variants: one variant choosing nothing when it has no axes, one per combination of the axes' values otherwise, at least one enabled. Only what the store's catalogue type allows may be sent (`capability_not_allowed`); every item of a food menu carries its veg or non-veg mark (`food_mark_required`); tags come from the type's closed sets; an offer costs less than the price and a price never exceeds the MRP. The price of each variant starts its history (`created`). Pictures are stored `product_image` assets of this store or crops of them. Live with no publish step: the menu follows within about a second. `catalog:write`."
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The item.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/catalog/CatalogItemCreate.yaml
+  responses:
+    "201":
+      description: The item.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/CatalogItem.yaml
+    "400":
+      description: "The body failed validation (`validation_failed`), each `errors` entry naming the member: `capability_not_allowed`, `food_mark_required`, `tag_not_in_set`, `offer_not_below_price`, `price_above_mrp`, `english_required`, `language_unsupported`, `axis_values_too_few`, `variant_selection_invalid`, `variant_selection_repeated`, `variant_combination_missing`, `no_enabled_variant`, `default_variant_required`, `pre_order_notice_invalid`, `item_unlisted`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`prescriptions_not_accepted` (the store's order settings do not accept prescriptions), `asset_not_usable` (a picture is not a stored `product_image` of this store), `category_has_subcategories`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

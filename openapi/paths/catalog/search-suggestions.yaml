@@ -1,0 +1,66 @@
+# Path item for /v1/storefront/search/suggestions. Referenced from openapi.yaml.
+get:
+  operationId: suggestNames
+  summary: Suggest names as the customer types
+  description: "Names of stores and products that start like what is being typed, or nearly, searched on names alone across the stores of the customer's city, one of each name, best first. A store's name opens the store; a product's name is searched for. Suggestions never hold up the results: ask for them alongside."
+  tags:
+    - Search
+  security: []
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: What was typed, at most 100 characters; fewer than two letters finds nothing.
+      schema:
+        type: string
+        maxLength: 100
+      example: biriyani
+    - name: service_area_id
+      in: query
+      required: true
+      description: The service area the customer is in, normally the zone of their pin or selected address; the search covers the stores of its city, those whose zone serves it first.
+      schema:
+        type: string
+        format: uuid
+      example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60
+    - name: vertical_id
+      in: query
+      required: false
+      description: Only names from stores trading in this Vertical.
+      schema:
+        type: string
+        format: uuid
+    - name: limit
+      in: query
+      required: false
+      description: How many names. 1 to 20, 8 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 20
+        default: 8
+  responses:
+    "200":
+      description: The suggestions.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SearchSuggestionList.yaml
+    "400":
+      description: A missing `service_area_id`, an unknown service area, or a malformed identifier (`validation_failed`, `malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,9 @@
+type: string
+description: "An item's stock across its enabled variants: all in stock, `partly` (some can be had, some cannot), all out of stock, or all sold out for today."
+enum:
+  - in_stock
+  - partly
+  - out_of_stock
+  - sold_out_today
+examples:
+  - in_stock

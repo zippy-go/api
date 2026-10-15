@@ -1,0 +1,44 @@
+type: object
+description: A brand of the store's own list; an item names one at most.
+required:
+  - id
+  - name
+  - item_count
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The brand.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc401
+  name:
+    type: string
+    description: Its name, unique in the store.
+    maxLength: 120
+    examples:
+      - Amul
+  item_count:
+    type: integer
+    description: How many items carry it.
+    examples:
+      - 40
+  created_at:
+    type: string
+    format: date-time
+    description: When it was created.
+    examples:
+      - 2026-10-15T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-15T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc401
+    name: Amul
+    item_count: 40
+    created_at: 2026-10-15T09:00:00Z
+    updated_at: 2026-10-15T09:00:00Z

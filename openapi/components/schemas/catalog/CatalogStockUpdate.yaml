@@ -1,0 +1,18 @@
+type: object
+description: Request body of the stock operations.
+required:
+  - status
+properties:
+  status:
+    $ref: ./StockStatus.yaml
+    description: "The new stock: `sold_out_today` comes back by itself at 00:00 in the store's clock."
+  quantity:
+    type:
+      - integer
+      - "null"
+    description: "How many are on hand, where the type tracks inventory: a restock sets it; zero is out of stock."
+    minimum: 0
+    examples:
+      - null
+examples:
+  - status: sold_out_today

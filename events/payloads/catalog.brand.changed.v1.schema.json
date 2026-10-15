@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.brand.changed.v1.schema.json",
+  "title": "CatalogBrandChangedPayload",
+  "description": "Payload of `catalog.brand.changed` version 1: a brand of a store's own list changed. The envelope's `partner_id` is the store's partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "brand_id",
+    "change",
+    "revision"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store whose catalogue changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "brand_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The brand.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc401"
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "created",
+        "renamed",
+        "deleted"
+      ],
+      "description": "What kind of change.",
+      "examples": [
+        "renamed"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The catalogue's revision after the change, raised by every change; the version of the `catalog.changed` signal on the store's catalogue channel.",
+      "examples": [
+        57
+      ]
+    }
+  }
+}

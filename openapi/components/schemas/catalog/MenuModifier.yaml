@@ -1,0 +1,70 @@
+type: object
+description: A question on the published menu, carried once however many items ask it.
+required:
+  - id
+  - name
+  - hint
+  - min
+  - max
+  - required
+  - repeats
+  - answers
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The question.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  hint:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: Its hint.
+  min:
+    type: integer
+    description: The least answers it asks for.
+    examples:
+      - 0
+  max:
+    type: integer
+    description: The most it takes; 0 is no ceiling.
+    examples:
+      - 1
+  required:
+    type: boolean
+    description: It asks for at least one answer; a sheet names it where the button will be until one is chosen.
+  repeats:
+    type: boolean
+    description: An answer may be chosen more than once.
+  answers:
+    type: array
+    items:
+      $ref: ./MenuAnswer.yaml
+    description: The answers offered, in order.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    name:
+      en: Choose your raita
+    hint:
+      en: One comes with the biryani
+    min: 0
+    max: 1
+    required: false
+    repeats: false
+    answers:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        name:
+          en: Boondi raita
+        description: null
+        food_mark: veg
+        dietary: []
+        picture: null
+        price:
+          minor_units: 4900
+          currency: INR
+        available: false
+        asks: []

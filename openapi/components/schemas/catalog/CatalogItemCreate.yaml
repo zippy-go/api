@@ -1,0 +1,125 @@
+type: object
+description: Request body of `POST .../catalog/items`. Only what the store's catalogue type allows may be sent (`capability_not_allowed` otherwise); where the type carries the food mark, `food_mark` is required.
+required:
+  - name
+  - variants
+properties:
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  status:
+    $ref: ./CatalogItemStatus.yaml
+    description: On sale or off sale; `active` when absent.
+  listed:
+    type: boolean
+    description: On the menu in its own right; `true` when absent.
+  brand_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its brand, one of the store's, where the type carries brands.
+    examples:
+      - null
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: Its veg or non-veg mark, required where the type carries the food mark.
+  spice_level:
+    oneOf:
+      - $ref: ./SpiceLevel.yaml
+      - type: "null"
+    description: How hot it is, where the type carries food details.
+  serves:
+    type:
+      - integer
+      - "null"
+    description: How many it serves, 1 to 20, where the type carries food details.
+    minimum: 1
+    maximum: 20
+    examples:
+      - 1
+  dietary:
+    type: array
+    items:
+      type: string
+    description: Dietary tags from the type's closed set.
+    examples:
+      - - halal
+  allergens:
+    type: array
+    items:
+      type: string
+    description: Allergen tags from the type's closed set.
+    examples:
+      - []
+  tags:
+    type: array
+    items:
+      type: string
+    description: Words customers find it by, lower case.
+    examples:
+      - - biryani
+        - dum
+  attributes:
+    type: object
+    description: Values of the typed fields the type declares (`profile.product_fields`), key to value.
+    additionalProperties: true
+    examples:
+      - {}
+  pictures:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "Its gallery as asset ids, the card first: stored `product_image` assets of this store or crops of them."
+    maxItems: 10
+  axes:
+    type: array
+    items:
+      $ref: ./ItemAxisInput.yaml
+    description: The axes it is sold along.
+    maxItems: 3
+  variants:
+    type: array
+    items:
+      $ref: ./CatalogVariantInput.yaml
+    description: Its variants.
+    minItems: 1
+    maxItems: 100
+  availability:
+    $ref: ./ItemAvailabilityInput.yaml
+    description: When and how it may be ordered.
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The categories to put it on, last in each.
+examples:
+  - name:
+      en: Hyderabadi Biryani
+    food_mark: non_veg
+    axes:
+      - name:
+          en: Portion
+        values:
+          - name:
+              en: Half
+          - name:
+              en: Full
+    variants:
+      - selection:
+          Portion: Half
+        price: 24900
+      - selection:
+          Portion: Full
+        price: 39900
+    category_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001

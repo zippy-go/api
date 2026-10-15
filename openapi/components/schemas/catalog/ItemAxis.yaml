@@ -1,0 +1,33 @@
+type: object
+description: An axis an item is sold along, such as a portion or a size, with at least two values.
+required:
+  - id
+  - name
+  - values
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The axis.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  values:
+    type: array
+    items:
+      $ref: ./ItemAxisValue.yaml
+    description: Its values.
+    minItems: 2
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601
+    name:
+      en: Portion
+    values:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+        name:
+          en: Half
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc612
+        name:
+          en: Full

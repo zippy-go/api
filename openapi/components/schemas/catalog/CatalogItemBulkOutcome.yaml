@@ -1,0 +1,21 @@
+type: object
+description: "What a bulk act did: the items done and the items refused, each on its own."
+required:
+  - done
+  - refused
+properties:
+  done:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items changed.
+  refused:
+    type: array
+    items:
+      $ref: ./BulkRefusal.yaml
+    description: The items refused, with why.
+examples:
+  - done:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    refused: []

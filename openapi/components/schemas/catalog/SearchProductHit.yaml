@@ -1,0 +1,67 @@
+type: object
+description: A product that matched, as a result row shows it.
+required:
+  - item_id
+  - name
+  - food_mark
+  - price
+  - offer_price
+  - picture
+  - available
+  - age_restricted
+  - prescription_required
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item; it opens its store at the item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: Its mark.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price before any offer, the lowest option's for an item with options.
+  offer_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The lowest offer price.
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its picture.
+  available:
+    type: boolean
+    description: It can be had now; "Sold out" otherwise.
+  age_restricted:
+    type: boolean
+    description: Marked 18+.
+  prescription_required:
+    type: boolean
+    description: Marked "needs a prescription".
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    name:
+      en: Hyderabadi Biryani
+      te: హైదరాబాదీ బిర్యానీ
+    food_mark: non_veg
+    price:
+      minor_units: 24900
+      currency: INR
+    offer_price: null
+    picture:
+      asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+      thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+      card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+      hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+    available: true
+    age_restricted: false
+    prescription_required: false

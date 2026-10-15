@@ -1,0 +1,36 @@
+type: object
+description: "What customers see of a catalogue now: the published menu's version and when it was published, and whether saved changes are on their way into it."
+required:
+  - version
+  - published_at
+  - pending
+  - revision
+properties:
+  version:
+    type:
+      - integer
+      - "null"
+    description: The published menu's version, which only rises; `null` before the first publication.
+    examples:
+      - 42
+  published_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When that version was published.
+    examples:
+      - 2026-10-15T09:00:00Z
+  pending:
+    type: boolean
+    description: Changes are saved and not yet in the published menu; they reach it within about a second.
+  revision:
+    type: integer
+    description: The catalogue's revision, raised by every change; the version of the `catalog.changed` signals.
+    examples:
+      - 57
+examples:
+  - version: 42
+    published_at: 2026-10-15T09:00:00Z
+    pending: false
+    revision: 57

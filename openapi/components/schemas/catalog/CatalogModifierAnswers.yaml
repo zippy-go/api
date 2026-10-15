@@ -1,0 +1,15 @@
+type: object
+description: "Request body of `PUT .../catalog/modifiers/{modifier_id}/answers`: the answers, in order."
+required:
+  - answers
+properties:
+  answers:
+    type: array
+    items:
+      $ref: ./ModifierAnswerInput.yaml
+    description: The answers.
+    maxItems: 100
+examples:
+  - answers:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        price: 0

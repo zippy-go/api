@@ -74,6 +74,22 @@ components/
     assets/        Digital assets: Asset, AssetState, AssetPurposeCode, AssetPurpose, AssetPurposeList, AssetGrantor,
                    AssetDestination, AssetGrantRequest, PartnerAssetGrantRequest, AssetGrant, UploadGrant, AssetConfirm,
                    AssetCrop, CropRect, SignedLink
+    catalog/       The catalogue: LocalizedText, CataloguePicture, CatalogueProfile, CatalogueTaxClass, CatalogSummary,
+                   CatalogCounts, MenuState, CatalogTree, TreeCategory, TreeModifier, TreeAnswer; categories: CatalogCategory,
+                   CatalogCategoryList, CatalogCategoryCreate, CatalogCategoryUpdate, CatalogCategoryOrder, CatalogCategoryItems,
+                   OutsideHours; items: CatalogItem, CatalogItemCreate, CatalogItemUpdate, CatalogItemRow, CatalogItemPage,
+                   CatalogItemStatus, FoodMark, SpiceLevel, ItemAxis, ItemAxisValue, ItemAxisInput, ItemAxisValueInput,
+                   VariantSelection, CatalogVariant, CatalogVariantInput, ItemAvailability, ItemAvailabilityInput, ItemFulfilment,
+                   TaxClass, StockStatus, ItemStockSummary, CatalogStockUpdate, CatalogPriceUpdate, PriceFigures,
+                   CatalogPriceChange, CatalogPriceChangeList, PriceChangeVia, CatalogItemBulk, ItemBulkAction, BulkRefusal,
+                   CatalogItemBulkOutcome; questions: ModifierUse, ModifierUseInput, AnswerOverride, AnswerOverrideInput,
+                   CatalogItemModifiers, CatalogModifier, CatalogModifierList, ModifierAnswer, ModifierAnswerInput,
+                   CatalogModifierCreate, CatalogModifierUpdate, CatalogModifierAnswers; brands: CatalogBrand, CatalogBrandList,
+                   CatalogBrandInput; oversight: CatalogOverview, CatalogOverviewPage; the published menu: MenuDocument,
+                   MenuCategory, MenuItem, MenuVariant, MenuAsk, MenuModifier, MenuAnswer, MenuCategoryPage, ItemSheet; the store
+                   page: StorePage, StoreLive, StoreHoursDay, StoreFulfilment, StoreMenuRef, StoreCategoryTab; search:
+                   SearchResult, SearchStoreHit, SearchStore, SearchProductHit, SearchSuggestion, SearchSuggestionKind,
+                   SearchSuggestionList, StoreSearchResult, SearchSynonymGroup, SearchSynonymGroupList, SearchSynonymGroupCreate
     <domain>/      One folder per further domain, one file per schema
   parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath,
                    IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader

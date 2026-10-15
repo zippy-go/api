@@ -1,0 +1,33 @@
+type: object
+description: Every live category of a store, in the store's order with sub-categories after their parent.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CatalogCategory.yaml
+    description: The categories.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+        location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        parent_id: null
+        name:
+          en: Biryanis
+          te: బిర్యానీలు
+        description: null
+        picture: null
+        position: 0
+        hidden: false
+        hours: null
+        outside_hours: grey
+        item_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        item_count: 1
+        child_ids: []
+        version: 2
+        created_at: 2026-10-15T09:00:00Z
+        updated_at: 2026-10-15T09:00:00Z
+        created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20

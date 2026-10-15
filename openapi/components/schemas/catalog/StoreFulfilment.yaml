@@ -1,0 +1,25 @@
+type: object
+description: The ways a store fulfils.
+required:
+  - delivery
+  - pickup
+  - dine_in
+  - scheduled
+properties:
+  delivery:
+    type: boolean
+    description: It delivers.
+  pickup:
+    type: boolean
+    description: Orders may be collected.
+  dine_in:
+    type: boolean
+    description: It serves at its tables.
+  scheduled:
+    type: boolean
+    description: It takes orders for a later slot.
+examples:
+  - delivery: true
+    pickup: true
+    dine_in: false
+    scheduled: false

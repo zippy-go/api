@@ -1,0 +1,207 @@
+type: object
+description: "What the storefront draws for one store, open or shut: its card facts, what a card has no room for, what it is doing now and the reference to its published menu."
+required:
+  - location_id
+  - partner_id
+  - name
+  - description
+  - logo
+  - banner
+  - address
+  - lat
+  - lng
+  - phone
+  - time_zone
+  - currency
+  - vertical_ids
+  - tags
+  - highlights
+  - fulfilment
+  - preparation_minutes
+  - new
+  - distance_metres
+  - live
+  - hours
+  - term
+  - catalogue_type
+  - menu
+  - categories
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  partner_id:
+    type: string
+    format: uuid
+    description: Its partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  description:
+    type:
+      - string
+      - "null"
+    description: What it says about itself.
+    examples:
+      - null
+  logo:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its tile.
+  banner:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its banner.
+  address:
+    $ref: ../common/Address.yaml
+    description: Where it is.
+  lat:
+    type: number
+    description: Latitude, for the map.
+    examples:
+      - 17.4401
+  lng:
+    type: number
+    description: Longitude, for the map.
+    examples:
+      - 78.3489
+  phone:
+    type:
+      - string
+      - "null"
+    description: How to ring it, E.164.
+    examples:
+      - null
+  time_zone:
+    type: string
+    description: Its clock.
+    examples:
+      - Asia/Kolkata
+  currency:
+    type: string
+    description: The currency of its prices.
+    examples:
+      - INR
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Verticals it trades in.
+  tags:
+    type: array
+    items:
+      type: string
+    description: Its search tags.
+  highlights:
+    type: array
+    items:
+      $ref: ../locations/Highlight.yaml
+    description: The marks drawn on its card.
+  fulfilment:
+    $ref: ./StoreFulfilment.yaml
+    description: How it fulfils.
+  preparation_minutes:
+    type: integer
+    description: The preparation it quotes now, in minutes.
+    examples:
+      - 20
+  new:
+    type: boolean
+    description: In its first thirty days.
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The straight-line distance from the pin sent, rounded to 50 m under a kilometre and to 100 m above; `null` without one.
+    examples:
+      - 1200
+  live:
+    $ref: ./StoreLive.yaml
+    description: What it is doing now.
+  hours:
+    type: array
+    items:
+      $ref: ./StoreHoursDay.yaml
+    description: Its week from today, in its clock.
+  term:
+    $ref: ../reference/CatalogueTerm.yaml
+    description: What it calls its catalogue.
+  catalogue_type:
+    $ref: ../services/CatalogueType.yaml
+    description: Its catalogue type.
+  menu:
+    oneOf:
+      - $ref: ./StoreMenuRef.yaml
+      - type: "null"
+    description: Its published menu; `null` when it has published nothing yet, which the page says where the menu will be.
+  categories:
+    type: array
+    items:
+      $ref: ./StoreCategoryTab.yaml
+    description: The strip of its categories, from the published menu.
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    name: Dev Kitchen Gachibowli
+    description: null
+    logo: null
+    banner: null
+    address:
+      line1: Plot 12, Financial District Road, Gachibowli
+      line2: null
+      city: Hyderabad
+      state: Telangana
+      postal_code: "500032"
+      country: IN
+    lat: 17.4401
+    lng: 78.3489
+    phone: null
+    time_zone: Asia/Kolkata
+    currency: INR
+    vertical_ids:
+      - 01a13a48-9e00-7000-8000-00000000b001
+    tags:
+      - biryani
+    highlights: []
+    fulfilment:
+      delivery: true
+      pickup: true
+      dine_in: false
+      scheduled: false
+    preparation_minutes: 20
+    new: false
+    distance_metres: 1200
+    live:
+      state: closed
+      reason: closed
+      until: 2026-10-16T05:30:00Z
+    hours:
+      - date: 2026-10-15
+        day: thursday
+        open:
+          - from: 11:00
+            to: 23:00
+    term: menu
+    catalogue_type: food
+    menu:
+      version: 42
+      published_at: 2026-10-15T09:00:00Z
+      etag: '"v42"'
+      url: /v1/storefront/stores/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40/menu?version=42
+    categories:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+        parent_id: null
+        name:
+          en: Biryanis
+          te: బిర్యానీలు
+        item_count: 1

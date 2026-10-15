@@ -1,0 +1,26 @@
+type: object
+description: An override as sent, naming only an answer the question offers (`answer_not_offered` otherwise).
+required:
+  - item_id
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The answer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+  price:
+    type:
+      - integer
+      - "null"
+    description: This item's price for the answer in minor units; `null` keeps the question's.
+    format: int64
+    minimum: 0
+    examples:
+      - 0
+  hidden:
+    type: boolean
+    description: Not offered under this item; `false` when absent.
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    price: 0

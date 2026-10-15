@@ -111,6 +111,20 @@ paths/
   partners/policy.yaml          GET, PUT /v1/partners/{partner_id}/policy (+ policy-versions.yaml, schedule.yaml)
   locations/policy.yaml         GET, PUT .../locations/{location_id}/policy (+ policy-versions, policy-effective,
                                 schedule, schedule-effective, schedule-trading)
+  catalog/catalog.yaml          GET /v1/partners/{partner_id}/locations/{location_id}/catalog (+ catalog-tree.yaml, GET .../catalog/tree)
+  catalog/categories*.yaml      GET, POST .../catalog/categories; order (PUT); category.yaml {category_id} (GET, PATCH, DELETE);
+                                category-items.yaml (GET, PUT); category-duplicate.yaml (POST)
+  catalog/items*.yaml           GET, POST .../catalog/items; filters (GET); bulk (POST); item.yaml {item_id} (GET, PATCH, DELETE);
+                                item-duplicate.yaml (POST), item-modifiers.yaml (PUT), item-stock.yaml (PUT)
+  catalog/variant-*.yaml        .../items/{item_id}/variants/{variant_id}/stock (PUT), price (PUT), price-history (GET)
+  catalog/modifier*.yaml        GET, POST .../catalog/modifiers; modifier.yaml {modifier_id} (GET, PATCH, DELETE); answers (PUT);
+                                duplicate (POST)
+  catalog/brand*.yaml           GET, POST .../catalog/brands; brand.yaml {brand_id} (PATCH, DELETE)
+  catalog/oversight.yaml        GET /v1/platform/catalogs (Mission Control catalogue oversight)
+  catalog/synonym*.yaml         GET, POST /v1/platform/search/synonyms; synonym.yaml DELETE .../{group_id}
+  catalog/store*.yaml           GET /v1/storefront/stores/{location_id} (store page), menu, menu/categories/{category_id},
+                                items/{item_id}, search, search/suggestions (tags Store pages and Search)
+  catalog/search*.yaml          GET /v1/storefront/search, /v1/storefront/search/suggestions (tag Search)
   orders/orders.yaml            /v1/orders            (collection, planned)
   orders/order.yaml             /v1/orders/{order_id} (single resource, planned)
 ```

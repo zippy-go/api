@@ -1,0 +1,7 @@
+type: string
+description: "The mark Indian labelling rules require on food: `veg` (the green symbol) or `non_veg` (the brown one)."
+enum:
+  - veg
+  - non_veg
+examples:
+  - veg

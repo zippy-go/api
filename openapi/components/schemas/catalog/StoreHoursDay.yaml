@@ -1,0 +1,27 @@
+type: object
+description: One day of a store's week, resolved through its zone's closures and its own.
+required:
+  - date
+  - day
+  - open
+properties:
+  date:
+    type: string
+    description: The date in the store's clock.
+    format: date
+    examples:
+      - 2026-10-15
+  day:
+    $ref: ../reference/Day.yaml
+    description: The weekday.
+  open:
+    type: array
+    items:
+      $ref: ../reference/Window.yaml
+    description: Its open windows; none when closed.
+examples:
+  - date: 2026-10-15
+    day: thursday
+    open:
+      - from: 11:00
+        to: 23:00

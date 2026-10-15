@@ -8695,6 +8695,2657 @@ export type AddressSuggestionList = {
 };
 
 /**
+ * The mark Indian labelling rules require on food: `veg` (the green symbol) or `non_veg` (the brown one).
+ */
+export type FoodMark = 'veg' | 'non_veg';
+
+/**
+ * How hot a dish is, as the menu says it.
+ */
+export type SpiceLevel = 'none' | 'mild' | 'medium' | 'hot';
+
+/**
+ * `active` is on sale; `inactive` is off sale: not on the menu and offered as no answer to any question. A duplicate starts `inactive`.
+ */
+export type CatalogItemStatus = 'active' | 'inactive';
+
+/**
+ * Whether a variant can be had: `in_stock`, `out_of_stock` until switched back, or `sold_out_today`, back in stock by itself at 00:00 in the store's clock.
+ */
+export type StockStatus = 'in_stock' | 'out_of_stock' | 'sold_out_today';
+
+/**
+ * An item's stock across its enabled variants: all in stock, `partly` (some can be had, some cannot), all out of stock, or all sold out for today.
+ */
+export type ItemStockSummary = 'in_stock' | 'partly' | 'out_of_stock' | 'sold_out_today';
+
+/**
+ * How an item may leave the store: any way the store offers, delivery only, or collection only.
+ */
+export type ItemFulfilment = 'any' | 'delivery_only' | 'pickup_only';
+
+/**
+ * What a category with hours of its own does outside them: `hide` leaves it off the menu, `grey` draws it greyed with its hours and lets nothing in it be chosen.
+ */
+export type OutsideHours = 'hide' | 'grey';
+
+/**
+ * India's GST classes: `nil_rated` (0 %), `merit` (5 %), `standard` (18 %) and `demerit` (40 %), the rates in force on 2026-10-15. Prices include the tax; the amount is worked out at the time of an order from the class and the rate then in force, never stored on the item. A variant without a class inherits its Vertical's default.
+ */
+export type TaxClass = 'nil_rated' | 'merit' | 'standard' | 'demerit';
+
+/**
+ * How a price was set: when the variant was `created`, by the item `editor`, by a `quick` change where the price is read, by a `bulk` act, or by an `import`.
+ */
+export type PriceChangeVia = 'created' | 'editor' | 'quick' | 'bulk' | 'import';
+
+/**
+ * What a bulk act does to every selected item: set its `stock`, put it on a `category`, make it ask `modifiers`, `delete` it, or set whether it is `listed`.
+ */
+export type ItemBulkAction = 'stock' | 'category' | 'modifiers' | 'delete' | 'listed';
+
+/**
+ * What a suggestion names: a `store`, which opens the store, or a `product`, whose name is searched for.
+ */
+export type SearchSuggestionKind = 'store' | 'product';
+
+/**
+ * Wording as a map of language to text. `en` is required; `hi` (Hindi) and `te` (Telugu) may be added, and a further language is a further key. A customer reads their language, English where it is missing.
+ */
+export type LocalizedText = {
+    /**
+     * The English wording.
+     */
+    en: string;
+    /**
+     * The Hindi wording.
+     */
+    hi?: string;
+    /**
+     * The Telugu wording.
+     */
+    te?: string;
+    [key: string]: string | undefined;
+};
+
+/**
+ * A picture as customers are sent it: the asset and its renditions sized to where they are drawn (`thumb` 160, `card` 480 and `hero` 1200 pixels wide), cut losslessly from the original. The addresses are relative to the API host and answer with a redirect to the file.
+ */
+export type CataloguePicture = {
+    /**
+     * The asset shown: the original picture or a crop of it.
+     */
+    asset_id: string;
+    /**
+     * The 160 pixel rendition.
+     */
+    thumb: string;
+    /**
+     * The 480 pixel rendition, for cards.
+     */
+    card: string;
+    /**
+     * The 1200 pixel rendition, for sheets and banners.
+     */
+    hero: string;
+};
+
+/**
+ * A tax class a variant may name, with the rate in force today.
+ */
+export type CatalogueTaxClass = {
+    /**
+     * The class.
+     */
+    code: TaxClass;
+    /**
+     * The class as a person says it.
+     */
+    label: string;
+    /**
+     * The rate in force today, in percent.
+     */
+    rate_percent: number;
+};
+
+/**
+ * What a store's catalogue type lets its items carry: the store type's catalogue block as platform staff keep it, with the defaults every type gets. The item form draws only what the profile allows; an item using anything else is refused naming it (`capability_not_allowed`).
+ */
+export type CatalogueProfile = {
+    /**
+     * The catalogue type of the product-sales Service switched on at the store.
+     */
+    catalogue_type: CatalogueType;
+    /**
+     * The reference store type it is (`FOOD`, `BAKERY`, `DRINKS`, `MARKETS`, `PHARMACY`, `RETAIL`), `null` for `general`.
+     */
+    store_type_code: string | null;
+    /**
+     * What screens call the catalogue: `menu` or `products`.
+     */
+    term: CatalogueTerm;
+    /**
+     * What items may use; a section the type does not allow is absent from the item form.
+     */
+    capabilities: Array<CatalogueCapability>;
+    /**
+     * Every item carries a veg or non-veg mark.
+     */
+    food_mark: boolean;
+    /**
+     * Variants may carry the MRP printed on the pack, and are never priced above it.
+     */
+    mrp: boolean;
+    /**
+     * Items may say their spice level and how many they serve.
+     */
+    food_details: boolean;
+    /**
+     * The closed set dietary tags are drawn from.
+     */
+    dietary_tags: Array<string>;
+    /**
+     * The closed set allergen tags are drawn from.
+     */
+    allergen_tags: Array<string>;
+    /**
+     * The typed fields an item of this type records in `attributes`.
+     */
+    product_fields: Array<ProductField>;
+    /**
+     * The languages wording is kept in.
+     */
+    languages: Array<string>;
+    /**
+     * The tax classes a variant may name, with today's rates.
+     */
+    tax_classes: Array<CatalogueTaxClass>;
+    /**
+     * The notice a pre-order-only item may ask for, in hours.
+     */
+    pre_order_notice_hours: Array<number>;
+};
+
+/**
+ * How much of a catalogue is in.
+ */
+export type CatalogCounts = {
+    /**
+     * Live categories.
+     */
+    categories: number;
+    /**
+     * Items, on sale or not.
+     */
+    items: number;
+    /**
+     * Items on the menu in their own right.
+     */
+    listed: number;
+    /**
+     * Questions.
+     */
+    modifiers: number;
+    /**
+     * Brands.
+     */
+    brands: number;
+};
+
+/**
+ * What customers see of a catalogue now: the published menu's version and when it was published, and whether saved changes are on their way into it.
+ */
+export type MenuState = {
+    /**
+     * The published menu's version, which only rises; `null` before the first publication.
+     */
+    version: number | null;
+    /**
+     * When that version was published.
+     */
+    published_at: string | null;
+    /**
+     * Changes are saved and not yet in the published menu; they reach it within about a second.
+     */
+    pending: boolean;
+    /**
+     * The catalogue's revision, raised by every change; the version of the `catalog.changed` signals.
+     */
+    revision: number;
+};
+
+/**
+ * A store's catalogue at a glance, the answer of `GET .../catalog`.
+ */
+export type CatalogSummary = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its partner.
+     */
+    partner_id: string;
+    /**
+     * The catalogue type.
+     */
+    catalogue_type: CatalogueType;
+    /**
+     * What screens call the catalogue.
+     */
+    term: CatalogueTerm;
+    /**
+     * What items may carry.
+     */
+    profile: CatalogueProfile;
+    /**
+     * The currency prices are in, the store's.
+     */
+    currency: string;
+    /**
+     * The store's clock, for hours and for when sold out for today ends.
+     */
+    time_zone: string;
+    /**
+     * How much is in.
+     */
+    counts: CatalogCounts;
+    /**
+     * What customers see now.
+     */
+    menu: MenuState;
+    /**
+     * Below this many on hand a variant is marked low in the Partner console and the storefront says how many are left.
+     */
+    low_stock_threshold: number;
+};
+
+/**
+ * A category of a store's catalogue. It owns the order of the items on it, may nest one level under another, and a category holding categories holds no items of its own.
+ */
+export type CatalogCategory = {
+    /**
+     * The category.
+     */
+    id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description: LocalizedText | null;
+    /**
+     * The category it sits under, one level deep at most; `null` at the top.
+     */
+    parent_id: string | null;
+    /**
+     * Hidden from customers altogether.
+     */
+    hidden: boolean;
+    /**
+     * Its own hours: a day not listed is not sold; `null` follows the store.
+     */
+    hours: Array<DaySchedule> | null;
+    /**
+     * What it does outside its hours.
+     */
+    outside_hours: OutsideHours;
+    /**
+     * Its picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Where it stands in the store's order, from 0.
+     */
+    position: number;
+    /**
+     * Its items, in its order.
+     */
+    item_ids: Array<string>;
+    /**
+     * How many items it holds.
+     */
+    item_count: number;
+    /**
+     * Its sub-categories, in order.
+     */
+    child_ids: Array<string>;
+    /**
+     * The version, raised by every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Who created it.
+     */
+    created_by: string | null;
+    /**
+     * Who last changed it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * Every live category of a store, in the store's order with sub-categories after their parent.
+ */
+export type CatalogCategoryList = {
+    /**
+     * The categories.
+     */
+    items: Array<CatalogCategory>;
+};
+
+/**
+ * Request body of `POST .../catalog/categories`: a new category, placed last.
+ */
+export type CatalogCategoryCreate = {
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description?: LocalizedText | null;
+    /**
+     * The category it sits under, one level deep at most; `null` at the top.
+     */
+    parent_id?: string | null;
+    /**
+     * Hidden from customers; `false` when absent.
+     */
+    hidden?: boolean;
+    /**
+     * Its own hours: a day not listed is not sold; `null` follows the store.
+     */
+    hours?: Array<DaySchedule> | null;
+    /**
+     * What it does outside its hours; `grey` when absent.
+     */
+    outside_hours?: OutsideHours;
+    /**
+     * Its picture: a stored `catalogue_category_image` asset of this store, or a crop of one.
+     */
+    picture_asset_id?: string | null;
+};
+
+/**
+ * Request body of `PATCH .../catalog/categories/{category_id}`: the members present change, absent ones stay, `null` clears a member that may be empty.
+ */
+export type CatalogCategoryUpdate = {
+    /**
+     * Its name.
+     */
+    name?: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description?: LocalizedText | null;
+    /**
+     * The category it sits under, one level deep at most; `null` at the top.
+     */
+    parent_id?: string | null;
+    /**
+     * Hidden from customers altogether.
+     */
+    hidden?: boolean;
+    /**
+     * Its own hours: a day not listed is not sold; `null` follows the store.
+     */
+    hours?: Array<DaySchedule> | null;
+    /**
+     * What it does outside its hours.
+     */
+    outside_hours?: OutsideHours;
+    /**
+     * Its picture: a stored `catalogue_category_image` asset of this store, or a crop of one; `null` removes it.
+     */
+    picture_asset_id?: string | null;
+};
+
+/**
+ * Request body of `PUT .../catalog/categories/order`: every live category once, in the new order.
+ */
+export type CatalogCategoryOrder = {
+    /**
+     * The categories in their new order.
+     */
+    category_ids: Array<string>;
+};
+
+/**
+ * Request body of `PUT .../catalog/categories/{category_id}/items`: the items on the category, in its order.
+ */
+export type CatalogCategoryItems = {
+    /**
+     * The items, in order.
+     */
+    item_ids: Array<string>;
+};
+
+/**
+ * One value of an axis.
+ */
+export type ItemAxisValue = {
+    /**
+     * The value.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+};
+
+/**
+ * An axis an item is sold along, such as a portion or a size, with at least two values.
+ */
+export type ItemAxis = {
+    /**
+     * The axis.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its values.
+     */
+    values: Array<ItemAxisValue>;
+};
+
+/**
+ * A value of an axis as sent: an `id` keeps a value the item already has.
+ */
+export type ItemAxisValueInput = {
+    /**
+     * The value, to keep one.
+     */
+    id?: string;
+    /**
+     * Its name, unique on the axis.
+     */
+    name: LocalizedText;
+};
+
+/**
+ * An axis as sent: an `id` keeps an axis the item already has.
+ */
+export type ItemAxisInput = {
+    /**
+     * The axis, to keep one.
+     */
+    id?: string;
+    /**
+     * Its name, unique on the item.
+     */
+    name: LocalizedText;
+    /**
+     * Its values, at least two.
+     */
+    values: Array<ItemAxisValueInput>;
+};
+
+/**
+ * The value a variant chooses on each axis, axis id to value id; empty for the one variant of an item with no axes. In requests the keys and values may also be the English names of the axis and the value.
+ */
+export type VariantSelection = {
+    [key: string]: string;
+};
+
+/**
+ * One way an item is sold, with its own price, stock and picture. Prices include tax.
+ */
+export type CatalogVariant = {
+    /**
+     * The variant.
+     */
+    id: string;
+    /**
+     * The value it chooses on each axis.
+     */
+    selection: VariantSelection;
+    /**
+     * Its place among the item's variants.
+     */
+    position: number;
+    /**
+     * Its price, tax included.
+     */
+    price: Money;
+    /**
+     * A lower price it is offered at, below `price`.
+     */
+    offer_price: Money | null;
+    /**
+     * The maximum retail price printed on the pack, where the type carries MRP.
+     */
+    mrp: Money | null;
+    /**
+     * Its tax class; `null` inherits the Vertical's default.
+     */
+    tax_class: TaxClass | null;
+    /**
+     * The store's own code for it.
+     */
+    sku: string | null;
+    /**
+     * Sold at all.
+     */
+    enabled: boolean;
+    /**
+     * Its own picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Whether it can be had.
+     */
+    stock: StockStatus;
+    /**
+     * When it is back in stock by itself, 00:00 in the store's clock, while sold out for today.
+     */
+    sold_out_until: string | null;
+    /**
+     * How many are on hand, where the type tracks inventory; `null` when not counted.
+     */
+    quantity: number | null;
+    /**
+     * Fewer on hand than the store's low-stock threshold.
+     */
+    low_stock: boolean;
+    /**
+     * Enabled, in stock and not counted down to nothing.
+     */
+    sellable: boolean;
+};
+
+/**
+ * A variant as sent. Prices are in minor units of the store's currency, tax included. A variant named by `id` keeps its stock and its price history.
+ */
+export type CatalogVariantInput = {
+    /**
+     * The variant, to keep one.
+     */
+    id?: string;
+    /**
+     * The value it chooses on each axis, by id or English name; empty for the one variant of an item with no axes.
+     */
+    selection?: VariantSelection;
+    /**
+     * Its price in minor units, tax included.
+     */
+    price: number;
+    /**
+     * A lower price it is offered at, below `price`.
+     */
+    offer_price?: number | null;
+    /**
+     * The MRP printed on the pack, where the type carries MRP; `price` may not exceed it.
+     */
+    mrp?: number | null;
+    /**
+     * Its tax class; `null` inherits the Vertical's default.
+     */
+    tax_class?: TaxClass | null;
+    /**
+     * The store's own code for it.
+     */
+    sku?: string | null;
+    /**
+     * Sold at all; `true` when absent.
+     */
+    enabled?: boolean;
+    /**
+     * Its picture: a stored `product_image` asset of this store, or a crop of one.
+     */
+    picture_asset_id?: string | null;
+    /**
+     * How many are on hand, where the type tracks inventory.
+     */
+    quantity?: number | null;
+};
+
+/**
+ * When and how an item may be ordered, where its catalogue type allows each; ordering refuses a basket line outside these and the storefront says why.
+ */
+export type ItemAvailability = {
+    /**
+     * Its own hours within its categories'; a day not listed is not sold; `null` follows its categories.
+     */
+    hours: Array<DaySchedule> | null;
+    /**
+     * Sold only ahead of time.
+     */
+    pre_order_only: boolean;
+    /**
+     * The notice a pre-order needs: 24, 48 or 72 hours.
+     */
+    pre_order_notice_hours: number | null;
+    /**
+     * How it may leave the store.
+     */
+    fulfilment: ItemFulfilment;
+    /**
+     * The most one order may take, 1 to 99.
+     */
+    max_per_order: number | null;
+    /**
+     * The most sold in a day, counted by ordering, 1 to 10000.
+     */
+    daily_limit: number | null;
+    /**
+     * Sold to adults only, marked 18+ (alcohol, tobacco, knives).
+     */
+    age_restricted: boolean;
+    /**
+     * Sold only against a prescription, at a store whose order settings accept prescriptions.
+     */
+    prescription_required: boolean;
+    /**
+     * Its own preparation time in minutes, 1 to 240.
+     */
+    preparation_minutes: number | null;
+    /**
+     * The customer may attach a personal message.
+     */
+    personalisation: boolean;
+};
+
+/**
+ * An item's availability as sent; absent members keep what is stored (`false`, `any` or `null` on a new item).
+ */
+export type ItemAvailabilityInput = {
+    /**
+     * Its own hours within its categories'; `null` follows its categories.
+     */
+    hours?: Array<DaySchedule> | null;
+    /**
+     * Sold only ahead of time.
+     */
+    pre_order_only?: boolean;
+    /**
+     * The notice a pre-order needs: 24, 48 or 72 hours.
+     */
+    pre_order_notice_hours?: number | null;
+    /**
+     * How it may leave the store.
+     */
+    fulfilment?: ItemFulfilment;
+    /**
+     * The most one order may take, 1 to 99.
+     */
+    max_per_order?: number | null;
+    /**
+     * The most sold in a day, 1 to 10000.
+     */
+    daily_limit?: number | null;
+    /**
+     * Sold to adults only.
+     */
+    age_restricted?: boolean;
+    /**
+     * Sold only against a prescription.
+     */
+    prescription_required?: boolean;
+    /**
+     * Its own preparation time in minutes, 1 to 240.
+     */
+    preparation_minutes?: number | null;
+    /**
+     * The customer may attach a personal message.
+     */
+    personalisation?: boolean;
+};
+
+/**
+ * What an item does to one answer of a question it asks, for itself alone: its own price for the answer, or hiding it.
+ */
+export type AnswerOverride = {
+    /**
+     * The answer, an item the question offers.
+     */
+    item_id: string;
+    /**
+     * This item's price for the answer; `null` keeps the question's.
+     */
+    price: Money | null;
+    /**
+     * Not offered under this item.
+     */
+    hidden: boolean;
+};
+
+/**
+ * An override as sent, naming only an answer the question offers (`answer_not_offered` otherwise).
+ */
+export type AnswerOverrideInput = {
+    /**
+     * The answer.
+     */
+    item_id: string;
+    /**
+     * This item's price for the answer in minor units; `null` keeps the question's.
+     */
+    price?: number | null;
+    /**
+     * Not offered under this item; `false` when absent.
+     */
+    hidden?: boolean;
+};
+
+/**
+ * A question an item asks, with the answers it prices or hides for itself.
+ */
+export type ModifierUse = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * The question's name.
+     */
+    name: LocalizedText;
+    /**
+     * What the item does to the question's answers.
+     */
+    overrides: Array<AnswerOverride>;
+};
+
+/**
+ * A question an item asks, as sent.
+ */
+export type ModifierUseInput = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * What the item does to the question's answers; none when absent.
+     */
+    overrides?: Array<AnswerOverrideInput>;
+};
+
+/**
+ * Request body of `PUT .../catalog/items/{item_id}/modifiers`: the questions the item asks, in the order it asks them.
+ */
+export type CatalogItemModifiers = {
+    /**
+     * The questions, in order.
+     */
+    modifiers: Array<ModifierUseInput>;
+};
+
+/**
+ * An item of a store's catalogue, sold as one or more variants, asking questions whose answers are items, as its staff keep it.
+ */
+export type CatalogItem = {
+    /**
+     * The item.
+     */
+    id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description: LocalizedText | null;
+    /**
+     * On sale or off sale.
+     */
+    status: CatalogItemStatus;
+    /**
+     * On the menu in its own right; an item that is not is only an answer to questions and sits on no category.
+     */
+    listed: boolean;
+    /**
+     * Its brand, one of the store's, where the type carries brands.
+     */
+    brand_id: string | null;
+    /**
+     * Its veg or non-veg mark, required where the type carries the food mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * How hot it is, where the type carries food details.
+     */
+    spice_level: SpiceLevel | null;
+    /**
+     * How many it serves, 1 to 20, where the type carries food details.
+     */
+    serves: number | null;
+    /**
+     * Dietary tags from the type's closed set.
+     */
+    dietary: Array<string>;
+    /**
+     * Allergen tags from the type's closed set.
+     */
+    allergens: Array<string>;
+    /**
+     * Words customers find it by, lower case.
+     */
+    tags: Array<string>;
+    /**
+     * Values of the typed fields the type declares (`profile.product_fields`), key to value.
+     */
+    attributes: {
+        [key: string]: unknown;
+    };
+    /**
+     * Its brand's name.
+     */
+    brand_name: string | null;
+    /**
+     * Its gallery; the first picture is its card.
+     */
+    pictures: Array<CataloguePicture>;
+    /**
+     * The axes it is sold along; none for an item sold one way.
+     */
+    axes: Array<ItemAxis>;
+    /**
+     * Its variants, at least one: one choosing nothing when it has no axes, one per combination it sells otherwise.
+     */
+    variants: Array<CatalogVariant>;
+    /**
+     * The questions it asks, in order.
+     */
+    modifiers: Array<ModifierUse>;
+    /**
+     * When and how it may be ordered.
+     */
+    availability: ItemAvailability;
+    /**
+     * The categories it sits on.
+     */
+    category_ids: Array<string>;
+    /**
+     * The questions offering it as an answer.
+     */
+    answer_of: Array<string>;
+    /**
+     * The least an enabled variant costs, before offers.
+     */
+    from_price: Money;
+    /**
+     * A customer can order it now: on sale with a variant that can be had.
+     */
+    sellable: boolean;
+    /**
+     * The version, raised by every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Who created it.
+     */
+    created_by: string | null;
+    /**
+     * Who last changed it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * Request body of `POST .../catalog/items`. Only what the store's catalogue type allows may be sent (`capability_not_allowed` otherwise); where the type carries the food mark, `food_mark` is required.
+ */
+export type CatalogItemCreate = {
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description?: LocalizedText | null;
+    /**
+     * On sale or off sale; `active` when absent.
+     */
+    status?: CatalogItemStatus;
+    /**
+     * On the menu in its own right; `true` when absent.
+     */
+    listed?: boolean;
+    /**
+     * Its brand, one of the store's, where the type carries brands.
+     */
+    brand_id?: string | null;
+    /**
+     * Its veg or non-veg mark, required where the type carries the food mark.
+     */
+    food_mark?: FoodMark | null;
+    /**
+     * How hot it is, where the type carries food details.
+     */
+    spice_level?: SpiceLevel | null;
+    /**
+     * How many it serves, 1 to 20, where the type carries food details.
+     */
+    serves?: number | null;
+    /**
+     * Dietary tags from the type's closed set.
+     */
+    dietary?: Array<string>;
+    /**
+     * Allergen tags from the type's closed set.
+     */
+    allergens?: Array<string>;
+    /**
+     * Words customers find it by, lower case.
+     */
+    tags?: Array<string>;
+    /**
+     * Values of the typed fields the type declares (`profile.product_fields`), key to value.
+     */
+    attributes?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Its gallery as asset ids, the card first: stored `product_image` assets of this store or crops of them.
+     */
+    pictures?: Array<string>;
+    /**
+     * The axes it is sold along.
+     */
+    axes?: Array<ItemAxisInput>;
+    /**
+     * Its variants.
+     */
+    variants: Array<CatalogVariantInput>;
+    /**
+     * When and how it may be ordered.
+     */
+    availability?: ItemAvailabilityInput;
+    /**
+     * The categories to put it on, last in each.
+     */
+    category_ids?: Array<string>;
+};
+
+/**
+ * Request body of `PATCH .../catalog/items/{item_id}`: the members present change, absent ones stay. `variants` replaces the list: a variant named by `id` keeps its stock and its price history, one left out is removed, one without an `id` is new; a price that changed makes one history row marked `editor`.
+ */
+export type CatalogItemUpdate = {
+    /**
+     * Its name.
+     */
+    name?: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description?: LocalizedText | null;
+    /**
+     * On sale or off sale.
+     */
+    status?: CatalogItemStatus;
+    /**
+     * On the menu in its own right; an item that is not is only an answer to questions and sits on no category.
+     */
+    listed?: boolean;
+    /**
+     * Its brand, one of the store's, where the type carries brands.
+     */
+    brand_id?: string | null;
+    /**
+     * Its veg or non-veg mark, required where the type carries the food mark.
+     */
+    food_mark?: FoodMark | null;
+    /**
+     * How hot it is, where the type carries food details.
+     */
+    spice_level?: SpiceLevel | null;
+    /**
+     * How many it serves, 1 to 20, where the type carries food details.
+     */
+    serves?: number | null;
+    /**
+     * Dietary tags from the type's closed set.
+     */
+    dietary?: Array<string>;
+    /**
+     * Allergen tags from the type's closed set.
+     */
+    allergens?: Array<string>;
+    /**
+     * Words customers find it by, lower case.
+     */
+    tags?: Array<string>;
+    /**
+     * Values of the typed fields the type declares (`profile.product_fields`), key to value.
+     */
+    attributes?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Its gallery as asset ids, the card first.
+     */
+    pictures?: Array<string>;
+    /**
+     * The axes it is sold along.
+     */
+    axes?: Array<ItemAxisInput>;
+    /**
+     * Its variants.
+     */
+    variants?: Array<CatalogVariantInput>;
+    /**
+     * When and how it may be ordered.
+     */
+    availability?: ItemAvailabilityInput;
+    /**
+     * The categories it sits on; it keeps its place on those it stays on.
+     */
+    category_ids?: Array<string>;
+};
+
+/**
+ * An item as a row of the catalogue's list and tree: what a member sees and changes without opening it.
+ */
+export type CatalogItemRow = {
+    /**
+     * The item.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * On sale or off sale.
+     */
+    status: CatalogItemStatus;
+    /**
+     * On the menu in its own right.
+     */
+    listed: boolean;
+    /**
+     * Its mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * Its card picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * The least an enabled variant costs, before offers.
+     */
+    from_price: Money;
+    /**
+     * Its variants cost different amounts, so the price reads "from" and opens the item.
+     */
+    price_varies: boolean;
+    /**
+     * Its one variant, when it has one, so its price is changed where it is read.
+     */
+    single_variant_id: string | null;
+    /**
+     * The one variant's offer price.
+     */
+    offer_price: Money | null;
+    /**
+     * How many variants it has.
+     */
+    variant_count: number;
+    /**
+     * Its stock across its enabled variants.
+     */
+    stock: ItemStockSummary;
+    /**
+     * A customer can order it now.
+     */
+    sellable: boolean;
+    /**
+     * The categories it sits on.
+     */
+    category_ids: Array<string>;
+    /**
+     * The questions it asks, in order.
+     */
+    modifiers: Array<string>;
+    /**
+     * The questions offering it.
+     */
+    answer_of: Array<string>;
+    /**
+     * Its brand.
+     */
+    brand_id: string | null;
+    /**
+     * It has a picture.
+     */
+    has_picture: boolean;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Its version.
+     */
+    version: number;
+};
+
+/**
+ * A page of item rows.
+ */
+export type CatalogItemPage = {
+    /**
+     * The rows on this page.
+     */
+    items: Array<CatalogItemRow>;
+    /**
+     * An opaque cursor to pass as `cursor` for the next page, or `null` on the last page.
+     */
+    next_cursor: string | null;
+    /**
+     * Facet counts, present when `facets` was asked for.
+     */
+    facets?: Array<Facet>;
+};
+
+/**
+ * An answer of a question in the catalogue tree: the item, its price here and its order.
+ */
+export type TreeAnswer = {
+    /**
+     * The answer, an item; its row is in the tree's `items`.
+     */
+    item_id: string;
+    /**
+     * The price that replaces the item's own when chosen here.
+     */
+    price: Money | null;
+    /**
+     * Offered; an answer that is not stays in the question, hidden.
+     */
+    offered: boolean;
+    /**
+     * Its place among the answers.
+     */
+    position: number;
+};
+
+/**
+ * A question in the catalogue tree with its rule and its answers.
+ */
+export type TreeModifier = {
+    /**
+     * The question.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its hint.
+     */
+    hint: LocalizedText | null;
+    /**
+     * The least answers it asks for.
+     */
+    min: number;
+    /**
+     * The most it takes; 0 is no ceiling.
+     */
+    max: number;
+    /**
+     * It asks for at least one answer.
+     */
+    required: boolean;
+    /**
+     * An answer may be chosen more than once.
+     */
+    repeats: boolean;
+    /**
+     * Asked or not.
+     */
+    status: CatalogItemStatus;
+    /**
+     * Its answers, in order.
+     */
+    answers: Array<TreeAnswer>;
+};
+
+/**
+ * A category in the catalogue tree, with its first fifty items.
+ */
+export type TreeCategory = {
+    /**
+     * The category.
+     */
+    id: string;
+    /**
+     * Its parent.
+     */
+    parent_id: string | null;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Hidden from customers.
+     */
+    hidden: boolean;
+    /**
+     * What it does outside its hours.
+     */
+    outside_hours: OutsideHours;
+    /**
+     * Its own hours; `null` follows the store.
+     */
+    hours: Array<DaySchedule> | null;
+    /**
+     * Its picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Its place in the store's order.
+     */
+    position: number;
+    /**
+     * How many items it holds.
+     */
+    item_count: number;
+    /**
+     * Its first fifty items in its order; their rows are in the tree's `items`.
+     */
+    item_ids: Array<string>;
+    /**
+     * Passed as `cursor` to `GET .../categories/{category_id}/items` for the rest; `null` when all are here.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A store's catalogue as one tree: categories in order with their first items, every question those items ask with its answers, and the row of every item reachable, so a client opens an item onto its questions, a question onto its answers and an answer onto the questions it asks in turn, three deep, never back into an item above it.
+ */
+export type CatalogTree = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The catalogue's revision.
+     */
+    revision: number;
+    /**
+     * The published menu's version; `null` before the first.
+     */
+    menu_version: number | null;
+    /**
+     * The categories in the store's order, sub-categories after their parent.
+     */
+    categories: Array<TreeCategory>;
+    /**
+     * The questions, by id.
+     */
+    modifiers: {
+        [key: string]: TreeModifier;
+    };
+    /**
+     * The item rows, by id: every item on a loaded page of a category and every answer reachable from them.
+     */
+    items: {
+        [key: string]: CatalogItemRow;
+    };
+};
+
+/**
+ * Request body of the stock operations.
+ */
+export type CatalogStockUpdate = {
+    /**
+     * The new stock: `sold_out_today` comes back by itself at 00:00 in the store's clock.
+     */
+    status: StockStatus;
+    /**
+     * How many are on hand, where the type tracks inventory: a restock sets it; zero is out of stock.
+     */
+    quantity?: number | null;
+};
+
+/**
+ * Request body of `PUT .../variants/{variant_id}/price`, in minor units of the store's currency, tax included.
+ */
+export type CatalogPriceUpdate = {
+    /**
+     * The price.
+     */
+    price: number;
+    /**
+     * A lower price it is offered at; `null` or absent removes the offer.
+     */
+    offer_price?: number | null;
+};
+
+/**
+ * A variant's price and offer price at one moment.
+ */
+export type PriceFigures = {
+    /**
+     * The price.
+     */
+    price: Money;
+    /**
+     * The offer price.
+     */
+    offer_price: Money | null;
+};
+
+/**
+ * One row of a variant's price history: what it was, what it became, when, who and how. The item carries only the current figures.
+ */
+export type CatalogPriceChange = {
+    /**
+     * The row.
+     */
+    id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * What it was; `null` when the variant was created.
+     */
+    from: PriceFigures | null;
+    /**
+     * What it became.
+     */
+    to: PriceFigures;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Who; `null` for the platform itself.
+     */
+    by: string | null;
+    /**
+     * How.
+     */
+    via: PriceChangeVia;
+};
+
+/**
+ * A variant's price history, newest first.
+ */
+export type CatalogPriceChangeList = {
+    /**
+     * The rows.
+     */
+    items: Array<CatalogPriceChange>;
+};
+
+/**
+ * An answer of a question: an item of the store, with the price that replaces its own when chosen here.
+ */
+export type ModifierAnswer = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The item's name.
+     */
+    name: LocalizedText;
+    /**
+     * The item's own mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The price when chosen here; `null` is the item's own.
+     */
+    price: Money | null;
+    /**
+     * The item's own price.
+     */
+    item_price: Money;
+    /**
+     * Offered here.
+     */
+    offered: boolean;
+    /**
+     * Its place among the answers.
+     */
+    position: number;
+    /**
+     * The item can be had now.
+     */
+    sellable: boolean;
+    /**
+     * The questions the item asks in turn.
+     */
+    asks: Array<string>;
+};
+
+/**
+ * A question: a name, a hint, a rule of least, most, required and repeats, and answers that are the store's own items.
+ */
+export type CatalogModifier = {
+    /**
+     * The question.
+     */
+    id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * A hint under it.
+     */
+    hint: LocalizedText | null;
+    /**
+     * The least answers it asks for.
+     */
+    min: number;
+    /**
+     * The most it takes; 0 is no ceiling.
+     */
+    max: number;
+    /**
+     * It asks for at least one answer.
+     */
+    required: boolean;
+    /**
+     * An answer may be chosen more than once.
+     */
+    repeats: boolean;
+    /**
+     * `inactive` is asked by nobody on the menu.
+     */
+    status: CatalogItemStatus;
+    /**
+     * Its answers, in order.
+     */
+    answers: Array<ModifierAnswer>;
+    /**
+     * The items asking it.
+     */
+    asked_by: Array<string>;
+    /**
+     * The version; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * Every question of a store.
+ */
+export type CatalogModifierList = {
+    /**
+     * The questions.
+     */
+    items: Array<CatalogModifier>;
+};
+
+/**
+ * An answer as sent: an item of the store, offered once per question.
+ */
+export type ModifierAnswerInput = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The price when chosen here, in minor units; `null` or absent keeps the item's own.
+     */
+    price?: number | null;
+    /**
+     * Offered; `true` when absent.
+     */
+    offered?: boolean;
+};
+
+/**
+ * Request body of `POST .../catalog/modifiers`. The least must be satisfiable by the answers offered and no more than the most (`modifier_rule_unsatisfiable`).
+ */
+export type CatalogModifierCreate = {
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * A hint under it.
+     */
+    hint?: LocalizedText | null;
+    /**
+     * The least answers it asks for; 0 when absent.
+     */
+    min?: number;
+    /**
+     * The most it takes, 0 for no ceiling; 0 when absent.
+     */
+    max?: number;
+    /**
+     * It asks for at least one answer; `false` when absent.
+     */
+    required?: boolean;
+    /**
+     * An answer may be chosen more than once; `false` when absent.
+     */
+    repeats?: boolean;
+    /**
+     * Asked or not; `active` when absent.
+     */
+    status?: CatalogItemStatus;
+    /**
+     * Its answers, in order.
+     */
+    answers?: Array<ModifierAnswerInput>;
+};
+
+/**
+ * Request body of `PATCH .../catalog/modifiers/{modifier_id}`: the members present change, absent ones stay.
+ */
+export type CatalogModifierUpdate = {
+    /**
+     * Its name.
+     */
+    name?: LocalizedText;
+    /**
+     * A hint under it.
+     */
+    hint?: LocalizedText | null;
+    /**
+     * The least answers it asks for; 0 when absent.
+     */
+    min?: number;
+    /**
+     * The most it takes, 0 for no ceiling; 0 when absent.
+     */
+    max?: number;
+    /**
+     * It asks for at least one answer; `false` when absent.
+     */
+    required?: boolean;
+    /**
+     * An answer may be chosen more than once; `false` when absent.
+     */
+    repeats?: boolean;
+    /**
+     * Asked or not; `active` when absent.
+     */
+    status?: CatalogItemStatus;
+};
+
+/**
+ * Request body of `PUT .../catalog/modifiers/{modifier_id}/answers`: the answers, in order.
+ */
+export type CatalogModifierAnswers = {
+    /**
+     * The answers.
+     */
+    answers: Array<ModifierAnswerInput>;
+};
+
+/**
+ * A brand of the store's own list; an item names one at most.
+ */
+export type CatalogBrand = {
+    /**
+     * The brand.
+     */
+    id: string;
+    /**
+     * Its name, unique in the store.
+     */
+    name: string;
+    /**
+     * How many items carry it.
+     */
+    item_count: number;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A store's brands, by name.
+ */
+export type CatalogBrandList = {
+    /**
+     * The brands.
+     */
+    items: Array<CatalogBrand>;
+};
+
+/**
+ * Request body of the brand writes.
+ */
+export type CatalogBrandInput = {
+    /**
+     * Its name, unique in the store.
+     */
+    name: string;
+};
+
+/**
+ * Request body of `POST .../catalog/items/bulk`: one act on up to 500 items.
+ */
+export type CatalogItemBulk = {
+    /**
+     * What to do.
+     */
+    action: ItemBulkAction;
+    /**
+     * The items.
+     */
+    item_ids: Array<string>;
+    /**
+     * The stock, for `stock`.
+     */
+    stock?: StockStatus;
+    /**
+     * The category to put them on, last, for `category`.
+     */
+    category_id?: string;
+    /**
+     * The questions they ask after their own, for `modifiers`.
+     */
+    modifier_ids?: Array<string>;
+    /**
+     * Whether they are listed, for `listed`.
+     */
+    listed?: boolean;
+};
+
+/**
+ * An item a bulk act did not change, with why.
+ */
+export type BulkRefusal = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The problem code it would have been refused with.
+     */
+    code: string;
+    /**
+     * Why, in a sentence a screen may show.
+     */
+    detail: string;
+};
+
+/**
+ * What a bulk act did: the items done and the items refused, each on its own.
+ */
+export type CatalogItemBulkOutcome = {
+    /**
+     * The items changed.
+     */
+    done: Array<string>;
+    /**
+     * The items refused, with why.
+     */
+    refused: Array<BulkRefusal>;
+};
+
+/**
+ * A store's catalogue as Mission Control oversees it.
+ */
+export type CatalogOverview = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its partner; open the catalogue through the partner routes with a Mission Control token.
+     */
+    partner_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The partner's name.
+     */
+    partner_name: string;
+    /**
+     * The catalogue type.
+     */
+    catalogue_type: CatalogueType;
+    /**
+     * What it is called.
+     */
+    term: CatalogueTerm;
+    /**
+     * How much of it is in.
+     */
+    counts: CatalogCounts;
+    /**
+     * What customers see now.
+     */
+    menu: MenuState;
+    /**
+     * When the catalogue last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A page of catalogues, most recently changed first.
+ */
+export type CatalogOverviewPage = {
+    /**
+     * The catalogues on this page.
+     */
+    items: Array<CatalogOverview>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Words that mean the same thing in search: each finds what any other finds, ranked below an exact match.
+ */
+export type SearchSynonymGroup = {
+    /**
+     * The group.
+     */
+    id: string;
+    /**
+     * The Vertical it applies in; `null` in every Vertical.
+     */
+    vertical_id: string | null;
+    /**
+     * The words, lower case.
+     */
+    words: Array<string>;
+    /**
+     * When it was added.
+     */
+    created_at: string;
+};
+
+/**
+ * Every synonym group.
+ */
+export type SearchSynonymGroupList = {
+    /**
+     * The groups.
+     */
+    items: Array<SearchSynonymGroup>;
+};
+
+/**
+ * Request body of `POST /v1/platform/search/synonyms`.
+ */
+export type SearchSynonymGroupCreate = {
+    /**
+     * Two to twenty words, in any script.
+     */
+    words: Array<string>;
+    /**
+     * The Vertical it applies in; `null` or absent in every Vertical.
+     */
+    vertical_id?: string | null;
+};
+
+/**
+ * A question an item asks on the published menu, with the answers it prices or hides for itself; the question itself is in the document's `modifiers`.
+ */
+export type MenuAsk = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * This item's price for an answer, by the answer's item id; an answer not named keeps the question's price.
+     */
+    prices: {
+        [key: string]: Money;
+    };
+    /**
+     * The answers this item hides.
+     */
+    hidden: Array<string>;
+};
+
+/**
+ * An enabled variant on the published menu.
+ */
+export type MenuVariant = {
+    /**
+     * The variant.
+     */
+    id: string;
+    /**
+     * The value it chooses on each axis.
+     */
+    selection: VariantSelection;
+    /**
+     * Its price, tax included.
+     */
+    price: Money;
+    /**
+     * The lower price it is offered at.
+     */
+    offer_price: Money | null;
+    /**
+     * The MRP printed on the pack, drawn struck through beside a lower price.
+     */
+    mrp: Money | null;
+    /**
+     * It can be had now.
+     */
+    available: boolean;
+    /**
+     * Its stock.
+     */
+    stock: StockStatus;
+    /**
+     * How many are left, said only at or below the store's low-stock threshold.
+     */
+    quantity_left: number | null;
+    /**
+     * Its own picture.
+     */
+    picture: CataloguePicture | null;
+};
+
+/**
+ * An answer of a question on the published menu: the item at the question's price, whether it can be had, and the questions it asks in turn.
+ */
+export type MenuAnswer = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description: LocalizedText | null;
+    /**
+     * Its own mark, drawn beside the answer.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * Its dietary tags.
+     */
+    dietary: Array<string>;
+    /**
+     * Its card picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Its price at this question.
+     */
+    price: Money;
+    /**
+     * It can be had now; an answer that cannot is drawn greyed.
+     */
+    available: boolean;
+    /**
+     * The questions it asks in turn, with its own prices and hidden answers.
+     */
+    asks: Array<MenuAsk>;
+};
+
+/**
+ * A question on the published menu, carried once however many items ask it.
+ */
+export type MenuModifier = {
+    /**
+     * The question.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its hint.
+     */
+    hint: LocalizedText | null;
+    /**
+     * The least answers it asks for.
+     */
+    min: number;
+    /**
+     * The most it takes; 0 is no ceiling.
+     */
+    max: number;
+    /**
+     * It asks for at least one answer; a sheet names it where the button will be until one is chosen.
+     */
+    required: boolean;
+    /**
+     * An answer may be chosen more than once.
+     */
+    repeats: boolean;
+    /**
+     * The answers offered, in order.
+     */
+    answers: Array<MenuAnswer>;
+};
+
+/**
+ * An item on the published menu, as a card and its sheet draw it.
+ */
+export type MenuItem = {
+    /**
+     * The item.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description: LocalizedText | null;
+    /**
+     * Its veg or non-veg mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * How hot it is.
+     */
+    spice_level: SpiceLevel | null;
+    /**
+     * How many it serves.
+     */
+    serves: number | null;
+    /**
+     * Its dietary tags.
+     */
+    dietary: Array<string>;
+    /**
+     * Its allergen tags.
+     */
+    allergens: Array<string>;
+    /**
+     * Its brand's name.
+     */
+    brand: string | null;
+    /**
+     * Its gallery; the first is its card.
+     */
+    pictures: Array<CataloguePicture>;
+    /**
+     * The least an enabled variant costs, before offers.
+     */
+    from_price: Money;
+    /**
+     * Its variants cost different amounts, so the card reads "from".
+     */
+    price_varies: boolean;
+    /**
+     * A customer can order it now; sold out is said, not hidden.
+     */
+    available: boolean;
+    /**
+     * Its stock across its variants.
+     */
+    stock: ItemStockSummary;
+    /**
+     * The axes its sheet draws as chips.
+     */
+    axes: Array<ItemAxis>;
+    /**
+     * Its enabled variants.
+     */
+    variants: Array<MenuVariant>;
+    /**
+     * The questions it asks, in order.
+     */
+    asks: Array<MenuAsk>;
+    /**
+     * When and how it may be ordered.
+     */
+    availability: ItemAvailability;
+};
+
+/**
+ * A category on the published menu with its first page of items.
+ */
+export type MenuCategory = {
+    /**
+     * The category.
+     */
+    id: string;
+    /**
+     * Its parent, for a sub-category.
+     */
+    parent_id: string | null;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it says about itself.
+     */
+    description: LocalizedText | null;
+    /**
+     * Its picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Its own hours in the store's clock; `null` follows the store.
+     */
+    hours: Array<DaySchedule> | null;
+    /**
+     * What it does outside its hours.
+     */
+    outside_hours: OutsideHours;
+    /**
+     * How many items it holds.
+     */
+    item_count: number;
+    /**
+     * Its first items, `page_size` at most.
+     */
+    items: Array<MenuItem>;
+    /**
+     * The offset of its next page at `GET .../menu/categories/{category_id}`; `null` when all are here.
+     */
+    next_offset: number | null;
+};
+
+/**
+ * A store's published menu: one document rebuilt within about a second of every change, stamped with a version that only rises. It carries only active, unhidden categories, items on sale and listed, and active questions, each question once.
+ */
+export type MenuDocument = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its partner.
+     */
+    partner_id: string;
+    /**
+     * The version, which only rises; the entity tag `"v<version>"`.
+     */
+    version: number;
+    /**
+     * The format of the document; 1 for this version of the API.
+     */
+    shape: number;
+    /**
+     * When it was published.
+     */
+    published_at: string;
+    /**
+     * The currency of every price.
+     */
+    currency: string;
+    /**
+     * The store's clock, for hours.
+     */
+    time_zone: string;
+    /**
+     * What the store calls it.
+     */
+    term: CatalogueTerm;
+    /**
+     * The catalogue type.
+     */
+    catalogue_type: CatalogueType;
+    /**
+     * The languages its wording is in.
+     */
+    languages: Array<string>;
+    /**
+     * How many items each category carries here.
+     */
+    page_size: number;
+    /**
+     * The categories in order, sub-categories after their parent.
+     */
+    categories: Array<MenuCategory>;
+    /**
+     * Every question asked anywhere on the menu, once, by id.
+     */
+    modifiers: {
+        [key: string]: MenuModifier;
+    };
+};
+
+/**
+ * Further items of a large category of the published menu.
+ */
+export type MenuCategoryPage = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The version of the menu the page is cut from.
+     */
+    version: number;
+    /**
+     * The category, its `items` left empty.
+     */
+    category: MenuCategory;
+    /**
+     * The items of this page.
+     */
+    items: Array<MenuItem>;
+    /**
+     * The offset of this page.
+     */
+    offset: number;
+    /**
+     * The offset of the next page; `null` on the last.
+     */
+    next_offset: number | null;
+    /**
+     * The questions these items ask and their answers ask in turn, by id.
+     */
+    modifiers: {
+        [key: string]: MenuModifier;
+    };
+};
+
+/**
+ * An item as its sheet draws it: the item and every question it asks and its answers ask, three deep.
+ */
+export type ItemSheet = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The version of the menu it is read from.
+     */
+    version: number;
+    /**
+     * The item.
+     */
+    item: MenuItem;
+    /**
+     * The questions, by id.
+     */
+    modifiers: {
+        [key: string]: MenuModifier;
+    };
+};
+
+/**
+ * The ways a store fulfils.
+ */
+export type StoreFulfilment = {
+    /**
+     * It delivers.
+     */
+    delivery: boolean;
+    /**
+     * Orders may be collected.
+     */
+    pickup: boolean;
+    /**
+     * It serves at its tables.
+     */
+    dine_in: boolean;
+    /**
+     * It takes orders for a later slot.
+     */
+    scheduled: boolean;
+};
+
+/**
+ * What a store is doing now, for the notice over its page.
+ */
+export type StoreLive = {
+    /**
+     * `online`, `closed` by its hours, `offline` while paused.
+     */
+    state: LocationLiveState;
+    /**
+     * Why it is not online.
+     */
+    reason: string | null;
+    /**
+     * When that changes: when it opens or closes next, or the pause ends.
+     */
+    until: string | null;
+};
+
+/**
+ * One day of a store's week, resolved through its zone's closures and its own.
+ */
+export type StoreHoursDay = {
+    /**
+     * The date in the store's clock.
+     */
+    date: string;
+    /**
+     * The weekday.
+     */
+    day: Day;
+    /**
+     * Its open windows; none when closed.
+     */
+    open: Array<Window>;
+};
+
+/**
+ * The store's published menu as its page refers to it.
+ */
+export type StoreMenuRef = {
+    /**
+     * The version.
+     */
+    version: number;
+    /**
+     * When it was published.
+     */
+    published_at: string;
+    /**
+     * Its entity tag.
+     */
+    etag: string;
+    /**
+     * Where to read it, naming the version.
+     */
+    url: string;
+};
+
+/**
+ * A category in the strip under the store's header.
+ */
+export type StoreCategoryTab = {
+    /**
+     * The category.
+     */
+    id: string;
+    /**
+     * Its parent.
+     */
+    parent_id: string | null;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * How many items it holds.
+     */
+    item_count: number;
+};
+
+/**
+ * What the storefront draws for one store, open or shut: its card facts, what a card has no room for, what it is doing now and the reference to its published menu.
+ */
+export type StorePage = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it says about itself.
+     */
+    description: string | null;
+    /**
+     * Its tile.
+     */
+    logo: CataloguePicture | null;
+    /**
+     * Its banner.
+     */
+    banner: CataloguePicture | null;
+    /**
+     * Where it is.
+     */
+    address: Address;
+    /**
+     * Latitude, for the map.
+     */
+    lat: number;
+    /**
+     * Longitude, for the map.
+     */
+    lng: number;
+    /**
+     * How to ring it, E.164.
+     */
+    phone: string | null;
+    /**
+     * Its clock.
+     */
+    time_zone: string;
+    /**
+     * The currency of its prices.
+     */
+    currency: string;
+    /**
+     * The Verticals it trades in.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Its search tags.
+     */
+    tags: Array<string>;
+    /**
+     * The marks drawn on its card.
+     */
+    highlights: Array<Highlight>;
+    /**
+     * How it fulfils.
+     */
+    fulfilment: StoreFulfilment;
+    /**
+     * The preparation it quotes now, in minutes.
+     */
+    preparation_minutes: number;
+    /**
+     * In its first thirty days.
+     */
+    new: boolean;
+    /**
+     * The straight-line distance from the pin sent, rounded to 50 m under a kilometre and to 100 m above; `null` without one.
+     */
+    distance_metres: number | null;
+    /**
+     * What it is doing now.
+     */
+    live: StoreLive;
+    /**
+     * Its week from today, in its clock.
+     */
+    hours: Array<StoreHoursDay>;
+    /**
+     * What it calls its catalogue.
+     */
+    term: CatalogueTerm;
+    /**
+     * Its catalogue type.
+     */
+    catalogue_type: CatalogueType;
+    /**
+     * Its published menu; `null` when it has published nothing yet, which the page says where the menu will be.
+     */
+    menu: StoreMenuRef | null;
+    /**
+     * The strip of its categories, from the published menu.
+     */
+    categories: Array<StoreCategoryTab>;
+};
+
+/**
+ * A product that matched, as a result row shows it.
+ */
+export type SearchProductHit = {
+    /**
+     * The item; it opens its store at the item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * Its price before any offer, the lowest option's for an item with options.
+     */
+    price: Money;
+    /**
+     * The lowest offer price.
+     */
+    offer_price: Money | null;
+    /**
+     * Its picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * It can be had now; "Sold out" otherwise.
+     */
+    available: boolean;
+    /**
+     * Marked 18+.
+     */
+    age_restricted: boolean;
+    /**
+     * Marked "needs a prescription".
+     */
+    prescription_required: boolean;
+};
+
+/**
+ * A store that matched, with what the customer needs to choose it.
+ */
+export type SearchStore = {
+    /**
+     * The store; it opens at its page.
+     */
+    location_id: string;
+    /**
+     * Its partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its tile.
+     */
+    logo: CataloguePicture | null;
+    /**
+     * Its Verticals.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Open, closed with when it opens, or offline.
+     */
+    live: StoreLive;
+    /**
+     * The distance from the pin sent; `null` without one.
+     */
+    distance_metres: number | null;
+    /**
+     * Its zone serves the customer's; otherwise it is marked "doesn't deliver here".
+     */
+    delivers_here: boolean;
+    /**
+     * It delivers.
+     */
+    delivery: boolean;
+    /**
+     * Orders may be collected, offered where it does not deliver here.
+     */
+    pickup: boolean;
+};
+
+/**
+ * A store found by its name or by what it sells, with its products that matched.
+ */
+export type SearchStoreHit = {
+    /**
+     * The store.
+     */
+    store: SearchStore;
+    /**
+     * The products that matched, best first, six at most.
+     */
+    products: Array<SearchProductHit>;
+    /**
+     * How many of its products matched in all ("See all").
+     */
+    product_count: number;
+    /**
+     * The store's own name matched.
+     */
+    name_matched: boolean;
+};
+
+/**
+ * What a search found, grouped by store and ranked by the published rule.
+ */
+export type SearchResult = {
+    /**
+     * What was typed.
+     */
+    query: string;
+    /**
+     * The words as understood: lower case, accents folded; fewer than two letters finds nothing.
+     */
+    words: Array<string>;
+    /**
+     * No store matched every word, so all but one were enough.
+     */
+    relaxed: boolean;
+    /**
+     * The service area searched from.
+     */
+    service_area_id: string;
+    /**
+     * The Vertical it was narrowed to.
+     */
+    vertical_id: string | null;
+    /**
+     * The stores, in rank order.
+     */
+    stores: Array<SearchStoreHit>;
+    /**
+     * How many stores matched.
+     */
+    total: number;
+    /**
+     * How long the search took at the server, in milliseconds.
+     */
+    took_ms: number;
+};
+
+/**
+ * A name suggested as the customer types.
+ */
+export type SearchSuggestion = {
+    /**
+     * What it names.
+     */
+    kind: SearchSuggestionKind;
+    /**
+     * The name, in the customer's language where the store keeps one.
+     */
+    name: string;
+    /**
+     * The store it belongs to.
+     */
+    location_id: string;
+    /**
+     * The product, for a product.
+     */
+    item_id: string | null;
+};
+
+/**
+ * Suggested names, one of each name, best first.
+ */
+export type SearchSuggestionList = {
+    /**
+     * What was typed.
+     */
+    query: string;
+    /**
+     * The suggestions.
+     */
+    items: Array<SearchSuggestion>;
+    /**
+     * How long it took at the server, in milliseconds.
+     */
+    took_ms: number;
+};
+
+/**
+ * What a search inside one store found: whole menu items, opening in the same sheet as the menu's.
+ */
+export type StoreSearchResult = {
+    /**
+     * What was typed.
+     */
+    query: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The version of the menu searched.
+     */
+    version: number;
+    /**
+     * The items found, best first.
+     */
+    items: Array<MenuItem>;
+    /**
+     * The questions those items ask, by id.
+     */
+    modifiers: {
+        [key: string]: MenuModifier;
+    };
+    /**
+     * How long it took at the server, in milliseconds.
+     */
+    took_ms: number;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -22408,3 +25059,3001 @@ export type SuggestAddressesResponses = {
 };
 
 export type SuggestAddressesResponse = SuggestAddressesResponses[keyof SuggestAddressesResponses];
+
+export type GetCatalogData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog';
+};
+
+export type GetCatalogErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogError = GetCatalogErrors[keyof GetCatalogErrors];
+
+export type GetCatalogResponses = {
+    /**
+     * The catalogue.
+     */
+    200: CatalogSummary;
+};
+
+export type GetCatalogResponse = GetCatalogResponses[keyof GetCatalogResponses];
+
+export type GetCatalogTreeData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/tree';
+};
+
+export type GetCatalogTreeErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogTreeError = GetCatalogTreeErrors[keyof GetCatalogTreeErrors];
+
+export type GetCatalogTreeResponses = {
+    /**
+     * The tree.
+     */
+    200: CatalogTree;
+};
+
+export type GetCatalogTreeResponse = GetCatalogTreeResponses[keyof GetCatalogTreeResponses];
+
+export type ListCatalogCategoriesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories';
+};
+
+export type ListCatalogCategoriesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogCategoriesError = ListCatalogCategoriesErrors[keyof ListCatalogCategoriesErrors];
+
+export type ListCatalogCategoriesResponses = {
+    /**
+     * The categories.
+     */
+    200: CatalogCategoryList;
+};
+
+export type ListCatalogCategoriesResponse = ListCatalogCategoriesResponses[keyof ListCatalogCategoriesResponses];
+
+export type CreateCatalogCategoryData = {
+    /**
+     * The category.
+     */
+    body: CatalogCategoryCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories';
+};
+
+export type CreateCatalogCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `category_too_deep` (the parent is itself a sub-category), `category_has_items` (the parent holds items of its own), `asset_not_usable` (the picture is not a stored `catalogue_category_image` of this store); or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCatalogCategoryError = CreateCatalogCategoryErrors[keyof CreateCatalogCategoryErrors];
+
+export type CreateCatalogCategoryResponses = {
+    /**
+     * The category.
+     */
+    201: CatalogCategory;
+};
+
+export type CreateCatalogCategoryResponse = CreateCatalogCategoryResponses[keyof CreateCatalogCategoryResponses];
+
+export type ReorderCatalogCategoriesData = {
+    /**
+     * Every live category, in order.
+     */
+    body: CatalogCategoryOrder;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/order';
+};
+
+export type ReorderCatalogCategoriesErrors = {
+    /**
+     * The list misses, repeats or names an unknown category (`validation_failed` with `order_incomplete`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReorderCatalogCategoriesError = ReorderCatalogCategoriesErrors[keyof ReorderCatalogCategoriesErrors];
+
+export type ReorderCatalogCategoriesResponses = {
+    /**
+     * The categories in their new order.
+     */
+    200: CatalogCategoryList;
+};
+
+export type ReorderCatalogCategoriesResponse = ReorderCatalogCategoriesResponses[keyof ReorderCatalogCategoriesResponses];
+
+export type DeleteCatalogCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}';
+};
+
+export type DeleteCatalogCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteCatalogCategoryError = DeleteCatalogCategoryErrors[keyof DeleteCatalogCategoryErrors];
+
+export type DeleteCatalogCategoryResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteCatalogCategoryResponse = DeleteCatalogCategoryResponses[keyof DeleteCatalogCategoryResponses];
+
+export type GetCatalogCategoryData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}';
+};
+
+export type GetCatalogCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogCategoryError = GetCatalogCategoryErrors[keyof GetCatalogCategoryErrors];
+
+export type GetCatalogCategoryResponses = {
+    /**
+     * The category, with its version as the `ETag`.
+     */
+    200: CatalogCategory;
+};
+
+export type GetCatalogCategoryResponse = GetCatalogCategoryResponses[keyof GetCatalogCategoryResponses];
+
+export type UpdateCatalogCategoryData = {
+    /**
+     * The members to change.
+     */
+    body: CatalogCategoryUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}';
+};
+
+export type UpdateCatalogCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `category_too_deep` (the parent is a sub-category, or this category has sub-categories of its own), `category_has_items` (the new parent holds items), `asset_not_usable`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches the record's version (`precondition_failed`); read it again and retry.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCatalogCategoryError = UpdateCatalogCategoryErrors[keyof UpdateCatalogCategoryErrors];
+
+export type UpdateCatalogCategoryResponses = {
+    /**
+     * The category after the change, with its new `ETag`.
+     */
+    200: CatalogCategory;
+};
+
+export type UpdateCatalogCategoryResponse = UpdateCatalogCategoryResponses[keyof UpdateCatalogCategoryResponses];
+
+export type ListCatalogCategoryItemsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/items';
+};
+
+export type ListCatalogCategoryItemsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogCategoryItemsError = ListCatalogCategoryItemsErrors[keyof ListCatalogCategoryItemsErrors];
+
+export type ListCatalogCategoryItemsResponses = {
+    /**
+     * A page of the category's items.
+     */
+    200: CatalogItemPage;
+};
+
+export type ListCatalogCategoryItemsResponse = ListCatalogCategoryItemsResponses[keyof ListCatalogCategoryItemsResponses];
+
+export type PutCatalogCategoryItemsData = {
+    /**
+     * The items, in order.
+     */
+    body: CatalogCategoryItems;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/items';
+};
+
+export type PutCatalogCategoryItemsErrors = {
+    /**
+     * An item is unknown or deleted (`validation_failed`), or not listed (`item_unlisted`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `category_has_subcategories`: the category holds sub-categories, which the `detail` offers instead; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogCategoryItemsError = PutCatalogCategoryItemsErrors[keyof PutCatalogCategoryItemsErrors];
+
+export type PutCatalogCategoryItemsResponses = {
+    /**
+     * The category with its items.
+     */
+    200: CatalogCategory;
+};
+
+export type PutCatalogCategoryItemsResponse = PutCatalogCategoryItemsResponses[keyof PutCatalogCategoryItemsResponses];
+
+export type DuplicateCatalogCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The category, which must be one of the store's.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/duplicate';
+};
+
+export type DuplicateCatalogCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DuplicateCatalogCategoryError = DuplicateCatalogCategoryErrors[keyof DuplicateCatalogCategoryErrors];
+
+export type DuplicateCatalogCategoryResponses = {
+    /**
+     * The copy.
+     */
+    201: CatalogCategory;
+};
+
+export type DuplicateCatalogCategoryResponse = DuplicateCatalogCategoryResponses[keyof DuplicateCatalogCategoryResponses];
+
+export type ListCatalogItemsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * Only items whose English name contains this text, case-insensitively.
+         */
+        q?: string;
+        /**
+         * Only items on this category.
+         */
+        category_id?: string;
+        /**
+         * Only items on sale (`active`) or off sale (`inactive`).
+         */
+        status?: CatalogItemStatus;
+        /**
+         * Only items that are, or are not, on the menu in their own right.
+         */
+        listed?: boolean;
+        /**
+         * Only items with a variant in this state.
+         */
+        stock?: StockStatus;
+        /**
+         * Only items with, or without, a picture.
+         */
+        has_picture?: boolean;
+        /**
+         * Only items with this mark.
+         */
+        food_mark?: FoodMark;
+        /**
+         * Only items of this brand.
+         */
+        brand_id?: string;
+        /**
+         * A filter tree as JSON, URL-encoded; the fields and operators are those of `GET .../items/filters`.
+         */
+        filter?: string;
+        /**
+         * Up to three sort keys, comma separated, each optionally prefixed with `-` to descend: `name`, `updated_at`, `created_at`, `from_price`. `name` by default; the id breaks ties.
+         */
+        sort?: string;
+        /**
+         * Fields to count values of, comma separated: `status`, `listed`, `food_mark`.
+         */
+        facets?: string;
+        /**
+         * How many per page. 1 to 100, 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items';
+};
+
+export type ListCatalogItemsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogItemsError = ListCatalogItemsErrors[keyof ListCatalogItemsErrors];
+
+export type ListCatalogItemsResponses = {
+    /**
+     * A page of items.
+     */
+    200: CatalogItemPage;
+};
+
+export type ListCatalogItemsResponse = ListCatalogItemsResponses[keyof ListCatalogItemsResponses];
+
+export type CreateCatalogItemData = {
+    /**
+     * The item.
+     */
+    body: CatalogItemCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items';
+};
+
+export type CreateCatalogItemErrors = {
+    /**
+     * The body failed validation (`validation_failed`), each `errors` entry naming the member: `capability_not_allowed`, `food_mark_required`, `tag_not_in_set`, `offer_not_below_price`, `price_above_mrp`, `english_required`, `language_unsupported`, `axis_values_too_few`, `variant_selection_invalid`, `variant_selection_repeated`, `variant_combination_missing`, `no_enabled_variant`, `default_variant_required`, `pre_order_notice_invalid`, `item_unlisted`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `prescriptions_not_accepted` (the store's order settings do not accept prescriptions), `asset_not_usable` (a picture is not a stored `product_image` of this store), `category_has_subcategories`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCatalogItemError = CreateCatalogItemErrors[keyof CreateCatalogItemErrors];
+
+export type CreateCatalogItemResponses = {
+    /**
+     * The item.
+     */
+    201: CatalogItem;
+};
+
+export type CreateCatalogItemResponse = CreateCatalogItemResponses[keyof CreateCatalogItemResponses];
+
+export type GetCatalogItemFiltersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/filters';
+};
+
+export type GetCatalogItemFiltersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogItemFiltersError = GetCatalogItemFiltersErrors[keyof GetCatalogItemFiltersErrors];
+
+export type GetCatalogItemFiltersResponses = {
+    /**
+     * The declared fields.
+     */
+    200: FilterSchema;
+};
+
+export type GetCatalogItemFiltersResponse = GetCatalogItemFiltersResponses[keyof GetCatalogItemFiltersResponses];
+
+export type BulkCatalogItemsData = {
+    /**
+     * The act and the items.
+     */
+    body: CatalogItemBulk;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/bulk';
+};
+
+export type BulkCatalogItemsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type BulkCatalogItemsError = BulkCatalogItemsErrors[keyof BulkCatalogItemsErrors];
+
+export type BulkCatalogItemsResponses = {
+    /**
+     * What was done and what was refused.
+     */
+    200: CatalogItemBulkOutcome;
+};
+
+export type BulkCatalogItemsResponse = BulkCatalogItemsResponses[keyof BulkCatalogItemsResponses];
+
+export type DeleteCatalogItemData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}';
+};
+
+export type DeleteCatalogItemErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteCatalogItemError = DeleteCatalogItemErrors[keyof DeleteCatalogItemErrors];
+
+export type DeleteCatalogItemResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteCatalogItemResponse = DeleteCatalogItemResponses[keyof DeleteCatalogItemResponses];
+
+export type GetCatalogItemData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}';
+};
+
+export type GetCatalogItemErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogItemError = GetCatalogItemErrors[keyof GetCatalogItemErrors];
+
+export type GetCatalogItemResponses = {
+    /**
+     * The item, with its version as the `ETag`.
+     */
+    200: CatalogItem;
+};
+
+export type GetCatalogItemResponse = GetCatalogItemResponses[keyof GetCatalogItemResponses];
+
+export type UpdateCatalogItemData = {
+    /**
+     * The members to change.
+     */
+    body: CatalogItemUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}';
+};
+
+export type UpdateCatalogItemErrors = {
+    /**
+     * The body failed validation (`validation_failed`) with the field codes of `POST .../items`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `prescriptions_not_accepted`, `asset_not_usable`, `category_has_subcategories`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches the record's version (`precondition_failed`); read it again and retry.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCatalogItemError = UpdateCatalogItemErrors[keyof UpdateCatalogItemErrors];
+
+export type UpdateCatalogItemResponses = {
+    /**
+     * The item after the change, with its new `ETag`.
+     */
+    200: CatalogItem;
+};
+
+export type UpdateCatalogItemResponse = UpdateCatalogItemResponses[keyof UpdateCatalogItemResponses];
+
+export type DuplicateCatalogItemData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/duplicate';
+};
+
+export type DuplicateCatalogItemErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DuplicateCatalogItemError = DuplicateCatalogItemErrors[keyof DuplicateCatalogItemErrors];
+
+export type DuplicateCatalogItemResponses = {
+    /**
+     * The copy.
+     */
+    201: CatalogItem;
+};
+
+export type DuplicateCatalogItemResponse = DuplicateCatalogItemResponses[keyof DuplicateCatalogItemResponses];
+
+export type PutCatalogItemModifiersData = {
+    /**
+     * The questions, in order.
+     */
+    body: CatalogItemModifiers;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/modifiers';
+};
+
+export type PutCatalogItemModifiersErrors = {
+    /**
+     * The body failed validation (`validation_failed`): an override names an answer the question does not offer (`answer_not_offered`), or a question is unknown or repeated.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `modifier_cycle` (the item would ask itself), `modifier_too_deep` (a chain of more than three questions, named in the `detail`); or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogItemModifiersError = PutCatalogItemModifiersErrors[keyof PutCatalogItemModifiersErrors];
+
+export type PutCatalogItemModifiersResponses = {
+    /**
+     * The item.
+     */
+    200: CatalogItem;
+};
+
+export type PutCatalogItemModifiersResponse = PutCatalogItemModifiersResponses[keyof PutCatalogItemModifiersResponses];
+
+export type PutCatalogItemStockData = {
+    /**
+     * The stock.
+     */
+    body: CatalogStockUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/stock';
+};
+
+export type PutCatalogItemStockErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:stock` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogItemStockError = PutCatalogItemStockErrors[keyof PutCatalogItemStockErrors];
+
+export type PutCatalogItemStockResponses = {
+    /**
+     * The item.
+     */
+    200: CatalogItem;
+};
+
+export type PutCatalogItemStockResponse = PutCatalogItemStockResponses[keyof PutCatalogItemStockResponses];
+
+export type PutCatalogVariantStockData = {
+    /**
+     * The stock.
+     */
+    body: CatalogStockUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+        /**
+         * The variant, which must be one of the item's.
+         */
+        variant_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/stock';
+};
+
+export type PutCatalogVariantStockErrors = {
+    /**
+     * The body failed validation (`validation_failed`): a `quantity` where the type tracks no inventory (`capability_not_allowed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:stock` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogVariantStockError = PutCatalogVariantStockErrors[keyof PutCatalogVariantStockErrors];
+
+export type PutCatalogVariantStockResponses = {
+    /**
+     * The item.
+     */
+    200: CatalogItem;
+};
+
+export type PutCatalogVariantStockResponse = PutCatalogVariantStockResponses[keyof PutCatalogVariantStockResponses];
+
+export type PutCatalogVariantPriceData = {
+    /**
+     * The price and the offer price.
+     */
+    body: CatalogPriceUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+        /**
+         * The variant, which must be one of the item's.
+         */
+        variant_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/price';
+};
+
+export type PutCatalogVariantPriceErrors = {
+    /**
+     * The body failed validation (`validation_failed`): `offer_not_below_price` or `price_above_mrp`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogVariantPriceError = PutCatalogVariantPriceErrors[keyof PutCatalogVariantPriceErrors];
+
+export type PutCatalogVariantPriceResponses = {
+    /**
+     * The item.
+     */
+    200: CatalogItem;
+};
+
+export type PutCatalogVariantPriceResponse = PutCatalogVariantPriceResponses[keyof PutCatalogVariantPriceResponses];
+
+export type ListCatalogPriceHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The item, which must be one of the store's.
+         */
+        item_id: string;
+        /**
+         * The variant, which must be one of the item's.
+         */
+        variant_id: string;
+    };
+    query?: {
+        /**
+         * How many rows. 1 to 200, 50 by default.
+         */
+        limit?: number;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/variants/{variant_id}/price-history';
+};
+
+export type ListCatalogPriceHistoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogPriceHistoryError = ListCatalogPriceHistoryErrors[keyof ListCatalogPriceHistoryErrors];
+
+export type ListCatalogPriceHistoryResponses = {
+    /**
+     * The history.
+     */
+    200: CatalogPriceChangeList;
+};
+
+export type ListCatalogPriceHistoryResponse = ListCatalogPriceHistoryResponses[keyof ListCatalogPriceHistoryResponses];
+
+export type ListCatalogModifiersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers';
+};
+
+export type ListCatalogModifiersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogModifiersError = ListCatalogModifiersErrors[keyof ListCatalogModifiersErrors];
+
+export type ListCatalogModifiersResponses = {
+    /**
+     * The questions.
+     */
+    200: CatalogModifierList;
+};
+
+export type ListCatalogModifiersResponse = ListCatalogModifiersResponses[keyof ListCatalogModifiersResponses];
+
+export type CreateCatalogModifierData = {
+    /**
+     * The question.
+     */
+    body: CatalogModifierCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers';
+};
+
+export type CreateCatalogModifierErrors = {
+    /**
+     * The body failed validation (`validation_failed`): `modifier_rule_unsatisfiable`, `answer_repeated`, `english_required`, or `capability_not_allowed` where the type carries no modifiers.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `modifier_cycle`, `modifier_too_deep`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCatalogModifierError = CreateCatalogModifierErrors[keyof CreateCatalogModifierErrors];
+
+export type CreateCatalogModifierResponses = {
+    /**
+     * The question.
+     */
+    201: CatalogModifier;
+};
+
+export type CreateCatalogModifierResponse = CreateCatalogModifierResponses[keyof CreateCatalogModifierResponses];
+
+export type DeleteCatalogModifierData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The question, which must be one of the store's.
+         */
+        modifier_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}';
+};
+
+export type DeleteCatalogModifierErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteCatalogModifierError = DeleteCatalogModifierErrors[keyof DeleteCatalogModifierErrors];
+
+export type DeleteCatalogModifierResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteCatalogModifierResponse = DeleteCatalogModifierResponses[keyof DeleteCatalogModifierResponses];
+
+export type GetCatalogModifierData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The question, which must be one of the store's.
+         */
+        modifier_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}';
+};
+
+export type GetCatalogModifierErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogModifierError = GetCatalogModifierErrors[keyof GetCatalogModifierErrors];
+
+export type GetCatalogModifierResponses = {
+    /**
+     * The question, with its version as the `ETag`.
+     */
+    200: CatalogModifier;
+};
+
+export type GetCatalogModifierResponse = GetCatalogModifierResponses[keyof GetCatalogModifierResponses];
+
+export type UpdateCatalogModifierData = {
+    /**
+     * The members to change.
+     */
+    body: CatalogModifierUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The question, which must be one of the store's.
+         */
+        modifier_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}';
+};
+
+export type UpdateCatalogModifierErrors = {
+    /**
+     * The body failed validation (`validation_failed`): `modifier_rule_unsatisfiable` or `english_required`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * `If-Match` no longer matches the record's version (`precondition_failed`); read it again and retry.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCatalogModifierError = UpdateCatalogModifierErrors[keyof UpdateCatalogModifierErrors];
+
+export type UpdateCatalogModifierResponses = {
+    /**
+     * The question after the change, with its new `ETag`.
+     */
+    200: CatalogModifier;
+};
+
+export type UpdateCatalogModifierResponse = UpdateCatalogModifierResponses[keyof UpdateCatalogModifierResponses];
+
+export type PutCatalogModifierAnswersData = {
+    /**
+     * The answers, in order.
+     */
+    body: CatalogModifierAnswers;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The question, which must be one of the store's.
+         */
+        modifier_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}/answers';
+};
+
+export type PutCatalogModifierAnswersErrors = {
+    /**
+     * The body failed validation (`validation_failed`): `answer_repeated`, `modifier_rule_unsatisfiable`, or an unknown or deleted item.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `modifier_cycle`, `modifier_too_deep`; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogModifierAnswersError = PutCatalogModifierAnswersErrors[keyof PutCatalogModifierAnswersErrors];
+
+export type PutCatalogModifierAnswersResponses = {
+    /**
+     * The question.
+     */
+    200: CatalogModifier;
+};
+
+export type PutCatalogModifierAnswersResponse = PutCatalogModifierAnswersResponses[keyof PutCatalogModifierAnswersResponses];
+
+export type DuplicateCatalogModifierData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The question, which must be one of the store's.
+         */
+        modifier_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/modifiers/{modifier_id}/duplicate';
+};
+
+export type DuplicateCatalogModifierErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DuplicateCatalogModifierError = DuplicateCatalogModifierErrors[keyof DuplicateCatalogModifierErrors];
+
+export type DuplicateCatalogModifierResponses = {
+    /**
+     * The copy.
+     */
+    201: CatalogModifier;
+};
+
+export type DuplicateCatalogModifierResponse = DuplicateCatalogModifierResponses[keyof DuplicateCatalogModifierResponses];
+
+export type ListCatalogBrandsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/brands';
+};
+
+export type ListCatalogBrandsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:read` at this Location (`access_denied`), the partner is not entitled to it (`not_enabled_for_partner`), or platform staff lack `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogBrandsError = ListCatalogBrandsErrors[keyof ListCatalogBrandsErrors];
+
+export type ListCatalogBrandsResponses = {
+    /**
+     * The brands.
+     */
+    200: CatalogBrandList;
+};
+
+export type ListCatalogBrandsResponse = ListCatalogBrandsResponses[keyof ListCatalogBrandsResponses];
+
+export type CreateCatalogBrandData = {
+    /**
+     * The brand.
+     */
+    body: CatalogBrandInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/brands';
+};
+
+export type CreateCatalogBrandErrors = {
+    /**
+     * The body failed validation (`validation_failed`), or the type carries no brands (`capability_not_allowed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the name is taken in the store; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCatalogBrandError = CreateCatalogBrandErrors[keyof CreateCatalogBrandErrors];
+
+export type CreateCatalogBrandResponses = {
+    /**
+     * The brand.
+     */
+    201: CatalogBrand;
+};
+
+export type CreateCatalogBrandResponse = CreateCatalogBrandResponses[keyof CreateCatalogBrandResponses];
+
+export type DeleteCatalogBrandData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The brand, which must be one of the store's.
+         */
+        brand_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/brands/{brand_id}';
+};
+
+export type DeleteCatalogBrandErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteCatalogBrandError = DeleteCatalogBrandErrors[keyof DeleteCatalogBrandErrors];
+
+export type DeleteCatalogBrandResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteCatalogBrandResponse = DeleteCatalogBrandResponses[keyof DeleteCatalogBrandResponses];
+
+export type UpdateCatalogBrandData = {
+    /**
+     * The new name.
+     */
+    body: CatalogBrandInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The brand, which must be one of the store's.
+         */
+        brand_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/brands/{brand_id}';
+};
+
+export type UpdateCatalogBrandErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The caller lacks `catalog:write` at this Location (`access_denied`), or the partner is not entitled to it (`not_enabled_for_partner`). Platform staff read catalogues and change none in this version (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The partner is not visible to the caller, or the store or the record does not exist or belongs to another partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the name is taken in the store; or `service_required`: the Location is a branch, with no product-sales Service switched on, so it has no catalogue.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateCatalogBrandError = UpdateCatalogBrandErrors[keyof UpdateCatalogBrandErrors];
+
+export type UpdateCatalogBrandResponses = {
+    /**
+     * The brand.
+     */
+    200: CatalogBrand;
+};
+
+export type UpdateCatalogBrandResponse = UpdateCatalogBrandResponses[keyof UpdateCatalogBrandResponses];
+
+export type ListCatalogOverviewsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only catalogues whose store or partner name contains this text, case-insensitively.
+         */
+        q?: string;
+        /**
+         * Only catalogues of this type.
+         */
+        catalogue_type?: CatalogueType;
+        /**
+         * Only this partner's catalogues.
+         */
+        partner_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/catalogs';
+};
+
+export type ListCatalogOverviewsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogOverviewsError = ListCatalogOverviewsErrors[keyof ListCatalogOverviewsErrors];
+
+export type ListCatalogOverviewsResponses = {
+    /**
+     * A page of catalogues.
+     */
+    200: CatalogOverviewPage;
+};
+
+export type ListCatalogOverviewsResponse = ListCatalogOverviewsResponses[keyof ListCatalogOverviewsResponses];
+
+export type ListSearchSynonymsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/search/synonyms';
+};
+
+export type ListSearchSynonymsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `setting:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSearchSynonymsError = ListSearchSynonymsErrors[keyof ListSearchSynonymsErrors];
+
+export type ListSearchSynonymsResponses = {
+    /**
+     * The groups.
+     */
+    200: SearchSynonymGroupList;
+};
+
+export type ListSearchSynonymsResponse = ListSearchSynonymsResponses[keyof ListSearchSynonymsResponses];
+
+export type CreateSearchSynonymGroupData = {
+    /**
+     * The words.
+     */
+    body: SearchSynonymGroupCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/search/synonyms';
+};
+
+export type CreateSearchSynonymGroupErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `setting:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `conflict`: the same words already form a group
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateSearchSynonymGroupError = CreateSearchSynonymGroupErrors[keyof CreateSearchSynonymGroupErrors];
+
+export type CreateSearchSynonymGroupResponses = {
+    /**
+     * The group.
+     */
+    201: SearchSynonymGroup;
+};
+
+export type CreateSearchSynonymGroupResponse = CreateSearchSynonymGroupResponses[keyof CreateSearchSynonymGroupResponses];
+
+export type DeleteSearchSynonymGroupData = {
+    body?: never;
+    path: {
+        /**
+         * The synonym group.
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/search/synonyms/{group_id}';
+};
+
+export type DeleteSearchSynonymGroupErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `setting:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such group (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteSearchSynonymGroupError = DeleteSearchSynonymGroupErrors[keyof DeleteSearchSynonymGroupErrors];
+
+export type DeleteSearchSynonymGroupResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteSearchSynonymGroupResponse = DeleteSearchSynonymGroupResponses[keyof DeleteSearchSynonymGroupResponses];
+
+export type GetStorePageData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The latitude of the customer's pin, for distances; sent with `lng`.
+         */
+        lat?: number;
+        /**
+         * The longitude of the customer's pin; sent with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}';
+};
+
+export type GetStorePageErrors = {
+    /**
+     * A latitude without a longitude or one out of range (`validation_failed`), or a malformed identifier (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store does not exist, is deleted, or is not live (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStorePageError = GetStorePageErrors[keyof GetStorePageErrors];
+
+export type GetStorePageResponses = {
+    /**
+     * The store page.
+     */
+    200: StorePage;
+};
+
+export type GetStorePageResponse = GetStorePageResponses[keyof GetStorePageResponses];
+
+export type GetStoreMenuData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The menu version the client was told of; the answer is that version or a later one, never an older one.
+         */
+        version?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/menu';
+};
+
+export type GetStoreMenuErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store does not exist, is deleted or is not live (`not_found`), or it has published no menu yet (`menu_not_published`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreMenuError = GetStoreMenuErrors[keyof GetStoreMenuErrors];
+
+export type GetStoreMenuResponses = {
+    /**
+     * The published menu, with its version as the `ETag`.
+     */
+    200: MenuDocument;
+};
+
+export type GetStoreMenuResponse = GetStoreMenuResponses[keyof GetStoreMenuResponses];
+
+export type GetStoreMenuCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+        /**
+         * A category of the published menu.
+         */
+        category_id: string;
+    };
+    query?: {
+        /**
+         * Where the page starts, 0 by default.
+         */
+        offset?: number;
+        /**
+         * How many items. 1 to 200, 60 by default.
+         */
+        limit?: number;
+        /**
+         * The menu version the client was told of; the answer is that version or a later one, never an older one.
+         */
+        version?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/menu/categories/{category_id}';
+};
+
+export type GetStoreMenuCategoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store or the category is not on the published menu (`not_found`, `menu_not_published`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreMenuCategoryError = GetStoreMenuCategoryErrors[keyof GetStoreMenuCategoryErrors];
+
+export type GetStoreMenuCategoryResponses = {
+    /**
+     * The page, with the menu's version as the `ETag`.
+     */
+    200: MenuCategoryPage;
+};
+
+export type GetStoreMenuCategoryResponse = GetStoreMenuCategoryResponses[keyof GetStoreMenuCategoryResponses];
+
+export type GetStoreItemData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+        /**
+         * An item of the published menu.
+         */
+        item_id: string;
+    };
+    query?: {
+        /**
+         * The menu version the client was told of; the answer is that version or a later one, never an older one.
+         */
+        version?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/items/{item_id}';
+};
+
+export type GetStoreItemErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store, or the item on its published menu, is not found (`not_found`, `menu_not_published`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreItemError = GetStoreItemErrors[keyof GetStoreItemErrors];
+
+export type GetStoreItemResponses = {
+    /**
+     * The item sheet, with the menu's version as the `ETag`.
+     */
+    200: ItemSheet;
+};
+
+export type GetStoreItemResponse = GetStoreItemResponses[keyof GetStoreItemResponses];
+
+export type SearchStoreData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * What was typed, at most 100 characters; fewer than two letters finds nothing.
+         */
+        q?: string;
+        /**
+         * How many items. 1 to 100, 30 by default.
+         */
+        limit?: number;
+        /**
+         * Only items marked veg.
+         */
+        veg?: boolean;
+    };
+    url: '/v1/storefront/stores/{location_id}/search';
+};
+
+export type SearchStoreErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store does not exist or is not live, or it has published no menu yet (`not_found`, `menu_not_published`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SearchStoreError = SearchStoreErrors[keyof SearchStoreErrors];
+
+export type SearchStoreResponses = {
+    /**
+     * The items found.
+     */
+    200: StoreSearchResult;
+};
+
+export type SearchStoreResponse = SearchStoreResponses[keyof SearchStoreResponses];
+
+export type SuggestInStoreData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * What was typed, at most 100 characters; fewer than two letters finds nothing.
+         */
+        q?: string;
+        /**
+         * How many names. 1 to 20, 8 by default.
+         */
+        limit?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/search/suggestions';
+};
+
+export type SuggestInStoreErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * The store does not exist, is deleted, or is not live (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SuggestInStoreError = SuggestInStoreErrors[keyof SuggestInStoreErrors];
+
+export type SuggestInStoreResponses = {
+    /**
+     * The suggestions.
+     */
+    200: SearchSuggestionList;
+};
+
+export type SuggestInStoreResponse = SuggestInStoreResponses[keyof SuggestInStoreResponses];
+
+export type SearchStoresData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * What was typed, at most 100 characters; fewer than two letters finds nothing.
+         */
+        q: string;
+        /**
+         * The service area the customer is in, normally the zone of their pin or selected address; the search covers the stores of its city, those whose zone serves it first.
+         */
+        service_area_id: string;
+        /**
+         * The latitude of the customer's pin, for distances; sent with `lng`.
+         */
+        lat?: number;
+        /**
+         * The longitude of the customer's pin; sent with `lat`.
+         */
+        lng?: number;
+        /**
+         * Only stores trading in this Vertical.
+         */
+        vertical_id?: string;
+        /**
+         * Only products marked veg, and stores with one that matched.
+         */
+        veg?: boolean;
+        /**
+         * Only products costing at least this, in minor units.
+         */
+        min_price?: number;
+        /**
+         * Only products costing at most this, in minor units.
+         */
+        max_price?: number;
+        /**
+         * Only stores open now.
+         */
+        open_now?: boolean;
+        /**
+         * How many stores. 1 to 50, 24 by default.
+         */
+        limit?: number;
+    };
+    url: '/v1/storefront/search';
+};
+
+export type SearchStoresErrors = {
+    /**
+     * A missing `q` or `service_area_id`, an unknown service area, a latitude without a longitude, or a malformed identifier (`validation_failed`, `malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SearchStoresError = SearchStoresErrors[keyof SearchStoresErrors];
+
+export type SearchStoresResponses = {
+    /**
+     * What was found.
+     */
+    200: SearchResult;
+};
+
+export type SearchStoresResponse = SearchStoresResponses[keyof SearchStoresResponses];
+
+export type SuggestNamesData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * What was typed, at most 100 characters; fewer than two letters finds nothing.
+         */
+        q?: string;
+        /**
+         * The service area the customer is in, normally the zone of their pin or selected address; the search covers the stores of its city, those whose zone serves it first.
+         */
+        service_area_id: string;
+        /**
+         * Only names from stores trading in this Vertical.
+         */
+        vertical_id?: string;
+        /**
+         * How many names. 1 to 20, 8 by default.
+         */
+        limit?: number;
+    };
+    url: '/v1/storefront/search/suggestions';
+};
+
+export type SuggestNamesErrors = {
+    /**
+     * A missing `service_area_id`, an unknown service area, or a malformed identifier (`validation_failed`, `malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SuggestNamesError = SuggestNamesErrors[keyof SuggestNamesErrors];
+
+export type SuggestNamesResponses = {
+    /**
+     * The suggestions.
+     */
+    200: SearchSuggestionList;
+};
+
+export type SuggestNamesResponse = SuggestNamesResponses[keyof SuggestNamesResponses];

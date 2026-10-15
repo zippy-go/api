@@ -1,0 +1,40 @@
+type: object
+description: How much of a catalogue is in.
+required:
+  - categories
+  - items
+  - listed
+  - modifiers
+  - brands
+properties:
+  categories:
+    type: integer
+    description: Live categories.
+    examples:
+      - 4
+  items:
+    type: integer
+    description: Items, on sale or not.
+    examples:
+      - 12
+  listed:
+    type: integer
+    description: Items on the menu in their own right.
+    examples:
+      - 10
+  modifiers:
+    type: integer
+    description: Questions.
+    examples:
+      - 2
+  brands:
+    type: integer
+    description: Brands.
+    examples:
+      - 0
+examples:
+  - categories: 4
+    items: 12
+    listed: 10
+    modifiers: 2
+    brands: 0

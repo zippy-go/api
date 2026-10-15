@@ -1,0 +1,50 @@
+type: object
+description: "Request body of `POST .../catalog/categories`: a new category, placed last."
+required:
+  - name
+properties:
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: What it says about itself.
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The category it sits under, one level deep at most; `null` at the top.
+    examples:
+      - null
+  hidden:
+    type: boolean
+    description: Hidden from customers; `false` when absent.
+  hours:
+    oneOf:
+      - type: array
+        items:
+          $ref: ../reference/DaySchedule.yaml
+        description: The days and windows it is sold.
+      - type: "null"
+    description: "Its own hours: a day not listed is not sold; `null` follows the store."
+  outside_hours:
+    $ref: ./OutsideHours.yaml
+    description: What it does outside its hours; `grey` when absent.
+  picture_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "Its picture: a stored `catalogue_category_image` asset of this store, or a crop of one."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+examples:
+  - name:
+      en: Biryanis
+      te: బిర్యానీలు
+    parent_id: null
+    hidden: false
+    outside_hours: grey

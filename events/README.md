@@ -77,6 +77,12 @@ with the identifiers when it is needed.
 | `access.membership.removed` | 1 | A membership was removed and its grants revoked. Payload: `membership_id`, `user_id`. |
 | `access.role.changed` | 1 | A role was defined, changed or deleted. Payload: `role_id`, `change`. |
 | `access.envelope.changed` | 1 | What the platform withholds from a partner's entitlements changed. Payload: `partner_id`, `withheld`. |
+| `catalog.item.changed` | 1 | An item of a store's catalogue changed. Payload: `location_id`, `item_id`, `change`, `revision`. |
+| `catalog.category.changed` | 1 | A category of a store's catalogue changed. Payload: `location_id`, `category_id`, `change`, `revision`. |
+| `catalog.modifier.changed` | 1 | A question of a store's catalogue changed. Payload: `location_id`, `modifier_id`, `change`, `revision`. |
+| `catalog.brand.changed` | 1 | A brand of a store's own list changed. Payload: `location_id`, `brand_id`, `change`, `revision`. |
+| `catalog.menu.published` | 1 | A store's menu was rebuilt into a new published document. Payload: `location_id`, `version`, `revision`, `published_at`, `items`. |
+| `catalog.search.missed` | 1 | A search found nothing, recorded without the customer's identity. Not scoped to a partner. Payload: `words`, `service_area_id`, `vertical_id`, `location_id`, `searched_at`. |
 
 ## Consuming events
 

@@ -1,0 +1,7 @@
+type: string
+description: "What a category with hours of its own does outside them: `hide` leaves it off the menu, `grey` draws it greyed with its hours and lets nothing in it be chosen."
+enum:
+  - hide
+  - grey
+examples:
+  - grey

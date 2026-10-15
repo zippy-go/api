@@ -1,0 +1,19 @@
+type: object
+description: A variant's price and offer price at one moment.
+required:
+  - price
+  - offer_price
+properties:
+  price:
+    $ref: ../common/Money.yaml
+    description: The price.
+  offer_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The offer price.
+examples:
+  - price:
+      minor_units: 24900
+      currency: INR
+    offer_price: null

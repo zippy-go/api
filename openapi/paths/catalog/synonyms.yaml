@@ -1,0 +1,104 @@
+# Path item for /v1/platform/search/synonyms. Referenced from openapi.yaml.
+get:
+  operationId: listSearchSynonyms
+  summary: List the synonym groups
+  description: The groups of words search treats as meaning the same thing, starting with the common spellings and names of Indian dishes and groceries. `setting:read`.
+  tags:
+    - Search
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The groups.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SearchSynonymGroupList.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `setting:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createSearchSynonymGroup
+  summary: Add a synonym group
+  description: Adds a group of words, in any script, each of which finds what any other finds, ranked below an exact match, in one Vertical or in every one. Searches use it within a minute, with no rebuild. `setting:write`.
+  tags:
+    - Search
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The words.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/catalog/SearchSynonymGroupCreate.yaml
+  responses:
+    "201":
+      description: The group.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SearchSynonymGroup.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `setting:write` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`conflict`: the same words already form a group"
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

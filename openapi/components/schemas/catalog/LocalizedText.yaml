@@ -1,0 +1,33 @@
+type: object
+description: Wording as a map of language to text. `en` is required; `hi` (Hindi) and `te` (Telugu) may be added, and a further language is a further key. A customer reads their language, English where it is missing.
+required:
+  - en
+properties:
+  en:
+    type: string
+    description: The English wording.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Hyderabadi Biryani
+  hi:
+    type: string
+    description: The Hindi wording.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - हैदराबादी बिरयानी
+  te:
+    type: string
+    description: The Telugu wording.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - హైదరాబాదీ బిర్యానీ
+additionalProperties:
+  type: string
+  minLength: 1
+  maxLength: 1000
+examples:
+  - en: Hyderabadi Biryani
+    te: హైదరాబాదీ బిర్యానీ

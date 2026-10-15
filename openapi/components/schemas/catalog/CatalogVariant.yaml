@@ -1,0 +1,111 @@
+type: object
+description: One way an item is sold, with its own price, stock and picture. Prices include tax.
+required:
+  - id
+  - selection
+  - position
+  - price
+  - offer_price
+  - mrp
+  - tax_class
+  - sku
+  - enabled
+  - picture
+  - stock
+  - sold_out_until
+  - quantity
+  - low_stock
+  - sellable
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+  selection:
+    $ref: ./VariantSelection.yaml
+    description: The value it chooses on each axis.
+  position:
+    type: integer
+    description: Its place among the item's variants.
+    examples:
+      - 0
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price, tax included.
+  offer_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A lower price it is offered at, below `price`.
+  mrp:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The maximum retail price printed on the pack, where the type carries MRP.
+  tax_class:
+    oneOf:
+      - $ref: ./TaxClass.yaml
+      - type: "null"
+    description: Its tax class; `null` inherits the Vertical's default.
+  sku:
+    type:
+      - string
+      - "null"
+    description: The store's own code for it.
+    maxLength: 64
+    examples:
+      - null
+  enabled:
+    type: boolean
+    description: Sold at all.
+  picture:
+    oneOf:
+      - $ref: ./CataloguePicture.yaml
+      - type: "null"
+    description: Its own picture.
+  stock:
+    $ref: ./StockStatus.yaml
+    description: Whether it can be had.
+  sold_out_until:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it is back in stock by itself, 00:00 in the store's clock, while sold out for today.
+    examples:
+      - 2026-10-15T09:00:00Z
+  quantity:
+    type:
+      - integer
+      - "null"
+    description: How many are on hand, where the type tracks inventory; `null` when not counted.
+    minimum: 0
+    examples:
+      - null
+  low_stock:
+    type: boolean
+    description: Fewer on hand than the store's low-stock threshold.
+  sellable:
+    type: boolean
+    description: Enabled, in stock and not counted down to nothing.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+    selection:
+      0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc601: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc611
+    position: 0
+    price:
+      minor_units: 24900
+      currency: INR
+    offer_price: null
+    mrp: null
+    tax_class: null
+    sku: null
+    enabled: true
+    picture: null
+    stock: in_stock
+    sold_out_until: null
+    quantity: null
+    low_stock: false
+    sellable: true

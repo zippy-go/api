@@ -1,0 +1,32 @@
+type: object
+description: "An answer of a question in the catalogue tree: the item, its price here and its order."
+required:
+  - item_id
+  - price
+  - offered
+  - position
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The answer, an item; its row is in the tree's `items`.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+  price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The price that replaces the item's own when chosen here.
+  offered:
+    type: boolean
+    description: Offered; an answer that is not stays in the question, hidden.
+  position:
+    type: integer
+    description: Its place among the answers.
+    examples:
+      - 0
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    price: null
+    offered: true
+    position: 0

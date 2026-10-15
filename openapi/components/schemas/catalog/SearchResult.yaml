@@ -1,0 +1,101 @@
+type: object
+description: What a search found, grouped by store and ranked by the published rule.
+required:
+  - query
+  - words
+  - relaxed
+  - service_area_id
+  - vertical_id
+  - stores
+  - total
+  - took_ms
+properties:
+  query:
+    type: string
+    description: What was typed.
+    examples:
+      - biriyani
+  words:
+    type: array
+    items:
+      type: string
+    description: "The words as understood: lower case, accents folded; fewer than two letters finds nothing."
+    examples:
+      - - biriyani
+  relaxed:
+    type: boolean
+    description: No store matched every word, so all but one were enough.
+  service_area_id:
+    type: string
+    format: uuid
+    description: The service area searched from.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60
+  vertical_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Vertical it was narrowed to.
+    examples:
+      - null
+  stores:
+    type: array
+    items:
+      $ref: ./SearchStoreHit.yaml
+    description: The stores, in rank order.
+  total:
+    type: integer
+    description: How many stores matched.
+    examples:
+      - 3
+  took_ms:
+    type: number
+    description: How long the search took at the server, in milliseconds.
+    examples:
+      - 12.5
+examples:
+  - query: biriyani
+    words:
+      - biriyani
+    relaxed: false
+    service_area_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a60
+    vertical_id: null
+    stores:
+      - store:
+          location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          name: Dev Kitchen Gachibowli
+          logo: null
+          vertical_ids:
+            - 01a13a48-9e00-7000-8000-00000000b001
+          live:
+            state: online
+            reason: null
+            until: 2026-10-15T17:30:00Z
+          distance_metres: 1200
+          delivers_here: true
+          delivery: true
+          pickup: true
+        products:
+          - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            name:
+              en: Hyderabadi Biryani
+              te: హైదరాబాదీ బిర్యానీ
+            food_mark: non_veg
+            price:
+              minor_units: 24900
+              currency: INR
+            offer_price: null
+            picture:
+              asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+              thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+              card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+              hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+            available: true
+            age_restricted: false
+            prescription_required: false
+        product_count: 1
+        name_matched: false
+    total: 1
+    took_ms: 12.5

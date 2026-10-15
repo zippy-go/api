@@ -163,6 +163,85 @@ errors:
           A customer's address whose map pin lies more than two kilometres from
           where its locality and PIN code geocode; the pin, not the text,
           decides where an agent goes.
+      - code: capability_not_allowed
+        message: This kind of store's items do not carry this.
+        description: >-
+          An item, a variant, a question or a brand uses what the store's
+          catalogue type does not allow (brands, variants, modifiers,
+          inventory, MRP, prescriptions and the rest); the entry points at
+          the member and names the capability.
+      - code: food_mark_required
+        message: Every dish needs a veg or non-veg mark.
+        description: >-
+          The store's catalogue type carries the food mark and the item was
+          saved without one.
+      - code: tag_not_in_set
+        message: The tag is not in this kind of store's closed set.
+        description: >-
+          A dietary or allergen tag outside the catalogue type's closed set;
+          free text is never a tag.
+      - code: offer_not_below_price
+        message: An offer has to cost less than the price.
+        description: A variant's offer price equal to or above its price.
+      - code: price_above_mrp
+        message: The price cannot exceed the MRP.
+        description: >-
+          A packaged good's price above the maximum retail price printed on
+          its pack.
+      - code: english_required
+        message: Wording needs English; Hindi and Telugu may be added.
+        description: A name, description or hint without its English wording.
+      - code: language_unsupported
+        message: Wording is kept in English, Hindi and Telugu.
+        description: Wording in a language the platform does not keep yet.
+      - code: axis_values_too_few
+        message: An axis needs at least two values.
+        description: An axis an item is sold along with fewer than two values.
+      - code: variant_selection_invalid
+        message: A variant chooses one declared value on every axis.
+        description: >-
+          A variant's selection misses an axis, names an unknown axis or
+          value, or chooses something on an item with no axes.
+      - code: variant_selection_repeated
+        message: Two variants choose the same values.
+        description: Two variants of one item with the same selection.
+      - code: variant_combination_missing
+        message: Every combination of the axes' values needs its variant.
+        description: >-
+          An item with axes is missing the variant of a combination of its
+          axes' values; the entry names the combination.
+      - code: no_enabled_variant
+        message: At least one variant is enabled.
+        description: Every variant of the item is disabled.
+      - code: default_variant_required
+        message: An item with no axes has exactly one variant, choosing nothing.
+        description: An item with no axes sent with more than one variant.
+      - code: answer_not_offered
+        message: The question does not offer this answer.
+        description: >-
+          An item prices or hides an answer the question it asks does not
+          offer.
+      - code: answer_repeated
+        message: An item is offered once per question.
+        description: The same item offered twice as an answer of one question.
+      - code: modifier_rule_unsatisfiable
+        message: The least the question asks for is more than its answers offer, or above its most.
+        description: >-
+          A question whose least cannot be met by the answers it offers, or
+          whose least is above its most.
+      - code: order_incomplete
+        message: Every live category is named once.
+        description: >-
+          A reorder that misses, repeats or names an unknown category; the
+          entry points at the list.
+      - code: item_unlisted
+        message: An item that is not on the menu in its own right sits on no category.
+        description: >-
+          An unlisted item, which exists only as an answer to questions, put
+          on a category.
+      - code: pre_order_notice_invalid
+        message: Pre-order notice is 24, 48 or 72 hours.
+        description: A pre-order-only item's notice outside the three choices.
 
   - code: channel_unknown
     status: 400
@@ -344,6 +423,15 @@ errors:
       The resource does not exist or is not visible to the caller. The API
       does not distinguish between the two.
 
+  - code: menu_not_published
+    status: 404
+    title: Menu not published
+    message: Store {id} has published no menu yet.
+    retryable: false
+    description: >-
+      The store exists and is live but has published nothing yet; its page
+      says so where the menu will be rather than pretend to load one.
+
   - code: method_not_allowed
     status: 405
     title: Method not allowed
@@ -489,6 +577,62 @@ errors:
     description: >-
       The partner cannot be archived while any of its locations is not
       archived; the `errors` member names each location still open.
+
+  - code: category_too_deep
+    status: 409
+    title: Category too deep
+    message: A category nests one level under another at most.
+    retryable: false
+    description: >-
+      The parent named is itself a sub-category, or the category being
+      moved under a parent has sub-categories of its own.
+
+  - code: category_has_items
+    status: 409
+    title: Category holds items
+    message: "{category} holds items of its own, so it cannot hold categories."
+    retryable: false
+    description: >-
+      A category holding categories holds no items of its own: move the
+      items to another category before nesting one under it.
+
+  - code: category_has_subcategories
+    status: 409
+    title: Category holds sub-categories
+    message: "{category} holds sub-categories; put the item on one of them: {subcategories}."
+    retryable: false
+    description: >-
+      A category holding sub-categories holds no items of its own; the
+      detail offers its sub-categories instead.
+
+  - code: modifier_cycle
+    status: 409
+    title: Questions loop
+    message: "{item} would ask itself through {chain}."
+    retryable: false
+    description: >-
+      An item would reach itself through the answers of the questions it
+      asks, for example a meal deal made an answer to a question the meal
+      deal asks.
+
+  - code: modifier_too_deep
+    status: 409
+    title: Questions nest too deep
+    message: "Questions nest three deep at most; this would make {chain}."
+    retryable: false
+    description: >-
+      Questions nest three deep at most (a meal deal, its burger, the
+      burger's cooking). The save would make a longer chain, which the
+      detail names question by question.
+
+  - code: prescriptions_not_accepted
+    status: 409
+    title: Prescriptions not accepted
+    message: This store does not accept prescriptions.
+    retryable: false
+    description: >-
+      An item needing a prescription is sold only at a store whose order
+      settings accept prescriptions, which platform staff switch on.
 
   - code: idempotency_key_reuse
     status: 409

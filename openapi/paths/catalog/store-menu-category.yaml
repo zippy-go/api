@@ -1,0 +1,86 @@
+# Path item for /v1/storefront/stores/{location_id}/menu/categories/{category_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store (a Location).
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  - name: category_id
+    in: path
+    required: true
+    description: A category of the published menu.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+get:
+  operationId: getStoreMenuCategory
+  summary: Page through a large category
+  description: Further items of a category of the published menu, from `offset`, with the questions those items ask and their answers ask in turn. Cut from the version named, or a later one.
+  tags:
+    - Store pages
+  security: []
+  parameters:
+    - name: offset
+      in: query
+      required: false
+      description: Where the page starts, 0 by default.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    - name: limit
+      in: query
+      required: false
+      description: How many items. 1 to 200, 60 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 60
+    - name: version
+      in: query
+      required: false
+      description: The menu version the client was told of; the answer is that version or a later one, never an older one.
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 42
+  responses:
+    "200":
+      description: The page, with the menu's version as the `ETag`.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/MenuCategoryPage.yaml
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The store or the category is not on the published menu (`not_found`, `menu_not_published`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

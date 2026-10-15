@@ -1,0 +1,24 @@
+type: object
+description: A tax class a variant may name, with the rate in force today.
+required:
+  - code
+  - label
+  - rate_percent
+properties:
+  code:
+    $ref: ./TaxClass.yaml
+    description: The class.
+  label:
+    type: string
+    description: The class as a person says it.
+    examples:
+      - Merit rate
+  rate_percent:
+    type: number
+    description: The rate in force today, in percent.
+    examples:
+      - 5
+examples:
+  - code: merit
+    label: Merit rate
+    rate_percent: 5

@@ -1,0 +1,7 @@
+type: string
+description: "`active` is on sale; `inactive` is off sale: not on the menu and offered as no answer to any question. A duplicate starts `inactive`."
+enum:
+  - active
+  - inactive
+examples:
+  - active

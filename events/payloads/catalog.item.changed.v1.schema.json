@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.item.changed.v1.schema.json",
+  "title": "CatalogItemChangedPayload",
+  "description": "Payload of `catalog.item.changed` version 1: an item of a store's catalogue changed. The envelope's `partner_id` is the store's partner. The payload names the item and what kind of change it was, never the values; readers fetch the item. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "item_id",
+    "change",
+    "revision"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store whose catalogue changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The item.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101"
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "created",
+        "updated",
+        "deleted",
+        "duplicated",
+        "stock",
+        "price",
+        "modifiers",
+        "categories"
+      ],
+      "description": "What kind of change: the item `created`, `updated` through its form, `deleted` or `duplicated` (the copy is the item named), or its `stock`, a `price`, the questions it asks (`modifiers`) or the categories it sits on.",
+      "examples": [
+        "price"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The catalogue's revision after the change, raised by every change; the version of the `catalog.changed` signal on the store's catalogue channel.",
+      "examples": [
+        57
+      ]
+    }
+  }
+}

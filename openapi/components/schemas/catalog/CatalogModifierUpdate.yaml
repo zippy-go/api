@@ -1,0 +1,37 @@
+type: object
+description: "Request body of `PATCH .../catalog/modifiers/{modifier_id}`: the members present change, absent ones stay."
+properties:
+  name:
+    $ref: ./LocalizedText.yaml
+    description: Its name.
+  hint:
+    oneOf:
+      - $ref: ./LocalizedText.yaml
+      - type: "null"
+    description: A hint under it.
+  min:
+    type: integer
+    description: The least answers it asks for; 0 when absent.
+    minimum: 0
+    maximum: 100
+    examples:
+      - 0
+  max:
+    type: integer
+    description: The most it takes, 0 for no ceiling; 0 when absent.
+    minimum: 0
+    maximum: 100
+    examples:
+      - 1
+  required:
+    type: boolean
+    description: It asks for at least one answer; `false` when absent.
+  repeats:
+    type: boolean
+    description: An answer may be chosen more than once; `false` when absent.
+  status:
+    $ref: ./CatalogItemStatus.yaml
+    description: Asked or not; `active` when absent.
+examples:
+  - required: true
+    min: 1

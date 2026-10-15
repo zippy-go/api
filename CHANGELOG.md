@@ -6,6 +6,76 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-15
+
+Step 2, catalogue: a store's catalogue kept in the Partner console and
+published within about a second as one versioned menu the storefront
+reads, a store's page and item sheet, and search across the stores of a
+city and inside one store. It merges after the customer slice (0.11.0).
+Additive only.
+
+### Added
+
+- The `Catalog` operations under
+  `/v1/partners/{partner_id}/locations/{location_id}/catalog`: the
+  catalogue at a glance with the profile its catalogue type allows
+  (`CatalogSummary`, `CatalogueProfile`), the catalogue as a tree
+  (`CatalogTree`), categories (list, create, reorder, read, change,
+  delete, set and page their items, duplicate), items sold as variants
+  (list with the filter grammar, create, read, change, delete, duplicate,
+  the questions they ask, their stock, a variant's stock, a quick price
+  change and the price history, and bulk acts on up to 500 items),
+  questions whose answers are items (`modifiers`: list, create, read,
+  change, delete, set their answers, duplicate) and the store's own
+  brands. Wording is `LocalizedText`, prices in requests are minor units
+  of the store's currency and in responses `Money`, tax included.
+  Reading needs `catalog:read` at the Location, changing `catalog:write`,
+  marking stock `catalog:stock` or `catalog:write`.
+- Mission Control's catalogue oversight, `GET /v1/platform/catalogs`
+  (`CatalogOverviewPage`), with the new permission `catalog:oversee`;
+  platform staff read any catalogue through the partner routes with it,
+  and change none in this version.
+- The `Store pages` operations, public: a store's page
+  (`GET /v1/storefront/stores/{location_id}`, `StorePage`), its published
+  menu (`GET .../menu`, `MenuDocument`) with its version as the `ETag`,
+  `If-None-Match` and a `version` the client was told of, a large
+  category's further pages (`GET .../menu/categories/{category_id}`) and
+  an item sheet (`GET .../items/{item_id}`, `ItemSheet`).
+- The `Search` operations, public: search across the stores of the
+  customer's city (`GET /v1/storefront/search`, `SearchResult`), names
+  suggested as the customer types (`GET /v1/storefront/search/suggestions`),
+  and search and suggestions inside one store
+  (`GET /v1/storefront/stores/{location_id}/search`, `/search/suggestions`);
+  and the synonym groups search treats as one word
+  (`GET`, `POST /v1/platform/search/synonyms`,
+  `DELETE /v1/platform/search/synonyms/{group_id}`) with `setting:read`
+  and `setting:write`.
+- The problem codes `category_too_deep`, `category_has_items`,
+  `category_has_subcategories`, `modifier_cycle`, `modifier_too_deep` and
+  `prescriptions_not_accepted` (409) and `menu_not_published` (404), and
+  the field codes `capability_not_allowed`, `food_mark_required`,
+  `tag_not_in_set`, `offer_not_below_price`, `price_above_mrp`,
+  `english_required`, `language_unsupported`, `axis_values_too_few`,
+  `variant_selection_invalid`, `variant_selection_repeated`,
+  `variant_combination_missing`, `no_enabled_variant`,
+  `default_variant_required`, `answer_not_offered`, `answer_repeated`,
+  `modifier_rule_unsatisfiable`, `order_incomplete`, `item_unlisted` and
+  `pre_order_notice_invalid` under `validation_failed`.
+- The events `catalog.item.changed`, `catalog.category.changed`,
+  `catalog.modifier.changed`, `catalog.brand.changed`,
+  `catalog.menu.published` and `catalog.search.missed`.
+- The live stream's catalogue signals: `menu.published` with the version
+  only on a store's public channel `store-{location_id}-menu`, and
+  `catalog.changed` with the kind and id of what changed and the
+  catalogue revision on `private-location-{location_id}-catalog`.
+
+### Changed
+
+- The asset purposes `product_image` and `catalogue_category_image` are
+  available: grants are issued at
+  `POST /v1/partners/{partner_id}/assets/grants` with the Location, to
+  holders of `catalog:write` there.
+
 ## [0.11.0] - 2026-10-15
 
 Step 2, customer: customers sign in with a code to their number and keep an

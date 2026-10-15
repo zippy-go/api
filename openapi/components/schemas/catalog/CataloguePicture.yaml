@@ -1,0 +1,34 @@
+type: object
+description: "A picture as customers are sent it: the asset and its renditions sized to where they are drawn (`thumb` 160, `card` 480 and `hero` 1200 pixels wide), cut losslessly from the original. The addresses are relative to the API host and answer with a redirect to the file."
+required:
+  - asset_id
+  - thumb
+  - card
+  - hero
+properties:
+  asset_id:
+    type: string
+    format: uuid
+    description: "The asset shown: the original picture or a crop of it."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+  thumb:
+    type: string
+    description: The 160 pixel rendition.
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+  card:
+    type: string
+    description: The 480 pixel rendition, for cards.
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+  hero:
+    type: string
+    description: The 1200 pixel rendition, for sheets and banners.
+    examples:
+      - /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero
+examples:
+  - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501
+    thumb: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/thumb
+    card: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/card
+    hero: /v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc501/renditions/hero

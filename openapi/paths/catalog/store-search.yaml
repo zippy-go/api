@@ -1,0 +1,72 @@
+# Path item for /v1/storefront/stores/{location_id}/search. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store (a Location).
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: searchStore
+  summary: Search inside a store
+  description: Searches the store's whole published menu, not only the categories a client has loaded, forgiving misspellings and the common spellings of Indian dishes. Results are menu items that open in the same sheet as the menu's, with their questions. Fewer than two letters finds nothing.
+  tags:
+    - Search
+  security: []
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: What was typed, at most 100 characters; fewer than two letters finds nothing.
+      schema:
+        type: string
+        maxLength: 100
+      example: biriyani
+    - name: limit
+      in: query
+      required: false
+      description: How many items. 1 to 100, 30 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 30
+    - name: veg
+      in: query
+      required: false
+      description: Only items marked veg.
+      schema:
+        type: boolean
+  responses:
+    "200":
+      description: The items found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/StoreSearchResult.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The store does not exist or is not live, or it has published no menu yet (`not_found`, `menu_not_published`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
