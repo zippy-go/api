@@ -1,0 +1,25 @@
+type: object
+description: 'How a store appears, apart from how it operates, the `Listing` schema. A value with a default: a store opened before it existed reads as reviewable and unmarked.'
+properties:
+  highlights:
+    type: array
+    items:
+      $ref: ./Highlight.yaml
+    description: The marks the storefront draws on its card; platform staff only.
+  reviews:
+    type: boolean
+    description: Whether customers may rate and review it; off hides the option and what is written.
+  tags:
+    type: array
+    items:
+      type: string
+    description: Search tags, lower cased and de-duplicated.
+    examples:
+      - &a1
+        - example
+        - late night
+examples:
+  - tags:
+      - example
+    highlights: []
+    reviews: true

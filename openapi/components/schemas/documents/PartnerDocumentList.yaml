@@ -1,0 +1,43 @@
+type: object
+description: The documents on file and the requirements, the `PartnerDocumentList` schema.
+required:
+  - items
+  - requirements
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PartnerDocument.yaml
+    description: The documents on file, newest first.
+  requirements:
+    type: array
+    items:
+      $ref: ./DocumentRequirement.yaml
+    description: Every kind the Partner must have on file, with where it stands.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        kind: gst_registration
+        asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55
+        label: null
+        number: 36AAACB1234C1Z5
+        issued_on: 2025-04-01
+        expires_on: null
+        review: pending
+        review_note: null
+        reviewed_by: null
+        reviewed_at: null
+        uploaded_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        uploaded_at: 2026-10-15T09:00:00Z
+        version: 1
+    requirements:
+      - kind: pan
+        state: missing
+        document_id: null
+        expires_on: null
+        expiring: false
+        review_note: null
+        trading: stopped
+        stops_on: null
+        covers: all_locations

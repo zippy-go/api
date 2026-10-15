@@ -1,0 +1,26 @@
+type: object
+description: A vehicle type with what it carries, the `VehicleType` schema.
+required:
+  - kind
+  - max_weight_kg
+  - max_volume_litres
+properties:
+  kind:
+    $ref: ./VehicleKind.yaml
+    description: The vehicle.
+  max_weight_kg:
+    type: integer
+    description: The heaviest parcel, in kilograms.
+    minimum: 0
+    examples:
+      - 12
+  max_volume_litres:
+    type: integer
+    description: The bulkiest parcel, in litres.
+    minimum: 0
+    examples:
+      - 40
+examples:
+  - kind: two_wheeler
+    max_weight_kg: 12
+    max_volume_litres: 40

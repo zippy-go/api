@@ -1,0 +1,17 @@
+type: object
+description: Whether checkout asks about cutlery and what saying yes costs, the `Cutlery` schema.
+required:
+  - asks
+  - fee
+properties:
+  asks:
+    type: boolean
+    description: Checkout asks.
+  fee:
+    type: integer
+    description: What saying yes costs, in minor units of the Location's currency.
+    examples:
+      - 500
+examples:
+  - asks: true
+    fee: 0

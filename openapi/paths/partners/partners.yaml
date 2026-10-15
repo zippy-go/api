@@ -13,6 +13,15 @@ post:
     `tenancy.partner.created` and `tenancy.membership.created`. An
     `Idempotency-Key` is honoured: a retry with the same key and body
     returns the partner already created.
+
+    Mission Control onboards a partner on its behalf by naming its
+    administrator in `owner`, who is invited by email as owner; platform
+    staff must name one, and a failure anywhere, the email included, leaves
+    no partner behind. Somebody who is not platform staff naming an `owner`
+    receives `403` (`forbidden`). The legal identity (`pan`, `gstin`,
+    `registration_number`, `registered_address`) and the `contacts` may be
+    given at creation; a GSTIN or PAN that fails its check is refused with
+    the field codes `gstin_invalid` and `pan_invalid`.
   tags:
     - Partners
   security:
@@ -41,6 +50,12 @@ post:
             $ref: ../../components/schemas/common/Problem.yaml
     '401':
       description: No valid access token was sent (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Somebody who is not platform staff named an `owner` (`forbidden`).
       content:
         application/problem+json:
           schema:

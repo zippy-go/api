@@ -1,0 +1,49 @@
+type: object
+description: "A field Service's settings at one Location, the `FieldServiceSettings` schema: bookable work around it. Changing them never moves or cancels a booking already made."
+properties:
+  area:
+    $ref: ./FieldArea.yaml
+    description: Where it takes bookings.
+  booking_window_days:
+    type: integer
+    description: How far ahead bookings are taken, in days, up to 60.
+    minimum: 0
+    examples:
+      - 14
+  buffer_minutes:
+    type: integer
+    description: The buffer between jobs, in minutes.
+    minimum: 0
+    examples:
+      - 15
+  hours:
+    type: array
+    items:
+      $ref: ../reference/DaySchedule.yaml
+    description: Its working hours; empty means the Location's hours.
+  min_notice_minutes:
+    type: integer
+    description: The notice a booking needs before its slot, in minutes.
+    minimum: 0
+    examples:
+      - 120
+  slot_minutes:
+    type: integer
+    description: The slot length, 15, 30 or 60 minutes.
+    minimum: 0
+    examples:
+      - 60
+examples:
+  - area:
+      radius_km: 10
+      polygon: null
+      whole_zone: false
+    hours:
+      - day: monday
+        open:
+          - from: 09:00
+            to: 22:00
+    slot_minutes: 60
+    buffer_minutes: 15
+    min_notice_minutes: 120
+    booking_window_days: 14

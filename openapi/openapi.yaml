@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.7.0
+  version: 0.8.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -84,7 +84,13 @@ tags:
   - name: Invitations
     description: Inviting users into a partner by email, and accepting an invitation.
   - name: Services
-    description: The kinds of service a partner runs (product sales, field service, delivery), with their status and configuration.
+    description: "The registry of services a partner runs: product sales, field service and delivery, several of a kind allowed, each with its configuration, the locations it is switched on at and whether it trades; a field service's settings at its locations and a delivery service's pricing as a provider."
+  - name: Plans
+    description: "A partner's plan, which decides the kinds of service it may run: the thirty-day Pro trial from activation, moves scheduled by platform staff, and what a move would stop."
+  - name: Partner documents
+    description: "A partner's compliance documents (GST registration, PAN, FSSAI licence, shop and establishment registration, identity, bank proof), what it must have on file and the review queue platform staff work through."
+  - name: Payout accounts
+    description: "The bank account a partner is paid into, held until platform staff verify it."
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
   - name: Assets
@@ -165,10 +171,56 @@ paths:
     $ref: ./paths/partners/summary.yaml
   /v1/partners/{partner_id}:
     $ref: ./paths/partners/partner.yaml
+  /v1/partners/{partner_id}/activation:
+    $ref: ./paths/partners/activation.yaml
+  /v1/partners/{partner_id}/standing:
+    $ref: ./paths/partners/standing.yaml
+  /v1/partners/{partner_id}/logo:
+    $ref: ./paths/partners/logo.yaml
+  /v1/partners/{partner_id}/banner:
+    $ref: ./paths/partners/banner.yaml
+  /v1/partners/{partner_id}/documents:
+    $ref: ./paths/documents/documents.yaml
+  /v1/partners/{partner_id}/documents/{document_id}:
+    $ref: ./paths/documents/document.yaml
+  /v1/partners/{partner_id}/documents/{document_id}/review:
+    $ref: ./paths/documents/document-review.yaml
+  /v1/partner-documents:
+    $ref: ./paths/documents/review-queue.yaml
+  /v1/partners/{partner_id}/payout-account:
+    $ref: ./paths/payouts/payout-account.yaml
+  /v1/partners/{partner_id}/payout-account/verify:
+    $ref: ./paths/payouts/payout-account-verify.yaml
+  /v1/partners/{partner_id}/plan:
+    $ref: ./paths/plans/plan.yaml
+  /v1/partners/{partner_id}/plan/impact:
+    $ref: ./paths/plans/plan-impact.yaml
   /v1/partners/{partner_id}/locations:
     $ref: ./paths/locations/locations.yaml
   /v1/partners/{partner_id}/locations/{location_id}:
     $ref: ./paths/locations/location.yaml
+  /v1/partners/{partner_id}/locations/bin:
+    $ref: ./paths/locations/bin.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/activation:
+    $ref: ./paths/locations/activation.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/fulfilment:
+    $ref: ./paths/locations/fulfilment.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/order-settings:
+    $ref: ./paths/locations/order-settings.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/listing:
+    $ref: ./paths/locations/listing.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/pause:
+    $ref: ./paths/locations/pause.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/restore:
+    $ref: ./paths/locations/restore.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/logo:
+    $ref: ./paths/locations/logo.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/banner:
+    $ref: ./paths/locations/banner.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/holidays:
+    $ref: ./paths/locations/holidays.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/holidays/{date}/closure:
+    $ref: ./paths/locations/holiday-closure.yaml
   /v1/partners/{partner_id}/memberships:
     $ref: ./paths/memberships/memberships.yaml
   /v1/partners/{partner_id}/memberships/{membership_id}:
@@ -183,6 +235,12 @@ paths:
     $ref: ./paths/services/services.yaml
   /v1/partners/{partner_id}/services/{kind}:
     $ref: ./paths/services/service.yaml
+  /v1/partners/{partner_id}/services/{service_id}/locations/{location_id}:
+    $ref: ./paths/services/service-location.yaml
+  /v1/partners/{partner_id}/services/{service_id}/pricing:
+    $ref: ./paths/services/pricing.yaml
+  /v1/partners/{partner_id}/services/{service_id}/pricing/quote:
+    $ref: ./paths/services/pricing-quote.yaml
   /v1/audit-log:
     $ref: ./paths/audit/audit-log.yaml
   /v1/audit-log/filters:
@@ -487,6 +545,158 @@ components:
       $ref: ./components/schemas/services/ServiceUpsert.yaml
     ServiceList:
       $ref: ./components/schemas/services/ServiceList.yaml
+    Blocker:
+      $ref: ./components/schemas/partners/Blocker.yaml
+    PartnerActivation:
+      $ref: ./components/schemas/partners/PartnerActivation.yaml
+    PartnerOwner:
+      $ref: ./components/schemas/partners/PartnerOwner.yaml
+    Contact:
+      $ref: ./components/schemas/partners/Contact.yaml
+    ContactConsent:
+      $ref: ./components/schemas/partners/ContactConsent.yaml
+    ContactPurpose:
+      $ref: ./components/schemas/partners/ContactPurpose.yaml
+    PartnerStanding:
+      $ref: ./components/schemas/partners/PartnerStanding.yaml
+    PartnerStandingSummary:
+      $ref: ./components/schemas/partners/PartnerStandingSummary.yaml
+    PayoutStanding:
+      $ref: ./components/schemas/partners/PayoutStanding.yaml
+    PictureUpdate:
+      $ref: ./components/schemas/partners/PictureUpdate.yaml
+    Plan:
+      $ref: ./components/schemas/plans/Plan.yaml
+    PlanOffer:
+      $ref: ./components/schemas/plans/PlanOffer.yaml
+    PartnerPlan:
+      $ref: ./components/schemas/plans/PartnerPlan.yaml
+    PlanTrial:
+      $ref: ./components/schemas/plans/PlanTrial.yaml
+    ScheduledPlanChange:
+      $ref: ./components/schemas/plans/ScheduledPlanChange.yaml
+    PlanImpact:
+      $ref: ./components/schemas/plans/PlanImpact.yaml
+    PlanImpactService:
+      $ref: ./components/schemas/plans/PlanImpactService.yaml
+    PartnerPlanUpdate:
+      $ref: ./components/schemas/plans/PartnerPlanUpdate.yaml
+    PartnerDocument:
+      $ref: ./components/schemas/documents/PartnerDocument.yaml
+    DocumentKind:
+      $ref: ./components/schemas/documents/DocumentKind.yaml
+    ReviewState:
+      $ref: ./components/schemas/documents/ReviewState.yaml
+    DocumentRequirement:
+      $ref: ./components/schemas/documents/DocumentRequirement.yaml
+    RequirementState:
+      $ref: ./components/schemas/documents/RequirementState.yaml
+    TradingEffect:
+      $ref: ./components/schemas/documents/TradingEffect.yaml
+    RequirementCoverage:
+      $ref: ./components/schemas/documents/RequirementCoverage.yaml
+    PartnerDocumentCreate:
+      $ref: ./components/schemas/documents/PartnerDocumentCreate.yaml
+    PartnerDocumentReview:
+      $ref: ./components/schemas/documents/PartnerDocumentReview.yaml
+    PartnerDocumentList:
+      $ref: ./components/schemas/documents/PartnerDocumentList.yaml
+    PartnerDocumentPage:
+      $ref: ./components/schemas/documents/PartnerDocumentPage.yaml
+    PayoutAccount:
+      $ref: ./components/schemas/payouts/PayoutAccount.yaml
+    PayoutAccountUpdate:
+      $ref: ./components/schemas/payouts/PayoutAccountUpdate.yaml
+    PayoutAccountState:
+      $ref: ./components/schemas/payouts/PayoutAccountState.yaml
+    PayoutAccountType:
+      $ref: ./components/schemas/payouts/PayoutAccountType.yaml
+    Carrier:
+      $ref: ./components/schemas/locations/Carrier.yaml
+    DeliveryMethod:
+      $ref: ./components/schemas/locations/DeliveryMethod.yaml
+    PickupMethod:
+      $ref: ./components/schemas/locations/PickupMethod.yaml
+    DineInMethod:
+      $ref: ./components/schemas/locations/DineInMethod.yaml
+    Fulfilment:
+      $ref: ./components/schemas/locations/Fulfilment.yaml
+    OrderSettings:
+      $ref: ./components/schemas/locations/OrderSettings.yaml
+    OrderSettingsUpdate:
+      $ref: ./components/schemas/locations/OrderSettingsUpdate.yaml
+    Preparation:
+      $ref: ./components/schemas/locations/Preparation.yaml
+    PreparationMode:
+      $ref: ./components/schemas/locations/PreparationMode.yaml
+    ScheduledOrders:
+      $ref: ./components/schemas/locations/ScheduledOrders.yaml
+    ScheduledOrdersUpdate:
+      $ref: ./components/schemas/locations/ScheduledOrdersUpdate.yaml
+    Cutlery:
+      $ref: ./components/schemas/locations/Cutlery.yaml
+    Listing:
+      $ref: ./components/schemas/locations/Listing.yaml
+    Highlight:
+      $ref: ./components/schemas/locations/Highlight.yaml
+    Pause:
+      $ref: ./components/schemas/locations/Pause.yaml
+    LocationPause:
+      $ref: ./components/schemas/locations/LocationPause.yaml
+    PauseReason:
+      $ref: ./components/schemas/locations/PauseReason.yaml
+    LocationLive:
+      $ref: ./components/schemas/locations/LocationLive.yaml
+    LocationLiveState:
+      $ref: ./components/schemas/locations/LocationLiveState.yaml
+    ReadsAs:
+      $ref: ./components/schemas/locations/ReadsAs.yaml
+    LocationActivation:
+      $ref: ./components/schemas/locations/LocationActivation.yaml
+    HolidayOffer:
+      $ref: ./components/schemas/locations/HolidayOffer.yaml
+    HolidayOfferList:
+      $ref: ./components/schemas/locations/HolidayOfferList.yaml
+    LocationService:
+      $ref: ./components/schemas/locations/LocationService.yaml
+    DeliveryPricing:
+      $ref: ./components/schemas/services/DeliveryPricing.yaml
+    KilometreBand:
+      $ref: ./components/schemas/services/KilometreBand.yaml
+    DeliveryQuote:
+      $ref: ./components/schemas/services/DeliveryQuote.yaml
+    DeliveryPricingVersion:
+      $ref: ./components/schemas/services/DeliveryPricingVersion.yaml
+    DeliveryPricingUpdate:
+      $ref: ./components/schemas/services/DeliveryPricingUpdate.yaml
+    FieldServiceSettings:
+      $ref: ./components/schemas/services/FieldServiceSettings.yaml
+    FieldArea:
+      $ref: ./components/schemas/services/FieldArea.yaml
+    KindAvailability:
+      $ref: ./components/schemas/services/KindAvailability.yaml
+    KindState:
+      $ref: ./components/schemas/services/KindState.yaml
+    ServiceAtLocation:
+      $ref: ./components/schemas/services/ServiceAtLocation.yaml
+    ServiceCreate:
+      $ref: ./components/schemas/services/ServiceCreate.yaml
+    ServiceLocationUpdate:
+      $ref: ./components/schemas/services/ServiceLocationUpdate.yaml
+    ServiceUpdate:
+      $ref: ./components/schemas/services/ServiceUpdate.yaml
+    ProductSalesConfig:
+      $ref: ./components/schemas/services/ProductSalesConfig.yaml
+    FieldServiceConfig:
+      $ref: ./components/schemas/services/FieldServiceConfig.yaml
+    DeliveryConfig:
+      $ref: ./components/schemas/services/DeliveryConfig.yaml
+    VehicleType:
+      $ref: ./components/schemas/services/VehicleType.yaml
+    VehicleKind:
+      $ref: ./components/schemas/services/VehicleKind.yaml
+    CatalogueType:
+      $ref: ./components/schemas/services/CatalogueType.yaml
     # Audit
     AuditActor:
       $ref: ./components/schemas/audit/AuditActor.yaml

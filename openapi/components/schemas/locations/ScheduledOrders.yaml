@@ -1,0 +1,33 @@
+type: object
+description: How a store takes scheduled orders, the `ScheduledOrders` schema.
+required:
+  - accepts
+  - slot_minutes
+  - window_days
+properties:
+  accepts:
+    type: boolean
+    description: Whether scheduled orders are taken; switching off keeps the slot settings.
+  slot_minutes:
+    type: integer
+    description: The slot length, 15, 30 or 60 minutes; platform staff's setting.
+    minimum: 0
+    examples:
+      - 30
+  window_days:
+    type: integer
+    description: How many days ahead orders are taken, 1 to 7.
+    minimum: 0
+    examples:
+      - 2
+  cap_per_slot:
+    type:
+      - integer
+      - 'null'
+    description: Most orders per slot, `null` for no cap; platform staff's setting.
+    minimum: 0
+examples:
+  - accepts: false
+    slot_minutes: 30
+    cap_per_slot: null
+    window_days: 2

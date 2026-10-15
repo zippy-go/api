@@ -1,19 +1,94 @@
 type: object
-description: A list of the services a partner has configured, the response of `GET /v1/partners/{partner_id}/services`.
+description: 'The registry of a partner, the response of `GET /v1/partners/{partner_id}/services`: its services, where every kind stands for it, and its plan.'
 required:
   - items
+  - kinds
+  - plan
 properties:
   items:
     type: array
-    description: One entry per kind the partner has put, in any status; a kind that was never put is not listed. The list is not paginated.
+    description: The partner's services, oldest first, in any status; several of a kind when the partner runs several. The list is not paginated.
     items:
       $ref: ./Service.yaml
+  kinds:
+    type: array
+    items:
+      $ref: ./KindAvailability.yaml
+    description: 'Every kind and where it stands for the Partner: enabled, awaiting documents, disabled, available, or not in the plan with the plan that includes it.'
+  plan:
+    $ref: ../plans/PlanOffer.yaml
+    description: The plan in force, with the kinds it includes.
 examples:
   - items:
       - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
         partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
-        kind: delivery
-        status: enabled
-        config: {}
+        kind: product_sales
+        name: Product sales
+        status: awaiting_documents
+        status_reason: null
+        config:
+          catalogue_type: food
+        everywhere: true
+        location_ids: &a1
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        awaiting:
+          - fssai_licence
+        trading: false
+        blockers:
+          - code: document_missing
+            message: The FSSAI licence is not on file.
+            pointer: /documents/fssai_licence
+        agents: null
+        pricing_version: null
+        version: 1
         created_at: 2026-10-14T08:30:00Z
         updated_at: 2026-10-14T08:30:00Z
+        created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a46
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        kind: delivery
+        name: Delivery
+        status: enabled
+        status_reason: null
+        config:
+          vehicle_types:
+            - kind: two_wheeler
+              max_weight_kg: 12
+              max_volume_litres: 40
+          coverage_radius_km: 8
+          open_to_partners: true
+        everywhere: false
+        location_ids: *a1
+        awaiting: []
+        trading: true
+        blockers: []
+        agents: 4
+        pricing_version: 3
+        version: 1
+        created_at: 2026-10-14T08:30:00Z
+        updated_at: 2026-10-14T08:30:00Z
+        created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    kinds:
+      - kind: product_sales
+        state: awaiting_documents
+        services: 1
+        plan_needed: null
+      - kind: field_service
+        state: available
+        services: 0
+        plan_needed: null
+      - kind: delivery
+        state: enabled
+        services: 1
+        plan_needed: null
+    plan:
+      plan: pro
+      label: Pro
+      monthly_fee: 499900
+      kinds:
+        - product_sales
+        - field_service
+        - delivery
+      platform_fleet: true

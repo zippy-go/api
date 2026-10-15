@@ -1,0 +1,35 @@
+type: object
+description: How a store takes orders, the `OrderSettings` schema.
+properties:
+  auto_reject_minutes:
+    type:
+      - integer
+      - 'null'
+    description: Minutes after which an order nobody accepted is declined; `null` means the platform's own limit. Platform staff's setting.
+    minimum: 0
+  cutlery:
+    $ref: ./Cutlery.yaml
+    description: Cutlery at checkout.
+  preparation:
+    $ref: ./Preparation.yaml
+    description: How preparation time is quoted.
+  prescriptions:
+    type: boolean
+    description: Whether an order may carry a prescription; platform staff's setting.
+  scheduled:
+    $ref: ./ScheduledOrders.yaml
+    description: Scheduled orders.
+examples:
+  - preparation:
+      mode: fixed
+      minutes: 20
+    scheduled:
+      accepts: false
+      slot_minutes: 30
+      cap_per_slot: null
+      window_days: 2
+    auto_reject_minutes: null
+    cutlery:
+      asks: true
+      fee: 0
+    prescriptions: false

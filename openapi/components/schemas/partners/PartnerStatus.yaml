@@ -1,13 +1,17 @@
 type: string
 description: |
   The partner's standing on the platform. A partner is `pending` from its
-  creation until the platform activates it, `active` while it operates and
-  `suspended` when the platform has stopped it. Only the platform realm
-  changes the status. Clients must tolerate values they do not know,
+  creation until the platform activates it, `active` while it operates,
+  `suspended` when the platform has stopped it (with a reason), and
+  `archived` once retired, when nothing new may refer to it. Only the
+  platform realm changes the status, along the lifecycle's transitions:
+  pending to active or archived, active to suspended or archived, suspended
+  to active or archived. Clients must tolerate values they do not know,
   because a new status is an additive change.
 enum:
   - pending
   - active
   - suspended
+  - archived
 examples:
   - active

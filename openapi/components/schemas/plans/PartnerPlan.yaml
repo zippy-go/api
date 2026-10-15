@@ -1,0 +1,67 @@
+type: object
+description: "A Partner's plan, the `PartnerPlan` schema: the plan with what it includes, the trial, a change waiting, and the plans on offer."
+required:
+  - current
+  - plan_after_trial
+  - plans
+properties:
+  current:
+    $ref: ./PlanOffer.yaml
+    description: The plan in force, with what it includes.
+  plan_after_trial:
+    $ref: ./Plan.yaml
+    description: The plan the Partner chose for after the trial; Starter unless chosen.
+  plans:
+    type: array
+    items:
+      $ref: ./PlanOffer.yaml
+    description: The plans on offer.
+  scheduled:
+    oneOf:
+      - $ref: ./ScheduledPlanChange.yaml
+      - type: 'null'
+    description: A change platform staff scheduled.
+  trial:
+    oneOf:
+      - $ref: ./PlanTrial.yaml
+      - type: 'null'
+    description: The Pro trial, once the Partner has had one.
+examples:
+  - current:
+      plan: pro
+      label: Pro
+      monthly_fee: 499900
+      kinds:
+        - product_sales
+        - field_service
+        - delivery
+      platform_fleet: true
+    trial:
+      ends_at: 2026-11-14T09:00:00Z
+      then: standard
+      running: true
+    plan_after_trial: standard
+    scheduled: null
+    plans:
+      - plan: starter
+        label: Starter
+        monthly_fee: 0
+        kinds:
+          - product_sales
+        platform_fleet: false
+      - plan: standard
+        label: Standard
+        monthly_fee: 199900
+        kinds:
+          - product_sales
+          - field_service
+          - delivery
+        platform_fleet: true
+      - plan: pro
+        label: Pro
+        monthly_fee: 499900
+        kinds:
+          - product_sales
+          - field_service
+          - delivery
+        platform_fleet: true

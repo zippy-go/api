@@ -50,6 +50,12 @@ post:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: The pin lands in a zone that does not serve (`zone_not_serving`), a vertical is not offered there (`vertical_not_offered`), or the partner is archived (`partner_archived`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '422':
       description: The pin is outside every service area and too far from any to be placed (`unprocessable`, pointers `/lat` and `/lng`).
       content:

@@ -1,0 +1,118 @@
+# Path item for /v1/partners/{partner_id}/plan. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPartnerPlan
+  summary: Get the partner's plan
+  description: "The Partner's plan: what it includes, the Pro trial, a change waiting, and the plans on offer. Members and platform staff."
+  tags:
+    - Plans
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The plan.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/plans/PartnerPlan.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putPartnerPlan
+  summary: Change the partner's plan
+  description: Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. The owner, or platform staff, choose the plan the trial ends into.
+  tags:
+    - Plans
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/plans/PartnerPlanUpdate.yaml
+  responses:
+    '200':
+      description: The plan as changed.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/plans/PartnerPlan.yaml
+    '400':
+      description: Malformed body, or a move without a reason.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not the owner, or a move by somebody who is not platform staff.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`partner_archived`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store or mail delivery is unavailable.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,8 @@
+type: string
+description: Where a Partner's payout account stands, for the directory.
+enum:
+  - none
+  - unverified
+  - verified
+examples:
+  - verified

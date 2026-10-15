@@ -1,0 +1,49 @@
+type: object
+description: A person to reach about something, the `Contact` schema.
+required:
+  - purpose
+properties:
+  purpose:
+    $ref: ./ContactPurpose.yaml
+    description: What the contact is for.
+  consent:
+    $ref: ./ContactConsent.yaml
+    description: What they agreed to be reached on.
+  email:
+    type:
+      - string
+      - 'null'
+    description: Their email address.
+    examples:
+      - person@example.com
+  name:
+    type:
+      - string
+      - 'null'
+    description: The person's name.
+    examples:
+      - Example Person
+  phone:
+    type:
+      - string
+      - 'null'
+    description: Their phone number in E.164; a number without a calling code is taken as Indian.
+    examples:
+      - '+15555550102'
+  role:
+    type:
+      - string
+      - 'null'
+    description: Their role.
+    examples:
+      - Store manager
+examples:
+  - purpose: operations
+    name: Example Person
+    role: Store manager
+    email: person@example.com
+    phone: '+15555550102'
+    consent:
+      email: true
+      sms: true
+      whatsapp: false

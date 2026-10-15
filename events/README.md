@@ -52,10 +52,24 @@ with the identifiers when it is needed.
 | `identity.invitation.sent` | 1 | An invitation to join a partner was created and its email is being sent. Payload: `invitation_id`, `partner_id`, `role`. |
 | `identity.invitation.accepted` | 1 | An invitation was accepted and became a membership. Payload: `invitation_id`, `partner_id`, `user_id`. |
 | `tenancy.partner.created` | 1 | A partner was created, `pending`, with its creator as first owner. Payload: `partner_id`, `kind`, `created_by`. |
-| `tenancy.partner.status_changed` | 1 | The platform realm changed a partner's status. Payload: `partner_id`, `status`. |
+| `tenancy.partner.status_changed` | 1 | The platform realm changed a partner's status along its lifecycle. Payload: `partner_id`, `status`, `previous_status`. |
+| `tenancy.partner.updated` | 1 | A partner's profile, legal identity, kind, contacts, logo or banner changed. Payload: `partner_id`, `changed` (member names, never values). |
 | `tenancy.location.created` | 1 | A location was added to a partner. Payload: `location_id`, `partner_id`. |
+| `tenancy.location.updated` | 1 | A location's profile, settings, fulfilment, listing, pause, pictures or fields changed. Payload: `partner_id`, `location_id`, `changed`. |
+| `tenancy.location.status_changed` | 1 | A location moved along its lifecycle. Payload: `partner_id`, `location_id`, `status`, `previous_status`. |
+| `tenancy.location.deleted` | 1 | A location was deleted softly, into the bin. Payload: `partner_id`, `location_id`. |
+| `tenancy.location.restored` | 1 | A location was restored from the bin. Payload: `partner_id`, `location_id`. |
+| `tenancy.location.paused` | 1 | A location was paused until a moment. Payload: `partner_id`, `location_id`, `until`, `reason`. |
+| `tenancy.location.resumed` | 1 | A paused location was resumed before its moment. Payload: `partner_id`, `location_id`. |
+| `tenancy.document.filed` | 1 | A partner filed a compliance document. Payload: `partner_id`, `document_id`, `kind`. |
+| `tenancy.document.reviewed` | 1 | Platform staff approved or rejected a compliance document. Payload: `partner_id`, `document_id`, `kind`, `outcome`. |
+| `tenancy.document.removed` | 1 | A compliance document was taken off file. Payload: `partner_id`, `document_id`, `kind`. |
+| `tenancy.document.notice_sent` | 1 | An expiry or rejection notice went to the partner's contacts. Payload: `partner_id`, `document_id`, `kind`, `step`, `recipients`. |
+| `tenancy.payout_account.changed` | 1 | A partner stated or changed its payout account. Payload: `partner_id`, `account_changed`. |
+| `tenancy.payout_account.verified` | 1 | Platform staff verified a payout account. Payload: `partner_id`. |
 | `tenancy.membership.created` | 1 | A user became a member of a partner. Payload: `membership_id`, `partner_id`, `user_id`, `role`. |
-| `tenancy.service.updated` | 1 | A partner's service of a kind was created or replaced. Payload: `partner_id`, `kind`, `status`. |
+| `tenancy.service.updated` | 1 | A partner's service was registered, enabled, disabled, configured, switched on or off at a location, or repriced. Payload: `partner_id`, `kind`, `status`, `service_id`, `name`, `changed`, `previous_status`, `pricing_version`. |
+| `tenancy.plan.changed` | 1 | A partner's plan changed; services of kinds it lacks were disabled. Payload: `partner_id`, `plan`, `previous_plan`, `trial_ended`, `disabled_service_ids`. |
 
 ## Consuming events
 

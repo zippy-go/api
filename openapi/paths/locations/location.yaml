@@ -63,11 +63,19 @@ patch:
   summary: Update a location
   description: |
     Changes the members of the location that are present in the body,
-    including `status`, and returns the location. Owners and managers may
-    update locations; other members receive `403` (`forbidden`). Send
-    `If-Match` with the version you hold to be refused with `412`
-    (`precondition_failed`) when someone else changed the location first;
-    every write raises the version by one.
+    including `status`, and returns the location with what it reads as, the
+    services on there, what it is doing now, its blockers and warnings.
+    Owners and managers may update locations; other members receive `403`
+    (`forbidden`). `status` follows the lifecycle: going live is refused with
+    `409` (`activation_blocked`) naming every blocker (read them first with
+    `GET .../activation`); asked while the partner is pending, it is
+    remembered and the location goes live with the partner's activation.
+    `fields` replaces the typed extra fields its services' types declare: a
+    value of the wrong shape or a field no type declares is refused, a
+    required one left empty blocks going live. Moving the pin keeps the zone
+    and warns when the pin leaves it. Send `If-Match` with the version you
+    hold to be refused with `412` (`precondition_failed`) when someone else
+    changed the location first; every write raises the version by one.
   tags:
     - Locations
   security:
@@ -115,6 +123,12 @@ patch:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: Going live names its blockers (`activation_blocked`), the move is not one the lifecycle allows (`illegal_transition`), or a vertical is not offered in the location's zone (`vertical_not_offered`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '412':
       description: '`If-Match` no longer matches the location''s version (`precondition_failed`); fetch it again and retry.'
       content:
@@ -129,6 +143,53 @@ patch:
             $ref: ../../components/schemas/common/Problem.yaml
     '4XX':
       description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: deleteLocation
+  summary: Delete a location into the bin
+  description: 'Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. Owners and managers.'
+  tags:
+    - Locations
+  security:
+    - Bearer: []
+  responses:
+    '204':
+      description: In the bin.
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: The role does not delete Locations.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown partner or location.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
       content:
         application/problem+json:
           schema:

@@ -1,0 +1,69 @@
+type: object
+description: A delivery Service's configuration as a Provider, the `DeliveryConfig` schema.
+properties:
+  coverage_radius_km:
+    type:
+      - integer
+      - 'null'
+    description: The radius around its depot Locations it covers, in kilometres, when no zones are drawn.
+    minimum: 0
+    examples:
+      - 8
+  hours:
+    type: array
+    items:
+      $ref: ../reference/DaySchedule.yaml
+    description: Its operating hours per weekday; empty means it follows its depot Locations' hours.
+  max_concurrent_tasks:
+    type: integer
+    description: Most tasks an agent carries at once.
+    minimum: 0
+    examples:
+      - 3
+  on_demand:
+    type: boolean
+    description: Whether it takes on-demand work.
+  open_to_partners:
+    type: boolean
+    description: Whether other Partners may ask it for deliveries, or it serves only its own Locations.
+  scheduled:
+    type: boolean
+    description: Whether it takes scheduled work.
+  scheduled_notice_minutes:
+    type: integer
+    description: The notice scheduled work needs, in minutes.
+    minimum: 0
+    examples:
+      - 60
+  vehicle_types:
+    type: array
+    items:
+      $ref: ./VehicleType.yaml
+    description: The vehicles it runs.
+  zones:
+    type: array
+    items:
+      type: array
+      items:
+        type: array
+        items:
+          type: number
+          format: double
+    description: Zones it serves, each one ring of `[longitude, latitude]` points.
+examples:
+  - vehicle_types:
+      - kind: two_wheeler
+        max_weight_kg: 12
+        max_volume_litres: 40
+    coverage_radius_km: 8
+    zones: []
+    hours:
+      - day: monday
+        open:
+          - from: 09:00
+            to: 22:00
+    on_demand: true
+    scheduled: true
+    scheduled_notice_minutes: 60
+    max_concurrent_tasks: 3
+    open_to_partners: true

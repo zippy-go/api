@@ -19,6 +19,14 @@ required:
   - created_by
   - updated_by
   - service_area_id
+  - pin_in_zone
+  - contacts
+  - vertical_ids
+  - category_ids
+  - fulfilment
+  - order_settings
+  - listing
+  - fields
 properties:
   id:
     type: string
@@ -116,6 +124,133 @@ properties:
     description: The service area the location's pin resolves to, set when the location is created or its pin moves; `null` for locations placed before service areas existed. See `GET /v1/service-areas/resolve`.
     examples:
       - 01a13a48-9e00-7000-8000-00000000a014
+  pin_in_zone:
+    type: boolean
+    description: Whether the pin lies inside the zone's fence; outside is a warning, not a refusal.
+  contacts:
+    type: array
+    items:
+      $ref: ../partners/Contact.yaml
+    description: The people to reach at the Location, with their consent per channel.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Verticals it trades in, each offered in its zone.
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its categories within those Verticals.
+  fulfilment:
+    $ref: ./Fulfilment.yaml
+    description: How orders leave it (a store's).
+  order_settings:
+    $ref: ./OrderSettings.yaml
+    description: How it takes orders (a store's).
+  listing:
+    $ref: ./Listing.yaml
+    description: How it appears on the storefront (a store's).
+  fields:
+    type: object
+    description: Typed extra fields the types of its Services declare (a food store's FSSAI licence number), checked against the reference data's field catalogue.
+  banner_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Its banner, a `location_banner` asset twice as wide as tall.
+  blockers:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ../partners/Blocker.yaml
+    description: What keeps it from going live, the same blockers an activation is refused with; on reads.
+  currency:
+    type:
+      - string
+      - 'null'
+    description: The currency of its zone's country.
+    examples:
+      - INR
+  deleted_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was deleted, for a Location in the bin.
+  description:
+    type:
+      - string
+      - 'null'
+    description: What the Location is, in its own words.
+  go_live_requested_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: "Set when somebody asked it to go live while its Partner was pending: the Partner's activation brings it live with it."
+  live:
+    oneOf:
+      - $ref: ./LocationLive.yaml
+      - type: 'null'
+    description: What it is doing now, at one instant; on reads.
+  logo_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Its tile on the storefront, a square `location_logo` asset.
+  pause:
+    oneOf:
+      - $ref: ./Pause.yaml
+      - type: 'null'
+    description: The pause in force or last set; it ends by itself at `until`.
+  reads_as:
+    oneOf:
+      - $ref: ./ReadsAs.yaml
+      - type: 'null'
+    description: A store when a product-sales Service is on there, else a branch; on reads.
+  services:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./LocationService.yaml
+    description: The Services switched on here and whether each trades here now, from the registry; on reads.
+  status_changed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the status last changed.
+  status_changed_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who last changed the status.
+  status_reason:
+    type:
+      - string
+      - 'null'
+    description: Why it is in that status, for a suspension.
+  warnings:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ../partners/Blocker.yaml
+    description: Softer gaps shown without stopping anybody (a pin outside the zone, nobody to call); on reads.
+  went_live_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it first went live.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -138,3 +273,71 @@ examples:
     created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     service_area_id: 01a13a48-9e00-7000-8000-00000000a014
+    pin_in_zone: true
+    contacts:
+      - purpose: operations
+        name: Example Person
+        role: Store manager
+        email: person@example.com
+        phone: '+15555550102'
+        consent:
+          email: true
+          sms: true
+          whatsapp: false
+    vertical_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a12
+    category_ids: []
+    fulfilment:
+      delivery:
+        carrier: platform_fleet
+        zone: null
+      pickup:
+        ready_offset_minutes: 10
+      dine_in: null
+    order_settings:
+      preparation:
+        mode: fixed
+        minutes: 20
+      scheduled:
+        accepts: false
+        slot_minutes: 30
+        cap_per_slot: null
+        window_days: 2
+      auto_reject_minutes: null
+      cutlery:
+        asks: true
+        fee: 0
+      prescriptions: false
+    listing:
+      tags:
+        - example
+      highlights: []
+      reviews: true
+    fields: {}
+    banner_asset_id: null
+    blockers: []
+    currency: INR
+    deleted_at: null
+    description: null
+    go_live_requested_at: null
+    live:
+      state: online
+      reason: null
+      until: 2026-10-15T17:30:00Z
+      pause: null
+      preparation_minutes: 20
+      at: 2026-10-15T09:00:00Z
+    logo_asset_id: null
+    pause: null
+    reads_as: store
+    services:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        kind: product_sales
+        name: Product sales
+        status: enabled
+        trading: true
+    status_changed_at: 2026-10-14T08:20:00Z
+    status_changed_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+    status_reason: null
+    warnings: []
+    went_live_at: 2026-10-14T08:20:00Z

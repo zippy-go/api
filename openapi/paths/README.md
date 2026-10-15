@@ -21,15 +21,29 @@ paths/
   partners/filters.yaml         GET /v1/partners/filters
   partners/summary.yaml         GET /v1/partners/summary
   partners/partner.yaml         GET, PATCH /v1/partners/{partner_id}
+  partners/activation.yaml      GET /v1/partners/{partner_id}/activation
+  partners/standing.yaml        GET /v1/partners/{partner_id}/standing
+  partners/logo.yaml            PUT /v1/partners/{partner_id}/logo (+ banner.yaml)
+  documents/documents.yaml      GET, POST /v1/partners/{partner_id}/documents
+  documents/document.yaml       GET, DELETE /v1/partners/{partner_id}/documents/{document_id}
+  documents/document-review.yaml POST /v1/partners/{partner_id}/documents/{document_id}/review
+  documents/review-queue.yaml   GET /v1/partner-documents
+  payouts/payout-account.yaml   GET, PUT /v1/partners/{partner_id}/payout-account (+ payout-account-verify.yaml)
+  plans/plan.yaml               GET, PUT /v1/partners/{partner_id}/plan (+ plan-impact.yaml)
   locations/locations.yaml      POST, GET /v1/partners/{partner_id}/locations
-  locations/location.yaml       GET, PATCH /v1/partners/{partner_id}/locations/{location_id}
+  locations/location.yaml       GET, PATCH, DELETE /v1/partners/{partner_id}/locations/{location_id}
+  locations/bin.yaml            GET /v1/partners/{partner_id}/locations/bin (+ restore.yaml)
+  locations/<operations>.yaml   .../locations/{location_id}/activation, fulfilment, order-settings, listing, pause,
+                                logo, banner, holidays, holidays/{date}/closure
   memberships/memberships.yaml  GET /v1/partners/{partner_id}/memberships
   memberships/membership.yaml   DELETE /v1/partners/{partner_id}/memberships/{membership_id}
   invitations/invitations.yaml  POST, GET /v1/partners/{partner_id}/invitations
   invitations/invitation.yaml   DELETE /v1/partners/{partner_id}/invitations/{invitation_id}
   invitations/accept.yaml       POST /v1/invitations/{token}/accept
-  services/services.yaml        GET /v1/partners/{partner_id}/services
-  services/service.yaml         PUT /v1/partners/{partner_id}/services/{kind}
+  services/services.yaml        GET, POST /v1/partners/{partner_id}/services
+  services/service.yaml         GET, PUT, PATCH /v1/partners/{partner_id}/services/{kind}
+  services/service-location.yaml GET, PUT, DELETE .../services/{service_id}/locations/{location_id}
+  services/pricing.yaml         GET, PUT .../services/{service_id}/pricing (+ pricing-quote.yaml)
   audit/audit-log.yaml          GET /v1/audit-log
   audit/filters.yaml            GET /v1/audit-log/filters
   audit/entry.yaml              GET /v1/audit-log/{entry_id}

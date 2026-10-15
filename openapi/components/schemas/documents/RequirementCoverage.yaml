@@ -1,0 +1,7 @@
+type: string
+description: Which Locations a requirement covers.
+enum:
+  - all_locations
+  - food_locations
+examples:
+  - all_locations

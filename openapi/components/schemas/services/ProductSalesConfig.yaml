@@ -1,0 +1,8 @@
+type: object
+description: A product-sales Service's configuration, the `ProductSalesConfig` schema.
+properties:
+  catalogue_type:
+    $ref: ./CatalogueType.yaml
+    description: What it sells; `general` when absent.
+examples:
+  - catalogue_type: food

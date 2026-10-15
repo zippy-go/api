@@ -1,0 +1,7 @@
+type: string
+description: A mark the storefront draws on a store's card and shelves it by; platform staff only.
+enum:
+  - exclusive
+  - premium
+examples:
+  - exclusive

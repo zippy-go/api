@@ -1,0 +1,45 @@
+type: object
+description: 'What a Location is doing now, the `LocationLive` schema: resolved at one instant per read.'
+required:
+  - state
+  - preparation_minutes
+  - at
+properties:
+  state:
+    $ref: ./LocationLiveState.yaml
+    description: The effective state.
+  preparation_minutes:
+    type: integer
+    description: The preparation minutes the store quotes now.
+    minimum: 0
+    examples:
+      - 20
+  at:
+    type: string
+    format: date-time
+    description: The instant this answer is for.
+  pause:
+    oneOf:
+      - $ref: ./Pause.yaml
+      - type: 'null'
+    description: The pause in force, with who, why and until when.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: 'Why it is not online: `paused`, `closed`, `location_pending`, `location_suspended`, `archived`, `partner_pending`, `partner_suspended`, `partner_archived`, `documents`, `not_selling`.'
+    examples:
+      - paused
+  until:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: 'When the state changes, when known: the end of a pause, the next opening or closing.'
+examples:
+  - state: online
+    reason: null
+    until: 2026-10-15T17:30:00Z
+    pause: null
+    preparation_minutes: 20
+    at: 2026-10-15T09:00:00Z

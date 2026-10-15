@@ -629,13 +629,16 @@ export type PartnerKind = 'organisation' | 'individual';
 
 /**
  * The partner's standing on the platform. A partner is `pending` from its
- * creation until the platform activates it, `active` while it operates and
- * `suspended` when the platform has stopped it. Only the platform realm
- * changes the status. Clients must tolerate values they do not know,
+ * creation until the platform activates it, `active` while it operates,
+ * `suspended` when the platform has stopped it (with a reason), and
+ * `archived` once retired, when nothing new may refer to it. Only the
+ * platform realm changes the status, along the lifecycle's transitions:
+ * pending to active or archived, active to suspended or archived, suspended
+ * to active or archived. Clients must tolerate values they do not know,
  * because a new status is an additive change.
  *
  */
-export type PartnerStatus = 'pending' | 'active' | 'suspended';
+export type PartnerStatus = 'pending' | 'active' | 'suspended' | 'archived';
 
 /**
  * A partner, the supply-side tenant: an organisation or an individual that
@@ -693,6 +696,70 @@ export type Partner = {
      * The user who last changed the partner, or `null` until it is changed through the API.
      */
     updated_by: string | null;
+    /**
+     * The country the Partner is registered in (ISO 3166-1 alpha-2); India at launch.
+     */
+    country: string;
+    /**
+     * Whether platform staff recorded the organisation as not registered for GST, so no GST registration is asked of it.
+     */
+    gst_unregistered: boolean;
+    /**
+     * The people to reach about what, with their consent per channel.
+     */
+    contacts: Array<Contact>;
+    /**
+     * The Partner's banner, an asset of the `partner_banner` purpose; twice as wide as tall.
+     */
+    banner_asset_id?: string | null;
+    /**
+     * What the Partner does, in its own words.
+     */
+    description?: string | null;
+    /**
+     * The GSTIN, for an organisation registered for GST.
+     */
+    gstin?: string | null;
+    /**
+     * The moment of first activation, the launch date; `null` until activated.
+     */
+    launched_at?: string | null;
+    /**
+     * The Partner's logo, an asset of the `partner_logo` purpose; square.
+     */
+    logo_asset_id?: string | null;
+    /**
+     * The Permanent Account Number: the person's for an individual, the entity's for an organisation.
+     */
+    pan?: string | null;
+    /**
+     * The plan, which decides the kinds of Service it may run: Pro while it is set up and for its thirty-day trial from activation.
+     */
+    plan?: Plan;
+    /**
+     * The registered address, in the Partner's country.
+     */
+    registered_address?: Address | null;
+    /**
+     * The company or LLP registration number, for an organisation that has one.
+     */
+    registration_number?: string | null;
+    /**
+     * When the status last changed; `null` for a Partner whose status never changed.
+     */
+    status_changed_at?: string | null;
+    /**
+     * Who last changed the status; `null` when never changed or changed by the platform itself.
+     */
+    status_changed_by?: string | null;
+    /**
+     * Why the Partner is in its status, shown to its members while it is suspended.
+     */
+    status_reason?: string | null;
+    /**
+     * Where the Partner stands, on directory reads and on a single read: whether it can trade, its Locations, members, documents and payout account; absent on writes.
+     */
+    standing?: PartnerStandingSummary | null;
 };
 
 /**
@@ -721,6 +788,34 @@ export type PartnerCreate = {
      * The phone number the platform may reach the partner at, in E.164 format. Omit it, or send `null`, to leave it unset.
      */
     contact_phone?: string | null;
+    /**
+     * The people to reach, with their consent per channel.
+     */
+    contacts?: Array<Contact>;
+    /**
+     * What the Partner does, in its own words.
+     */
+    description?: string | null;
+    /**
+     * The GSTIN, for an organisation registered for GST; it embeds the PAN.
+     */
+    gstin?: string | null;
+    /**
+     * The administrator, for Mission Control's onboarding on the Partner's behalf (platform staff only, and required of them): invited by email as the Partner's owner. Omitted from the Partner console, where the caller becomes the owner.
+     */
+    owner?: PartnerOwner | null;
+    /**
+     * The Permanent Account Number.
+     */
+    pan?: string | null;
+    /**
+     * The registered address, in India.
+     */
+    registered_address?: Address | null;
+    /**
+     * The company or LLP registration number, for an organisation that has one.
+     */
+    registration_number?: string | null;
 };
 
 /**
@@ -756,6 +851,38 @@ export type PartnerUpdate = {
      * Why the status is changed, kept in the audit log with the entry for the change. Sent with `status`.
      */
     reason?: string;
+    /**
+     * The contacts, replaced as a whole.
+     */
+    contacts?: Array<Contact> | null;
+    /**
+     * New description, or `null` to clear.
+     */
+    description?: string | null;
+    /**
+     * `true` records the organisation as not registered for GST, so no GST registration is asked of it; platform realm only, with a `reason`.
+     */
+    gst_unregistered?: boolean | null;
+    /**
+     * New GSTIN, or `null` to clear.
+     */
+    gstin?: string | null;
+    /**
+     * New kind; platform realm only, with a `reason`. Locations, members, documents and settings are kept.
+     */
+    kind?: PartnerKind | null;
+    /**
+     * New PAN, or `null` to clear.
+     */
+    pan?: string | null;
+    /**
+     * New registered address, or `null` to clear.
+     */
+    registered_address?: Address | null;
+    /**
+     * New registration number, or `null` to clear.
+     */
+    registration_number?: string | null;
 };
 
 /**
@@ -777,13 +904,17 @@ export type PartnerList = {
 };
 
 /**
- * Whether a location takes part in the partner's operations. An `inactive`
- * location is kept with its history but is not offered for new operations.
+ * Where a location is in its lifecycle, the one partners share: `pending`
+ * from its opening until it goes live, `active` while it operates,
+ * `suspended` while stopped, `archived` once retired. Moves: pending to
+ * active or archived, active to suspended or archived, suspended to active
+ * or archived, archived to pending (platform staff only). `inactive` is the
+ * step 1 name of `suspended`, still accepted on input and never returned.
  * Clients must tolerate values they do not know, because a new status is an
  * additive change.
  *
  */
-export type LocationStatus = 'active' | 'inactive';
+export type LocationStatus = 'active' | 'inactive' | 'pending' | 'suspended' | 'archived';
 
 /**
  * A physical place that belongs to a partner: a store, a restaurant, a dark
@@ -852,6 +983,104 @@ export type Location = {
      * The service area the location's pin resolves to, set when the location is created or its pin moves; `null` for locations placed before service areas existed. See `GET /v1/service-areas/resolve`.
      */
     service_area_id: string | null;
+    /**
+     * Whether the pin lies inside the zone's fence; outside is a warning, not a refusal.
+     */
+    pin_in_zone: boolean;
+    /**
+     * The people to reach at the Location, with their consent per channel.
+     */
+    contacts: Array<Contact>;
+    /**
+     * The Verticals it trades in, each offered in its zone.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Its categories within those Verticals.
+     */
+    category_ids: Array<string>;
+    /**
+     * How orders leave it (a store's).
+     */
+    fulfilment: Fulfilment;
+    /**
+     * How it takes orders (a store's).
+     */
+    order_settings: OrderSettings;
+    /**
+     * How it appears on the storefront (a store's).
+     */
+    listing: Listing;
+    /**
+     * Typed extra fields the types of its Services declare (a food store's FSSAI licence number), checked against the reference data's field catalogue.
+     */
+    fields: {
+        [key: string]: unknown;
+    };
+    /**
+     * Its banner, a `location_banner` asset twice as wide as tall.
+     */
+    banner_asset_id?: string | null;
+    /**
+     * What keeps it from going live, the same blockers an activation is refused with; on reads.
+     */
+    blockers?: Array<Blocker> | null;
+    /**
+     * The currency of its zone's country.
+     */
+    currency?: string | null;
+    /**
+     * When it was deleted, for a Location in the bin.
+     */
+    deleted_at?: string | null;
+    /**
+     * What the Location is, in its own words.
+     */
+    description?: string | null;
+    /**
+     * Set when somebody asked it to go live while its Partner was pending: the Partner's activation brings it live with it.
+     */
+    go_live_requested_at?: string | null;
+    /**
+     * What it is doing now, at one instant; on reads.
+     */
+    live?: LocationLive | null;
+    /**
+     * Its tile on the storefront, a square `location_logo` asset.
+     */
+    logo_asset_id?: string | null;
+    /**
+     * The pause in force or last set; it ends by itself at `until`.
+     */
+    pause?: Pause | null;
+    /**
+     * A store when a product-sales Service is on there, else a branch; on reads.
+     */
+    reads_as?: ReadsAs | null;
+    /**
+     * The Services switched on here and whether each trades here now, from the registry; on reads.
+     */
+    services?: Array<LocationService> | null;
+    /**
+     * When the status last changed.
+     */
+    status_changed_at?: string | null;
+    /**
+     * Who last changed the status.
+     */
+    status_changed_by?: string | null;
+    /**
+     * Why it is in that status, for a suspension.
+     */
+    status_reason?: string | null;
+    /**
+     * Softer gaps shown without stopping anybody (a pin outside the zone, nobody to call); on reads.
+     */
+    warnings?: Array<Blocker> | null;
+    /**
+     * When it first went live.
+     */
+    went_live_at?: string | null;
 };
 
 /**
@@ -887,6 +1116,22 @@ export type LocationCreate = {
      * The phone number of the location in E.164 format. Omit it, or send `null`, to leave it unset.
      */
     phone?: string | null;
+    /**
+     * Its categories within those Verticals.
+     */
+    category_ids?: Array<string>;
+    /**
+     * The people to reach there, with their consent per channel.
+     */
+    contacts?: Array<Contact>;
+    /**
+     * What the Location is, in its own words.
+     */
+    description?: string | null;
+    /**
+     * The Verticals it trades in, each offered in the zone its pin resolves to.
+     */
+    vertical_ids?: Array<string>;
 };
 
 /**
@@ -924,6 +1169,32 @@ export type LocationUpdate = {
      * The new status.
      */
     status?: LocationStatus;
+    /**
+     * The categories, replaced as a whole.
+     */
+    category_ids?: Array<string> | null;
+    /**
+     * The contacts, replaced as a whole.
+     */
+    contacts?: Array<Contact> | null;
+    /**
+     * New description, or `null` to clear.
+     */
+    description?: string | null;
+    /**
+     * The typed extra fields the types of the Location's Services declare (a food store's `fssai_licence_number`), replaced as a whole; a value of the wrong shape or a field no type declares is refused, a required one left out blocks going live.
+     */
+    fields?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The reason for a status change, kept in the audit log.
+     */
+    reason?: string | null;
+    /**
+     * The Verticals, replaced as a whole; each offered in the Location's zone.
+     */
+    vertical_ids?: Array<string> | null;
 };
 
 /**
@@ -1108,17 +1379,25 @@ export type InvitationAccepted = {
 export type ServiceKind = 'product_sales' | 'field_service' | 'delivery';
 
 /**
- * Whether a partner's service is in operation. A `disabled` service keeps
- * its configuration but takes no part in operations. Clients must tolerate
- * values they do not know, because a new status is an additive change.
+ * Whether a partner's service is in operation. An `enabled` service trades
+ * where it is switched on; an `awaiting_documents` service is enabled but
+ * waits for the documents its kind needs to be approved, configurable and
+ * not trading (the platform sets it, a client never sends it); a `disabled`
+ * service keeps its configuration but takes no part in operations. Clients
+ * must tolerate values they do not know, because a new status is an
+ * additive change.
  *
  */
-export type ServiceStatus = 'enabled' | 'disabled';
+export type ServiceStatus = 'enabled' | 'disabled' | 'awaiting_documents';
 
 /**
- * One kind of service a partner runs, with its status and configuration. A
- * partner has at most one service per kind; it is created or replaced with
- * `PUT /v1/partners/{partner_id}/services/{kind}`.
+ * A service a partner runs: a line of business of one kind (product sales,
+ * field service or delivery), with its name, status and configuration, the
+ * locations it is switched on at, and whether it trades there now with what
+ * stops it. A partner may run several services of one kind. Registered with
+ * `POST /v1/partners/{partner_id}/services` and changed with `PATCH`; the
+ * step 1 `PUT /v1/partners/{partner_id}/services/{kind}` keeps working on the
+ * partner's first service of the kind.
  *
  */
 export type Service = {
@@ -1152,13 +1431,62 @@ export type Service = {
      * When the service was last put, as an RFC 3339 timestamp in UTC; equal to `created_at` until the first change.
      */
     updated_at: string;
+    /**
+     * Its name, defaulting to its kind.
+     */
+    name: string;
+    /**
+     * `true` when it is switched on at every Location of the Partner, present and future.
+     */
+    everywhere: boolean;
+    /**
+     * The Locations it is switched on at (every open Location when `everywhere`).
+     */
+    location_ids: Array<string>;
+    /**
+     * The documents it waits for, while `awaiting_documents`.
+     */
+    awaiting: Array<DocumentKind>;
+    /**
+     * `true` when it trades somewhere now: enabled, in the plan, the Partner active, switched on at a Location, and with agents for an agent-based kind.
+     */
+    trading: boolean;
+    /**
+     * What stops it trading, each with its code: `service_disabled`, `document_missing`, `document_pending`, `document_rejected`, `document_expired`, `not_in_plan`, `partner_not_active`, `switched_on_nowhere`, `no_agents`.
+     */
+    blockers: Array<Blocker>;
+    /**
+     * The version, raised by one on every change.
+     */
+    version: number;
+    /**
+     * The agents holding a membership in it, for delivery and field Services; `null` for product sales or when the fleet cannot say.
+     */
+    agents?: number | null;
+    /**
+     * Who registered it; `null` for the step 1 rows and the seed.
+     */
+    created_by?: string | null;
+    /**
+     * The current pricing version, for a delivery Service that has one.
+     */
+    pricing_version?: number | null;
+    /**
+     * Why it is in its status, when platform staff or a plan change set it.
+     */
+    status_reason?: string | null;
+    /**
+     * Who last changed it.
+     */
+    updated_by?: string | null;
 };
 
 /**
  * The request body of `PUT /v1/partners/{partner_id}/services/{kind}`.
  * `config` replaces the stored configuration as a whole when present; when
  * it is omitted the existing configuration is kept, or an empty object is
- * stored for a new service.
+ * stored for a new service. `status` is `enabled` or `disabled`;
+ * `awaiting_documents` is the platform's to set and is refused.
  *
  */
 export type ServiceUpsert = {
@@ -1172,17 +1500,1491 @@ export type ServiceUpsert = {
     config?: {
         [key: string]: unknown;
     };
+    /**
+     * A new name; kept when omitted.
+     */
+    name?: string | null;
+    /**
+     * Why; required of platform staff acting for the Partner.
+     */
+    reason?: string | null;
 };
 
 /**
- * A list of the services a partner has configured, the response of `GET /v1/partners/{partner_id}/services`.
+ * The registry of a partner, the response of `GET /v1/partners/{partner_id}/services`: its services, where every kind stands for it, and its plan.
  */
 export type ServiceList = {
     /**
-     * One entry per kind the partner has put, in any status; a kind that was never put is not listed. The list is not paginated.
+     * The partner's services, oldest first, in any status; several of a kind when the partner runs several. The list is not paginated.
      */
     items: Array<Service>;
+    /**
+     * Every kind and where it stands for the Partner: enabled, awaiting documents, disabled, available, or not in the plan with the plan that includes it.
+     */
+    kinds: Array<KindAvailability>;
+    /**
+     * The plan in force, with the kinds it includes.
+     */
+    plan: PlanOffer;
 };
+
+/**
+ * What keeps a Partner or a Location from going live, the `Blocker` schema: a stable code from `activation_blocked`'s field-level codes, a sentence a screen may show verbatim, and where in the record it points.
+ */
+export type Blocker = {
+    /**
+     * The stable code, for example `document_missing`.
+     */
+    code: string;
+    /**
+     * A sentence saying what stands in the way.
+     */
+    message: string;
+    /**
+     * A JSON Pointer into the record, for example `/documents/pan`.
+     */
+    pointer: string;
+};
+
+/**
+ * What activating a Partner needs, the `PartnerActivation` schema: the setup checklist the consoles show before anybody tries, the same blockers an attempt would be refused with.
+ */
+export type PartnerActivation = {
+    /**
+     * The Partner's status.
+     */
+    status: PartnerStatus;
+    /**
+     * `true` when nothing blocks activation; for a Partner that is not pending it says whether an activation would pass.
+     */
+    ready: boolean;
+    /**
+     * What stands in the way, each with its code; empty when ready.
+     */
+    blockers: Array<Blocker>;
+};
+
+/**
+ * The administrator Mission Control names when it onboards a Partner, the `PartnerOwner` schema.
+ */
+export type PartnerOwner = {
+    /**
+     * The administrator's email address; the invitation goes there, also when the address already belongs to a member of another Partner.
+     */
+    email: string;
+    /**
+     * The administrator's name.
+     */
+    display_name: string;
+};
+
+/**
+ * A person to reach about something, the `Contact` schema.
+ */
+export type Contact = {
+    /**
+     * What the contact is for.
+     */
+    purpose: ContactPurpose;
+    /**
+     * What they agreed to be reached on.
+     */
+    consent?: ContactConsent;
+    /**
+     * Their email address.
+     */
+    email?: string | null;
+    /**
+     * The person's name.
+     */
+    name?: string | null;
+    /**
+     * Their phone number in E.164; a number without a calling code is taken as Indian.
+     */
+    phone?: string | null;
+    /**
+     * Their role.
+     */
+    role?: string | null;
+};
+
+/**
+ * What a contact agreed to be reached on, the `ContactConsent` schema. Consent is per person and per channel, and never inferred from a number or an address being present.
+ */
+export type ContactConsent = {
+    /**
+     * Agreed to email.
+     */
+    email?: boolean;
+    /**
+     * Agreed to SMS.
+     */
+    sms?: boolean;
+    /**
+     * Agreed to WhatsApp.
+     */
+    whatsapp?: boolean;
+};
+
+/**
+ * What a contact is for. A notice looks for its purpose, then operations, then anybody.
+ */
+export type ContactPurpose = 'operations' | 'finance' | 'escalation' | 'legal';
+
+/**
+ * The Partner console's view of its registration and standing, the `PartnerStanding` schema.
+ */
+export type PartnerStanding = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * Its lifecycle status.
+     */
+    status: PartnerStatus;
+    /**
+     * What activation needs, with every blocker.
+     */
+    activation: PartnerActivation;
+    /**
+     * Every document the Partner must have on file and where each stands: its review, its expiry, and what it does to trading.
+     */
+    requirements: Array<DocumentRequirement>;
+    /**
+     * Whether the next payout may go out now: the account verified and any hold over.
+     */
+    payouts_may_go: boolean;
+    /**
+     * The permissions withheld from the Partner's entitlement envelope.
+     */
+    withheld_permissions: Array<string>;
+    /**
+     * The directory summary.
+     */
+    summary: PartnerStandingSummary;
+    /**
+     * The launch date.
+     */
+    launched_at?: string | null;
+    /**
+     * The payout account, masked; `null` until stated.
+     */
+    payout_account?: PayoutAccount | null;
+    /**
+     * When the status last changed.
+     */
+    status_changed_at?: string | null;
+    /**
+     * Why it is in that status, shown while it is suspended.
+     */
+    status_reason?: string | null;
+};
+
+/**
+ * What the directory row carries beside a Partner, the `PartnerStandingSummary` schema.
+ */
+export type PartnerStandingSummary = {
+    /**
+     * Whether the Partner can trade now: active, and no document has stopped every Location.
+     */
+    can_trade: boolean;
+    /**
+     * Its Locations.
+     */
+    locations_total: number;
+    /**
+     * Its Locations that are live.
+     */
+    locations_live: number;
+    /**
+     * Members who can sign in.
+     */
+    members_can_sign_in: number;
+    /**
+     * `true` when nobody can sign in to the Partner, which platform staff should notice.
+     */
+    nobody_can_sign_in: boolean;
+    /**
+     * Required documents approved.
+     */
+    documents_approved: number;
+    /**
+     * Required documents awaiting review.
+     */
+    documents_pending: number;
+    /**
+     * Required documents missing, rejected or expired.
+     */
+    documents_missing: number;
+    /**
+     * Where the payout account stands.
+     */
+    payout_account: PayoutStanding;
+    /**
+     * The kinds of Service it runs: those with a Service enabled or awaiting documents.
+     */
+    runs: Array<ServiceKind>;
+};
+
+/**
+ * Where a Partner's payout account stands, for the directory.
+ */
+export type PayoutStanding = 'none' | 'unverified' | 'verified';
+
+/**
+ * Request body of the logo and banner routes, the `PictureUpdate` schema.
+ */
+export type PictureUpdate = {
+    /**
+     * The picture: a confirmed asset of the slot's purpose (`partner_logo`, square; `partner_banner`, twice as wide as tall), or `null` to remove it.
+     */
+    asset_id?: string | null;
+};
+
+/**
+ * A Partner's plan, held on the Partner until platform-configuration owns plans: Starter (INR 0), Standard (INR 1,999) and Pro (INR 4,999) a month before GST.
+ */
+export type Plan = 'starter' | 'standard' | 'pro';
+
+/**
+ * One of the plans as offered, the `PlanOffer` schema.
+ */
+export type PlanOffer = {
+    /**
+     * The plan.
+     */
+    plan: Plan;
+    /**
+     * Its name.
+     */
+    label: string;
+    /**
+     * The monthly fee in paise, before GST.
+     */
+    monthly_fee: number;
+    /**
+     * The kinds of Service it includes.
+     */
+    kinds: Array<ServiceKind>;
+    /**
+     * Whether its stores may use the platform fleet.
+     */
+    platform_fleet: boolean;
+};
+
+/**
+ * A Partner's plan, the `PartnerPlan` schema: the plan with what it includes, the trial, a change waiting, and the plans on offer.
+ */
+export type PartnerPlan = {
+    /**
+     * The plan in force, with what it includes.
+     */
+    current: PlanOffer;
+    /**
+     * The plan the Partner chose for after the trial; Starter unless chosen.
+     */
+    plan_after_trial: Plan;
+    /**
+     * The plans on offer.
+     */
+    plans: Array<PlanOffer>;
+    /**
+     * A change platform staff scheduled.
+     */
+    scheduled?: ScheduledPlanChange | null;
+    /**
+     * The Pro trial, once the Partner has had one.
+     */
+    trial?: PlanTrial | null;
+};
+
+/**
+ * The Pro trial of a Partner, the `PlanTrial` schema.
+ */
+export type PlanTrial = {
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * The plan the Partner moves to then.
+     */
+    then: Plan;
+    /**
+     * `true` while it runs.
+     */
+    running: boolean;
+};
+
+/**
+ * A plan change waiting for its moment, the `ScheduledPlanChange` schema.
+ */
+export type ScheduledPlanChange = {
+    /**
+     * The plan it moves to.
+     */
+    plan: Plan;
+    /**
+     * When.
+     */
+    effective_at: string;
+    /**
+     * Why, as platform staff gave it.
+     */
+    reason?: string | null;
+    /**
+     * Who scheduled it.
+     */
+    scheduled_by?: string | null;
+};
+
+/**
+ * What moving a Partner to a plan would do, the `PlanImpact` schema: shown to platform staff before they confirm.
+ */
+export type PlanImpact = {
+    /**
+     * The plan in force.
+     */
+    from: Plan;
+    /**
+     * The plan proposed.
+     */
+    to: Plan;
+    /**
+     * The kinds the proposed plan lacks.
+     */
+    kinds_lost: Array<ServiceKind>;
+    /**
+     * The Services that would be disabled, enabled or awaiting documents now.
+     */
+    services: Array<PlanImpactService>;
+    /**
+     * `false` when its stores would lose the platform fleet.
+     */
+    platform_fleet: boolean;
+};
+
+/**
+ * A Service a plan change would stop, the `PlanImpactService` schema.
+ */
+export type PlanImpactService = {
+    /**
+     * The Service.
+     */
+    id: string;
+    /**
+     * Its kind.
+     */
+    kind: ServiceKind;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The Locations where it would stop.
+     */
+    location_ids: Array<string>;
+};
+
+/**
+ * Request body of `PUT /v1/partners/{partner_id}/plan`, the `PartnerPlanUpdate` schema.
+ */
+export type PartnerPlanUpdate = {
+    /**
+     * When the move takes effect; now when absent.
+     */
+    effective_at?: string | null;
+    /**
+     * The plan to move to; platform staff only, with a reason. The plan in force cancels a change waiting.
+     */
+    plan?: Plan | null;
+    /**
+     * The plan to move to when the trial ends; the owner or platform staff.
+     */
+    plan_after_trial?: Plan | null;
+    /**
+     * Why.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A compliance document on file, the `PartnerDocument` schema.
+ */
+export type PartnerDocument = {
+    /**
+     * Identifier of the document.
+     */
+    id: string;
+    /**
+     * The Partner it belongs to.
+     */
+    partner_id: string;
+    /**
+     * What it is.
+     */
+    kind: DocumentKind;
+    /**
+     * The uploaded file (purpose `partner_document`, restricted): read it through `GET /v1/assets/{asset_id}/link`.
+     */
+    asset_id: string;
+    /**
+     * Where its review is.
+     */
+    review: ReviewState;
+    /**
+     * When it was filed.
+     */
+    uploaded_at: string;
+    /**
+     * The version, raised on every review.
+     */
+    version: number;
+    /**
+     * The last day it is valid.
+     */
+    expires_on?: string | null;
+    /**
+     * When it was issued.
+     */
+    issued_on?: string | null;
+    /**
+     * A label, for example the outlet a licence names.
+     */
+    label?: string | null;
+    /**
+     * The number the document carries, for example the licence number.
+     */
+    number?: string | null;
+    /**
+     * The reviewer's note; always present on a rejection.
+     */
+    review_note?: string | null;
+    /**
+     * When it was reviewed.
+     */
+    reviewed_at?: string | null;
+    /**
+     * Who reviewed it.
+     */
+    reviewed_by?: string | null;
+    /**
+     * Who filed it.
+     */
+    uploaded_by?: string | null;
+};
+
+/**
+ * The kind of a compliance document.
+ */
+export type DocumentKind = 'gst_registration' | 'fssai_licence' | 'shop_establishment' | 'pan' | 'identity' | 'bank_proof' | 'other';
+
+/**
+ * Where a document's review is.
+ */
+export type ReviewState = 'pending' | 'approved' | 'rejected';
+
+/**
+ * One requirement and where it stands, the `DocumentRequirement` schema.
+ */
+export type DocumentRequirement = {
+    /**
+     * The kind required.
+     */
+    kind: DocumentKind;
+    /**
+     * Where it stands.
+     */
+    state: RequirementState;
+    /**
+     * `true` within thirty days of the expiry of a satisfied requirement.
+     */
+    expiring: boolean;
+    /**
+     * What it does to trading.
+     */
+    trading: TradingEffect;
+    /**
+     * Which Locations it covers.
+     */
+    covers: RequirementCoverage;
+    /**
+     * The document that decides it, when one is on file.
+     */
+    document_id?: string | null;
+    /**
+     * The deciding document's last valid day.
+     */
+    expires_on?: string | null;
+    /**
+     * The reviewer's note of a rejection.
+     */
+    review_note?: string | null;
+    /**
+     * The first day the covered Locations do not trade, in a grace period or once stopped.
+     */
+    stops_on?: string | null;
+};
+
+/**
+ * Where a requirement stands.
+ */
+export type RequirementState = 'satisfied' | 'pending' | 'rejected' | 'expired' | 'missing';
+
+/**
+ * What a requirement does to trading.
+ */
+export type TradingEffect = 'trading' | 'grace' | 'awaiting_review' | 'stopped';
+
+/**
+ * Which Locations a requirement covers.
+ */
+export type RequirementCoverage = 'all_locations' | 'food_locations';
+
+/**
+ * Request body of `POST /v1/partners/{partner_id}/documents`, the `PartnerDocumentCreate` schema.
+ */
+export type PartnerDocumentCreate = {
+    /**
+     * What the document is.
+     */
+    kind: DocumentKind;
+    /**
+     * The uploaded file: an asset of the `partner_document` purpose, granted on `POST /v1/partners/{partner_id}/assets/grants` and confirmed.
+     */
+    asset_id: string;
+    /**
+     * Its last valid day; not before the issue date.
+     */
+    expires_on?: string | null;
+    /**
+     * When it was issued.
+     */
+    issued_on?: string | null;
+    /**
+     * A label, for example the outlet a licence names.
+     */
+    label?: string | null;
+    /**
+     * The number the document carries, for example the licence number.
+     */
+    number?: string | null;
+};
+
+/**
+ * Request body of the review, the `PartnerDocumentReview` schema.
+ */
+export type PartnerDocumentReview = {
+    /**
+     * `approved`, or `rejected` with a note; an approval is withdrawn by a rejection.
+     */
+    outcome: ReviewState;
+    /**
+     * The note the Partner reads, at most 400 characters; required for a rejection.
+     */
+    note?: string | null;
+};
+
+/**
+ * The documents on file and the requirements, the `PartnerDocumentList` schema.
+ */
+export type PartnerDocumentList = {
+    /**
+     * The documents on file, newest first.
+     */
+    items: Array<PartnerDocument>;
+    /**
+     * Every kind the Partner must have on file, with where it stands.
+     */
+    requirements: Array<DocumentRequirement>;
+};
+
+/**
+ * A page of documents across Partners, the `PartnerDocumentPage` schema.
+ */
+export type PartnerDocumentPage = {
+    /**
+     * The documents, oldest first by default.
+     */
+    items: Array<PartnerDocument>;
+    /**
+     * Cursor of the next page, `null` on the last one.
+     */
+    next_cursor?: string | null;
+};
+
+/**
+ * The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits.
+ */
+export type PayoutAccount = {
+    /**
+     * The account holder's name.
+     */
+    holder_name: string;
+    /**
+     * Business or personal.
+     */
+    account_type: PayoutAccountType;
+    /**
+     * The account number, all but the last four digits masked; sending it back unchanged keeps the account.
+     */
+    account_number: string;
+    /**
+     * The last four digits.
+     */
+    last4: string;
+    /**
+     * The IFSC.
+     */
+    ifsc: string;
+    /**
+     * Whether platform staff verified it.
+     */
+    state: PayoutAccountState;
+    /**
+     * When the Partner last changed it.
+     */
+    updated_at: string;
+    /**
+     * The version, raised on every write.
+     */
+    version: number;
+    /**
+     * The bank's name.
+     */
+    bank_name?: string | null;
+    /**
+     * Payouts wait until this moment after a change of account, and until it is verified.
+     */
+    payouts_held_until?: string | null;
+    /**
+     * The UPI ID.
+     */
+    upi_id?: string | null;
+    /**
+     * When it was verified.
+     */
+    verified_at?: string | null;
+    /**
+     * Who verified it.
+     */
+    verified_by?: string | null;
+};
+
+/**
+ * Request body of `PUT /v1/partners/{partner_id}/payout-account`, the `PayoutAccountUpdate` schema.
+ */
+export type PayoutAccountUpdate = {
+    /**
+     * The account holder's name.
+     */
+    holder_name: string;
+    /**
+     * Business or personal.
+     */
+    account_type: PayoutAccountType;
+    /**
+     * The IFSC: four letters, a zero and six letters or digits.
+     */
+    ifsc: string;
+    /**
+     * The account number, nine to eighteen digits; omitted, or the masked number sent back unchanged, keeps the account on file.
+     */
+    account_number?: string | null;
+    /**
+     * The bank's name.
+     */
+    bank_name?: string | null;
+    /**
+     * A UPI ID, optional.
+     */
+    upi_id?: string | null;
+};
+
+/**
+ * Whether platform staff verified the account.
+ */
+export type PayoutAccountState = 'unverified' | 'verified';
+
+/**
+ * Whose account it is.
+ */
+export type PayoutAccountType = 'business' | 'personal';
+
+/**
+ * Who carries a store's deliveries.
+ */
+export type Carrier = 'own_agents' | 'platform_fleet' | 'external_carrier';
+
+/**
+ * Delivery as a store offers it, the `DeliveryMethod` schema.
+ */
+export type DeliveryMethod = {
+    /**
+     * Who carries the deliveries.
+     */
+    carrier: Carrier;
+    /**
+     * A delivery zone drawn as one ring of `[longitude, latitude]` points where a radius is the wrong shape; the resolved coverage radius applies without one. Switching delivery off discards it.
+     */
+    zone?: Array<Array<number>> | null;
+};
+
+/**
+ * Pickup as a store offers it, the `PickupMethod` schema.
+ */
+export type PickupMethod = {
+    /**
+     * Minutes added to preparation before a collection is ready, 0 to 120.
+     */
+    ready_offset_minutes?: number;
+};
+
+/**
+ * Dine-in as a store offers it, the `DineInMethod` schema: it needs tables, which arrive with dine-in.
+ */
+export type DineInMethod = {
+    [key: string]: unknown;
+};
+
+/**
+ * How orders leave a store, the `Fulfilment` schema: a method's presence enables it, and switching one off discards its settings.
+ */
+export type Fulfilment = {
+    /**
+     * Delivery, with its carrier and optional zone.
+     */
+    delivery?: DeliveryMethod | null;
+    /**
+     * Dine-in.
+     */
+    dine_in?: DineInMethod | null;
+    /**
+     * Pickup, with its ready offset.
+     */
+    pickup?: PickupMethod | null;
+};
+
+/**
+ * How a store takes orders, the `OrderSettings` schema.
+ */
+export type OrderSettings = {
+    /**
+     * Minutes after which an order nobody accepted is declined; `null` means the platform's own limit. Platform staff's setting.
+     */
+    auto_reject_minutes?: number | null;
+    /**
+     * Cutlery at checkout.
+     */
+    cutlery?: Cutlery;
+    /**
+     * How preparation time is quoted.
+     */
+    preparation?: Preparation;
+    /**
+     * Whether an order may carry a prescription; platform staff's setting.
+     */
+    prescriptions?: boolean;
+    /**
+     * Scheduled orders.
+     */
+    scheduled?: ScheduledOrders;
+};
+
+/**
+ * Request body of `PUT .../order-settings`, the `OrderSettingsUpdate` schema: absent members are kept.
+ */
+export type OrderSettingsUpdate = {
+    /**
+     * Minutes after which an order nobody accepted is declined, or `null` for the platform's own limit; platform staff only.
+     */
+    auto_reject_minutes?: number | null;
+    /**
+     * Cutlery at checkout.
+     */
+    cutlery?: Cutlery | null;
+    /**
+     * How preparation time is quoted.
+     */
+    preparation?: Preparation | null;
+    /**
+     * Whether an order may carry a prescription; platform staff only.
+     */
+    prescriptions?: boolean | null;
+    /**
+     * Scheduled orders; slot settings are refused while scheduled orders are not taken.
+     */
+    scheduled?: ScheduledOrdersUpdate | null;
+};
+
+/**
+ * How preparation time is quoted, the `Preparation` schema.
+ */
+export type Preparation = {
+    /**
+     * Typed or measured.
+     */
+    mode: PreparationMode;
+    /**
+     * The typed minutes, the quote in fixed mode and the fallback in measured mode.
+     */
+    minutes: number;
+};
+
+/**
+ * How preparation time is quoted.
+ */
+export type PreparationMode = 'fixed' | 'measured';
+
+/**
+ * How a store takes scheduled orders, the `ScheduledOrders` schema.
+ */
+export type ScheduledOrders = {
+    /**
+     * Whether scheduled orders are taken; switching off keeps the slot settings.
+     */
+    accepts: boolean;
+    /**
+     * The slot length, 15, 30 or 60 minutes; platform staff's setting.
+     */
+    slot_minutes: number;
+    /**
+     * How many days ahead orders are taken, 1 to 7.
+     */
+    window_days: number;
+    /**
+     * Most orders per slot, `null` for no cap; platform staff's setting.
+     */
+    cap_per_slot?: number | null;
+};
+
+/**
+ * Scheduled orders as changed, the `ScheduledOrdersUpdate` schema: absent members are kept.
+ */
+export type ScheduledOrdersUpdate = {
+    /**
+     * Whether scheduled orders are taken; switching off keeps the slot settings.
+     */
+    accepts?: boolean | null;
+    /**
+     * Most orders per slot, or `null` for no cap; platform staff only.
+     */
+    cap_per_slot?: number | null;
+    /**
+     * The slot length, 15, 30 or 60 minutes; platform staff only.
+     */
+    slot_minutes?: number | null;
+    /**
+     * How many days ahead, 1 to 7, the platform's limit.
+     */
+    window_days?: number | null;
+};
+
+/**
+ * Whether checkout asks about cutlery and what saying yes costs, the `Cutlery` schema.
+ */
+export type Cutlery = {
+    /**
+     * Checkout asks.
+     */
+    asks: boolean;
+    /**
+     * What saying yes costs, in minor units of the Location's currency.
+     */
+    fee: number;
+};
+
+/**
+ * How a store appears, apart from how it operates, the `Listing` schema. A value with a default: a store opened before it existed reads as reviewable and unmarked.
+ */
+export type Listing = {
+    /**
+     * The marks the storefront draws on its card; platform staff only.
+     */
+    highlights?: Array<Highlight>;
+    /**
+     * Whether customers may rate and review it; off hides the option and what is written.
+     */
+    reviews?: boolean;
+    /**
+     * Search tags, lower cased and de-duplicated.
+     */
+    tags?: Array<string>;
+};
+
+/**
+ * A mark the storefront draws on a store's card and shelves it by; platform staff only.
+ */
+export type Highlight = 'exclusive' | 'premium';
+
+/**
+ * A store's pause, the `LocationPause` schema: who paused it, why and until when.
+ */
+export type Pause = {
+    /**
+     * When it takes orders again, by itself.
+     */
+    until: string;
+    /**
+     * Why.
+     */
+    reason: PauseReason;
+    /**
+     * When.
+     */
+    paused_at: string;
+    /**
+     * The message customers read, for a custom reason.
+     */
+    message?: string | null;
+    /**
+     * Who paused it.
+     */
+    paused_by?: string | null;
+};
+
+/**
+ * Request body of `POST .../pause`, the `LocationPause` schema.
+ */
+export type LocationPause = {
+    /**
+     * How long, one minute to a day (1440 minutes); the console offers 15, 30 and 60.
+     */
+    minutes: number;
+    /**
+     * Why: high demand, or a custom message customers read.
+     */
+    reason: PauseReason;
+    /**
+     * The message customers read, at most 200 characters; required for a custom reason.
+     */
+    message?: string | null;
+};
+
+/**
+ * Why a store is paused.
+ */
+export type PauseReason = 'high_demand' | 'custom';
+
+/**
+ * What a Location is doing now, the `LocationLive` schema: resolved at one instant per read.
+ */
+export type LocationLive = {
+    /**
+     * The effective state.
+     */
+    state: LocationLiveState;
+    /**
+     * The preparation minutes the store quotes now.
+     */
+    preparation_minutes: number;
+    /**
+     * The instant this answer is for.
+     */
+    at: string;
+    /**
+     * The pause in force, with who, why and until when.
+     */
+    pause?: Pause | null;
+    /**
+     * Why it is not online: `paused`, `closed`, `location_pending`, `location_suspended`, `archived`, `partner_pending`, `partner_suspended`, `partner_archived`, `documents`, `not_selling`.
+     */
+    reason?: string | null;
+    /**
+     * When the state changes, when known: the end of a pause, the next opening or closing.
+     */
+    until?: string | null;
+};
+
+/**
+ * What a Location is doing now.
+ */
+export type LocationLiveState = 'online' | 'closed' | 'offline' | 'not_live';
+
+/**
+ * What a Location is, by what it runs: a store sells (a product-sales Service is on there), a branch only operates (a delivery depot, a field Service's base). Never chosen by hand.
+ */
+export type ReadsAs = 'store' | 'branch';
+
+/**
+ * What going live needs for a Location, the `LocationActivation` schema.
+ */
+export type LocationActivation = {
+    /**
+     * The Location's status.
+     */
+    status: LocationStatus;
+    /**
+     * `true` when nothing blocks it going live.
+     */
+    ready: boolean;
+    /**
+     * What stands in the way, each with its code; the same blockers an activation is refused with.
+     */
+    blockers: Array<Blocker>;
+};
+
+/**
+ * A holiday of the Location's country offered as a closure, the `HolidayOffer` schema.
+ */
+export type HolidayOffer = {
+    /**
+     * The date.
+     */
+    date: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * `true` when the Location is already closed that day, by its own closure or one set on its zone, city or country.
+     */
+    covered: boolean;
+    /**
+     * Who closed it, when covered: the layer's label.
+     */
+    covered_by?: string | null;
+};
+
+/**
+ * The holidays offered, the `HolidayOfferList` schema.
+ */
+export type HolidayOfferList = {
+    /**
+     * Upcoming public holidays of the Location's country, oldest first.
+     */
+    items: Array<HolidayOffer>;
+};
+
+/**
+ * A Service switched on at a Location as the Location reads it, the `LocationService` schema.
+ */
+export type LocationService = {
+    /**
+     * The Service.
+     */
+    id: string;
+    /**
+     * Its kind.
+     */
+    kind: ServiceKind;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its status.
+     */
+    status: ServiceStatus;
+    /**
+     * Whether it trades here now.
+     */
+    trading: boolean;
+};
+
+/**
+ * A delivery Service's pricing as a Provider, the `DeliveryPricing` schema: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands, and an optional waiting fee; every amount in minor units of `currency`.
+ */
+export type DeliveryPricing = {
+    /**
+     * The currency of every amount.
+     */
+    currency: string;
+    /**
+     * The fee per delivery.
+     */
+    flat_fee: number;
+    /**
+     * The distance the flat fee covers, in metres.
+     */
+    base_distance_metres: number;
+    /**
+     * The per-kilometre charge beyond it, in ascending bands ending open-ended.
+     */
+    per_km: Array<KilometreBand>;
+    /**
+     * The minutes of waiting included.
+     */
+    free_waiting_minutes?: number;
+    /**
+     * The fee per minute of waiting beyond the free minutes, when charged.
+     */
+    waiting_fee_per_minute?: number | null;
+};
+
+/**
+ * One band of the per-kilometre charge beyond the base distance, the `KilometreBand` schema.
+ */
+export type KilometreBand = {
+    /**
+     * The charge per kilometre in the band, in minor units.
+     */
+    per_km: number;
+    /**
+     * The band's upper bound in metres from the pickup; `null` for the open-ended last band.
+     */
+    up_to_metres?: number | null;
+};
+
+/**
+ * A quote and how it was reached, the `DeliveryQuote` schema.
+ */
+export type DeliveryQuote = {
+    /**
+     * The pricing version it was priced at, which the delivery keeps.
+     */
+    version: number;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * The distance priced, in metres.
+     */
+    distance_metres: number;
+    /**
+     * The minutes of waiting priced.
+     */
+    waiting_minutes: number;
+    /**
+     * The flat fee.
+     */
+    flat_fee: number;
+    /**
+     * The per-kilometre charge beyond the base distance.
+     */
+    distance_charge: number;
+    /**
+     * The waiting charge.
+     */
+    waiting_charge: number;
+    /**
+     * The total, in minor units.
+     */
+    total: number;
+};
+
+/**
+ * A version of a delivery Service's pricing, the `DeliveryPricingVersion` schema.
+ */
+export type DeliveryPricingVersion = {
+    /**
+     * The Service.
+     */
+    service_id: string;
+    /**
+     * The version, from 1; every delivery keeps the version it was quoted at.
+     */
+    version: number;
+    /**
+     * The pricing.
+     */
+    pricing: DeliveryPricing;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * Who made it.
+     */
+    created_by?: string | null;
+};
+
+/**
+ * Request body of `PUT .../services/{service_id}/pricing`, the `DeliveryPricingUpdate` schema: the next version of the pricing.
+ */
+export type DeliveryPricingUpdate = {
+    /**
+     * The pricing.
+     */
+    pricing: DeliveryPricing;
+    /**
+     * Why; required of platform staff acting for the Partner.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A field Service's settings at one Location, the `FieldServiceSettings` schema: bookable work around it. Changing them never moves or cancels a booking already made.
+ */
+export type FieldServiceSettings = {
+    /**
+     * Where it takes bookings.
+     */
+    area?: FieldArea;
+    /**
+     * How far ahead bookings are taken, in days, up to 60.
+     */
+    booking_window_days?: number;
+    /**
+     * The buffer between jobs, in minutes.
+     */
+    buffer_minutes?: number;
+    /**
+     * Its working hours; empty means the Location's hours.
+     */
+    hours?: Array<DaySchedule>;
+    /**
+     * The notice a booking needs before its slot, in minutes.
+     */
+    min_notice_minutes?: number;
+    /**
+     * The slot length, 15, 30 or 60 minutes.
+     */
+    slot_minutes?: number;
+};
+
+/**
+ * Where a field Service takes bookings around a Location, the `FieldArea` schema.
+ */
+export type FieldArea = {
+    /**
+     * A drawn polygon, one ring of `[longitude, latitude]` points, in place of the radius.
+     */
+    polygon?: Array<Array<number>> | null;
+    /**
+     * A radius around the Location, in kilometres, up to 25; 10 by default.
+     */
+    radius_km?: number | null;
+    /**
+     * The Location's whole zone, in place of either.
+     */
+    whole_zone?: boolean;
+};
+
+/**
+ * A kind and where it stands for the Partner, the `KindAvailability` schema.
+ */
+export type KindAvailability = {
+    /**
+     * The kind.
+     */
+    kind: ServiceKind;
+    /**
+     * Where it stands.
+     */
+    state: KindState;
+    /**
+     * The Services of the kind, whatever their status.
+     */
+    services: number;
+    /**
+     * The lowest plan that includes it, when the Partner's does not.
+     */
+    plan_needed?: Plan | null;
+};
+
+/**
+ * Where a kind of Service stands for a Partner.
+ */
+export type KindState = 'enabled' | 'awaiting_documents' | 'disabled' | 'available' | 'not_in_plan';
+
+/**
+ * A Service at one Location, the `ServiceAtLocation` schema.
+ */
+export type ServiceAtLocation = {
+    /**
+     * The Service.
+     */
+    service_id: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Whether the Service is switched on there.
+     */
+    switched_on: boolean;
+    /**
+     * Whether it is on there because it is on everywhere.
+     */
+    everywhere: boolean;
+    /**
+     * Whether it trades there now.
+     */
+    trading: boolean;
+    /**
+     * For a field Service: its bookable area, hours and slots there, defaults filled in.
+     */
+    settings?: FieldServiceSettings | null;
+};
+
+/**
+ * Request body of `POST /v1/partners/{partner_id}/services`, the `ServiceCreate` schema.
+ */
+export type ServiceCreate = {
+    /**
+     * What the Service is.
+     */
+    kind: ServiceKind;
+    /**
+     * Its configuration by kind: `ProductSalesConfig`, `FieldServiceConfig` or `DeliveryConfig`; `{}` when absent.
+     */
+    config?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * `false` registers it disabled; enabled by default, awaiting documents while its kind needs some not approved.
+     */
+    enabled?: boolean;
+    /**
+     * Switched on at every Location, present and future; the default when `location_ids` is absent.
+     */
+    everywhere?: boolean | null;
+    /**
+     * The Locations to switch it on at; `[]` switches it on nowhere.
+     */
+    location_ids?: Array<string> | null;
+    /**
+     * Its name, 1 to 100 characters; the kind's when absent.
+     */
+    name?: string | null;
+    /**
+     * Why; required of platform staff acting for the Partner.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Request body of `PUT .../services/{service_id}/locations/{location_id}`, the `ServiceLocationUpdate` schema.
+ */
+export type ServiceLocationUpdate = {
+    /**
+     * Why; required of platform staff acting for the Partner.
+     */
+    reason?: string | null;
+    /**
+     * For a field Service, its area, hours and slots at the Location, defaults filled in for absent members; absent for any other kind.
+     */
+    settings?: FieldServiceSettings | null;
+};
+
+/**
+ * Request body of `PATCH /v1/partners/{partner_id}/services/{kind}`, the `ServiceUpdate` schema: absent members are kept.
+ */
+export type ServiceUpdate = {
+    /**
+     * A configuration replacing the stored one as a whole.
+     */
+    config?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * `true` switches it on at every Location; `false` keeps it on where it is, one by one.
+     */
+    everywhere?: boolean | null;
+    /**
+     * Switches it on at exactly these Locations.
+     */
+    location_ids?: Array<string> | null;
+    /**
+     * A new name.
+     */
+    name?: string | null;
+    /**
+     * Why; required of platform staff acting for the Partner.
+     */
+    reason?: string | null;
+    /**
+     * `enabled` or `disabled`; disabling keeps the configuration, re-enabling restores it.
+     */
+    status?: ServiceStatus | null;
+};
+
+/**
+ * A product-sales Service's configuration, the `ProductSalesConfig` schema.
+ */
+export type ProductSalesConfig = {
+    /**
+     * What it sells; `general` when absent.
+     */
+    catalogue_type?: CatalogueType;
+};
+
+/**
+ * A field Service's configuration, the `FieldServiceConfig` schema: the bookable work itself, with its durations and prices, is the services catalogue.
+ */
+export type FieldServiceConfig = {
+    /**
+     * The qualifications the Partner names, which its agents hold and its bookable work requires.
+     */
+    qualifications?: Array<string>;
+    /**
+     * The reference service type's code, lower case (`salon`, `repairs`, `laundry`, `cleaning`).
+     */
+    service_type?: string | null;
+};
+
+/**
+ * A delivery Service's configuration as a Provider, the `DeliveryConfig` schema.
+ */
+export type DeliveryConfig = {
+    /**
+     * The radius around its depot Locations it covers, in kilometres, when no zones are drawn.
+     */
+    coverage_radius_km?: number | null;
+    /**
+     * Its operating hours per weekday; empty means it follows its depot Locations' hours.
+     */
+    hours?: Array<DaySchedule>;
+    /**
+     * Most tasks an agent carries at once.
+     */
+    max_concurrent_tasks?: number;
+    /**
+     * Whether it takes on-demand work.
+     */
+    on_demand?: boolean;
+    /**
+     * Whether other Partners may ask it for deliveries, or it serves only its own Locations.
+     */
+    open_to_partners?: boolean;
+    /**
+     * Whether it takes scheduled work.
+     */
+    scheduled?: boolean;
+    /**
+     * The notice scheduled work needs, in minutes.
+     */
+    scheduled_notice_minutes?: number;
+    /**
+     * The vehicles it runs.
+     */
+    vehicle_types?: Array<VehicleType>;
+    /**
+     * Zones it serves, each one ring of `[longitude, latitude]` points.
+     */
+    zones?: Array<Array<Array<number>>>;
+};
+
+/**
+ * A vehicle type with what it carries, the `VehicleType` schema.
+ */
+export type VehicleType = {
+    /**
+     * The vehicle.
+     */
+    kind: VehicleKind;
+    /**
+     * The heaviest parcel, in kilograms.
+     */
+    max_weight_kg: number;
+    /**
+     * The bulkiest parcel, in litres.
+     */
+    max_volume_litres: number;
+};
+
+/**
+ * A vehicle a delivery Service runs.
+ */
+export type VehicleKind = 'bicycle' | 'two_wheeler' | 'three_wheeler' | 'four_wheeler';
+
+/**
+ * What a product-sales Service sells, deciding what its items collect and the documents it needs: the store types of the reference data, and `general` for none of them.
+ */
+export type CatalogueType = 'food' | 'bakery' | 'drinks' | 'grocery' | 'pharmacy' | 'retail' | 'general';
 
 /**
  * Who performed an audited act. A signed-in person, with the membership they acted under and their name frozen at the time, or the system for timers and provider notices.
@@ -5048,6 +6850,10 @@ export type CreatePartnerErrors = {
      */
     401: Problem;
     /**
+     * Somebody who is not platform staff named an `owner` (`forbidden`).
+     */
+    403: Problem;
+    /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
@@ -5234,6 +7040,10 @@ export type UpdatePartnerErrors = {
      */
     404: Problem;
     /**
+     * The change breaks the lifecycle: activation names its blockers (`activation_blocked`, with one error per blocker), a move the lifecycle does not allow (`illegal_transition`), archiving while locations are open (`locations_open`), or a change to an archived partner (`partner_archived`).
+     */
+    409: Problem;
+    /**
      * `If-Match` no longer matches the partner's version (`precondition_failed`); fetch it again and retry.
      */
     412: Problem;
@@ -5257,6 +7067,889 @@ export type UpdatePartnerResponses = {
 };
 
 export type UpdatePartnerResponse = UpdatePartnerResponses[keyof UpdatePartnerResponses];
+
+export type GetPartnerActivationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/activation';
+};
+
+export type GetPartnerActivationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerActivationError = GetPartnerActivationErrors[keyof GetPartnerActivationErrors];
+
+export type GetPartnerActivationResponses = {
+    /**
+     * The status and the blockers.
+     */
+    200: PartnerActivation;
+};
+
+export type GetPartnerActivationResponse = GetPartnerActivationResponses[keyof GetPartnerActivationResponses];
+
+export type GetPartnerStandingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/standing';
+};
+
+export type GetPartnerStandingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerStandingError = GetPartnerStandingErrors[keyof GetPartnerStandingErrors];
+
+export type GetPartnerStandingResponses = {
+    /**
+     * The standing.
+     */
+    200: PartnerStanding;
+};
+
+export type GetPartnerStandingResponse = GetPartnerStandingResponses[keyof GetPartnerStandingResponses];
+
+export type PutPartnerLogoData = {
+    /**
+     * The request.
+     */
+    body: PictureUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/logo';
+};
+
+export type PutPartnerLogoErrors = {
+    /**
+     * Malformed body, or a picture that is not square.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not brand the Partner.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable`: not a stored logo of this Partner (a document is never a logo).
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerLogoError = PutPartnerLogoErrors[keyof PutPartnerLogoErrors];
+
+export type PutPartnerLogoResponses = {
+    /**
+     * The partner with its logo.
+     */
+    200: Partner;
+};
+
+export type PutPartnerLogoResponse = PutPartnerLogoResponses[keyof PutPartnerLogoResponses];
+
+export type PutPartnerBannerData = {
+    /**
+     * The request.
+     */
+    body: PictureUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/banner';
+};
+
+export type PutPartnerBannerErrors = {
+    /**
+     * Malformed body, or a picture that is not twice as wide as tall.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not brand the Partner.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable`: not a stored banner of this Partner.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerBannerError = PutPartnerBannerErrors[keyof PutPartnerBannerErrors];
+
+export type PutPartnerBannerResponses = {
+    /**
+     * The partner with its banner.
+     */
+    200: Partner;
+};
+
+export type PutPartnerBannerResponse = PutPartnerBannerResponses[keyof PutPartnerBannerResponses];
+
+export type ListPartnerDocumentsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/documents';
+};
+
+export type ListPartnerDocumentsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerDocumentsError = ListPartnerDocumentsErrors[keyof ListPartnerDocumentsErrors];
+
+export type ListPartnerDocumentsResponses = {
+    /**
+     * The documents and the requirements.
+     */
+    200: PartnerDocumentList;
+};
+
+export type ListPartnerDocumentsResponse = ListPartnerDocumentsResponses[keyof ListPartnerDocumentsResponses];
+
+export type CreatePartnerDocumentData = {
+    /**
+     * The request.
+     */
+    body: PartnerDocumentCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/documents';
+};
+
+export type CreatePartnerDocumentErrors = {
+    /**
+     * Malformed body, or an expiry before the issue date.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not file documents.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable`: not a stored document of this Partner; `partner_archived`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerDocumentError = CreatePartnerDocumentErrors[keyof CreatePartnerDocumentErrors];
+
+export type CreatePartnerDocumentResponses = {
+    /**
+     * The document, pending review.
+     */
+    201: PartnerDocument;
+};
+
+export type CreatePartnerDocumentResponse = CreatePartnerDocumentResponses[keyof CreatePartnerDocumentResponses];
+
+export type RemovePartnerDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The document, which must be on file with the partner in the path.
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/documents/{document_id}';
+};
+
+export type RemovePartnerDocumentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not remove documents.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or document.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemovePartnerDocumentError = RemovePartnerDocumentErrors[keyof RemovePartnerDocumentErrors];
+
+export type RemovePartnerDocumentResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type RemovePartnerDocumentResponse = RemovePartnerDocumentResponses[keyof RemovePartnerDocumentResponses];
+
+export type GetPartnerDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The document, which must be on file with the partner in the path.
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/documents/{document_id}';
+};
+
+export type GetPartnerDocumentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown partner or document.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerDocumentError = GetPartnerDocumentErrors[keyof GetPartnerDocumentErrors];
+
+export type GetPartnerDocumentResponses = {
+    /**
+     * The document.
+     */
+    200: PartnerDocument;
+};
+
+export type GetPartnerDocumentResponse = GetPartnerDocumentResponses[keyof GetPartnerDocumentResponses];
+
+export type ReviewPartnerDocumentData = {
+    /**
+     * The request.
+     */
+    body: PartnerDocumentReview;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The document, which must be on file with the partner in the path.
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/documents/{document_id}/review';
+};
+
+export type ReviewPartnerDocumentErrors = {
+    /**
+     * Malformed body, or a rejection without a note.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or document.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`: a rejected document is replaced, not reviewed again.
+     */
+    409: Problem;
+    /**
+     * A store or mail delivery is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReviewPartnerDocumentError = ReviewPartnerDocumentErrors[keyof ReviewPartnerDocumentErrors];
+
+export type ReviewPartnerDocumentResponses = {
+    /**
+     * The document as reviewed.
+     */
+    200: PartnerDocument;
+};
+
+export type ReviewPartnerDocumentResponse = ReviewPartnerDocumentResponses[keyof ReviewPartnerDocumentResponses];
+
+export type ListDocumentsForReviewData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only documents in this review state.
+         */
+        review?: ReviewState;
+        /**
+         * Only documents of this kind.
+         */
+        kind?: DocumentKind;
+        /**
+         * Only this Partner's documents.
+         */
+        partner_id?: string;
+        /**
+         * A filter tree as JSON over `review`, `kind`, `partner_id` and `uploaded_at`.
+         */
+        filter?: string;
+        /**
+         * `uploaded_at` (default) or `-uploaded_at`.
+         */
+        sort?: string;
+        /**
+         * Page size (default 25).
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partner-documents';
+};
+
+export type ListDocumentsForReviewErrors = {
+    /**
+     * A parameter was refused.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff.
+     */
+    403: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListDocumentsForReviewError = ListDocumentsForReviewErrors[keyof ListDocumentsForReviewErrors];
+
+export type ListDocumentsForReviewResponses = {
+    /**
+     * A page of documents.
+     */
+    200: PartnerDocumentPage;
+};
+
+export type ListDocumentsForReviewResponse = ListDocumentsForReviewResponses[keyof ListDocumentsForReviewResponses];
+
+export type GetPayoutAccountData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/payout-account';
+};
+
+export type GetPayoutAccountErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown partner, or no account stated yet.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPayoutAccountError = GetPayoutAccountErrors[keyof GetPayoutAccountErrors];
+
+export type GetPayoutAccountResponses = {
+    /**
+     * The account, masked.
+     */
+    200: PayoutAccount;
+};
+
+export type GetPayoutAccountResponse = GetPayoutAccountResponses[keyof GetPayoutAccountResponses];
+
+export type PutPayoutAccountData = {
+    /**
+     * The request.
+     */
+    body: PayoutAccountUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/payout-account';
+};
+
+export type PutPayoutAccountErrors = {
+    /**
+     * Malformed body or invalid fields (`ifsc_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not change the account.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPayoutAccountError = PutPayoutAccountErrors[keyof PutPayoutAccountErrors];
+
+export type PutPayoutAccountResponses = {
+    /**
+     * The account as saved, masked and unverified.
+     */
+    200: PayoutAccount;
+};
+
+export type PutPayoutAccountResponse = PutPayoutAccountResponses[keyof PutPayoutAccountResponses];
+
+export type VerifyPayoutAccountData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/payout-account/verify';
+};
+
+export type VerifyPayoutAccountErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not platform staff.
+     */
+    403: Problem;
+    /**
+     * Unknown partner, or no account stated.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyPayoutAccountError = VerifyPayoutAccountErrors[keyof VerifyPayoutAccountErrors];
+
+export type VerifyPayoutAccountResponses = {
+    /**
+     * The account, verified.
+     */
+    200: PayoutAccount;
+};
+
+export type VerifyPayoutAccountResponse = VerifyPayoutAccountResponses[keyof VerifyPayoutAccountResponses];
+
+export type GetPartnerPlanData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/plan';
+};
+
+export type GetPartnerPlanErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerPlanError = GetPartnerPlanErrors[keyof GetPartnerPlanErrors];
+
+export type GetPartnerPlanResponses = {
+    /**
+     * The plan.
+     */
+    200: PartnerPlan;
+};
+
+export type GetPartnerPlanResponse = GetPartnerPlanResponses[keyof GetPartnerPlanResponses];
+
+export type PutPartnerPlanData = {
+    /**
+     * The request.
+     */
+    body: PartnerPlanUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/plan';
+};
+
+export type PutPartnerPlanErrors = {
+    /**
+     * Malformed body, or a move without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not the owner, or a move by somebody who is not platform staff.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `partner_archived`.
+     */
+    409: Problem;
+    /**
+     * A store or mail delivery is unavailable.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerPlanError = PutPartnerPlanErrors[keyof PutPartnerPlanErrors];
+
+export type PutPartnerPlanResponses = {
+    /**
+     * The plan as changed.
+     */
+    200: PartnerPlan;
+};
+
+export type PutPartnerPlanResponse = PutPartnerPlanResponses[keyof PutPartnerPlanResponses];
+
+export type GetPlanImpactData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query: {
+        /**
+         * The plan proposed.
+         */
+        plan: Plan;
+    };
+    url: '/v1/partners/{partner_id}/plan/impact';
+};
+
+export type GetPlanImpactErrors = {
+    /**
+     * An unknown plan.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not the owner.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlanImpactError = GetPlanImpactErrors[keyof GetPlanImpactErrors];
+
+export type GetPlanImpactResponses = {
+    /**
+     * The impact.
+     */
+    200: PlanImpact;
+};
+
+export type GetPlanImpactResponse = GetPlanImpactResponses[keyof GetPlanImpactResponses];
 
 export type ListLocationsData = {
     body?: never;
@@ -5333,6 +8026,10 @@ export type CreateLocationErrors = {
      */
     404: Problem;
     /**
+     * The pin lands in a zone that does not serve (`zone_not_serving`), a vertical is not offered there (`vertical_not_offered`), or the partner is archived (`partner_archived`).
+     */
+    409: Problem;
+    /**
      * The pin is outside every service area and too far from any to be placed (`unprocessable`, pointers `/lat` and `/lng`).
      */
     422: Problem;
@@ -5356,6 +8053,60 @@ export type CreateLocationResponses = {
 };
 
 export type CreateLocationResponse = CreateLocationResponses[keyof CreateLocationResponses];
+
+export type DeleteLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}';
+};
+
+export type DeleteLocationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not delete Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteLocationError = DeleteLocationErrors[keyof DeleteLocationErrors];
+
+export type DeleteLocationResponses = {
+    /**
+     * In the bin.
+     */
+    204: void;
+};
+
+export type DeleteLocationResponse = DeleteLocationResponses[keyof DeleteLocationResponses];
 
 export type GetLocationData = {
     body?: never;
@@ -5457,6 +8208,10 @@ export type UpdateLocationErrors = {
      */
     404: Problem;
     /**
+     * Going live names its blockers (`activation_blocked`), the move is not one the lifecycle allows (`illegal_transition`), or a vertical is not offered in the location's zone (`vertical_not_offered`).
+     */
+    409: Problem;
+    /**
      * `If-Match` no longer matches the location's version (`precondition_failed`); fetch it again and retry.
      */
     412: Problem;
@@ -5484,6 +8239,716 @@ export type UpdateLocationResponses = {
 };
 
 export type UpdateLocationResponse = UpdateLocationResponses[keyof UpdateLocationResponses];
+
+export type ListLocationBinData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/bin';
+};
+
+export type ListLocationBinErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationBinError = ListLocationBinErrors[keyof ListLocationBinErrors];
+
+export type ListLocationBinResponses = {
+    /**
+     * The deleted Locations.
+     */
+    200: LocationList;
+};
+
+export type ListLocationBinResponse = ListLocationBinResponses[keyof ListLocationBinResponses];
+
+export type GetLocationActivationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/activation';
+};
+
+export type GetLocationActivationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationActivationError = GetLocationActivationErrors[keyof GetLocationActivationErrors];
+
+export type GetLocationActivationResponses = {
+    /**
+     * The status and the blockers.
+     */
+    200: LocationActivation;
+};
+
+export type GetLocationActivationResponse = GetLocationActivationResponses[keyof GetLocationActivationResponses];
+
+export type PutLocationFulfilmentData = {
+    /**
+     * The request.
+     */
+    body: Fulfilment;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/fulfilment';
+};
+
+export type PutLocationFulfilmentErrors = {
+    /**
+     * Malformed body or invalid fields.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not change Locations, or `not_in_plan` for the platform fleet.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * `service_required`: own agents without a delivery Service, a branch, dine-in.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationFulfilmentError = PutLocationFulfilmentErrors[keyof PutLocationFulfilmentErrors];
+
+export type PutLocationFulfilmentResponses = {
+    /**
+     * The Location with its fulfilment.
+     */
+    200: Location;
+};
+
+export type PutLocationFulfilmentResponse = PutLocationFulfilmentResponses[keyof PutLocationFulfilmentResponses];
+
+export type PutLocationOrderSettingsData = {
+    /**
+     * The request.
+     */
+    body: OrderSettingsUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/order-settings';
+};
+
+export type PutLocationOrderSettingsErrors = {
+    /**
+     * Malformed body or invalid fields.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not change Locations, or a platform staff's setting.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * `service_required`: a branch takes no orders.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationOrderSettingsError = PutLocationOrderSettingsErrors[keyof PutLocationOrderSettingsErrors];
+
+export type PutLocationOrderSettingsResponses = {
+    /**
+     * The Location with its order settings.
+     */
+    200: Location;
+};
+
+export type PutLocationOrderSettingsResponse = PutLocationOrderSettingsResponses[keyof PutLocationOrderSettingsResponses];
+
+export type PutLocationListingData = {
+    /**
+     * The request.
+     */
+    body: Listing;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/listing';
+};
+
+export type PutLocationListingErrors = {
+    /**
+     * Malformed body or invalid tags.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not change Locations, or highlights set by a member.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * `service_required`: a branch is not listed.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationListingError = PutLocationListingErrors[keyof PutLocationListingErrors];
+
+export type PutLocationListingResponses = {
+    /**
+     * The Location with its listing.
+     */
+    200: Location;
+};
+
+export type PutLocationListingResponse = PutLocationListingResponses[keyof PutLocationListingResponses];
+
+export type ResumeLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pause';
+};
+
+export type ResumeLocationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not resume Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumeLocationError = ResumeLocationErrors[keyof ResumeLocationErrors];
+
+export type ResumeLocationResponses = {
+    /**
+     * The Location, taking orders again when open.
+     */
+    200: Location;
+};
+
+export type ResumeLocationResponse = ResumeLocationResponses[keyof ResumeLocationResponses];
+
+export type PauseLocationData = {
+    /**
+     * The request.
+     */
+    body: LocationPause;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pause';
+};
+
+export type PauseLocationErrors = {
+    /**
+     * More than a day, or a custom reason without its message.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not pause Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PauseLocationError = PauseLocationErrors[keyof PauseLocationErrors];
+
+export type PauseLocationResponses = {
+    /**
+     * The Location, offline until the pause ends.
+     */
+    200: Location;
+};
+
+export type PauseLocationResponse = PauseLocationResponses[keyof PauseLocationResponses];
+
+export type RestoreLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/restore';
+};
+
+export type RestoreLocationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not restore Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner, or no such Location in the bin.
+     */
+    404: Problem;
+    /**
+     * `partner_archived`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RestoreLocationError = RestoreLocationErrors[keyof RestoreLocationErrors];
+
+export type RestoreLocationResponses = {
+    /**
+     * The Location, listed again.
+     */
+    200: Location;
+};
+
+export type RestoreLocationResponse = RestoreLocationResponses[keyof RestoreLocationResponses];
+
+export type PutLocationLogoData = {
+    /**
+     * The request.
+     */
+    body: PictureUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/logo';
+};
+
+export type PutLocationLogoErrors = {
+    /**
+     * Malformed body, or a picture that is not square.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not brand Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationLogoError = PutLocationLogoErrors[keyof PutLocationLogoErrors];
+
+export type PutLocationLogoResponses = {
+    /**
+     * The Location with its tile.
+     */
+    200: Location;
+};
+
+export type PutLocationLogoResponse = PutLocationLogoResponses[keyof PutLocationLogoResponses];
+
+export type PutLocationBannerData = {
+    /**
+     * The request.
+     */
+    body: PictureUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/banner';
+};
+
+export type PutLocationBannerErrors = {
+    /**
+     * Malformed body, or a picture that is not twice as wide as tall.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not brand Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationBannerError = PutLocationBannerErrors[keyof PutLocationBannerErrors];
+
+export type PutLocationBannerResponses = {
+    /**
+     * The Location with its banner.
+     */
+    200: Location;
+};
+
+export type PutLocationBannerResponse = PutLocationBannerResponses[keyof PutLocationBannerResponses];
+
+export type ListLocationHolidaysData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/holidays';
+};
+
+export type ListLocationHolidaysErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationHolidaysError = ListLocationHolidaysErrors[keyof ListLocationHolidaysErrors];
+
+export type ListLocationHolidaysResponses = {
+    /**
+     * The holidays offered.
+     */
+    200: HolidayOfferList;
+};
+
+export type ListLocationHolidaysResponse = ListLocationHolidaysResponses[keyof ListLocationHolidaysResponses];
+
+export type CloseLocationForHolidayData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The holiday's date, as an RFC 3339 full date.
+         */
+        date: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/holidays/{date}/closure';
+};
+
+export type CloseLocationForHolidayErrors = {
+    /**
+     * Not an upcoming public holiday of the Location's country.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The role does not change Locations.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location.
+     */
+    404: Problem;
+    /**
+     * Already closed that day.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CloseLocationForHolidayError = CloseLocationForHolidayErrors[keyof CloseLocationForHolidayErrors];
+
+export type CloseLocationForHolidayResponses = {
+    /**
+     * The Location's schedule layer as saved.
+     */
+    200: ScheduleLayer;
+};
+
+export type CloseLocationForHolidayResponse = CloseLocationForHolidayResponses[keyof CloseLocationForHolidayResponses];
 
 export type ListMembershipsData = {
     body?: never;
@@ -5840,6 +9305,182 @@ export type ListServicesResponses = {
 
 export type ListServicesResponse = ListServicesResponses[keyof ListServicesResponses];
 
+export type CreateServiceData = {
+    /**
+     * The request.
+     */
+    body: ServiceCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services';
+};
+
+export type CreateServiceErrors = {
+    /**
+     * Malformed body, a configuration of the wrong shape, a Location not the Partner's, or platform staff without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager, or `not_in_plan`: the plan does not include the kind.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `partner_archived`.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateServiceError = CreateServiceErrors[keyof CreateServiceErrors];
+
+export type CreateServiceResponses = {
+    /**
+     * The Service as registered.
+     */
+    201: Service;
+};
+
+export type CreateServiceResponse = CreateServiceResponses[keyof CreateServiceResponses];
+
+export type GetServiceData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * A service's id, or a kind (`product_sales`, `field_service`, `delivery`) naming the partner's first service of that kind.
+         */
+        kind: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{kind}';
+};
+
+export type GetServiceErrors = {
+    /**
+     * Neither a Service id nor a kind.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceError = GetServiceErrors[keyof GetServiceErrors];
+
+export type GetServiceResponses = {
+    /**
+     * The Service.
+     */
+    200: Service;
+};
+
+export type GetServiceResponse = GetServiceResponses[keyof GetServiceResponses];
+
+export type UpdateServiceData = {
+    /**
+     * The request.
+     */
+    body: ServiceUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * A service's id, or a kind (`product_sales`, `field_service`, `delivery`) naming the partner's first service of that kind.
+         */
+        kind: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{kind}';
+};
+
+export type UpdateServiceErrors = {
+    /**
+     * Malformed body, a configuration of the wrong shape, `awaiting_documents` sent, a Location not the Partner's, or platform staff without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager, or `not_in_plan` on enabling.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateServiceError = UpdateServiceErrors[keyof UpdateServiceErrors];
+
+export type UpdateServiceResponses = {
+    /**
+     * The Service as changed.
+     */
+    200: Service;
+};
+
+export type UpdateServiceResponse = UpdateServiceResponses[keyof UpdateServiceResponses];
+
 export type UpsertServiceData = {
     /**
      * The status and, optionally, the configuration of the service.
@@ -5877,6 +9518,10 @@ export type UpsertServiceErrors = {
      */
     404: Problem;
     /**
+     * The partner is archived (`partner_archived`).
+     */
+    409: Problem;
+    /**
      * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
@@ -5896,6 +9541,387 @@ export type UpsertServiceResponses = {
 };
 
 export type UpsertServiceResponse = UpsertServiceResponses[keyof UpsertServiceResponses];
+
+export type DeleteServiceLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * Why; required of platform staff acting for the Partner.
+         */
+        reason?: string;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}';
+};
+
+export type DeleteServiceLocationErrors = {
+    /**
+     * Platform staff without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteServiceLocationError = DeleteServiceLocationErrors[keyof DeleteServiceLocationErrors];
+
+export type DeleteServiceLocationResponses = {
+    /**
+     * The Service, switched off there.
+     */
+    200: Service;
+};
+
+export type DeleteServiceLocationResponse = DeleteServiceLocationResponses[keyof DeleteServiceLocationResponses];
+
+export type GetServiceLocationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}';
+};
+
+export type GetServiceLocationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceLocationError = GetServiceLocationErrors[keyof GetServiceLocationErrors];
+
+export type GetServiceLocationResponses = {
+    /**
+     * The Service at the Location.
+     */
+    200: ServiceAtLocation;
+};
+
+export type GetServiceLocationResponse = GetServiceLocationResponses[keyof GetServiceLocationResponses];
+
+export type PutServiceLocationData = {
+    /**
+     * The request.
+     */
+    body: ServiceLocationUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+        /**
+         * The location, which must belong to the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}';
+};
+
+export type PutServiceLocationErrors = {
+    /**
+     * Settings out of bounds, settings for a kind that has none, or platform staff without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutServiceLocationError = PutServiceLocationErrors[keyof PutServiceLocationErrors];
+
+export type PutServiceLocationResponses = {
+    /**
+     * The Service at the Location.
+     */
+    200: ServiceAtLocation;
+};
+
+export type PutServiceLocationResponse = PutServiceLocationResponses[keyof PutServiceLocationResponses];
+
+export type GetDeliveryPricingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+    };
+    query?: {
+        /**
+         * A version to read; the latest when absent.
+         */
+        version?: number;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing';
+};
+
+export type GetDeliveryPricingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown, not visible, or no pricing yet.
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Service is not a delivery Service.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDeliveryPricingError = GetDeliveryPricingErrors[keyof GetDeliveryPricingErrors];
+
+export type GetDeliveryPricingResponses = {
+    /**
+     * The pricing version.
+     */
+    200: DeliveryPricingVersion;
+};
+
+export type GetDeliveryPricingResponse = GetDeliveryPricingResponses[keyof GetDeliveryPricingResponses];
+
+export type PutDeliveryPricingData = {
+    /**
+     * The request.
+     */
+    body: DeliveryPricingUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing';
+};
+
+export type PutDeliveryPricingErrors = {
+    /**
+     * Amounts negative, bands out of order, a currency not operated, or platform staff without a reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Neither owner nor manager.
+     */
+    403: Problem;
+    /**
+     * The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Service is not a delivery Service.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutDeliveryPricingError = PutDeliveryPricingErrors[keyof PutDeliveryPricingErrors];
+
+export type PutDeliveryPricingResponses = {
+    /**
+     * The new version.
+     */
+    201: DeliveryPricingVersion;
+};
+
+export type PutDeliveryPricingResponse = PutDeliveryPricingResponses[keyof PutDeliveryPricingResponses];
+
+export type QuoteDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, which must belong to the partner in the path.
+         */
+        service_id: string;
+    };
+    query: {
+        /**
+         * The distance from pickup to drop-off, in metres.
+         */
+        distance_metres: number;
+        /**
+         * The minutes of waiting to price; none when absent.
+         */
+        waiting_minutes?: number;
+        /**
+         * A pricing version to quote at; the latest when absent.
+         */
+        version?: number;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing/quote';
+};
+
+export type QuoteDeliveryErrors = {
+    /**
+     * A negative or missing distance.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Unknown, not visible, or no pricing yet.
+     */
+    404: Problem;
+    /**
+     * `service_required`: the Service is not a delivery Service.
+     */
+    409: Problem;
+    /**
+     * A store the operation needs is unavailable (`unavailable`); retry shortly.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type QuoteDeliveryError = QuoteDeliveryErrors[keyof QuoteDeliveryErrors];
+
+export type QuoteDeliveryResponses = {
+    /**
+     * The quote.
+     */
+    200: DeliveryQuote;
+};
+
+export type QuoteDeliveryResponse = QuoteDeliveryResponses[keyof QuoteDeliveryResponses];
 
 export type ListAuditEntriesData = {
     body?: never;

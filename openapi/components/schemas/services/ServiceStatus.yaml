@@ -1,10 +1,15 @@
 type: string
 description: |
-  Whether a partner's service is in operation. A `disabled` service keeps
-  its configuration but takes no part in operations. Clients must tolerate
-  values they do not know, because a new status is an additive change.
+  Whether a partner's service is in operation. An `enabled` service trades
+  where it is switched on; an `awaiting_documents` service is enabled but
+  waits for the documents its kind needs to be approved, configurable and
+  not trading (the platform sets it, a client never sends it); a `disabled`
+  service keeps its configuration but takes no part in operations. Clients
+  must tolerate values they do not know, because a new status is an
+  additive change.
 enum:
   - enabled
   - disabled
+  - awaiting_documents
 examples:
   - enabled

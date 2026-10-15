@@ -1,0 +1,99 @@
+type: object
+description: The Partner console's view of its registration and standing, the `PartnerStanding` schema.
+required:
+  - partner_id
+  - status
+  - activation
+  - requirements
+  - payouts_may_go
+  - withheld_permissions
+  - summary
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+  status:
+    $ref: ./PartnerStatus.yaml
+    description: Its lifecycle status.
+  activation:
+    $ref: ./PartnerActivation.yaml
+    description: What activation needs, with every blocker.
+  requirements:
+    type: array
+    items:
+      $ref: ../documents/DocumentRequirement.yaml
+    description: 'Every document the Partner must have on file and where each stands: its review, its expiry, and what it does to trading.'
+  payouts_may_go:
+    type: boolean
+    description: 'Whether the next payout may go out now: the account verified and any hold over.'
+  withheld_permissions:
+    type: array
+    items:
+      type: string
+    description: The permissions withheld from the Partner's entitlement envelope.
+    examples:
+      - &a1 []
+  summary:
+    $ref: ./PartnerStandingSummary.yaml
+    description: The directory summary.
+  launched_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: The launch date.
+  payout_account:
+    oneOf:
+      - $ref: ../payouts/PayoutAccount.yaml
+      - type: 'null'
+    description: The payout account, masked; `null` until stated.
+  status_changed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the status last changed.
+  status_reason:
+    type:
+      - string
+      - 'null'
+    description: Why it is in that status, shown while it is suspended.
+examples:
+  - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    status: pending
+    status_reason: null
+    status_changed_at: null
+    launched_at: null
+    activation:
+      status: pending
+      ready: false
+      blockers:
+        - code: document_missing
+          message: The PAN is not on file.
+          pointer: /documents/pan
+    requirements:
+      - kind: pan
+        state: missing
+        document_id: null
+        expires_on: null
+        expiring: false
+        review_note: null
+        trading: stopped
+        stops_on: null
+        covers: all_locations
+    payout_account: null
+    payouts_may_go: false
+    withheld_permissions: []
+    summary:
+      can_trade: false
+      locations_total: 1
+      locations_live: 0
+      members_can_sign_in: 1
+      nobody_can_sign_in: false
+      documents_approved: 1
+      documents_pending: 0
+      documents_missing: 1
+      payout_account: none
+      runs:
+        - product_sales

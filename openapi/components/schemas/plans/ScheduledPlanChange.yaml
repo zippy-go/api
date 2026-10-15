@@ -1,0 +1,29 @@
+type: object
+description: A plan change waiting for its moment, the `ScheduledPlanChange` schema.
+required:
+  - plan
+  - effective_at
+properties:
+  plan:
+    $ref: ./Plan.yaml
+    description: The plan it moves to.
+  effective_at:
+    type: string
+    format: date-time
+    description: When.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why, as platform staff gave it.
+  scheduled_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who scheduled it.
+examples:
+  - plan: starter
+    effective_at: 2026-11-01T00:00:00Z
+    reason: Moved to the free plan on request
+    scheduled_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21

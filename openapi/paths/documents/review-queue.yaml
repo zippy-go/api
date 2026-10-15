@@ -1,0 +1,98 @@
+# Path item for /v1/partner-documents. Referenced from openapi.yaml.
+get:
+  operationId: listDocumentsForReview
+  summary: List documents for review
+  description: "Documents on file across Partners, oldest first: Mission Control's review queue. Filter with `review`, `kind` and `partner_id` or the full grammar; platform realm only (`partner:read`)."
+  tags:
+    - Partner documents
+  security:
+    - Bearer: []
+  parameters:
+    - name: review
+      in: query
+      required: false
+      description: Only documents in this review state.
+      schema:
+        $ref: ../../components/schemas/documents/ReviewState.yaml
+    - name: kind
+      in: query
+      required: false
+      description: Only documents of this kind.
+      schema:
+        $ref: ../../components/schemas/documents/DocumentKind.yaml
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's documents.
+      schema:
+        type: string
+        format: uuid
+    - name: filter
+      in: query
+      required: false
+      description: A filter tree as JSON over `review`, `kind`, `partner_id` and `uploaded_at`.
+      schema:
+        type: string
+    - name: sort
+      in: query
+      required: false
+      description: '`uploaded_at` (default) or `-uploaded_at`.'
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: Page size (default 25).
+      schema:
+        type: integer
+        maximum: 100
+        minimum: 1
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: A page of documents.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/documents/PartnerDocumentPage.yaml
+    '400':
+      description: A parameter was refused.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not platform staff.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

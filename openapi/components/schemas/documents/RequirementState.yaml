@@ -1,0 +1,10 @@
+type: string
+description: Where a requirement stands.
+enum:
+  - satisfied
+  - pending
+  - rejected
+  - expired
+  - missing
+examples:
+  - satisfied

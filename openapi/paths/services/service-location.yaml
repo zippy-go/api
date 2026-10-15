@@ -1,0 +1,192 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/locations/{location_id}. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The service, which must belong to the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  - name: location_id
+    in: path
+    required: true
+    description: The location, which must belong to the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: getServiceLocation
+  summary: Get a service at a location
+  description: "A Service at one Location: whether it is switched on there and trades, and a field Service's area, hours and slots there. Members and platform staff."
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  responses:
+    '200':
+      description: The Service at the Location.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/ServiceAtLocation.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putServiceLocation
+  summary: Switch a service on at a location
+  description: Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. Owners and managers; platform staff with a reason.
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/services/ServiceLocationUpdate.yaml
+  responses:
+    '200':
+      description: The Service at the Location.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/ServiceAtLocation.yaml
+    '400':
+      description: Settings out of bounds, settings for a kind that has none, or platform staff without a reason.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Neither owner nor manager.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: deleteServiceLocation
+  summary: Switch a service off at a location
+  description: Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. Owners and managers; platform staff with a reason.
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  parameters:
+    - name: reason
+      in: query
+      required: false
+      description: Why; required of platform staff acting for the Partner.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: The Service, switched off there.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/Service.yaml
+    '400':
+      description: Platform staff without a reason.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Neither owner nor manager.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

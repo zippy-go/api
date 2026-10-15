@@ -1,0 +1,11 @@
+type: object
+description: Pickup as a store offers it, the `PickupMethod` schema.
+properties:
+  ready_offset_minutes:
+    type: integer
+    description: Minutes added to preparation before a collection is ready, 0 to 120.
+    minimum: 0
+    examples:
+      - 10
+examples:
+  - ready_offset_minutes: 10

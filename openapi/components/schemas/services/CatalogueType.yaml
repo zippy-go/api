@@ -1,0 +1,12 @@
+type: string
+description: 'What a product-sales Service sells, deciding what its items collect and the documents it needs: the store types of the reference data, and `general` for none of them.'
+enum:
+  - food
+  - bakery
+  - drinks
+  - grocery
+  - pharmacy
+  - retail
+  - general
+examples:
+  - food

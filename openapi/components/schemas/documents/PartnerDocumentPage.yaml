@@ -1,0 +1,33 @@
+type: object
+description: A page of documents across Partners, the `PartnerDocumentPage` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PartnerDocument.yaml
+    description: The documents, oldest first by default.
+  next_cursor:
+    type:
+      - string
+      - 'null'
+    description: Cursor of the next page, `null` on the last one.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        kind: gst_registration
+        asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55
+        label: null
+        number: 36AAACB1234C1Z5
+        issued_on: 2025-04-01
+        expires_on: null
+        review: pending
+        review_note: null
+        reviewed_by: null
+        reviewed_at: null
+        uploaded_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        uploaded_at: 2026-10-15T09:00:00Z
+        version: 1
+    next_cursor: null

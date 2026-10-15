@@ -1,0 +1,55 @@
+type: object
+description: Request body of `POST /v1/partners/{partner_id}/services`, the `ServiceCreate` schema.
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./ServiceKind.yaml
+    description: What the Service is.
+  config:
+    type:
+      - object
+      - 'null'
+    description: 'Its configuration by kind: `ProductSalesConfig`, `FieldServiceConfig` or `DeliveryConfig`; `{}` when absent.'
+  enabled:
+    type: boolean
+    description: '`false` registers it disabled; enabled by default, awaiting documents while its kind needs some not approved.'
+  everywhere:
+    type:
+      - boolean
+      - 'null'
+    description: Switched on at every Location, present and future; the default when `location_ids` is absent.
+  location_ids:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+      format: uuid
+    description: The Locations to switch it on at; `[]` switches it on nowhere.
+  name:
+    type:
+      - string
+      - 'null'
+    description: Its name, 1 to 100 characters; the kind's when absent.
+    examples:
+      - Evening deliveries
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why; required of platform staff acting for the Partner.
+examples:
+  - kind: delivery
+    name: Delivery
+    config:
+      vehicle_types:
+        - kind: two_wheeler
+          max_weight_kg: 12
+          max_volume_litres: 40
+      open_to_partners: true
+    location_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  - kind: product_sales
+    config:
+      catalogue_type: food

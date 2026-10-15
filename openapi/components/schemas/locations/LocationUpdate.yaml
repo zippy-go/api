@@ -45,5 +45,43 @@ properties:
   status:
     $ref: ./LocationStatus.yaml
     description: The new status.
+  category_ids:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+      format: uuid
+    description: The categories, replaced as a whole.
+  contacts:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ../partners/Contact.yaml
+    description: The contacts, replaced as a whole.
+  description:
+    type:
+      - string
+      - 'null'
+    description: New description, or `null` to clear.
+  fields:
+    type:
+      - object
+      - 'null'
+    description: The typed extra fields the types of the Location's Services declare (a food store's `fssai_licence_number`), replaced as a whole; a value of the wrong shape or a field no type declares is refused, a required one left out blocks going live.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: The reason for a status change, kept in the audit log.
+  vertical_ids:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+      format: uuid
+    description: The Verticals, replaced as a whole; each offered in the Location's zone.
 examples:
   - status: inactive

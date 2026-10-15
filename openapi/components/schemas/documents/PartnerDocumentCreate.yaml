@@ -1,0 +1,42 @@
+type: object
+description: Request body of `POST /v1/partners/{partner_id}/documents`, the `PartnerDocumentCreate` schema.
+required:
+  - kind
+  - asset_id
+properties:
+  kind:
+    $ref: ./DocumentKind.yaml
+    description: What the document is.
+  asset_id:
+    type: string
+    format: uuid
+    description: 'The uploaded file: an asset of the `partner_document` purpose, granted on `POST /v1/partners/{partner_id}/assets/grants` and confirmed.'
+  expires_on:
+    type:
+      - string
+      - 'null'
+    description: Its last valid day; not before the issue date.
+    examples:
+      - 2026-11-14
+  issued_on:
+    type:
+      - string
+      - 'null'
+    description: When it was issued.
+    examples:
+      - 2025-11-15
+  label:
+    type:
+      - string
+      - 'null'
+    description: A label, for example the outlet a licence names.
+  number:
+    type:
+      - string
+      - 'null'
+    description: The number the document carries, for example the licence number.
+examples:
+  - kind: gst_registration
+    asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55
+    number: 36AAACB1234C1Z5
+    issued_on: 2025-04-01

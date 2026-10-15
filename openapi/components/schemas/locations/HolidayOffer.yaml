@@ -1,0 +1,30 @@
+type: object
+description: A holiday of the Location's country offered as a closure, the `HolidayOffer` schema.
+required:
+  - date
+  - name
+  - covered
+properties:
+  date:
+    type: string
+    description: The date.
+    examples:
+      - 2027-01-26
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Republic Day
+  covered:
+    type: boolean
+    description: '`true` when the Location is already closed that day, by its own closure or one set on its zone, city or country.'
+  covered_by:
+    type:
+      - string
+      - 'null'
+    description: "Who closed it, when covered: the layer's label."
+examples:
+  - date: 2027-01-26
+    name: Republic Day
+    covered: false
+    covered_by: null

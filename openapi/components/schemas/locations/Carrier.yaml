@@ -1,0 +1,8 @@
+type: string
+description: Who carries a store's deliveries.
+enum:
+  - own_agents
+  - platform_fleet
+  - external_carrier
+examples:
+  - platform_fleet

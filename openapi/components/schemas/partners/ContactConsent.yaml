@@ -1,0 +1,16 @@
+type: object
+description: What a contact agreed to be reached on, the `ContactConsent` schema. Consent is per person and per channel, and never inferred from a number or an address being present.
+properties:
+  email:
+    type: boolean
+    description: Agreed to email.
+  sms:
+    type: boolean
+    description: Agreed to SMS.
+  whatsapp:
+    type: boolean
+    description: Agreed to WhatsApp.
+examples:
+  - email: true
+    sms: true
+    whatsapp: false

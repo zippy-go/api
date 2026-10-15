@@ -2,27 +2,92 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.service.updated.v1.schema.json",
   "title": "TenancyServiceUpdatedPayload",
-  "description": "Payload of `tenancy.service.updated` version 1: a partner's service of a kind was created or replaced with `PUT /v1/partners/{partner_id}/services/{kind}`. The envelope's `partner_id` is the partner. The configuration is not part of the payload; read it with `GET /v1/partners/{partner_id}/services`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "description": "Payload of `tenancy.service.updated` version 1: a partner's service was registered, enabled, disabled, configured, switched on or off at a location, or repriced, by the partner, by platform staff on its behalf, by a document's approval or by a plan change. The envelope's `partner_id` is the partner. Readers ask the registry where the service trades (`GET /v1/partners/{partner_id}/services`) rather than keep a copy; the configuration is not part of the payload. Consumers must ignore fields they do not know; new optional fields are an additive change.",
   "type": "object",
-  "required": ["partner_id", "kind", "status"],
+  "required": [
+    "partner_id",
+    "kind",
+    "status"
+  ],
   "properties": {
     "partner_id": {
       "type": "string",
       "format": "uuid",
       "description": "The partner that runs the service, the same value as the envelope's `partner_id`.",
-      "examples": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"]
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
     },
     "kind": {
       "type": "string",
-      "enum": ["product_sales", "field_service", "delivery"],
-      "description": "The kind of service that was put.",
-      "examples": ["delivery"]
+      "enum": [
+        "product_sales",
+        "field_service",
+        "delivery"
+      ],
+      "description": "The kind of the service.",
+      "examples": [
+        "delivery"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["enabled", "disabled"],
-      "description": "The status of the service after the put.",
-      "examples": ["enabled"]
+      "enum": [
+        "enabled",
+        "awaiting_documents",
+        "disabled"
+      ],
+      "description": "The status of the service after the change.",
+      "examples": [
+        "enabled"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The service, one of possibly several of its kind; absent only on events published before services had ids of their own in events.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a46"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The service's name.",
+      "examples": [
+        "Delivery"
+      ]
+    },
+    "changed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The members that changed: `status`, `name`, `config`, `locations` or `pricing`.",
+      "examples": [
+        [
+          "status"
+        ]
+      ]
+    },
+    "previous_status": {
+      "type": "string",
+      "enum": [
+        "enabled",
+        "awaiting_documents",
+        "disabled"
+      ],
+      "description": "The status before the change, when the change moved it.",
+      "examples": [
+        "awaiting_documents"
+      ]
+    },
+    "pricing_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The pricing version in force, for a delivery service whose pricing changed.",
+      "examples": [
+        3
+      ]
     }
   }
 }

@@ -90,8 +90,9 @@ events:
     version: 1
     domain: tenancy
     description: >-
-      The platform realm changed a partner's status. The envelope's
-      `partner_id` is the partner.
+      The platform realm changed a partner's status along its lifecycle
+      (pending, active, suspended, archived). The envelope's `partner_id` is
+      the partner.
     payload_schema: ./payloads/tenancy.partner.status_changed.v1.schema.json
     example: ./examples/tenancy.partner.status_changed.v1.json
 
@@ -118,10 +119,149 @@ events:
     version: 1
     domain: tenancy
     description: >-
-      A partner's service of a kind was created or replaced. The envelope's
-      `partner_id` is the partner; the configuration is not in the payload.
+      A partner's service was registered, enabled, disabled, configured,
+      switched on or off at a location, or repriced; readers ask the
+      registry where it trades. The envelope's `partner_id` is the partner;
+      the configuration is not in the payload.
     payload_schema: ./payloads/tenancy.service.updated.v1.schema.json
     example: ./examples/tenancy.service.updated.v1.json
+
+  - type: tenancy.partner.updated
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner's profile, legal identity, kind, contacts, logo or
+      banner changed; the payload names the members, never their values.
+      The envelope's `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.partner.updated.v1.schema.json
+    example: ./examples/tenancy.partner.updated.v1.json
+
+  - type: tenancy.location.updated
+    version: 1
+    domain: tenancy
+    description: >-
+      A location's profile, settings, fulfilment, order settings,
+      listing, pause, pictures or typed fields changed; the payload
+      names the members. The envelope's `partner_id` is the location's
+      partner.
+    payload_schema: ./payloads/tenancy.location.updated.v1.schema.json
+    example: ./examples/tenancy.location.updated.v1.json
+
+  - type: tenancy.location.status_changed
+    version: 1
+    domain: tenancy
+    description: >-
+      A location moved along its lifecycle (pending, active, suspended,
+      archived), including going live with its partner's activation. The
+      envelope's `partner_id` is the location's partner.
+    payload_schema: ./payloads/tenancy.location.status_changed.v1.schema.json
+    example: ./examples/tenancy.location.status_changed.v1.json
+
+  - type: tenancy.location.deleted
+    version: 1
+    domain: tenancy
+    description: >-
+      A location was deleted softly, into the bin, from where it can be
+      restored. The envelope's `partner_id` is the location's partner.
+    payload_schema: ./payloads/tenancy.location.deleted.v1.schema.json
+    example: ./examples/tenancy.location.deleted.v1.json
+
+  - type: tenancy.location.restored
+    version: 1
+    domain: tenancy
+    description: >-
+      A location was restored from the bin. The envelope's `partner_id`
+      is the location's partner.
+    payload_schema: ./payloads/tenancy.location.restored.v1.schema.json
+    example: ./examples/tenancy.location.restored.v1.json
+
+  - type: tenancy.location.paused
+    version: 1
+    domain: tenancy
+    description: >-
+      A location was paused until a moment, with a reason; it resumes by
+      itself at `until`. The envelope's `partner_id` is the location's
+      partner.
+    payload_schema: ./payloads/tenancy.location.paused.v1.schema.json
+    example: ./examples/tenancy.location.paused.v1.json
+
+  - type: tenancy.location.resumed
+    version: 1
+    domain: tenancy
+    description: >-
+      A paused location was resumed before its moment. The envelope's
+      `partner_id` is the location's partner.
+    payload_schema: ./payloads/tenancy.location.resumed.v1.schema.json
+    example: ./examples/tenancy.location.resumed.v1.json
+
+  - type: tenancy.document.filed
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner filed a compliance document for review. The envelope's
+      `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.document.filed.v1.schema.json
+    example: ./examples/tenancy.document.filed.v1.json
+
+  - type: tenancy.document.removed
+    version: 1
+    domain: tenancy
+    description: >-
+      A compliance document was taken off file. The envelope's
+      `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.document.removed.v1.schema.json
+    example: ./examples/tenancy.document.removed.v1.json
+
+  - type: tenancy.document.reviewed
+    version: 1
+    domain: tenancy
+    description: >-
+      Platform staff approved or rejected a compliance document;
+      services waiting for it are enabled in the same act. The
+      envelope's `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.document.reviewed.v1.schema.json
+    example: ./examples/tenancy.document.reviewed.v1.json
+
+  - type: tenancy.document.notice_sent
+    version: 1
+    domain: tenancy
+    description: >-
+      A notice about a document's expiry (thirty days, seven days, the
+      day, the end of the grace) or rejection went to the partner's
+      contacts, once per step. The envelope's `partner_id` is the
+      partner.
+    payload_schema: ./payloads/tenancy.document.notice_sent.v1.schema.json
+    example: ./examples/tenancy.document.notice_sent.v1.json
+
+  - type: tenancy.payout_account.changed
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner stated or changed its payout account, unverified again;
+      a changed number or IFSC holds the next payout. The envelope's
+      `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.payout_account.changed.v1.schema.json
+    example: ./examples/tenancy.payout_account.changed.v1.json
+
+  - type: tenancy.payout_account.verified
+    version: 1
+    domain: tenancy
+    description: >-
+      Platform staff verified a partner's payout account. The envelope's
+      `partner_id` is the partner.
+    payload_schema: ./payloads/tenancy.payout_account.verified.v1.schema.json
+    example: ./examples/tenancy.payout_account.verified.v1.json
+
+  - type: tenancy.plan.changed
+    version: 1
+    domain: tenancy
+    description: >-
+      A partner's plan changed (by platform staff, at a scheduled
+      moment, or when the trial ended); services of kinds the new plan
+      lacks were disabled in the same act. The envelope's `partner_id`
+      is the partner.
+    payload_schema: ./payloads/tenancy.plan.changed.v1.schema.json
+    example: ./examples/tenancy.plan.changed.v1.json
 
   - type: reference.vertical.transitioned
     version: 1

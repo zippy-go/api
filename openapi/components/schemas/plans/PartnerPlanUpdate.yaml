@@ -1,0 +1,29 @@
+type: object
+description: Request body of `PUT /v1/partners/{partner_id}/plan`, the `PartnerPlanUpdate` schema.
+properties:
+  effective_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the move takes effect; now when absent.
+  plan:
+    oneOf:
+      - $ref: ./Plan.yaml
+      - type: 'null'
+    description: The plan to move to; platform staff only, with a reason. The plan in force cancels a change waiting.
+  plan_after_trial:
+    oneOf:
+      - $ref: ./Plan.yaml
+      - type: 'null'
+    description: The plan to move to when the trial ends; the owner or platform staff.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why.
+examples:
+  - plan: starter
+    effective_at: 2026-11-01T00:00:00Z
+    reason: Moved to the free plan on request
+  - plan_after_trial: standard

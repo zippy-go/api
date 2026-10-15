@@ -1,0 +1,39 @@
+type: object
+description: One of the plans as offered, the `PlanOffer` schema.
+required:
+  - plan
+  - label
+  - monthly_fee
+  - kinds
+  - platform_fleet
+properties:
+  plan:
+    $ref: ./Plan.yaml
+    description: The plan.
+  label:
+    type: string
+    description: Its name.
+    examples:
+      - Standard
+  monthly_fee:
+    type: integer
+    description: The monthly fee in paise, before GST.
+    examples:
+      - 199900
+  kinds:
+    type: array
+    items:
+      $ref: ../services/ServiceKind.yaml
+    description: The kinds of Service it includes.
+  platform_fleet:
+    type: boolean
+    description: Whether its stores may use the platform fleet.
+examples:
+  - plan: standard
+    label: Standard
+    monthly_fee: 199900
+    kinds:
+      - product_sales
+      - field_service
+      - delivery
+    platform_fleet: true

@@ -1,0 +1,47 @@
+type: object
+description: Request body of `PUT /v1/partners/{partner_id}/payout-account`, the `PayoutAccountUpdate` schema.
+required:
+  - holder_name
+  - account_type
+  - ifsc
+properties:
+  holder_name:
+    type: string
+    description: The account holder's name.
+    examples:
+      - Example Partner Ltd
+  account_type:
+    $ref: ./PayoutAccountType.yaml
+    description: Business or personal.
+  ifsc:
+    type: string
+    description: 'The IFSC: four letters, a zero and six letters or digits.'
+    examples:
+      - EXMP0001234
+  account_number:
+    type:
+      - string
+      - 'null'
+    description: The account number, nine to eighteen digits; omitted, or the masked number sent back unchanged, keeps the account on file.
+    examples:
+      - '50100123456789'
+  bank_name:
+    type:
+      - string
+      - 'null'
+    description: The bank's name.
+    examples:
+      - Example Bank
+  upi_id:
+    type:
+      - string
+      - 'null'
+    description: A UPI ID, optional.
+    examples:
+      - partner@exampleupi
+examples:
+  - holder_name: Example Partner Ltd
+    account_type: business
+    account_number: '000123456789'
+    ifsc: EXMP0001234
+    bank_name: Example Bank

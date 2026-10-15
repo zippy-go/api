@@ -1,0 +1,11 @@
+type: object
+description: Request body of the logo and banner routes, the `PictureUpdate` schema.
+properties:
+  asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: "The picture: a confirmed asset of the slot's purpose (`partner_logo`, square; `partner_banner`, twice as wide as tall), or `null` to remove it."
+examples:
+  - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55

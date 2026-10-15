@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.document.removed.v1.schema.json",
+  "title": "TenancyDocumentRemovedPayload",
+  "description": "Payload of `tenancy.document.removed` version 1: a compliance document was taken off file. The envelope's `partner_id` is the partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "document_id",
+    "kind"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner, the same value as the envelope's `partner_id`.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "document_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The document.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "gst_registration",
+        "fssai_licence",
+        "shop_establishment",
+        "pan",
+        "identity",
+        "bank_proof",
+        "other"
+      ],
+      "description": "Its kind.",
+      "examples": [
+        "gst_registration"
+      ]
+    }
+  }
+}

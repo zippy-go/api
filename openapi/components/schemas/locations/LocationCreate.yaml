@@ -50,6 +50,28 @@ properties:
     description: The phone number of the location in E.164 format. Omit it, or send `null`, to leave it unset.
     examples:
       - '+15555550102'
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its categories within those Verticals.
+  contacts:
+    type: array
+    items:
+      $ref: ../partners/Contact.yaml
+    description: The people to reach there, with their consent per channel.
+  description:
+    type:
+      - string
+      - 'null'
+    description: What the Location is, in its own words.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Verticals it trades in, each offered in the zone its pin resolves to.
 examples:
   - name: Location 40
     address:

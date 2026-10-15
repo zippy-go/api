@@ -1,0 +1,18 @@
+type: object
+description: Request body of `PUT .../services/{service_id}/locations/{location_id}`, the `ServiceLocationUpdate` schema.
+properties:
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why; required of platform staff acting for the Partner.
+  settings:
+    oneOf:
+      - $ref: ./FieldServiceSettings.yaml
+      - type: 'null'
+    description: For a field Service, its area, hours and slots at the Location, defaults filled in for absent members; absent for any other kind.
+examples:
+  - settings:
+      area:
+        radius_km: 5
+      slot_minutes: 30

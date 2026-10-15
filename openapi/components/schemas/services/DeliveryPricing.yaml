@@ -1,0 +1,46 @@
+type: object
+description: "A delivery Service's pricing as a Provider, the `DeliveryPricing` schema: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands, and an optional waiting fee; every amount in minor units of `currency`."
+required:
+  - currency
+  - flat_fee
+  - base_distance_metres
+  - per_km
+properties:
+  currency:
+    type: string
+    description: The currency of every amount.
+    examples:
+      - INR
+  flat_fee:
+    type: integer
+    description: The fee per delivery.
+    examples:
+      - 3000
+  base_distance_metres:
+    type: integer
+    description: The distance the flat fee covers, in metres.
+    examples:
+      - 2000
+  per_km:
+    type: array
+    items:
+      $ref: ./KilometreBand.yaml
+    description: The per-kilometre charge beyond it, in ascending bands ending open-ended.
+  free_waiting_minutes:
+    type: integer
+    description: The minutes of waiting included.
+    minimum: 0
+  waiting_fee_per_minute:
+    type:
+      - integer
+      - 'null'
+    description: The fee per minute of waiting beyond the free minutes, when charged.
+examples:
+  - currency: INR
+    flat_fee: 3000
+    base_distance_metres: 2000
+    per_km:
+      - up_to_metres: null
+        per_km: 800
+    waiting_fee_per_minute: 100
+    free_waiting_minutes: 5

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.plan.changed.v1.schema.json",
+  "title": "TenancyPlanChangedPayload",
+  "description": "Payload of `tenancy.plan.changed` version 1: a partner's plan changed, by platform staff, at a moment they scheduled, or when the Pro trial ended; every service of a kind the new plan lacks was disabled in the same act and announces it with `tenancy.service.updated`. The envelope's `partner_id` is the partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "plan",
+    "previous_plan",
+    "trial_ended",
+    "disabled_service_ids"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner, the same value as the envelope's `partner_id`.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "standard",
+        "pro"
+      ],
+      "description": "The plan now.",
+      "examples": [
+        "starter"
+      ]
+    },
+    "previous_plan": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "standard",
+        "pro"
+      ],
+      "description": "The plan before.",
+      "examples": [
+        "pro"
+      ]
+    },
+    "trial_ended": {
+      "type": "boolean",
+      "description": "`true` when the Pro trial ended with this change.",
+      "examples": [
+        true
+      ]
+    },
+    "disabled_service_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "The services the change disabled.",
+      "examples": [
+        [
+          "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a46"
+        ]
+      ]
+    }
+  }
+}

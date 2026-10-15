@@ -1,0 +1,67 @@
+# Path item for /v1/partners/{partner_id}/plan/impact. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPlanImpact
+  summary: Preview what a plan change would stop
+  description: 'What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. The owner and platform staff.'
+  tags:
+    - Plans
+  security:
+    - Bearer: []
+  parameters:
+    - name: plan
+      in: query
+      required: true
+      description: The plan proposed.
+      schema:
+        $ref: ../../components/schemas/plans/Plan.yaml
+  responses:
+    '200':
+      description: The impact.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/plans/PlanImpact.yaml
+    '400':
+      description: An unknown plan.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Not the owner.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

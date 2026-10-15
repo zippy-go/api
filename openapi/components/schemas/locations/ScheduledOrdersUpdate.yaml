@@ -1,0 +1,29 @@
+type: object
+description: 'Scheduled orders as changed, the `ScheduledOrdersUpdate` schema: absent members are kept.'
+properties:
+  accepts:
+    type:
+      - boolean
+      - 'null'
+    description: Whether scheduled orders are taken; switching off keeps the slot settings.
+  cap_per_slot:
+    type:
+      - integer
+      - 'null'
+    description: Most orders per slot, or `null` for no cap; platform staff only.
+    minimum: 0
+  slot_minutes:
+    type:
+      - integer
+      - 'null'
+    description: The slot length, 15, 30 or 60 minutes; platform staff only.
+    minimum: 0
+  window_days:
+    type:
+      - integer
+      - 'null'
+    description: How many days ahead, 1 to 7, the platform's limit.
+    minimum: 0
+examples:
+  - accepts: true
+    window_days: 3

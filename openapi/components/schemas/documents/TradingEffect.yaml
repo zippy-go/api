@@ -1,0 +1,9 @@
+type: string
+description: What a requirement does to trading.
+enum:
+  - trading
+  - grace
+  - awaiting_review
+  - stopped
+examples:
+  - trading

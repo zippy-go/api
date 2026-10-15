@@ -1,0 +1,16 @@
+type: object
+description: The holidays offered, the `HolidayOfferList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./HolidayOffer.yaml
+    description: Upcoming public holidays of the Location's country, oldest first.
+examples:
+  - items:
+      - date: 2027-01-26
+        name: Republic Day
+        covered: false
+        covered_by: null

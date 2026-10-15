@@ -1,0 +1,41 @@
+type: object
+description: 'Request body of `PATCH /v1/partners/{partner_id}/services/{kind}`, the `ServiceUpdate` schema: absent members are kept.'
+properties:
+  config:
+    type:
+      - object
+      - 'null'
+    description: A configuration replacing the stored one as a whole.
+  everywhere:
+    type:
+      - boolean
+      - 'null'
+    description: '`true` switches it on at every Location; `false` keeps it on where it is, one by one.'
+  location_ids:
+    type:
+      - array
+      - 'null'
+    items:
+      type: string
+      format: uuid
+    description: Switches it on at exactly these Locations.
+  name:
+    type:
+      - string
+      - 'null'
+    description: A new name.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why; required of platform staff acting for the Partner.
+  status:
+    oneOf:
+      - $ref: ./ServiceStatus.yaml
+      - type: 'null'
+    description: '`enabled` or `disabled`; disabling keeps the configuration, re-enabling restores it.'
+examples:
+  - status: disabled
+    reason: Asked by the partner
+  - location_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40

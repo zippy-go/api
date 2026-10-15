@@ -12,12 +12,28 @@ components/
                    token signing keys: JsonWebKeySet, JsonWebKey
     auth/          Signing in and sessions: OtpChannel, OtpRequest, OtpChallenge, OtpVerifyRequest,
                    PasswordSignInRequest, PasswordChangeRequest, RefreshRequest, TokenResponse, User, Me
-    partners/      The tenant record: Partner, PartnerKind, PartnerStatus, PartnerCreate, PartnerUpdate, PartnerList
-    locations/     A partner's places: Location, LocationStatus, LocationCreate, LocationUpdate, LocationList
+    partners/      The tenant record: Partner, PartnerKind, PartnerStatus, PartnerCreate, PartnerUpdate, PartnerList,
+                   PartnerOwner, Contact, ContactConsent, ContactPurpose, Blocker, PartnerActivation, PartnerStanding,
+                   PartnerStandingSummary, PayoutStanding, PictureUpdate
+    documents/     Compliance documents: PartnerDocument, DocumentKind, ReviewState, DocumentRequirement,
+                   RequirementState, TradingEffect, RequirementCoverage, PartnerDocumentCreate, PartnerDocumentReview,
+                   PartnerDocumentList, PartnerDocumentPage
+    payouts/       The payout account: PayoutAccount, PayoutAccountUpdate, PayoutAccountState, PayoutAccountType
+    plans/         A partner's plan: Plan, PlanOffer, PartnerPlan, PlanTrial, ScheduledPlanChange, PlanImpact,
+                   PlanImpactService, PartnerPlanUpdate
+    locations/     A partner's places: Location, LocationStatus, LocationCreate, LocationUpdate, LocationList,
+                   ReadsAs, LocationLive, LocationLiveState, LocationActivation, LocationService, Fulfilment,
+                   DeliveryMethod, PickupMethod, DineInMethod, Carrier, OrderSettings, OrderSettingsUpdate, Preparation,
+                   PreparationMode, ScheduledOrders, ScheduledOrdersUpdate, Cutlery, Listing, Highlight, Pause,
+                   LocationPause, PauseReason, HolidayOffer, HolidayOfferList
     memberships/   A user's place in a partner: Membership, MembershipRole, MembershipList
     invitations/   Joining a partner: Invitation, InvitationStatus, InvitationCreate, InvitationList,
                    InvitationAcceptRequest, InvitationAccepted
-    services/      What a partner runs: ServiceKind, ServiceStatus, Service, ServiceUpsert, ServiceList
+    services/      What a partner runs: ServiceKind, ServiceStatus, Service, ServiceUpsert, ServiceList, ServiceCreate,
+                   ServiceUpdate, KindAvailability, KindState, ServiceAtLocation, ServiceLocationUpdate,
+                   FieldServiceSettings, FieldArea, DeliveryPricing, KilometreBand, DeliveryPricingVersion,
+                   DeliveryPricingUpdate, DeliveryQuote, and the configurations by kind: ProductSalesConfig with
+                   CatalogueType, FieldServiceConfig, DeliveryConfig with VehicleType and VehicleKind
     audit/         The audit log: AuditEntry, AuditActor, AuditTarget, AuditEntryList
     fleet/         Agents and positions: Agent, AgentPosition, AgentStatus, AgentList,
                    LocationPing, LocationPingBatch, LocationPingsAccepted

@@ -1,0 +1,25 @@
+type: object
+description: "How orders leave a store, the `Fulfilment` schema: a method's presence enables it, and switching one off discards its settings."
+properties:
+  delivery:
+    oneOf:
+      - $ref: ./DeliveryMethod.yaml
+      - type: 'null'
+    description: Delivery, with its carrier and optional zone.
+  dine_in:
+    oneOf:
+      - $ref: ./DineInMethod.yaml
+      - type: 'null'
+    description: Dine-in.
+  pickup:
+    oneOf:
+      - $ref: ./PickupMethod.yaml
+      - type: 'null'
+    description: Pickup, with its ready offset.
+examples:
+  - delivery:
+      carrier: platform_fleet
+      zone: null
+    pickup:
+      ready_offset_minutes: 10
+    dine_in: null

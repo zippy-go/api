@@ -3,7 +3,8 @@ description: |
   The request body of `PUT /v1/partners/{partner_id}/services/{kind}`.
   `config` replaces the stored configuration as a whole when present; when
   it is omitted the existing configuration is kept, or an empty object is
-  stored for a new service.
+  stored for a new service. `status` is `enabled` or `disabled`;
+  `awaiting_documents` is the platform's to set and is refused.
 required:
   - status
 properties:
@@ -16,6 +17,16 @@ properties:
     description: The settings for the kind of service, replacing the stored ones as a whole. The keys of each kind are documented when that kind's features are released.
     examples:
       - {}
+  name:
+    type:
+      - string
+      - 'null'
+    description: A new name; kept when omitted.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why; required of platform staff acting for the Partner.
 examples:
   - status: enabled
     config: {}

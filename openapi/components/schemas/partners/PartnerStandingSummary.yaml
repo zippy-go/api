@@ -1,0 +1,70 @@
+type: object
+description: What the directory row carries beside a Partner, the `PartnerStandingSummary` schema.
+required:
+  - can_trade
+  - locations_total
+  - locations_live
+  - members_can_sign_in
+  - nobody_can_sign_in
+  - documents_approved
+  - documents_pending
+  - documents_missing
+  - payout_account
+  - runs
+properties:
+  can_trade:
+    type: boolean
+    description: 'Whether the Partner can trade now: active, and no document has stopped every Location.'
+  locations_total:
+    type: integer
+    description: Its Locations.
+    examples:
+      - 3
+  locations_live:
+    type: integer
+    description: Its Locations that are live.
+    examples:
+      - 2
+  members_can_sign_in:
+    type: integer
+    description: Members who can sign in.
+    examples:
+      - 2
+  nobody_can_sign_in:
+    type: boolean
+    description: '`true` when nobody can sign in to the Partner, which platform staff should notice.'
+  documents_approved:
+    type: integer
+    description: Required documents approved.
+    examples:
+      - 2
+  documents_pending:
+    type: integer
+    description: Required documents awaiting review.
+    examples:
+      - 1
+  documents_missing:
+    type: integer
+    description: Required documents missing, rejected or expired.
+    examples:
+      - 0
+  payout_account:
+    $ref: ./PayoutStanding.yaml
+    description: Where the payout account stands.
+  runs:
+    type: array
+    items:
+      $ref: ../services/ServiceKind.yaml
+    description: 'The kinds of Service it runs: those with a Service enabled or awaiting documents.'
+examples:
+  - can_trade: false
+    locations_total: 1
+    locations_live: 0
+    members_can_sign_in: 1
+    nobody_can_sign_in: false
+    documents_approved: 1
+    documents_pending: 0
+    documents_missing: 1
+    payout_account: none
+    runs:
+      - product_sales

@@ -1,0 +1,7 @@
+type: string
+description: Why a store is paused.
+enum:
+  - high_demand
+  - custom
+examples:
+  - high_demand

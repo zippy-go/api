@@ -1,0 +1,25 @@
+type: object
+description: 'What activating a Partner needs, the `PartnerActivation` schema: the setup checklist the consoles show before anybody tries, the same blockers an attempt would be refused with.'
+required:
+  - status
+  - ready
+  - blockers
+properties:
+  status:
+    $ref: ./PartnerStatus.yaml
+    description: The Partner's status.
+  ready:
+    type: boolean
+    description: '`true` when nothing blocks activation; for a Partner that is not pending it says whether an activation would pass.'
+  blockers:
+    type: array
+    items:
+      $ref: ./Blocker.yaml
+    description: What stands in the way, each with its code; empty when ready.
+examples:
+  - status: pending
+    ready: false
+    blockers:
+      - code: document_missing
+        message: The PAN is not on file.
+        pointer: /documents/pan

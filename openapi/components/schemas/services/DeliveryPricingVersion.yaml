@@ -1,0 +1,44 @@
+type: object
+description: A version of a delivery Service's pricing, the `DeliveryPricingVersion` schema.
+required:
+  - service_id
+  - version
+  - pricing
+  - created_at
+properties:
+  service_id:
+    type: string
+    format: uuid
+    description: The Service.
+  version:
+    type: integer
+    description: The version, from 1; every delivery keeps the version it was quoted at.
+    examples:
+      - 3
+  pricing:
+    $ref: ./DeliveryPricing.yaml
+    description: The pricing.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+  created_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who made it.
+examples:
+  - service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a46
+    version: 3
+    pricing:
+      currency: INR
+      flat_fee: 3000
+      base_distance_metres: 2000
+      per_km:
+        - up_to_metres: null
+          per_km: 800
+      waiting_fee_per_minute: 100
+      free_waiting_minutes: 5
+    created_at: 2026-10-15T09:00:00Z
+    created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20

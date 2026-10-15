@@ -1,0 +1,19 @@
+type: object
+description: Request body of the review, the `PartnerDocumentReview` schema.
+required:
+  - outcome
+properties:
+  outcome:
+    $ref: ./ReviewState.yaml
+    description: '`approved`, or `rejected` with a note; an approval is withdrawn by a rejection.'
+  note:
+    type:
+      - string
+      - 'null'
+    description: The note the Partner reads, at most 400 characters; required for a rejection.
+    examples:
+      - The licence names another address.
+examples:
+  - outcome: approved
+  - outcome: rejected
+    note: The document names another address.

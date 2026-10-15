@@ -35,4 +35,16 @@ examples:
         version: 2
         created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
         updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a21
+        country: IN
+        gst_unregistered: false
+        contacts:
+          - purpose: operations
+            name: Example Person
+            role: Store manager
+            email: person@example.com
+            phone: '+15555550102'
+            consent:
+              email: true
+              sms: true
+              whatsapp: false
     next_cursor: null

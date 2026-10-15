@@ -1,0 +1,12 @@
+type: string
+description: The kind of a compliance document.
+enum:
+  - gst_registration
+  - fssai_licence
+  - shop_establishment
+  - pan
+  - identity
+  - bank_proof
+  - other
+examples:
+  - gst_registration

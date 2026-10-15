@@ -1,0 +1,8 @@
+type: string
+description: "A Partner's plan, held on the Partner until platform-configuration owns plans: Starter (INR 0), Standard (INR 1,999) and Pro (INR 4,999) a month before GST."
+enum:
+  - starter
+  - standard
+  - pro
+examples:
+  - standard

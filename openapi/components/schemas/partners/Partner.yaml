@@ -17,6 +17,9 @@ required:
   - version
   - created_by
   - updated_by
+  - country
+  - gst_unregistered
+  - contacts
 properties:
   id:
     type: string
@@ -96,6 +99,95 @@ properties:
     description: The user who last changed the partner, or `null` until it is changed through the API.
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  country:
+    type: string
+    description: The country the Partner is registered in (ISO 3166-1 alpha-2); India at launch.
+    examples:
+      - IN
+  gst_unregistered:
+    type: boolean
+    description: Whether platform staff recorded the organisation as not registered for GST, so no GST registration is asked of it.
+  contacts:
+    type: array
+    items:
+      $ref: ./Contact.yaml
+    description: The people to reach about what, with their consent per channel.
+  banner_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Partner's banner, an asset of the `partner_banner` purpose; twice as wide as tall.
+  description:
+    type:
+      - string
+      - 'null'
+    description: What the Partner does, in its own words.
+  gstin:
+    type:
+      - string
+      - 'null'
+    description: The GSTIN, for an organisation registered for GST.
+    examples:
+      - 36AAACB1234C1Z5
+  launched_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: The moment of first activation, the launch date; `null` until activated.
+  logo_asset_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The Partner's logo, an asset of the `partner_logo` purpose; square.
+  pan:
+    type:
+      - string
+      - 'null'
+    description: "The Permanent Account Number: the person's for an individual, the entity's for an organisation."
+    examples:
+      - AAACB1234C
+  plan:
+    $ref: ../plans/Plan.yaml
+    description: 'The plan, which decides the kinds of Service it may run: Pro while it is set up and for its thirty-day trial from activation.'
+  registered_address:
+    oneOf:
+      - $ref: ../common/Address.yaml
+      - type: 'null'
+    description: The registered address, in the Partner's country.
+  registration_number:
+    type:
+      - string
+      - 'null'
+    description: The company or LLP registration number, for an organisation that has one.
+    examples:
+      - U55101TG2019PTC123456
+  status_changed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When the status last changed; `null` for a Partner whose status never changed.
+  status_changed_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who last changed the status; `null` when never changed or changed by the platform itself.
+  status_reason:
+    type:
+      - string
+      - 'null'
+    description: Why the Partner is in its status, shown to its members while it is suspended.
+    examples:
+      - Documents under review
+  standing:
+    oneOf:
+      - $ref: ./PartnerStandingSummary.yaml
+      - type: 'null'
+    description: 'Where the Partner stands, on directory reads and on a single read: whether it can trade, its Locations, members, documents and payout account; absent on writes.'
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
     kind: organisation
@@ -109,3 +201,45 @@ examples:
     version: 1
     created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    country: IN
+    gst_unregistered: false
+    contacts:
+      - purpose: operations
+        name: Example Person
+        role: Store manager
+        email: person@example.com
+        phone: '+15555550102'
+        consent:
+          email: true
+          sms: true
+          whatsapp: false
+    banner_asset_id: null
+    description: null
+    gstin: 36AAACB1234C1Z5
+    launched_at: null
+    logo_asset_id: null
+    pan: AAACB1234C
+    plan: pro
+    registered_address:
+      line1: 1 Example Street
+      line2: null
+      city: Hyderabad
+      state: Telangana
+      postal_code: '500001'
+      country: IN
+    registration_number: null
+    status_changed_at: null
+    status_changed_by: null
+    status_reason: null
+    standing:
+      can_trade: false
+      locations_total: 1
+      locations_live: 0
+      members_can_sign_in: 1
+      nobody_can_sign_in: false
+      documents_approved: 1
+      documents_pending: 0
+      documents_missing: 1
+      payout_account: none
+      runs:
+        - product_sales

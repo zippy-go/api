@@ -1,0 +1,107 @@
+type: object
+description: A compliance document on file, the `PartnerDocument` schema.
+required:
+  - id
+  - partner_id
+  - kind
+  - asset_id
+  - review
+  - uploaded_at
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Identifier of the document.
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner it belongs to.
+  kind:
+    $ref: ./DocumentKind.yaml
+    description: What it is.
+  asset_id:
+    type: string
+    format: uuid
+    description: 'The uploaded file (purpose `partner_document`, restricted): read it through `GET /v1/assets/{asset_id}/link`.'
+  review:
+    $ref: ./ReviewState.yaml
+    description: Where its review is.
+  uploaded_at:
+    type: string
+    format: date-time
+    description: When it was filed.
+  version:
+    type: integer
+    description: The version, raised on every review.
+    examples:
+      - 1
+  expires_on:
+    type:
+      - string
+      - 'null'
+    description: The last day it is valid.
+    examples:
+      - 2026-11-14
+  issued_on:
+    type:
+      - string
+      - 'null'
+    description: When it was issued.
+    examples:
+      - 2025-11-15
+  label:
+    type:
+      - string
+      - 'null'
+    description: A label, for example the outlet a licence names.
+    examples:
+      - Example location
+  number:
+    type:
+      - string
+      - 'null'
+    description: The number the document carries, for example the licence number.
+    examples:
+      - '13624012000123'
+  review_note:
+    type:
+      - string
+      - 'null'
+    description: The reviewer's note; always present on a rejection.
+    examples:
+      - The licence is for another address.
+  reviewed_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was reviewed.
+  reviewed_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who reviewed it.
+  uploaded_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who filed it.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    kind: gst_registration
+    asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a55
+    label: null
+    number: 36AAACB1234C1Z5
+    issued_on: 2025-04-01
+    expires_on: null
+    review: pending
+    review_note: null
+    reviewed_by: null
+    reviewed_at: null
+    uploaded_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    uploaded_at: 2026-10-15T09:00:00Z
+    version: 1

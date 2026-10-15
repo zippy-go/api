@@ -1,0 +1,26 @@
+type: object
+description: "What keeps a Partner or a Location from going live, the `Blocker` schema: a stable code from `activation_blocked`'s field-level codes, a sentence a screen may show verbatim, and where in the record it points."
+required:
+  - code
+  - message
+  - pointer
+properties:
+  code:
+    type: string
+    description: The stable code, for example `document_missing`.
+    examples:
+      - document_missing
+  message:
+    type: string
+    description: A sentence saying what stands in the way.
+    examples:
+      - The PAN is not on file.
+  pointer:
+    type: string
+    description: A JSON Pointer into the record, for example `/documents/pan`.
+    examples:
+      - /documents/pan
+examples:
+  - code: document_missing
+    message: The PAN is not on file.
+    pointer: /documents/pan

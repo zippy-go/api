@@ -1,0 +1,4 @@
+type: object
+description: 'Dine-in as a store offers it, the `DineInMethod` schema: it needs tables, which arrive with dine-in.'
+examples:
+  - {}

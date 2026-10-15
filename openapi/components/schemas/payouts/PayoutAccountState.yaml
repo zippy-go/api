@@ -1,0 +1,7 @@
+type: string
+description: Whether platform staff verified the account.
+enum:
+  - unverified
+  - verified
+examples:
+  - unverified

@@ -1,0 +1,23 @@
+type: object
+description: "A field Service's configuration, the `FieldServiceConfig` schema: the bookable work itself, with its durations and prices, is the services catalogue."
+properties:
+  qualifications:
+    type: array
+    items:
+      type: string
+    description: The qualifications the Partner names, which its agents hold and its bookable work requires.
+    examples:
+      - &a1
+        - beautician
+        - electrician
+  service_type:
+    type:
+      - string
+      - 'null'
+    description: The reference service type's code, lower case (`salon`, `repairs`, `laundry`, `cleaning`).
+    examples:
+      - salon
+examples:
+  - service_type: salon
+    qualifications:
+      - beautician

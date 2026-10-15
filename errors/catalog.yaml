@@ -94,6 +94,15 @@ errors:
       - code: crop_outside
         message: The crop rectangle runs past the picture.
         description: A crop rectangle that does not fit inside the original picture.
+      - code: gstin_invalid
+        message: A GSTIN is fifteen characters, the state code, the PAN, an entity number, Z and a check character.
+        description: A GSTIN of the wrong shape, with a wrong check character, or one that does not embed the partner's PAN.
+      - code: pan_invalid
+        message: A PAN is five letters, four digits and a letter, such as ABCDE1234F.
+        description: A Permanent Account Number of the wrong shape.
+      - code: ifsc_invalid
+        message: An IFSC is four letters, a zero and six letters or digits, such as HDFC0001234.
+        description: An Indian Financial System Code of the wrong shape on a payout account.
 
   - code: channel_unknown
     status: 400
@@ -141,6 +150,16 @@ errors:
       The caller is authenticated but is not allowed to perform the action,
       for example because the resource belongs to another partner or the
       key lacks the required scope.
+
+  - code: not_in_plan
+    status: 403
+    title: Not in the plan
+    message: The partner's plan does not include {what}; the {plan} plan does.
+    retryable: false
+    description: >-
+      The partner's plan does not include what was asked for, a kind of
+      service or the platform fleet; the detail names the lowest plan that
+      does. Platform staff move a partner's plan.
 
   - code: not_found
     status: 404
@@ -207,6 +226,95 @@ errors:
       operation: a reservation attached as a picture, a document attached as
       a logo, a crop of a vector, or a confirmation that found the file
       outside its purpose's folder or readable by anyone.
+
+  - code: activation_blocked
+    status: 409
+    title: Activation blocked
+    message: "The {what} cannot go live yet: {count} blocker(s) stand in the way."
+    retryable: false
+    description: >-
+      The partner or location cannot go live yet. The `errors` member names
+      each blocker with a field-level code below, the same blockers the
+      partner's and the location's activation reads carry; clear them and
+      try again.
+    details:
+      - code: document_missing
+        message: A required document is not on file.
+        description: The partner must have a document of this kind approved before it is activated; none is on file.
+      - code: document_pending
+        message: A required document is awaiting review.
+        description: A document of this kind is on file but platform staff have not reviewed it yet.
+      - code: document_rejected
+        message: A required document was rejected.
+        description: The newest document of this kind was rejected; a replacement must be approved.
+      - code: document_expired
+        message: A required document has expired.
+        description: The approved document of this kind is past its expiry and no replacement is approved.
+      - code: no_administrator
+        message: Nobody administers the partner yet.
+        description: The partner has no owner; the administrator named at onboarding has not accepted the invitation.
+      - code: partner_not_active
+        message: The partner is not active.
+        description: A location goes live only while its partner is active; asked while the partner is pending, it goes live with the partner's activation.
+      - code: no_fulfilment
+        message: The store offers neither delivery, pickup nor dine-in.
+        description: A store needs at least one fulfilment method before it goes live.
+      - code: closed_all_week
+        message: The location is closed every day of the week.
+        description: No day of the effective week has an opening window; give the location opening hours.
+      - code: no_vertical
+        message: The store belongs to no vertical.
+        description: A store trades in at least one vertical its zone offers.
+      - code: field_required
+        message: A field the location's type requires is missing.
+        description: The type of a service on at the location (a product-sales service's catalogue type, a field service's service type) declares a required field the location does not carry.
+
+  - code: partner_archived
+    status: 409
+    title: Partner archived
+    message: Partner {id} is archived; nothing new can be added to it until platform staff return it to pending.
+    retryable: false
+    description: >-
+      The partner is archived, and nothing new may refer to an archived
+      partner: no location is opened, no service enabled and no document
+      filed until platform staff return it to pending.
+
+  - code: zone_not_serving
+    status: 409
+    title: Zone does not serve
+    message: "The pin lands in {zone}, which does not serve: it is not fenced or not active."
+    retryable: false
+    description: >-
+      The location's pin lands in a zone that does not serve: it has no
+      fence, or it or an area above it is not active. The detail names the
+      zone.
+
+  - code: vertical_not_offered
+    status: 409
+    title: Vertical not offered
+    message: "{vertical} is not offered in the location's zone."
+    retryable: false
+    description: The location names a vertical its zone does not offer; the detail names the vertical.
+
+  - code: service_required
+    status: 409
+    title: Service required
+    message: "{sentence}"
+    retryable: false
+    description: >-
+      The setting needs a service the partner does not run there, or a
+      capability that does not exist yet: own agents without a delivery
+      service, fulfilment at a branch, dine-in before tables, pricing on a
+      service that is not a delivery service. The detail says which.
+
+  - code: locations_open
+    status: 409
+    title: Locations still open
+    message: The partner cannot be archived while {count} of its locations are not archived.
+    retryable: false
+    description: >-
+      The partner cannot be archived while any of its locations is not
+      archived; the `errors` member names each location still open.
 
   - code: idempotency_key_reuse
     status: 409

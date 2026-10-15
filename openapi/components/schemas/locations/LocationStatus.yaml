@@ -1,11 +1,18 @@
 type: string
 description: |
-  Whether a location takes part in the partner's operations. An `inactive`
-  location is kept with its history but is not offered for new operations.
+  Where a location is in its lifecycle, the one partners share: `pending`
+  from its opening until it goes live, `active` while it operates,
+  `suspended` while stopped, `archived` once retired. Moves: pending to
+  active or archived, active to suspended or archived, suspended to active
+  or archived, archived to pending (platform staff only). `inactive` is the
+  step 1 name of `suspended`, still accepted on input and never returned.
   Clients must tolerate values they do not know, because a new status is an
   additive change.
 enum:
   - active
   - inactive
+  - pending
+  - suspended
+  - archived
 examples:
   - active

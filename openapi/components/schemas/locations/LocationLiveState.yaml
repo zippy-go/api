@@ -1,0 +1,9 @@
+type: string
+description: What a Location is doing now.
+enum:
+  - online
+  - closed
+  - offline
+  - not_live
+examples:
+  - online

@@ -1,0 +1,26 @@
+type: object
+description: Request body of `POST .../pause`, the `LocationPause` schema.
+required:
+  - minutes
+  - reason
+properties:
+  minutes:
+    type: integer
+    description: How long, one minute to a day (1440 minutes); the console offers 15, 30 and 60.
+    minimum: 0
+    examples:
+      - 40
+  reason:
+    $ref: ./PauseReason.yaml
+    description: 'Why: high demand, or a custom message customers read.'
+  message:
+    type:
+      - string
+      - 'null'
+    description: The message customers read, at most 200 characters; required for a custom reason.
+    examples:
+      - Back after the lunch rush
+examples:
+  - minutes: 40
+    reason: high_demand
+    message: Back after the rush

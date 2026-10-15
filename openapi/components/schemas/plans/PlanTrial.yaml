@@ -1,0 +1,21 @@
+type: object
+description: The Pro trial of a Partner, the `PlanTrial` schema.
+required:
+  - ends_at
+  - then
+  - running
+properties:
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+  then:
+    $ref: ./Plan.yaml
+    description: The plan the Partner moves to then.
+  running:
+    type: boolean
+    description: '`true` while it runs.'
+examples:
+  - ends_at: 2026-11-14T09:00:00Z
+    then: starter
+    running: true

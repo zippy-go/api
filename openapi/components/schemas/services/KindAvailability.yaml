@@ -1,0 +1,27 @@
+type: object
+description: A kind and where it stands for the Partner, the `KindAvailability` schema.
+required:
+  - kind
+  - state
+  - services
+properties:
+  kind:
+    $ref: ./ServiceKind.yaml
+    description: The kind.
+  state:
+    $ref: ./KindState.yaml
+    description: Where it stands.
+  services:
+    type: integer
+    description: The Services of the kind, whatever their status.
+    minimum: 0
+  plan_needed:
+    oneOf:
+      - $ref: ../plans/Plan.yaml
+      - type: 'null'
+    description: The lowest plan that includes it, when the Partner's does not.
+examples:
+  - kind: field_service
+    state: not_in_plan
+    services: 0
+    plan_needed: standard

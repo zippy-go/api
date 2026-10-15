@@ -1,0 +1,7 @@
+type: string
+description: "What a Location is, by what it runs: a store sells (a product-sales Service is on there), a branch only operates (a delivery depot, a field Service's base). Never chosen by hand."
+enum:
+  - store
+  - branch
+examples:
+  - store

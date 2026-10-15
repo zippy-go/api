@@ -1,0 +1,25 @@
+type: object
+description: What going live needs for a Location, the `LocationActivation` schema.
+required:
+  - status
+  - ready
+  - blockers
+properties:
+  status:
+    $ref: ./LocationStatus.yaml
+    description: The Location's status.
+  ready:
+    type: boolean
+    description: '`true` when nothing blocks it going live.'
+  blockers:
+    type: array
+    items:
+      $ref: ../partners/Blocker.yaml
+    description: What stands in the way, each with its code; the same blockers an activation is refused with.
+examples:
+  - status: pending
+    ready: false
+    blockers:
+      - code: no_fulfilment
+        message: The store offers neither delivery, pickup nor dine-in.
+        pointer: /fulfilment

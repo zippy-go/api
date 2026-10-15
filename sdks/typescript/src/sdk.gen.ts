@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ConfirmAssetData, ConfirmAssetErrors, ConfirmAssetResponses, CreateAssetCropData, CreateAssetCropErrors, CreateAssetCropResponses, CreateAssetGrantData, CreateAssetGrantErrors, CreateAssetGrantResponses, CreateCampaignSlotData, CreateCampaignSlotErrors, CreateCampaignSlotResponses, CreateCountryData, CreateCountryErrors, CreateCountryResponses, CreateCurrencyData, CreateCurrencyErrors, CreateCurrencyResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerAssetGrantData, CreatePartnerAssetGrantErrors, CreatePartnerAssetGrantResponses, CreatePartnerData, CreatePartnerErrors, CreatePartnerResponses, CreateServiceAreaData, CreateServiceAreaErrors, CreateServiceAreaResponses, CreateServiceTypeData, CreateServiceTypeErrors, CreateServiceTypeResponses, CreateStoreTypeData, CreateStoreTypeErrors, CreateStoreTypeResponses, CreateVerticalData, CreateVerticalErrors, CreateVerticalResponses, DeleteCampaignSlotData, DeleteCampaignSlotErrors, DeleteCampaignSlotResponses, DeleteServiceAreaFenceData, DeleteServiceAreaFenceErrors, DeleteServiceAreaFenceResponses, DiscardAssetData, DiscardAssetErrors, DiscardAssetResponses, DivideServiceAreaData, DivideServiceAreaErrors, DivideServiceAreaResponses, GetAssetData, GetAssetErrors, GetAssetLinkData, GetAssetLinkErrors, GetAssetLinkResponses, GetAssetRenditionData, GetAssetRenditionErrors, GetAssetRenditionResponses, GetAssetResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetCampaignSlotData, GetCampaignSlotErrors, GetCampaignSlotResponses, GetCountryData, GetCountryErrors, GetCountryHolidaysData, GetCountryHolidaysErrors, GetCountryHolidaysResponses, GetCountryPolicyData, GetCountryPolicyErrors, GetCountryPolicyResponses, GetCountryResponses, GetCountryScheduleData, GetCountryScheduleErrors, GetCountryScheduleResponses, GetCurrencyData, GetCurrencyErrors, GetCurrencyResponses, GetDisplayGridData, GetDisplayGridErrors, GetDisplayGridResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLiveConfigData, GetLiveConfigErrors, GetLiveConfigResponses, GetLocationData, GetLocationEffectivePolicyData, GetLocationEffectivePolicyErrors, GetLocationEffectivePolicyResponses, GetLocationEffectiveScheduleData, GetLocationEffectiveScheduleErrors, GetLocationEffectiveScheduleResponses, GetLocationErrors, GetLocationPolicyData, GetLocationPolicyErrors, GetLocationPolicyResponses, GetLocationResponses, GetLocationScheduleData, GetLocationScheduleErrors, GetLocationScheduleResponses, GetLocationTradingData, GetLocationTradingErrors, GetLocationTradingResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerData, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerPolicyData, GetPartnerPolicyErrors, GetPartnerPolicyResponses, GetPartnerResponses, GetPartnerScheduleData, GetPartnerScheduleErrors, GetPartnerScheduleResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, GetServiceAreaData, GetServiceAreaErrors, GetServiceAreaImpactData, GetServiceAreaImpactErrors, GetServiceAreaImpactResponses, GetServiceAreaPolicyData, GetServiceAreaPolicyErrors, GetServiceAreaPolicyResponses, GetServiceAreaResponses, GetServiceAreaScheduleData, GetServiceAreaScheduleErrors, GetServiceAreaScheduleResponses, GetServiceTypeData, GetServiceTypeErrors, GetServiceTypeResponses, GetSettingData, GetSettingErrors, GetSettingResponses, GetStoreTypeData, GetStoreTypeErrors, GetStoreTypeResponses, GetVerticalData, GetVerticalErrors, GetVerticalReachData, GetVerticalReachErrors, GetVerticalReachResponses, GetVerticalResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAssetPurposesData, ListAssetPurposesErrors, ListAssetPurposesResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListCampaignSlotsData, ListCampaignSlotsErrors, ListCampaignSlotsResponses, ListCountriesData, ListCountriesErrors, ListCountriesResponses, ListCountryPolicyVersionsData, ListCountryPolicyVersionsErrors, ListCountryPolicyVersionsResponses, ListCurrenciesData, ListCurrenciesErrors, ListCurrenciesResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationPolicyVersionsData, ListLocationPolicyVersionsErrors, ListLocationPolicyVersionsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnerPolicyVersionsData, ListPartnerPolicyVersionsErrors, ListPartnerPolicyVersionsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServiceAreaPolicyVersionsData, ListServiceAreaPolicyVersionsErrors, ListServiceAreaPolicyVersionsResponses, ListServiceAreasData, ListServiceAreasErrors, ListServiceAreasResponses, ListServiceAreaVerticalsData, ListServiceAreaVerticalsErrors, ListServiceAreaVerticalsResponses, ListServiceFieldsData, ListServiceFieldsErrors, ListServiceFieldsResponses, ListServicesData, ListServicesErrors, ListServicesResponses, ListServiceTypesData, ListServiceTypesErrors, ListServiceTypesResponses, ListSettingsData, ListSettingsErrors, ListSettingsResponses, ListStoreFieldsData, ListStoreFieldsErrors, ListStoreFieldsResponses, ListStoreTypesData, ListStoreTypesErrors, ListStoreTypesResponses, ListVerticalsData, ListVerticalsErrors, ListVerticalsResponses, MergeServiceAreasData, MergeServiceAreasErrors, MergeServiceAreasResponses, OpenLiveStreamData, OpenLiveStreamErrors, OpenLiveStreamResponse, OpenLiveStreamResponses, PlanServiceAreaDivisionData, PlanServiceAreaDivisionErrors, PlanServiceAreaDivisionResponses, PutCountryDefaultServiceAreaData, PutCountryDefaultServiceAreaErrors, PutCountryDefaultServiceAreaResponses, PutCountryHolidaysData, PutCountryHolidaysErrors, PutCountryHolidaysResponses, PutCountryPolicyData, PutCountryPolicyErrors, PutCountryPolicyResponses, PutCountryScheduleData, PutCountryScheduleErrors, PutCountryScheduleResponses, PutDisplayGridData, PutDisplayGridErrors, PutDisplayGridResponses, PutLocationPolicyData, PutLocationPolicyErrors, PutLocationPolicyResponses, PutLocationScheduleData, PutLocationScheduleErrors, PutLocationScheduleResponses, PutPartnerPolicyData, PutPartnerPolicyErrors, PutPartnerPolicyResponses, PutPartnerScheduleData, PutPartnerScheduleErrors, PutPartnerScheduleResponses, PutServiceAreaFenceData, PutServiceAreaFenceErrors, PutServiceAreaFenceResponses, PutServiceAreaPolicyData, PutServiceAreaPolicyErrors, PutServiceAreaPolicyResponses, PutServiceAreaScheduleData, PutServiceAreaScheduleErrors, PutServiceAreaScheduleResponses, PutServiceAreaVerticalOrderData, PutServiceAreaVerticalOrderErrors, PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalsData, PutServiceAreaVerticalsErrors, PutServiceAreaVerticalsResponses, PutSettingData, PutSettingErrors, PutSettingResponses, PutVerticalCategoriesData, PutVerticalCategoriesErrors, PutVerticalCategoriesResponses, PutVerticalImageData, PutVerticalImageErrors, PutVerticalImageResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, ResetSettingData, ResetSettingErrors, ResetSettingResponses, ResolveServiceAreaData, ResolveServiceAreaErrors, ResolveServiceAreaResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SetCountryOrdersData, SetCountryOrdersErrors, SetCountryOrdersResponses, SetCountrySignInData, SetCountrySignInErrors, SetCountrySignInResponses, SetCountryStatusData, SetCountryStatusErrors, SetCountryStatusResponses, SetServiceAreaStatusData, SetServiceAreaStatusErrors, SetServiceAreaStatusResponses, SetServiceTypeStatusData, SetServiceTypeStatusErrors, SetServiceTypeStatusResponses, SetStoreTypeStatusData, SetStoreTypeStatusErrors, SetStoreTypeStatusResponses, SetVerticalStatusData, SetVerticalStatusErrors, SetVerticalStatusResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateCampaignSlotData, UpdateCampaignSlotErrors, UpdateCampaignSlotResponses, UpdateCountryData, UpdateCountryErrors, UpdateCountryResponses, UpdateCurrencyData, UpdateCurrencyErrors, UpdateCurrencyResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpdateServiceAreaData, UpdateServiceAreaErrors, UpdateServiceAreaResponses, UpdateServiceTypeData, UpdateServiceTypeErrors, UpdateServiceTypeResponses, UpdateStoreTypeData, UpdateStoreTypeErrors, UpdateStoreTypeResponses, UpdateVerticalData, UpdateVerticalErrors, UpdateVerticalResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CloseLocationForHolidayData, CloseLocationForHolidayErrors, CloseLocationForHolidayResponses, ConfirmAssetData, ConfirmAssetErrors, ConfirmAssetResponses, CreateAssetCropData, CreateAssetCropErrors, CreateAssetCropResponses, CreateAssetGrantData, CreateAssetGrantErrors, CreateAssetGrantResponses, CreateCampaignSlotData, CreateCampaignSlotErrors, CreateCampaignSlotResponses, CreateCountryData, CreateCountryErrors, CreateCountryResponses, CreateCurrencyData, CreateCurrencyErrors, CreateCurrencyResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreatePartnerAssetGrantData, CreatePartnerAssetGrantErrors, CreatePartnerAssetGrantResponses, CreatePartnerData, CreatePartnerDocumentData, CreatePartnerDocumentErrors, CreatePartnerDocumentResponses, CreatePartnerErrors, CreatePartnerResponses, CreateServiceAreaData, CreateServiceAreaErrors, CreateServiceAreaResponses, CreateServiceData, CreateServiceErrors, CreateServiceResponses, CreateServiceTypeData, CreateServiceTypeErrors, CreateServiceTypeResponses, CreateStoreTypeData, CreateStoreTypeErrors, CreateStoreTypeResponses, CreateVerticalData, CreateVerticalErrors, CreateVerticalResponses, DeleteCampaignSlotData, DeleteCampaignSlotErrors, DeleteCampaignSlotResponses, DeleteLocationData, DeleteLocationErrors, DeleteLocationResponses, DeleteServiceAreaFenceData, DeleteServiceAreaFenceErrors, DeleteServiceAreaFenceResponses, DeleteServiceLocationData, DeleteServiceLocationErrors, DeleteServiceLocationResponses, DiscardAssetData, DiscardAssetErrors, DiscardAssetResponses, DivideServiceAreaData, DivideServiceAreaErrors, DivideServiceAreaResponses, GetAssetData, GetAssetErrors, GetAssetLinkData, GetAssetLinkErrors, GetAssetLinkResponses, GetAssetRenditionData, GetAssetRenditionErrors, GetAssetRenditionResponses, GetAssetResponses, GetAuditEntryData, GetAuditEntryErrors, GetAuditEntryResponses, GetAuditFiltersData, GetAuditFiltersErrors, GetAuditFiltersResponses, GetCampaignSlotData, GetCampaignSlotErrors, GetCampaignSlotResponses, GetCountryData, GetCountryErrors, GetCountryHolidaysData, GetCountryHolidaysErrors, GetCountryHolidaysResponses, GetCountryPolicyData, GetCountryPolicyErrors, GetCountryPolicyResponses, GetCountryResponses, GetCountryScheduleData, GetCountryScheduleErrors, GetCountryScheduleResponses, GetCurrencyData, GetCurrencyErrors, GetCurrencyResponses, GetDeliveryPricingData, GetDeliveryPricingErrors, GetDeliveryPricingResponses, GetDisplayGridData, GetDisplayGridErrors, GetDisplayGridResponses, GetHealthData, GetHealthDetailsData, GetHealthDetailsErrors, GetHealthDetailsResponses, GetHealthErrors, GetHealthResponses, GetJwksData, GetJwksErrors, GetJwksResponses, GetLiveConfigData, GetLiveConfigErrors, GetLiveConfigResponses, GetLocationActivationData, GetLocationActivationErrors, GetLocationActivationResponses, GetLocationData, GetLocationEffectivePolicyData, GetLocationEffectivePolicyErrors, GetLocationEffectivePolicyResponses, GetLocationEffectiveScheduleData, GetLocationEffectiveScheduleErrors, GetLocationEffectiveScheduleResponses, GetLocationErrors, GetLocationPolicyData, GetLocationPolicyErrors, GetLocationPolicyResponses, GetLocationResponses, GetLocationScheduleData, GetLocationScheduleErrors, GetLocationScheduleResponses, GetLocationTradingData, GetLocationTradingErrors, GetLocationTradingResponses, GetMeData, GetMeErrors, GetMeResponses, GetPartnerActivationData, GetPartnerActivationErrors, GetPartnerActivationResponses, GetPartnerData, GetPartnerDocumentData, GetPartnerDocumentErrors, GetPartnerDocumentResponses, GetPartnerErrors, GetPartnerFiltersData, GetPartnerFiltersErrors, GetPartnerFiltersResponses, GetPartnerPlanData, GetPartnerPlanErrors, GetPartnerPlanResponses, GetPartnerPolicyData, GetPartnerPolicyErrors, GetPartnerPolicyResponses, GetPartnerResponses, GetPartnerScheduleData, GetPartnerScheduleErrors, GetPartnerScheduleResponses, GetPartnerStandingData, GetPartnerStandingErrors, GetPartnerStandingResponses, GetPartnerSummaryData, GetPartnerSummaryErrors, GetPartnerSummaryResponses, GetPayoutAccountData, GetPayoutAccountErrors, GetPayoutAccountResponses, GetPlanImpactData, GetPlanImpactErrors, GetPlanImpactResponses, GetProblemTypeData, GetProblemTypeErrors, GetProblemTypeResponses, GetServiceAreaData, GetServiceAreaErrors, GetServiceAreaImpactData, GetServiceAreaImpactErrors, GetServiceAreaImpactResponses, GetServiceAreaPolicyData, GetServiceAreaPolicyErrors, GetServiceAreaPolicyResponses, GetServiceAreaResponses, GetServiceAreaScheduleData, GetServiceAreaScheduleErrors, GetServiceAreaScheduleResponses, GetServiceData, GetServiceErrors, GetServiceLocationData, GetServiceLocationErrors, GetServiceLocationResponses, GetServiceResponses, GetServiceTypeData, GetServiceTypeErrors, GetServiceTypeResponses, GetSettingData, GetSettingErrors, GetSettingResponses, GetStoreTypeData, GetStoreTypeErrors, GetStoreTypeResponses, GetVerticalData, GetVerticalErrors, GetVerticalReachData, GetVerticalReachErrors, GetVerticalReachResponses, GetVerticalResponses, ListAgentsData, ListAgentsErrors, ListAgentsResponses, ListAssetPurposesData, ListAssetPurposesErrors, ListAssetPurposesResponses, ListAuditEntriesData, ListAuditEntriesErrors, ListAuditEntriesResponses, ListCampaignSlotsData, ListCampaignSlotsErrors, ListCampaignSlotsResponses, ListCountriesData, ListCountriesErrors, ListCountriesResponses, ListCountryPolicyVersionsData, ListCountryPolicyVersionsErrors, ListCountryPolicyVersionsResponses, ListCurrenciesData, ListCurrenciesErrors, ListCurrenciesResponses, ListDocumentsForReviewData, ListDocumentsForReviewErrors, ListDocumentsForReviewResponses, ListEventsData, ListEventsErrors, ListEventsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocationBinData, ListLocationBinErrors, ListLocationBinResponses, ListLocationHolidaysData, ListLocationHolidaysErrors, ListLocationHolidaysResponses, ListLocationPolicyVersionsData, ListLocationPolicyVersionsErrors, ListLocationPolicyVersionsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListMembershipsData, ListMembershipsErrors, ListMembershipsResponses, ListPartnerDocumentsData, ListPartnerDocumentsErrors, ListPartnerDocumentsResponses, ListPartnerPolicyVersionsData, ListPartnerPolicyVersionsErrors, ListPartnerPolicyVersionsResponses, ListPartnersData, ListPartnersErrors, ListPartnersResponses, ListServiceAreaPolicyVersionsData, ListServiceAreaPolicyVersionsErrors, ListServiceAreaPolicyVersionsResponses, ListServiceAreasData, ListServiceAreasErrors, ListServiceAreasResponses, ListServiceAreaVerticalsData, ListServiceAreaVerticalsErrors, ListServiceAreaVerticalsResponses, ListServiceFieldsData, ListServiceFieldsErrors, ListServiceFieldsResponses, ListServicesData, ListServicesErrors, ListServicesResponses, ListServiceTypesData, ListServiceTypesErrors, ListServiceTypesResponses, ListSettingsData, ListSettingsErrors, ListSettingsResponses, ListStoreFieldsData, ListStoreFieldsErrors, ListStoreFieldsResponses, ListStoreTypesData, ListStoreTypesErrors, ListStoreTypesResponses, ListVerticalsData, ListVerticalsErrors, ListVerticalsResponses, MergeServiceAreasData, MergeServiceAreasErrors, MergeServiceAreasResponses, OpenLiveStreamData, OpenLiveStreamErrors, OpenLiveStreamResponse, OpenLiveStreamResponses, PauseLocationData, PauseLocationErrors, PauseLocationResponses, PlanServiceAreaDivisionData, PlanServiceAreaDivisionErrors, PlanServiceAreaDivisionResponses, PutCountryDefaultServiceAreaData, PutCountryDefaultServiceAreaErrors, PutCountryDefaultServiceAreaResponses, PutCountryHolidaysData, PutCountryHolidaysErrors, PutCountryHolidaysResponses, PutCountryPolicyData, PutCountryPolicyErrors, PutCountryPolicyResponses, PutCountryScheduleData, PutCountryScheduleErrors, PutCountryScheduleResponses, PutDeliveryPricingData, PutDeliveryPricingErrors, PutDeliveryPricingResponses, PutDisplayGridData, PutDisplayGridErrors, PutDisplayGridResponses, PutLocationBannerData, PutLocationBannerErrors, PutLocationBannerResponses, PutLocationFulfilmentData, PutLocationFulfilmentErrors, PutLocationFulfilmentResponses, PutLocationListingData, PutLocationListingErrors, PutLocationListingResponses, PutLocationLogoData, PutLocationLogoErrors, PutLocationLogoResponses, PutLocationOrderSettingsData, PutLocationOrderSettingsErrors, PutLocationOrderSettingsResponses, PutLocationPolicyData, PutLocationPolicyErrors, PutLocationPolicyResponses, PutLocationScheduleData, PutLocationScheduleErrors, PutLocationScheduleResponses, PutPartnerBannerData, PutPartnerBannerErrors, PutPartnerBannerResponses, PutPartnerLogoData, PutPartnerLogoErrors, PutPartnerLogoResponses, PutPartnerPlanData, PutPartnerPlanErrors, PutPartnerPlanResponses, PutPartnerPolicyData, PutPartnerPolicyErrors, PutPartnerPolicyResponses, PutPartnerScheduleData, PutPartnerScheduleErrors, PutPartnerScheduleResponses, PutPayoutAccountData, PutPayoutAccountErrors, PutPayoutAccountResponses, PutServiceAreaFenceData, PutServiceAreaFenceErrors, PutServiceAreaFenceResponses, PutServiceAreaPolicyData, PutServiceAreaPolicyErrors, PutServiceAreaPolicyResponses, PutServiceAreaScheduleData, PutServiceAreaScheduleErrors, PutServiceAreaScheduleResponses, PutServiceAreaVerticalOrderData, PutServiceAreaVerticalOrderErrors, PutServiceAreaVerticalOrderResponses, PutServiceAreaVerticalsData, PutServiceAreaVerticalsErrors, PutServiceAreaVerticalsResponses, PutServiceLocationData, PutServiceLocationErrors, PutServiceLocationResponses, PutSettingData, PutSettingErrors, PutSettingResponses, PutVerticalCategoriesData, PutVerticalCategoriesErrors, PutVerticalCategoriesResponses, PutVerticalImageData, PutVerticalImageErrors, PutVerticalImageResponses, QuoteDeliveryData, QuoteDeliveryErrors, QuoteDeliveryResponses, RefreshSessionData, RefreshSessionErrors, RefreshSessionResponses, RemoveMembershipData, RemoveMembershipErrors, RemoveMembershipResponses, RemovePartnerDocumentData, RemovePartnerDocumentErrors, RemovePartnerDocumentResponses, RequestOtpData, RequestOtpErrors, RequestOtpResponses, ResetSettingData, ResetSettingErrors, ResetSettingResponses, ResolveServiceAreaData, ResolveServiceAreaErrors, ResolveServiceAreaResponses, RestoreLocationData, RestoreLocationErrors, RestoreLocationResponses, ResumeLocationData, ResumeLocationErrors, ResumeLocationResponses, ReviewPartnerDocumentData, ReviewPartnerDocumentErrors, ReviewPartnerDocumentResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, SetCountryOrdersData, SetCountryOrdersErrors, SetCountryOrdersResponses, SetCountrySignInData, SetCountrySignInErrors, SetCountrySignInResponses, SetCountryStatusData, SetCountryStatusErrors, SetCountryStatusResponses, SetServiceAreaStatusData, SetServiceAreaStatusErrors, SetServiceAreaStatusResponses, SetServiceTypeStatusData, SetServiceTypeStatusErrors, SetServiceTypeStatusResponses, SetStoreTypeStatusData, SetStoreTypeStatusErrors, SetStoreTypeStatusResponses, SetVerticalStatusData, SetVerticalStatusErrors, SetVerticalStatusResponses, SignInWithPasswordData, SignInWithPasswordErrors, SignInWithPasswordResponses, SignOutData, SignOutErrors, SignOutResponses, StreamAgentsData, StreamAgentsErrors, StreamAgentsResponse, StreamAgentsResponses, StreamEventsData, StreamEventsErrors, StreamEventsResponse, StreamEventsResponses, SubmitLocationPingsData, SubmitLocationPingsErrors, SubmitLocationPingsResponses, UpdateCampaignSlotData, UpdateCampaignSlotErrors, UpdateCampaignSlotResponses, UpdateCountryData, UpdateCountryErrors, UpdateCountryResponses, UpdateCurrencyData, UpdateCurrencyErrors, UpdateCurrencyResponses, UpdateLocationData, UpdateLocationErrors, UpdateLocationResponses, UpdatePartnerData, UpdatePartnerErrors, UpdatePartnerResponses, UpdateServiceAreaData, UpdateServiceAreaErrors, UpdateServiceAreaResponses, UpdateServiceData, UpdateServiceErrors, UpdateServiceResponses, UpdateServiceTypeData, UpdateServiceTypeErrors, UpdateServiceTypeResponses, UpdateStoreTypeData, UpdateStoreTypeErrors, UpdateStoreTypeResponses, UpdateVerticalData, UpdateVerticalErrors, UpdateVerticalResponses, UpsertServiceData, UpsertServiceErrors, UpsertServiceResponses, VerifyOtpData, VerifyOtpErrors, VerifyOtpResponses, VerifyPayoutAccountData, VerifyPayoutAccountErrors, VerifyPayoutAccountResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -391,6 +391,15 @@ export const listPartners = <ThrowOnError extends boolean = false>(options?: Opt
  * `Idempotency-Key` is honoured: a retry with the same key and body
  * returns the partner already created.
  *
+ * Mission Control onboards a partner on its behalf by naming its
+ * administrator in `owner`, who is invited by email as owner; platform
+ * staff must name one, and a failure anywhere, the email included, leaves
+ * no partner behind. Somebody who is not platform staff naming an `owner`
+ * receives `403` (`forbidden`). The legal identity (`pan`, `gstin`,
+ * `registration_number`, `registered_address`) and the `contacts` may be
+ * given at creation; a GSTIN or PAN that fails its check is refused with
+ * the field codes `gstin_invalid` and `pan_invalid`.
+ *
  */
 export const createPartner = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerData, ThrowOnError>): RequestResult<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerResponses, CreatePartnerErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -450,14 +459,23 @@ export const getPartner = <ThrowOnError extends boolean = false>(options: Option
  * Update a partner
  *
  * Changes the members of the partner that are present in the body and
- * returns the partner. Owners and managers may change `name`,
- * `legal_name`, `contact_email` and `contact_phone`; `status` may only be
- * changed by the platform realm. A caller without the role for a member
- * in the body receives `403` (`forbidden`) and nothing is changed. A
- * status change publishes `tenancy.partner.status_changed` and appends
- * an audit entry with the `reason`. Send `If-Match` with the version you
- * hold to be refused with `412` (`precondition_failed`) when someone else
- * changed the partner first; every write raises the version by one.
+ * returns the partner. Owners and managers may change the profile, the
+ * legal identity (`legal_name`, `registration_number`, `gstin`, `pan`,
+ * `registered_address`) and the `contacts`; `status`, `kind` and
+ * `gst_unregistered` may only be changed by the platform realm, `kind` and
+ * `gst_unregistered` with a `reason`. A caller without the role for a
+ * member in the body receives `403` (`forbidden`) and nothing is changed.
+ *
+ * `status` follows the lifecycle: activating a pending partner is refused
+ * with `409` (`activation_blocked`) naming every blocker (read them first
+ * with `GET /v1/partners/{partner_id}/activation`), suspending needs a
+ * `reason` kept on the partner with when and by whom, and archiving is
+ * refused while locations are open (`locations_open`). A status change
+ * publishes `tenancy.partner.status_changed`, any other change
+ * `tenancy.partner.updated`, and both append an audit entry with the
+ * `reason`. Send `If-Match` with the version you hold to be refused with
+ * `412` (`precondition_failed`) when someone else changed the partner
+ * first; every write raises the version by one.
  *
  */
 export const updatePartner = <ThrowOnError extends boolean = false>(options: Options<UpdatePartnerData, ThrowOnError>): RequestResult<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePartnerResponses, UpdatePartnerErrors, ThrowOnError>({
@@ -468,6 +486,208 @@ export const updatePartner = <ThrowOnError extends boolean = false>(options: Opt
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Read what activation needs
+ *
+ * What activating the partner needs: its status and every blocker (nobody administering it, the documents it must have approved), the checklist the consoles show before an attempt and the same blockers an attempt is refused with. Members and platform staff.
+ *
+ * Permissions once access lands: `partner:access` for members, `partner:read` for platform staff.
+ */
+export const getPartnerActivation = <ThrowOnError extends boolean = false>(options: Options<GetPartnerActivationData, ThrowOnError>): RequestResult<GetPartnerActivationResponses, GetPartnerActivationErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerActivationResponses, GetPartnerActivationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/activation',
+    ...options
+});
+
+/**
+ * Read the partner's standing
+ *
+ * The Partner's registration and standing for the Partner console: the lifecycle and its reason, what activation needs, every document it must have with its review, expiry and what it does to trading, the payout account (masked), the permissions withheld from it and the directory summary. Members and platform staff.
+ */
+export const getPartnerStanding = <ThrowOnError extends boolean = false>(options: Options<GetPartnerStandingData, ThrowOnError>): RequestResult<GetPartnerStandingResponses, GetPartnerStandingErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerStandingResponses, GetPartnerStandingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/standing',
+    ...options
+});
+
+/**
+ * Set or clear the partner's logo
+ *
+ * Applies the Partner's logo as soon as it is stored, or removes it with `null`: a confirmed `partner_logo` asset, square. Owners and managers, or platform staff.
+ */
+export const putPartnerLogo = <ThrowOnError extends boolean = false>(options: Options<PutPartnerLogoData, ThrowOnError>): RequestResult<PutPartnerLogoResponses, PutPartnerLogoErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerLogoResponses, PutPartnerLogoErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/logo',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set or clear the partner's banner
+ *
+ * Applies the Partner's banner as soon as it is stored, or removes it with `null`: a confirmed `partner_banner` asset, twice as wide as tall. Owners and managers, or platform staff.
+ */
+export const putPartnerBanner = <ThrowOnError extends boolean = false>(options: Options<PutPartnerBannerData, ThrowOnError>): RequestResult<PutPartnerBannerResponses, PutPartnerBannerErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerBannerResponses, PutPartnerBannerErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/banner',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the partner's documents
+ *
+ * The documents on file, newest first, with every kind the Partner must have and where each stands; members and platform staff.
+ */
+export const listPartnerDocuments = <ThrowOnError extends boolean = false>(options: Options<ListPartnerDocumentsData, ThrowOnError>): RequestResult<ListPartnerDocumentsResponses, ListPartnerDocumentsErrors, ThrowOnError> => (options.client ?? client).get<ListPartnerDocumentsResponses, ListPartnerDocumentsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/documents',
+    ...options
+});
+
+/**
+ * File a document
+ *
+ * Files a compliance document, pending review: the file is uploaded first under the `partner_document` purpose (private storage) and confirmed. Owners and managers, or platform staff on the Partner's behalf.
+ */
+export const createPartnerDocument = <ThrowOnError extends boolean = false>(options: Options<CreatePartnerDocumentData, ThrowOnError>): RequestResult<CreatePartnerDocumentResponses, CreatePartnerDocumentErrors, ThrowOnError> => (options.client ?? client).post<CreatePartnerDocumentResponses, CreatePartnerDocumentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/documents',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Take a document off file
+ *
+ * Takes a document off file; owners and managers, or platform staff.
+ */
+export const removePartnerDocument = <ThrowOnError extends boolean = false>(options: Options<RemovePartnerDocumentData, ThrowOnError>): RequestResult<RemovePartnerDocumentResponses, RemovePartnerDocumentErrors, ThrowOnError> => (options.client ?? client).delete<RemovePartnerDocumentResponses, RemovePartnerDocumentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/documents/{document_id}',
+    ...options
+});
+
+/**
+ * Get a document
+ *
+ * One document on file; members and platform staff. The file itself is read through `GET /v1/assets/{asset_id}/link`, a signed link of a few minutes.
+ */
+export const getPartnerDocument = <ThrowOnError extends boolean = false>(options: Options<GetPartnerDocumentData, ThrowOnError>): RequestResult<GetPartnerDocumentResponses, GetPartnerDocumentErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerDocumentResponses, GetPartnerDocumentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/documents/{document_id}',
+    ...options
+});
+
+/**
+ * Approve or reject a document
+ *
+ * Reviews a document: approves it, or rejects it with a note the Partner reads and its contacts are told; an approval is withdrawn by a rejection. Platform staff only, a separate authority from writing the Partner.
+ */
+export const reviewPartnerDocument = <ThrowOnError extends boolean = false>(options: Options<ReviewPartnerDocumentData, ThrowOnError>): RequestResult<ReviewPartnerDocumentResponses, ReviewPartnerDocumentErrors, ThrowOnError> => (options.client ?? client).post<ReviewPartnerDocumentResponses, ReviewPartnerDocumentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/documents/{document_id}/review',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List documents for review
+ *
+ * Documents on file across Partners, oldest first: Mission Control's review queue. Filter with `review`, `kind` and `partner_id` or the full grammar; platform realm only (`partner:read`).
+ */
+export const listDocumentsForReview = <ThrowOnError extends boolean = false>(options?: Options<ListDocumentsForReviewData, ThrowOnError>): RequestResult<ListDocumentsForReviewResponses, ListDocumentsForReviewErrors, ThrowOnError> => (options?.client ?? client).get<ListDocumentsForReviewResponses, ListDocumentsForReviewErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partner-documents',
+    ...options
+});
+
+/**
+ * Get the payout account
+ *
+ * The payout account, every number masked to its last four digits; members and platform staff.
+ */
+export const getPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<GetPayoutAccountData, ThrowOnError>): RequestResult<GetPayoutAccountResponses, GetPayoutAccountErrors, ThrowOnError> => (options.client ?? client).get<GetPayoutAccountResponses, GetPayoutAccountErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/payout-account',
+    ...options
+});
+
+/**
+ * State the payout account
+ *
+ * States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. Owners and managers, or platform staff.
+ */
+export const putPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<PutPayoutAccountData, ThrowOnError>): RequestResult<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError> => (options.client ?? client).put<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/payout-account',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Verify the payout account
+ *
+ * Marks the payout account verified; platform staff only (the approval permission). Payouts resume once any hold after a change of account is over.
+ */
+export const verifyPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<VerifyPayoutAccountData, ThrowOnError>): RequestResult<VerifyPayoutAccountResponses, VerifyPayoutAccountErrors, ThrowOnError> => (options.client ?? client).post<VerifyPayoutAccountResponses, VerifyPayoutAccountErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/payout-account/verify',
+    ...options
+});
+
+/**
+ * Get the partner's plan
+ *
+ * The Partner's plan: what it includes, the Pro trial, a change waiting, and the plans on offer. Members and platform staff.
+ */
+export const getPartnerPlan = <ThrowOnError extends boolean = false>(options: Options<GetPartnerPlanData, ThrowOnError>): RequestResult<GetPartnerPlanResponses, GetPartnerPlanErrors, ThrowOnError> => (options.client ?? client).get<GetPartnerPlanResponses, GetPartnerPlanErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/plan',
+    ...options
+});
+
+/**
+ * Change the partner's plan
+ *
+ * Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. The owner, or platform staff, choose the plan the trial ends into.
+ */
+export const putPartnerPlan = <ThrowOnError extends boolean = false>(options: Options<PutPartnerPlanData, ThrowOnError>): RequestResult<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/plan',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preview what a plan change would stop
+ *
+ * What moving the Partner to a plan would stop: the kinds it lacks, the Services of those kinds with their Locations, and whether its stores keep the platform fleet; shown before a move is confirmed. The owner and platform staff.
+ */
+export const getPlanImpact = <ThrowOnError extends boolean = false>(options: Options<GetPlanImpactData, ThrowOnError>): RequestResult<GetPlanImpactResponses, GetPlanImpactErrors, ThrowOnError> => (options.client ?? client).get<GetPlanImpactResponses, GetPlanImpactErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/plan/impact',
+    ...options
 });
 
 /**
@@ -503,6 +723,17 @@ export const createLocation = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
+ * Delete a location into the bin
+ *
+ * Deletes a Location softly: it leaves every listing and read at once and keeps its record, pictures, hours and settings for a restore from the bin. Owners and managers.
+ */
+export const deleteLocation = <ThrowOnError extends boolean = false>(options: Options<DeleteLocationData, ThrowOnError>): RequestResult<DeleteLocationResponses, DeleteLocationErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLocationResponses, DeleteLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}',
+    ...options
+});
+
+/**
  * Get a location
  *
  * Returns one of the partner's locations. Any member of the partner and the platform realm may read it.
@@ -517,11 +748,19 @@ export const getLocation = <ThrowOnError extends boolean = false>(options: Optio
  * Update a location
  *
  * Changes the members of the location that are present in the body,
- * including `status`, and returns the location. Owners and managers may
- * update locations; other members receive `403` (`forbidden`). Send
- * `If-Match` with the version you hold to be refused with `412`
- * (`precondition_failed`) when someone else changed the location first;
- * every write raises the version by one.
+ * including `status`, and returns the location with what it reads as, the
+ * services on there, what it is doing now, its blockers and warnings.
+ * Owners and managers may update locations; other members receive `403`
+ * (`forbidden`). `status` follows the lifecycle: going live is refused with
+ * `409` (`activation_blocked`) naming every blocker (read them first with
+ * `GET .../activation`); asked while the partner is pending, it is
+ * remembered and the location goes live with the partner's activation.
+ * `fields` replaces the typed extra fields its services' types declare: a
+ * value of the wrong shape or a field no type declares is refused, a
+ * required one left empty blocks going live. Moving the pin keeps the zone
+ * and warns when the pin leaves it. Send `If-Match` with the version you
+ * hold to be refused with `412` (`precondition_failed`) when someone else
+ * changed the location first; every write raises the version by one.
  *
  */
 export const updateLocation = <ThrowOnError extends boolean = false>(options: Options<UpdateLocationData, ThrowOnError>): RequestResult<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError> => (options.client ?? client).patch<UpdateLocationResponses, UpdateLocationErrors, ThrowOnError>({
@@ -532,6 +771,162 @@ export const updateLocation = <ThrowOnError extends boolean = false>(options: Op
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * List the locations in the bin
+ *
+ * The Locations in the bin, oldest first; members and platform staff.
+ */
+export const listLocationBin = <ThrowOnError extends boolean = false>(options: Options<ListLocationBinData, ThrowOnError>): RequestResult<ListLocationBinResponses, ListLocationBinErrors, ThrowOnError> => (options.client ?? client).get<ListLocationBinResponses, ListLocationBinErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/bin',
+    ...options
+});
+
+/**
+ * Read what going live needs
+ *
+ * What going live needs for the Location: its status and every blocker (its Partner not active; for a store, no fulfilment, closed all week, no Vertical), the checklist the consoles show before an attempt. Members and platform staff.
+ */
+export const getLocationActivation = <ThrowOnError extends boolean = false>(options: Options<GetLocationActivationData, ThrowOnError>): RequestResult<GetLocationActivationResponses, GetLocationActivationErrors, ThrowOnError> => (options.client ?? client).get<GetLocationActivationResponses, GetLocationActivationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/activation',
+    ...options
+});
+
+/**
+ * Set how a store's orders leave it
+ *
+ * Replaces how orders leave the store: a method's presence enables it, own agents need the Partner's delivery Service, dine-in needs tables (not yet), and switching delivery off discards its zone. A branch has no fulfilment. Owners and managers.
+ */
+export const putLocationFulfilment = <ThrowOnError extends boolean = false>(options: Options<PutLocationFulfilmentData, ThrowOnError>): RequestResult<PutLocationFulfilmentResponses, PutLocationFulfilmentErrors, ThrowOnError> => (options.client ?? client).put<PutLocationFulfilmentResponses, PutLocationFulfilmentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/fulfilment',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Change how a store takes orders
+ *
+ * Changes how the store takes orders; absent members are kept. The slot length, the cap per slot, the auto-reject window and prescriptions are platform staff's; slot settings sent while scheduled orders are off are refused; the window is at most seven days. Owners and managers.
+ */
+export const putLocationOrderSettings = <ThrowOnError extends boolean = false>(options: Options<PutLocationOrderSettingsData, ThrowOnError>): RequestResult<PutLocationOrderSettingsResponses, PutLocationOrderSettingsErrors, ThrowOnError> => (options.client ?? client).put<PutLocationOrderSettingsResponses, PutLocationOrderSettingsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/order-settings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set how a store appears
+ *
+ * Replaces how the store appears: reviews on or off, search tags (lower cased and de-duplicated), and the highlights, which only platform staff set. Owners and managers.
+ */
+export const putLocationListing = <ThrowOnError extends boolean = false>(options: Options<PutLocationListingData, ThrowOnError>): RequestResult<PutLocationListingResponses, PutLocationListingErrors, ThrowOnError> => (options.client ?? client).put<PutLocationListingResponses, PutLocationListingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/listing',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Resume a paused location
+ *
+ * Resumes a paused Location now. Owners and managers.
+ */
+export const resumeLocation = <ThrowOnError extends boolean = false>(options: Options<ResumeLocationData, ThrowOnError>): RequestResult<ResumeLocationResponses, ResumeLocationErrors, ThrowOnError> => (options.client ?? client).delete<ResumeLocationResponses, ResumeLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pause',
+    ...options
+});
+
+/**
+ * Pause a location
+ *
+ * Pauses the Location for one minute to a day with a reason, recording who; it takes orders again at that moment by itself. Pausing is operational: an active store paused for the evening is still active. Owners and managers.
+ */
+export const pauseLocation = <ThrowOnError extends boolean = false>(options: Options<PauseLocationData, ThrowOnError>): RequestResult<PauseLocationResponses, PauseLocationErrors, ThrowOnError> => (options.client ?? client).post<PauseLocationResponses, PauseLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pause',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Restore a location from the bin
+ *
+ * Restores a Location from the bin exactly as it was. Owners and managers.
+ */
+export const restoreLocation = <ThrowOnError extends boolean = false>(options: Options<RestoreLocationData, ThrowOnError>): RequestResult<RestoreLocationResponses, RestoreLocationErrors, ThrowOnError> => (options.client ?? client).post<RestoreLocationResponses, RestoreLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/restore',
+    ...options
+});
+
+/**
+ * Set or clear a location's tile
+ *
+ * Applies the Location's tile as soon as it is stored, or removes it with `null`: a confirmed `location_logo` asset, square. Owners and managers.
+ */
+export const putLocationLogo = <ThrowOnError extends boolean = false>(options: Options<PutLocationLogoData, ThrowOnError>): RequestResult<PutLocationLogoResponses, PutLocationLogoErrors, ThrowOnError> => (options.client ?? client).put<PutLocationLogoResponses, PutLocationLogoErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/logo',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Set or clear a location's banner
+ *
+ * Applies the Location's banner as soon as it is stored, or removes it with `null`: a confirmed `location_banner` asset, twice as wide as tall. Owners and managers.
+ */
+export const putLocationBanner = <ThrowOnError extends boolean = false>(options: Options<PutLocationBannerData, ThrowOnError>): RequestResult<PutLocationBannerResponses, PutLocationBannerErrors, ThrowOnError> => (options.client ?? client).put<PutLocationBannerResponses, PutLocationBannerErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/banner',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the holidays a location may close for
+ *
+ * The upcoming public holidays of the Location's country, each saying whether the Location is already closed that day and by which layer. Members and platform staff.
+ */
+export const listLocationHolidays = <ThrowOnError extends boolean = false>(options: Options<ListLocationHolidaysData, ThrowOnError>): RequestResult<ListLocationHolidaysResponses, ListLocationHolidaysErrors, ThrowOnError> => (options.client ?? client).get<ListLocationHolidaysResponses, ListLocationHolidaysErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/holidays',
+    ...options
+});
+
+/**
+ * Close a location for a holiday
+ *
+ * Marks a public holiday closed at the Location in one act: a closed-all-day closure named after the holiday, added to the Location's own schedule. A holiday already covered says so. Owners and managers.
+ */
+export const closeLocationForHoliday = <ThrowOnError extends boolean = false>(options: Options<CloseLocationForHolidayData, ThrowOnError>): RequestResult<CloseLocationForHolidayResponses, CloseLocationForHolidayErrors, ThrowOnError> => (options.client ?? client).post<CloseLocationForHolidayResponses, CloseLocationForHolidayErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/locations/{location_id}/holidays/{date}/closure',
+    ...options
 });
 
 /**
@@ -648,9 +1043,12 @@ export const acceptInvitation = <ThrowOnError extends boolean = false>(options: 
 /**
  * List services
  *
- * Returns the services the partner has configured, one per kind that was
- * ever put, in any status. Any member of the partner and the platform
- * realm may read them. The list is not paginated.
+ * Returns the registry of the partner: its services, oldest first, in any
+ * status, each with the locations it is switched on at, whether it trades
+ * and what stops it; every kind as enabled, awaiting documents, disabled,
+ * available, or not in the plan with the plan that includes it; and the
+ * plan. Any member of the partner and the platform realm may read it. The
+ * list is not paginated.
  *
  */
 export const listServices = <ThrowOnError extends boolean = false>(options: Options<ListServicesData, ThrowOnError>): RequestResult<ListServicesResponses, ListServicesErrors, ThrowOnError> => (options.client ?? client).get<ListServicesResponses, ListServicesErrors, ThrowOnError>({
@@ -660,12 +1058,57 @@ export const listServices = <ThrowOnError extends boolean = false>(options: Opti
 });
 
 /**
+ * Register a service
+ *
+ * Registers a Service: several of one kind are allowed. Enabled unless `enabled` is `false`; a kind the plan lacks is refused naming the plan that has it; a kind needing documents not yet approved (product sales of a food catalogue type needs the FSSAI licence) lands in `awaiting_documents`, configurable and not trading. Switched on everywhere unless `location_ids` names some. Send `Idempotency-Key` to make a repeated creation answer the first. Owners and managers; platform staff with a reason.
+ */
+export const createService = <ThrowOnError extends boolean = false>(options: Options<CreateServiceData, ThrowOnError>): RequestResult<CreateServiceResponses, CreateServiceErrors, ThrowOnError> => (options.client ?? client).post<CreateServiceResponses, CreateServiceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get a service
+ *
+ * One Service: by its id, or by a kind for the Partner's first Service of that kind. Members and platform staff; another Partner's Service is not found.
+ */
+export const getService = <ThrowOnError extends boolean = false>(options: Options<GetServiceData, ThrowOnError>): RequestResult<GetServiceResponses, GetServiceErrors, ThrowOnError> => (options.client ?? client).get<GetServiceResponses, GetServiceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{kind}',
+    ...options
+});
+
+/**
+ * Change a service
+ *
+ * Changes a Service, by id or by kind: its name, its configuration as a whole, where it is switched on, and enabling or disabling it. Disabling stops its trade at once and keeps the configuration; re-enabling restores it as it was, waiting for documents its kind needs. Owners and managers; platform staff with a reason.
+ */
+export const updateService = <ThrowOnError extends boolean = false>(options: Options<UpdateServiceData, ThrowOnError>): RequestResult<UpdateServiceResponses, UpdateServiceErrors, ThrowOnError> => (options.client ?? client).patch<UpdateServiceResponses, UpdateServiceErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{kind}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Create or replace a service
  *
- * Creates the partner's service of this kind, or replaces its status and
- * configuration when it exists, and returns it with `200` in both cases.
- * Owners and managers may put services; other members receive `403`
- * (`forbidden`). Publishes `tenancy.service.updated`.
+ * Creates the partner's first service of this kind, switched on at every
+ * location, or changes its status, configuration and name when it exists,
+ * and returns it with `200` in both cases. Enabling a kind the plan lacks
+ * is refused with `403` (`not_in_plan`); enabling a kind that needs
+ * documents not yet approved lands in `awaiting_documents`. Owners and
+ * managers may put services; other members receive `403` (`forbidden`);
+ * platform staff acting for the partner give a `reason`. Publishes
+ * `tenancy.service.updated`.
  *
  */
 export const upsertService = <ThrowOnError extends boolean = false>(options: Options<UpsertServiceData, ThrowOnError>): RequestResult<UpsertServiceResponses, UpsertServiceErrors, ThrowOnError> => (options.client ?? client).put<UpsertServiceResponses, UpsertServiceErrors, ThrowOnError>({
@@ -676,6 +1119,80 @@ export const upsertService = <ThrowOnError extends boolean = false>(options: Opt
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Switch a service off at a location
+ *
+ * Switches a Service off at a Location; one switched on everywhere stays on at every other Location, one by one. Owners and managers; platform staff with a reason.
+ */
+export const deleteServiceLocation = <ThrowOnError extends boolean = false>(options: Options<DeleteServiceLocationData, ThrowOnError>): RequestResult<DeleteServiceLocationResponses, DeleteServiceLocationErrors, ThrowOnError> => (options.client ?? client).delete<DeleteServiceLocationResponses, DeleteServiceLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}',
+    ...options
+});
+
+/**
+ * Get a service at a location
+ *
+ * A Service at one Location: whether it is switched on there and trades, and a field Service's area, hours and slots there. Members and platform staff.
+ */
+export const getServiceLocation = <ThrowOnError extends boolean = false>(options: Options<GetServiceLocationData, ThrowOnError>): RequestResult<GetServiceLocationResponses, GetServiceLocationErrors, ThrowOnError> => (options.client ?? client).get<GetServiceLocationResponses, GetServiceLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}',
+    ...options
+});
+
+/**
+ * Switch a service on at a location
+ *
+ * Switches a Service on at a Location, with a field Service's settings there (a radius of up to 25 km, a polygon or the whole zone; hours; 15, 30 or 60 minute slots; a buffer; a minimum notice; a booking window of up to 60 days). Changing them never moves or cancels a booking already made. Owners and managers; platform staff with a reason.
+ */
+export const putServiceLocation = <ThrowOnError extends boolean = false>(options: Options<PutServiceLocationData, ThrowOnError>): RequestResult<PutServiceLocationResponses, PutServiceLocationErrors, ThrowOnError> => (options.client ?? client).put<PutServiceLocationResponses, PutServiceLocationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/locations/{location_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get a delivery service's pricing
+ *
+ * A delivery Service's pricing as a Provider: the latest version, or the one asked for. Members and platform staff.
+ */
+export const getDeliveryPricing = <ThrowOnError extends boolean = false>(options: Options<GetDeliveryPricingData, ThrowOnError>): RequestResult<GetDeliveryPricingResponses, GetDeliveryPricingErrors, ThrowOnError> => (options.client ?? client).get<GetDeliveryPricingResponses, GetDeliveryPricingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing',
+    ...options
+});
+
+/**
+ * Version a delivery service's pricing
+ *
+ * Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. Owners and managers; platform staff with a reason.
+ */
+export const putDeliveryPricing = <ThrowOnError extends boolean = false>(options: Options<PutDeliveryPricingData, ThrowOnError>): RequestResult<PutDeliveryPricingResponses, PutDeliveryPricingErrors, ThrowOnError> => (options.client ?? client).put<PutDeliveryPricingResponses, PutDeliveryPricingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Quote a delivery
+ *
+ * What a delivery costs at the Service's pricing: the flat fee, the per-kilometre charge beyond the base distance band by band, the waiting beyond the free minutes, rounded once, with the version that explains it. Members and platform staff.
+ */
+export const quoteDelivery = <ThrowOnError extends boolean = false>(options: Options<QuoteDeliveryData, ThrowOnError>): RequestResult<QuoteDeliveryResponses, QuoteDeliveryErrors, ThrowOnError> => (options.client ?? client).get<QuoteDeliveryResponses, QuoteDeliveryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/v1/partners/{partner_id}/services/{service_id}/pricing/quote',
+    ...options
 });
 
 /**

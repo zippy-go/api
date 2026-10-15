@@ -6,6 +6,83 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-15
+
+### Added
+
+- The partner as a legal entity (specification
+  `partner-and-location-management`): `Partner` gains `country`,
+  `registration_number`, `gstin` (checked, embedding the PAN), `pan`,
+  `gst_unregistered`, `registered_address`, `description`, `contacts` with
+  per-channel consent, `logo_asset_id`, `banner_asset_id`, `launched_at`,
+  `status_reason`, `status_changed_at`, `status_changed_by`, `plan` and,
+  on reads, `standing`; `PartnerCreate` and `PartnerUpdate` take them, the
+  field codes `gstin_invalid` and `pan_invalid` name a failed check.
+  Mission Control onboards a partner on its behalf by naming its
+  administrator in `owner` (`PartnerOwner`), invited by email.
+- The lifecycle with archive: `PartnerStatus` gains `archived`; activation
+  is refused with `409` (`activation_blocked`, one field-level code per
+  blocker: `document_missing`, `document_pending`, `document_rejected`,
+  `document_expired`, `no_administrator`, `partner_not_active`,
+  `no_fulfilment`, `closed_all_week`, `no_vertical`, `field_required`),
+  readable before any attempt at `GET /v1/partners/{partner_id}/activation`
+  (`PartnerActivation`); suspending needs a reason; archiving is refused
+  while locations are open (`locations_open`); nothing new refers to an
+  archived partner (`partner_archived`).
+- Compliance documents (tag `Partner documents`):
+  `GET, POST /v1/partners/{partner_id}/documents`, `GET, DELETE
+  .../documents/{document_id}`, the review `POST .../review` and Mission
+  Control's queue `GET /v1/partner-documents`, with what a partner must
+  have on file and what each requirement does to trading
+  (`DocumentRequirement`).
+- The payout account (tag `Payout accounts`): `GET, PUT
+  /v1/partners/{partner_id}/payout-account` and `POST .../verify`, the IFSC
+  checked (`ifsc_invalid`), the number masked on reads.
+- The partner's logo and banner (`PUT /v1/partners/{partner_id}/logo`,
+  `.../banner`) and its standing (`GET /v1/partners/{partner_id}/standing`).
+- Locations as stores and branches: `Location` gains `pin_in_zone`,
+  `currency`, `description`, `contacts`, `vertical_ids`, `category_ids`,
+  `fulfilment`, `order_settings`, `listing`, `pause`, `fields`,
+  `logo_asset_id`, `banner_asset_id`, `deleted_at`, `went_live_at`,
+  `go_live_requested_at`, the status reason, when and by whom, and on reads
+  `reads_as`, `services`, `live`, `blockers` and `warnings`;
+  `LocationStatus` gains `pending`, `suspended` and `archived` (`inactive`
+  stays accepted as the name of `suspended`). Opening is refused in a zone
+  that does not serve (`zone_not_serving`) or for a vertical it does not
+  offer (`vertical_not_offered`). New operations: `DELETE` into the bin,
+  `GET .../locations/bin`, `POST .../restore`, `GET .../activation`, `PUT
+  .../fulfilment`, `.../order-settings`, `.../listing`, `.../logo`,
+  `.../banner`, `POST` and `DELETE .../pause`, `GET .../holidays` and
+  `POST .../holidays/{date}/closure`; `service_required` refuses a setting
+  that needs a service the partner does not run there.
+- The registry of services (specification `services-and-capabilities`):
+  several services of one kind; `POST /v1/partners/{partner_id}/services`
+  (`ServiceCreate`), `GET` and `PATCH .../services/{kind}` naming a service
+  by id or kind (`ServiceUpdate`); `Service` gains `name`, `status_reason`,
+  `everywhere`, `location_ids`, `awaiting`, `trading`, `blockers`, `agents`,
+  `pricing_version`, `version`, `created_by` and `updated_by`;
+  `ServiceStatus` gains `awaiting_documents`; `ServiceList` gains `kinds`
+  (`KindAvailability`) and `plan`; the configurations by kind
+  (`ProductSalesConfig`, `FieldServiceConfig`, `DeliveryConfig`); a
+  service at a location with a field service's settings (`GET, PUT, DELETE
+  .../services/{service_id}/locations/{location_id}`); a delivery
+  service's versioned pricing as a provider and its quote (`GET, PUT
+  .../services/{service_id}/pricing`, `GET .../pricing/quote`).
+- Plans (tag `Plans`): `GET, PUT /v1/partners/{partner_id}/plan`
+  (`PartnerPlan`, `PartnerPlanUpdate`) and `GET .../plan/impact`
+  (`PlanImpact`); a kind the plan lacks is refused with `403`
+  (`not_in_plan`).
+- Events: `tenancy.partner.updated`, `tenancy.location.updated`,
+  `tenancy.location.status_changed`, `tenancy.location.deleted`,
+  `tenancy.location.restored`, `tenancy.location.paused`,
+  `tenancy.location.resumed`, `tenancy.document.filed`,
+  `tenancy.document.reviewed`, `tenancy.document.removed`,
+  `tenancy.document.notice_sent`, `tenancy.payout_account.changed`,
+  `tenancy.payout_account.verified` and `tenancy.plan.changed`;
+  `tenancy.partner.status_changed` gains `previous_status` and `archived`;
+  `tenancy.service.updated` gains `service_id`, `name`, `changed`,
+  `previous_status`, `pricing_version` and `awaiting_documents`.
+
 ## [0.7.0] - 2026-10-15
 
 ### Added

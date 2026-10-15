@@ -1,0 +1,37 @@
+type: object
+description: "A store's pause, the `LocationPause` schema: who paused it, why and until when."
+required:
+  - until
+  - reason
+  - paused_at
+properties:
+  until:
+    type: string
+    format: date-time
+    description: When it takes orders again, by itself.
+  reason:
+    $ref: ./PauseReason.yaml
+    description: Why.
+  paused_at:
+    type: string
+    format: date-time
+    description: When.
+  message:
+    type:
+      - string
+      - 'null'
+    description: The message customers read, for a custom reason.
+    examples:
+      - Back after the lunch rush
+  paused_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who paused it.
+examples:
+  - until: 2026-10-15T13:40:00Z
+    reason: high_demand
+    message: Back after the rush
+    paused_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    paused_at: 2026-10-15T13:00:00Z

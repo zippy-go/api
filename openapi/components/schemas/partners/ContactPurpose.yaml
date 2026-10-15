@@ -1,0 +1,9 @@
+type: string
+description: What a contact is for. A notice looks for its purpose, then operations, then anybody.
+enum:
+  - operations
+  - finance
+  - escalation
+  - legal
+examples:
+  - operations

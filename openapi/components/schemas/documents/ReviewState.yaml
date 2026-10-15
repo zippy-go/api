@@ -1,0 +1,8 @@
+type: string
+description: Where a document's review is.
+enum:
+  - pending
+  - approved
+  - rejected
+examples:
+  - pending

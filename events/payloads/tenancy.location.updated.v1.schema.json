@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/tenancy.location.updated.v1.schema.json",
+  "title": "TenancyLocationUpdatedPayload",
+  "description": "Payload of `tenancy.location.updated` version 1: a location's profile, settings, fulfilment, listing, pause, pictures or typed fields changed. The envelope's `partner_id` is the location's partner. The payload names the members that changed, never their values. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "location_id",
+    "changed"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The partner of the location, the same value as the envelope's `partner_id`.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The location that changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "changed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The names of the location's members that changed, never their values.",
+      "examples": [
+        [
+          "fulfilment",
+          "listing"
+        ]
+      ]
+    }
+  }
+}

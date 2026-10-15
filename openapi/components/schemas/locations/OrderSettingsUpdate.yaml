@@ -1,0 +1,36 @@
+type: object
+description: 'Request body of `PUT .../order-settings`, the `OrderSettingsUpdate` schema: absent members are kept.'
+properties:
+  auto_reject_minutes:
+    type:
+      - integer
+      - 'null'
+    description: Minutes after which an order nobody accepted is declined, or `null` for the platform's own limit; platform staff only.
+    minimum: 0
+  cutlery:
+    oneOf:
+      - $ref: ./Cutlery.yaml
+      - type: 'null'
+    description: Cutlery at checkout.
+  preparation:
+    oneOf:
+      - $ref: ./Preparation.yaml
+      - type: 'null'
+    description: How preparation time is quoted.
+  prescriptions:
+    type:
+      - boolean
+      - 'null'
+    description: Whether an order may carry a prescription; platform staff only.
+  scheduled:
+    oneOf:
+      - $ref: ./ScheduledOrdersUpdate.yaml
+      - type: 'null'
+    description: Scheduled orders; slot settings are refused while scheduled orders are not taken.
+examples:
+  - preparation:
+      mode: fixed
+      minutes: 25
+    scheduled:
+      accepts: true
+      window_days: 3

@@ -1,0 +1,93 @@
+type: object
+description: 'The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits.'
+required:
+  - holder_name
+  - account_type
+  - account_number
+  - last4
+  - ifsc
+  - state
+  - updated_at
+  - version
+properties:
+  holder_name:
+    type: string
+    description: The account holder's name.
+    examples:
+      - Example Partner Ltd
+  account_type:
+    $ref: ./PayoutAccountType.yaml
+    description: Business or personal.
+  account_number:
+    type: string
+    description: The account number, all but the last four digits masked; sending it back unchanged keeps the account.
+    examples:
+      - XXXXXXXX1234
+  last4:
+    type: string
+    description: The last four digits.
+    examples:
+      - '1234'
+  ifsc:
+    type: string
+    description: The IFSC.
+    examples:
+      - EXMP0001234
+  state:
+    $ref: ./PayoutAccountState.yaml
+    description: Whether platform staff verified it.
+  updated_at:
+    type: string
+    format: date-time
+    description: When the Partner last changed it.
+  version:
+    type: integer
+    description: The version, raised on every write.
+    examples:
+      - 2
+  bank_name:
+    type:
+      - string
+      - 'null'
+    description: The bank's name.
+    examples:
+      - Example Bank
+  payouts_held_until:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: Payouts wait until this moment after a change of account, and until it is verified.
+  upi_id:
+    type:
+      - string
+      - 'null'
+    description: The UPI ID.
+    examples:
+      - partner@exampleupi
+  verified_at:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: When it was verified.
+  verified_by:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: Who verified it.
+examples:
+  - holder_name: Example Partner Ltd
+    account_type: business
+    account_number: XXXXXXXX1234
+    last4: '1234'
+    ifsc: EXMP0001234
+    bank_name: Example Bank
+    upi_id: null
+    state: unverified
+    verified_by: null
+    verified_at: null
+    payouts_held_until: 2026-10-17T09:00:00Z
+    updated_at: 2026-10-15T09:00:00Z
+    version: 1

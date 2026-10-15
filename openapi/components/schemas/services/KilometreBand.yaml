@@ -1,0 +1,20 @@
+type: object
+description: One band of the per-kilometre charge beyond the base distance, the `KilometreBand` schema.
+required:
+  - per_km
+properties:
+  per_km:
+    type: integer
+    description: The charge per kilometre in the band, in minor units.
+    examples:
+      - 800
+  up_to_metres:
+    type:
+      - integer
+      - 'null'
+    description: The band's upper bound in metres from the pickup; `null` for the open-ended last band.
+    examples:
+      - 10000
+examples:
+  - up_to_metres: null
+    per_km: 800

@@ -22,12 +22,12 @@ and its status is part of the contract.
 
 | Status | Codes |
 | --- | --- |
-| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak` or one of the `filter_*` and `sort_*` codes), `channel_unknown` |
+| 400 | `validation_failed` (every failing part listed in `errors` with a JSON Pointer, a sentence and, where defined, a code such as `malformed_identifier`, `cursor_invalid`, `password_weak`, `gstin_invalid`, `pan_invalid`, `ifsc_invalid` or one of the `filter_*` and `sort_*` codes), `channel_unknown` |
 | 401 | `unauthenticated`, `invalid_code`, `code_expired` |
-| 403 | `forbidden` |
+| 403 | `forbidden`, `not_in_plan` |
 | 404 | `not_found`, also for another tenant's record, identical to an id that never existed |
 | 405 | `method_not_allowed` |
-| 409 | `conflict`, `illegal_transition`, `locations_stranded`, `sign_in_closed`, `idempotency_key_reuse`, `asset_not_usable` |
+| 409 | `conflict`, `illegal_transition`, `locations_stranded`, `sign_in_closed`, `idempotency_key_reuse`, `asset_not_usable`, `activation_blocked` (each blocker in `errors` with a code such as `document_missing` or `no_fulfilment`), `partner_archived`, `zone_not_serving`, `vertical_not_offered`, `service_required`, `locations_open` |
 | 410 | `invitation_invalid`, `version_retired` |
 | 412 | `precondition_failed` |
 | 415 | `unsupported_media_type` |

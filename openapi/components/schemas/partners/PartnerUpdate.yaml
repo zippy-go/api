@@ -47,6 +47,48 @@ properties:
     description: Why the status is changed, kept in the audit log with the entry for the change. Sent with `status`.
     examples:
       - Documents verified
+  contacts:
+    type:
+      - array
+      - 'null'
+    items:
+      $ref: ./Contact.yaml
+    description: The contacts, replaced as a whole.
+  description:
+    type:
+      - string
+      - 'null'
+    description: New description, or `null` to clear.
+  gst_unregistered:
+    type:
+      - boolean
+      - 'null'
+    description: '`true` records the organisation as not registered for GST, so no GST registration is asked of it; platform realm only, with a `reason`.'
+  gstin:
+    type:
+      - string
+      - 'null'
+    description: New GSTIN, or `null` to clear.
+  kind:
+    oneOf:
+      - $ref: ./PartnerKind.yaml
+      - type: 'null'
+    description: New kind; platform realm only, with a `reason`. Locations, members, documents and settings are kept.
+  pan:
+    type:
+      - string
+      - 'null'
+    description: New PAN, or `null` to clear.
+  registered_address:
+    oneOf:
+      - $ref: ../common/Address.yaml
+      - type: 'null'
+    description: New registered address, or `null` to clear.
+  registration_number:
+    type:
+      - string
+      - 'null'
+    description: New registration number, or `null` to clear.
 examples:
   - name: Example Partner
     contact_phone: '+15555550101'

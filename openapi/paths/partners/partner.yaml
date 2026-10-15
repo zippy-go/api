@@ -59,14 +59,23 @@ patch:
   summary: Update a partner
   description: |
     Changes the members of the partner that are present in the body and
-    returns the partner. Owners and managers may change `name`,
-    `legal_name`, `contact_email` and `contact_phone`; `status` may only be
-    changed by the platform realm. A caller without the role for a member
-    in the body receives `403` (`forbidden`) and nothing is changed. A
-    status change publishes `tenancy.partner.status_changed` and appends
-    an audit entry with the `reason`. Send `If-Match` with the version you
-    hold to be refused with `412` (`precondition_failed`) when someone else
-    changed the partner first; every write raises the version by one.
+    returns the partner. Owners and managers may change the profile, the
+    legal identity (`legal_name`, `registration_number`, `gstin`, `pan`,
+    `registered_address`) and the `contacts`; `status`, `kind` and
+    `gst_unregistered` may only be changed by the platform realm, `kind` and
+    `gst_unregistered` with a `reason`. A caller without the role for a
+    member in the body receives `403` (`forbidden`) and nothing is changed.
+
+    `status` follows the lifecycle: activating a pending partner is refused
+    with `409` (`activation_blocked`) naming every blocker (read them first
+    with `GET /v1/partners/{partner_id}/activation`), suspending needs a
+    `reason` kept on the partner with when and by whom, and archiving is
+    refused while locations are open (`locations_open`). A status change
+    publishes `tenancy.partner.status_changed`, any other change
+    `tenancy.partner.updated`, and both append an audit entry with the
+    `reason`. Send `If-Match` with the version you hold to be refused with
+    `412` (`precondition_failed`) when someone else changed the partner
+    first; every write raises the version by one.
   tags:
     - Partners
   security:
@@ -110,6 +119,12 @@ patch:
             $ref: ../../components/schemas/common/Problem.yaml
     '404':
       description: The partner does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: 'The change breaks the lifecycle: activation names its blockers (`activation_blocked`, with one error per blocker), a move the lifecycle does not allow (`illegal_transition`), archiving while locations are open (`locations_open`), or a change to an archived partner (`partner_archived`).'
       content:
         application/problem+json:
           schema:

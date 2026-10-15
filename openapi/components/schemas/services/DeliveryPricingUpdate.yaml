@@ -1,0 +1,23 @@
+type: object
+description: 'Request body of `PUT .../services/{service_id}/pricing`, the `DeliveryPricingUpdate` schema: the next version of the pricing.'
+required:
+  - pricing
+properties:
+  pricing:
+    $ref: ./DeliveryPricing.yaml
+    description: The pricing.
+  reason:
+    type:
+      - string
+      - 'null'
+    description: Why; required of platform staff acting for the Partner.
+examples:
+  - pricing:
+      currency: INR
+      flat_fee: 3000
+      base_distance_metres: 2000
+      per_km:
+        - up_to_metres: null
+          per_km: 800
+      waiting_fee_per_minute: 100
+      free_waiting_minutes: 5

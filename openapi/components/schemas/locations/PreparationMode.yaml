@@ -1,0 +1,7 @@
+type: string
+description: How preparation time is quoted.
+enum:
+  - fixed
+  - measured
+examples:
+  - fixed

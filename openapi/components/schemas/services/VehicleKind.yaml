@@ -1,0 +1,9 @@
+type: string
+description: A vehicle a delivery Service runs.
+enum:
+  - bicycle
+  - two_wheeler
+  - three_wheeler
+  - four_wheeler
+examples:
+  - two_wheeler

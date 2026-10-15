@@ -1,0 +1,41 @@
+type: object
+description: 'What moving a Partner to a plan would do, the `PlanImpact` schema: shown to platform staff before they confirm.'
+required:
+  - from
+  - to
+  - kinds_lost
+  - services
+  - platform_fleet
+properties:
+  from:
+    $ref: ./Plan.yaml
+    description: The plan in force.
+  to:
+    $ref: ./Plan.yaml
+    description: The plan proposed.
+  kinds_lost:
+    type: array
+    items:
+      $ref: ../services/ServiceKind.yaml
+    description: The kinds the proposed plan lacks.
+  services:
+    type: array
+    items:
+      $ref: ./PlanImpactService.yaml
+    description: The Services that would be disabled, enabled or awaiting documents now.
+  platform_fleet:
+    type: boolean
+    description: '`false` when its stores would lose the platform fleet.'
+examples:
+  - from: standard
+    to: starter
+    kinds_lost:
+      - field_service
+      - delivery
+    services:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a46
+        kind: delivery
+        name: Delivery
+        location_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    platform_fleet: false

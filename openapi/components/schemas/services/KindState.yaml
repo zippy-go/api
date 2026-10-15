@@ -1,0 +1,10 @@
+type: string
+description: Where a kind of Service stands for a Partner.
+enum:
+  - enabled
+  - awaiting_documents
+  - disabled
+  - available
+  - not_in_plan
+examples:
+  - enabled

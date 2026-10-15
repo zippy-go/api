@@ -1,0 +1,18 @@
+type: object
+description: How preparation time is quoted, the `Preparation` schema.
+required:
+  - mode
+  - minutes
+properties:
+  mode:
+    $ref: ./PreparationMode.yaml
+    description: Typed or measured.
+  minutes:
+    type: integer
+    description: The typed minutes, the quote in fixed mode and the fallback in measured mode.
+    minimum: 0
+    examples:
+      - 20
+examples:
+  - mode: fixed
+    minutes: 20

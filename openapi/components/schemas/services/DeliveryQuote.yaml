@@ -1,0 +1,58 @@
+type: object
+description: A quote and how it was reached, the `DeliveryQuote` schema.
+required:
+  - version
+  - currency
+  - distance_metres
+  - waiting_minutes
+  - flat_fee
+  - distance_charge
+  - waiting_charge
+  - total
+properties:
+  version:
+    type: integer
+    description: The pricing version it was priced at, which the delivery keeps.
+    examples:
+      - 3
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  distance_metres:
+    type: integer
+    description: The distance priced, in metres.
+    examples:
+      - 5000
+  waiting_minutes:
+    type: integer
+    description: The minutes of waiting priced.
+    minimum: 0
+  flat_fee:
+    type: integer
+    description: The flat fee.
+    examples:
+      - 3000
+  distance_charge:
+    type: integer
+    description: The per-kilometre charge beyond the base distance.
+    examples:
+      - 2400
+  waiting_charge:
+    type: integer
+    description: The waiting charge.
+  total:
+    type: integer
+    description: The total, in minor units.
+    examples:
+      - 5400
+examples:
+  - version: 3
+    currency: INR
+    distance_metres: 5000
+    waiting_minutes: 0
+    flat_fee: 3000
+    distance_charge: 2400
+    waiting_charge: 0
+    total: 5400

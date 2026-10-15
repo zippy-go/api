@@ -1,0 +1,7 @@
+type: string
+description: Whose account it is.
+enum:
+  - business
+  - personal
+examples:
+  - business

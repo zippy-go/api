@@ -1,0 +1,33 @@
+type: object
+description: A Service switched on at a Location as the Location reads it, the `LocationService` schema.
+required:
+  - id
+  - kind
+  - name
+  - status
+  - trading
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Service.
+  kind:
+    $ref: ../services/ServiceKind.yaml
+    description: Its kind.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Delivery
+  status:
+    $ref: ../services/ServiceStatus.yaml
+    description: Its status.
+  trading:
+    type: boolean
+    description: Whether it trades here now.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    kind: product_sales
+    name: Product sales
+    status: enabled
+    trading: true

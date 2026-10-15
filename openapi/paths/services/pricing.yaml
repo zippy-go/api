@@ -1,0 +1,140 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/pricing. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The service, which must belong to the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+get:
+  operationId: getDeliveryPricing
+  summary: Get a delivery service's pricing
+  description: "A delivery Service's pricing as a Provider: the latest version, or the one asked for. Members and platform staff."
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  parameters:
+    - name: version
+      in: query
+      required: false
+      description: A version to read; the latest when absent.
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    '200':
+      description: The pricing version.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/DeliveryPricingVersion.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: Unknown, not visible, or no pricing yet.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`service_required`: the Service is not a delivery Service.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putDeliveryPricing
+  summary: Version a delivery service's pricing
+  description: "Makes the next version of a delivery Service's pricing: a flat fee per delivery, a per-kilometre charge beyond a base distance in ascending bands ending open, and an optional waiting fee, in minor units of an operating currency. A delivery quoted at one version is paid at it. Owners and managers; platform staff with a reason."
+  tags:
+    - Services
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/services/DeliveryPricingUpdate.yaml
+  responses:
+    '201':
+      description: The new version.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/services/DeliveryPricingVersion.yaml
+    '400':
+      description: Amounts negative, bands out of order, a currency not operated, or platform staff without a reason.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '401':
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: Neither owner nor manager.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '404':
+      description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '409':
+      description: '`service_required`: the Service is not a delivery Service.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    '503':
+      description: A store the operation needs is unavailable (`unavailable`); retry shortly.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
