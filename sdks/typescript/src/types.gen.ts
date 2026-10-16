@@ -16950,11 +16950,11 @@ export type OrderStore = {
      */
     time_zone: string;
     /**
-     * Where it is, as it was when the order was placed (the pickup on the order's map). Since 0.17.0.
+     * Where it is, as it was when the order was placed (the pickup on the order's map). Since 0.18.0.
      */
     lat?: number;
     /**
-     * Where it is, as it was when the order was placed. Since 0.17.0.
+     * Where it is, as it was when the order was placed. Since 0.18.0.
      */
     lng?: number;
 };
@@ -17394,7 +17394,7 @@ export type CustomerOrderSummary = {
      */
     total: Money;
     /**
-     * The courier's first name, once the Agent's app has the delivery, as the order's page reads it; `null` before and for a pickup. Since 0.17.0.
+     * The courier's first name, once the Agent's app has the delivery, as the order's page reads it; `null` before and for a pickup. Since 0.18.0.
      */
     courier?: OrderCourier | null;
 };
@@ -18377,7 +18377,7 @@ export type DeliveryProvider = {
 };
 
 /**
- * Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.17.0.
+ * Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.18.0.
  */
 export type DeliveryChain = {
     /**

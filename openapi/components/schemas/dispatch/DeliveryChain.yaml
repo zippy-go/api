@@ -1,5 +1,5 @@
 type: object
-description: "Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.17.0."
+description: "Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.18.0."
 required:
   - location_id
   - providers
