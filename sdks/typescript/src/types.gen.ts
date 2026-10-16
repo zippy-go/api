@@ -18731,7 +18731,7 @@ export type DeliverySummary = {
      */
     expected_at: string | null;
     /**
-     * Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+     * Whether it is expected more than 5 minutes after the time the customer was promised (`drop_at` when none is known), or not delivered 5 minutes after it, so a board reads late when the customer hears it runs late.
      */
     late: boolean;
     /**

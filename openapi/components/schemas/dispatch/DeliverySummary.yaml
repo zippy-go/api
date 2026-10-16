@@ -117,7 +117,7 @@ properties:
       - 2026-10-16T13:44:00Z
   late:
     type: boolean
-    description: Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+    description: Whether it is expected more than 5 minutes after the time the customer was promised (`drop_at` when none is known), or not delivered 5 minutes after it, so a board reads late when the customer hears it runs late.
     examples:
       - false
   waiting_since:
