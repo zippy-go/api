@@ -65,7 +65,9 @@ after the workforce (0.17.0) merged first. Additive only.
   store's order gains its courier with a way to call them (`courier`,
   `StoreCourier`), `expected_at`, the delivery (`delivery_id`), whether a
   Provider carries it (`carried_by_provider`: the store then neither hands
-  over nor delivers by hand) and the proof.
+  over nor delivers by hand) and the proof. My orders' rows
+  (`CustomerOrderSummary`) carry the courier too, and the store an order is
+  from (`OrderStore`) its point (`lat`, `lng`) for the order's map.
 - Live: the dispatch board channels `private-partner-{partner_id}-deliveries`
   (members with `dispatch:read`) and `private-deliveries` (platform
   `dispatch:read`) carrying `delivery.changed`; `offer.changed` on an
@@ -83,6 +85,27 @@ after the workforce (0.17.0) merged first. Additive only.
   `delivery_collected`, `delivery_ended`, `nothing_to_ask`,
   `delivery_not_failed`, `delivery_open`, `not_for_delivery`,
   `no_provider` and `assignment_refused` with its field codes.
+- Notifications: an offer is pushed to the devices of the person holding
+  the Agent membership (`RecipientKind` `agent`, template `agent.offer`);
+  the customer is told of `on_its_way` with the courier's first name,
+  `running_late` and `undelivered`.
+- The boards list the deliveries under way and the failed ones waiting to
+  be sent again or cancelled; a delivery that ended otherwise is off them
+  (`DeliveryBoardGroup`).
+- Who carries a Location's deliveries, in the order they are asked
+  (`GET /v1/partners/{partner_id}/locations/{location_id}/delivery-chain`,
+  `DeliveryChain`): its own delivery service, then the platform fleet, each
+  naming its Partner.
+
+### Changed
+
+- `DispatchSettings` and `DispatchSettingsUpdate` no longer carry
+  `max_tasks_per_agent`, `cash_ceiling` or `drop_code_required`, written
+  earlier on this branch and never released: the limit per Agent, the cash
+  ceiling and the customer's code at the door are the delivery service's
+  agent settings, which the workforce keeps and dispatch weighs Agents
+  against (the coordinator's decision). A client still sending them is
+  answered `400`.
 
 ## [0.17.0] - 2026-10-16
 

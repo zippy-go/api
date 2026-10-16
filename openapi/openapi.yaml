@@ -997,6 +997,8 @@ paths:
     $ref: ./paths/deliveries/partner-order-deliveries.yaml
   /v1/partners/{partner_id}/services/{service_id}/dispatch-settings:
     $ref: ./paths/deliveries/dispatch-settings.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/delivery-chain:
+    $ref: ./paths/deliveries/partner-location-delivery-chain.yaml
   /v1/platform/dispatch/board:
     $ref: ./paths/deliveries/platform-board.yaml
   /v1/platform/deliveries/{delivery_id}:
@@ -2644,6 +2646,8 @@ components:
       $ref: ./components/schemas/dispatch/AssignmentRefusalCode.yaml
     DeliveryProvider:
       $ref: ./components/schemas/dispatch/DeliveryProvider.yaml
+    DeliveryChain:
+      $ref: ./components/schemas/dispatch/DeliveryChain.yaml
     DeliveryStop:
       $ref: ./components/schemas/dispatch/DeliveryStop.yaml
     DeliveryCourier:

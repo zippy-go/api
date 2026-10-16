@@ -1,0 +1,37 @@
+type: object
+description: "Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.17.0."
+required:
+  - location_id
+  - providers
+  - note
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000302
+  providers:
+    type: array
+    description: The Providers in the order a delivery is asked of them, each naming its Partner; empty when none can carry the store's deliveries now.
+    items:
+      $ref: ./DeliveryProvider.yaml
+  note:
+    type:
+      - string
+      - "null"
+    description: Why there is none, when there is none.
+    examples:
+      - null
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000302
+    providers:
+      - kind: own_service
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        service_id: 01a13a48-9e00-7000-8000-000000000206
+        name: Dev Kitchen Riders
+      - kind: platform_fleet
+        partner_id: 01a13a48-9e00-7000-8000-000000000002
+        service_id: 01a13a48-9e00-7000-8000-000000000202
+        name: ZippyGo Fleet
+    note: null

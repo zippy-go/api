@@ -16949,6 +16949,14 @@ export type OrderStore = {
      * Its clock, which the order's times are shown on.
      */
     time_zone: string;
+    /**
+     * Where it is, as it was when the order was placed (the pickup on the order's map). Since 0.17.0.
+     */
+    lat?: number;
+    /**
+     * Where it is, as it was when the order was placed. Since 0.17.0.
+     */
+    lng?: number;
 };
 
 /**
@@ -17385,6 +17393,10 @@ export type CustomerOrderSummary = {
      * Its total as ordered.
      */
     total: Money;
+    /**
+     * The courier's first name, once the Agent's app has the delivery, as the order's page reads it; `null` before and for a pickup. Since 0.17.0.
+     */
+    courier?: OrderCourier | null;
 };
 
 /**
@@ -18303,7 +18315,7 @@ export type PlatformOrderSummary = {
 export type DeliveryState = 'wanted' | 'waiting' | 'assigned' | 'collected' | 'delivered' | 'failed' | 'called_off';
 
 /**
- * The group a delivery falls in on a dispatch board, one at a time, the first that applies: `needs_somebody`, `undelivered` (its drop failed and the order is neither sent again nor cancelled), `late`, `waiting_for_release`, `waiting_for_agent`, `assigned`, `collected`.
+ * The group a delivery falls in on a dispatch board, one at a time, the first that applies: `needs_somebody`, `undelivered` (its drop failed and the order is neither sent again nor cancelled), `late`, `waiting_for_release`, `waiting_for_agent`, `assigned`, `collected`. The boards list the deliveries under way and the failed ones whose order is neither sent again nor cancelled; a delivery that ended otherwise (delivered, called off, or failed and resolved) is off the boards, and where it is still read (its page, its order's deliveries) its `state` says how it ended and its group reads `collected`.
  */
 export type DeliveryBoardGroup = 'waiting_for_release' | 'waiting_for_agent' | 'assigned' | 'collected' | 'late' | 'undelivered' | 'needs_somebody';
 
@@ -18362,6 +18374,24 @@ export type DeliveryProvider = {
      * The Provider's name.
      */
     name: string;
+};
+
+/**
+ * Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.17.0.
+ */
+export type DeliveryChain = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The Providers in the order a delivery is asked of them, each naming its Partner; empty when none can carry the store's deliveries now.
+     */
+    providers: Array<DeliveryProvider>;
+    /**
+     * Why there is none, when there is none.
+     */
+    note: string | null;
 };
 
 /**
@@ -19169,7 +19199,7 @@ export type OrderDeliveries = {
 };
 
 /**
- * How a delivery service dispatches: the strategy, offers or direct assignment, whether deliveries are offered automatically, the offer's time, the most deliveries an Agent carries at once, the time the service has before the next Provider of a chain is asked, the cash ceiling and whether the drop needs the customer's code. A service never saved reads the defaults: nearest available with direct assignment for a Partner's own Agents, ETA-based with offers for the platform fleet.
+ * How a delivery service dispatches: the strategy, offers or direct assignment, whether deliveries are offered automatically, the offer's time and the time the service has before the next Provider of a chain is asked. A service never saved reads the defaults: nearest available with direct assignment for a Partner's own Agents, ETA-based with offers for the platform fleet. The most deliveries an Agent carries at once, the cash ceiling and whether the drop needs the customer's code are the service's agent settings, which the workforce keeps (`/v1/partners/{partner_id}/services/{service_id}/agent-settings`) and dispatch weighs Agents against.
  */
 export type DispatchSettings = {
     /**
@@ -19197,21 +19227,9 @@ export type DispatchSettings = {
      */
     offer_timeout_seconds: number;
     /**
-     * The most deliveries an Agent carries at once, 1 to 10.
-     */
-    max_tasks_per_agent: number;
-    /**
      * How long the service has a delivery before the next Provider of the chain is asked, 1 to 60 minutes.
      */
     fallback_minutes: number;
-    /**
-     * Above this much cash in hand no delivery collecting cash goes to an Agent.
-     */
-    cash_ceiling: Money;
-    /**
-     * Whether every drop needs the customer's 4-digit code.
-     */
-    drop_code_required: boolean;
     /**
      * Its version; `If-Match` guards a change.
      */
@@ -19251,21 +19269,9 @@ export type DispatchSettingsUpdate = {
      */
     offer_timeout_seconds: number;
     /**
-     * 1 to 10.
-     */
-    max_tasks_per_agent: number;
-    /**
      * 1 to 60 minutes.
      */
     fallback_minutes: number;
-    /**
-     * The cash ceiling, in the service's currency, ₹0 to ₹50,000.
-     */
-    cash_ceiling: Money;
-    /**
-     * Whether every drop needs the customer's code.
-     */
-    drop_code_required: boolean;
     /**
      * Why, kept in the audit log; at most 500 characters.
      */
@@ -45175,6 +45181,60 @@ export type PutDispatchSettingsResponses = {
 };
 
 export type PutDispatchSettingsResponse = PutDispatchSettingsResponses[keyof PutDispatchSettingsResponses];
+
+export type GetPartnerLocationDeliveryChainData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be one of the partner's; another's answers `404`.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/delivery-chain';
+};
+
+export type GetPartnerLocationDeliveryChainErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerLocationDeliveryChainError = GetPartnerLocationDeliveryChainErrors[keyof GetPartnerLocationDeliveryChainErrors];
+
+export type GetPartnerLocationDeliveryChainResponses = {
+    /**
+     * The chain.
+     */
+    200: DeliveryChain;
+};
+
+export type GetPartnerLocationDeliveryChainResponse = GetPartnerLocationDeliveryChainResponses[keyof GetPartnerLocationDeliveryChainResponses];
 
 export type GetPlatformDispatchBoardData = {
     body?: never;

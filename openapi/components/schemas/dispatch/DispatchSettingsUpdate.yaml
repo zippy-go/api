@@ -5,10 +5,7 @@ required:
   - mode
   - auto_assign
   - offer_timeout_seconds
-  - max_tasks_per_agent
   - fallback_minutes
-  - cash_ceiling
-  - drop_code_required
 properties:
   strategy:
     $ref: ./DispatchStrategy.yaml
@@ -28,13 +25,6 @@ properties:
       - 45
     minimum: 30
     maximum: 120
-  max_tasks_per_agent:
-    type: integer
-    description: 1 to 10.
-    examples:
-      - 3
-    minimum: 1
-    maximum: 10
   fallback_minutes:
     type: integer
     description: 1 to 60 minutes.
@@ -42,14 +32,6 @@ properties:
       - 10
     minimum: 1
     maximum: 60
-  cash_ceiling:
-    $ref: ../common/Money.yaml
-    description: The cash ceiling, in the service's currency, ₹0 to ₹50,000.
-  drop_code_required:
-    type: boolean
-    description: Whether every drop needs the customer's code.
-    examples:
-      - false
   reason:
     type:
       - string
@@ -63,10 +45,5 @@ examples:
     mode: offers
     auto_assign: true
     offer_timeout_seconds: 45
-    max_tasks_per_agent: 3
     fallback_minutes: 10
-    cash_ceiling:
-      minor_units: 500000
-      currency: INR
-    drop_code_required: false
     reason: null

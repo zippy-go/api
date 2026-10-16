@@ -35,9 +35,23 @@ properties:
     examples:
       - Asia/Kolkata
     description: Its clock, which the order's times are shown on.
+  lat:
+    type: number
+    format: double
+    examples:
+      - 17.4401
+    description: Where it is, as it was when the order was placed (the pickup on the order's map). Since 0.17.0.
+  lng:
+    type: number
+    format: double
+    examples:
+      - 78.3489
+    description: Where it is, as it was when the order was placed. Since 0.17.0.
 examples:
   - location_id: 01a13a48-9e00-7000-8000-000000000301
     name: Dev Kitchen Gachibowli
     address_line: Plot 12, Financial District Road, Gachibowli, Hyderabad 500032
     phone: "+919848000001"
     time_zone: Asia/Kolkata
+    lat: 17.4401
+    lng: 78.3489
