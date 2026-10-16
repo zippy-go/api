@@ -1,0 +1,13 @@
+type: object
+description: Declines an offer, with a reason if the Agent gives one. Declines are counted, never punished.
+properties:
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, at most 200 characters.
+    examples:
+      - Too far
+    maxLength: 200
+examples:
+  - reason: Too far

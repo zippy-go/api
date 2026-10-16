@@ -1,0 +1,59 @@
+type: object
+description: "One end of a delivery: the pickup at the store or the drop at the customer."
+required:
+  - kind
+  - name
+  - area
+  - lat
+  - lng
+  - planned_at
+properties:
+  kind:
+    type: string
+    description: Which end.
+    examples:
+      - pickup
+    enum:
+      - pickup
+      - drop
+  name:
+    type:
+      - string
+      - "null"
+    description: The store's name for the pickup; the customer's first name for the drop.
+    examples:
+      - Dev Kitchen Gachibowli
+  area:
+    type:
+      - string
+      - "null"
+    description: The area it is in, as people say it.
+    examples:
+      - Gachibowli
+  lat:
+    type: number
+    description: Latitude (WGS 84).
+    examples:
+      - 17.4401
+    minimum: -90
+    maximum: 90
+  lng:
+    type: number
+    description: Longitude (WGS 84).
+    examples:
+      - 78.3489
+    minimum: -180
+    maximum: 180
+  planned_at:
+    type: string
+    format: date-time
+    description: When the Agent should be there.
+    examples:
+      - 2026-10-16T13:25:00Z
+examples:
+  - kind: pickup
+    name: Dev Kitchen Gachibowli
+    area: Gachibowli
+    lat: 17.4401
+    lng: 78.3489
+    planned_at: 2026-10-16T13:25:00Z

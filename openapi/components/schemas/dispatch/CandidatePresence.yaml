@@ -1,0 +1,8 @@
+type: string
+description: "Whether an Agent can be seen working: `online` on duty and heard from in the last 60 seconds, `busy` online with a delivery under way, `offline` otherwise."
+enum:
+  - online
+  - busy
+  - offline
+examples:
+  - online

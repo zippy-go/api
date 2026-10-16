@@ -1,0 +1,131 @@
+type: object
+description: "An Agent a dispatcher may give a delivery to: online ones first, with how many deliveries each carries; an offline Agent may be chosen with a warning; one who cannot take it says why in words."
+required:
+  - agent_id
+  - first_name
+  - display_name
+  - kind
+  - presence
+  - deliveries_under_way
+  - team
+  - provider
+  - position
+  - eta_seconds
+  - distance_metres
+  - can_take
+  - refusal
+  - refusal_code
+  - warning
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  display_name:
+    type: string
+    description: The name the Agent is shown under.
+    examples:
+      - Ravi Kumar
+  kind:
+    type:
+      - string
+      - "null"
+    description: "The Agent's kind: `walker`, `bicycle`, `two_wheeler` or `van`."
+    examples:
+      - two_wheeler
+  presence:
+    $ref: ./CandidatePresence.yaml
+    description: Whether the Agent can be seen working.
+  deliveries_under_way:
+    type: integer
+    description: How many deliveries the Agent carries now.
+    examples:
+      - 1
+    minimum: 0
+  team:
+    oneOf:
+      - $ref: ./DispatchTeam.yaml
+      - type: "null"
+    description: The Agent's team.
+  provider:
+    $ref: ./DeliveryProvider.yaml
+    description: The delivery service the Agent belongs to.
+  position:
+    oneOf:
+      - $ref: ./CandidatePosition.yaml
+      - type: "null"
+    description: The last known position.
+  eta_seconds:
+    type:
+      - integer
+      - "null"
+    description: Routed time to the store, in seconds.
+    examples:
+      - 180
+    minimum: 0
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: Routed distance to the store, in metres.
+    examples:
+      - 900
+    minimum: 0
+  can_take:
+    type: boolean
+    description: Whether the delivery may be given to the Agent.
+    examples:
+      - true
+  refusal:
+    type:
+      - string
+      - "null"
+    description: Why not, in words.
+    examples:
+      - null
+  refusal_code:
+    oneOf:
+      - $ref: ./AssignmentRefusalCode.yaml
+      - type: "null"
+    description: Why not, as a code.
+  warning:
+    type:
+      - string
+      - "null"
+    description: Something to know before choosing, such as the Agent being offline.
+    examples:
+      - null
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    first_name: Ravi
+    display_name: Ravi Kumar
+    kind: two_wheeler
+    presence: online
+    deliveries_under_way: 1
+    team:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd601
+      name: Everyone
+      default: true
+    provider:
+      kind: platform_fleet
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      name: ZippyGo Fleet
+    position:
+      lat: 17.4432
+      lng: 78.3519
+      recorded_at: 2026-10-16T13:09:55Z
+      age_seconds: 5
+    eta_seconds: 180
+    distance_metres: 900
+    can_take: true
+    refusal: null
+    refusal_code: null
+    warning: null

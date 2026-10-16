@@ -1,0 +1,32 @@
+type: object
+description: A move from one Provider of the chain to the next, or to a dispatcher.
+required:
+  - from
+  - to
+  - at
+  - why
+properties:
+  from:
+    $ref: ./ProviderKind.yaml
+    description: The Provider it left.
+  to:
+    oneOf:
+      - $ref: ./ProviderKind.yaml
+      - type: "null"
+    description: The Provider it went to; `null` when the chain was exhausted and it waits for a dispatcher.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-16T13:22:00Z
+  why:
+    type: string
+    description: Why, in words.
+    examples:
+      - Nobody of the store's own Agents took it within 10 minutes.
+examples:
+  - from: own_service
+    to: platform_fleet
+    at: 2026-10-16T13:22:00Z
+    why: Nobody of the store's own Agents took it within 10 minutes.

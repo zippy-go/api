@@ -1,0 +1,35 @@
+type: object
+description: A Provider as a delivery names it.
+required:
+  - kind
+  - partner_id
+  - service_id
+  - name
+properties:
+  kind:
+    $ref: ./ProviderKind.yaml
+    description: The kind of Provider.
+  partner_id:
+    type: string
+    format: uuid
+    description: "The Provider's Partner: the store's own, or the platform fleet's."
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  service_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The delivery service, for an agent-based Provider.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  name:
+    type: string
+    description: The Provider's name.
+    examples:
+      - ZippyGo Fleet
+examples:
+  - kind: platform_fleet
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    name: ZippyGo Fleet

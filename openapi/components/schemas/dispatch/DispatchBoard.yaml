@@ -1,0 +1,74 @@
+type: object
+description: "A live dispatch board: the open deliveries, and those finished in the last hour, each in its group, with the counts. Re-read it every `reread_seconds` and whenever a `delivery.changed` signal arrives on the board channel."
+required:
+  - counts
+  - items
+  - read_at
+  - reread_seconds
+properties:
+  counts:
+    $ref: ./DispatchBoardCounts.yaml
+    description: How many in each group.
+  items:
+    type: array
+    items:
+      $ref: ./DeliverySummary.yaml
+    description: "The deliveries: needing somebody first, then undelivered, late, waiting for release, waiting for an Agent (longest first), assigned and collected (soonest due first)."
+  read_at:
+    type: string
+    format: date-time
+    description: When the board was read.
+    examples:
+      - 2026-10-16T13:10:00Z
+  reread_seconds:
+    type: integer
+    description: How often to read it again when no signal arrives.
+    examples:
+      - 30
+    minimum: 1
+examples:
+  - counts:
+      waiting_for_release: 0
+      waiting_for_agent: 0
+      assigned: 1
+      collected: 0
+      late: 0
+      undelivered: 0
+      needs_somebody: 0
+      total: 1
+    items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        order_number: AB0042
+        attempt: 1
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        location_name: Dev Kitchen Gachibowli
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        state: assigned
+        group: assigned
+        provider:
+          kind: platform_fleet
+          partner_id: 01a13a48-9e00-7000-8000-000000000002
+          service_id: 01a13a48-9e00-7000-8000-000000000202
+          name: ZippyGo Fleet
+        courier:
+          agent_id: 01a13a48-9e00-7000-8000-000000000107
+          first_name: Ravi
+          phone: null
+          provider_kind: platform_fleet
+          named_at: 2026-10-16T13:12:30Z
+        pickup_at: 2026-10-16T13:25:00Z
+        drop_at: 2026-10-16T13:45:00Z
+        release_at: null
+        released: true
+        expected_at: 2026-10-16T13:44:00Z
+        late: false
+        waiting_since: null
+        raised: false
+        need: null
+        asks: 1
+        offers_open: 0
+        version: 6
+        updated_at: 2026-10-16T13:12:30Z
+    read_at: 2026-10-16T13:10:00Z
+    reread_seconds: 30

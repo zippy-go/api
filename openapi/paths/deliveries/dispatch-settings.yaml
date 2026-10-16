@@ -1,0 +1,121 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/dispatch-settings. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service, which must be the partner's; another's answers `404`.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000202
+get:
+  operationId: getDispatchSettings
+  summary: Read a delivery service's dispatch settings
+  description: How the delivery service dispatches, with its `ETag`; a service never saved reads the defaults. Members need `dispatch:read` in the partner; platform staff use the same route with their platform permissions.
+  tags: &a1
+    - Deliveries
+  security: &a2
+    - Bearer: []
+  responses:
+    "200":
+      description: The settings.
+      headers:
+        ETag:
+          description: The settings' version, for `If-Match`.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DispatchSettings.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:read`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the partner, or a service that is not its delivery service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX: &a3
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default: &a4
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: putDispatchSettings
+  summary: Change a delivery service's dispatch settings
+  description: "Replaces the delivery service's dispatch settings as a whole: the strategy, offers or direct assignment, auto-assign, the offer's time (30 to 120 seconds), the most deliveries an Agent carries at once (1 to 10), the minutes before the next Provider of a chain is asked (1 to 60), the cash ceiling and whether every drop needs the customer's code. Applies to what is offered after the change; recorded with who made it, in the audit log. `If-Match` with the `ETag` answers `412` when the settings moved. Members need `dispatch:manage` in the partner; platform staff use the same routes with platform `dispatch:manage`, every act written to the audit log."
+  tags: *a1
+  security: *a2
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The settings.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/dispatch/DispatchSettingsUpdate.yaml
+  responses:
+    "200":
+      description: The settings, changed.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DispatchSettings.yaml
+    "400":
+      description: "`validation_failed`: a value out of its bounds, or a cash ceiling in another currency; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:manage`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the partner, or a service that is not its delivery service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "412":
+      description: "`precondition_failed`: `If-Match` names a version that is no longer current."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX: *a3
+    default: *a4

@@ -1,0 +1,59 @@
+type: object
+description: One thing said about a delivery, in order; a delivery keeps its last 100 and never the same thing twice.
+required:
+  - at
+  - kind
+  - actor
+  - actor_name
+  - agent_id
+  - text
+properties:
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-16T13:12:30Z
+  kind:
+    type: string
+    description: "What happened, as a code: `created`, `asked`, `released`, `offered`, `declined`, `offer_expired`, `assigned`, `named`, `collected`, `delivered`, `failed`, `handed_back`, `returned`, `fallback`, `given_by_hand`, `called_off`, `waiting_for_agent`, `needs_somebody`, `help_asked`, `expected`, `provider_said` and others; clients show `text`."
+    examples:
+      - assigned
+  actor:
+    type: string
+    description: Who said it.
+    examples:
+      - agent
+    enum:
+      - system
+      - agent
+      - staff
+      - platform
+      - provider
+  actor_name:
+    type:
+      - string
+      - "null"
+    description: Their name, when a person; `the platform` for Mission Control to a Partner.
+    examples:
+      - Ravi
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent it is about, when one.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  text:
+    type: string
+    description: What happened, in words.
+    examples:
+      - Ravi accepted the offer.
+examples:
+  - at: 2026-10-16T13:12:30Z
+    kind: assigned
+    actor: agent
+    actor_name: Ravi
+    agent_id: 01a13a48-9e00-7000-8000-000000000107
+    text: Ravi accepted the offer.

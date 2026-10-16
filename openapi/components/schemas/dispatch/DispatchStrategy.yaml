@@ -1,0 +1,9 @@
+type: string
+description: "How a delivery service chooses its Agents: `nearest_available` offers to eligible Agents in order of routed time to the store, one at a time; `broadcast` offers to every eligible Agent within 5 km at once, widening by 2 km a round, three rounds of 45 seconds; `round_robin` offers to the eligible Agent longest without a task; `eta_based` chooses the Agent who adds the least time while every promise is kept."
+enum:
+  - nearest_available
+  - broadcast
+  - round_robin
+  - eta_based
+examples:
+  - nearest_available

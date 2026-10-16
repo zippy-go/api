@@ -1,0 +1,7 @@
+type: string
+description: "How a chosen Agent receives a delivery: `offers`, which the Agent accepts or declines within the offer's time; `direct`, which lands in the Agent's list at once and may be handed back with a reason within 60 seconds."
+enum:
+  - offers
+  - direct
+examples:
+  - offers

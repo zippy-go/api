@@ -1,0 +1,113 @@
+type: object
+description: "How a delivery service dispatches: the strategy, offers or direct assignment, whether deliveries are offered automatically, the offer's time, the most deliveries an Agent carries at once, the time the service has before the next Provider of a chain is asked, the cash ceiling and whether the drop needs the customer's code. A service never saved reads the defaults: nearest available with direct assignment for a Partner's own Agents, ETA-based with offers for the platform fleet."
+required:
+  - service_id
+  - partner_id
+  - strategy
+  - mode
+  - auto_assign
+  - offer_timeout_seconds
+  - max_tasks_per_agent
+  - fallback_minutes
+  - cash_ceiling
+  - drop_code_required
+  - version
+  - defaults
+  - updated_at
+  - updated_by
+properties:
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  partner_id:
+    type: string
+    format: uuid
+    description: The service's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  strategy:
+    $ref: ./DispatchStrategy.yaml
+    description: How Agents are chosen.
+  mode:
+    $ref: ./DispatchMode.yaml
+    description: Offers or direct assignment.
+  auto_assign:
+    type: boolean
+    description: Whether deliveries go to Agents by themselves; when off every delivery waits for a dispatcher.
+    examples:
+      - true
+  offer_timeout_seconds:
+    type: integer
+    description: How long an offer waits for an answer, 30 to 120 seconds.
+    examples:
+      - 45
+    minimum: 30
+    maximum: 120
+  max_tasks_per_agent:
+    type: integer
+    description: The most deliveries an Agent carries at once, 1 to 10.
+    examples:
+      - 3
+    minimum: 1
+    maximum: 10
+  fallback_minutes:
+    type: integer
+    description: How long the service has a delivery before the next Provider of the chain is asked, 1 to 60 minutes.
+    examples:
+      - 10
+    minimum: 1
+    maximum: 60
+  cash_ceiling:
+    $ref: ../common/Money.yaml
+    description: Above this much cash in hand no delivery collecting cash goes to an Agent.
+  drop_code_required:
+    type: boolean
+    description: Whether every drop needs the customer's 4-digit code.
+    examples:
+      - false
+  version:
+    type: integer
+    description: Its version; `If-Match` guards a change.
+    examples:
+      - 1
+    minimum: 1
+  defaults:
+    type: boolean
+    description: Whether these are the defaults, never saved.
+    examples:
+      - false
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When last changed.
+    examples:
+      - 2026-10-16T09:00:00Z
+  updated_by:
+    type:
+      - string
+      - "null"
+    description: Who last changed it.
+    examples:
+      - Platform admin
+examples:
+  - service_id: 01a13a48-9e00-7000-8000-000000000202
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    strategy: eta_based
+    mode: offers
+    auto_assign: true
+    offer_timeout_seconds: 45
+    max_tasks_per_agent: 3
+    fallback_minutes: 10
+    cash_ceiling:
+      minor_units: 500000
+      currency: INR
+    drop_code_required: false
+    version: 2
+    defaults: false
+    updated_at: 2026-10-16T09:00:00Z
+    updated_by: Platform admin

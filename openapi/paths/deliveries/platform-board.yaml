@@ -1,0 +1,76 @@
+# Path item for /v1/platform/dispatch/board. Referenced from openapi.yaml.
+get:
+  operationId: getPlatformDispatchBoard
+  summary: Read the dispatch board across Partners
+  description: Mission Control's live board of every delivery across Partners, in the same groups as a Partner's, narrowed by Partner, store and zone. It updates within seconds over `private-deliveries` (`delivery.changed`) and is read again every 30 seconds; the map of Agents comes from `private-agents`. Mission Control tokens holding platform `dispatch:read`.
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  parameters:
+    - name: partner_id
+      in: query
+      required: false
+      description: Only deliveries of this Partner's stores.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000001
+    - name: location_id
+      in: query
+      required: false
+      description: Only deliveries from this store.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000301
+    - name: zone_id
+      in: query
+      required: false
+      description: Only deliveries from stores in this zone.
+      schema:
+        type: string
+        format: uuid
+    - name: group
+      in: query
+      required: false
+      description: Only this group.
+      schema:
+        $ref: ../../components/schemas/dispatch/DeliveryBoardGroup.yaml
+  responses:
+    "200":
+      description: The board.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DispatchBoard.yaml
+    "400":
+      description: "`validation_failed` for an unknown group; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: not a Mission Control token, or without `dispatch:read`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

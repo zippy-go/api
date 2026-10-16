@@ -822,3 +822,107 @@ events:
       done; the customer is told.
     payload_schema: ./payloads/ordering.order.help_resolved.v1.schema.json
     example: ./examples/ordering.order.help_resolved.v1.json
+
+  - type: orchestration.delivery.created
+    version: 1
+    domain: orchestration
+    description: >-
+      A store accepted a delivery order and its delivery was written down, before any Provider is asked: one per order however many times the acceptance is heard, with the pickup at the ready time and the drop at the promised time, each moved up to the next five minutes, and when its offers go out.
+    payload_schema: ./payloads/orchestration.delivery.created.v1.schema.json
+    example: ./examples/orchestration.delivery.created.v1.json
+
+  - type: orchestration.delivery.released
+    version: 1
+    domain: orchestration
+    description: >-
+      A delivery waiting for release was released: its offers go out so the Agent reaches the store as the order is ready.
+    payload_schema: ./payloads/orchestration.delivery.released.v1.schema.json
+    example: ./examples/orchestration.delivery.released.v1.json
+
+  - type: orchestration.delivery.offered
+    version: 1
+    domain: orchestration
+    description: >-
+      A delivery was offered to one or more Agents. The Agent's devices are pushed and its task channel hears `offer.changed`.
+    payload_schema: ./payloads/orchestration.delivery.offered.v1.schema.json
+    example: ./examples/orchestration.delivery.offered.v1.json
+
+  - type: orchestration.delivery.assigned
+    version: 1
+    domain: orchestration
+    description: >-
+      An Agent has the delivery: an offer accepted, a direct assignment by a strategy, or a choice by hand. The explanation summarised here is on the delivery in full.
+    payload_schema: ./payloads/orchestration.delivery.assigned.v1.schema.json
+    example: ./examples/orchestration.delivery.assigned.v1.json
+
+  - type: orchestration.delivery.collected
+    version: 1
+    domain: orchestration
+    description: >-
+      The Agent completed the pickup: the order is on its way, as `ordering.order.on_its_way` says.
+    payload_schema: ./payloads/orchestration.delivery.collected.v1.schema.json
+    example: ./examples/orchestration.delivery.collected.v1.json
+
+  - type: orchestration.delivery.delivered
+    version: 1
+    domain: orchestration
+    description: >-
+      The Agent completed the drop with its proof: the order is delivered, as `ordering.order.delivered` says.
+    payload_schema: ./payloads/orchestration.delivery.delivered.v1.schema.json
+    example: ./examples/orchestration.delivery.delivered.v1.json
+
+  - type: orchestration.delivery.undelivered
+    version: 1
+    domain: orchestration
+    description: >-
+      The drop failed: the delivery failed with the Agent's reason, and the order is undelivered for the dispatcher and Mission Control to send again or cancel.
+    payload_schema: ./payloads/orchestration.delivery.undelivered.v1.schema.json
+    example: ./examples/orchestration.delivery.undelivered.v1.json
+
+  - type: orchestration.delivery.called_off
+    version: 1
+    domain: orchestration
+    description: >-
+      The delivery was called off: its order ended before the courier did, or the order was sent again with a new delivery. Offers are withdrawn and the Agent's tasks called off with the reason.
+    payload_schema: ./payloads/orchestration.delivery.called_off.v1.schema.json
+    example: ./examples/orchestration.delivery.called_off.v1.json
+
+  - type: orchestration.delivery.waiting_for_agent
+    version: 1
+    domain: orchestration
+    description: >-
+      A released delivery has waited 3 minutes with no Agent taking it: it is raised to the dispatcher and Mission Control, and still offered again every minute.
+    payload_schema: ./payloads/orchestration.delivery.waiting_for_agent.v1.schema.json
+    example: ./examples/orchestration.delivery.waiting_for_agent.v1.json
+
+  - type: orchestration.delivery.needs_somebody
+    version: 1
+    domain: orchestration
+    description: >-
+      A delivery needs somebody: no Provider can carry it, the chain is exhausted, a Provider refused or lost it, the Agent handed it back or was let go, auto-assign is off or no team or zone holds it, or the Agent asked for help. It is listed first on the boards, with why.
+    payload_schema: ./payloads/orchestration.delivery.needs_somebody.v1.schema.json
+    example: ./examples/orchestration.delivery.needs_somebody.v1.json
+
+  - type: ordering.order.on_its_way
+    version: 1
+    domain: ordering
+    description: >-
+      Dispatch moved a delivery order on its way, as the platform itself, when its Agent completed the pickup (through `ready` first when the store had not said so), naming the courier: the customer is told the Agent's first name and, for a cash order, the amount to keep ready.
+    payload_schema: ./payloads/ordering.order.on_its_way.v1.schema.json
+    example: ./examples/ordering.order.on_its_way.v1.json
+
+  - type: ordering.order.undelivered
+    version: 1
+    domain: ordering
+    description: >-
+      Dispatch left an order on its way undelivered, as the platform itself, when its Agent failed the drop: the reason is for the dispatcher and Mission Control, who send it again or cancel it with a refund; the customer is told it could not be delivered and is being sorted out.
+    payload_schema: ./payloads/ordering.order.undelivered.v1.schema.json
+    example: ./examples/ordering.order.undelivered.v1.json
+
+  - type: ordering.order.running_late
+    version: 1
+    domain: ordering
+    description: >-
+      An accepted, ready or on-its-way order is expected more than 5 minutes past its promise: the customer is told once, with the new time. The status does not change; told once per order however late it runs after.
+    payload_schema: ./payloads/ordering.order.running_late.v1.schema.json
+    example: ./examples/ordering.order.running_late.v1.json

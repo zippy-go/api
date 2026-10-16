@@ -1,0 +1,36 @@
+type: object
+description: "The proof a delivered order carries: what was recorded at the door and when, with a short-lived link to the photo where one was taken."
+required:
+  - recorded_at
+  - kinds
+  - photo_url
+properties:
+  recorded_at:
+    type: string
+    format: date-time
+    description: When the drop was completed on the device.
+    examples:
+      - 2026-10-16T13:42:00Z
+  kinds:
+    type: array
+    items:
+      type: string
+      enum:
+        - photo
+        - signature
+        - code
+        - scan
+        - confirmation
+    description: What was recorded.
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A link to the photo, valid for ten minutes; read the order again for a fresh one.
+    examples:
+      - https://api.example/v1/assets/0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd701/link
+examples:
+  - recorded_at: 2026-10-16T13:42:00Z
+    kinds:
+      - photo
+    photo_url: null

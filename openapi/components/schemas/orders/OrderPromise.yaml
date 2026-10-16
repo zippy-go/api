@@ -34,6 +34,14 @@ properties:
     examples:
       - false
     description: Whether it is past its promise.
+  expected_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:44:00Z
+    description: "When it is expected at the door now, as the customer was last told; the promise until an Agent has it."
 examples:
   - preparation_minutes: 20
     ready_by: 2026-10-16T13:22:00Z

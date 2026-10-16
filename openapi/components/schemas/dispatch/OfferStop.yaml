@@ -1,0 +1,42 @@
+type: object
+description: "A stop of an offer: where, by area only until it is accepted, and when."
+required:
+  - kind
+  - area
+  - planned_at
+  - distance_metres
+properties:
+  kind:
+    type: string
+    description: Which end.
+    examples:
+      - pickup
+    enum:
+      - pickup
+      - drop
+  area:
+    type:
+      - string
+      - "null"
+    description: The area.
+    examples:
+      - Kondapur
+  planned_at:
+    type: string
+    format: date-time
+    description: When to be there.
+    examples:
+      - 2026-10-16T13:25:00Z
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: Routed distance from the previous point (the Agent, then the store), in metres.
+    examples:
+      - 900
+    minimum: 0
+examples:
+  - kind: drop
+    area: Kondapur
+    planned_at: 2026-10-16T13:45:00Z
+    distance_metres: 3200

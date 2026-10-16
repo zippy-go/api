@@ -62,8 +62,10 @@ hear the public channels (`broadcast`, `store-<location_id>-menu`).
 | `private-location-{location_id}-orders`, `-kitchen`, `-tables` | Members of the location's partner with `order:read` there |
 | `private-location-{location_id}-catalog`  | Members of the location's partner with `catalog:read` there |
 | `private-partner-{partner_id}-agents`     | Members of the partner with `dispatch:read`    |
+| `private-partner-{partner_id}-deliveries` | Members of the partner with `dispatch:read`    |
 | `private-orders`                          | Platform staff with `order:read` (the network) |
 | `private-agents`                          | Platform staff with `agent:read` (the network) |
+| `private-deliveries`                      | Platform staff with `dispatch:read` (the network) |
 | `private-agent-{agent_id}-tasks`          | That agent                                     |
 
 The token's surface decides the population: a customer token hears
@@ -98,6 +100,17 @@ status) whenever an Agent's membership, documents or duty change: a new
 document, a decision, duty on or off, an activation or a suspension. The
 consoles read the Agent again without a reload.
 
+Every change of a delivery signals `delivery.changed` (subject `delivery`
+with its id, its new state and its version) on the board channel of the
+partner whose store it comes from (`private-partner-{partner_id}-deliveries`)
+and on `private-deliveries`: the dispatch boards and the delivery's page read
+it again. An offer made to an agent, or one that leaves the agent's screen
+(expired, taken, withdrawn), signals `offer.changed` (subject `offer`, its
+status) on the agent's task channel. From the moment an order is collected
+until it is delivered, its channel also carries `courier.position` frames:
+where its courier is and how old that position is. Before the pickup and
+after the delivery no position is sent.
+
 | Event            | Data                                                        | When                                              |
 | ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
 | `snapshot`       | `AgentsSnapshot`: `{ "channel", "agents": [Agent, ...] }`    | On open, per agent channel                        |
@@ -105,6 +118,7 @@ consoles read the Agent again without a reload.
 | `signal`         | `Signal`: `{ "channel", "kind", "subject", "status", "version" }` | Something changed; refetch it                |
 | `agent.position` | `AgentPositionFrame`                                        | An agent moved                                    |
 | `agent.status`   | `AgentStatusFrame`                                          | An agent went online or offline                   |
+| `courier.position` | `CourierPositionFrame`: `{ "channel", "order_id", "position", "age_seconds" }` | An order's courier moved, from collection until delivery |
 | `heartbeat`      | empty                                                       | Every 15 seconds                                  |
 | `close`          | `Close`: `{ "reason": "token_expired" \| "revoked" \| "replaced" }` | The platform ends the stream; reconnect or sign in |
 
@@ -155,7 +169,7 @@ same shape as the items of `GET /v1/events`.
   missed come first, with their ids, and no `resync` is sent for those
   channels. When the platform no longer holds that position (it keeps the
   latest ten thousand signals), the stream starts again with a `snapshot`
-  or `resync` per channel. Agent positions are never replayed.
+  or `resync` per channel. Agent and courier positions are never replayed.
 - The other two streams do not replay: their frames carry no `id` and the
   `Last-Event-ID` request header is ignored. After a reconnect, the agent
   stream sends a fresh `snapshot` to start from; for the event stream,

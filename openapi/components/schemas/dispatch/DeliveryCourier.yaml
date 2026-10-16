@@ -1,0 +1,42 @@
+type: object
+description: Who carries a delivery, named once the Agent's app has it.
+required:
+  - agent_id
+  - first_name
+  - phone
+  - provider_kind
+  - named_at
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent (the membership).
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  phone:
+    type:
+      - string
+      - "null"
+    description: A number to call the Agent on, for the store and the dispatcher; `null` when none is known.
+    examples:
+      - "+919800000107"
+  provider_kind:
+    $ref: ./ProviderKind.yaml
+    description: The kind of Provider the Agent works for.
+  named_at:
+    type: string
+    format: date-time
+    description: When the Agent's app had it.
+    examples:
+      - 2026-10-16T13:12:30Z
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    first_name: Ravi
+    phone: null
+    provider_kind: platform_fleet
+    named_at: 2026-10-16T13:12:30Z

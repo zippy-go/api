@@ -159,6 +159,12 @@ paths/
                                 delivered, cancel (POST, one file each)
   order-handling/platform-*.yaml GET /v1/platform/orders (+ platform-summary.yaml, .../summary), GET .../{order_id},
                                 POST .../cancel; refund-preview.yaml, refunds.yaml, help-resolve.yaml
+  deliveries/agent-offers.yaml  GET /v1/agent/offers (+ agent-offer.yaml, agent-offer-accept.yaml, agent-offer-decline.yaml)
+  deliveries/partner-*.yaml     GET /v1/partners/{partner_id}/dispatch/board; .../deliveries/{delivery_id} with
+                                candidates, assignment, ask, send-again; GET, POST .../orders/{order_id}/deliveries
+  deliveries/dispatch-settings.yaml GET, PUT /v1/partners/{partner_id}/services/{service_id}/dispatch-settings
+  deliveries/platform-*.yaml    GET /v1/platform/dispatch/board; /v1/platform/deliveries/{delivery_id} with the same
+                                acts; GET, POST /v1/platform/orders/{order_id}/deliveries
 ```
 
 Rules:

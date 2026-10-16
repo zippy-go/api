@@ -253,7 +253,7 @@ tags:
   - name: Order handling
     description: "How a store runs the orders it receives and how Mission Control watches and intervenes: the live board with the one move each order waits for and its timer, accepting with a preparation time and lines left out, declining with a reason, more preparation time, pausing new orders, ready, collected, handed over and delivered (a stand-in for dispatch until step 4), the store's cancellation and its history; Mission Control's board across every store with what needs attention, cancellation at any point, refunds of lines bounded by what was paid, and help resolved. Members need `order:read` and `order:manage` at the Location; platform staff `order:read`, `order:manage` and `order:refund`."
   - name: Deliveries
-    description: Fulfilment of orders from pickup to dropoff, including tasks and trips.
+    description: "Dispatch: an accepted delivery order becomes one delivery, asked of the store's Provider (its own delivery service, then the platform fleet), offered or given to an Agent by the service's strategy with an explanation, given by hand from a dispatch board, moved forward by what the Agent does with the order following, and kept to its promise. The Agent app's offers; the Partner's and Mission Control's dispatch boards, deliveries, choices by hand, asking again and sending again; each delivery service's dispatch settings. Boards hear `delivery.changed` on `private-partner-{partner_id}-deliveries` and `private-deliveries`; an Agent hears `offer.changed` on its task channel; an order's channel carries its courier's `courier.position` from collection until delivery."
   - name: Agent app
     description: "The Agent app: the person's Agent memberships and invitations, documents with upload grants, the duty switch with the zone, position reports, tasks with their steps and proof, help on a task, the day's earnings, cash in hand and the pay rule. Takes Agent app tokens (audience `agent`)."
   - name: Agents
@@ -972,6 +972,45 @@ paths:
     $ref: ./paths/order-handling/refunds.yaml
   /v1/platform/orders/{order_id}/help/{help_id}/resolve:
     $ref: ./paths/order-handling/help-resolve.yaml
+
+  /v1/agent/offers:
+    $ref: ./paths/deliveries/agent-offers.yaml
+  /v1/agent/offers/{offer_id}:
+    $ref: ./paths/deliveries/agent-offer.yaml
+  /v1/agent/offers/{offer_id}/accept:
+    $ref: ./paths/deliveries/agent-offer-accept.yaml
+  /v1/agent/offers/{offer_id}/decline:
+    $ref: ./paths/deliveries/agent-offer-decline.yaml
+  /v1/partners/{partner_id}/dispatch/board:
+    $ref: ./paths/deliveries/partner-board.yaml
+  /v1/partners/{partner_id}/deliveries/{delivery_id}:
+    $ref: ./paths/deliveries/partner-delivery.yaml
+  /v1/partners/{partner_id}/deliveries/{delivery_id}/candidates:
+    $ref: ./paths/deliveries/partner-delivery-candidates.yaml
+  /v1/partners/{partner_id}/deliveries/{delivery_id}/assignment:
+    $ref: ./paths/deliveries/partner-delivery-assignment.yaml
+  /v1/partners/{partner_id}/deliveries/{delivery_id}/ask:
+    $ref: ./paths/deliveries/partner-delivery-ask.yaml
+  /v1/partners/{partner_id}/deliveries/{delivery_id}/send-again:
+    $ref: ./paths/deliveries/partner-delivery-send-again.yaml
+  /v1/partners/{partner_id}/orders/{order_id}/deliveries:
+    $ref: ./paths/deliveries/partner-order-deliveries.yaml
+  /v1/partners/{partner_id}/services/{service_id}/dispatch-settings:
+    $ref: ./paths/deliveries/dispatch-settings.yaml
+  /v1/platform/dispatch/board:
+    $ref: ./paths/deliveries/platform-board.yaml
+  /v1/platform/deliveries/{delivery_id}:
+    $ref: ./paths/deliveries/platform-delivery.yaml
+  /v1/platform/deliveries/{delivery_id}/candidates:
+    $ref: ./paths/deliveries/platform-delivery-candidates.yaml
+  /v1/platform/deliveries/{delivery_id}/assignment:
+    $ref: ./paths/deliveries/platform-delivery-assignment.yaml
+  /v1/platform/deliveries/{delivery_id}/ask:
+    $ref: ./paths/deliveries/platform-delivery-ask.yaml
+  /v1/platform/deliveries/{delivery_id}/send-again:
+    $ref: ./paths/deliveries/platform-delivery-send-again.yaml
+  /v1/platform/orders/{order_id}/deliveries:
+    $ref: ./paths/deliveries/platform-order-deliveries.yaml
 
 components:
   securitySchemes:
@@ -2585,3 +2624,89 @@ components:
       $ref: ./components/schemas/orders/AttentionCounts.yaml
     PlatformOrderSummary:
       $ref: ./components/schemas/orders/PlatformOrderSummary.yaml
+    DeliveryState:
+      $ref: ./components/schemas/dispatch/DeliveryState.yaml
+    DeliveryBoardGroup:
+      $ref: ./components/schemas/dispatch/DeliveryBoardGroup.yaml
+    ProviderKind:
+      $ref: ./components/schemas/dispatch/ProviderKind.yaml
+    DispatchStrategy:
+      $ref: ./components/schemas/dispatch/DispatchStrategy.yaml
+    DispatchMode:
+      $ref: ./components/schemas/dispatch/DispatchMode.yaml
+    OfferStatus:
+      $ref: ./components/schemas/dispatch/OfferStatus.yaml
+    CandidatePresence:
+      $ref: ./components/schemas/dispatch/CandidatePresence.yaml
+    DeliveryNeedReason:
+      $ref: ./components/schemas/dispatch/DeliveryNeedReason.yaml
+    AssignmentRefusalCode:
+      $ref: ./components/schemas/dispatch/AssignmentRefusalCode.yaml
+    DeliveryProvider:
+      $ref: ./components/schemas/dispatch/DeliveryProvider.yaml
+    DeliveryStop:
+      $ref: ./components/schemas/dispatch/DeliveryStop.yaml
+    DeliveryCourier:
+      $ref: ./components/schemas/dispatch/DeliveryCourier.yaml
+    DeliveryNeed:
+      $ref: ./components/schemas/dispatch/DeliveryNeed.yaml
+    DeliveryPayLine:
+      $ref: ./components/schemas/dispatch/DeliveryPayLine.yaml
+    DeliveryPay:
+      $ref: ./components/schemas/dispatch/DeliveryPay.yaml
+    ExplainedCandidate:
+      $ref: ./components/schemas/dispatch/ExplainedCandidate.yaml
+    DeliveryFallback:
+      $ref: ./components/schemas/dispatch/DeliveryFallback.yaml
+    HandChoice:
+      $ref: ./components/schemas/dispatch/HandChoice.yaml
+    DeliveryExplanation:
+      $ref: ./components/schemas/dispatch/DeliveryExplanation.yaml
+    DeliveryLogLine:
+      $ref: ./components/schemas/dispatch/DeliveryLogLine.yaml
+    DeliverySummary:
+      $ref: ./components/schemas/dispatch/DeliverySummary.yaml
+    DeliveryTimes:
+      $ref: ./components/schemas/dispatch/DeliveryTimes.yaml
+    DeliveryActions:
+      $ref: ./components/schemas/dispatch/DeliveryActions.yaml
+    DeliveryDetail:
+      $ref: ./components/schemas/dispatch/DeliveryDetail.yaml
+    DispatchBoardCounts:
+      $ref: ./components/schemas/dispatch/DispatchBoardCounts.yaml
+    DispatchBoard:
+      $ref: ./components/schemas/dispatch/DispatchBoard.yaml
+    DispatchTeam:
+      $ref: ./components/schemas/dispatch/DispatchTeam.yaml
+    CandidatePosition:
+      $ref: ./components/schemas/dispatch/CandidatePosition.yaml
+    DeliveryCandidate:
+      $ref: ./components/schemas/dispatch/DeliveryCandidate.yaml
+    DeliveryCandidateList:
+      $ref: ./components/schemas/dispatch/DeliveryCandidateList.yaml
+    DeliveryAssignmentInput:
+      $ref: ./components/schemas/dispatch/DeliveryAssignmentInput.yaml
+    OrderDeliveries:
+      $ref: ./components/schemas/dispatch/OrderDeliveries.yaml
+    DispatchSettings:
+      $ref: ./components/schemas/dispatch/DispatchSettings.yaml
+    DispatchSettingsUpdate:
+      $ref: ./components/schemas/dispatch/DispatchSettingsUpdate.yaml
+    OfferStore:
+      $ref: ./components/schemas/dispatch/OfferStore.yaml
+    OfferStop:
+      $ref: ./components/schemas/dispatch/OfferStop.yaml
+    AgentOffer:
+      $ref: ./components/schemas/dispatch/AgentOffer.yaml
+    AgentOfferList:
+      $ref: ./components/schemas/dispatch/AgentOfferList.yaml
+    OfferDecline:
+      $ref: ./components/schemas/dispatch/OfferDecline.yaml
+    CourierPositionFrame:
+      $ref: ./components/schemas/live/CourierPositionFrame.yaml
+    OrderCourier:
+      $ref: ./components/schemas/orders/OrderCourier.yaml
+    StoreCourier:
+      $ref: ./components/schemas/orders/StoreCourier.yaml
+    OrderProof:
+      $ref: ./components/schemas/orders/OrderProof.yaml

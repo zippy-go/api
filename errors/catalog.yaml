@@ -1415,3 +1415,111 @@ errors:
     description: >-
       This deployment holds no two-step key, so an authenticator cannot be
       set up here.
+
+  - code: offer_taken
+    status: 409
+    title: Offer taken
+    message: "Another Agent took this delivery first."
+    retryable: false
+    description: >-
+      Two Agents accepted offers of one delivery at the same moment; the other one has it.
+
+  - code: offer_closed
+    status: 409
+    title: Offer closed
+    message: "The offer is no longer open: it {how}."
+    retryable: false
+    description: >-
+      The offer expired unanswered, was withdrawn (the delivery went elsewhere or its order ended), or was answered already.
+
+  - code: delivery_not_with_provider
+    status: 409
+    title: No Provider has the delivery
+    message: "No Provider has the delivery yet; ask for it first."
+    retryable: false
+    description: >-
+      A delivery is given by hand only once a Provider has it; ask a Provider for it first.
+
+  - code: delivery_collected
+    status: 409
+    title: Delivery collected
+    message: "The Agent has the order now; talk to them."
+    retryable: false
+    description: >-
+      Once the order is collected nobody can give the delivery to anybody else, and there is nothing to ask for: the goods are with somebody.
+
+  - code: delivery_ended
+    status: 409
+    title: Delivery ended
+    message: "The delivery is {state}."
+    retryable: false
+    description: >-
+      The delivery was delivered, failed at the door or was called off; nothing moves it any more.
+
+  - code: nothing_to_ask
+    status: 409
+    title: Nothing to ask for
+    message: "A Provider has the delivery and nothing is wrong with it; there is nothing to ask for."
+    retryable: false
+    description: >-
+      Asking again is for a delivery needing somebody, or one no Provider has; this one is with a Provider and nothing is wrong with it.
+
+  - code: delivery_not_failed
+    status: 409
+    title: Delivery not failed
+    message: "Only an order whose delivery failed at the door is sent again; this delivery is {state}."
+    retryable: false
+    description: >-
+      Sending again is for an undelivered order: its delivery failed at the door and it was neither sent again nor cancelled.
+
+  - code: delivery_open
+    status: 409
+    title: Delivery under way
+    message: "A delivery of the order is under way."
+    retryable: false
+    description: >-
+      A delivery is asked for an order only when none of its deliveries is under way.
+
+  - code: not_for_delivery
+    status: 409
+    title: Not for delivery
+    message: "The order is a pickup; nothing is delivered."
+    retryable: false
+    description: >-
+      Deliveries are asked for delivery orders only.
+
+  - code: no_provider
+    status: 409
+    title: No Provider
+    message: "The store names no Provider that can carry its deliveries; configure a delivery service or the platform fleet first."
+    retryable: false
+    description: >-
+      The store's delivery setting names no Provider that can carry the delivery now: no delivery service of its own at the store, and the platform fleet neither chosen nor operating in the store's zone.
+
+  - code: assignment_refused
+    status: 409
+    title: Assignment refused
+    message: "{agent} cannot take it: {why}."
+    retryable: false
+    description: >-
+      The delivery cannot be given to that Agent by hand; the detail says
+      why in words and `errors[].code` names it.
+    details:
+      - code: agent_over_limit
+        message: "The Agent carries the most deliveries the service allows."
+        description: "The Agent has as many deliveries under way as the service's limit (3 by default)."
+      - code: agent_kind_not_allowed
+        message: "The Agent's kind is not allowed for this delivery."
+        description: "The Agent's kind (walker, bicycle, two-wheeler, van) is not one the service or the delivery allows."
+      - code: agent_suspended
+        message: "The Agent is suspended."
+        description: "The membership is suspended; it receives no work until the suspension is lifted."
+      - code: agent_not_active
+        message: "The Agent is not active."
+        description: "The membership is pending or offboarded."
+      - code: agent_cash_ceiling
+        message: "The Agent holds too much cash for this delivery."
+        description: "The delivery collects cash and the Agent's cash in hand would pass the service's cash ceiling."
+      - code: agent_not_in_service
+        message: "The Agent is not of a delivery service that may carry this delivery."
+        description: "The Agent belongs to no delivery service of the delivery's chain that the caller may choose from."

@@ -1,0 +1,48 @@
+type: object
+description: "A choice made by hand: who made it and when."
+required:
+  - by_name
+  - by_user_id
+  - platform
+  - at
+  - note
+properties:
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Who chose, as the record names them; `the platform` for Mission Control to a Partner.
+    examples:
+      - Priya Sharma
+  by_user_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who chose; shown to Mission Control only.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  platform:
+    type: boolean
+    description: Whether Mission Control chose.
+    examples:
+      - false
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-16T13:15:00Z
+  note:
+    type:
+      - string
+      - "null"
+    description: The note given.
+    examples:
+      - null
+examples:
+  - by_name: Priya Sharma
+    by_user_id: null
+    platform: false
+    at: 2026-10-16T13:15:00Z
+    note: null

@@ -1,0 +1,12 @@
+type: string
+description: "Where a delivery is. `wanted`: written down, no Provider has it yet; `waiting`: a Provider has it and nobody has taken it (waiting for release until its offers go out); `assigned`: an Agent has it and is on the way to the store; `collected`: the Agent has the order; `delivered`, `failed` (the drop failed) and `called_off` (its order ended first) are final. It only moves forward, except that an Agent who lets go of it, or is let go, returns it from `assigned` to `waiting`."
+enum:
+  - wanted
+  - waiting
+  - assigned
+  - collected
+  - delivered
+  - failed
+  - called_off
+examples:
+  - assigned

@@ -1,0 +1,12 @@
+type: object
+description: "An Agent's offers: the open ones first, soonest to expire first, then those answered or closed in the last hour."
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentOffer.yaml
+    description: The offers.
+examples:
+  - items: []

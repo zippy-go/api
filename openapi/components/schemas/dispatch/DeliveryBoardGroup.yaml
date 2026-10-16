@@ -1,0 +1,12 @@
+type: string
+description: "The group a delivery falls in on a dispatch board, one at a time, the first that applies: `needs_somebody`, `undelivered` (its drop failed and the order is neither sent again nor cancelled), `late`, `waiting_for_release`, `waiting_for_agent`, `assigned`, `collected`."
+enum:
+  - waiting_for_release
+  - waiting_for_agent
+  - assigned
+  - collected
+  - late
+  - undelivered
+  - needs_somebody
+examples:
+  - waiting_for_agent

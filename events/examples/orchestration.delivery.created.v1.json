@@ -1,0 +1,31 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be001",
+  "type": "orchestration.delivery.created",
+  "version": 1,
+  "occurred_at": "2026-10-16T13:10:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "attempt": 1,
+    "state": "wanted",
+    "previous_state": null,
+    "version": 1,
+    "at": "2026-10-16T13:10:00Z",
+    "provider_kind": null,
+    "provider_partner_id": null,
+    "service_id": null,
+    "agent_id": null,
+    "pickup_at": "2026-10-16T13:25:00Z",
+    "drop_at": "2026-10-16T13:45:00Z",
+    "release_at": null,
+    "chain": [
+      "platform_fleet"
+    ],
+    "drop_code_required": false
+  }
+}

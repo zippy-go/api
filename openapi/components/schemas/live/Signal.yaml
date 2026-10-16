@@ -18,7 +18,9 @@ properties:
       What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
       `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
       `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
-      `duty.changed`, `agent.changed`.
+      `duty.changed`, `agent.changed`, `delivery.changed` (on the dispatch board channels, subject
+      `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject
+      `offer`, its status).
     examples:
       - vertical.transitioned
   status:

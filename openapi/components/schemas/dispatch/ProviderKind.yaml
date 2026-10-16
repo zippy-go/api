@@ -1,0 +1,8 @@
+type: string
+description: "A kind of Provider: the store's Partner's own delivery service, the platform fleet, or an external carrier (none is built yet)."
+enum:
+  - own_service
+  - platform_fleet
+  - carrier
+examples:
+  - platform_fleet

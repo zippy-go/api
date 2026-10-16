@@ -1,0 +1,13 @@
+type: string
+description: "Why a delivery needs somebody: `no_provider` (the store names none that can carry it), `chain_exhausted` (every Provider had its time), `provider_refused`, `provider_lost` (a Provider may have it and did not answer), `handed_back` (the Agent let go of it), `returned` (the Agent was suspended, removed, offboarded or went off duty), `dispatcher_only` (auto-assign is off, or no team or zone holds it), `help_asked` (the Agent asked for help)."
+enum:
+  - no_provider
+  - chain_exhausted
+  - provider_refused
+  - provider_lost
+  - handed_back
+  - returned
+  - dispatcher_only
+  - help_asked
+examples:
+  - handed_back

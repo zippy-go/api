@@ -6,6 +6,84 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-16
+
+Step 4, dispatch: an accepted delivery order becomes one delivery, asked of
+the store's Provider, offered or given to an Agent by the delivery
+service's strategy with an explanation, given by hand from a dispatch
+board, moved forward by what the Agent does with the order following, the
+customer watching the courier approach and the promise kept up to date.
+Written as 0.17.0 on its own branch beside the workforce slice and renumbered
+after the workforce (0.17.0) merged first. Additive only.
+
+### Added
+
+- The Agent app's offers (`Deliveries` tag): the calling Agent's offers
+  with the stops by area, the planned times, the distance, the pay with its
+  breakdown and rule, cash to collect and what is carried
+  (`GET /v1/agent/offers`, `AgentOfferList`, `AgentOffer`), one offer
+  (`GET /v1/agent/offers/{offer_id}`), accepting it (`POST .../accept`;
+  `409` `offer_taken` when another Agent accepted first, `offer_closed`
+  once it expired, was withdrawn or answered) and declining it with an
+  optional reason (`POST .../decline`, `OfferDecline`). Locally and in the
+  sandbox the simulator's service token acts for Agents without a user,
+  naming the Agent in `agent_id`.
+- The Partner's dispatch board (`GET /v1/partners/{partner_id}/dispatch/board`,
+  `DispatchBoard` with `DispatchBoardCounts` and `DeliverySummary` rows in
+  `DeliveryBoardGroup`s: waiting for release, waiting for an Agent,
+  assigned, collected, late, undelivered and needing somebody), a
+  delivery's page with its Provider, state, courier, times, distances,
+  team, `DeliveryExplanation` and log (`DeliveryLogLine`)
+  (`GET .../deliveries/{delivery_id}`, `DeliveryDetail`), who it may be given to (`GET .../candidates`,
+  `DeliveryCandidateList`), giving it to a team or an Agent
+  (`POST .../assignment`, `DeliveryAssignmentInput`; `409`
+  `assignment_refused` with `agent_over_limit`, `agent_kind_not_allowed`,
+  `agent_suspended`, `agent_not_active`, `agent_cash_ceiling`,
+  `agent_not_in_service`, `delivery_not_with_provider`,
+  `delivery_collected`, `delivery_ended`), asking again
+  (`POST .../ask`; `nothing_to_ask`, `no_provider`), sending an
+  undelivered order again (`POST .../send-again`, `201` with the new
+  delivery; `delivery_not_failed`), an order's deliveries and asking for
+  one when it has none (`GET`, `POST /v1/partners/{partner_id}/orders/{order_id}/deliveries`,
+  `OrderDeliveries`; `not_for_delivery`, `delivery_open`), and each
+  delivery service's dispatch settings
+  (`GET`, `PUT /v1/partners/{partner_id}/services/{service_id}/dispatch-settings`,
+  `DispatchSettings`, `DispatchSettingsUpdate`, with `ETag` and
+  `If-Match`): the strategy (`DispatchStrategy`: nearest available,
+  broadcast, round robin, ETA-based), offers or direct assignment
+  (`DispatchMode`), auto-assign, the offer's time, the limit per Agent, the
+  minutes before the next Provider, the cash ceiling and the customer's
+  code at the drop.
+- Mission Control's board across Partners and the same acts
+  (`GET /v1/platform/dispatch/board`, `GET /v1/platform/deliveries/{delivery_id}`,
+  `.../candidates`, `.../assignment`, `.../ask`, `.../send-again`,
+  `GET`, `POST /v1/platform/orders/{order_id}/deliveries`).
+- The customer's order gains its courier's first name (`courier`,
+  `OrderCourier`), the time it is expected at the door (`expected_at`, also
+  on `OrderPromise`), the code for the door when the delivery asks for one
+  (`drop_code`) and the proof once delivered (`proof`, `OrderProof`). A
+  store's order gains its courier with a way to call them (`courier`,
+  `StoreCourier`), `expected_at`, the delivery (`delivery_id`), whether a
+  Provider carries it (`carried_by_provider`: the store then neither hands
+  over nor delivers by hand) and the proof.
+- Live: the dispatch board channels `private-partner-{partner_id}-deliveries`
+  (members with `dispatch:read`) and `private-deliveries` (platform
+  `dispatch:read`) carrying `delivery.changed`; `offer.changed` on an
+  Agent's task channel; the `courier.position` frame
+  (`CourierPositionFrame`) on an order's channel from collection until
+  delivery, never replayed.
+- Events: `orchestration.delivery.created`, `released`, `offered`,
+  `assigned`, `collected`, `delivered`, `undelivered`, `called_off`,
+  `waiting_for_agent` and `needs_somebody`, each with the delivery, the
+  order, the store, its Partner and, where named, the Agent; and
+  `ordering.order.on_its_way` (with the courier), `undelivered` and
+  `running_late` (told once). `ordering.order.delivered` gains the optional
+  `delivery_id`, `agent_id`, `distance_metres` and `proof_kinds`.
+- Error codes: `offer_taken`, `offer_closed`, `delivery_not_with_provider`,
+  `delivery_collected`, `delivery_ended`, `nothing_to_ask`,
+  `delivery_not_failed`, `delivery_open`, `not_for_delivery`,
+  `no_provider` and `assignment_refused` with its field codes.
+
 ## [0.17.0] - 2026-10-16
 
 Step 4, workforce: a Partner's Agents in its delivery services, from the

@@ -1,0 +1,66 @@
+type: object
+description: An Agent a strategy considered, with where it ranked and why it could not take the delivery when it could not.
+required:
+  - agent_id
+  - first_name
+  - rank
+  - eta_seconds
+  - distance_metres
+  - eligible
+  - reason
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  rank:
+    type:
+      - integer
+      - "null"
+    description: Its place in the order the strategy offers in; `null` when not eligible.
+    examples:
+      - 1
+    minimum: 1
+  eta_seconds:
+    type:
+      - integer
+      - "null"
+    description: Its routed time to the store at the time, in seconds.
+    examples:
+      - 180
+    minimum: 0
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: Its routed distance to the store at the time, in metres.
+    examples:
+      - 900
+    minimum: 0
+  eligible:
+    type: boolean
+    description: Whether it could take the delivery.
+    examples:
+      - true
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why it could not, in words.
+    examples:
+      - null
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    first_name: Ravi
+    rank: 1
+    eta_seconds: 180
+    distance_metres: 900
+    eligible: true
+    reason: null

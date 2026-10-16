@@ -9667,7 +9667,9 @@ export type Signal = {
      * What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
      * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
      * `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
-     * `duty.changed`, `agent.changed`.
+     * `duty.changed`, `agent.changed`, `delivery.changed` (on the dispatch board channels, subject
+     * `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject
+     * `offer`, its status).
      */
     kind: string;
     /**
@@ -17157,6 +17159,10 @@ export type OrderPromise = {
      * Whether it is past its promise.
      */
     late: boolean;
+    /**
+     * When it is expected at the door now, as the customer was last told; the promise until an Agent has it.
+     */
+    expected_at?: string | null;
 };
 
 /**
@@ -17313,6 +17319,22 @@ export type CustomerOrder = {
      * How it ended, when it was declined, cancelled or expired; the note is never shown here.
      */
     ended: OrderEnd | null;
+    /**
+     * The courier's first name, once the Agent's app has the delivery; `null` before and for a pickup. Their position travels on the order's channel as `courier.position` frames from collection until delivery.
+     */
+    courier?: OrderCourier | null;
+    /**
+     * When it is expected at the door now, as the customer was last told: the promise until an Agent has it, then recomputed at assignment, at collection and every minute on the way.
+     */
+    expected_at?: string | null;
+    /**
+     * The 4-digit code to tell the Agent at the door, when the delivery asks for one; `null` otherwise.
+     */
+    drop_code?: string | null;
+    /**
+     * The proof of delivery, once delivered.
+     */
+    proof?: OrderProof | null;
 };
 
 /**
@@ -17645,6 +17667,26 @@ export type StoreOrder = {
      * Whether the store may cancel it now (accepted or ready).
      */
     cancellable: boolean;
+    /**
+     * Who carries a delivery and a way to call them, once the Agent's app has it; `null` before and for a pickup.
+     */
+    courier?: StoreCourier | null;
+    /**
+     * When it is expected at the door now, as the customer was last told.
+     */
+    expected_at?: string | null;
+    /**
+     * The delivery under way, or the last one; read it from the dispatch routes. `null` for a pickup and before acceptance.
+     */
+    delivery_id?: string | null;
+    /**
+     * Whether a Provider carries the delivery: the store then hands nothing over and delivers nothing by hand, the Agent's steps move the order; `false` for an order no Provider carries, which the store moves by hand.
+     */
+    carried_by_provider?: boolean;
+    /**
+     * The proof of delivery, once delivered.
+     */
+    proof?: OrderProof | null;
 };
 
 /**
@@ -18253,6 +18295,1187 @@ export type PlatformOrderSummary = {
      * What needs attention.
      */
     attention: AttentionCounts;
+};
+
+/**
+ * Where a delivery is. `wanted`: written down, no Provider has it yet; `waiting`: a Provider has it and nobody has taken it (waiting for release until its offers go out); `assigned`: an Agent has it and is on the way to the store; `collected`: the Agent has the order; `delivered`, `failed` (the drop failed) and `called_off` (its order ended first) are final. It only moves forward, except that an Agent who lets go of it, or is let go, returns it from `assigned` to `waiting`.
+ */
+export type DeliveryState = 'wanted' | 'waiting' | 'assigned' | 'collected' | 'delivered' | 'failed' | 'called_off';
+
+/**
+ * The group a delivery falls in on a dispatch board, one at a time, the first that applies: `needs_somebody`, `undelivered` (its drop failed and the order is neither sent again nor cancelled), `late`, `waiting_for_release`, `waiting_for_agent`, `assigned`, `collected`.
+ */
+export type DeliveryBoardGroup = 'waiting_for_release' | 'waiting_for_agent' | 'assigned' | 'collected' | 'late' | 'undelivered' | 'needs_somebody';
+
+/**
+ * A kind of Provider: the store's Partner's own delivery service, the platform fleet, or an external carrier (none is built yet).
+ */
+export type ProviderKind = 'own_service' | 'platform_fleet' | 'carrier';
+
+/**
+ * How a delivery service chooses its Agents: `nearest_available` offers to eligible Agents in order of routed time to the store, one at a time; `broadcast` offers to every eligible Agent within 5 km at once, widening by 2 km a round, three rounds of 45 seconds; `round_robin` offers to the eligible Agent longest without a task; `eta_based` chooses the Agent who adds the least time while every promise is kept.
+ */
+export type DispatchStrategy = 'nearest_available' | 'broadcast' | 'round_robin' | 'eta_based';
+
+/**
+ * How a chosen Agent receives a delivery: `offers`, which the Agent accepts or declines within the offer's time; `direct`, which lands in the Agent's list at once and may be handed back with a reason within 60 seconds.
+ */
+export type DispatchMode = 'offers' | 'direct';
+
+/**
+ * Where an offer is: `open` waits for the Agent; `accepted`; `declined`; `expired` after its time with no answer; `withdrawn` when the delivery went elsewhere (another Provider, a dispatcher, its order ended); `taken` when another Agent accepted first.
+ */
+export type OfferStatus = 'open' | 'accepted' | 'declined' | 'expired' | 'withdrawn' | 'taken';
+
+/**
+ * Whether an Agent can be seen working: `online` on duty and heard from in the last 60 seconds, `busy` online with a delivery under way, `offline` otherwise.
+ */
+export type CandidatePresence = 'online' | 'busy' | 'offline';
+
+/**
+ * Why a delivery needs somebody: `no_provider` (the store names none that can carry it), `chain_exhausted` (every Provider had its time), `provider_refused`, `provider_lost` (a Provider may have it and did not answer), `handed_back` (the Agent let go of it), `returned` (the Agent was suspended, removed, offboarded or went off duty), `dispatcher_only` (auto-assign is off, or no team or zone holds it), `help_asked` (the Agent asked for help).
+ */
+export type DeliveryNeedReason = 'no_provider' | 'chain_exhausted' | 'provider_refused' | 'provider_lost' | 'handed_back' | 'returned' | 'dispatcher_only' | 'help_asked';
+
+/**
+ * Why an Agent cannot be given a delivery by hand.
+ */
+export type AssignmentRefusalCode = 'agent_over_limit' | 'agent_kind_not_allowed' | 'agent_suspended' | 'agent_not_active' | 'agent_cash_ceiling' | 'agent_not_in_service';
+
+/**
+ * A Provider as a delivery names it.
+ */
+export type DeliveryProvider = {
+    /**
+     * The kind of Provider.
+     */
+    kind: ProviderKind;
+    /**
+     * The Provider's Partner: the store's own, or the platform fleet's.
+     */
+    partner_id: string;
+    /**
+     * The delivery service, for an agent-based Provider.
+     */
+    service_id: string | null;
+    /**
+     * The Provider's name.
+     */
+    name: string;
+};
+
+/**
+ * One end of a delivery: the pickup at the store or the drop at the customer.
+ */
+export type DeliveryStop = {
+    /**
+     * Which end.
+     */
+    kind: 'pickup' | 'drop';
+    /**
+     * The store's name for the pickup; the customer's first name for the drop.
+     */
+    name: string | null;
+    /**
+     * The area it is in, as people say it.
+     */
+    area: string | null;
+    /**
+     * Latitude (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude (WGS 84).
+     */
+    lng: number;
+    /**
+     * When the Agent should be there.
+     */
+    planned_at: string;
+};
+
+/**
+ * Who carries a delivery, named once the Agent's app has it.
+ */
+export type DeliveryCourier = {
+    /**
+     * The Agent (the membership).
+     */
+    agent_id: string;
+    /**
+     * The Agent's first name.
+     */
+    first_name: string;
+    /**
+     * A number to call the Agent on, for the store and the dispatcher; `null` when none is known.
+     */
+    phone: string | null;
+    /**
+     * The kind of Provider the Agent works for.
+     */
+    provider_kind: ProviderKind;
+    /**
+     * When the Agent's app had it.
+     */
+    named_at: string;
+};
+
+/**
+ * Why a delivery needs somebody, since when, and in words a screen may show.
+ */
+export type DeliveryNeed = {
+    /**
+     * Why.
+     */
+    reason: DeliveryNeedReason;
+    /**
+     * The reason in words.
+     */
+    detail: string;
+    /**
+     * Since when.
+     */
+    since: string;
+    /**
+     * The Agent it is about, when one.
+     */
+    agent_id: string | null;
+};
+
+/**
+ * One line of what an Agent is paid for a delivery.
+ */
+export type DeliveryPayLine = {
+    /**
+     * What it pays for.
+     */
+    label: string;
+    /**
+     * How much.
+     */
+    amount: Money;
+};
+
+/**
+ * What the Agent is paid for a delivery under the service's pay rule, as estimated when it was offered or given: the rule's version, the total and its lines.
+ */
+export type DeliveryPay = {
+    /**
+     * The pay rule's version.
+     */
+    rule_version: number;
+    /**
+     * The total.
+     */
+    total: Money;
+    /**
+     * The breakdown.
+     */
+    lines: Array<DeliveryPayLine>;
+};
+
+/**
+ * An Agent a strategy considered, with where it ranked and why it could not take the delivery when it could not.
+ */
+export type ExplainedCandidate = {
+    /**
+     * The Agent.
+     */
+    agent_id: string;
+    /**
+     * The Agent's first name.
+     */
+    first_name: string;
+    /**
+     * Its place in the order the strategy offers in; `null` when not eligible.
+     */
+    rank: number | null;
+    /**
+     * Its routed time to the store at the time, in seconds.
+     */
+    eta_seconds: number | null;
+    /**
+     * Its routed distance to the store at the time, in metres.
+     */
+    distance_metres: number | null;
+    /**
+     * Whether it could take the delivery.
+     */
+    eligible: boolean;
+    /**
+     * Why it could not, in words.
+     */
+    reason: string | null;
+};
+
+/**
+ * A move from one Provider of the chain to the next, or to a dispatcher.
+ */
+export type DeliveryFallback = {
+    /**
+     * The Provider it left.
+     */
+    from: ProviderKind;
+    /**
+     * The Provider it went to; `null` when the chain was exhausted and it waits for a dispatcher.
+     */
+    to: ProviderKind | null;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Why, in words.
+     */
+    why: string;
+};
+
+/**
+ * A choice made by hand: who made it and when.
+ */
+export type HandChoice = {
+    /**
+     * Who chose, as the record names them; `the platform` for Mission Control to a Partner.
+     */
+    by_name: string | null;
+    /**
+     * Who chose; shown to Mission Control only.
+     */
+    by_user_id: string | null;
+    /**
+     * Whether Mission Control chose.
+     */
+    platform: boolean;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * The note given.
+     */
+    note: string | null;
+};
+
+/**
+ * Why a delivery went to whom: the strategy, how many Agents were considered and how many could take it, who was chosen and why, their time to the store at the time, the pay and its rule, every fallback, and for a choice by hand who made it and when. The Partner and Mission Control read all of it; the Agent reads the pay; the customer none.
+ */
+export type DeliveryExplanation = {
+    /**
+     * The strategy that chose; `null` for a choice by hand or before any choice.
+     */
+    strategy: DispatchStrategy | null;
+    /**
+     * Offered or given directly.
+     */
+    mode: DispatchMode | null;
+    /**
+     * Who chose by hand, when one did.
+     */
+    by_hand: HandChoice | null;
+    /**
+     * How many Agents were considered.
+     */
+    considered: number;
+    /**
+     * How many of them could take it.
+     */
+    eligible: number;
+    /**
+     * The Agent chosen, when one was.
+     */
+    chosen: ExplainedCandidate | null;
+    /**
+     * Why the chosen one was chosen, in words.
+     */
+    why: string | null;
+    /**
+     * The pay of the chosen Agent, with its rule.
+     */
+    pay: DeliveryPay | null;
+    /**
+     * Every move to another Provider, oldest first.
+     */
+    fallbacks: Array<DeliveryFallback>;
+    /**
+     * The Agents considered last, eligible ones in the order offered, then the others with why not.
+     */
+    candidates: Array<ExplainedCandidate>;
+};
+
+/**
+ * One thing said about a delivery, in order; a delivery keeps its last 100 and never the same thing twice.
+ */
+export type DeliveryLogLine = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * What happened, as a code: `created`, `asked`, `released`, `offered`, `declined`, `offer_expired`, `assigned`, `named`, `collected`, `delivered`, `failed`, `handed_back`, `returned`, `fallback`, `given_by_hand`, `called_off`, `waiting_for_agent`, `needs_somebody`, `help_asked`, `expected`, `provider_said` and others; clients show `text`.
+     */
+    kind: string;
+    /**
+     * Who said it.
+     */
+    actor: 'system' | 'agent' | 'staff' | 'platform' | 'provider';
+    /**
+     * Their name, when a person; `the platform` for Mission Control to a Partner.
+     */
+    actor_name: string | null;
+    /**
+     * The Agent it is about, when one.
+     */
+    agent_id: string | null;
+    /**
+     * What happened, in words.
+     */
+    text: string;
+};
+
+/**
+ * A delivery as a dispatch board lists it.
+ */
+export type DeliverySummary = {
+    /**
+     * The delivery.
+     */
+    id: string;
+    /**
+     * The order it fulfils.
+     */
+    order_id: string;
+    /**
+     * The order's number, as said aloud.
+     */
+    order_number: string;
+    /**
+     * Which delivery of the order this is: 1, or more once the order was sent again.
+     */
+    attempt: number;
+    /**
+     * The store it is picked up from.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * Where the delivery is.
+     */
+    state: DeliveryState;
+    /**
+     * The board group it falls in now.
+     */
+    group: DeliveryBoardGroup;
+    /**
+     * The Provider that has it; `null` while none does.
+     */
+    provider: DeliveryProvider | null;
+    /**
+     * Who carries it, once the Agent's app has it; `null` otherwise.
+     */
+    courier: DeliveryCourier | null;
+    /**
+     * When the Agent should be at the store: the ready time, moved up to the next five minutes.
+     */
+    pickup_at: string;
+    /**
+     * When the Agent should be at the door: the promised time, moved up to the next five minutes.
+     */
+    drop_at: string;
+    /**
+     * When its offers go out, while it waits for release; `null` once released.
+     */
+    release_at: string | null;
+    /**
+     * Whether it was released to Agents.
+     */
+    released: boolean;
+    /**
+     * When it is expected at the door now, recomputed at assignment, at collection and every minute on the way.
+     */
+    expected_at: string | null;
+    /**
+     * Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+     */
+    late: boolean;
+    /**
+     * Since when it has waited for an Agent, while released and unassigned.
+     */
+    waiting_since: string | null;
+    /**
+     * Whether it has waited for an Agent for 3 minutes or more, raised to the dispatcher and Mission Control.
+     */
+    raised: boolean;
+    /**
+     * Why it needs somebody, when it does.
+     */
+    need: DeliveryNeed | null;
+    /**
+     * How many times a Provider was asked for it.
+     */
+    asks: number;
+    /**
+     * How many of its offers wait for an answer now.
+     */
+    offers_open: number;
+    /**
+     * Its version; it only rises, and `delivery.changed` signals carry it.
+     */
+    version: number;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * When a delivery was written down, released, taken, collected and finished.
+ */
+export type DeliveryTimes = {
+    /**
+     * When it was written down.
+     */
+    created_at: string;
+    /**
+     * When its offers went out.
+     */
+    released_at: string | null;
+    /**
+     * When an Agent took it, the last time.
+     */
+    assigned_at: string | null;
+    /**
+     * When the Agent collected the order.
+     */
+    collected_at: string | null;
+    /**
+     * When it was delivered, failed or called off.
+     */
+    finished_at: string | null;
+};
+
+/**
+ * What the reader may do to the delivery now, for the buttons a screen shows.
+ */
+export type DeliveryActions = {
+    /**
+     * Give it to a team or an Agent by hand.
+     */
+    give: boolean;
+    /**
+     * Ask a Provider for it again.
+     */
+    ask_again: boolean;
+    /**
+     * Send its undelivered order again, as a new delivery.
+     */
+    send_again: boolean;
+};
+
+/**
+ * A delivery's page: what a board lists, and the stops, the Provider chain, the team, the times, the distances, the cash, what is carried, the explanation and the log.
+ */
+export type DeliveryDetail = {
+    /**
+     * The delivery.
+     */
+    id: string;
+    /**
+     * The order it fulfils.
+     */
+    order_id: string;
+    /**
+     * The order's number, as said aloud.
+     */
+    order_number: string;
+    /**
+     * Which delivery of the order this is: 1, or more once the order was sent again.
+     */
+    attempt: number;
+    /**
+     * The store it is picked up from.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * Where the delivery is.
+     */
+    state: DeliveryState;
+    /**
+     * The board group it falls in now.
+     */
+    group: DeliveryBoardGroup;
+    /**
+     * The Provider that has it; `null` while none does.
+     */
+    provider: DeliveryProvider | null;
+    /**
+     * Who carries it, once the Agent's app has it; `null` otherwise.
+     */
+    courier: DeliveryCourier | null;
+    /**
+     * When the Agent should be at the store: the ready time, moved up to the next five minutes.
+     */
+    pickup_at: string;
+    /**
+     * When the Agent should be at the door: the promised time, moved up to the next five minutes.
+     */
+    drop_at: string;
+    /**
+     * When its offers go out, while it waits for release; `null` once released.
+     */
+    release_at: string | null;
+    /**
+     * Whether it was released to Agents.
+     */
+    released: boolean;
+    /**
+     * When it is expected at the door now, recomputed at assignment, at collection and every minute on the way.
+     */
+    expected_at: string | null;
+    /**
+     * Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+     */
+    late: boolean;
+    /**
+     * Since when it has waited for an Agent, while released and unassigned.
+     */
+    waiting_since: string | null;
+    /**
+     * Whether it has waited for an Agent for 3 minutes or more, raised to the dispatcher and Mission Control.
+     */
+    raised: boolean;
+    /**
+     * Why it needs somebody, when it does.
+     */
+    need: DeliveryNeed | null;
+    /**
+     * How many times a Provider was asked for it.
+     */
+    asks: number;
+    /**
+     * How many of its offers wait for an answer now.
+     */
+    offers_open: number;
+    /**
+     * Its version; it only rises, and `delivery.changed` signals carry it.
+     */
+    version: number;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * The pickup, then the drop.
+     */
+    stops: Array<DeliveryStop>;
+    /**
+     * The Providers it may go to, in order, as the store named them when it was written down.
+     */
+    chain: Array<DeliveryProvider>;
+    /**
+     * The team it goes to, when one.
+     */
+    team: DispatchTeam | null;
+    /**
+     * The zone it goes to when no team holds it: the store's.
+     */
+    zone_id: string | null;
+    /**
+     * When things happened.
+     */
+    times: DeliveryTimes;
+    /**
+     * The routed distance from the store to the door, in metres.
+     */
+    estimated_distance_metres: number | null;
+    /**
+     * The distance the Agent went, measured, once delivered.
+     */
+    distance_metres: number | null;
+    /**
+     * Cash the Agent collects at the door, for a cash order.
+     */
+    cash_to_collect: Money | null;
+    /**
+     * What is carried, in words.
+     */
+    carrying: string;
+    /**
+     * Whether the drop needs the customer's code.
+     */
+    drop_code_required: boolean;
+    /**
+     * The last reason a Provider said no or did not answer.
+     */
+    last_refusal: string | null;
+    /**
+     * Why the drop failed, when it did.
+     */
+    failed_reason: string | null;
+    /**
+     * Why it went to whom.
+     */
+    explanation: DeliveryExplanation;
+    /**
+     * Everything said about it, oldest first, the last 100.
+     */
+    log: Array<DeliveryLogLine>;
+    /**
+     * What the reader may do now.
+     */
+    actions: DeliveryActions;
+};
+
+/**
+ * How many deliveries a board holds in each group.
+ */
+export type DispatchBoardCounts = {
+    /**
+     * In the `waiting_for_release` group.
+     */
+    waiting_for_release: number;
+    /**
+     * In the `waiting_for_agent` group.
+     */
+    waiting_for_agent: number;
+    /**
+     * In the `assigned` group.
+     */
+    assigned: number;
+    /**
+     * In the `collected` group.
+     */
+    collected: number;
+    /**
+     * In the `late` group.
+     */
+    late: number;
+    /**
+     * In the `undelivered` group.
+     */
+    undelivered: number;
+    /**
+     * In the `needs_somebody` group.
+     */
+    needs_somebody: number;
+    /**
+     * Every delivery on the board.
+     */
+    total: number;
+};
+
+/**
+ * A live dispatch board: the open deliveries, and those finished in the last hour, each in its group, with the counts. Re-read it every `reread_seconds` and whenever a `delivery.changed` signal arrives on the board channel.
+ */
+export type DispatchBoard = {
+    /**
+     * How many in each group.
+     */
+    counts: DispatchBoardCounts;
+    /**
+     * The deliveries: needing somebody first, then undelivered, late, waiting for release, waiting for an Agent (longest first), assigned and collected (soonest due first).
+     */
+    items: Array<DeliverySummary>;
+    /**
+     * When the board was read.
+     */
+    read_at: string;
+    /**
+     * How often to read it again when no signal arrives.
+     */
+    reread_seconds: number;
+};
+
+/**
+ * A team of a delivery service's Agents.
+ */
+export type DispatchTeam = {
+    /**
+     * The team.
+     */
+    id: string;
+    /**
+     * The team's name.
+     */
+    name: string;
+    /**
+     * Whether it is the service's default team.
+     */
+    default: boolean;
+};
+
+/**
+ * An Agent's last known position and how old it is.
+ */
+export type CandidatePosition = {
+    /**
+     * Latitude (WGS 84).
+     */
+    lat: number;
+    /**
+     * Longitude (WGS 84).
+     */
+    lng: number;
+    /**
+     * When the device recorded it.
+     */
+    recorded_at: string;
+    /**
+     * How old it is, in seconds.
+     */
+    age_seconds: number;
+};
+
+/**
+ * An Agent a dispatcher may give a delivery to: online ones first, with how many deliveries each carries; an offline Agent may be chosen with a warning; one who cannot take it says why in words.
+ */
+export type DeliveryCandidate = {
+    /**
+     * The Agent.
+     */
+    agent_id: string;
+    /**
+     * The Agent's first name.
+     */
+    first_name: string;
+    /**
+     * The name the Agent is shown under.
+     */
+    display_name: string;
+    /**
+     * The Agent's kind: `walker`, `bicycle`, `two_wheeler` or `van`.
+     */
+    kind: string | null;
+    /**
+     * Whether the Agent can be seen working.
+     */
+    presence: CandidatePresence;
+    /**
+     * How many deliveries the Agent carries now.
+     */
+    deliveries_under_way: number;
+    /**
+     * The Agent's team.
+     */
+    team: DispatchTeam | null;
+    /**
+     * The delivery service the Agent belongs to.
+     */
+    provider: DeliveryProvider;
+    /**
+     * The last known position.
+     */
+    position: CandidatePosition | null;
+    /**
+     * Routed time to the store, in seconds.
+     */
+    eta_seconds: number | null;
+    /**
+     * Routed distance to the store, in metres.
+     */
+    distance_metres: number | null;
+    /**
+     * Whether the delivery may be given to the Agent.
+     */
+    can_take: boolean;
+    /**
+     * Why not, in words.
+     */
+    refusal: string | null;
+    /**
+     * Why not, as a code.
+     */
+    refusal_code: AssignmentRefusalCode | null;
+    /**
+     * Something to know before choosing, such as the Agent being offline.
+     */
+    warning: string | null;
+};
+
+/**
+ * Who a delivery may be given to by hand: the teams and the Agents of the delivery services the reader may choose from.
+ */
+export type DeliveryCandidateList = {
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The teams.
+     */
+    teams: Array<DispatchTeam>;
+    /**
+     * The Agents: those who can take it first, online before offline, nearest first; then those who cannot, with why.
+     */
+    items: Array<DeliveryCandidate>;
+};
+
+/**
+ * Gives a delivery to an Agent, or to a team for dispatch to choose within it. One of the two is required; an Agent given with a team must be of it.
+ */
+export type DeliveryAssignmentInput = {
+    /**
+     * The Agent.
+     */
+    agent_id?: string | null;
+    /**
+     * The team.
+     */
+    team_id?: string | null;
+    /**
+     * Why, kept on the delivery and in the audit log; at most 500 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * An order's deliveries, newest first, and whether one can be asked for: an order accepted while its store named no Provider says so here, and becomes askable once one is configured.
+ */
+export type OrderDeliveries = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its deliveries, newest first.
+     */
+    items: Array<DeliverySummary>;
+    /**
+     * Whether the store names a Provider that can carry it now.
+     */
+    provider_configured: boolean;
+    /**
+     * Whether a delivery may be asked for now: the order is a delivery, accepted or ready, with no delivery under way, and a Provider is configured.
+     */
+    askable: boolean;
+    /**
+     * What the order page should say about it, in words.
+     */
+    note: string | null;
+};
+
+/**
+ * How a delivery service dispatches: the strategy, offers or direct assignment, whether deliveries are offered automatically, the offer's time, the most deliveries an Agent carries at once, the time the service has before the next Provider of a chain is asked, the cash ceiling and whether the drop needs the customer's code. A service never saved reads the defaults: nearest available with direct assignment for a Partner's own Agents, ETA-based with offers for the platform fleet.
+ */
+export type DispatchSettings = {
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The service's Partner.
+     */
+    partner_id: string;
+    /**
+     * How Agents are chosen.
+     */
+    strategy: DispatchStrategy;
+    /**
+     * Offers or direct assignment.
+     */
+    mode: DispatchMode;
+    /**
+     * Whether deliveries go to Agents by themselves; when off every delivery waits for a dispatcher.
+     */
+    auto_assign: boolean;
+    /**
+     * How long an offer waits for an answer, 30 to 120 seconds.
+     */
+    offer_timeout_seconds: number;
+    /**
+     * The most deliveries an Agent carries at once, 1 to 10.
+     */
+    max_tasks_per_agent: number;
+    /**
+     * How long the service has a delivery before the next Provider of the chain is asked, 1 to 60 minutes.
+     */
+    fallback_minutes: number;
+    /**
+     * Above this much cash in hand no delivery collecting cash goes to an Agent.
+     */
+    cash_ceiling: Money;
+    /**
+     * Whether every drop needs the customer's 4-digit code.
+     */
+    drop_code_required: boolean;
+    /**
+     * Its version; `If-Match` guards a change.
+     */
+    version: number;
+    /**
+     * Whether these are the defaults, never saved.
+     */
+    defaults: boolean;
+    /**
+     * When last changed.
+     */
+    updated_at: string | null;
+    /**
+     * Who last changed it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * A delivery service's dispatch settings as a whole, with an optional reason, recorded with who made the change.
+ */
+export type DispatchSettingsUpdate = {
+    /**
+     * How Agents are chosen.
+     */
+    strategy: DispatchStrategy;
+    /**
+     * Offers or direct assignment.
+     */
+    mode: DispatchMode;
+    /**
+     * Whether deliveries go to Agents by themselves.
+     */
+    auto_assign: boolean;
+    /**
+     * 30 to 120 seconds.
+     */
+    offer_timeout_seconds: number;
+    /**
+     * 1 to 10.
+     */
+    max_tasks_per_agent: number;
+    /**
+     * 1 to 60 minutes.
+     */
+    fallback_minutes: number;
+    /**
+     * The cash ceiling, in the service's currency, ₹0 to ₹50,000.
+     */
+    cash_ceiling: Money;
+    /**
+     * Whether every drop needs the customer's code.
+     */
+    drop_code_required: boolean;
+    /**
+     * Why, kept in the audit log; at most 500 characters.
+     */
+    reason?: string | null;
+};
+
+/**
+ * The store an offer picks up from.
+ */
+export type OfferStore = {
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * The area it is in.
+     */
+    area: string | null;
+};
+
+/**
+ * A stop of an offer: where, by area only until it is accepted, and when.
+ */
+export type OfferStop = {
+    /**
+     * Which end.
+     */
+    kind: 'pickup' | 'drop';
+    /**
+     * The area.
+     */
+    area: string | null;
+    /**
+     * When to be there.
+     */
+    planned_at: string;
+    /**
+     * Routed distance from the previous point (the Agent, then the store), in metres.
+     */
+    distance_metres: number | null;
+};
+
+/**
+ * A delivery offered to an Agent, with everything to decide by: the stops with their areas and times, the distance, the pay with its breakdown and rule, cash to collect and what is carried. It leaves the screen when it expires, is taken by another Agent or is withdrawn; the app hears `offer.changed` on the Agent's task channel.
+ */
+export type AgentOffer = {
+    /**
+     * The offer.
+     */
+    id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The Agent it is offered to.
+     */
+    agent_id: string;
+    /**
+     * Where the offer is.
+     */
+    status: OfferStatus;
+    /**
+     * `offers`; a direct assignment is a task, not an offer.
+     */
+    mode: DispatchMode;
+    /**
+     * When it was offered.
+     */
+    offered_at: string;
+    /**
+     * When it leaves the screen unanswered.
+     */
+    expires_at: string;
+    /**
+     * Seconds until it expires, 0 once it is not open.
+     */
+    seconds_left: number;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * Where it is picked up.
+     */
+    store: OfferStore;
+    /**
+     * The pickup, then the drop.
+     */
+    stops: Array<OfferStop>;
+    /**
+     * The whole routed distance: to the store, then to the door, in metres.
+     */
+    distance_metres: number;
+    /**
+     * Routed time from the Agent to the store, in seconds.
+     */
+    pickup_eta_seconds: number | null;
+    /**
+     * What the delivery pays the Agent, with its breakdown and rule.
+     */
+    pay: DeliveryPay;
+    /**
+     * Cash to collect at the door, for a cash order.
+     */
+    cash_to_collect: Money | null;
+    /**
+     * What is carried, in words.
+     */
+    carrying: string;
+    /**
+     * The reason the Agent gave when declining.
+     */
+    declined_reason: string | null;
+};
+
+/**
+ * An Agent's offers: the open ones first, soonest to expire first, then those answered or closed in the last hour.
+ */
+export type AgentOfferList = {
+    /**
+     * The offers.
+     */
+    items: Array<AgentOffer>;
+};
+
+/**
+ * Declines an offer, with a reason if the Agent gives one. Declines are counted, never punished.
+ */
+export type OfferDecline = {
+    /**
+     * Why, at most 200 characters.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Data of a `courier.position` frame on an order's channel: where its courier is, from the moment the order is collected until it is delivered, never before, with how old the position is.
+ */
+export type CourierPositionFrame = {
+    /**
+     * The channel.
+     */
+    channel: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The courier's position.
+     */
+    position: AgentPosition;
+    /**
+     * How old the position is, in seconds, when sent.
+     */
+    age_seconds: number;
+};
+
+/**
+ * The order's courier as the customer reads it: the first name, once the Agent's app has the delivery. The courier's position travels as `courier.position` frames on the order's channel from collection until delivery.
+ */
+export type OrderCourier = {
+    /**
+     * The Agent's first name.
+     */
+    first_name: string;
+    /**
+     * Since when.
+     */
+    named_at: string;
+};
+
+/**
+ * The order's courier as the store and Mission Control read it: who, and a way to call them.
+ */
+export type StoreCourier = {
+    /**
+     * The Agent.
+     */
+    agent_id: string;
+    /**
+     * The Agent's first name.
+     */
+    first_name: string;
+    /**
+     * A number to call the Agent on; `null` when none is known.
+     */
+    phone: string | null;
+    /**
+     * The kind of Provider the Agent works for.
+     */
+    provider: ProviderKind | null;
+};
+
+/**
+ * The proof a delivered order carries: what was recorded at the door and when, with a short-lived link to the photo where one was taken.
+ */
+export type OrderProof = {
+    /**
+     * When the drop was completed on the device.
+     */
+    recorded_at: string;
+    /**
+     * What was recorded.
+     */
+    kinds: Array<'photo' | 'signature' | 'code' | 'scan' | 'confirmation'>;
+    /**
+     * A link to the photo, valid for ten minutes; read the order again for a fresh one.
+     */
+    photo_url: string | null;
 };
 
 /**
@@ -33218,7 +34441,7 @@ export type OpenLiveStreamError = OpenLiveStreamErrors[keyof OpenLiveStreamError
 
 export type OpenLiveStreamResponses = {
     /**
-     * Server-sent events: `snapshot` or `resync` per channel, then `signal`, `agent.position`, `agent.status`, `heartbeat` and finally `close`
+     * Server-sent events: `snapshot` or `resync` per channel, then `signal`, `agent.position`, `agent.status`, `courier.position`, `heartbeat` and finally `close`
      */
     200: ServerSentEventStream;
 };
@@ -43154,3 +44377,1233 @@ export type ResolveOrderHelpResponses = {
 };
 
 export type ResolveOrderHelpResponse = ResolveOrderHelpResponses[keyof ResolveOrderHelpResponses];
+
+export type ListAgentOffersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The Agent membership to list; required with the simulator's service token, optional otherwise (every membership of the caller).
+         */
+        agent_id?: string;
+    };
+    url: '/v1/agent/offers';
+};
+
+export type ListAgentOffersErrors = {
+    /**
+     * `malformed_identifier` for an `agent_id` that is not a UUID.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not an Agent app token, or the service token of another job, or outside local and the sandbox.
+     */
+    403: Problem;
+    /**
+     * `not_found`: an `agent_id` that is not one of the caller's memberships, or not an Agent without a user for the simulator.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentOffersError = ListAgentOffersErrors[keyof ListAgentOffersErrors];
+
+export type ListAgentOffersResponses = {
+    /**
+     * The offers.
+     */
+    200: AgentOfferList;
+};
+
+export type ListAgentOffersResponse = ListAgentOffersResponses[keyof ListAgentOffersResponses];
+
+export type GetAgentOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer, which must be the calling Agent's; another's answers `404`.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/offers/{offer_id}';
+};
+
+export type GetAgentOfferErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such offer of the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentOfferError = GetAgentOfferErrors[keyof GetAgentOfferErrors];
+
+export type GetAgentOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: AgentOffer;
+};
+
+export type GetAgentOfferResponse = GetAgentOfferResponses[keyof GetAgentOfferResponses];
+
+export type AcceptAgentOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer, which must be the calling Agent's; another's answers `404`.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/offers/{offer_id}/accept';
+};
+
+export type AcceptAgentOfferErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such offer of the caller.
+     */
+    404: Problem;
+    /**
+     * `offer_taken`: another Agent accepted first; `offer_closed`: the offer expired, was withdrawn or was answered already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptAgentOfferError = AcceptAgentOfferErrors[keyof AcceptAgentOfferErrors];
+
+export type AcceptAgentOfferResponses = {
+    /**
+     * The offer, accepted.
+     */
+    200: AgentOffer;
+};
+
+export type AcceptAgentOfferResponse = AcceptAgentOfferResponses[keyof AcceptAgentOfferResponses];
+
+export type DeclineAgentOfferData = {
+    /**
+     * The reason, if any.
+     */
+    body?: OfferDecline;
+    path: {
+        /**
+         * The offer, which must be the calling Agent's; another's answers `404`.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/offers/{offer_id}/decline';
+};
+
+export type DeclineAgentOfferErrors = {
+    /**
+     * `validation_failed`: a reason longer than 200 characters; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such offer of the caller.
+     */
+    404: Problem;
+    /**
+     * `offer_closed`: the offer expired, was withdrawn, taken or answered already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineAgentOfferError = DeclineAgentOfferErrors[keyof DeclineAgentOfferErrors];
+
+export type DeclineAgentOfferResponses = {
+    /**
+     * The offer, declined.
+     */
+    200: AgentOffer;
+};
+
+export type DeclineAgentOfferResponse = DeclineAgentOfferResponses[keyof DeclineAgentOfferResponses];
+
+export type GetPartnerDispatchBoardData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only deliveries from this store.
+         */
+        location_id?: string;
+        /**
+         * Only this group.
+         */
+        group?: DeliveryBoardGroup;
+    };
+    url: '/v1/partners/{partner_id}/dispatch/board';
+};
+
+export type GetPartnerDispatchBoardErrors = {
+    /**
+     * `validation_failed` for an unknown group; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a store that is not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerDispatchBoardError = GetPartnerDispatchBoardErrors[keyof GetPartnerDispatchBoardErrors];
+
+export type GetPartnerDispatchBoardResponses = {
+    /**
+     * The board.
+     */
+    200: DispatchBoard;
+};
+
+export type GetPartnerDispatchBoardResponse = GetPartnerDispatchBoardResponses[keyof GetPartnerDispatchBoardResponses];
+
+export type GetPartnerDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery, which must be one of the partner's stores'; another's answers `404`.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/deliveries/{delivery_id}';
+};
+
+export type GetPartnerDeliveryErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the delivery.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerDeliveryError = GetPartnerDeliveryErrors[keyof GetPartnerDeliveryErrors];
+
+export type GetPartnerDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    200: DeliveryDetail;
+};
+
+export type GetPartnerDeliveryResponse = GetPartnerDeliveryResponses[keyof GetPartnerDeliveryResponses];
+
+export type ListPartnerDeliveryCandidatesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery, which must be one of the partner's stores'; another's answers `404`.
+         */
+        delivery_id: string;
+    };
+    query?: {
+        /**
+         * Only the Agents of this team.
+         */
+        team_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/deliveries/{delivery_id}/candidates';
+};
+
+export type ListPartnerDeliveryCandidatesErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, the delivery or the team.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerDeliveryCandidatesError = ListPartnerDeliveryCandidatesErrors[keyof ListPartnerDeliveryCandidatesErrors];
+
+export type ListPartnerDeliveryCandidatesResponses = {
+    /**
+     * The teams and the Agents.
+     */
+    200: DeliveryCandidateList;
+};
+
+export type ListPartnerDeliveryCandidatesResponse = ListPartnerDeliveryCandidatesResponses[keyof ListPartnerDeliveryCandidatesResponses];
+
+export type GivePartnerDeliveryData = {
+    /**
+     * The team or the Agent, and an optional note.
+     */
+    body: DeliveryAssignmentInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery, which must be one of the partner's stores'; another's answers `404`.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/deliveries/{delivery_id}/assignment';
+};
+
+export type GivePartnerDeliveryErrors = {
+    /**
+     * `validation_failed`: neither a team nor an Agent, or a note over 500 characters; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, the delivery, the team or the Agent (an Agent of another partner answers the same).
+     */
+    404: Problem;
+    /**
+     * `assignment_refused` naming why in words, with `errors[].code` one of `agent_over_limit`, `agent_kind_not_allowed`, `agent_suspended`, `agent_not_active`, `agent_cash_ceiling`, `agent_not_in_service`; `delivery_not_with_provider` before a Provider has it (ask for it first); `delivery_collected` once the Agent has the order (talk to them); `delivery_ended` once it is delivered, failed or called off.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GivePartnerDeliveryError = GivePartnerDeliveryErrors[keyof GivePartnerDeliveryErrors];
+
+export type GivePartnerDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    200: DeliveryDetail;
+};
+
+export type GivePartnerDeliveryResponse = GivePartnerDeliveryResponses[keyof GivePartnerDeliveryResponses];
+
+export type AskPartnerDeliveryAgainData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery, which must be one of the partner's stores'; another's answers `404`.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/deliveries/{delivery_id}/ask';
+};
+
+export type AskPartnerDeliveryAgainErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the delivery.
+     */
+    404: Problem;
+    /**
+     * `nothing_to_ask` while a Provider has the delivery and nothing is wrong with it; `delivery_collected` once collected; `delivery_ended` once it ended; `no_provider` while the store names no Provider that can carry it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskPartnerDeliveryAgainError = AskPartnerDeliveryAgainErrors[keyof AskPartnerDeliveryAgainErrors];
+
+export type AskPartnerDeliveryAgainResponses = {
+    /**
+     * The delivery, asked again.
+     */
+    200: DeliveryDetail;
+};
+
+export type AskPartnerDeliveryAgainResponse = AskPartnerDeliveryAgainResponses[keyof AskPartnerDeliveryAgainResponses];
+
+export type SendPartnerDeliveryAgainData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery, which must be one of the partner's stores'; another's answers `404`.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/deliveries/{delivery_id}/send-again';
+};
+
+export type SendPartnerDeliveryAgainErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the delivery.
+     */
+    404: Problem;
+    /**
+     * `delivery_not_failed` unless this delivery failed at the door and its order is still undelivered (sent again or cancelled already answers this too); `no_provider` while the store names no Provider.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendPartnerDeliveryAgainError = SendPartnerDeliveryAgainErrors[keyof SendPartnerDeliveryAgainErrors];
+
+export type SendPartnerDeliveryAgainResponses = {
+    /**
+     * The new delivery.
+     */
+    201: DeliveryDetail;
+};
+
+export type SendPartnerDeliveryAgainResponse = SendPartnerDeliveryAgainResponses[keyof SendPartnerDeliveryAgainResponses];
+
+export type ListPartnerOrderDeliveriesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The order, which must be one of the partner's stores'; another's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/orders/{order_id}/deliveries';
+};
+
+export type ListPartnerOrderDeliveriesErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerOrderDeliveriesError = ListPartnerOrderDeliveriesErrors[keyof ListPartnerOrderDeliveriesErrors];
+
+export type ListPartnerOrderDeliveriesResponses = {
+    /**
+     * The order's deliveries.
+     */
+    200: OrderDeliveries;
+};
+
+export type ListPartnerOrderDeliveriesResponse = ListPartnerOrderDeliveriesResponses[keyof ListPartnerOrderDeliveriesResponses];
+
+export type AskPartnerOrderDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The order, which must be one of the partner's stores'; another's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/orders/{order_id}/deliveries';
+};
+
+export type AskPartnerOrderDeliveryErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the order.
+     */
+    404: Problem;
+    /**
+     * `not_for_delivery` for a pickup order; `order_moved` unless the order is accepted or ready; `delivery_open` while a delivery of it is under way; `no_provider` while the store names no Provider.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskPartnerOrderDeliveryError = AskPartnerOrderDeliveryErrors[keyof AskPartnerOrderDeliveryErrors];
+
+export type AskPartnerOrderDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    201: DeliveryDetail;
+};
+
+export type AskPartnerOrderDeliveryResponse = AskPartnerOrderDeliveryResponses[keyof AskPartnerOrderDeliveryResponses];
+
+export type GetDispatchSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, which must be the partner's; another's answers `404`.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/dispatch-settings';
+};
+
+export type GetDispatchSettingsErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a service that is not its delivery service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDispatchSettingsError = GetDispatchSettingsErrors[keyof GetDispatchSettingsErrors];
+
+export type GetDispatchSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: DispatchSettings;
+};
+
+export type GetDispatchSettingsResponse = GetDispatchSettingsResponses[keyof GetDispatchSettingsResponses];
+
+export type PutDispatchSettingsData = {
+    /**
+     * The settings.
+     */
+    body: DispatchSettingsUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, which must be the partner's; another's answers `404`.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/dispatch-settings';
+};
+
+export type PutDispatchSettingsErrors = {
+    /**
+     * `validation_failed`: a value out of its bounds, or a cash ceiling in another currency; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a service that is not its delivery service.
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: `If-Match` names a version that is no longer current.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutDispatchSettingsError = PutDispatchSettingsErrors[keyof PutDispatchSettingsErrors];
+
+export type PutDispatchSettingsResponses = {
+    /**
+     * The settings, changed.
+     */
+    200: DispatchSettings;
+};
+
+export type PutDispatchSettingsResponse = PutDispatchSettingsResponses[keyof PutDispatchSettingsResponses];
+
+export type GetPlatformDispatchBoardData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only deliveries of this Partner's stores.
+         */
+        partner_id?: string;
+        /**
+         * Only deliveries from this store.
+         */
+        location_id?: string;
+        /**
+         * Only deliveries from stores in this zone.
+         */
+        zone_id?: string;
+        /**
+         * Only this group.
+         */
+        group?: DeliveryBoardGroup;
+    };
+    url: '/v1/platform/dispatch/board';
+};
+
+export type GetPlatformDispatchBoardErrors = {
+    /**
+     * `validation_failed` for an unknown group; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token, or without `dispatch:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformDispatchBoardError = GetPlatformDispatchBoardErrors[keyof GetPlatformDispatchBoardErrors];
+
+export type GetPlatformDispatchBoardResponses = {
+    /**
+     * The board.
+     */
+    200: DispatchBoard;
+};
+
+export type GetPlatformDispatchBoardResponse = GetPlatformDispatchBoardResponses[keyof GetPlatformDispatchBoardResponses];
+
+export type GetPlatformDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/deliveries/{delivery_id}';
+};
+
+export type GetPlatformDeliveryErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformDeliveryError = GetPlatformDeliveryErrors[keyof GetPlatformDeliveryErrors];
+
+export type GetPlatformDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    200: DeliveryDetail;
+};
+
+export type GetPlatformDeliveryResponse = GetPlatformDeliveryResponses[keyof GetPlatformDeliveryResponses];
+
+export type ListPlatformDeliveryCandidatesData = {
+    body?: never;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: {
+        /**
+         * Only the Agents of this team.
+         */
+        team_id?: string;
+    };
+    url: '/v1/platform/deliveries/{delivery_id}/candidates';
+};
+
+export type ListPlatformDeliveryCandidatesErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the delivery or the team.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformDeliveryCandidatesError = ListPlatformDeliveryCandidatesErrors[keyof ListPlatformDeliveryCandidatesErrors];
+
+export type ListPlatformDeliveryCandidatesResponses = {
+    /**
+     * The teams and the Agents.
+     */
+    200: DeliveryCandidateList;
+};
+
+export type ListPlatformDeliveryCandidatesResponse = ListPlatformDeliveryCandidatesResponses[keyof ListPlatformDeliveryCandidatesResponses];
+
+export type GivePlatformDeliveryData = {
+    /**
+     * The team or the Agent, and an optional note.
+     */
+    body: DeliveryAssignmentInput;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/deliveries/{delivery_id}/assignment';
+};
+
+export type GivePlatformDeliveryErrors = {
+    /**
+     * `validation_failed`: neither a team nor an Agent, or a note over 500 characters; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the delivery, the team or the Agent.
+     */
+    404: Problem;
+    /**
+     * `assignment_refused` naming why in words, with `errors[].code` one of `agent_over_limit`, `agent_kind_not_allowed`, `agent_suspended`, `agent_not_active`, `agent_cash_ceiling`, `agent_not_in_service`; `delivery_not_with_provider` before a Provider has it (ask for it first); `delivery_collected` once the Agent has the order (talk to them); `delivery_ended` once it is delivered, failed or called off.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GivePlatformDeliveryError = GivePlatformDeliveryErrors[keyof GivePlatformDeliveryErrors];
+
+export type GivePlatformDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    200: DeliveryDetail;
+};
+
+export type GivePlatformDeliveryResponse = GivePlatformDeliveryResponses[keyof GivePlatformDeliveryResponses];
+
+export type AskPlatformDeliveryAgainData = {
+    body?: never;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/deliveries/{delivery_id}/ask';
+};
+
+export type AskPlatformDeliveryAgainErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `nothing_to_ask` while a Provider has the delivery and nothing is wrong with it; `delivery_collected` once collected; `delivery_ended` once it ended; `no_provider` while the store names no Provider that can carry it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskPlatformDeliveryAgainError = AskPlatformDeliveryAgainErrors[keyof AskPlatformDeliveryAgainErrors];
+
+export type AskPlatformDeliveryAgainResponses = {
+    /**
+     * The delivery, asked again.
+     */
+    200: DeliveryDetail;
+};
+
+export type AskPlatformDeliveryAgainResponse = AskPlatformDeliveryAgainResponses[keyof AskPlatformDeliveryAgainResponses];
+
+export type SendPlatformDeliveryAgainData = {
+    body?: never;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/deliveries/{delivery_id}/send-again';
+};
+
+export type SendPlatformDeliveryAgainErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `delivery_not_failed` unless this delivery failed at the door and its order is still undelivered (sent again or cancelled already answers this too); `no_provider` while the store names no Provider.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendPlatformDeliveryAgainError = SendPlatformDeliveryAgainErrors[keyof SendPlatformDeliveryAgainErrors];
+
+export type SendPlatformDeliveryAgainResponses = {
+    /**
+     * The new delivery.
+     */
+    201: DeliveryDetail;
+};
+
+export type SendPlatformDeliveryAgainResponse = SendPlatformDeliveryAgainResponses[keyof SendPlatformDeliveryAgainResponses];
+
+export type ListPlatformOrderDeliveriesData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/deliveries';
+};
+
+export type ListPlatformOrderDeliveriesErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformOrderDeliveriesError = ListPlatformOrderDeliveriesErrors[keyof ListPlatformOrderDeliveriesErrors];
+
+export type ListPlatformOrderDeliveriesResponses = {
+    /**
+     * The order's deliveries.
+     */
+    200: OrderDeliveries;
+};
+
+export type ListPlatformOrderDeliveriesResponse = ListPlatformOrderDeliveriesResponses[keyof ListPlatformOrderDeliveriesResponses];
+
+export type AskPlatformOrderDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/deliveries';
+};
+
+export type AskPlatformOrderDeliveryErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `not_for_delivery` for a pickup order; `order_moved` unless the order is accepted or ready; `delivery_open` while a delivery of it is under way; `no_provider` while the store names no Provider.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskPlatformOrderDeliveryError = AskPlatformOrderDeliveryErrors[keyof AskPlatformOrderDeliveryErrors];
+
+export type AskPlatformOrderDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    201: DeliveryDetail;
+};
+
+export type AskPlatformOrderDeliveryResponse = AskPlatformOrderDeliveryResponses[keyof AskPlatformOrderDeliveryResponses];

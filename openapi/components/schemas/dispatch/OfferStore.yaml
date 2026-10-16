@@ -1,0 +1,21 @@
+type: object
+description: The store an offer picks up from.
+required:
+  - name
+  - area
+properties:
+  name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  area:
+    type:
+      - string
+      - "null"
+    description: The area it is in.
+    examples:
+      - Gachibowli
+examples:
+  - name: Dev Kitchen Gachibowli
+    area: Gachibowli

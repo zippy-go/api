@@ -1,0 +1,20 @@
+type: object
+description: "The order's courier as the customer reads it: the first name, once the Agent's app has the delivery. The courier's position travels as `courier.position` frames on the order's channel from collection until delivery."
+required:
+  - first_name
+  - named_at
+properties:
+  first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  named_at:
+    type: string
+    format: date-time
+    description: Since when.
+    examples:
+      - 2026-10-16T13:12:30Z
+examples:
+  - first_name: Ravi
+    named_at: 2026-10-16T13:12:30Z

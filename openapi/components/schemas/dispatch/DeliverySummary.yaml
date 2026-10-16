@@ -1,0 +1,198 @@
+type: object
+description: A delivery as a dispatch board lists it.
+required:
+  - id
+  - order_id
+  - order_number
+  - attempt
+  - location_id
+  - location_name
+  - partner_id
+  - state
+  - group
+  - provider
+  - courier
+  - pickup_at
+  - drop_at
+  - release_at
+  - released
+  - expected_at
+  - late
+  - waiting_since
+  - raised
+  - need
+  - asks
+  - offers_open
+  - version
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+  order_id:
+    type: string
+    format: uuid
+    description: The order it fulfils.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: The order's number, as said aloud.
+    examples:
+      - AB0042
+  attempt:
+    type: integer
+    description: "Which delivery of the order this is: 1, or more once the order was sent again."
+    examples:
+      - 1
+    minimum: 1
+  location_id:
+    type: string
+    format: uuid
+    description: The store it is picked up from.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_id:
+    type: string
+    format: uuid
+    description: The store's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  state:
+    $ref: ./DeliveryState.yaml
+    description: Where the delivery is.
+  group:
+    $ref: ./DeliveryBoardGroup.yaml
+    description: The board group it falls in now.
+  provider:
+    oneOf:
+      - $ref: ./DeliveryProvider.yaml
+      - type: "null"
+    description: The Provider that has it; `null` while none does.
+  courier:
+    oneOf:
+      - $ref: ./DeliveryCourier.yaml
+      - type: "null"
+    description: Who carries it, once the Agent's app has it; `null` otherwise.
+  pickup_at:
+    type: string
+    format: date-time
+    description: "When the Agent should be at the store: the ready time, moved up to the next five minutes."
+    examples:
+      - 2026-10-16T13:25:00Z
+  drop_at:
+    type: string
+    format: date-time
+    description: "When the Agent should be at the door: the promised time, moved up to the next five minutes."
+    examples:
+      - 2026-10-16T13:45:00Z
+  release_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When its offers go out, while it waits for release; `null` once released.
+    examples:
+      - 2026-10-16T13:17:00Z
+  released:
+    type: boolean
+    description: Whether it was released to Agents.
+    examples:
+      - true
+  expected_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it is expected at the door now, recomputed at assignment, at collection and every minute on the way.
+    examples:
+      - 2026-10-16T13:44:00Z
+  late:
+    type: boolean
+    description: Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+    examples:
+      - false
+  waiting_since:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: Since when it has waited for an Agent, while released and unassigned.
+    examples:
+      - 2026-10-16T13:10:00Z
+  raised:
+    type: boolean
+    description: Whether it has waited for an Agent for 3 minutes or more, raised to the dispatcher and Mission Control.
+    examples:
+      - false
+  need:
+    oneOf:
+      - $ref: ./DeliveryNeed.yaml
+      - type: "null"
+    description: Why it needs somebody, when it does.
+  asks:
+    type: integer
+    description: How many times a Provider was asked for it.
+    examples:
+      - 1
+    minimum: 0
+  offers_open:
+    type: integer
+    description: How many of its offers wait for an answer now.
+    examples:
+      - 0
+    minimum: 0
+  version:
+    type: integer
+    description: Its version; it only rises, and `delivery.changed` signals carry it.
+    examples:
+      - 6
+    minimum: 1
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-16T13:12:30Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB0042
+    attempt: 1
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    state: assigned
+    group: assigned
+    provider:
+      kind: platform_fleet
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      name: ZippyGo Fleet
+    courier:
+      agent_id: 01a13a48-9e00-7000-8000-000000000107
+      first_name: Ravi
+      phone: null
+      provider_kind: platform_fleet
+      named_at: 2026-10-16T13:12:30Z
+    pickup_at: 2026-10-16T13:25:00Z
+    drop_at: 2026-10-16T13:45:00Z
+    release_at: null
+    released: true
+    expected_at: 2026-10-16T13:44:00Z
+    late: false
+    waiting_since: null
+    raised: false
+    need: null
+    asks: 1
+    offers_open: 0
+    version: 6
+    updated_at: 2026-10-16T13:12:30Z

@@ -1,0 +1,69 @@
+type: object
+description: How many deliveries a board holds in each group.
+required:
+  - waiting_for_release
+  - waiting_for_agent
+  - assigned
+  - collected
+  - late
+  - undelivered
+  - needs_somebody
+  - total
+properties:
+  waiting_for_release:
+    type: integer
+    description: In the `waiting_for_release` group.
+    examples:
+      - 0
+    minimum: 0
+  waiting_for_agent:
+    type: integer
+    description: In the `waiting_for_agent` group.
+    examples:
+      - 0
+    minimum: 0
+  assigned:
+    type: integer
+    description: In the `assigned` group.
+    examples:
+      - 0
+    minimum: 0
+  collected:
+    type: integer
+    description: In the `collected` group.
+    examples:
+      - 0
+    minimum: 0
+  late:
+    type: integer
+    description: In the `late` group.
+    examples:
+      - 0
+    minimum: 0
+  undelivered:
+    type: integer
+    description: In the `undelivered` group.
+    examples:
+      - 0
+    minimum: 0
+  needs_somebody:
+    type: integer
+    description: In the `needs_somebody` group.
+    examples:
+      - 0
+    minimum: 0
+  total:
+    type: integer
+    description: Every delivery on the board.
+    examples:
+      - 0
+    minimum: 0
+examples:
+  - waiting_for_release: 1
+    waiting_for_agent: 0
+    assigned: 2
+    collected: 1
+    late: 0
+    undelivered: 0
+    needs_somebody: 1
+    total: 5

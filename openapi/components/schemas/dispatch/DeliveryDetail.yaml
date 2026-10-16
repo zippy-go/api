@@ -1,0 +1,372 @@
+type: object
+description: "A delivery's page: what a board lists, and the stops, the Provider chain, the team, the times, the distances, the cash, what is carried, the explanation and the log."
+required:
+  - id
+  - order_id
+  - order_number
+  - attempt
+  - location_id
+  - location_name
+  - partner_id
+  - state
+  - group
+  - provider
+  - courier
+  - pickup_at
+  - drop_at
+  - release_at
+  - released
+  - expected_at
+  - late
+  - waiting_since
+  - raised
+  - need
+  - asks
+  - offers_open
+  - version
+  - updated_at
+  - stops
+  - chain
+  - team
+  - zone_id
+  - times
+  - estimated_distance_metres
+  - distance_metres
+  - cash_to_collect
+  - carrying
+  - drop_code_required
+  - last_refusal
+  - failed_reason
+  - explanation
+  - log
+  - actions
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+  order_id:
+    type: string
+    format: uuid
+    description: The order it fulfils.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: The order's number, as said aloud.
+    examples:
+      - AB0042
+  attempt:
+    type: integer
+    description: "Which delivery of the order this is: 1, or more once the order was sent again."
+    examples:
+      - 1
+    minimum: 1
+  location_id:
+    type: string
+    format: uuid
+    description: The store it is picked up from.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_id:
+    type: string
+    format: uuid
+    description: The store's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  state:
+    $ref: ./DeliveryState.yaml
+    description: Where the delivery is.
+  group:
+    $ref: ./DeliveryBoardGroup.yaml
+    description: The board group it falls in now.
+  provider:
+    oneOf:
+      - $ref: ./DeliveryProvider.yaml
+      - type: "null"
+    description: The Provider that has it; `null` while none does.
+  courier:
+    oneOf:
+      - $ref: ./DeliveryCourier.yaml
+      - type: "null"
+    description: Who carries it, once the Agent's app has it; `null` otherwise.
+  pickup_at:
+    type: string
+    format: date-time
+    description: "When the Agent should be at the store: the ready time, moved up to the next five minutes."
+    examples:
+      - 2026-10-16T13:25:00Z
+  drop_at:
+    type: string
+    format: date-time
+    description: "When the Agent should be at the door: the promised time, moved up to the next five minutes."
+    examples:
+      - 2026-10-16T13:45:00Z
+  release_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When its offers go out, while it waits for release; `null` once released.
+    examples:
+      - 2026-10-16T13:17:00Z
+  released:
+    type: boolean
+    description: Whether it was released to Agents.
+    examples:
+      - true
+  expected_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it is expected at the door now, recomputed at assignment, at collection and every minute on the way.
+    examples:
+      - 2026-10-16T13:44:00Z
+  late:
+    type: boolean
+    description: Whether it is expected more than 5 minutes after `drop_at`, or not delivered 5 minutes after it.
+    examples:
+      - false
+  waiting_since:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: Since when it has waited for an Agent, while released and unassigned.
+    examples:
+      - 2026-10-16T13:10:00Z
+  raised:
+    type: boolean
+    description: Whether it has waited for an Agent for 3 minutes or more, raised to the dispatcher and Mission Control.
+    examples:
+      - false
+  need:
+    oneOf:
+      - $ref: ./DeliveryNeed.yaml
+      - type: "null"
+    description: Why it needs somebody, when it does.
+  asks:
+    type: integer
+    description: How many times a Provider was asked for it.
+    examples:
+      - 1
+    minimum: 0
+  offers_open:
+    type: integer
+    description: How many of its offers wait for an answer now.
+    examples:
+      - 0
+    minimum: 0
+  version:
+    type: integer
+    description: Its version; it only rises, and `delivery.changed` signals carry it.
+    examples:
+      - 6
+    minimum: 1
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-16T13:12:30Z
+  stops:
+    type: array
+    items:
+      $ref: ./DeliveryStop.yaml
+    description: The pickup, then the drop.
+  chain:
+    type: array
+    items:
+      $ref: ./DeliveryProvider.yaml
+    description: The Providers it may go to, in order, as the store named them when it was written down.
+  team:
+    oneOf:
+      - $ref: ./DispatchTeam.yaml
+      - type: "null"
+    description: The team it goes to, when one.
+  zone_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The zone it goes to when no team holds it: the store's."
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000c101
+  times:
+    $ref: ./DeliveryTimes.yaml
+    description: When things happened.
+  estimated_distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The routed distance from the store to the door, in metres.
+    examples:
+      - 3200
+    minimum: 0
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The distance the Agent went, measured, once delivered.
+    examples:
+      - null
+    minimum: 0
+  cash_to_collect:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Cash the Agent collects at the door, for a cash order.
+  carrying:
+    type: string
+    description: What is carried, in words.
+    examples:
+      - Food, 3 items
+  drop_code_required:
+    type: boolean
+    description: Whether the drop needs the customer's code.
+    examples:
+      - false
+  last_refusal:
+    type:
+      - string
+      - "null"
+    description: The last reason a Provider said no or did not answer.
+    examples:
+      - null
+  failed_reason:
+    type:
+      - string
+      - "null"
+    description: Why the drop failed, when it did.
+    examples:
+      - null
+  explanation:
+    $ref: ./DeliveryExplanation.yaml
+    description: Why it went to whom.
+  log:
+    type: array
+    items:
+      $ref: ./DeliveryLogLine.yaml
+    description: Everything said about it, oldest first, the last 100.
+  actions:
+    $ref: ./DeliveryActions.yaml
+    description: What the reader may do now.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB0042
+    attempt: 1
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    state: assigned
+    group: assigned
+    provider: &a1
+      kind: platform_fleet
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      name: ZippyGo Fleet
+    courier:
+      agent_id: 01a13a48-9e00-7000-8000-000000000107
+      first_name: Ravi
+      phone: null
+      provider_kind: platform_fleet
+      named_at: 2026-10-16T13:12:30Z
+    pickup_at: 2026-10-16T13:25:00Z
+    drop_at: 2026-10-16T13:45:00Z
+    release_at: null
+    released: true
+    expected_at: 2026-10-16T13:44:00Z
+    late: false
+    waiting_since: null
+    raised: false
+    need: null
+    asks: 1
+    offers_open: 0
+    version: 6
+    updated_at: 2026-10-16T13:12:30Z
+    stops:
+      - kind: pickup
+        name: Dev Kitchen Gachibowli
+        area: Gachibowli
+        lat: 17.4401
+        lng: 78.3489
+        planned_at: 2026-10-16T13:25:00Z
+      - kind: drop
+        name: Asha
+        area: Kondapur
+        lat: 17.4589
+        lng: 78.3622
+        planned_at: 2026-10-16T13:45:00Z
+    chain:
+      - *a1
+    team: null
+    zone_id: 01a13a48-9e00-7000-8000-00000000c101
+    times:
+      created_at: 2026-10-16T13:10:00Z
+      released_at: 2026-10-16T13:10:00Z
+      assigned_at: 2026-10-16T13:12:30Z
+      collected_at: null
+      finished_at: null
+    estimated_distance_metres: 3200
+    distance_metres: null
+    cash_to_collect: null
+    carrying: Food, 3 items
+    drop_code_required: false
+    last_refusal: null
+    failed_reason: null
+    explanation:
+      strategy: nearest_available
+      mode: offers
+      by_hand: null
+      considered: 4
+      eligible: 3
+      chosen: &a2
+        agent_id: 01a13a48-9e00-7000-8000-000000000107
+        first_name: Ravi
+        rank: 1
+        eta_seconds: 180
+        distance_metres: 900
+        eligible: true
+        reason: null
+      why: "Nearest by road: 3 minutes from the store."
+      pay:
+        rule_version: 1
+        total:
+          minor_units: 4920
+          currency: INR
+        lines:
+          - label: Pickup
+            amount:
+              minor_units: 0
+              currency: INR
+          - label: Drop
+            amount:
+              minor_units: 3000
+              currency: INR
+          - label: 3.2 km at ₹6.00 a km
+            amount:
+              minor_units: 1920
+              currency: INR
+      fallbacks: []
+      candidates:
+        - *a2
+    log:
+      - at: 2026-10-16T13:12:30Z
+        kind: assigned
+        actor: agent
+        actor_name: Ravi
+        agent_id: 01a13a48-9e00-7000-8000-000000000107
+        text: Ravi accepted the offer.
+    actions:
+      give: true
+      ask_again: false
+      send_again: false

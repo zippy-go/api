@@ -1,0 +1,69 @@
+# Path item for /v1/partners/{partner_id}/dispatch/board. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPartnerDispatchBoard
+  summary: Read the partner's dispatch board
+  description: "The live board of the deliveries of the partner's stores, whoever carries them: waiting for release, waiting for an Agent, assigned, collected, late, undelivered and needing somebody, with the counts. It updates within seconds over `private-partner-{partner_id}-deliveries` (`delivery.changed`) and is read again every 30 seconds; the map of Agents comes from `private-partner-{partner_id}-agents`. Members need `dispatch:read` in the partner to read; platform staff use the same routes with their platform permissions."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  parameters:
+    - name: location_id
+      in: query
+      required: false
+      description: Only deliveries from this store.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000301
+    - name: group
+      in: query
+      required: false
+      description: Only this group.
+      schema:
+        $ref: ../../components/schemas/dispatch/DeliveryBoardGroup.yaml
+  responses:
+    "200":
+      description: The board.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DispatchBoard.yaml
+    "400":
+      description: "`validation_failed` for an unknown group; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:read`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the partner, or a store that is not its."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

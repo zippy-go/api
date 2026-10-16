@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.undelivered.v1.schema.json",
+  "title": "OrderingOrderUndeliveredPayload",
+  "description": "Payload of `ordering.order.undelivered` version 1. Dispatch left an order on its way undelivered, as the platform itself, when its Agent failed the drop: the reason is for the dispatcher and Mission Control, who send it again or cancel it with a refund; the customer is told it could not be delivered and is being sorted out. The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. Read the order at `GET /v1/platform/orders/{order_id}`, `GET /v1/customer/orders/{order_id}` or the store's route. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "by",
+    "delivery_id",
+    "agent_id",
+    "reason",
+    "undelivered_at"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ],
+      "description": "The status after the change.",
+      "examples": [
+        "on_its_way"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before; `null` for a first status.",
+      "examples": [
+        "ready"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "The order's version after the change; it only rises, and signals carry it.",
+      "examples": [
+        5
+      ],
+      "minimum": 1
+    },
+    "fulfilment": {
+      "type": "string",
+      "description": "Delivery or pickup.",
+      "examples": [
+        "delivery"
+      ],
+      "enum": [
+        "delivery",
+        "pickup"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of every amount, in its minor unit.",
+      "examples": [
+        "INR"
+      ],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T13:30:00Z"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "description": "Who made the move: dispatch moves an order as the platform itself.",
+      "examples": [
+        "system"
+      ],
+      "enum": [
+        "customer",
+        "staff",
+        "platform",
+        "system"
+      ]
+    },
+    "delivery_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent who failed the drop.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "The Agent's reason.",
+      "examples": [
+        "Customer not reachable"
+      ]
+    },
+    "undelivered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the drop failed on the device.",
+      "examples": [
+        "2026-10-16T13:50:00Z"
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+type: string
+description: "Where an offer is: `open` waits for the Agent; `accepted`; `declined`; `expired` after its time with no answer; `withdrawn` when the delivery went elsewhere (another Provider, a dispatcher, its order ended); `taken` when another Agent accepted first."
+enum:
+  - open
+  - accepted
+  - declined
+  - expired
+  - withdrawn
+  - taken
+examples:
+  - open

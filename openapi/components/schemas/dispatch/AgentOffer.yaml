@@ -1,0 +1,155 @@
+type: object
+description: "A delivery offered to an Agent, with everything to decide by: the stops with their areas and times, the distance, the pay with its breakdown and rule, cash to collect and what is carried. It leaves the screen when it expires, is taken by another Agent or is withdrawn; the app hears `offer.changed` on the Agent's task channel."
+required:
+  - id
+  - delivery_id
+  - agent_id
+  - status
+  - mode
+  - offered_at
+  - expires_at
+  - seconds_left
+  - order_number
+  - store
+  - stops
+  - distance_metres
+  - pickup_eta_seconds
+  - pay
+  - cash_to_collect
+  - carrying
+  - declined_reason
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd501
+  delivery_id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent it is offered to.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  status:
+    $ref: ./OfferStatus.yaml
+    description: Where the offer is.
+  mode:
+    $ref: ./DispatchMode.yaml
+    description: "`offers`; a direct assignment is a task, not an offer."
+  offered_at:
+    type: string
+    format: date-time
+    description: When it was offered.
+    examples:
+      - 2026-10-16T13:10:00Z
+  expires_at:
+    type: string
+    format: date-time
+    description: When it leaves the screen unanswered.
+    examples:
+      - 2026-10-16T13:10:45Z
+  seconds_left:
+    type: integer
+    description: Seconds until it expires, 0 once it is not open.
+    examples:
+      - 45
+    minimum: 0
+  order_number:
+    type: string
+    description: The order's number.
+    examples:
+      - AB0042
+  store:
+    $ref: ./OfferStore.yaml
+    description: Where it is picked up.
+  stops:
+    type: array
+    items:
+      $ref: ./OfferStop.yaml
+    description: The pickup, then the drop.
+  distance_metres:
+    type: integer
+    description: "The whole routed distance: to the store, then to the door, in metres."
+    examples:
+      - 4100
+    minimum: 0
+  pickup_eta_seconds:
+    type:
+      - integer
+      - "null"
+    description: Routed time from the Agent to the store, in seconds.
+    examples:
+      - 180
+    minimum: 0
+  pay:
+    $ref: ./DeliveryPay.yaml
+    description: What the delivery pays the Agent, with its breakdown and rule.
+  cash_to_collect:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Cash to collect at the door, for a cash order.
+  carrying:
+    type: string
+    description: What is carried, in words.
+    examples:
+      - Food, 3 items
+  declined_reason:
+    type:
+      - string
+      - "null"
+    description: The reason the Agent gave when declining.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd501
+    delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+    agent_id: 01a13a48-9e00-7000-8000-000000000107
+    status: open
+    mode: offers
+    offered_at: 2026-10-16T13:10:00Z
+    expires_at: 2026-10-16T13:10:45Z
+    seconds_left: 45
+    order_number: AB0042
+    store:
+      name: Dev Kitchen Gachibowli
+      area: Gachibowli
+    stops:
+      - kind: pickup
+        area: Gachibowli
+        planned_at: 2026-10-16T13:25:00Z
+        distance_metres: 900
+      - kind: drop
+        area: Kondapur
+        planned_at: 2026-10-16T13:45:00Z
+        distance_metres: 3200
+    distance_metres: 4100
+    pickup_eta_seconds: 180
+    pay:
+      rule_version: 1
+      total:
+        minor_units: 4920
+        currency: INR
+      lines:
+        - label: Pickup
+          amount:
+            minor_units: 0
+            currency: INR
+        - label: Drop
+          amount:
+            minor_units: 3000
+            currency: INR
+        - label: 3.2 km at ₹6.00 a km
+          amount:
+            minor_units: 1920
+            currency: INR
+    cash_to_collect: null
+    carrying: Food, 3 items
+    declined_reason: null

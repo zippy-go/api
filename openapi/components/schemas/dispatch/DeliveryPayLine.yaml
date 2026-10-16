@@ -1,0 +1,19 @@
+type: object
+description: One line of what an Agent is paid for a delivery.
+required:
+  - label
+  - amount
+properties:
+  label:
+    type: string
+    description: What it pays for.
+    examples:
+      - 3.2 km at ₹6.00 a km
+  amount:
+    $ref: ../common/Money.yaml
+    description: How much.
+examples:
+  - label: Drop
+    amount:
+      minor_units: 3000
+      currency: INR

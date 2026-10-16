@@ -1,0 +1,53 @@
+type: object
+description: When a delivery was written down, released, taken, collected and finished.
+required:
+  - created_at
+  - released_at
+  - assigned_at
+  - collected_at
+  - finished_at
+properties:
+  created_at:
+    type: string
+    format: date-time
+    description: When it was written down.
+    examples:
+      - 2026-10-16T13:10:00Z
+  released_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When its offers went out.
+    examples:
+      - 2026-10-16T13:10:00Z
+  assigned_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When an Agent took it, the last time.
+    examples:
+      - 2026-10-16T13:12:30Z
+  collected_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent collected the order.
+    examples:
+      - null
+  finished_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was delivered, failed or called off.
+    examples:
+      - null
+examples:
+  - created_at: 2026-10-16T13:10:00Z
+    released_at: 2026-10-16T13:10:00Z
+    assigned_at: 2026-10-16T13:12:30Z
+    collected_at: null
+    finished_at: null

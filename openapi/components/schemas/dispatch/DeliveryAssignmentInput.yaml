@@ -1,0 +1,31 @@
+type: object
+description: Gives a delivery to an Agent, or to a team for dispatch to choose within it. One of the two is required; an Agent given with a team must be of it.
+properties:
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  team_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The team.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd601
+  note:
+    type:
+      - string
+      - "null"
+    description: Why, kept on the delivery and in the audit log; at most 500 characters.
+    examples:
+      - null
+    maxLength: 500
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    team_id: null
+    note: null

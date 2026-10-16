@@ -1,0 +1,35 @@
+type: object
+description: Why a delivery needs somebody, since when, and in words a screen may show.
+required:
+  - reason
+  - detail
+  - since
+  - agent_id
+properties:
+  reason:
+    $ref: ./DeliveryNeedReason.yaml
+    description: Why.
+  detail:
+    type: string
+    description: The reason in words.
+    examples:
+      - "Ravi handed it back: Puncture."
+  since:
+    type: string
+    format: date-time
+    description: Since when.
+    examples:
+      - 2026-10-16T13:14:00Z
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent it is about, when one.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+examples:
+  - reason: handed_back
+    detail: "Ravi handed it back: Puncture."
+    since: 2026-10-16T13:14:00Z
+    agent_id: 01a13a48-9e00-7000-8000-000000000107

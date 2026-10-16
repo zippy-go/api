@@ -164,6 +164,51 @@
       "examples": [
         75800
       ]
+    },
+    "delivery_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The delivery whose Agent completed the drop; absent or `null` when the store delivered it by hand.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent who delivered it, when one did.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "distance_metres": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "The distance the Agent went, measured, when one delivered it.",
+      "examples": [
+        3600
+      ]
+    },
+    "proof_kinds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What the proof of delivery holds (`photo`, `signature`, `code`, `scan`, `confirmation`), when an Agent delivered it.",
+      "examples": [
+        [
+          "photo"
+        ]
+      ]
     }
   }
 }

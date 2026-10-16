@@ -1,0 +1,68 @@
+# Path item for /v1/partners/{partner_id}/deliveries/{delivery_id}/send-again. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: delivery_id
+    in: path
+    required: true
+    description: The delivery, which must be one of the partner's stores'; another's answers `404`.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+post:
+  operationId: sendPartnerDeliveryAgain
+  summary: Send an undelivered order again
+  description: "Sends the order of a delivery that failed at the door again: a new delivery is written down and asked for, offered first to the Agent who had it when that Agent is still online; the failed delivery is kept with its log. The order stays undelivered until the new delivery is collected, then goes on its way. To give up instead, cancel the order with a refund through its order routes. Members need `dispatch:manage` in the partner; platform staff use the same routes with platform `dispatch:manage`, every act written to the audit log."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  responses:
+    "201":
+      description: The new delivery.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DeliveryDetail.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:manage`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the partner or the delivery."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`delivery_not_failed` unless this delivery failed at the door and its order is still undelivered (sent again or cancelled already answers this too); `no_provider` while the store names no Provider."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

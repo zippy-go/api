@@ -1,0 +1,25 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be002",
+  "type": "orchestration.delivery.released",
+  "version": 1,
+  "occurred_at": "2026-10-16T13:10:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "attempt": 1,
+    "state": "waiting",
+    "previous_state": "waiting",
+    "version": 3,
+    "at": "2026-10-16T13:10:00Z",
+    "provider_kind": "platform_fleet",
+    "provider_partner_id": "01a13a48-9e00-7000-8000-000000000002",
+    "service_id": "01a13a48-9e00-7000-8000-000000000202",
+    "agent_id": null,
+    "released_at": "2026-10-16T13:10:00Z"
+  }
+}

@@ -1,0 +1,39 @@
+type: object
+description: "What the Agent is paid for a delivery under the service's pay rule, as estimated when it was offered or given: the rule's version, the total and its lines."
+required:
+  - rule_version
+  - total
+  - lines
+properties:
+  rule_version:
+    type: integer
+    description: The pay rule's version.
+    examples:
+      - 1
+    minimum: 1
+  total:
+    $ref: ../common/Money.yaml
+    description: The total.
+  lines:
+    type: array
+    items:
+      $ref: ./DeliveryPayLine.yaml
+    description: The breakdown.
+examples:
+  - rule_version: 1
+    total:
+      minor_units: 4920
+      currency: INR
+    lines:
+      - label: Pickup
+        amount:
+          minor_units: 0
+          currency: INR
+      - label: Drop
+        amount:
+          minor_units: 3000
+          currency: INR
+      - label: 3.2 km at ₹6.00 a km
+        amount:
+          minor_units: 1920
+          currency: INR

@@ -1,0 +1,26 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be007",
+  "type": "orchestration.delivery.undelivered",
+  "version": 1,
+  "occurred_at": "2026-10-16T13:50:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "attempt": 1,
+    "state": "failed",
+    "previous_state": "collected",
+    "version": 9,
+    "at": "2026-10-16T13:50:00Z",
+    "provider_kind": "platform_fleet",
+    "provider_partner_id": "01a13a48-9e00-7000-8000-000000000002",
+    "service_id": "01a13a48-9e00-7000-8000-000000000202",
+    "agent_id": "01a13a48-9e00-7000-8000-000000000107",
+    "reason": "Customer not reachable",
+    "failed_at": "2026-10-16T13:50:00Z"
+  }
+}

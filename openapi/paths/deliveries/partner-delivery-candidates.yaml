@@ -1,0 +1,71 @@
+# Path item for /v1/partners/{partner_id}/deliveries/{delivery_id}/candidates. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: delivery_id
+    in: path
+    required: true
+    description: The delivery, which must be one of the partner's stores'; another's answers `404`.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+get:
+  operationId: listPartnerDeliveryCandidates
+  summary: List who a delivery may be given to
+  description: "Who the delivery may be given to by hand, from the partner's own delivery service: the teams, then the Agents, those who can take it first, online before offline and nearest first, each with how many deliveries they carry, their position and its age, and their routed time to the store; then those who cannot, each with why in words (over the limit, a kind not allowed, suspended, not active, over the cash ceiling). Members need `dispatch:manage` in the partner; platform staff use the same routes with platform `dispatch:manage`, every act written to the audit log."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  parameters:
+    - name: team_id
+      in: query
+      required: false
+      description: Only the Agents of this team.
+      schema:
+        type: string
+        format: uuid
+      example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd601
+  responses:
+    "200":
+      description: The teams and the Agents.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DeliveryCandidateList.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:manage`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the partner, the delivery or the team."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

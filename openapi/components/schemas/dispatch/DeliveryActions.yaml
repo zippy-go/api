@@ -1,0 +1,26 @@
+type: object
+description: What the reader may do to the delivery now, for the buttons a screen shows.
+required:
+  - give
+  - ask_again
+  - send_again
+properties:
+  give:
+    type: boolean
+    description: Give it to a team or an Agent by hand.
+    examples:
+      - true
+  ask_again:
+    type: boolean
+    description: Ask a Provider for it again.
+    examples:
+      - false
+  send_again:
+    type: boolean
+    description: Send its undelivered order again, as a new delivery.
+    examples:
+      - false
+examples:
+  - give: true
+    ask_again: false
+    send_again: false

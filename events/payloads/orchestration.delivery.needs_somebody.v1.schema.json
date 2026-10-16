@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/orchestration.delivery.needs_somebody.v1.schema.json",
+  "title": "OrchestrationDeliveryNeedsSomebodyPayload",
+  "description": "Payload of `orchestration.delivery.needs_somebody` version 1. A delivery needs somebody: no Provider can carry it, the chain is exhausted, a Provider refused or lost it, the Agent handed it back or was let go, auto-assign is off or no team or zone holds it, or the Agent asked for help. It is listed first on the boards, with why. The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. Read the delivery at `GET /v1/partners/{partner_id}/deliveries/{delivery_id}` or `GET /v1/platform/deliveries/{delivery_id}`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "delivery_id",
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "attempt",
+    "state",
+    "previous_state",
+    "version",
+    "at",
+    "provider_kind",
+    "provider_partner_id",
+    "service_id",
+    "agent_id",
+    "reason",
+    "detail"
+  ],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order it fulfils.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store it is picked up from.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "description": "Which delivery of the order: 1, or more once the order was sent again.",
+      "examples": [
+        1
+      ],
+      "minimum": 1
+    },
+    "state": {
+      "type": "string",
+      "description": "The state after the change.",
+      "examples": [
+        "waiting"
+      ],
+      "enum": [
+        "wanted",
+        "waiting",
+        "assigned",
+        "collected",
+        "delivered",
+        "failed",
+        "called_off"
+      ]
+    },
+    "previous_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "wanted",
+        "waiting",
+        "assigned",
+        "collected",
+        "delivered",
+        "failed",
+        "called_off",
+        null
+      ],
+      "description": "The state before; `null` for a new delivery.",
+      "examples": [
+        "wanted"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "The delivery's version after the change; it only rises, and `delivery.changed` signals carry it.",
+      "examples": [
+        2
+      ],
+      "minimum": 1
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T13:10:00Z"
+      ]
+    },
+    "provider_kind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "own_service",
+        "platform_fleet",
+        "carrier",
+        null
+      ],
+      "description": "The kind of Provider that has it; `null` while none does.",
+      "examples": [
+        "platform_fleet"
+      ]
+    },
+    "provider_partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Provider's Partner.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "service_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The delivery service that has it, for an agent-based Provider.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000202"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent it is about, where one is named.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why.",
+      "examples": [
+        "handed_back"
+      ],
+      "enum": [
+        "no_provider",
+        "chain_exhausted",
+        "provider_refused",
+        "provider_lost",
+        "handed_back",
+        "returned",
+        "dispatcher_only",
+        "help_asked"
+      ]
+    },
+    "detail": {
+      "type": "string",
+      "description": "Why, in words.",
+      "examples": [
+        "Ravi handed it back: Puncture."
+      ]
+    }
+  }
+}

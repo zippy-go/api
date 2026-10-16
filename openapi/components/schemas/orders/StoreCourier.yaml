@@ -1,0 +1,36 @@
+type: object
+description: "The order's courier as the store and Mission Control read it: who, and a way to call them."
+required:
+  - agent_id
+  - first_name
+  - phone
+  - provider
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  phone:
+    type:
+      - string
+      - "null"
+    description: A number to call the Agent on; `null` when none is known.
+    examples:
+      - "+919800000107"
+  provider:
+    oneOf:
+      - $ref: ../dispatch/ProviderKind.yaml
+      - type: "null"
+    description: The kind of Provider the Agent works for.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    first_name: Ravi
+    phone: null
+    provider: platform_fleet

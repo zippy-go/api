@@ -1,0 +1,11 @@
+type: string
+description: Why an Agent cannot be given a delivery by hand.
+enum:
+  - agent_over_limit
+  - agent_kind_not_allowed
+  - agent_suspended
+  - agent_not_active
+  - agent_cash_ceiling
+  - agent_not_in_service
+examples:
+  - agent_over_limit
