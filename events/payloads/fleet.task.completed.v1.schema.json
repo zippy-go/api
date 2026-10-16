@@ -17,6 +17,7 @@
     "order_number",
     "location_id",
     "kind",
+    "assignment",
     "status",
     "previous_status",
     "version",
@@ -130,6 +131,17 @@
       "description": "The stop's kind.",
       "examples": [
         "pickup"
+      ]
+    },
+    "assignment": {
+      "type": "string",
+      "enum": [
+        "offer",
+        "direct"
+      ],
+      "description": "How the trip reached the Agent: an accepted `offer` or a `direct` assignment.",
+      "examples": [
+        "direct"
       ]
     },
     "status": {

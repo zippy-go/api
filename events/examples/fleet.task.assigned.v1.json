@@ -18,11 +18,11 @@
     "order_number": "AB1234",
     "location_id": "01a13a48-9e00-7000-8000-000000000301",
     "kind": "pickup",
+    "assignment": "direct",
     "status": "accepted",
     "previous_status": null,
     "version": 1,
     "at": "2026-10-16T09:00:00Z",
-    "assignment": "direct",
     "sequence": 1,
     "planned_at": "2026-10-16T09:20:00Z",
     "pay_rule_version": 1

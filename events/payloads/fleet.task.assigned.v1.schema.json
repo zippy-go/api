@@ -17,11 +17,11 @@
     "order_number",
     "location_id",
     "kind",
+    "assignment",
     "status",
     "previous_status",
     "version",
     "at",
-    "assignment",
     "sequence",
     "planned_at",
     "pay_rule_version"
@@ -130,6 +130,17 @@
         "pickup"
       ]
     },
+    "assignment": {
+      "type": "string",
+      "enum": [
+        "offer",
+        "direct"
+      ],
+      "description": "How the trip reached the Agent: an accepted `offer` or a `direct` assignment.",
+      "examples": [
+        "direct"
+      ]
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -181,17 +192,6 @@
       "description": "When the platform recorded it.",
       "examples": [
         "2026-10-16T09:00:00Z"
-      ]
-    },
-    "assignment": {
-      "type": "string",
-      "enum": [
-        "offer",
-        "direct"
-      ],
-      "description": "How it reached the Agent.",
-      "examples": [
-        "direct"
       ]
     },
     "sequence": {

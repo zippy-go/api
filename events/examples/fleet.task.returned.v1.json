@@ -18,6 +18,7 @@
     "order_number": "AB1234",
     "location_id": "01a13a48-9e00-7000-8000-000000000301",
     "kind": "pickup",
+    "assignment": "direct",
     "status": "returned",
     "previous_status": "on_the_way",
     "version": 1,
