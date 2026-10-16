@@ -1,0 +1,60 @@
+type: object
+description: A piece of proof kept on a task with when and where it was recorded. A photo or a signature is a private file (purpose `proof_of_delivery_photo`) read through its ten-minute link; the code is kept as matched, never as the digits.
+required:
+  - kind
+  - asset_id
+  - scanned
+  - matched
+  - recorded_at
+  - position
+  - link
+properties:
+  kind:
+    $ref: ./ProofKind.yaml
+    description: What it is.
+  asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The file, for a photo or a signature.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+  scanned:
+    type:
+      - string
+      - "null"
+    description: The number scanned or typed, for a scan.
+  matched:
+    type: boolean
+    description: Whether a scan matched the order's number or a code the customer's code; `true` for files.
+    examples:
+      - true
+  recorded_at:
+    type: string
+    format: date-time
+    description: When it was recorded on the device.
+    examples:
+      - 2026-10-16T09:42:00Z
+  position:
+    oneOf:
+      - $ref: ../storefront/GeoPoint.yaml
+      - type: "null"
+    description: Where.
+  link:
+    oneOf:
+      - $ref: ../assets/SignedLink.yaml
+      - type: "null"
+    description: A link to the file, minted for this read and recorded.
+examples:
+  - kind: photo
+    asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+    scanned: null
+    matched: true
+    recorded_at: 2026-10-16T09:42:00Z
+    position:
+      lat: 17.4401
+      lng: 78.3489
+    link:
+      expires_at: 2026-10-15T09:00:00Z
+      url: example

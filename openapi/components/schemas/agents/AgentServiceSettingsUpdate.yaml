@@ -1,0 +1,51 @@
+type: object
+description: Changes a service's settings; absent members are kept.
+properties:
+  geofence_metres:
+    type:
+      - integer
+      - "null"
+    format: int32
+    minimum: 50
+    maximum: 500
+    description: 50 to 500.
+    examples:
+      - 150
+  drop_code_required:
+    type:
+      - boolean
+      - "null"
+    description: Whether a drop asks for the customer's code.
+    examples:
+      - true
+  signature_required:
+    type:
+      - boolean
+      - "null"
+    description: Whether a drop asks for a signature.
+  police_verification_required:
+    type:
+      - boolean
+      - "null"
+    description: Whether police verification is required.
+  cash_ceiling:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The cash ceiling, 0 or more, in the service's currency.
+  failure_reasons:
+    type:
+      - array
+      - "null"
+    items:
+      type: string
+    minItems: 1
+    maxItems: 12
+    description: The reasons a drop may fail with, 1 to 12 of 1 to 80 characters.
+examples:
+  - geofence_metres: 150
+    drop_code_required: true
+    signature_required: null
+    police_verification_required: null
+    cash_ceiling: null
+    failure_reasons: null

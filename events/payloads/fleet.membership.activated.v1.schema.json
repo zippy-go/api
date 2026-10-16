@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.membership.activated.v1.schema.json",
+  "title": "FleetMembershipActivatedPayload",
+  "description": "Payload of `fleet.membership.activated` version 1. The Partner (or Mission Control for the platform fleet) activated the membership once its documents were approved: the Agent may go on duty and receive work. The envelope's `partner_id` is the Agent's Partner. No payload carries a phone number, an email address or a document number. Read the Agent at `GET /v1/partners/{partner_id}/agents/{agent_id}`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "user_id",
+    "kind",
+    "status",
+    "previous_status",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner whose service it is; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person, once they joined; `null` for an invitation.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "walker",
+        "bicycle",
+        "two_wheeler",
+        "van"
+      ],
+      "description": "What the Agent moves with.",
+      "examples": [
+        "two_wheeler"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "invited",
+        "pending",
+        "active",
+        "suspended",
+        "offboarded"
+      ],
+      "description": "The status after the change.",
+      "examples": [
+        "active"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "invited",
+        "pending",
+        "active",
+        "suspended",
+        "offboarded",
+        null
+      ],
+      "description": "The status before; `null` for an invitation.",
+      "examples": [
+        "pending"
+      ]
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who made the change; `null` when the platform did.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T09:00:00Z"
+      ]
+    }
+  }
+}

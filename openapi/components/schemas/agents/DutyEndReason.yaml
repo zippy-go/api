@@ -1,0 +1,9 @@
+type: string
+description: "Why a duty stretch ended: the Agent `switched_off`; nothing was heard from the app for 30 minutes (`silent`, closed at the last report); the membership was `suspended` or `offboarded`."
+enum:
+  - switched_off
+  - silent
+  - suspended
+  - offboarded
+examples:
+  - switched_off

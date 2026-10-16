@@ -1,0 +1,14 @@
+type: object
+description: Hands a direct assignment back within 60 seconds of receiving it.
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 200
+    description: Why, 1 to 200 characters.
+    examples:
+      - Puncture
+examples:
+  - reason: Puncture

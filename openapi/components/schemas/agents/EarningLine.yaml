@@ -1,0 +1,24 @@
+type: object
+description: A line of an Agent's pay.
+required:
+  - kind
+  - label
+  - amount
+properties:
+  kind:
+    $ref: ./EarningLineKind.yaml
+    description: What it pays for.
+  label:
+    type: string
+    description: The line in words.
+    examples:
+      - 3.2 km at ₹6.00 per km
+  amount:
+    $ref: ../common/Money.yaml
+    description: The amount.
+examples:
+  - kind: distance
+    label: 3.2 km at ₹6.00 per km
+    amount:
+      minor_units: 1920
+      currency: INR

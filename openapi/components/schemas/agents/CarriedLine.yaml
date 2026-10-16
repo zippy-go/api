@@ -1,0 +1,32 @@
+type: object
+description: A line of the order the Agent carries.
+required:
+  - name
+  - quantity
+  - choices
+properties:
+  name:
+    type: string
+    description: What it is.
+    examples:
+      - Chicken Biryani
+  quantity:
+    type: integer
+    format: int32
+    description: How many.
+    examples:
+      - 2
+  choices:
+    type: array
+    items:
+      type: string
+    description: What was chosen in it.
+    examples:
+      - - Full
+        - Extra raita
+examples:
+  - name: Chicken Biryani
+    quantity: 2
+    choices:
+      - Full
+      - Extra raita

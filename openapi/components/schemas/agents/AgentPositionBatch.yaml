@@ -1,0 +1,27 @@
+type: object
+description: Positions recorded on the device, 1 to 500; an app back in signal sends what it kept in one batch. The newest one wins.
+required:
+  - positions
+properties:
+  positions:
+    type: array
+    items:
+      $ref: ./AgentPositionReport.yaml
+    minItems: 1
+    maxItems: 500
+    description: The positions.
+    examples:
+      - - lat: 17.4401
+          lng: 78.3489
+          heading_deg: 270.5
+          speed_mps: 4.2
+          accuracy_m: 8
+          recorded_at: 2026-10-16T09:00:00Z
+examples:
+  - positions:
+      - lat: 17.4401
+        lng: 78.3489
+        heading_deg: 270.5
+        speed_mps: 4.2
+        accuracy_m: 8
+        recorded_at: 2026-10-16T09:00:00Z

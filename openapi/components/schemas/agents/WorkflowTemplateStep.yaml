@@ -1,0 +1,17 @@
+type: object
+description: A step of a workflow template.
+required:
+  - kind
+  - required
+properties:
+  kind:
+    $ref: ./TaskStepKind.yaml
+    description: The step.
+  required:
+    type: boolean
+    description: Whether a task cannot complete without it.
+    examples:
+      - true
+examples:
+  - kind: arrive
+    required: true

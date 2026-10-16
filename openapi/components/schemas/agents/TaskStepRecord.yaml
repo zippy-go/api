@@ -1,0 +1,75 @@
+type: object
+description: "A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence."
+required:
+  - client_id
+  - kind
+  - recorded_at
+properties:
+  client_id:
+    type: string
+    format: uuid
+    description: The app's id for this step; a repeat answers what the first did.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9ab1
+  kind:
+    $ref: ./TaskStepKind.yaml
+    description: The step.
+  recorded_at:
+    type: string
+    format: date-time
+    description: When it was recorded on the device; a task completes at this time.
+    examples:
+      - 2026-10-16T09:00:00Z
+  position:
+    oneOf:
+      - $ref: ../storefront/GeoPoint.yaml
+      - type: "null"
+    description: Where it was recorded.
+  value:
+    type:
+      - string
+      - "null"
+    maxLength: 64
+    description: For a scan, the order label's number; for a code, the 4 digits entered.
+  asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: For a photo or a signature, the file posted with a proof upload grant.
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: For cash, the amount collected.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    description: For notes, at most 500 characters.
+  reason:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: For fail, one of the task's failure reasons.
+  override_reason:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: For arrive from outside the geofence, why.
+examples:
+  - client_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9ab1
+    kind: arrive
+    recorded_at: 2026-10-16T09:00:00Z
+    position:
+      lat: 17.4401
+      lng: 78.3489
+    value: null
+    asset_id: null
+    amount: null
+    note: null
+    reason: null
+    override_reason: null

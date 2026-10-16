@@ -1,0 +1,36 @@
+type: object
+description: "The steps of a kind of stop for a service, the platform's defaults as the service's settings adjust them: a pickup is navigate, arrive, scan and notes; a drop-off navigate, arrive, photo and notes, with a signature and the customer's code when the service asks for them, and cash when the order collects it."
+required:
+  - kind
+  - steps
+  - failure_reasons
+properties:
+  kind:
+    $ref: ./TaskKind.yaml
+    description: The kind of stop.
+  steps:
+    type: array
+    items:
+      $ref: ./WorkflowTemplateStep.yaml
+    description: The steps in order.
+    examples:
+      - - kind: arrive
+          required: true
+  failure_reasons:
+    type: array
+    items:
+      type: string
+    description: The reasons a stop of this kind may fail with.
+    examples:
+      - - Customer not reachable
+        - Address not found
+        - Customer refused
+examples:
+  - kind: pickup
+    steps:
+      - kind: arrive
+        required: true
+    failure_reasons:
+      - Customer not reachable
+      - Address not found
+      - Customer refused

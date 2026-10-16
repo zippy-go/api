@@ -4377,13 +4377,13 @@ export type ImpersonationSessionList = {
 };
 
 /**
- * The working status of an agent. `online` means the agent is attached to
- * its service and reporting; `offline` means it is not. Clients must
- * tolerate values they do not know, because a new status is an additive
- * change.
+ * An agent's presence. `online` means the agent is on duty and its app was
+ * heard from within the last 60 seconds; `busy` means online with a task
+ * under way; `offline` means neither. Clients must tolerate values they do
+ * not know, because a new status is an additive change.
  *
  */
-export type AgentStatus = 'online' | 'offline';
+export type AgentStatus = 'online' | 'busy' | 'offline';
 
 /**
  * The last known position of an agent: WGS 84 coordinates, the heading and
@@ -4450,6 +4450,22 @@ export type Agent = {
      * The agent's last known position, or `null` when the agent has not reported one yet.
      */
     position: AgentPosition | null;
+    /**
+     * What the agent moves with.
+     */
+    kind: AgentKind;
+    /**
+     * Whether the agent is on duty; positions are applied only on duty.
+     */
+    on_duty: boolean;
+    /**
+     * The zone the agent chose when going on duty, or `null` off duty.
+     */
+    zone_id: string | null;
+    /**
+     * The task under way, the next stop first, so a live map can show what a busy agent is doing; `null` when none.
+     */
+    current_task: AgentTaskBrief | null;
 };
 
 /**
@@ -4514,6 +4530,1957 @@ export type LocationPingsAccepted = {
      * The number of pings accepted for processing. They are applied after the response is sent; agents' positions and the live streams reflect them shortly after.
      */
     accepted: number;
+    /**
+     * The number of pings dropped and never kept because their agent is off duty. Present since contract 0.17.0.
+     */
+    dropped?: number;
+};
+
+/**
+ * What an Agent moves with, which decides the documents the membership needs and what the Agent can carry: `walker` (10 kg), `bicycle` (15 kg), `two_wheeler` (25 kg), `van` (300 kg). A delivery service takes the kinds its vehicle types name (a walker always, a bicycle for `bicycle`, a two-wheeler for `two_wheeler`, a van for `four_wheeler`), every kind when it names none. Clients must tolerate values they do not know.
+ */
+export type AgentKind = 'walker' | 'bicycle' | 'two_wheeler' | 'van';
+
+/**
+ * Where an Agent membership stands: `invited` until the person accepts in the Agent app, `pending` until its documents are approved and the Partner activates it, `active` while the Agent may work, `suspended` when the Partner or Mission Control stopped it with a reason the Agent reads, `offboarded` when it ended, which is final. Clients must tolerate values they do not know.
+ */
+export type AgentMembershipStatus = 'invited' | 'pending' | 'active' | 'suspended' | 'offboarded';
+
+/**
+ * How an invitation reached the person: by SMS to a mobile number, or by email.
+ */
+export type AgentContactChannel = 'phone' | 'email';
+
+/**
+ * An onboarding document: `identity` for every kind of Agent; `driving_licence` and `vehicle_registration` for two-wheelers and vans; `police_verification` where the service requires it.
+ */
+export type AgentDocumentKind = 'identity' | 'driving_licence' | 'vehicle_registration' | 'police_verification';
+
+/**
+ * The government identity document an `identity` document is.
+ */
+export type IdentityDocumentType = 'aadhaar' | 'pan' | 'passport' | 'voter_id';
+
+/**
+ * Where a document stands: `uploaded` while its file is filed and not yet confirmed, `under_review` waiting for a reviewer, `approved`, `rejected` with a reason the Agent reads, `expired` once its expiry date has passed on the India calendar.
+ */
+export type AgentDocumentStatus = 'uploaded' | 'under_review' | 'approved' | 'rejected' | 'expired';
+
+/**
+ * A reviewer's decision on a document.
+ */
+export type AgentDocumentDecision = 'approve' | 'reject';
+
+/**
+ * The kind of stop a task is: `pickup` at the store, `drop_off` at the customer. Returns, appointments and on-site jobs come with later steps; clients must tolerate values they do not know.
+ */
+export type TaskKind = 'pickup' | 'drop_off';
+
+/**
+ * Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way).
+ */
+export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | 'failed' | 'called_off' | 'handed_back' | 'returned';
+
+/**
+ * How the task reached the Agent: an `offer` the Agent accepted, or a `direct` assignment, which lands with a sound and may be handed back with a reason within 60 seconds of the app receiving it.
+ */
+export type TaskAssignment = 'offer' | 'direct';
+
+/**
+ * A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`.
+ */
+export type TaskStepKind = 'navigate' | 'arrive' | 'scan' | 'photo' | 'signature' | 'code' | 'cash' | 'notes' | 'complete' | 'fail';
+
+/**
+ * A line of an Agent's pay: the base for a `pickup` or a `drop_off`, the `distance` at the rule's amount per kilometre, `waiting` beyond the free minutes at a pickup, the amount for a task `call_off` after the Agent started towards it, and the `tip` in full.
+ */
+export type EarningLineKind = 'pickup' | 'drop_off' | 'distance' | 'waiting' | 'call_off' | 'tip';
+
+/**
+ * Why a task paid: it was `completed`, it `failed_after_arrival` (a drop failed once the Agent had arrived pays its base and the distance), or it was `called_off` after the Agent started towards it.
+ */
+export type EarningOutcome = 'completed' | 'failed_after_arrival' | 'called_off';
+
+/**
+ * A piece of proof kept on a task: the `photo` at the door, a `signature`, the `scan` of the order label, the customer's `code` entered.
+ */
+export type ProofKind = 'photo' | 'signature' | 'scan' | 'code';
+
+/**
+ * Where a team's area comes from: the zones the service delivers in (`service_zones`), else the zones of the Locations it is switched on at (`location_zones`), else `none`.
+ */
+export type TeamAreaSource = 'service_zones' | 'location_zones' | 'none';
+
+/**
+ * Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Clients must tolerate values they do not know.
+ */
+export type AgentBlockerCode = 'not_active' | 'suspended' | 'offboarded' | 'document_missing' | 'document_pending' | 'document_rejected' | 'document_expired' | 'on_duty_elsewhere';
+
+/**
+ * Why a duty stretch ended: the Agent `switched_off`; nothing was heard from the app for 30 minutes (`silent`, closed at the last report); the membership was `suspended` or `offboarded`.
+ */
+export type DutyEndReason = 'switched_off' | 'silent' | 'suspended' | 'offboarded';
+
+/**
+ * A zone by id and name.
+ */
+export type ZoneRef = {
+    /**
+     * The zone (a service area of kind zone).
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+};
+
+/**
+ * One reason an Agent cannot be activated, go on duty or take work, with the sentence a screen shows.
+ */
+export type AgentBlocker = {
+    /**
+     * What stands in the way.
+     */
+    code: AgentBlockerCode;
+    /**
+     * The reason in words, for the Agent or the Partner.
+     */
+    sentence: string;
+    /**
+     * The document concerned, for the document codes.
+     */
+    document_kind: AgentDocumentKind | null;
+};
+
+/**
+ * A file of a document, stored privately (purpose `agent_document`); read it through the document's file link.
+ */
+export type AgentDocumentFile = {
+    /**
+     * The stored file.
+     */
+    asset_id: string;
+    /**
+     * Its safe name.
+     */
+    file_name: string;
+    /**
+     * Its type as the store reported it.
+     */
+    content_type: string;
+    /**
+     * Its size.
+     */
+    size_bytes: number;
+};
+
+/**
+ * An onboarding document of an Agent membership, with its review. The number is shown to the Agent, to the Partner's members holding `agent:manage` for the service and to Mission Control, and never travels in an event.
+ */
+export type AgentDocument = {
+    /**
+     * The document.
+     */
+    id: string;
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The Agent's name, for review queues.
+     */
+    agent_display_name: string;
+    /**
+     * The Partner's name, for Mission Control's queue.
+     */
+    partner_name: string | null;
+    /**
+     * What it is.
+     */
+    kind: AgentDocumentKind;
+    /**
+     * For an identity document, which one.
+     */
+    identity_type: IdentityDocumentType | null;
+    /**
+     * The document's number.
+     */
+    number: string | null;
+    /**
+     * Its expiry, for a licence and a registration.
+     */
+    expires_on: string | null;
+    /**
+     * For police verification, the date it was done.
+     */
+    verified_on: string | null;
+    /**
+     * Its files, one to four.
+     */
+    files: Array<AgentDocumentFile>;
+    /**
+     * Where it stands.
+     */
+    status: AgentDocumentStatus;
+    /**
+     * The reviewer's reason, which the Agent reads, when rejected.
+     */
+    rejection_reason: string | null;
+    /**
+     * When it was filed.
+     */
+    submitted_at: string;
+    /**
+     * When it was decided.
+     */
+    reviewed_at: string | null;
+    /**
+     * Who decided; `null` in the Agent app.
+     */
+    reviewed_by: string | null;
+    /**
+     * The reviewer's name; `null` in the Agent app.
+     */
+    reviewer_name: string | null;
+    /**
+     * Raised by one on every change.
+     */
+    version: number;
+};
+
+/**
+ * An Agent membership's documents, newest first, with what the membership needs.
+ */
+export type AgentDocumentList = {
+    /**
+     * Every document filed, newest first.
+     */
+    items: Array<AgentDocument>;
+    /**
+     * Each document the membership needs and where it stands.
+     */
+    requirements: Array<AgentDocumentRequirement>;
+};
+
+/**
+ * A page of documents waiting for review, oldest first.
+ */
+export type AgentDocumentPage = {
+    /**
+     * The documents.
+     */
+    items: Array<AgentDocument>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A document to file for the membership, once its files are posted with upload grants. The identity type and number are required for an identity document; the number and the expiry date for a licence and a registration; the date done for police verification.
+ */
+export type AgentDocumentSubmit = {
+    /**
+     * What it is.
+     */
+    kind: AgentDocumentKind;
+    /**
+     * For an identity document, which one.
+     */
+    identity_type?: IdentityDocumentType | null;
+    /**
+     * Its number: 12 digits for Aadhaar, five letters, four digits and a letter for PAN, a letter and seven digits for a passport, three letters and seven digits for a voter id; 5 to 20 letters and digits for a licence or a registration.
+     */
+    number?: string | null;
+    /**
+     * Its expiry, after today, for a licence and a registration.
+     */
+    expires_on?: string | null;
+    /**
+     * For police verification, the date it was done, not after today.
+     */
+    verified_on?: string | null;
+    /**
+     * The files, granted by `POST .../document-uploads` and posted to the store: one to four.
+     */
+    asset_ids: Array<string>;
+};
+
+/**
+ * A reviewer's decision. A rejection needs a reason, which the Agent reads.
+ */
+export type AgentDocumentReview = {
+    /**
+     * Approve or reject.
+     */
+    decision: AgentDocumentDecision;
+    /**
+     * Why it is rejected: 1 to 500 characters, required to reject.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A file the Agent app is about to upload: what it reads of the file, checked against the purpose before any byte is sent.
+ */
+export type AgentUpload = {
+    /**
+     * The file name as the person has it.
+     */
+    file_name: string;
+    /**
+     * Its type: `application/pdf`, `image/png` or `image/jpeg` for a document; `image/jpeg`, `image/png` or `image/webp` for proof.
+     */
+    content_type: string;
+    /**
+     * Its size in bytes: at most 10 MB for a document, 8 MB for proof.
+     */
+    size_bytes: number;
+};
+
+/**
+ * A proof file the Agent app is about to upload for a task.
+ */
+export type TaskProofUpload = {
+    /**
+     * A `photo` or a `signature`.
+     */
+    kind: ProofKind;
+    /**
+     * The file name.
+     */
+    file_name: string;
+    /**
+     * Its type: `image/jpeg`, `image/png` or `image/webp`.
+     */
+    content_type: string;
+    /**
+     * Its size in bytes, at most 8 MB.
+     */
+    size_bytes: number;
+};
+
+/**
+ * Invites a person into one of the Partner's delivery services as an Agent of a kind, by mobile number (10 digits read as +91, or E.164) or by email. The person is told by message how to join.
+ */
+export type AgentInvite = {
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * What they will move with; one the service takes.
+     */
+    kind: AgentKind;
+    /**
+     * Their name as the Partner knows it, 1 to 100 characters; the first word is what customers read.
+     */
+    name: string;
+    /**
+     * Their mobile number; this or `email`.
+     */
+    phone?: string | null;
+    /**
+     * Their email; this or `phone`.
+     */
+    email?: string | null;
+};
+
+/**
+ * The owner of an individual Partner joins their own delivery service as its Agent, with no invitation; the membership is pending its documents.
+ */
+export type AgentSelfJoin = {
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * What they move with.
+     */
+    kind: AgentKind;
+};
+
+/**
+ * Changes an Agent membership: its name, or its kind, which puts an active membership back to pending until the new kind's documents are approved.
+ */
+export type AgentUpdate = {
+    /**
+     * The name, 1 to 100 characters.
+     */
+    display_name?: string | null;
+    /**
+     * The kind.
+     */
+    kind?: AgentKind | null;
+};
+
+/**
+ * Why a membership is suspended or offboarded; the Agent reads it.
+ */
+export type AgentStatusReason = {
+    /**
+     * 1 to 500 characters.
+     */
+    reason: string;
+};
+
+/**
+ * Lifts a suspension.
+ */
+export type AgentReinstatement = {
+    /**
+     * A note for the record, at most 500 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * An invitation in progress, as the Partner sees it.
+ */
+export type AgentInvitationState = {
+    /**
+     * How the person was told.
+     */
+    channel: AgentContactChannel;
+    /**
+     * When it was last sent.
+     */
+    sent_at: string;
+    /**
+     * When it lapses; the Partner may send it again.
+     */
+    expires_at: string;
+    /**
+     * Whether it has lapsed.
+     */
+    expired: boolean;
+    /**
+     * Who invited.
+     */
+    invited_by: string | null;
+};
+
+/**
+ * Where a task takes the Agent.
+ */
+export type TaskStop = {
+    /**
+     * The store's name, or the customer's first name.
+     */
+    name: string;
+    /**
+     * The address in words.
+     */
+    address: string | null;
+    /**
+     * The point the geofence is measured from.
+     */
+    point: GeoPoint;
+    /**
+     * The store, for a pickup.
+     */
+    location_id: string | null;
+    /**
+     * How near the Agent must be to arrive without an override.
+     */
+    geofence_metres: number;
+};
+
+/**
+ * An Agent's current task in short, for live maps and lists: the delivery, the order number and the stop the Agent is heading to.
+ */
+export type AgentTaskBrief = {
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The stop's kind.
+     */
+    kind: TaskKind;
+    /**
+     * Where the task stands.
+     */
+    status: TaskStatus;
+    /**
+     * The stop.
+     */
+    heading_to: TaskStop;
+};
+
+/**
+ * A change of a membership's status, with who made it, when and why.
+ */
+export type AgentStatusChange = {
+    /**
+     * The status after.
+     */
+    status: AgentMembershipStatus;
+    /**
+     * The status before; `null` for the first.
+     */
+    previous_status: AgentMembershipStatus | null;
+    /**
+     * Why.
+     */
+    reason: string | null;
+    /**
+     * Who; `null` for the platform itself.
+     */
+    by: string | null;
+    /**
+     * Their name.
+     */
+    by_name: string | null;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * How many Agents are in each status, and how many are online and busy now.
+ */
+export type AgentCounts = {
+    /**
+     * Invited.
+     */
+    invited: number;
+    /**
+     * Pending.
+     */
+    pending: number;
+    /**
+     * Active.
+     */
+    active: number;
+    /**
+     * Suspended.
+     */
+    suspended: number;
+    /**
+     * Offboarded.
+     */
+    offboarded: number;
+    /**
+     * Online now (busy included).
+     */
+    online: number;
+    /**
+     * Busy now.
+     */
+    busy: number;
+};
+
+/**
+ * An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand.
+ */
+export type PartnerAgent = {
+    /**
+     * The Agent membership.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string | null;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    service_name: string;
+    /**
+     * The Agent's name.
+     */
+    display_name: string;
+    /**
+     * What the Agent moves with.
+     */
+    kind: AgentKind;
+    /**
+     * Where the membership stands.
+     */
+    status: AgentMembershipStatus;
+    /**
+     * Why it is suspended or offboarded.
+     */
+    status_reason: string | null;
+    /**
+     * When the status last changed.
+     */
+    status_changed_at: string | null;
+    /**
+     * The person, once they joined.
+     */
+    user_id: string | null;
+    /**
+     * Their mobile number, E.164.
+     */
+    phone: string | null;
+    /**
+     * Their email.
+     */
+    email: string | null;
+    /**
+     * The invitation, while it is in progress.
+     */
+    invitation: AgentInvitationState | null;
+    /**
+     * When they accepted.
+     */
+    joined_at: string | null;
+    /**
+     * When the membership first became active.
+     */
+    activated_at: string | null;
+    /**
+     * Online (on duty and heard from within 60 seconds), busy (online with a task under way) or offline.
+     */
+    presence: AgentStatus;
+    /**
+     * Whether a duty stretch is open.
+     */
+    on_duty: boolean;
+    /**
+     * The zone the Agent works while on duty.
+     */
+    duty_zone: ZoneRef | null;
+    /**
+     * When the Agent's app was last heard from.
+     */
+    last_seen_at: string | null;
+    /**
+     * The last position, kept 6 hours, with when it was recorded on the device.
+     */
+    position: AgentPosition | null;
+    /**
+     * The task under way, the next stop first.
+     */
+    current_task: AgentTaskBrief | null;
+    /**
+     * Deliveries under way; a pickup and its drop count once.
+     */
+    tasks_under_way: number;
+    /**
+     * Cash collected and not yet settled.
+     */
+    cash_in_hand: Money;
+    /**
+     * The team; every Agent is in the service's default team.
+     */
+    team_id: string | null;
+    /**
+     * The documents the membership needs and where each stands.
+     */
+    documents: Array<AgentDocumentRequirement>;
+    /**
+     * What stops activation (while pending) or going on duty (while active); empty when nothing does.
+     */
+    blockers: Array<AgentBlocker>;
+    /**
+     * Arrivals recorded from outside a stop's geofence with a reason.
+     */
+    geofence_overrides: number;
+    /**
+     * Every change of status, newest first; read of one Agent only.
+     */
+    history?: Array<AgentStatusChange>;
+    /**
+     * When the membership (or its invitation) was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Raised by one on every change.
+     */
+    version: number;
+};
+
+/**
+ * A page of Agents by name, with the counts of the whole selection.
+ */
+export type PartnerAgentPage = {
+    /**
+     * The Agents.
+     */
+    items: Array<PartnerAgent>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * How many in each status, and online and busy now, among those the filters select.
+     */
+    counts: AgentCounts;
+};
+
+/**
+ * A duty stretch the platform closed because nothing was heard from the app for 30 minutes, told the next time the app opens.
+ */
+export type DutyClosure = {
+    /**
+     * The stretch.
+     */
+    stretch_id: string;
+    /**
+     * When it was closed: at the last report.
+     */
+    ended_at: string;
+    /**
+     * The zone it was in.
+     */
+    zone: ZoneRef | null;
+};
+
+/**
+ * An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled.
+ */
+export type AgentDuty = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * Whether a duty stretch is open.
+     */
+    on_duty: boolean;
+    /**
+     * The open stretch.
+     */
+    stretch_id: string | null;
+    /**
+     * The zone chosen when going on duty.
+     */
+    zone: ZoneRef | null;
+    /**
+     * When the open stretch started.
+     */
+    started_at: string | null;
+    /**
+     * When the app was last heard from in this stretch.
+     */
+    last_heard_at: string | null;
+    /**
+     * Whether the stretch is outside any shift; always, until shifts arrive.
+     */
+    unscheduled: boolean;
+    /**
+     * Whether switching on would be accepted now.
+     */
+    can_go_on_duty: boolean;
+    /**
+     * Why the Agent cannot go on duty, in words.
+     */
+    blockers: Array<AgentBlocker>;
+    /**
+     * A stretch the platform closed for silence and has not told the Agent of yet; reading it here tells them.
+     */
+    closed_for_silence: DutyClosure | null;
+};
+
+/**
+ * Switches duty on, in a zone, or off.
+ */
+export type AgentDutyUpdate = {
+    /**
+     * `true` to go on duty, `false` to go off.
+     */
+    on_duty: boolean;
+    /**
+     * The zone to work, required to go on duty: one `GET .../zones` offers.
+     */
+    zone_id?: string | null;
+    /**
+     * Where the Agent is, kept as the first position of the stretch.
+     */
+    position?: GeoPoint | null;
+};
+
+/**
+ * A zone an Agent may choose when going on duty.
+ */
+export type DutyZone = {
+    /**
+     * The zone.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether the position given lies in it; offered first.
+     */
+    here: boolean;
+    /**
+     * Whether it is in the service's area, where its deliveries are offered.
+     */
+    in_area: boolean;
+};
+
+/**
+ * The zones an Agent may choose, the one they are in first, then the service's area, then the rest of the city by name.
+ */
+export type DutyZoneList = {
+    /**
+     * The zones.
+     */
+    items: Array<DutyZone>;
+};
+
+/**
+ * One position from the Agent's device.
+ */
+export type AgentPositionReport = {
+    /**
+     * Latitude, -90 to 90.
+     */
+    lat: number;
+    /**
+     * Longitude, -180 to 180.
+     */
+    lng: number;
+    /**
+     * Direction of travel in degrees from true north, 0 to 360.
+     */
+    heading_deg?: number | null;
+    /**
+     * Speed in metres per second, at least 0.
+     */
+    speed_mps?: number | null;
+    /**
+     * The device's accuracy radius in metres, at least 0.
+     */
+    accuracy_m?: number | null;
+    /**
+     * When it was recorded on the device.
+     */
+    recorded_at: string;
+};
+
+/**
+ * Positions recorded on the device, 1 to 500; an app back in signal sends what it kept in one batch. The newest one wins.
+ */
+export type AgentPositionBatch = {
+    /**
+     * The positions.
+     */
+    positions: Array<AgentPositionReport>;
+};
+
+/**
+ * What became of a batch: applied while on duty, dropped and never kept otherwise.
+ */
+export type AgentPositionsAccepted = {
+    /**
+     * Positions applied.
+     */
+    accepted: number;
+    /**
+     * Positions dropped because the Agent is off duty.
+     */
+    dropped: number;
+    /**
+     * Whether the Agent is on duty; an app off duty stops reporting.
+     */
+    on_duty: boolean;
+};
+
+/**
+ * One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force.
+ */
+export type AgentMembership = {
+    /**
+     * The Agent membership.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    partner_name: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    service_name: string;
+    /**
+     * The Agent's name.
+     */
+    display_name: string;
+    /**
+     * What the Agent moves with.
+     */
+    kind: AgentKind;
+    /**
+     * Where the membership stands.
+     */
+    status: AgentMembershipStatus;
+    /**
+     * Why it is suspended or offboarded, in the reviewer's words.
+     */
+    status_reason: string | null;
+    /**
+     * When the person accepted.
+     */
+    joined_at: string | null;
+    /**
+     * When it first became active.
+     */
+    activated_at: string | null;
+    /**
+     * Whether it is the membership the person works under now.
+     */
+    working: boolean;
+    /**
+     * The documents it needs and where each stands.
+     */
+    documents: Array<AgentDocumentRequirement>;
+    /**
+     * Duty, and whether the Agent may go on duty.
+     */
+    duty: AgentDuty;
+    /**
+     * Deliveries under way.
+     */
+    tasks_under_way: number;
+    /**
+     * Cash collected and not yet settled.
+     */
+    cash_in_hand: Money;
+    /**
+     * The service's cash ceiling, beyond which no task collecting cash is offered.
+     */
+    cash_ceiling: Money;
+    /**
+     * The version of the service's pay rule in force.
+     */
+    pay_rule_version: number;
+};
+
+/**
+ * Every Agent membership of the person that is not offboarded, and the one they work under.
+ */
+export type AgentMembershipList = {
+    /**
+     * The memberships, the working one first.
+     */
+    items: Array<AgentMembership>;
+    /**
+     * The membership the person works under: the one on duty, else the one last chosen, else the first active one.
+     */
+    working_agent_id: string | null;
+};
+
+/**
+ * The membership the person chooses to work under; the app shows only its tasks.
+ */
+export type AgentWorkingChoice = {
+    /**
+     * One of the person's memberships.
+     */
+    agent_id: string;
+};
+
+/**
+ * An invitation in progress for the person's verified mobile number or email, as the Agent app lists it.
+ */
+export type AgentInvitation = {
+    /**
+     * The invitation.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    partner_name: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    service_name: string;
+    /**
+     * The name the Partner invited them under.
+     */
+    display_name: string;
+    /**
+     * The kind they are invited as.
+     */
+    kind: AgentKind;
+    /**
+     * How they were told.
+     */
+    channel: AgentContactChannel;
+    /**
+     * When.
+     */
+    invited_at: string;
+    /**
+     * When it lapses.
+     */
+    expires_at: string;
+};
+
+/**
+ * The invitations in progress for the person.
+ */
+export type AgentInvitationList = {
+    /**
+     * The invitations, newest first.
+     */
+    items: Array<AgentInvitation>;
+};
+
+/**
+ * A line of the order the Agent carries.
+ */
+export type CarriedLine = {
+    /**
+     * What it is.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * What was chosen in it.
+     */
+    choices: Array<string>;
+};
+
+/**
+ * The customer of a task, as the platform's own Agents get them: the first name, the address and, for the task's duration, a number to call.
+ */
+export type TaskCustomer = {
+    /**
+     * Their first name.
+     */
+    first_name: string;
+    /**
+     * A number to call while the task is under way; `null` once it ends and to anyone but the Agent.
+     */
+    phone: string | null;
+    /**
+     * The drop address in words.
+     */
+    address: string | null;
+    /**
+     * The customer's note.
+     */
+    note: string | null;
+};
+
+/**
+ * A step of a task's workflow and whether it is done.
+ */
+export type WorkflowStep = {
+    /**
+     * The step.
+     */
+    kind: TaskStepKind;
+    /**
+     * Whether the task cannot complete without it.
+     */
+    required: boolean;
+    /**
+     * Whether it is recorded.
+     */
+    done: boolean;
+    /**
+     * When it was recorded on the device.
+     */
+    done_at: string | null;
+};
+
+/**
+ * A line of an Agent's pay.
+ */
+export type EarningLine = {
+    /**
+     * What it pays for.
+     */
+    kind: EarningLineKind;
+    /**
+     * The line in words.
+     */
+    label: string;
+    /**
+     * The amount.
+     */
+    amount: Money;
+};
+
+/**
+ * The pay of a delivery under a version of the service's pay rule: an estimate at the planned routed distance when offered, earned at the measured distance on completion.
+ */
+export type PayQuote = {
+    /**
+     * The pay rule version it is under, kept for the task whatever is published later.
+     */
+    rule_version: number;
+    /**
+     * Each line of the breakdown.
+     */
+    lines: Array<EarningLine>;
+    /**
+     * The total.
+     */
+    total: Money;
+};
+
+/**
+ * A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first.
+ */
+export type AgentTask = {
+    /**
+     * The task.
+     */
+    id: string;
+    /**
+     * The trip bundling the delivery's pickup and drop.
+     */
+    trip_id: string;
+    /**
+     * The Agent membership holding it.
+     */
+    agent_id: string;
+    /**
+     * The Agent's Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The order's number, as its label carries it.
+     */
+    order_number: string;
+    /**
+     * The stop's kind.
+     */
+    kind: TaskKind;
+    /**
+     * Its place in the trip, from 1.
+     */
+    sequence: number;
+    /**
+     * Where it stands.
+     */
+    status: TaskStatus;
+    /**
+     * How it reached the Agent.
+     */
+    assignment: TaskAssignment;
+    /**
+     * Where it takes the Agent.
+     */
+    stop: TaskStop;
+    /**
+     * What is carried.
+     */
+    lines: Array<CarriedLine>;
+    /**
+     * The customer; the number only while under way and only for the Agent.
+     */
+    customer: TaskCustomer | null;
+    /**
+     * Cash to collect at the drop.
+     */
+    cash_to_collect: Money | null;
+    /**
+     * The order's tip, the Agent's in full.
+     */
+    tip: Money | null;
+    /**
+     * Whether the drop asks for the customer's 4-digit code.
+     */
+    code_required: boolean;
+    /**
+     * Wrong codes left before the Agent is told to call the customer.
+     */
+    code_attempts_left: number | null;
+    /**
+     * The workflow's steps in order.
+     */
+    steps: Array<WorkflowStep>;
+    /**
+     * The reasons a drop may fail with.
+     */
+    failure_reasons: Array<string>;
+    /**
+     * The delivery's pay under its rule version.
+     */
+    pay: PayQuote;
+    /**
+     * When the Agent should be at the stop.
+     */
+    planned_at: string | null;
+    /**
+     * When the Agent was given it.
+     */
+    assigned_at: string;
+    /**
+     * When the Agent app received it.
+     */
+    received_at: string | null;
+    /**
+     * When the Agent started towards the stop.
+     */
+    started_at: string | null;
+    /**
+     * When the Agent arrived.
+     */
+    arrived_at: string | null;
+    /**
+     * When it completed, as recorded on the device.
+     */
+    completed_at: string | null;
+    /**
+     * When it ended without completing.
+     */
+    ended_at: string | null;
+    /**
+     * Why it failed, was called off, handed back or returned.
+     */
+    end_reason: string | null;
+    /**
+     * Until when a direct assignment may be handed back.
+     */
+    hand_back_until: string | null;
+    /**
+     * The reason given for arriving from outside the geofence.
+     */
+    arrive_override_reason: string | null;
+    /**
+     * The distance measured along the Agent's route for this stop.
+     */
+    measured_distance_m: number;
+    /**
+     * Raised by one on every change.
+     */
+    version: number;
+};
+
+/**
+ * An Agent's tasks, the next stop first.
+ */
+export type AgentTaskList = {
+    /**
+     * The tasks.
+     */
+    items: Array<AgentTask>;
+    /**
+     * The next stop: the earliest task under way of the oldest trip.
+     */
+    next_task_id: string | null;
+};
+
+/**
+ * A page of an Agent's tasks, newest first.
+ */
+export type AgentTaskPage = {
+    /**
+     * The tasks.
+     */
+    items: Array<AgentTask>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence.
+ */
+export type TaskStepRecord = {
+    /**
+     * The app's id for this step; a repeat answers what the first did.
+     */
+    client_id: string;
+    /**
+     * The step.
+     */
+    kind: TaskStepKind;
+    /**
+     * When it was recorded on the device; a task completes at this time.
+     */
+    recorded_at: string;
+    /**
+     * Where it was recorded.
+     */
+    position?: GeoPoint | null;
+    /**
+     * For a scan, the order label's number; for a code, the 4 digits entered.
+     */
+    value?: string | null;
+    /**
+     * For a photo or a signature, the file posted with a proof upload grant.
+     */
+    asset_id?: string | null;
+    /**
+     * For cash, the amount collected.
+     */
+    amount?: Money | null;
+    /**
+     * For notes, at most 500 characters.
+     */
+    note?: string | null;
+    /**
+     * For fail, one of the task's failure reasons.
+     */
+    reason?: string | null;
+    /**
+     * For arrive from outside the geofence, why.
+     */
+    override_reason?: string | null;
+};
+
+/**
+ * A step as the platform recorded it.
+ */
+export type TaskStepOutcome = {
+    /**
+     * The app's id for the step.
+     */
+    client_id: string;
+    /**
+     * The step.
+     */
+    kind: TaskStepKind;
+    /**
+     * When it was recorded on the device.
+     */
+    recorded_at: string;
+    /**
+     * When it reached the platform.
+     */
+    received_at: string;
+    /**
+     * Whether this answer is of a step sent before.
+     */
+    repeated: boolean;
+};
+
+/**
+ * A step applied, with the task after it.
+ */
+export type TaskStepResult = {
+    /**
+     * The step.
+     */
+    step: TaskStepOutcome;
+    /**
+     * The task after the step.
+     */
+    task: AgentTask;
+};
+
+/**
+ * Hands a direct assignment back within 60 seconds of receiving it.
+ */
+export type TaskHandBack = {
+    /**
+     * Why, 1 to 200 characters.
+     */
+    reason: string;
+};
+
+/**
+ * Asks for help on a task in the Agent's words; the Partner's dispatcher and Mission Control see it on the delivery.
+ */
+export type TaskHelpRequest = {
+    /**
+     * What is wrong, 1 to 500 characters.
+     */
+    message: string;
+};
+
+/**
+ * A request for help on a task.
+ */
+export type TaskHelp = {
+    /**
+     * The request.
+     */
+    id: string;
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The Agent's words.
+     */
+    message: string;
+    /**
+     * When.
+     */
+    requested_at: string;
+};
+
+/**
+ * A piece of proof kept on a task with when and where it was recorded. A photo or a signature is a private file (purpose `proof_of_delivery_photo`) read through its ten-minute link; the code is kept as matched, never as the digits.
+ */
+export type ProofItem = {
+    /**
+     * What it is.
+     */
+    kind: ProofKind;
+    /**
+     * The file, for a photo or a signature.
+     */
+    asset_id: string | null;
+    /**
+     * The number scanned or typed, for a scan.
+     */
+    scanned: string | null;
+    /**
+     * Whether a scan matched the order's number or a code the customer's code; `true` for files.
+     */
+    matched: boolean;
+    /**
+     * When it was recorded on the device.
+     */
+    recorded_at: string;
+    /**
+     * Where.
+     */
+    position: GeoPoint | null;
+    /**
+     * A link to the file, minted for this read and recorded.
+     */
+    link: SignedLink | null;
+};
+
+/**
+ * The proof kept on a delivery's drop: what was recorded at the door, readable by the customer of the order, the Partner and Mission Control for 365 days, never deleted or replaced after the task completed.
+ */
+export type ProofOfDelivery = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    order_number: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The drop task.
+     */
+    task_id: string;
+    /**
+     * Where the drop stands.
+     */
+    status: TaskStatus;
+    /**
+     * When the drop completed, as recorded on the device.
+     */
+    delivered_at: string | null;
+    /**
+     * The Agent's first name.
+     */
+    agent_first_name: string;
+    /**
+     * The proof, in the order it was recorded.
+     */
+    items: Array<ProofItem>;
+    /**
+     * Until when it is kept.
+     */
+    keep_until: string;
+};
+
+/**
+ * What a task earned, with its breakdown under the rule version it was offered under.
+ */
+export type TaskEarning = {
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The stop's kind.
+     */
+    kind: TaskKind;
+    /**
+     * Why it paid.
+     */
+    outcome: EarningOutcome;
+    /**
+     * The pay rule version.
+     */
+    rule_version: number;
+    /**
+     * The breakdown.
+     */
+    lines: Array<EarningLine>;
+    /**
+     * The total, tip included.
+     */
+    total: Money;
+    /**
+     * When it was earned: the step's recorded time.
+     */
+    earned_at: string;
+};
+
+/**
+ * An Agent's day on the India calendar: each task's pay with its breakdown, the tips, the total and the cash in hand now.
+ */
+export type AgentDay = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * The calendar the day is read on.
+     */
+    time_zone: string;
+    /**
+     * Each task that earned, in order.
+     */
+    tasks: Array<TaskEarning>;
+    /**
+     * Drops completed.
+     */
+    deliveries: number;
+    /**
+     * Tips, in full.
+     */
+    tips: Money;
+    /**
+     * Everything earned, tips included.
+     */
+    total: Money;
+    /**
+     * Cash collected and not yet settled, now.
+     */
+    cash_in_hand: Money;
+};
+
+/**
+ * Cash an Agent collected at a drop.
+ */
+export type CashCollection = {
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * What was collected.
+     */
+    amount: Money;
+    /**
+     * When.
+     */
+    collected_at: string;
+};
+
+/**
+ * Cash an Agent holds: collected at drops and not yet settled with the Partner, against the service's ceiling.
+ */
+export type CashInHand = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * Cash in hand.
+     */
+    amount: Money;
+    /**
+     * The service's cash ceiling.
+     */
+    ceiling: Money;
+    /**
+     * The collections not yet settled, newest first.
+     */
+    collections: Array<CashCollection>;
+};
+
+/**
+ * A published version of a delivery service's pay rule: a base per pickup and per drop-off, an amount per kilometre of routed distance between stops, waiting pay per minute beyond the free minutes at a pickup, what a task called off after the Agent started towards it pays, and tips in full. A task keeps the version it was offered under.
+ */
+export type PayRule = {
+    /**
+     * The version.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The version, from 1.
+     */
+    version: number;
+    /**
+     * Per pickup.
+     */
+    pickup: Money;
+    /**
+     * Per drop-off.
+     */
+    drop_off: Money;
+    /**
+     * Per kilometre of routed distance between stops.
+     */
+    per_km: Money;
+    /**
+     * Per minute of waiting beyond the free minutes at a pickup.
+     */
+    waiting_per_minute: Money;
+    /**
+     * Minutes of waiting at a pickup that pay nothing.
+     */
+    waiting_free_minutes: number;
+    /**
+     * What a task called off after the Agent started towards it pays.
+     */
+    call_off: Money;
+    /**
+     * What changed, for the Agents.
+     */
+    note: string | null;
+    /**
+     * When it was published.
+     */
+    published_at: string;
+    /**
+     * Who published it; `null` for the defaults.
+     */
+    published_by: string | null;
+};
+
+/**
+ * Every published version of a service's pay rule, newest first.
+ */
+export type PayRuleList = {
+    /**
+     * The versions.
+     */
+    items: Array<PayRule>;
+    /**
+     * The version in force for new offers.
+     */
+    current_version: number;
+};
+
+/**
+ * A new version of the pay rule, in force for offers made after it. Amounts in the service's currency, 0 or more.
+ */
+export type PayRulePublish = {
+    /**
+     * Per pickup.
+     */
+    pickup: Money;
+    /**
+     * Per drop-off.
+     */
+    drop_off: Money;
+    /**
+     * Per kilometre.
+     */
+    per_km: Money;
+    /**
+     * Per minute of waiting beyond the free minutes.
+     */
+    waiting_per_minute: Money;
+    /**
+     * Free minutes at a pickup, 0 to 60.
+     */
+    waiting_free_minutes: number;
+    /**
+     * For a task called off after the Agent started towards it.
+     */
+    call_off: Money;
+    /**
+     * What changed, at most 200 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * A team of a delivery service's Agents with the area dispatch offers its deliveries in. Every service has one default team holding every Agent, whose area is the zones the service delivers in, else the zones of its Locations; teams beyond the default come later.
+ */
+export type AgentTeam = {
+    /**
+     * The team.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether it is the default team.
+     */
+    default: boolean;
+    /**
+     * The kinds it is limited to; empty for every kind.
+     */
+    kinds: Array<AgentKind>;
+    /**
+     * Its area.
+     */
+    zones: Array<ZoneRef>;
+    /**
+     * Where the area comes from.
+     */
+    area_source: TeamAreaSource;
+    /**
+     * Agents in it, offboarded ones left out.
+     */
+    agent_count: number;
+};
+
+/**
+ * A service's teams.
+ */
+export type AgentTeamList = {
+    /**
+     * The teams, the default first.
+     */
+    items: Array<AgentTeam>;
+};
+
+/**
+ * A step of a workflow template.
+ */
+export type WorkflowTemplateStep = {
+    /**
+     * The step.
+     */
+    kind: TaskStepKind;
+    /**
+     * Whether a task cannot complete without it.
+     */
+    required: boolean;
+};
+
+/**
+ * The steps of a kind of stop for a service, the platform's defaults as the service's settings adjust them: a pickup is navigate, arrive, scan and notes; a drop-off navigate, arrive, photo and notes, with a signature and the customer's code when the service asks for them, and cash when the order collects it.
+ */
+export type WorkflowTemplate = {
+    /**
+     * The kind of stop.
+     */
+    kind: TaskKind;
+    /**
+     * The steps in order.
+     */
+    steps: Array<WorkflowTemplateStep>;
+    /**
+     * The reasons a stop of this kind may fail with.
+     */
+    failure_reasons: Array<string>;
+};
+
+/**
+ * How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates.
+ */
+export type AgentServiceSettings = {
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * How near a stop an Agent must be to arrive without an override, 50 to 500.
+     */
+    geofence_metres: number;
+    /**
+     * Whether a drop asks for the customer's 4-digit code.
+     */
+    drop_code_required: boolean;
+    /**
+     * Whether a drop asks for a signature.
+     */
+    signature_required: boolean;
+    /**
+     * Whether the membership needs police verification.
+     */
+    police_verification_required: boolean;
+    /**
+     * Cash in hand beyond which no task collecting cash is offered.
+     */
+    cash_ceiling: Money;
+    /**
+     * Deliveries an Agent carries at once, the service's `max_concurrent_tasks`.
+     */
+    task_limit: number;
+    /**
+     * The workflow of each kind of stop.
+     */
+    templates: Array<WorkflowTemplate>;
+    /**
+     * Raised by one on every change; 1 while the defaults stand.
+     */
+    version: number;
+    /**
+     * When last changed.
+     */
+    updated_at: string | null;
+    /**
+     * Who last changed it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * Changes a service's settings; absent members are kept.
+ */
+export type AgentServiceSettingsUpdate = {
+    /**
+     * 50 to 500.
+     */
+    geofence_metres?: number | null;
+    /**
+     * Whether a drop asks for the customer's code.
+     */
+    drop_code_required?: boolean | null;
+    /**
+     * Whether a drop asks for a signature.
+     */
+    signature_required?: boolean | null;
+    /**
+     * Whether police verification is required.
+     */
+    police_verification_required?: boolean | null;
+    /**
+     * The cash ceiling, 0 or more, in the service's currency.
+     */
+    cash_ceiling?: Money | null;
+    /**
+     * The reasons a drop may fail with, 1 to 12 of 1 to 80 characters.
+     */
+    failure_reasons?: Array<string> | null;
+};
+
+/**
+ * A document the membership needs, with where it stands.
+ */
+export type AgentDocumentRequirement = {
+    /**
+     * The document.
+     */
+    kind: AgentDocumentKind;
+    /**
+     * Whether the membership needs it to become active.
+     */
+    required: boolean;
+    /**
+     * Why it is needed, in words.
+     */
+    reason: string;
+    /**
+     * Where the latest document of this kind stands; `null` when none is filed.
+     */
+    status: AgentDocumentStatus | null;
+    /**
+     * The latest document of this kind.
+     */
+    document_id: string | null;
+    /**
+     * When it expires, for a licence and a registration.
+     */
+    expires_on: string | null;
+    /**
+     * Whether it is approved and not expired.
+     */
+    satisfied: boolean;
 };
 
 /**
@@ -5318,7 +7285,7 @@ export type AgentPositionUpdate = {
 };
 
 /**
- * The data of a `status` frame on `GET /v1/live/agents`, sent when an agent goes online or offline.
+ * The data of a `status` frame on `GET /v1/live/agents`, sent when an agent goes online, busy or offline, and when its task changes.
  */
 export type AgentStatusUpdate = {
     /**
@@ -5333,6 +7300,10 @@ export type AgentStatusUpdate = {
      * When the agent was last heard from, as an RFC 3339 timestamp in UTC, or `null` if never.
      */
     last_seen_at: string | null;
+    /**
+     * The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
+     */
+    current_task?: AgentTaskBrief | null;
 };
 
 /**
@@ -7570,6 +9541,10 @@ export type AgentStatusFrame = {
      * Its new status.
      */
     status: AgentStatus;
+    /**
+     * The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
+     */
+    current_task?: AgentTaskBrief | null;
 };
 
 /**
@@ -16479,6 +18454,2803 @@ export type SubmitLocationPingsResponses = {
 };
 
 export type SubmitLocationPingsResponse = SubmitLocationPingsResponses[keyof SubmitLocationPingsResponses];
+
+export type ListOwnAgentMembershipsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/agent/memberships';
+};
+
+export type ListOwnAgentMembershipsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOwnAgentMembershipsError = ListOwnAgentMembershipsErrors[keyof ListOwnAgentMembershipsErrors];
+
+export type ListOwnAgentMembershipsResponses = {
+    /**
+     * The memberships.
+     */
+    200: AgentMembershipList;
+};
+
+export type ListOwnAgentMembershipsResponse = ListOwnAgentMembershipsResponses[keyof ListOwnAgentMembershipsResponses];
+
+export type GetOwnAgentMembershipData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}';
+};
+
+export type GetOwnAgentMembershipErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnAgentMembershipError = GetOwnAgentMembershipErrors[keyof GetOwnAgentMembershipErrors];
+
+export type GetOwnAgentMembershipResponses = {
+    /**
+     * The membership.
+     */
+    200: AgentMembership;
+};
+
+export type GetOwnAgentMembershipResponse = GetOwnAgentMembershipResponses[keyof GetOwnAgentMembershipResponses];
+
+export type ChooseWorkingMembershipData = {
+    /**
+     * The membership.
+     */
+    body: AgentWorkingChoice;
+    path?: never;
+    query?: never;
+    url: '/v1/agent/working-membership';
+};
+
+export type ChooseWorkingMembershipErrors = {
+    /**
+     * `validation_failed`: a malformed `agent_id`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * `duty_refused`: the person is on duty in another membership; go off duty there first.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ChooseWorkingMembershipError = ChooseWorkingMembershipErrors[keyof ChooseWorkingMembershipErrors];
+
+export type ChooseWorkingMembershipResponses = {
+    /**
+     * The memberships, the chosen one working.
+     */
+    200: AgentMembershipList;
+};
+
+export type ChooseWorkingMembershipResponse = ChooseWorkingMembershipResponses[keyof ChooseWorkingMembershipResponses];
+
+export type ListOwnAgentInvitationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/agent/invitations';
+};
+
+export type ListOwnAgentInvitationsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOwnAgentInvitationsError = ListOwnAgentInvitationsErrors[keyof ListOwnAgentInvitationsErrors];
+
+export type ListOwnAgentInvitationsResponses = {
+    /**
+     * The invitations.
+     */
+    200: AgentInvitationList;
+};
+
+export type ListOwnAgentInvitationsResponse = ListOwnAgentInvitationsResponses[keyof ListOwnAgentInvitationsResponses];
+
+export type AcceptAgentInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * The invitation, as `GET /v1/agent/invitations` lists it.
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/invitations/{invitation_id}/accept';
+};
+
+export type AcceptAgentInvitationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no invitation in progress for the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * `agent_already_member`: the person already holds a membership in the service.
+     */
+    409: Problem;
+    /**
+     * `invitation_invalid`: the invitation lapsed or was withdrawn; ask the Partner to send it again.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptAgentInvitationError = AcceptAgentInvitationErrors[keyof AcceptAgentInvitationErrors];
+
+export type AcceptAgentInvitationResponses = {
+    /**
+     * The membership, pending.
+     */
+    200: AgentMembership;
+};
+
+export type AcceptAgentInvitationResponse = AcceptAgentInvitationResponses[keyof AcceptAgentInvitationResponses];
+
+export type DeclineAgentInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * The invitation, as `GET /v1/agent/invitations` lists it.
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/invitations/{invitation_id}/decline';
+};
+
+export type DeclineAgentInvitationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no invitation in progress for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineAgentInvitationError = DeclineAgentInvitationErrors[keyof DeclineAgentInvitationErrors];
+
+export type DeclineAgentInvitationResponses = {
+    /**
+     * Declined.
+     */
+    204: void;
+};
+
+export type DeclineAgentInvitationResponse = DeclineAgentInvitationResponses[keyof DeclineAgentInvitationResponses];
+
+export type ListOwnAgentDocumentsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/documents';
+};
+
+export type ListOwnAgentDocumentsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOwnAgentDocumentsError = ListOwnAgentDocumentsErrors[keyof ListOwnAgentDocumentsErrors];
+
+export type ListOwnAgentDocumentsResponses = {
+    /**
+     * The documents.
+     */
+    200: AgentDocumentList;
+};
+
+export type ListOwnAgentDocumentsResponse = ListOwnAgentDocumentsResponses[keyof ListOwnAgentDocumentsResponses];
+
+export type SubmitAgentDocumentData = {
+    /**
+     * The document.
+     */
+    body: AgentDocumentSubmit;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/documents';
+};
+
+export type SubmitAgentDocumentErrors = {
+    /**
+     * `validation_failed`: a missing or malformed member for the kind (the number's shape, an expiry not after today, a verification in the future), or a file that is not one of the membership's uploads.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * `asset_not_usable` when a file has not arrived in the store yet (post it, then file again); `conflict` when a document of the kind is approved and not expired, or the membership is offboarded.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SubmitAgentDocumentError = SubmitAgentDocumentErrors[keyof SubmitAgentDocumentErrors];
+
+export type SubmitAgentDocumentResponses = {
+    /**
+     * The document, under review.
+     */
+    201: AgentDocument;
+};
+
+export type SubmitAgentDocumentResponse = SubmitAgentDocumentResponses[keyof SubmitAgentDocumentResponses];
+
+export type GrantAgentDocumentUploadData = {
+    /**
+     * The file's facts.
+     */
+    body: AgentUpload;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/document-uploads';
+};
+
+export type GrantAgentDocumentUploadErrors = {
+    /**
+     * `validation_failed` with `unsupported_file_type` or `file_too_large`, before any byte is sent.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the membership is offboarded.
+     */
+    409: Problem;
+    /**
+     * `unavailable`: the store is not configured or not answering.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GrantAgentDocumentUploadError = GrantAgentDocumentUploadErrors[keyof GrantAgentDocumentUploadErrors];
+
+export type GrantAgentDocumentUploadResponses = {
+    /**
+     * The reservation and the form to post the file with.
+     */
+    201: AssetGrant;
+};
+
+export type GrantAgentDocumentUploadResponse = GrantAgentDocumentUploadResponses[keyof GrantAgentDocumentUploadResponses];
+
+export type LinkOwnAgentDocumentFileData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The document, one of the Agent's.
+         */
+        document_id: string;
+        /**
+         * One of the document's files.
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/documents/{document_id}/files/{asset_id}/link';
+};
+
+export type LinkOwnAgentDocumentFileErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such document or file of the caller's membership.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type LinkOwnAgentDocumentFileError = LinkOwnAgentDocumentFileErrors[keyof LinkOwnAgentDocumentFileErrors];
+
+export type LinkOwnAgentDocumentFileResponses = {
+    /**
+     * The link.
+     */
+    200: SignedLink;
+};
+
+export type LinkOwnAgentDocumentFileResponse = LinkOwnAgentDocumentFileResponses[keyof LinkOwnAgentDocumentFileResponses];
+
+export type GetAgentDutyData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/duty';
+};
+
+export type GetAgentDutyErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentDutyError = GetAgentDutyErrors[keyof GetAgentDutyErrors];
+
+export type GetAgentDutyResponses = {
+    /**
+     * The duty.
+     */
+    200: AgentDuty;
+};
+
+export type GetAgentDutyResponse = GetAgentDutyResponses[keyof GetAgentDutyResponses];
+
+export type SetAgentDutyData = {
+    /**
+     * On or off, and the zone.
+     */
+    body: AgentDutyUpdate;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/duty';
+};
+
+export type SetAgentDutyErrors = {
+    /**
+     * `validation_failed`: no zone to go on duty in, or a zone that is not a serving zone.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * `duty_refused` with the blockers in `errors` (`duty_not_active`, `duty_document_expired`, `duty_elsewhere`), or `tasks_under_way` going off duty with a delivery under way.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetAgentDutyError = SetAgentDutyErrors[keyof SetAgentDutyErrors];
+
+export type SetAgentDutyResponses = {
+    /**
+     * The duty after the switch.
+     */
+    200: AgentDuty;
+};
+
+export type SetAgentDutyResponse = SetAgentDutyResponses[keyof SetAgentDutyResponses];
+
+export type ListDutyZonesData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * The Agent's latitude.
+         */
+        lat?: number;
+        /**
+         * The Agent's longitude.
+         */
+        lng?: number;
+    };
+    url: '/v1/agent/memberships/{agent_id}/zones';
+};
+
+export type ListDutyZonesErrors = {
+    /**
+     * `validation_failed`: a latitude or longitude out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListDutyZonesError = ListDutyZonesErrors[keyof ListDutyZonesErrors];
+
+export type ListDutyZonesResponses = {
+    /**
+     * The zones.
+     */
+    200: DutyZoneList;
+};
+
+export type ListDutyZonesResponse = ListDutyZonesResponses[keyof ListDutyZonesResponses];
+
+export type ReportAgentPositionsData = {
+    /**
+     * The positions.
+     */
+    body: AgentPositionBatch;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/positions';
+};
+
+export type ReportAgentPositionsErrors = {
+    /**
+     * `validation_failed`: a batch of 0 or more than 500, or a position out of range; `errors` points at each, and nothing is applied.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReportAgentPositionsError = ReportAgentPositionsErrors[keyof ReportAgentPositionsErrors];
+
+export type ReportAgentPositionsResponses = {
+    /**
+     * The batch was applied, or dropped off duty.
+     */
+    202: AgentPositionsAccepted;
+};
+
+export type ReportAgentPositionsResponse = ReportAgentPositionsResponses[keyof ReportAgentPositionsResponses];
+
+export type ListAgentTasksData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * `open` (the default) or `finished`.
+         */
+        status?: 'open' | 'finished';
+        /**
+         * For `finished`, the day.
+         */
+        date?: string;
+    };
+    url: '/v1/agent/memberships/{agent_id}/tasks';
+};
+
+export type ListAgentTasksErrors = {
+    /**
+     * `validation_failed`: an unknown status or a malformed date.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentTasksError = ListAgentTasksErrors[keyof ListAgentTasksErrors];
+
+export type ListAgentTasksResponses = {
+    /**
+     * The tasks.
+     */
+    200: AgentTaskList;
+};
+
+export type ListAgentTasksResponse = ListAgentTasksResponses[keyof ListAgentTasksResponses];
+
+export type GetAgentTaskData = {
+    body?: never;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}';
+};
+
+export type GetAgentTaskErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentTaskError = GetAgentTaskErrors[keyof GetAgentTaskErrors];
+
+export type GetAgentTaskResponses = {
+    /**
+     * The task.
+     */
+    200: AgentTask;
+};
+
+export type GetAgentTaskResponse = GetAgentTaskResponses[keyof GetAgentTaskResponses];
+
+export type AcknowledgeAgentTaskData = {
+    body?: never;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/receipt';
+};
+
+export type AcknowledgeAgentTaskErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * `task_closed`: the task ended before the app had it, saying how.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcknowledgeAgentTaskError = AcknowledgeAgentTaskErrors[keyof AcknowledgeAgentTaskErrors];
+
+export type AcknowledgeAgentTaskResponses = {
+    /**
+     * The task, received.
+     */
+    200: AgentTask;
+};
+
+export type AcknowledgeAgentTaskResponse = AcknowledgeAgentTaskResponses[keyof AcknowledgeAgentTaskResponses];
+
+export type RecordTaskStepData = {
+    /**
+     * The step.
+     */
+    body: TaskStepRecord;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/steps';
+};
+
+export type RecordTaskStepErrors = {
+    /**
+     * `validation_failed`: a member the step needs is missing or malformed (a value for a scan or a code, a file for a photo or a signature, an amount for cash, a reason to fail that is not on the task's list).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * `task_closed` (the task was given to somebody else, called off or returned, with when and why), `step_required` (an earlier step or the proof the task needs is missing, named), `outside_geofence` (with the distance; send it again with an override reason), `scan_mismatch`, `code_wrong` (with the attempts left), `code_locked` (five wrong codes: call the customer), `asset_not_usable` (the file has not arrived in the store yet).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecordTaskStepError = RecordTaskStepErrors[keyof RecordTaskStepErrors];
+
+export type RecordTaskStepResponses = {
+    /**
+     * The step, applied, and the task after it.
+     */
+    200: TaskStepResult;
+};
+
+export type RecordTaskStepResponse = RecordTaskStepResponses[keyof RecordTaskStepResponses];
+
+export type HandBackAgentTaskData = {
+    /**
+     * Why.
+     */
+    body: TaskHandBack;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/hand-back';
+};
+
+export type HandBackAgentTaskErrors = {
+    /**
+     * `validation_failed`: a reason missing or over 200 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * `hand_back_closed`: the task came as an accepted offer, the minute has passed, or the Agent started towards the store; `task_closed` when it already ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type HandBackAgentTaskError = HandBackAgentTaskErrors[keyof HandBackAgentTaskErrors];
+
+export type HandBackAgentTaskResponses = {
+    /**
+     * The task, handed back.
+     */
+    200: AgentTask;
+};
+
+export type HandBackAgentTaskResponse = HandBackAgentTaskResponses[keyof HandBackAgentTaskResponses];
+
+export type GrantTaskProofUploadData = {
+    /**
+     * What the file is.
+     */
+    body: TaskProofUpload;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/proof-uploads';
+};
+
+export type GrantTaskProofUploadErrors = {
+    /**
+     * `validation_failed` with `unsupported_file_type` or `file_too_large`, or a kind the workflow does not ask for.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * `task_closed`, or `conflict` when three files were granted for the step already.
+     */
+    409: Problem;
+    /**
+     * `unavailable`: the store is not configured or not answering.
+     */
+    503: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GrantTaskProofUploadError = GrantTaskProofUploadErrors[keyof GrantTaskProofUploadErrors];
+
+export type GrantTaskProofUploadResponses = {
+    /**
+     * The reservation and the form to post the file with.
+     */
+    201: AssetGrant;
+};
+
+export type GrantTaskProofUploadResponse = GrantTaskProofUploadResponses[keyof GrantTaskProofUploadResponses];
+
+export type RequestTaskHelpData = {
+    /**
+     * What is wrong.
+     */
+    body: TaskHelpRequest;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/help';
+};
+
+export type RequestTaskHelpErrors = {
+    /**
+     * `validation_failed`: a message missing or over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestTaskHelpError = RequestTaskHelpErrors[keyof RequestTaskHelpErrors];
+
+export type RequestTaskHelpResponses = {
+    /**
+     * The request.
+     */
+    201: TaskHelp;
+};
+
+export type RequestTaskHelpResponse = RequestTaskHelpResponses[keyof RequestTaskHelpResponses];
+
+export type GetOwnTaskProofData = {
+    body?: never;
+    path: {
+        /**
+         * The task: one stop of a trip, held by the Agent.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/proof';
+};
+
+export type GetOwnTaskProofErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's memberships.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnTaskProofError = GetOwnTaskProofErrors[keyof GetOwnTaskProofErrors];
+
+export type GetOwnTaskProofResponses = {
+    /**
+     * The proof.
+     */
+    200: ProofOfDelivery;
+};
+
+export type GetOwnTaskProofResponse = GetOwnTaskProofResponses[keyof GetOwnTaskProofResponses];
+
+export type GetAgentDayData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * The day; today by default.
+         */
+        date?: string;
+    };
+    url: '/v1/agent/memberships/{agent_id}/earnings';
+};
+
+export type GetAgentDayErrors = {
+    /**
+     * `validation_failed`: a malformed date.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentDayError = GetAgentDayErrors[keyof GetAgentDayErrors];
+
+export type GetAgentDayResponses = {
+    /**
+     * The day.
+     */
+    200: AgentDay;
+};
+
+export type GetAgentDayResponse = GetAgentDayResponses[keyof GetAgentDayResponses];
+
+export type GetAgentCashData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/cash';
+};
+
+export type GetAgentCashErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentCashError = GetAgentCashErrors[keyof GetAgentCashErrors];
+
+export type GetAgentCashResponses = {
+    /**
+     * The cash in hand.
+     */
+    200: CashInHand;
+};
+
+export type GetAgentCashResponse = GetAgentCashResponses[keyof GetAgentCashResponses];
+
+export type GetAgentPayRuleData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/pay-rule';
+};
+
+export type GetAgentPayRuleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentPayRuleError = GetAgentPayRuleErrors[keyof GetAgentPayRuleErrors];
+
+export type GetAgentPayRuleResponses = {
+    /**
+     * The pay rule.
+     */
+    200: PayRule;
+};
+
+export type GetAgentPayRuleResponse = GetAgentPayRuleResponses[keyof GetAgentPayRuleResponses];
+
+export type ListPartnerAgentsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only this service's.
+         */
+        service_id?: string;
+        /**
+         * Only Agents in this status.
+         */
+        status?: AgentMembershipStatus;
+        /**
+         * Agents whose name holds these words, or whose mobile number ends in these digits.
+         */
+        q?: string;
+        /**
+         * At most this many, 1 to 200; 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/agents';
+};
+
+export type ListPartnerAgentsErrors = {
+    /**
+     * `validation_failed`: a malformed filter, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerAgentsError = ListPartnerAgentsErrors[keyof ListPartnerAgentsErrors];
+
+export type ListPartnerAgentsResponses = {
+    /**
+     * The Agents.
+     */
+    200: PartnerAgentPage;
+};
+
+export type ListPartnerAgentsResponse = ListPartnerAgentsResponses[keyof ListPartnerAgentsResponses];
+
+export type InviteAgentData = {
+    /**
+     * Who, into which service, as what.
+     */
+    body: AgentInvite;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents';
+};
+
+export type InviteAgentErrors = {
+    /**
+     * `validation_failed`: a missing name, neither or both of a number and an email, a number that is not a mobile number (`invalid_mobile`, `not_a_mobile`), a malformed email.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based` (the service does not send people out), `kind_not_allowed` (the service does not run that kind's vehicle), `agent_already_member` (the person holds a membership or an invitation in progress in the service), `partner_archived`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type InviteAgentError = InviteAgentErrors[keyof InviteAgentErrors];
+
+export type InviteAgentResponses = {
+    /**
+     * The Agent, invited.
+     */
+    201: PartnerAgent;
+};
+
+export type InviteAgentResponse = InviteAgentResponses[keyof InviteAgentResponses];
+
+export type JoinOwnDeliveryServiceData = {
+    /**
+     * The service and the kind.
+     */
+    body: AgentSelfJoin;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/self';
+};
+
+export type JoinOwnDeliveryServiceErrors = {
+    /**
+     * `validation_failed`: a malformed service id.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: the Partner is not an individual Partner, or the caller is not its owner.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`, `kind_not_allowed`, or `agent_already_member` when the owner holds one already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type JoinOwnDeliveryServiceError = JoinOwnDeliveryServiceErrors[keyof JoinOwnDeliveryServiceErrors];
+
+export type JoinOwnDeliveryServiceResponses = {
+    /**
+     * The membership, pending.
+     */
+    201: PartnerAgent;
+};
+
+export type JoinOwnDeliveryServiceResponse = JoinOwnDeliveryServiceResponses[keyof JoinOwnDeliveryServiceResponses];
+
+export type GetPartnerAgentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}';
+};
+
+export type GetPartnerAgentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerAgentError = GetPartnerAgentErrors[keyof GetPartnerAgentErrors];
+
+export type GetPartnerAgentResponses = {
+    /**
+     * The Agent.
+     */
+    200: PartnerAgent;
+};
+
+export type GetPartnerAgentResponse = GetPartnerAgentResponses[keyof GetPartnerAgentResponses];
+
+export type UpdatePartnerAgentData = {
+    /**
+     * What changes.
+     */
+    body: AgentUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}';
+};
+
+export type UpdatePartnerAgentErrors = {
+    /**
+     * `validation_failed`: a blank or long name.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `kind_not_allowed`, or `illegal_transition` for an offboarded membership.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`: the Agent changed since the `ETag` sent.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePartnerAgentError = UpdatePartnerAgentErrors[keyof UpdatePartnerAgentErrors];
+
+export type UpdatePartnerAgentResponses = {
+    /**
+     * The Agent.
+     */
+    200: PartnerAgent;
+};
+
+export type UpdatePartnerAgentResponse = UpdatePartnerAgentResponses[keyof UpdatePartnerAgentResponses];
+
+export type ActivateAgentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/activate';
+};
+
+export type ActivateAgentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `activation_blocked` naming each document missing, under review, rejected or expired (`document_missing`, `document_pending`, `document_rejected`, `document_expired`), or `illegal_transition` from invited or offboarded (an offboarded Agent is invited again instead).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ActivateAgentError = ActivateAgentErrors[keyof ActivateAgentErrors];
+
+export type ActivateAgentResponses = {
+    /**
+     * The Agent after the change.
+     */
+    200: PartnerAgent;
+};
+
+export type ActivateAgentResponse = ActivateAgentResponses[keyof ActivateAgentResponses];
+
+export type SuspendAgentData = {
+    /**
+     * Why.
+     */
+    body: AgentStatusReason;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/suspend';
+};
+
+export type SuspendAgentErrors = {
+    /**
+     * `validation_failed`: a reason missing or over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition` from invited, suspended or offboarded.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SuspendAgentError = SuspendAgentErrors[keyof SuspendAgentErrors];
+
+export type SuspendAgentResponses = {
+    /**
+     * The Agent after the change.
+     */
+    200: PartnerAgent;
+};
+
+export type SuspendAgentResponse = SuspendAgentResponses[keyof SuspendAgentResponses];
+
+export type ReinstateAgentData = {
+    /**
+     * Why.
+     */
+    body: AgentReinstatement;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/reinstate';
+};
+
+export type ReinstateAgentErrors = {
+    /**
+     * `validation_failed`: a reason missing or over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition` when the membership is not suspended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReinstateAgentError = ReinstateAgentErrors[keyof ReinstateAgentErrors];
+
+export type ReinstateAgentResponses = {
+    /**
+     * The Agent after the change.
+     */
+    200: PartnerAgent;
+};
+
+export type ReinstateAgentResponse = ReinstateAgentResponses[keyof ReinstateAgentResponses];
+
+export type OffboardAgentData = {
+    /**
+     * Why.
+     */
+    body: AgentStatusReason;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/offboard';
+};
+
+export type OffboardAgentErrors = {
+    /**
+     * `validation_failed`: a reason missing or over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition` when already offboarded.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type OffboardAgentError = OffboardAgentErrors[keyof OffboardAgentErrors];
+
+export type OffboardAgentResponses = {
+    /**
+     * The Agent after the change.
+     */
+    200: PartnerAgent;
+};
+
+export type OffboardAgentResponse = OffboardAgentResponses[keyof OffboardAgentResponses];
+
+export type ResendAgentInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/invitation';
+};
+
+export type ResendAgentInvitationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition` when the person already accepted or the invitation was withdrawn.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResendAgentInvitationError = ResendAgentInvitationErrors[keyof ResendAgentInvitationErrors];
+
+export type ResendAgentInvitationResponses = {
+    /**
+     * The Agent after the change.
+     */
+    200: PartnerAgent;
+};
+
+export type ResendAgentInvitationResponse = ResendAgentInvitationResponses[keyof ResendAgentInvitationResponses];
+
+export type ListAgentDocumentsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/documents';
+};
+
+export type ListAgentDocumentsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentDocumentsError = ListAgentDocumentsErrors[keyof ListAgentDocumentsErrors];
+
+export type ListAgentDocumentsResponses = {
+    /**
+     * The documents.
+     */
+    200: AgentDocumentList;
+};
+
+export type ListAgentDocumentsResponse = ListAgentDocumentsResponses[keyof ListAgentDocumentsResponses];
+
+export type ReviewAgentDocumentData = {
+    /**
+     * The decision.
+     */
+    body: AgentDocumentReview;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The document, one of the Agent's.
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/documents/{document_id}/review';
+};
+
+export type ReviewAgentDocumentErrors = {
+    /**
+     * `validation_failed`: a rejection without a reason, or a reason over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the document.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`: the document is not under review.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReviewAgentDocumentError = ReviewAgentDocumentErrors[keyof ReviewAgentDocumentErrors];
+
+export type ReviewAgentDocumentResponses = {
+    /**
+     * The document, decided.
+     */
+    200: AgentDocument;
+};
+
+export type ReviewAgentDocumentResponse = ReviewAgentDocumentResponses[keyof ReviewAgentDocumentResponses];
+
+export type LinkAgentDocumentFileData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The document, one of the Agent's.
+         */
+        document_id: string;
+        /**
+         * One of the document's files.
+         */
+        asset_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/documents/{document_id}/files/{asset_id}/link';
+};
+
+export type LinkAgentDocumentFileErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent, the document or the file.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type LinkAgentDocumentFileError = LinkAgentDocumentFileErrors[keyof LinkAgentDocumentFileErrors];
+
+export type LinkAgentDocumentFileResponses = {
+    /**
+     * The link.
+     */
+    200: SignedLink;
+};
+
+export type LinkAgentDocumentFileResponse = LinkAgentDocumentFileResponses[keyof LinkAgentDocumentFileResponses];
+
+export type ListPartnerAgentTasksData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * At most this many, 1 to 100; 20 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/tasks';
+};
+
+export type ListPartnerAgentTasksErrors = {
+    /**
+     * `validation_failed`: a limit out of range, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerAgentTasksError = ListPartnerAgentTasksErrors[keyof ListPartnerAgentTasksErrors];
+
+export type ListPartnerAgentTasksResponses = {
+    /**
+     * The tasks.
+     */
+    200: AgentTaskPage;
+};
+
+export type ListPartnerAgentTasksResponse = ListPartnerAgentTasksResponses[keyof ListPartnerAgentTasksResponses];
+
+export type ListAgentDocumentQueueData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only documents in this status; `under_review` by default.
+         */
+        status?: AgentDocumentStatus;
+        /**
+         * Only this service's.
+         */
+        service_id?: string;
+        /**
+         * At most this many, 1 to 200; 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/agent-documents';
+};
+
+export type ListAgentDocumentQueueErrors = {
+    /**
+     * `validation_failed`: a malformed filter, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentDocumentQueueError = ListAgentDocumentQueueErrors[keyof ListAgentDocumentQueueErrors];
+
+export type ListAgentDocumentQueueResponses = {
+    /**
+     * The documents.
+     */
+    200: AgentDocumentPage;
+};
+
+export type ListAgentDocumentQueueResponse = ListAgentDocumentQueueResponses[keyof ListAgentDocumentQueueResponses];
+
+export type GetPartnerOrderProofData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The order the delivery fulfils.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/orders/{order_id}/proof-of-delivery';
+};
+
+export type GetPartnerOrderProofErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no drop for the order that the Partner sold or carried.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerOrderProofError = GetPartnerOrderProofErrors[keyof GetPartnerOrderProofErrors];
+
+export type GetPartnerOrderProofResponses = {
+    /**
+     * The proof.
+     */
+    200: ProofOfDelivery;
+};
+
+export type GetPartnerOrderProofResponse = GetPartnerOrderProofResponses[keyof GetPartnerOrderProofResponses];
+
+export type ListAgentTeamsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/teams';
+};
+
+export type ListAgentTeamsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`: the service does not send people out.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentTeamsError = ListAgentTeamsErrors[keyof ListAgentTeamsErrors];
+
+export type ListAgentTeamsResponses = {
+    /**
+     * The teams.
+     */
+    200: AgentTeamList;
+};
+
+export type ListAgentTeamsResponse = ListAgentTeamsResponses[keyof ListAgentTeamsResponses];
+
+export type GetAgentServiceSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/agent-settings';
+};
+
+export type GetAgentServiceSettingsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentServiceSettingsError = GetAgentServiceSettingsErrors[keyof GetAgentServiceSettingsErrors];
+
+export type GetAgentServiceSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: AgentServiceSettings;
+};
+
+export type GetAgentServiceSettingsResponse = GetAgentServiceSettingsResponses[keyof GetAgentServiceSettingsResponses];
+
+export type UpdateAgentServiceSettingsData = {
+    /**
+     * What changes.
+     */
+    body: AgentServiceSettingsUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/agent-settings';
+};
+
+export type UpdateAgentServiceSettingsErrors = {
+    /**
+     * `validation_failed`: a geofence outside 50 to 500 metres, a negative ceiling or one in another currency, an empty or long failure reason.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateAgentServiceSettingsError = UpdateAgentServiceSettingsErrors[keyof UpdateAgentServiceSettingsErrors];
+
+export type UpdateAgentServiceSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: AgentServiceSettings;
+};
+
+export type UpdateAgentServiceSettingsResponse = UpdateAgentServiceSettingsResponses[keyof UpdateAgentServiceSettingsResponses];
+
+export type ListPayRulesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/pay-rules';
+};
+
+export type ListPayRulesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPayRulesError = ListPayRulesErrors[keyof ListPayRulesErrors];
+
+export type ListPayRulesResponses = {
+    /**
+     * The versions.
+     */
+    200: PayRuleList;
+};
+
+export type ListPayRulesResponse = ListPayRulesResponses[keyof ListPayRulesResponses];
+
+export type PublishPayRuleData = {
+    /**
+     * The new version.
+     */
+    body: PayRulePublish;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/pay-rules';
+};
+
+export type PublishPayRuleErrors = {
+    /**
+     * `validation_failed`: a negative amount, one in another currency, or free minutes outside 0 to 60.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` naming the permission the member lacks at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPayRuleError = PublishPayRuleErrors[keyof PublishPayRuleErrors];
+
+export type PublishPayRuleResponses = {
+    /**
+     * The version published.
+     */
+    201: PayRule;
+};
+
+export type PublishPayRuleResponse = PublishPayRuleResponses[keyof PublishPayRuleResponses];
+
+export type ListAllAgentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * Only this service's.
+         */
+        service_id?: string;
+        /**
+         * Only Agents in this status.
+         */
+        status?: AgentMembershipStatus;
+        /**
+         * Agents whose name holds these words, or whose mobile number ends in these digits.
+         */
+        q?: string;
+        /**
+         * At most this many, 1 to 200; 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agents';
+};
+
+export type ListAllAgentsErrors = {
+    /**
+     * `validation_failed`: a malformed filter, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` naming the platform permission.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAllAgentsError = ListAllAgentsErrors[keyof ListAllAgentsErrors];
+
+export type ListAllAgentsResponses = {
+    /**
+     * The Agents.
+     */
+    200: PartnerAgentPage;
+};
+
+export type ListAllAgentsResponse = ListAllAgentsResponses[keyof ListAllAgentsResponses];
+
+export type GetAnyAgentData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}';
+};
+
+export type GetAnyAgentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` naming the platform permission.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Agent.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAnyAgentError = GetAnyAgentErrors[keyof GetAnyAgentErrors];
+
+export type GetAnyAgentResponses = {
+    /**
+     * The Agent.
+     */
+    200: PartnerAgent;
+};
+
+export type GetAnyAgentResponse = GetAnyAgentResponses[keyof GetAnyAgentResponses];
+
+export type ListAllAgentDocumentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only documents in this status; `under_review` by default.
+         */
+        status?: AgentDocumentStatus;
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * At most this many, 1 to 200; 50 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agent-documents';
+};
+
+export type ListAllAgentDocumentsErrors = {
+    /**
+     * `validation_failed`: a malformed filter, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` naming the platform permission.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAllAgentDocumentsError = ListAllAgentDocumentsErrors[keyof ListAllAgentDocumentsErrors];
+
+export type ListAllAgentDocumentsResponses = {
+    /**
+     * The documents.
+     */
+    200: AgentDocumentPage;
+};
+
+export type ListAllAgentDocumentsResponse = ListAllAgentDocumentsResponses[keyof ListAllAgentDocumentsResponses];
+
+export type GetPlatformOrderProofData = {
+    body?: never;
+    path: {
+        /**
+         * The order the delivery fulfils.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/proof-of-delivery';
+};
+
+export type GetPlatformOrderProofErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` naming the platform permission.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no drop for the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOrderProofError = GetPlatformOrderProofErrors[keyof GetPlatformOrderProofErrors];
+
+export type GetPlatformOrderProofResponses = {
+    /**
+     * The proof.
+     */
+    200: ProofOfDelivery;
+};
+
+export type GetPlatformOrderProofResponse = GetPlatformOrderProofResponses[keyof GetPlatformOrderProofResponses];
+
+export type GetCustomerOrderProofData = {
+    body?: never;
+    path: {
+        /**
+         * The order the delivery fulfils.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/proof-of-delivery';
+};
+
+export type GetCustomerOrderProofErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a customer token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no delivered drop for an order of the caller (another customer's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerOrderProofError = GetCustomerOrderProofErrors[keyof GetCustomerOrderProofErrors];
+
+export type GetCustomerOrderProofResponses = {
+    /**
+     * The proof.
+     */
+    200: ProofOfDelivery;
+};
+
+export type GetCustomerOrderProofResponse = GetCustomerOrderProofResponses[keyof GetCustomerOrderProofResponses];
 
 export type ListEventsData = {
     body?: never;

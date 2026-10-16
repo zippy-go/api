@@ -1,0 +1,80 @@
+# Path item for /v1/agent/memberships/{agent_id}/document-uploads. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+post:
+  operationId: grantAgentDocumentUpload
+  summary: Get an upload grant for a document file
+  description: "Issues a five-minute grant to post one document file straight to private storage (purpose `agent_document`: PDF, PNG or JPEG, at most 10 MB). File the document with the grant's asset id once the file is posted. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The file's facts.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/AgentUpload.yaml
+  responses:
+    "201":
+      description: The reservation and the form to post the file with.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/assets/AssetGrant.yaml
+    "400":
+      description: "`validation_failed` with `unsupported_file_type` or `file_too_large`, before any byte is sent."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`conflict`: the membership is offboarded."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "503":
+      description: "`unavailable`: the store is not configured or not answering."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

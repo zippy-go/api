@@ -1,0 +1,20 @@
+type: object
+description: A zone by id and name.
+required:
+  - id
+  - name
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The zone (a service area of kind zone).
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Gachibowli
+examples:
+  - id: 01a13a48-9e00-7000-8000-00000000a011
+    name: Gachibowli

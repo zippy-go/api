@@ -1,0 +1,11 @@
+type: object
+description: Lifts a suspension.
+properties:
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    description: A note for the record, at most 500 characters.
+examples:
+  - note: null

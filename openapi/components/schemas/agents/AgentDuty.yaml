@@ -1,0 +1,94 @@
+type: object
+description: "An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled."
+required:
+  - agent_id
+  - on_duty
+  - stretch_id
+  - zone
+  - started_at
+  - last_heard_at
+  - unscheduled
+  - can_go_on_duty
+  - blockers
+  - closed_for_silence
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  on_duty:
+    type: boolean
+    description: Whether a duty stretch is open.
+    examples:
+      - true
+  stretch_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The open stretch.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+  zone:
+    oneOf:
+      - $ref: ./ZoneRef.yaml
+      - type: "null"
+    description: The zone chosen when going on duty.
+  started_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the open stretch started.
+    examples:
+      - 2026-10-16T09:00:00Z
+  last_heard_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the app was last heard from in this stretch.
+    examples:
+      - 2026-10-16T09:00:00Z
+  unscheduled:
+    type: boolean
+    description: Whether the stretch is outside any shift; always, until shifts arrive.
+    examples:
+      - true
+  can_go_on_duty:
+    type: boolean
+    description: Whether switching on would be accepted now.
+    examples:
+      - true
+  blockers:
+    type: array
+    items:
+      $ref: ./AgentBlocker.yaml
+    description: Why the Agent cannot go on duty, in words.
+    examples:
+      - []
+  closed_for_silence:
+    oneOf:
+      - $ref: ./DutyClosure.yaml
+      - type: "null"
+    description: A stretch the platform closed for silence and has not told the Agent of yet; reading it here tells them.
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    on_duty: true
+    stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+    zone:
+      id: 01a13a48-9e00-7000-8000-00000000a011
+      name: Gachibowli
+    started_at: 2026-10-16T09:00:00Z
+    last_heard_at: 2026-10-16T09:00:00Z
+    unscheduled: true
+    can_go_on_duty: true
+    blockers: []
+    closed_for_silence:
+      stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+      ended_at: 2026-10-16T22:10:00Z
+      zone:
+        id: 01a13a48-9e00-7000-8000-00000000a011
+        name: Gachibowli

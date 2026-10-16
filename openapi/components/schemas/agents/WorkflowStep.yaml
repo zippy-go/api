@@ -1,0 +1,32 @@
+type: object
+description: A step of a task's workflow and whether it is done.
+required:
+  - kind
+  - required
+  - done
+  - done_at
+properties:
+  kind:
+    $ref: ./TaskStepKind.yaml
+    description: The step.
+  required:
+    type: boolean
+    description: Whether the task cannot complete without it.
+    examples:
+      - true
+  done:
+    type: boolean
+    description: Whether it is recorded.
+    examples:
+      - false
+  done_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was recorded on the device.
+examples:
+  - kind: arrive
+    required: true
+    done: false
+    done_at: null

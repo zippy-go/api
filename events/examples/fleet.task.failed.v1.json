@@ -1,0 +1,29 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a04",
+  "type": "fleet.task.failed",
+  "version": 1,
+  "occurred_at": "2026-10-16T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01",
+  "payload": {
+    "task_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "trip_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10",
+    "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10",
+    "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+    "service_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45",
+    "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01",
+    "attempt": 1,
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "order_number": "AB1234",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "kind": "drop_off",
+    "status": "failed",
+    "previous_status": "arrived",
+    "version": 1,
+    "at": "2026-10-16T09:00:00Z",
+    "recorded_at": "2026-10-16T09:00:00Z",
+    "reason": "Customer not reachable",
+    "arrived": true
+  }
+}

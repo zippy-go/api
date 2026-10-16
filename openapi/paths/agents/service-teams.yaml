@@ -1,0 +1,62 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/teams. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service, one of the Partner's.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+get:
+  operationId: listAgentTeams
+  summary: List a service's teams
+  description: "The teams of a delivery service: its default team holds every Agent and its area is the zones the service delivers in, else the zones of its Locations, which dispatch reads. Teams beyond the default come later. Members need `agent:read` for the service; Mission Control uses the same route with its platform permissions."
+  tags:
+    - Agents
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The teams.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentTeamList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` naming the permission the member lacks at the service, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`service_not_agent_based`: the service does not send people out."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

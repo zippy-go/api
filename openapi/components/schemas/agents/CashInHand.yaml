@@ -1,0 +1,47 @@
+type: object
+description: "Cash an Agent holds: collected at drops and not yet settled with the Partner, against the service's ceiling."
+required:
+  - agent_id
+  - amount
+  - ceiling
+  - collections
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  amount:
+    $ref: ../common/Money.yaml
+    description: Cash in hand.
+  ceiling:
+    $ref: ../common/Money.yaml
+    description: The service's cash ceiling.
+  collections:
+    type: array
+    items:
+      $ref: ./CashCollection.yaml
+    description: The collections not yet settled, newest first.
+    examples:
+      - - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+          order_number: AB1234
+          amount:
+            minor_units: 48000
+            currency: INR
+          collected_at: 2026-10-16T09:00:00Z
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    amount:
+      minor_units: 48000
+      currency: INR
+    ceiling:
+      minor_units: 500000
+      currency: INR
+    collections:
+      - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+        order_number: AB1234
+        amount:
+          minor_units: 48000
+          currency: INR
+        collected_at: 2026-10-16T09:00:00Z

@@ -1,0 +1,119 @@
+# Path item for /v1/agent/memberships/{agent_id}/documents. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+get:
+  operationId: listOwnAgentDocuments
+  summary: List the membership's documents
+  description: "The documents filed for the membership, newest first, with each document the membership needs and where it stands: an identity document for every kind, a driving licence and the vehicle's registration with their expiry dates for two-wheelers and vans, police verification where the service requires it. A rejected document carries the reviewer's reason. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The documents.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentDocumentList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: submitAgentDocument
+  summary: File a document
+  description: "Files a document with the files posted through upload grants: each file is confirmed against the store and the document goes under review, the Partner's for its own services, platform staff's for the platform fleet. A document of a kind already approved and not expired is refused until renewals arrive; a rejected one is filed again as a new document. Every reading of a file is recorded. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The document.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/AgentDocumentSubmit.yaml
+  responses:
+    "201":
+      description: The document, under review.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentDocument.yaml
+    "400":
+      description: "`validation_failed`: a missing or malformed member for the kind (the number's shape, an expiry not after today, a verification in the future), or a file that is not one of the membership's uploads."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`asset_not_usable` when a file has not arrived in the store yet (post it, then file again); `conflict` when a document of the kind is approved and not expired, or the membership is offboarded."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

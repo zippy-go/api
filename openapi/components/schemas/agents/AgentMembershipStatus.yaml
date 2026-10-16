@@ -1,0 +1,10 @@
+type: string
+description: "Where an Agent membership stands: `invited` until the person accepts in the Agent app, `pending` until its documents are approved and the Partner activates it, `active` while the Agent may work, `suspended` when the Partner or Mission Control stopped it with a reason the Agent reads, `offboarded` when it ended, which is final. Clients must tolerate values they do not know."
+enum:
+  - invited
+  - pending
+  - active
+  - suspended
+  - offboarded
+examples:
+  - active

@@ -1,0 +1,32 @@
+type: object
+description: A proof file the Agent app is about to upload for a task.
+required:
+  - kind
+  - file_name
+  - content_type
+  - size_bytes
+properties:
+  kind:
+    $ref: ./ProofKind.yaml
+    description: A `photo` or a `signature`.
+  file_name:
+    type: string
+    description: The file name.
+    examples:
+      - door.jpg
+  content_type:
+    type: string
+    description: "Its type: `image/jpeg`, `image/png` or `image/webp`."
+    examples:
+      - image/jpeg
+  size_bytes:
+    type: integer
+    format: int64
+    description: Its size in bytes, at most 8 MB.
+    examples:
+      - 482113
+examples:
+  - kind: photo
+    file_name: door.jpg
+    content_type: image/jpeg
+    size_bytes: 482113

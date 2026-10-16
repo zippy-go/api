@@ -1,0 +1,41 @@
+type: object
+description: Invites a person into one of the Partner's delivery services as an Agent of a kind, by mobile number (10 digits read as +91, or E.164) or by email. The person is told by message how to join.
+required:
+  - service_id
+  - kind
+  - name
+properties:
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  kind:
+    $ref: ./AgentKind.yaml
+    description: What they will move with; one the service takes.
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: Their name as the Partner knows it, 1 to 100 characters; the first word is what customers read.
+    examples:
+      - Ravi Kumar
+  phone:
+    type:
+      - string
+      - "null"
+    description: Their mobile number; this or `email`.
+    examples:
+      - "+919876543210"
+  email:
+    type:
+      - string
+      - "null"
+    description: Their email; this or `phone`.
+examples:
+  - service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    kind: two_wheeler
+    name: Ravi Kumar
+    phone: "+919876543210"
+    email: null

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.16.0
+  version: 0.17.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -254,6 +254,10 @@ tags:
     description: "How a store runs the orders it receives and how Mission Control watches and intervenes: the live board with the one move each order waits for and its timer, accepting with a preparation time and lines left out, declining with a reason, more preparation time, pausing new orders, ready, collected, handed over and delivered (a stand-in for dispatch until step 4), the store's cancellation and its history; Mission Control's board across every store with what needs attention, cancellation at any point, refunds of lines bounded by what was paid, and help resolved. Members need `order:read` and `order:manage` at the Location; platform staff `order:read`, `order:manage` and `order:refund`."
   - name: Deliveries
     description: Fulfilment of orders from pickup to dropoff, including tasks and trips.
+  - name: Agent app
+    description: "The Agent app: the person's Agent memberships and invitations, documents with upload grants, the duty switch with the zone, position reports, tasks with their steps and proof, help on a task, the day's earnings, cash in hand and the pay rule. Takes Agent app tokens (audience `agent`)."
+  - name: Agents
+    description: "A Partner's Agents in its delivery services: invitations by mobile number or email, statuses with who, when and why, onboarding documents and their review, the default team, how a service runs its Agents' work, pay rules, and proof of delivery; Mission Control sees every Agent across Partners and manages the platform fleet with the same routes."
   - name: Fleet
     description: Providers, agents, vehicles and capacity.
   - name: Live
@@ -276,6 +280,96 @@ paths:
     $ref: ./paths/fleet/agents.yaml
   /v1/fleet/location-pings:
     $ref: ./paths/fleet/location-pings.yaml
+  /v1/agent/memberships:
+    $ref: ./paths/agent-app/memberships.yaml
+  /v1/agent/memberships/{agent_id}:
+    $ref: ./paths/agent-app/membership.yaml
+  /v1/agent/working-membership:
+    $ref: ./paths/agent-app/working-membership.yaml
+  /v1/agent/invitations:
+    $ref: ./paths/agent-app/invitations.yaml
+  /v1/agent/invitations/{invitation_id}/accept:
+    $ref: ./paths/agent-app/invitation-accept.yaml
+  /v1/agent/invitations/{invitation_id}/decline:
+    $ref: ./paths/agent-app/invitation-decline.yaml
+  /v1/agent/memberships/{agent_id}/documents:
+    $ref: ./paths/agent-app/documents.yaml
+  /v1/agent/memberships/{agent_id}/document-uploads:
+    $ref: ./paths/agent-app/document-uploads.yaml
+  /v1/agent/memberships/{agent_id}/documents/{document_id}/files/{asset_id}/link:
+    $ref: ./paths/agent-app/document-file-link.yaml
+  /v1/agent/memberships/{agent_id}/duty:
+    $ref: ./paths/agent-app/duty.yaml
+  /v1/agent/memberships/{agent_id}/zones:
+    $ref: ./paths/agent-app/zones.yaml
+  /v1/agent/memberships/{agent_id}/positions:
+    $ref: ./paths/agent-app/positions.yaml
+  /v1/agent/memberships/{agent_id}/tasks:
+    $ref: ./paths/agent-app/tasks.yaml
+  /v1/agent/tasks/{task_id}:
+    $ref: ./paths/agent-app/task.yaml
+  /v1/agent/tasks/{task_id}/receipt:
+    $ref: ./paths/agent-app/task-receipt.yaml
+  /v1/agent/tasks/{task_id}/steps:
+    $ref: ./paths/agent-app/task-steps.yaml
+  /v1/agent/tasks/{task_id}/hand-back:
+    $ref: ./paths/agent-app/task-hand-back.yaml
+  /v1/agent/tasks/{task_id}/proof-uploads:
+    $ref: ./paths/agent-app/task-proof-uploads.yaml
+  /v1/agent/tasks/{task_id}/help:
+    $ref: ./paths/agent-app/task-help.yaml
+  /v1/agent/tasks/{task_id}/proof:
+    $ref: ./paths/agent-app/task-proof.yaml
+  /v1/agent/memberships/{agent_id}/earnings:
+    $ref: ./paths/agent-app/earnings.yaml
+  /v1/agent/memberships/{agent_id}/cash:
+    $ref: ./paths/agent-app/cash.yaml
+  /v1/agent/memberships/{agent_id}/pay-rule:
+    $ref: ./paths/agent-app/pay-rule.yaml
+  /v1/partners/{partner_id}/agents:
+    $ref: ./paths/agents/partner-agents.yaml
+  /v1/partners/{partner_id}/agents/self:
+    $ref: ./paths/agents/partner-agent-self.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}:
+    $ref: ./paths/agents/partner-agent.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/activate:
+    $ref: ./paths/agents/partner-agent-activate.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/suspend:
+    $ref: ./paths/agents/partner-agent-suspend.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/reinstate:
+    $ref: ./paths/agents/partner-agent-reinstate.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/offboard:
+    $ref: ./paths/agents/partner-agent-offboard.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/invitation:
+    $ref: ./paths/agents/partner-agent-invitation.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/documents:
+    $ref: ./paths/agents/partner-agent-documents.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/documents/{document_id}/review:
+    $ref: ./paths/agents/partner-agent-document-review.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/documents/{document_id}/files/{asset_id}/link:
+    $ref: ./paths/agents/partner-agent-document-file-link.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/tasks:
+    $ref: ./paths/agents/partner-agent-tasks.yaml
+  /v1/partners/{partner_id}/agent-documents:
+    $ref: ./paths/agents/partner-agent-documents-queue.yaml
+  /v1/partners/{partner_id}/orders/{order_id}/proof-of-delivery:
+    $ref: ./paths/agents/partner-order-proof.yaml
+  /v1/partners/{partner_id}/services/{service_id}/teams:
+    $ref: ./paths/agents/service-teams.yaml
+  /v1/partners/{partner_id}/services/{service_id}/agent-settings:
+    $ref: ./paths/agents/service-agent-settings.yaml
+  /v1/partners/{partner_id}/services/{service_id}/pay-rules:
+    $ref: ./paths/agents/service-pay-rules.yaml
+  /v1/platform/agents:
+    $ref: ./paths/agents/platform-agents.yaml
+  /v1/platform/agents/{agent_id}:
+    $ref: ./paths/agents/platform-agent.yaml
+  /v1/platform/agent-documents:
+    $ref: ./paths/agents/platform-agent-documents.yaml
+  /v1/platform/orders/{order_id}/proof-of-delivery:
+    $ref: ./paths/agents/platform-order-proof.yaml
+  /v1/customer/orders/{order_id}/proof-of-delivery:
+    $ref: ./paths/agents/customer-order-proof.yaml
   /v1/events:
     $ref: ./paths/events/events.yaml
   /v1/live/agents:
@@ -1342,6 +1436,172 @@ components:
       $ref: ./components/schemas/fleet/LocationPingBatch.yaml
     LocationPingsAccepted:
       $ref: ./components/schemas/fleet/LocationPingsAccepted.yaml
+    # Agents
+    AgentKind:
+      $ref: ./components/schemas/agents/AgentKind.yaml
+    AgentMembershipStatus:
+      $ref: ./components/schemas/agents/AgentMembershipStatus.yaml
+    AgentContactChannel:
+      $ref: ./components/schemas/agents/AgentContactChannel.yaml
+    AgentDocumentKind:
+      $ref: ./components/schemas/agents/AgentDocumentKind.yaml
+    IdentityDocumentType:
+      $ref: ./components/schemas/agents/IdentityDocumentType.yaml
+    AgentDocumentStatus:
+      $ref: ./components/schemas/agents/AgentDocumentStatus.yaml
+    AgentDocumentDecision:
+      $ref: ./components/schemas/agents/AgentDocumentDecision.yaml
+    TaskKind:
+      $ref: ./components/schemas/agents/TaskKind.yaml
+    TaskStatus:
+      $ref: ./components/schemas/agents/TaskStatus.yaml
+    TaskAssignment:
+      $ref: ./components/schemas/agents/TaskAssignment.yaml
+    TaskStepKind:
+      $ref: ./components/schemas/agents/TaskStepKind.yaml
+    EarningLineKind:
+      $ref: ./components/schemas/agents/EarningLineKind.yaml
+    EarningOutcome:
+      $ref: ./components/schemas/agents/EarningOutcome.yaml
+    ProofKind:
+      $ref: ./components/schemas/agents/ProofKind.yaml
+    TeamAreaSource:
+      $ref: ./components/schemas/agents/TeamAreaSource.yaml
+    AgentBlockerCode:
+      $ref: ./components/schemas/agents/AgentBlockerCode.yaml
+    DutyEndReason:
+      $ref: ./components/schemas/agents/DutyEndReason.yaml
+    ZoneRef:
+      $ref: ./components/schemas/agents/ZoneRef.yaml
+    AgentBlocker:
+      $ref: ./components/schemas/agents/AgentBlocker.yaml
+    AgentDocumentFile:
+      $ref: ./components/schemas/agents/AgentDocumentFile.yaml
+    AgentDocument:
+      $ref: ./components/schemas/agents/AgentDocument.yaml
+    AgentDocumentList:
+      $ref: ./components/schemas/agents/AgentDocumentList.yaml
+    AgentDocumentPage:
+      $ref: ./components/schemas/agents/AgentDocumentPage.yaml
+    AgentDocumentSubmit:
+      $ref: ./components/schemas/agents/AgentDocumentSubmit.yaml
+    AgentDocumentReview:
+      $ref: ./components/schemas/agents/AgentDocumentReview.yaml
+    AgentUpload:
+      $ref: ./components/schemas/agents/AgentUpload.yaml
+    TaskProofUpload:
+      $ref: ./components/schemas/agents/TaskProofUpload.yaml
+    AgentInvite:
+      $ref: ./components/schemas/agents/AgentInvite.yaml
+    AgentSelfJoin:
+      $ref: ./components/schemas/agents/AgentSelfJoin.yaml
+    AgentUpdate:
+      $ref: ./components/schemas/agents/AgentUpdate.yaml
+    AgentStatusReason:
+      $ref: ./components/schemas/agents/AgentStatusReason.yaml
+    AgentReinstatement:
+      $ref: ./components/schemas/agents/AgentReinstatement.yaml
+    AgentInvitationState:
+      $ref: ./components/schemas/agents/AgentInvitationState.yaml
+    TaskStop:
+      $ref: ./components/schemas/agents/TaskStop.yaml
+    AgentTaskBrief:
+      $ref: ./components/schemas/agents/AgentTaskBrief.yaml
+    AgentStatusChange:
+      $ref: ./components/schemas/agents/AgentStatusChange.yaml
+    AgentCounts:
+      $ref: ./components/schemas/agents/AgentCounts.yaml
+    PartnerAgent:
+      $ref: ./components/schemas/agents/PartnerAgent.yaml
+    PartnerAgentPage:
+      $ref: ./components/schemas/agents/PartnerAgentPage.yaml
+    DutyClosure:
+      $ref: ./components/schemas/agents/DutyClosure.yaml
+    AgentDuty:
+      $ref: ./components/schemas/agents/AgentDuty.yaml
+    AgentDutyUpdate:
+      $ref: ./components/schemas/agents/AgentDutyUpdate.yaml
+    DutyZone:
+      $ref: ./components/schemas/agents/DutyZone.yaml
+    DutyZoneList:
+      $ref: ./components/schemas/agents/DutyZoneList.yaml
+    AgentPositionReport:
+      $ref: ./components/schemas/agents/AgentPositionReport.yaml
+    AgentPositionBatch:
+      $ref: ./components/schemas/agents/AgentPositionBatch.yaml
+    AgentPositionsAccepted:
+      $ref: ./components/schemas/agents/AgentPositionsAccepted.yaml
+    AgentMembership:
+      $ref: ./components/schemas/agents/AgentMembership.yaml
+    AgentMembershipList:
+      $ref: ./components/schemas/agents/AgentMembershipList.yaml
+    AgentWorkingChoice:
+      $ref: ./components/schemas/agents/AgentWorkingChoice.yaml
+    AgentInvitation:
+      $ref: ./components/schemas/agents/AgentInvitation.yaml
+    AgentInvitationList:
+      $ref: ./components/schemas/agents/AgentInvitationList.yaml
+    CarriedLine:
+      $ref: ./components/schemas/agents/CarriedLine.yaml
+    TaskCustomer:
+      $ref: ./components/schemas/agents/TaskCustomer.yaml
+    WorkflowStep:
+      $ref: ./components/schemas/agents/WorkflowStep.yaml
+    EarningLine:
+      $ref: ./components/schemas/agents/EarningLine.yaml
+    PayQuote:
+      $ref: ./components/schemas/agents/PayQuote.yaml
+    AgentTask:
+      $ref: ./components/schemas/agents/AgentTask.yaml
+    AgentTaskList:
+      $ref: ./components/schemas/agents/AgentTaskList.yaml
+    AgentTaskPage:
+      $ref: ./components/schemas/agents/AgentTaskPage.yaml
+    TaskStepRecord:
+      $ref: ./components/schemas/agents/TaskStepRecord.yaml
+    TaskStepOutcome:
+      $ref: ./components/schemas/agents/TaskStepOutcome.yaml
+    TaskStepResult:
+      $ref: ./components/schemas/agents/TaskStepResult.yaml
+    TaskHandBack:
+      $ref: ./components/schemas/agents/TaskHandBack.yaml
+    TaskHelpRequest:
+      $ref: ./components/schemas/agents/TaskHelpRequest.yaml
+    TaskHelp:
+      $ref: ./components/schemas/agents/TaskHelp.yaml
+    ProofItem:
+      $ref: ./components/schemas/agents/ProofItem.yaml
+    ProofOfDelivery:
+      $ref: ./components/schemas/agents/ProofOfDelivery.yaml
+    TaskEarning:
+      $ref: ./components/schemas/agents/TaskEarning.yaml
+    AgentDay:
+      $ref: ./components/schemas/agents/AgentDay.yaml
+    CashCollection:
+      $ref: ./components/schemas/agents/CashCollection.yaml
+    CashInHand:
+      $ref: ./components/schemas/agents/CashInHand.yaml
+    PayRule:
+      $ref: ./components/schemas/agents/PayRule.yaml
+    PayRuleList:
+      $ref: ./components/schemas/agents/PayRuleList.yaml
+    PayRulePublish:
+      $ref: ./components/schemas/agents/PayRulePublish.yaml
+    AgentTeam:
+      $ref: ./components/schemas/agents/AgentTeam.yaml
+    AgentTeamList:
+      $ref: ./components/schemas/agents/AgentTeamList.yaml
+    WorkflowTemplateStep:
+      $ref: ./components/schemas/agents/WorkflowTemplateStep.yaml
+    WorkflowTemplate:
+      $ref: ./components/schemas/agents/WorkflowTemplate.yaml
+    AgentServiceSettings:
+      $ref: ./components/schemas/agents/AgentServiceSettings.yaml
+    AgentServiceSettingsUpdate:
+      $ref: ./components/schemas/agents/AgentServiceSettingsUpdate.yaml
+    # Agents
+    AgentDocumentRequirement:
+      $ref: ./components/schemas/agents/AgentDocumentRequirement.yaml
     # Events
     Event:
       $ref: ./components/schemas/events/Event.yaml

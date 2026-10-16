@@ -1,0 +1,76 @@
+type: object
+description: An invitation in progress for the person's verified mobile number or email, as the Agent app lists it.
+required:
+  - id
+  - partner_id
+  - partner_name
+  - service_id
+  - service_name
+  - display_name
+  - kind
+  - channel
+  - invited_at
+  - expires_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The invitation.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  partner_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  service_name:
+    type: string
+    description: Its name.
+    examples:
+      - Delivery
+  display_name:
+    type: string
+    description: The name the Partner invited them under.
+    examples:
+      - Ravi Kumar
+  kind:
+    $ref: ./AgentKind.yaml
+    description: The kind they are invited as.
+  channel:
+    $ref: ./AgentContactChannel.yaml
+    description: How they were told.
+  invited_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-16T09:00:00Z
+  expires_at:
+    type: string
+    format: date-time
+    description: When it lapses.
+    examples:
+      - 2026-10-30T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    partner_name: Dev Kitchen
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    service_name: Delivery
+    display_name: Ravi Kumar
+    kind: two_wheeler
+    channel: phone
+    invited_at: 2026-10-16T09:00:00Z
+    expires_at: 2026-10-30T09:00:00Z

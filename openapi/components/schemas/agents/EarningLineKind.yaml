@@ -1,0 +1,11 @@
+type: string
+description: "A line of an Agent's pay: the base for a `pickup` or a `drop_off`, the `distance` at the rule's amount per kilometre, `waiting` beyond the free minutes at a pickup, the amount for a task `call_off` after the Agent started towards it, and the `tip` in full."
+enum:
+  - pickup
+  - drop_off
+  - distance
+  - waiting
+  - call_off
+  - tip
+examples:
+  - distance

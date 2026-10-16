@@ -1,0 +1,28 @@
+type: object
+description: "What became of a batch: applied while on duty, dropped and never kept otherwise."
+required:
+  - accepted
+  - dropped
+  - on_duty
+properties:
+  accepted:
+    type: integer
+    format: int32
+    description: Positions applied.
+    examples:
+      - 3
+  dropped:
+    type: integer
+    format: int32
+    description: Positions dropped because the Agent is off duty.
+    examples:
+      - 0
+  on_duty:
+    type: boolean
+    description: Whether the Agent is on duty; an app off duty stops reporting.
+    examples:
+      - true
+examples:
+  - accepted: 3
+    dropped: 0
+    on_duty: true

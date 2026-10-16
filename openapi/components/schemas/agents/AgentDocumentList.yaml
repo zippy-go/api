@@ -1,0 +1,81 @@
+type: object
+description: An Agent membership's documents, newest first, with what the membership needs.
+required:
+  - items
+  - requirements
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentDocument.yaml
+    description: Every document filed, newest first.
+    examples:
+      - - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+          agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+          agent_display_name: Ravi Kumar
+          partner_name: Dev Kitchen
+          kind: driving_licence
+          identity_type: null
+          number: TS0920230001234
+          expires_on: 2030-04-30
+          verified_on: null
+          files:
+            - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+              file_name: licence-front.jpg
+              content_type: image/jpeg
+              size_bytes: 482113
+          status: under_review
+          rejection_reason: null
+          submitted_at: 2026-10-16T09:00:00Z
+          reviewed_at: null
+          reviewed_by: null
+          reviewer_name: null
+          version: 1
+  requirements:
+    type: array
+    items:
+      $ref: ./AgentDocumentRequirement.yaml
+    description: Each document the membership needs and where it stands.
+    examples:
+      - - kind: driving_licence
+          required: true
+          reason: Two-wheelers and vans need a driving licence.
+          status: approved
+          document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+          expires_on: 2030-04-30
+          satisfied: true
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+        agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        agent_display_name: Ravi Kumar
+        partner_name: Dev Kitchen
+        kind: driving_licence
+        identity_type: null
+        number: TS0920230001234
+        expires_on: 2030-04-30
+        verified_on: null
+        files:
+          - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+            file_name: licence-front.jpg
+            content_type: image/jpeg
+            size_bytes: 482113
+        status: under_review
+        rejection_reason: null
+        submitted_at: 2026-10-16T09:00:00Z
+        reviewed_at: null
+        reviewed_by: null
+        reviewer_name: null
+        version: 1
+    requirements:
+      - kind: driving_licence
+        required: true
+        reason: Two-wheelers and vans need a driving licence.
+        status: approved
+        document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+        expires_on: 2030-04-30
+        satisfied: true

@@ -1,0 +1,115 @@
+type: object
+description: Every Agent membership of the person that is not offboarded, and the one they work under.
+required:
+  - items
+  - working_agent_id
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentMembership.yaml
+    description: The memberships, the working one first.
+    examples:
+      - - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          partner_name: Dev Kitchen
+          service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+          service_name: Delivery
+          display_name: Ravi Kumar
+          kind: two_wheeler
+          status: active
+          status_reason: null
+          joined_at: 2026-10-16T09:00:00Z
+          activated_at: 2026-10-16T09:00:00Z
+          working: true
+          documents:
+            - kind: driving_licence
+              required: true
+              reason: Two-wheelers and vans need a driving licence.
+              status: approved
+              document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+              expires_on: 2030-04-30
+              satisfied: true
+          duty:
+            agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+            on_duty: true
+            stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+            zone:
+              id: 01a13a48-9e00-7000-8000-00000000a011
+              name: Gachibowli
+            started_at: 2026-10-16T09:00:00Z
+            last_heard_at: 2026-10-16T09:00:00Z
+            unscheduled: true
+            can_go_on_duty: true
+            blockers: []
+            closed_for_silence:
+              stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+              ended_at: 2026-10-16T22:10:00Z
+              zone:
+                id: 01a13a48-9e00-7000-8000-00000000a011
+                name: Gachibowli
+          tasks_under_way: 0
+          cash_in_hand:
+            minor_units: 0
+            currency: INR
+          cash_ceiling:
+            minor_units: 500000
+            currency: INR
+          pay_rule_version: 1
+  working_agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The membership the person works under: the one on duty, else the one last chosen, else the first active one."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        partner_name: Dev Kitchen
+        service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        service_name: Delivery
+        display_name: Ravi Kumar
+        kind: two_wheeler
+        status: active
+        status_reason: null
+        joined_at: 2026-10-16T09:00:00Z
+        activated_at: 2026-10-16T09:00:00Z
+        working: true
+        documents:
+          - kind: driving_licence
+            required: true
+            reason: Two-wheelers and vans need a driving licence.
+            status: approved
+            document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+            expires_on: 2030-04-30
+            satisfied: true
+        duty:
+          agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          on_duty: true
+          stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+          zone:
+            id: 01a13a48-9e00-7000-8000-00000000a011
+            name: Gachibowli
+          started_at: 2026-10-16T09:00:00Z
+          last_heard_at: 2026-10-16T09:00:00Z
+          unscheduled: true
+          can_go_on_duty: true
+          blockers: []
+          closed_for_silence:
+            stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+            ended_at: 2026-10-16T22:10:00Z
+            zone:
+              id: 01a13a48-9e00-7000-8000-00000000a011
+              name: Gachibowli
+        tasks_under_way: 0
+        cash_in_hand:
+          minor_units: 0
+          currency: INR
+        cash_ceiling:
+          minor_units: 500000
+          currency: INR
+        pay_rule_version: 1
+    working_agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10

@@ -861,6 +861,134 @@ errors:
       what arrived before it has, cancelling once it is complete, or any
       help on an order never placed."
 
+  - code: service_not_agent_based
+    status: 409
+    title: Service does not send people out
+    message: The service {service} does not send people out, so it has no Agents.
+    retryable: false
+    description: >-
+      An Agent was invited into, or read for, a service that is not
+      agent-based (a product-sales service). Agents join delivery services;
+      field services take Agents with bookings in a later step.
+
+  - code: kind_not_allowed
+    status: 409
+    title: Kind not allowed
+    message: The service does not run the vehicle a {kind} Agent needs; it takes {kinds}.
+    retryable: false
+    description: >-
+      The kind of Agent named needs a vehicle the delivery service does not
+      run: a walker is always taken, a bicycle needs the vehicle type
+      `bicycle`, a two-wheeler `two_wheeler`, a van `four_wheeler`; a service
+      naming no vehicle types takes every kind.
+
+  - code: agent_already_member
+    status: 409
+    title: Already an Agent of the service
+    message: The person already holds a membership or an invitation in progress in this service.
+    retryable: false
+    description: >-
+      The mobile number or email invited, or the person accepting or
+      joining, already holds a membership in the service that is not
+      offboarded, or an invitation in progress for it.
+
+  - code: duty_refused
+    status: 409
+    title: Duty refused
+    message: "You cannot go on duty: {reason}"
+    retryable: false
+    description: >-
+      Going on duty, or choosing the membership to work under, was refused.
+      The `detail` says why in words, and the `errors` member names each
+      reason with a field-level code.
+    details:
+      - code: duty_not_active
+        message: The membership is not active.
+        description: The membership is pending, suspended or offboarded; only an active membership goes on duty.
+      - code: duty_document_expired
+        message: A required document has expired.
+        description: A document the membership needs passed its expiry date on the India calendar; a driving licence stops duty at once.
+      - code: duty_elsewhere
+        message: You are on duty for another service.
+        description: The person is on duty in another of their memberships; they go off duty there first.
+
+  - code: tasks_under_way
+    status: 409
+    title: Deliveries under way
+    message: "{count} delivery or deliveries are under way."
+    retryable: false
+    description: >-
+      Going off duty was refused while a delivery is under way; complete it,
+      or ask the dispatcher to take it back, first.
+
+  - code: task_closed
+    status: 409
+    title: Task closed
+    message: "This task ended: {what}."
+    retryable: false
+    description: >-
+      A step, a receipt or a hand-back arrived for a task that was given to
+      somebody else, called off, handed back or returned (a membership
+      suspended or offboarded, a duty closed). The `detail` says what
+      happened and when, so the Agent app can tell the Agent.
+
+  - code: step_required
+    status: 409
+    title: Step required
+    message: "Do this first: {steps}."
+    retryable: false
+    description: >-
+      A step came before the steps it needs: a drop before its pickup is
+      complete, arrival before starting, completion without a required
+      step or the proof the task asks for. The `detail` names what is
+      missing.
+
+  - code: outside_geofence
+    status: 409
+    title: Not at the stop
+    message: You are {distance} m from the stop; arrive within {radius} m or give a reason.
+    retryable: false
+    description: >-
+      Arrival was recorded farther from the stop than its geofence (100 m by
+      default). Send the arrival again with an `override_reason`, which is
+      kept on the task and counted.
+
+  - code: scan_mismatch
+    status: 409
+    title: Scan does not match
+    message: The scanned number is not this order's.
+    retryable: false
+    description: >-
+      The number scanned or typed at the pickup is not the order's number
+      on its label.
+
+  - code: code_wrong
+    status: 409
+    title: Wrong code
+    message: That is not the customer's code; {attempts} attempt(s) left.
+    retryable: false
+    description: >-
+      The 4-digit code entered at the drop is not the customer's. Five wrong
+      codes lock the code; the Agent is then told to call the customer.
+
+  - code: code_locked
+    status: 409
+    title: Code locked
+    message: Five wrong codes were entered; call the customer.
+    retryable: false
+    description: >-
+      Five wrong codes were entered for the drop. The code is no longer
+      checked; call the customer, or fail the drop with a reason.
+
+  - code: hand_back_closed
+    status: 409
+    title: Cannot hand back
+    message: This task can no longer be handed back.
+    retryable: false
+    description: >-
+      Only a delivery given directly may be handed back, within 60 seconds
+      of the app receiving it and before starting towards the store.
+
   - code: idempotency_key_reuse
     status: 409
     title: Idempotency key reused

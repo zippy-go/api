@@ -1,0 +1,113 @@
+type: object
+description: "How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates."
+required:
+  - service_id
+  - partner_id
+  - geofence_metres
+  - drop_code_required
+  - signature_required
+  - police_verification_required
+  - cash_ceiling
+  - task_limit
+  - templates
+  - version
+  - updated_at
+  - updated_by
+properties:
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  geofence_metres:
+    type: integer
+    format: int32
+    description: How near a stop an Agent must be to arrive without an override, 50 to 500.
+    examples:
+      - 100
+  drop_code_required:
+    type: boolean
+    description: Whether a drop asks for the customer's 4-digit code.
+    examples:
+      - false
+  signature_required:
+    type: boolean
+    description: Whether a drop asks for a signature.
+    examples:
+      - false
+  police_verification_required:
+    type: boolean
+    description: Whether the membership needs police verification.
+    examples:
+      - false
+  cash_ceiling:
+    $ref: ../common/Money.yaml
+    description: Cash in hand beyond which no task collecting cash is offered.
+  task_limit:
+    type: integer
+    format: int32
+    description: Deliveries an Agent carries at once, the service's `max_concurrent_tasks`.
+    examples:
+      - 3
+  templates:
+    type: array
+    items:
+      $ref: ./WorkflowTemplate.yaml
+    description: The workflow of each kind of stop.
+    examples:
+      - - kind: pickup
+          steps:
+            - kind: arrive
+              required: true
+          failure_reasons:
+            - Customer not reachable
+            - Address not found
+            - Customer refused
+  version:
+    type: integer
+    format: int64
+    description: Raised by one on every change; 1 while the defaults stand.
+    examples:
+      - 1
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When last changed.
+  updated_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who last changed it.
+examples:
+  - service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    geofence_metres: 100
+    drop_code_required: false
+    signature_required: false
+    police_verification_required: false
+    cash_ceiling:
+      minor_units: 500000
+      currency: INR
+    task_limit: 3
+    templates:
+      - kind: pickup
+        steps:
+          - kind: arrive
+            required: true
+        failure_reasons:
+          - Customer not reachable
+          - Address not found
+          - Customer refused
+    version: 1
+    updated_at: null
+    updated_by: null

@@ -1,0 +1,10 @@
+type: string
+description: "Where a document stands: `uploaded` while its file is filed and not yet confirmed, `under_review` waiting for a reviewer, `approved`, `rejected` with a reason the Agent reads, `expired` once its expiry date has passed on the India calendar."
+enum:
+  - uploaded
+  - under_review
+  - approved
+  - rejected
+  - expired
+examples:
+  - under_review

@@ -1,0 +1,18 @@
+type: object
+description: The owner of an individual Partner joins their own delivery service as its Agent, with no invitation; the membership is pending its documents.
+required:
+  - service_id
+  - kind
+properties:
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  kind:
+    $ref: ./AgentKind.yaml
+    description: What they move with.
+examples:
+  - service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    kind: two_wheeler

@@ -30,4 +30,8 @@ examples:
           speed_mps: 4.2
         service_kind: delivery
         status: online
+        kind: two_wheeler
+        on_duty: true
+        zone_id: 01a13a48-9e00-7000-8000-00000000a011
+        current_task: null
     channel: private-agents

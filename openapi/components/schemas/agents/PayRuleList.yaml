@@ -1,0 +1,67 @@
+type: object
+description: Every published version of a service's pay rule, newest first.
+required:
+  - items
+  - current_version
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PayRule.yaml
+    description: The versions.
+    examples:
+      - - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+          version: 1
+          pickup:
+            minor_units: 2500
+            currency: INR
+          drop_off:
+            minor_units: 3000
+            currency: INR
+          per_km:
+            minor_units: 600
+            currency: INR
+          waiting_per_minute:
+            minor_units: 100
+            currency: INR
+          waiting_free_minutes: 10
+          call_off:
+            minor_units: 2000
+            currency: INR
+          note: null
+          published_at: 2026-10-16T09:00:00Z
+          published_by: null
+  current_version:
+    type: integer
+    format: int32
+    description: The version in force for new offers.
+    examples:
+      - 1
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        version: 1
+        pickup:
+          minor_units: 2500
+          currency: INR
+        drop_off:
+          minor_units: 3000
+          currency: INR
+        per_km:
+          minor_units: 600
+          currency: INR
+        waiting_per_minute:
+          minor_units: 100
+          currency: INR
+        waiting_free_minutes: 10
+        call_off:
+          minor_units: 2000
+          currency: INR
+        note: null
+        published_at: 2026-10-16T09:00:00Z
+        published_by: null
+    current_version: 1

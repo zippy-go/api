@@ -1,0 +1,14 @@
+type: object
+description: Asks for help on a task in the Agent's words; the Partner's dispatcher and Mission Control see it on the delivery.
+required:
+  - message
+properties:
+  message:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: What is wrong, 1 to 500 characters.
+    examples:
+      - Store refused to hand over the order
+examples:
+  - message: Store refused to hand over the order

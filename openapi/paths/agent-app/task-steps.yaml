@@ -1,0 +1,74 @@
+# Path item for /v1/agent/tasks/{task_id}/steps. Referenced from openapi.yaml.
+parameters:
+  - name: task_id
+    in: path
+    required: true
+    description: "The task: one stop of a trip, held by the Agent."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+post:
+  operationId: recordTaskStep
+  summary: Record a step of a task
+  description: "Applies one step recorded in the app, in the order the app recorded them, each once however often it is sent: a repeat of a client id answers what the first did, refusals included. The task moves only forward: navigate starts towards the stop; arrive is accepted within the stop's geofence (100 m by default) or with an override and its reason, which is kept and counted; a scan is the order label's number, typed when no camera is available; a code is the customer's 4 digits, refused when wrong, five times, then the Agent is told to call the customer; cash records the amount collected; complete needs every required step, the proof a drop asks for among them, and counts at its recorded time; fail takes a reason from the task's list. The next stop of the trip comes first: a drop waits for its pickup. A step for a task given to somebody else, called off or returned while the app was offline is refused saying what happened. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The step.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/TaskStepRecord.yaml
+  responses:
+    "200":
+      description: The step, applied, and the task after it.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/TaskStepResult.yaml
+    "400":
+      description: "`validation_failed`: a member the step needs is missing or malformed (a value for a scan or a code, a file for a photo or a signature, an amount for cash, a reason to fail that is not on the task's list)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such task of the caller's memberships."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`task_closed` (the task was given to somebody else, called off or returned, with when and why), `step_required` (an earlier step or the proof the task needs is missing, named), `outside_geofence` (with the distance; send it again with an override reason), `scan_mismatch`, `code_wrong` (with the attempts left), `code_locked` (five wrong codes: call the customer), `asset_not_usable` (the file has not arrived in the store yet)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

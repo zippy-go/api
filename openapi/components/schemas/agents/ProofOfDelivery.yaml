@@ -1,0 +1,96 @@
+type: object
+description: "The proof kept on a delivery's drop: what was recorded at the door, readable by the customer of the order, the Partner and Mission Control for 365 days, never deleted or replaced after the task completed."
+required:
+  - order_id
+  - order_number
+  - delivery_id
+  - task_id
+  - status
+  - delivered_at
+  - agent_first_name
+  - items
+  - keep_until
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: Its number.
+    examples:
+      - AB1234
+  delivery_id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  task_id:
+    type: string
+    format: uuid
+    description: The drop task.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  status:
+    $ref: ./TaskStatus.yaml
+    description: Where the drop stands.
+  delivered_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the drop completed, as recorded on the device.
+    examples:
+      - 2026-10-16T09:42:00Z
+  agent_first_name:
+    type: string
+    description: The Agent's first name.
+    examples:
+      - Ravi
+  items:
+    type: array
+    items:
+      $ref: ./ProofItem.yaml
+    description: The proof, in the order it was recorded.
+    examples:
+      - - kind: photo
+          asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+          scanned: null
+          matched: true
+          recorded_at: 2026-10-16T09:42:00Z
+          position:
+            lat: 17.4401
+            lng: 78.3489
+          link:
+            expires_at: 2026-10-15T09:00:00Z
+            url: example
+  keep_until:
+    type: string
+    format: date
+    description: Until when it is kept.
+    examples:
+      - 2027-10-16
+examples:
+  - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB1234
+    delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    status: completed
+    delivered_at: 2026-10-16T09:42:00Z
+    agent_first_name: Ravi
+    items:
+      - kind: photo
+        asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+        scanned: null
+        matched: true
+        recorded_at: 2026-10-16T09:42:00Z
+        position:
+          lat: 17.4401
+          lng: 78.3489
+        link:
+          expires_at: 2026-10-15T09:00:00Z
+          url: example
+    keep_until: 2027-10-16

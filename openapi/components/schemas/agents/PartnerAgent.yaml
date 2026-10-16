@@ -1,0 +1,307 @@
+type: object
+description: "An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand."
+required:
+  - id
+  - partner_id
+  - partner_name
+  - service_id
+  - service_name
+  - display_name
+  - kind
+  - status
+  - status_reason
+  - status_changed_at
+  - user_id
+  - phone
+  - email
+  - invitation
+  - joined_at
+  - activated_at
+  - presence
+  - on_duty
+  - duty_zone
+  - last_seen_at
+  - position
+  - current_task
+  - tasks_under_way
+  - cash_in_hand
+  - team_id
+  - documents
+  - blockers
+  - geofence_overrides
+  - created_at
+  - updated_at
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  partner_name:
+    type:
+      - string
+      - "null"
+    description: The Partner's name.
+    examples:
+      - Dev Kitchen
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  service_name:
+    type: string
+    description: Its name.
+    examples:
+      - Delivery
+  display_name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  kind:
+    $ref: ./AgentKind.yaml
+    description: What the Agent moves with.
+  status:
+    $ref: ./AgentMembershipStatus.yaml
+    description: Where the membership stands.
+  status_reason:
+    type:
+      - string
+      - "null"
+    description: Why it is suspended or offboarded.
+  status_changed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the status last changed.
+    examples:
+      - 2026-10-16T09:00:00Z
+  user_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The person, once they joined.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  phone:
+    type:
+      - string
+      - "null"
+    description: Their mobile number, E.164.
+    examples:
+      - "+919876543210"
+  email:
+    type:
+      - string
+      - "null"
+    description: Their email.
+  invitation:
+    oneOf:
+      - $ref: ./AgentInvitationState.yaml
+      - type: "null"
+    description: The invitation, while it is in progress.
+  joined_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When they accepted.
+    examples:
+      - 2026-10-16T09:00:00Z
+  activated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the membership first became active.
+    examples:
+      - 2026-10-16T09:00:00Z
+  presence:
+    $ref: ../fleet/AgentStatus.yaml
+    description: Online (on duty and heard from within 60 seconds), busy (online with a task under way) or offline.
+  on_duty:
+    type: boolean
+    description: Whether a duty stretch is open.
+    examples:
+      - true
+  duty_zone:
+    oneOf:
+      - $ref: ./ZoneRef.yaml
+      - type: "null"
+    description: The zone the Agent works while on duty.
+  last_seen_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent's app was last heard from.
+    examples:
+      - 2026-10-16T09:00:00Z
+  position:
+    oneOf:
+      - $ref: ../fleet/AgentPosition.yaml
+      - type: "null"
+    description: The last position, kept 6 hours, with when it was recorded on the device.
+  current_task:
+    oneOf:
+      - $ref: ./AgentTaskBrief.yaml
+      - type: "null"
+    description: The task under way, the next stop first.
+  tasks_under_way:
+    type: integer
+    format: int32
+    description: Deliveries under way; a pickup and its drop count once.
+    examples:
+      - 1
+  cash_in_hand:
+    $ref: ../common/Money.yaml
+    description: Cash collected and not yet settled.
+  team_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The team; every Agent is in the service's default team.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+  documents:
+    type: array
+    items:
+      $ref: ./AgentDocumentRequirement.yaml
+    description: The documents the membership needs and where each stands.
+    examples:
+      - - kind: driving_licence
+          required: true
+          reason: Two-wheelers and vans need a driving licence.
+          status: approved
+          document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+          expires_on: 2030-04-30
+          satisfied: true
+  blockers:
+    type: array
+    items:
+      $ref: ./AgentBlocker.yaml
+    description: What stops activation (while pending) or going on duty (while active); empty when nothing does.
+    examples:
+      - []
+  geofence_overrides:
+    type: integer
+    format: int32
+    description: Arrivals recorded from outside a stop's geofence with a reason.
+    examples:
+      - 0
+  history:
+    type: array
+    items:
+      $ref: ./AgentStatusChange.yaml
+    description: Every change of status, newest first; read of one Agent only.
+    examples:
+      - - status: active
+          previous_status: pending
+          reason: null
+          by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+          by_name: Asha Rao
+          at: 2026-10-16T09:00:00Z
+  created_at:
+    type: string
+    format: date-time
+    description: When the membership (or its invitation) was made.
+    examples:
+      - 2026-10-16T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-16T09:00:00Z
+  version:
+    type: integer
+    format: int64
+    description: Raised by one on every change.
+    examples:
+      - 3
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    partner_name: Dev Kitchen
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    service_name: Delivery
+    display_name: Ravi Kumar
+    kind: two_wheeler
+    status: active
+    status_reason: null
+    status_changed_at: 2026-10-16T09:00:00Z
+    user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    phone: "+919876543210"
+    email: null
+    invitation:
+      channel: phone
+      sent_at: 2026-10-16T09:00:00Z
+      expires_at: 2026-10-30T09:00:00Z
+      expired: false
+      invited_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    joined_at: 2026-10-16T09:00:00Z
+    activated_at: 2026-10-16T09:00:00Z
+    presence: online
+    on_duty: true
+    duty_zone:
+      id: 01a13a48-9e00-7000-8000-00000000a011
+      name: Gachibowli
+    last_seen_at: 2026-10-16T09:00:00Z
+    position:
+      lat: 12.9716
+      lng: 77.5946
+      heading_deg: 270.5
+      speed_mps: 4.2
+      recorded_at: 2026-10-14T08:00:00Z
+    current_task:
+      task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+      delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+      order_number: AB1234
+      kind: pickup
+      status: on_the_way
+      heading_to:
+        name: Dev Kitchen Gachibowli
+        address: Plot 12, DLF Cyber City, Gachibowli, 500032
+        point:
+          lat: 17.4401
+          lng: 78.3489
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        geofence_metres: 100
+    tasks_under_way: 1
+    cash_in_hand:
+      minor_units: 48000
+      currency: INR
+    team_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+    documents:
+      - kind: driving_licence
+        required: true
+        reason: Two-wheelers and vans need a driving licence.
+        status: approved
+        document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+        expires_on: 2030-04-30
+        satisfied: true
+    blockers: []
+    geofence_overrides: 0
+    history:
+      - status: active
+        previous_status: pending
+        reason: null
+        by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        by_name: Asha Rao
+        at: 2026-10-16T09:00:00Z
+    created_at: 2026-10-16T09:00:00Z
+    updated_at: 2026-10-16T09:00:00Z
+    version: 3

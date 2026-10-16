@@ -1,0 +1,97 @@
+type: object
+description: "An Agent's day on the India calendar: each task's pay with its breakdown, the tips, the total and the cash in hand now."
+required:
+  - agent_id
+  - date
+  - time_zone
+  - tasks
+  - deliveries
+  - tips
+  - total
+  - cash_in_hand
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-10-16
+  time_zone:
+    type: string
+    description: The calendar the day is read on.
+    examples:
+      - Asia/Kolkata
+  tasks:
+    type: array
+    items:
+      $ref: ./TaskEarning.yaml
+    description: Each task that earned, in order.
+    examples:
+      - - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+          delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+          order_number: AB1234
+          kind: drop_off
+          outcome: completed
+          rule_version: 3
+          lines:
+            - kind: distance
+              label: 3.2 km at ₹6.00 per km
+              amount:
+                minor_units: 1920
+                currency: INR
+          total:
+            minor_units: 7160
+            currency: INR
+          earned_at: 2026-10-16T09:42:00Z
+  deliveries:
+    type: integer
+    format: int32
+    description: Drops completed.
+    examples:
+      - 1
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips, in full.
+  total:
+    $ref: ../common/Money.yaml
+    description: Everything earned, tips included.
+  cash_in_hand:
+    $ref: ../common/Money.yaml
+    description: Cash collected and not yet settled, now.
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    date: 2026-10-16
+    time_zone: Asia/Kolkata
+    tasks:
+      - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+        delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+        order_number: AB1234
+        kind: drop_off
+        outcome: completed
+        rule_version: 3
+        lines:
+          - kind: distance
+            label: 3.2 km at ₹6.00 per km
+            amount:
+              minor_units: 1920
+              currency: INR
+        total:
+          minor_units: 7160
+          currency: INR
+        earned_at: 2026-10-16T09:42:00Z
+    deliveries: 1
+    tips:
+      minor_units: 2000
+      currency: INR
+    total:
+      minor_units: 9660
+      currency: INR
+    cash_in_hand:
+      minor_units: 0
+      currency: INR

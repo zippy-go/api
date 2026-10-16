@@ -1,0 +1,62 @@
+# Path item for /v1/partners/{partner_id}/agents/{agent_id}/invitation. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+post:
+  operationId: resendAgentInvitation
+  summary: Send an invitation again
+  description: Sends an invitation in progress again by the same channel and gives it 14 more days. Every change of status is recorded with who, when and why, and in the audit log. Members need `agent:manage` for the service; Mission Control manages the platform fleet, and any Partner's Agents, with the same route and its platform permissions, every change written to the audit log.
+  tags:
+    - Agents
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The Agent after the change.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/PartnerAgent.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` naming the permission the member lacks at the service, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Partner, the Agent or the service is not one the caller can see; another Partner's Agent answers the same."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`illegal_transition` when the person already accepted or the invitation was withdrawn."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

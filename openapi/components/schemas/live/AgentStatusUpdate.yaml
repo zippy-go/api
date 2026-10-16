@@ -1,5 +1,5 @@
 type: object
-description: The data of a `status` frame on `GET /v1/live/agents`, sent when an agent goes online or offline.
+description: The data of a `status` frame on `GET /v1/live/agents`, sent when an agent goes online, busy or offline, and when its task changes.
 required:
   - agent_id
   - status
@@ -22,6 +22,11 @@ properties:
     description: When the agent was last heard from, as an RFC 3339 timestamp in UTC, or `null` if never.
     examples:
       - 2026-10-14T08:00:00Z
+  current_task:
+    oneOf:
+      - $ref: ../agents/AgentTaskBrief.yaml
+      - type: 'null'
+    description: The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
 examples:
   - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
     status: offline

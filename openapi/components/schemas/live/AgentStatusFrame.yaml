@@ -23,6 +23,11 @@ properties:
   status:
     $ref: ../fleet/AgentStatus.yaml
     description: Its new status.
+  current_task:
+    oneOf:
+      - $ref: ../agents/AgentTaskBrief.yaml
+      - type: 'null'
+    description: The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-00000000a014
     channel: private-agents

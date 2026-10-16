@@ -1,0 +1,41 @@
+type: object
+description: A step as the platform recorded it.
+required:
+  - client_id
+  - kind
+  - recorded_at
+  - received_at
+  - repeated
+properties:
+  client_id:
+    type: string
+    format: uuid
+    description: The app's id for the step.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9ab1
+  kind:
+    $ref: ./TaskStepKind.yaml
+    description: The step.
+  recorded_at:
+    type: string
+    format: date-time
+    description: When it was recorded on the device.
+    examples:
+      - 2026-10-16T09:00:00Z
+  received_at:
+    type: string
+    format: date-time
+    description: When it reached the platform.
+    examples:
+      - 2026-10-16T09:00:00Z
+  repeated:
+    type: boolean
+    description: Whether this answer is of a step sent before.
+    examples:
+      - false
+examples:
+  - client_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9ab1
+    kind: arrive
+    recorded_at: 2026-10-16T09:00:00Z
+    received_at: 2026-10-16T09:00:00Z
+    repeated: false

@@ -1,0 +1,176 @@
+type: object
+description: A page of Agents by name, with the counts of the whole selection.
+required:
+  - items
+  - next_cursor
+  - counts
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PartnerAgent.yaml
+    description: The Agents.
+    examples:
+      - - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          partner_name: Dev Kitchen
+          service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+          service_name: Delivery
+          display_name: Ravi Kumar
+          kind: two_wheeler
+          status: active
+          status_reason: null
+          status_changed_at: 2026-10-16T09:00:00Z
+          user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+          phone: "+919876543210"
+          email: null
+          invitation:
+            channel: phone
+            sent_at: 2026-10-16T09:00:00Z
+            expires_at: 2026-10-30T09:00:00Z
+            expired: false
+            invited_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+          joined_at: 2026-10-16T09:00:00Z
+          activated_at: 2026-10-16T09:00:00Z
+          presence: online
+          on_duty: true
+          duty_zone:
+            id: 01a13a48-9e00-7000-8000-00000000a011
+            name: Gachibowli
+          last_seen_at: 2026-10-16T09:00:00Z
+          position:
+            lat: 12.9716
+            lng: 77.5946
+            heading_deg: 270.5
+            speed_mps: 4.2
+            recorded_at: 2026-10-14T08:00:00Z
+          current_task:
+            task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+            delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+            order_number: AB1234
+            kind: pickup
+            status: on_the_way
+            heading_to:
+              name: Dev Kitchen Gachibowli
+              address: Plot 12, DLF Cyber City, Gachibowli, 500032
+              point:
+                lat: 17.4401
+                lng: 78.3489
+              location_id: 01a13a48-9e00-7000-8000-000000000301
+              geofence_metres: 100
+          tasks_under_way: 1
+          cash_in_hand:
+            minor_units: 48000
+            currency: INR
+          team_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+          documents:
+            - kind: driving_licence
+              required: true
+              reason: Two-wheelers and vans need a driving licence.
+              status: approved
+              document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+              expires_on: 2030-04-30
+              satisfied: true
+          blockers: []
+          geofence_overrides: 0
+          history:
+            - status: active
+              previous_status: pending
+              reason: null
+              by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+              by_name: Asha Rao
+              at: 2026-10-16T09:00:00Z
+          created_at: 2026-10-16T09:00:00Z
+          updated_at: 2026-10-16T09:00:00Z
+          version: 3
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+  counts:
+    $ref: ./AgentCounts.yaml
+    description: How many in each status, and online and busy now, among those the filters select.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        partner_name: Dev Kitchen
+        service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        service_name: Delivery
+        display_name: Ravi Kumar
+        kind: two_wheeler
+        status: active
+        status_reason: null
+        status_changed_at: 2026-10-16T09:00:00Z
+        user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        phone: "+919876543210"
+        email: null
+        invitation:
+          channel: phone
+          sent_at: 2026-10-16T09:00:00Z
+          expires_at: 2026-10-30T09:00:00Z
+          expired: false
+          invited_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        joined_at: 2026-10-16T09:00:00Z
+        activated_at: 2026-10-16T09:00:00Z
+        presence: online
+        on_duty: true
+        duty_zone:
+          id: 01a13a48-9e00-7000-8000-00000000a011
+          name: Gachibowli
+        last_seen_at: 2026-10-16T09:00:00Z
+        position:
+          lat: 12.9716
+          lng: 77.5946
+          heading_deg: 270.5
+          speed_mps: 4.2
+          recorded_at: 2026-10-14T08:00:00Z
+        current_task:
+          task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+          delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+          order_number: AB1234
+          kind: pickup
+          status: on_the_way
+          heading_to:
+            name: Dev Kitchen Gachibowli
+            address: Plot 12, DLF Cyber City, Gachibowli, 500032
+            point:
+              lat: 17.4401
+              lng: 78.3489
+            location_id: 01a13a48-9e00-7000-8000-000000000301
+            geofence_metres: 100
+        tasks_under_way: 1
+        cash_in_hand:
+          minor_units: 48000
+          currency: INR
+        team_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
+        documents:
+          - kind: driving_licence
+            required: true
+            reason: Two-wheelers and vans need a driving licence.
+            status: approved
+            document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+            expires_on: 2030-04-30
+            satisfied: true
+        blockers: []
+        geofence_overrides: 0
+        history:
+          - status: active
+            previous_status: pending
+            reason: null
+            by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+            by_name: Asha Rao
+            at: 2026-10-16T09:00:00Z
+        created_at: 2026-10-16T09:00:00Z
+        updated_at: 2026-10-16T09:00:00Z
+        version: 3
+    next_cursor: null
+    counts:
+      invited: 1
+      pending: 2
+      active: 12
+      suspended: 0
+      offboarded: 3
+      online: 7
+      busy: 4

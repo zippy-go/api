@@ -36,6 +36,153 @@ events:
     payload_schema: ./payloads/fleet.agent.offline.v1.schema.json
     example: ./examples/fleet.agent.offline.v1.json
 
+  - type: fleet.membership.invited
+    version: 1
+    domain: fleet
+    description: A Partner invited a person into one of its delivery services by mobile number or email; the person is told by message how to join. Dispatch ignores it. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.membership.invited.v1.schema.json
+    example: ./examples/fleet.membership.invited.v1.json
+
+  - type: fleet.membership.joined
+    version: 1
+    domain: fleet
+    description: "The person accepted an invitation in the Agent app, or an individual Partner's owner joined their own delivery service: the membership is pending its documents. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.membership.joined.v1.schema.json
+    example: ./examples/fleet.membership.joined.v1.json
+
+  - type: fleet.membership.activated
+    version: 1
+    domain: fleet
+    description: "The Partner (or Mission Control for the platform fleet) activated the membership once its documents were approved: the Agent may go on duty and receive work. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.membership.activated.v1.schema.json
+    example: ./examples/fleet.membership.activated.v1.json
+
+  - type: fleet.membership.suspended
+    version: 1
+    domain: fleet
+    description: "The membership was suspended with a reason the Agent reads, at once: its duty stretch closed, its offers vanish and every task under way was returned, each announced by `fleet.task.returned`. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.membership.suspended.v1.schema.json
+    example: ./examples/fleet.membership.suspended.v1.json
+
+  - type: fleet.membership.reinstated
+    version: 1
+    domain: fleet
+    description: "A suspension was lifted: the membership is active again, or pending when its documents no longer stand. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.membership.reinstated.v1.schema.json
+    example: ./examples/fleet.membership.reinstated.v1.json
+
+  - type: fleet.membership.offboarded
+    version: 1
+    domain: fleet
+    description: The membership ended for good, or an invitation was withdrawn or declined, with a reason; what suspension does, and the person keeps their account. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.membership.offboarded.v1.schema.json
+    example: ./examples/fleet.membership.offboarded.v1.json
+
+  - type: fleet.document.submitted
+    version: 1
+    domain: fleet
+    description: An Agent filed a document with its files; it waits for review by the Partner, or by platform staff for the platform fleet. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.document.submitted.v1.schema.json
+    example: ./examples/fleet.document.submitted.v1.json
+
+  - type: fleet.document.approved
+    version: 1
+    domain: fleet
+    description: A reviewer approved a document; the Agent is told. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.document.approved.v1.schema.json
+    example: ./examples/fleet.document.approved.v1.json
+
+  - type: fleet.document.rejected
+    version: 1
+    domain: fleet
+    description: A reviewer rejected a document with a reason the Agent reads; the Agent is told and may file it again. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.document.rejected.v1.schema.json
+    example: ./examples/fleet.document.rejected.v1.json
+
+  - type: fleet.duty.started
+    version: 1
+    domain: fleet
+    description: "An Agent switched on duty in a zone: a duty stretch opened, and dispatch may offer them work there. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.duty.started.v1.schema.json
+    example: ./examples/fleet.duty.started.v1.json
+
+  - type: fleet.duty.ended
+    version: 1
+    domain: fleet
+    description: "A duty stretch closed: switched off, closed at the last report after 30 minutes with nothing heard, or ended by a suspension or an offboarding. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.duty.ended.v1.schema.json
+    example: ./examples/fleet.duty.ended.v1.json
+
+  - type: fleet.task.assigned
+    version: 1
+    domain: fleet
+    description: "A task of a trip was given to an Agent, as an accepted offer or directly, idempotently by the delivery and its attempt: one event per task (a pickup and a drop). The courier is named on the order only once the app received it. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.assigned.v1.schema.json
+    example: ./examples/fleet.task.assigned.v1.json
+
+  - type: fleet.task.received
+    version: 1
+    domain: fleet
+    description: "The Agent app has the task: the courier is named on the order from now. A direct assignment may be handed back within 60 seconds from now. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.received.v1.schema.json
+    example: ./examples/fleet.task.received.v1.json
+
+  - type: fleet.task.started
+    version: 1
+    domain: fleet
+    description: The Agent started towards the stop. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.started.v1.schema.json
+    example: ./examples/fleet.task.started.v1.json
+
+  - type: fleet.task.arrived
+    version: 1
+    domain: fleet
+    description: The Agent arrived at the stop, within its geofence or with an override and its reason. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.arrived.v1.schema.json
+    example: ./examples/fleet.task.arrived.v1.json
+
+  - type: fleet.task.completed
+    version: 1
+    domain: fleet
+    description: "The stop is complete at the step's recorded time: a pickup collected (the order goes on its way), a drop delivered with its proof (the order is delivered). No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.completed.v1.schema.json
+    example: ./examples/fleet.task.completed.v1.json
+
+  - type: fleet.task.failed
+    version: 1
+    domain: fleet
+    description: The Agent failed the stop with a reason from the template's list; a drop failed leaves the order undelivered for dispatch to handle. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.failed.v1.schema.json
+    example: ./examples/fleet.task.failed.v1.json
+
+  - type: fleet.task.handed_back
+    version: 1
+    domain: fleet
+    description: "The Agent handed a direct assignment back with a reason within its minute: the delivery waits for somebody else. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.handed_back.v1.schema.json
+    example: ./examples/fleet.task.handed_back.v1.json
+
+  - type: fleet.task.returned
+    version: 1
+    domain: fleet
+    description: A task under way went back to the dispatcher because the membership was suspended or offboarded or the duty closed. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.returned.v1.schema.json
+    example: ./examples/fleet.task.returned.v1.json
+
+  - type: fleet.task.called_off
+    version: 1
+    domain: fleet
+    description: Dispatch called the delivery's tasks off with a reason; the Agent was told with a sound. A task called off after the Agent started towards it pays the rule's amount. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.called_off.v1.schema.json
+    example: ./examples/fleet.task.called_off.v1.json
+
+  - type: fleet.task.help_requested
+    version: 1
+    domain: fleet
+    description: The Agent asked for help on a task in their own words; dispatch puts it on the delivery for the Partner's dispatcher and Mission Control. No payload carries a phone number, an email address or a document number.
+    payload_schema: ./payloads/fleet.task.help_requested.v1.schema.json
+    example: ./examples/fleet.task.help_requested.v1.json
+
   - type: identity.user.registered
     version: 1
     domain: identity

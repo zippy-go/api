@@ -1,0 +1,9 @@
+type: string
+description: "A piece of proof kept on a task: the `photo` at the door, a `signature`, the `scan` of the order label, the customer's `code` entered."
+enum:
+  - photo
+  - signature
+  - scan
+  - code
+examples:
+  - photo

@@ -1,0 +1,56 @@
+type: object
+description: One position from the Agent's device.
+required:
+  - lat
+  - lng
+  - recorded_at
+properties:
+  lat:
+    type: number
+    format: double
+    description: Latitude, -90 to 90.
+    examples:
+      - 17.4401
+  lng:
+    type: number
+    format: double
+    description: Longitude, -180 to 180.
+    examples:
+      - 78.3489
+  heading_deg:
+    type:
+      - number
+      - "null"
+    format: double
+    description: Direction of travel in degrees from true north, 0 to 360.
+    examples:
+      - 270.5
+  speed_mps:
+    type:
+      - number
+      - "null"
+    format: double
+    description: Speed in metres per second, at least 0.
+    examples:
+      - 4.2
+  accuracy_m:
+    type:
+      - number
+      - "null"
+    format: double
+    description: The device's accuracy radius in metres, at least 0.
+    examples:
+      - 8
+  recorded_at:
+    type: string
+    format: date-time
+    description: When it was recorded on the device.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - lat: 17.4401
+    lng: 78.3489
+    heading_deg: 270.5
+    speed_mps: 4.2
+    accuracy_m: 8
+    recorded_at: 2026-10-16T09:00:00Z

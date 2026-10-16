@@ -1,0 +1,34 @@
+type: object
+description: A zone an Agent may choose when going on duty.
+required:
+  - id
+  - name
+  - here
+  - in_area
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The zone.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Gachibowli
+  here:
+    type: boolean
+    description: Whether the position given lies in it; offered first.
+    examples:
+      - true
+  in_area:
+    type: boolean
+    description: Whether it is in the service's area, where its deliveries are offered.
+    examples:
+      - true
+examples:
+  - id: 01a13a48-9e00-7000-8000-00000000a011
+    name: Gachibowli
+    here: true
+    in_area: true

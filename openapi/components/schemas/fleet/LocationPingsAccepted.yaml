@@ -9,5 +9,12 @@ properties:
     description: The number of pings accepted for processing. They are applied after the response is sent; agents' positions and the live streams reflect them shortly after.
     examples:
       - 1
+  dropped:
+    type: integer
+    minimum: 0
+    description: The number of pings dropped and never kept because their agent is off duty. Present since contract 0.17.0.
+    examples:
+      - 0
 examples:
   - accepted: 1
+    dropped: 0

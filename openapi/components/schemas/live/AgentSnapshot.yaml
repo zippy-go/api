@@ -15,6 +15,10 @@ examples:
         display_name: Agent 10
         service_kind: delivery
         status: online
+        kind: two_wheeler
+        on_duty: true
+        zone_id: 01a13a48-9e00-7000-8000-00000000a011
+        current_task: null
         last_seen_at: 2026-10-14T08:00:00Z
         position:
           lat: 12.9716

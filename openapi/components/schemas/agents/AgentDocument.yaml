@@ -1,0 +1,159 @@
+type: object
+description: An onboarding document of an Agent membership, with its review. The number is shown to the Agent, to the Partner's members holding `agent:manage` for the service and to Mission Control, and never travels in an event.
+required:
+  - id
+  - agent_id
+  - partner_id
+  - service_id
+  - agent_display_name
+  - partner_name
+  - kind
+  - identity_type
+  - number
+  - expires_on
+  - verified_on
+  - files
+  - status
+  - rejection_reason
+  - submitted_at
+  - reviewed_at
+  - reviewed_by
+  - reviewer_name
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The document.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  agent_display_name:
+    type: string
+    description: The Agent's name, for review queues.
+    examples:
+      - Ravi Kumar
+  partner_name:
+    type:
+      - string
+      - "null"
+    description: The Partner's name, for Mission Control's queue.
+    examples:
+      - Dev Kitchen
+  kind:
+    $ref: ./AgentDocumentKind.yaml
+    description: What it is.
+  identity_type:
+    oneOf:
+      - $ref: ./IdentityDocumentType.yaml
+      - type: "null"
+    description: For an identity document, which one.
+  number:
+    type:
+      - string
+      - "null"
+    description: The document's number.
+    examples:
+      - TS0920230001234
+  expires_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its expiry, for a licence and a registration.
+    examples:
+      - 2030-04-30
+  verified_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: For police verification, the date it was done.
+  files:
+    type: array
+    items:
+      $ref: ./AgentDocumentFile.yaml
+    description: Its files, one to four.
+    examples:
+      - - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+          file_name: licence-front.jpg
+          content_type: image/jpeg
+          size_bytes: 482113
+  status:
+    $ref: ./AgentDocumentStatus.yaml
+    description: Where it stands.
+  rejection_reason:
+    type:
+      - string
+      - "null"
+    description: The reviewer's reason, which the Agent reads, when rejected.
+  submitted_at:
+    type: string
+    format: date-time
+    description: When it was filed.
+    examples:
+      - 2026-10-16T09:00:00Z
+  reviewed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was decided.
+  reviewed_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who decided; `null` in the Agent app.
+  reviewer_name:
+    type:
+      - string
+      - "null"
+    description: The reviewer's name; `null` in the Agent app.
+  version:
+    type: integer
+    format: int64
+    description: Raised by one on every change.
+    examples:
+      - 1
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+    agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    agent_display_name: Ravi Kumar
+    partner_name: Dev Kitchen
+    kind: driving_licence
+    identity_type: null
+    number: TS0920230001234
+    expires_on: 2030-04-30
+    verified_on: null
+    files:
+      - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+        file_name: licence-front.jpg
+        content_type: image/jpeg
+        size_bytes: 482113
+    status: under_review
+    rejection_reason: null
+    submitted_at: 2026-10-16T09:00:00Z
+    reviewed_at: null
+    reviewed_by: null
+    reviewer_name: null
+    version: 1

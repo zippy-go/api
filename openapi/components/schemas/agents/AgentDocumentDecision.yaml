@@ -1,0 +1,7 @@
+type: string
+description: A reviewer's decision on a document.
+enum:
+  - approve
+  - reject
+examples:
+  - approve

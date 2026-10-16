@@ -6,6 +6,93 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-16
+
+Step 4, workforce: a Partner's Agents in its delivery services, from the
+invitation to the day's pay. Written before the platform serves it so the
+consoles and the Agent app build against it; the dispatch slice of step 4
+takes the next free minor when it merges after this one. Additive only.
+
+### Added
+
+- The `Agent app` operations, for Agent app tokens (audience `agent`): the
+  person's memberships with the documents still needed, duty, cash in hand
+  and the pay rule version (`GET /v1/agent/memberships`, `GET
+  .../{agent_id}`, `AgentMembershipList`, `AgentMembership`), the one they
+  work under (`PUT /v1/agent/working-membership`), invitations in progress
+  for their verified number or email and accepting or declining one (`GET
+  /v1/agent/invitations`, `POST .../{invitation_id}/accept`, `.../decline`),
+  documents with upload grants (`GET`, `POST .../documents`, `POST
+  .../document-uploads`, `GET .../documents/{document_id}/files/{asset_id}/link`),
+  the duty switch with the zone (`GET`, `PUT .../duty`, `GET .../zones`,
+  `AgentDuty`), position batches applied only on duty (`POST .../positions`,
+  `AgentPositionBatch`), tasks with their workflow steps applied once by a
+  client id and in order (`GET .../tasks`, `GET /v1/agent/tasks/{task_id}`,
+  `POST .../receipt`, `POST .../steps` with `TaskStepRecord`, `POST
+  .../hand-back`, `POST .../proof-uploads`, `POST .../help`, `GET
+  .../proof`), the day's pay with each task's breakdown, tips and cash in
+  hand (`GET .../earnings`, `AgentDay`), cash in hand (`GET .../cash`) and
+  the pay rule in force (`GET .../pay-rule`). Where `APP_PROFILE` is local
+  or sandbox the simulator's service token acts for an Agent without a user
+  on the same routes.
+- The `Agents` operations for a Partner's members (`agent:read`,
+  `agent:manage` for the service) and for Mission Control with its platform
+  permissions: the Agents with the counts of the selection (`GET
+  /v1/partners/{partner_id}/agents`, `PartnerAgentPage`, `PartnerAgent`),
+  an invitation by mobile number (+91 by default) or email with a kind
+  (`POST`, `AgentInvite`), an individual Partner's owner joining their own
+  delivery service (`POST .../agents/self`), one Agent with its status
+  history (`GET`, `PATCH .../agents/{agent_id}` with `If-Match`), its
+  statuses (`POST .../activate`, `.../suspend`, `.../reinstate`,
+  `.../offboard`, `.../invitation` to send an invitation again), its
+  documents and their review (`GET .../documents`, `POST
+  .../documents/{document_id}/review`, the file links), the review queue
+  (`GET /v1/partners/{partner_id}/agent-documents`), an Agent's tasks (`GET
+  .../tasks`), an order's proof of delivery (`GET
+  /v1/partners/{partner_id}/orders/{order_id}/proof-of-delivery`), a
+  service's teams with the default team's area (`GET
+  .../services/{service_id}/teams`), how a service runs its Agents' work
+  (`GET`, `PATCH .../agent-settings`: geofence, the customer's code, a
+  signature, police verification, the cash ceiling, the limit of
+  deliveries under way and the workflow templates) and its pay rule
+  versions (`GET`, `POST .../pay-rules`).
+- Mission Control: every Agent across Partners (`GET /v1/platform/agents`,
+  `GET .../{agent_id}`) and every document waiting for review (`GET
+  /v1/platform/agent-documents`) with platform `agent:read`; any order's
+  proof of delivery (`GET /v1/platform/orders/{order_id}/proof-of-delivery`,
+  `order:read`). The customer reads their own order's (`GET
+  /v1/customer/orders/{order_id}/proof-of-delivery`).
+- `Agent` (the live agent read of `GET /v1/fleet/agents` and the agent
+  streams) carries `kind`, `on_duty`, `zone_id` and `current_task` (the
+  task under way in short: the delivery, the order number and the stop it
+  is heading to); `AgentStatus` gains `busy` (online with a task under
+  way); the `status` frames (`AgentStatusUpdate`, `AgentStatusFrame`) carry
+  `current_task`; `LocationPingsAccepted` counts the pings `dropped` off
+  duty.
+- Problem codes `service_not_agent_based`, `kind_not_allowed`,
+  `agent_already_member`, `duty_refused` (field codes `duty_not_active`,
+  `duty_document_expired`, `duty_elsewhere`), `tasks_under_way`,
+  `task_closed`, `step_required`, `outside_geofence`, `scan_mismatch`,
+  `code_wrong`, `code_locked` and `hand_back_closed`, all 409.
+- Events `fleet.membership.invited`, `.joined`, `.activated`,
+  `.suspended`, `.reinstated`, `.offboarded`; `fleet.document.submitted`,
+  `.approved`, `.rejected`; `fleet.duty.started`, `.ended`;
+  `fleet.task.assigned`, `.received`, `.started`, `.arrived`,
+  `.completed`, `.failed`, `.handed_back`, `.returned`, `.called_off`,
+  `.help_requested`, each with the Agent, the Partner and the service and,
+  for tasks, the delivery and the order; never a phone number, an email
+  address or a document number.
+
+### Changed
+
+- `POST /v1/fleet/location-pings` applies a ping only while its agent is
+  on duty; a ping off duty is dropped and never kept. The Agent app
+  reports its own positions at `POST
+  /v1/agent/memberships/{agent_id}/positions`.
+- An invited mobile number or email may ask for a one-time code for the
+  Agent app before it has an account: the account is made when the code
+  is verified. A code for anybody else still never makes an account.
+
 ## [0.16.0] - 2026-10-16
 
 Step 3, orders: server baskets priced by the platform, checkout, placing

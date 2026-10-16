@@ -1,0 +1,35 @@
+type: object
+description: A file of a document, stored privately (purpose `agent_document`); read it through the document's file link.
+required:
+  - asset_id
+  - file_name
+  - content_type
+  - size_bytes
+properties:
+  asset_id:
+    type: string
+    format: uuid
+    description: The stored file.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+  file_name:
+    type: string
+    description: Its safe name.
+    examples:
+      - licence-front.jpg
+  content_type:
+    type: string
+    description: Its type as the store reported it.
+    examples:
+      - image/jpeg
+  size_bytes:
+    type: integer
+    format: int64
+    description: Its size.
+    examples:
+      - 482113
+examples:
+  - asset_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+    file_name: licence-front.jpg
+    content_type: image/jpeg
+    size_bytes: 482113

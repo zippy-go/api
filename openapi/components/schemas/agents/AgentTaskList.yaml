@@ -1,0 +1,161 @@
+type: object
+description: An Agent's tasks, the next stop first.
+required:
+  - items
+  - next_task_id
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentTask.yaml
+    description: The tasks.
+    examples:
+      - - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+          trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10
+          agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+          partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+          service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+          delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+          order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+          order_number: AB1234
+          kind: pickup
+          sequence: 1
+          status: on_the_way
+          assignment: direct
+          stop:
+            name: Dev Kitchen Gachibowli
+            address: Plot 12, DLF Cyber City, Gachibowli, 500032
+            point:
+              lat: 17.4401
+              lng: 78.3489
+            location_id: 01a13a48-9e00-7000-8000-000000000301
+            geofence_metres: 100
+          lines:
+            - name: Chicken Biryani
+              quantity: 2
+              choices:
+                - Full
+                - Extra raita
+          customer:
+            first_name: Priya
+            phone: "+919812345678"
+            address: Flat 402, Aparna Towers, Kondapur, 500084
+            note: Ring the bell twice
+          cash_to_collect: null
+          tip:
+            minor_units: 2000
+            currency: INR
+          code_required: false
+          code_attempts_left: null
+          steps:
+            - kind: arrive
+              required: true
+              done: false
+              done_at: null
+          failure_reasons:
+            - Customer not reachable
+            - Address not found
+            - Customer refused
+          pay:
+            rule_version: 3
+            lines:
+              - kind: distance
+                label: 3.2 km at ₹6.00 per km
+                amount:
+                  minor_units: 1920
+                  currency: INR
+            total:
+              minor_units: 7420
+              currency: INR
+          planned_at: 2026-10-16T09:20:00Z
+          assigned_at: 2026-10-16T09:00:00Z
+          received_at: 2026-10-16T09:00:00Z
+          started_at: null
+          arrived_at: null
+          completed_at: null
+          ended_at: null
+          end_reason: null
+          hand_back_until: null
+          arrive_override_reason: null
+          measured_distance_m: 0
+          version: 2
+  next_task_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The next stop: the earliest task under way of the oldest trip."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+        trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10
+        agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+        delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        order_number: AB1234
+        kind: pickup
+        sequence: 1
+        status: on_the_way
+        assignment: direct
+        stop:
+          name: Dev Kitchen Gachibowli
+          address: Plot 12, DLF Cyber City, Gachibowli, 500032
+          point:
+            lat: 17.4401
+            lng: 78.3489
+          location_id: 01a13a48-9e00-7000-8000-000000000301
+          geofence_metres: 100
+        lines:
+          - name: Chicken Biryani
+            quantity: 2
+            choices:
+              - Full
+              - Extra raita
+        customer:
+          first_name: Priya
+          phone: "+919812345678"
+          address: Flat 402, Aparna Towers, Kondapur, 500084
+          note: Ring the bell twice
+        cash_to_collect: null
+        tip:
+          minor_units: 2000
+          currency: INR
+        code_required: false
+        code_attempts_left: null
+        steps:
+          - kind: arrive
+            required: true
+            done: false
+            done_at: null
+        failure_reasons:
+          - Customer not reachable
+          - Address not found
+          - Customer refused
+        pay:
+          rule_version: 3
+          lines:
+            - kind: distance
+              label: 3.2 km at ₹6.00 per km
+              amount:
+                minor_units: 1920
+                currency: INR
+          total:
+            minor_units: 7420
+            currency: INR
+        planned_at: 2026-10-16T09:20:00Z
+        assigned_at: 2026-10-16T09:00:00Z
+        received_at: 2026-10-16T09:00:00Z
+        started_at: null
+        arrived_at: null
+        completed_at: null
+        ended_at: null
+        end_reason: null
+        hand_back_until: null
+        arrive_override_reason: null
+        measured_distance_m: 0
+        version: 2
+    next_task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01

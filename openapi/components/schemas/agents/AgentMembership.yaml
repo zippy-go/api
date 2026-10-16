@@ -1,0 +1,168 @@
+type: object
+description: "One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force."
+required:
+  - id
+  - partner_id
+  - partner_name
+  - service_id
+  - service_name
+  - display_name
+  - kind
+  - status
+  - status_reason
+  - joined_at
+  - activated_at
+  - working
+  - documents
+  - duty
+  - tasks_under_way
+  - cash_in_hand
+  - cash_ceiling
+  - pay_rule_version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  partner_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  service_name:
+    type: string
+    description: Its name.
+    examples:
+      - Delivery
+  display_name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  kind:
+    $ref: ./AgentKind.yaml
+    description: What the Agent moves with.
+  status:
+    $ref: ./AgentMembershipStatus.yaml
+    description: Where the membership stands.
+  status_reason:
+    type:
+      - string
+      - "null"
+    description: Why it is suspended or offboarded, in the reviewer's words.
+  joined_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the person accepted.
+    examples:
+      - 2026-10-16T09:00:00Z
+  activated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it first became active.
+    examples:
+      - 2026-10-16T09:00:00Z
+  working:
+    type: boolean
+    description: Whether it is the membership the person works under now.
+    examples:
+      - true
+  documents:
+    type: array
+    items:
+      $ref: ./AgentDocumentRequirement.yaml
+    description: The documents it needs and where each stands.
+    examples:
+      - - kind: driving_licence
+          required: true
+          reason: Two-wheelers and vans need a driving licence.
+          status: approved
+          document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+          expires_on: 2030-04-30
+          satisfied: true
+  duty:
+    $ref: ./AgentDuty.yaml
+    description: Duty, and whether the Agent may go on duty.
+  tasks_under_way:
+    type: integer
+    format: int32
+    description: Deliveries under way.
+    examples:
+      - 0
+  cash_in_hand:
+    $ref: ../common/Money.yaml
+    description: Cash collected and not yet settled.
+  cash_ceiling:
+    $ref: ../common/Money.yaml
+    description: The service's cash ceiling, beyond which no task collecting cash is offered.
+  pay_rule_version:
+    type: integer
+    format: int32
+    description: The version of the service's pay rule in force.
+    examples:
+      - 1
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    partner_name: Dev Kitchen
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    service_name: Delivery
+    display_name: Ravi Kumar
+    kind: two_wheeler
+    status: active
+    status_reason: null
+    joined_at: 2026-10-16T09:00:00Z
+    activated_at: 2026-10-16T09:00:00Z
+    working: true
+    documents:
+      - kind: driving_licence
+        required: true
+        reason: Two-wheelers and vans need a driving licence.
+        status: approved
+        document_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01
+        expires_on: 2030-04-30
+        satisfied: true
+    duty:
+      agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+      on_duty: true
+      stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+      zone:
+        id: 01a13a48-9e00-7000-8000-00000000a011
+        name: Gachibowli
+      started_at: 2026-10-16T09:00:00Z
+      last_heard_at: 2026-10-16T09:00:00Z
+      unscheduled: true
+      can_go_on_duty: true
+      blockers: []
+      closed_for_silence:
+        stretch_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95
+        ended_at: 2026-10-16T22:10:00Z
+        zone:
+          id: 01a13a48-9e00-7000-8000-00000000a011
+          name: Gachibowli
+    tasks_under_way: 0
+    cash_in_hand:
+      minor_units: 0
+      currency: INR
+    cash_ceiling:
+      minor_units: 500000
+      currency: INR
+    pay_rule_version: 1

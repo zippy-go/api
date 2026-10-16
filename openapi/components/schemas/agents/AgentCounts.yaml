@@ -1,0 +1,61 @@
+type: object
+description: How many Agents are in each status, and how many are online and busy now.
+required:
+  - invited
+  - pending
+  - active
+  - suspended
+  - offboarded
+  - online
+  - busy
+properties:
+  invited:
+    type: integer
+    format: int32
+    description: Invited.
+    examples:
+      - 1
+  pending:
+    type: integer
+    format: int32
+    description: Pending.
+    examples:
+      - 2
+  active:
+    type: integer
+    format: int32
+    description: Active.
+    examples:
+      - 12
+  suspended:
+    type: integer
+    format: int32
+    description: Suspended.
+    examples:
+      - 0
+  offboarded:
+    type: integer
+    format: int32
+    description: Offboarded.
+    examples:
+      - 3
+  online:
+    type: integer
+    format: int32
+    description: Online now (busy included).
+    examples:
+      - 7
+  busy:
+    type: integer
+    format: int32
+    description: Busy now.
+    examples:
+      - 4
+examples:
+  - invited: 1
+    pending: 2
+    active: 12
+    suspended: 0
+    offboarded: 3
+    online: 7
+    busy: 4

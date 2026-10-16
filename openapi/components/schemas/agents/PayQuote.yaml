@@ -1,0 +1,38 @@
+type: object
+description: "The pay of a delivery under a version of the service's pay rule: an estimate at the planned routed distance when offered, earned at the measured distance on completion."
+required:
+  - rule_version
+  - lines
+  - total
+properties:
+  rule_version:
+    type: integer
+    format: int32
+    description: The pay rule version it is under, kept for the task whatever is published later.
+    examples:
+      - 3
+  lines:
+    type: array
+    items:
+      $ref: ./EarningLine.yaml
+    description: Each line of the breakdown.
+    examples:
+      - - kind: distance
+          label: 3.2 km at ₹6.00 per km
+          amount:
+            minor_units: 1920
+            currency: INR
+  total:
+    $ref: ../common/Money.yaml
+    description: The total.
+examples:
+  - rule_version: 3
+    lines:
+      - kind: distance
+        label: 3.2 km at ₹6.00 per km
+        amount:
+          minor_units: 1920
+          currency: INR
+    total:
+      minor_units: 7420
+      currency: INR

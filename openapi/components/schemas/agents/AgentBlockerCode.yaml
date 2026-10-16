@@ -1,0 +1,13 @@
+type: string
+description: "Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Clients must tolerate values they do not know."
+enum:
+  - not_active
+  - suspended
+  - offboarded
+  - document_missing
+  - document_pending
+  - document_rejected
+  - document_expired
+  - on_duty_elsewhere
+examples:
+  - document_missing

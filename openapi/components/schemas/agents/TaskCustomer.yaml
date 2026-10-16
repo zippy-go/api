@@ -1,0 +1,39 @@
+type: object
+description: "The customer of a task, as the platform's own Agents get them: the first name, the address and, for the task's duration, a number to call."
+required:
+  - first_name
+  - phone
+  - address
+  - note
+properties:
+  first_name:
+    type: string
+    description: Their first name.
+    examples:
+      - Priya
+  phone:
+    type:
+      - string
+      - "null"
+    description: A number to call while the task is under way; `null` once it ends and to anyone but the Agent.
+    examples:
+      - "+919812345678"
+  address:
+    type:
+      - string
+      - "null"
+    description: The drop address in words.
+    examples:
+      - Flat 402, Aparna Towers, Kondapur, 500084
+  note:
+    type:
+      - string
+      - "null"
+    description: The customer's note.
+    examples:
+      - Ring the bell twice
+examples:
+  - first_name: Priya
+    phone: "+919812345678"
+    address: Flat 402, Aparna Towers, Kondapur, 500084
+    note: Ring the bell twice

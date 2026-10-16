@@ -1,0 +1,46 @@
+type: object
+description: Where a task takes the Agent.
+required:
+  - name
+  - address
+  - point
+  - location_id
+  - geofence_metres
+properties:
+  name:
+    type: string
+    description: The store's name, or the customer's first name.
+    examples:
+      - Dev Kitchen Gachibowli
+  address:
+    type:
+      - string
+      - "null"
+    description: The address in words.
+    examples:
+      - Plot 12, DLF Cyber City, Gachibowli, 500032
+  point:
+    $ref: ../storefront/GeoPoint.yaml
+    description: The point the geofence is measured from.
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The store, for a pickup.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  geofence_metres:
+    type: integer
+    format: int32
+    description: How near the Agent must be to arrive without an override.
+    examples:
+      - 100
+examples:
+  - name: Dev Kitchen Gachibowli
+    address: Plot 12, DLF Cyber City, Gachibowli, 500032
+    point:
+      lat: 17.4401
+      lng: 78.3489
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    geofence_metres: 100

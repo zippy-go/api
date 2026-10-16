@@ -1,0 +1,18 @@
+type: object
+description: A reviewer's decision. A rejection needs a reason, which the Agent reads.
+required:
+  - decision
+properties:
+  decision:
+    $ref: ./AgentDocumentDecision.yaml
+    description: Approve or reject.
+  reason:
+    type:
+      - string
+      - "null"
+    minLength: 1
+    maxLength: 500
+    description: "Why it is rejected: 1 to 500 characters, required to reject."
+examples:
+  - decision: approve
+    reason: null

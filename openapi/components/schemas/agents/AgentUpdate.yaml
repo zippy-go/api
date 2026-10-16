@@ -1,0 +1,20 @@
+type: object
+description: "Changes an Agent membership: its name, or its kind, which puts an active membership back to pending until the new kind's documents are approved."
+properties:
+  display_name:
+    type:
+      - string
+      - "null"
+    minLength: 1
+    maxLength: 100
+    description: The name, 1 to 100 characters.
+    examples:
+      - Ravi Kumar
+  kind:
+    oneOf:
+      - $ref: ./AgentKind.yaml
+      - type: "null"
+    description: The kind.
+examples:
+  - display_name: Ravi Kumar
+    kind: two_wheeler

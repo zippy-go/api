@@ -1,0 +1,51 @@
+type: object
+description: A change of a membership's status, with who made it, when and why.
+required:
+  - status
+  - previous_status
+  - reason
+  - by
+  - by_name
+  - at
+properties:
+  status:
+    $ref: ./AgentMembershipStatus.yaml
+    description: The status after.
+  previous_status:
+    oneOf:
+      - $ref: ./AgentMembershipStatus.yaml
+      - type: "null"
+    description: The status before; `null` for the first.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why.
+  by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who; `null` for the platform itself.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Their name.
+    examples:
+      - Asha Rao
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-16T09:00:00Z
+examples:
+  - status: active
+    previous_status: pending
+    reason: null
+    by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    by_name: Asha Rao
+    at: 2026-10-16T09:00:00Z

@@ -1,0 +1,29 @@
+type: object
+description: Switches duty on, in a zone, or off.
+required:
+  - on_duty
+properties:
+  on_duty:
+    type: boolean
+    description: "`true` to go on duty, `false` to go off."
+    examples:
+      - true
+  zone_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The zone to work, required to go on duty: one `GET .../zones` offers."
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  position:
+    oneOf:
+      - $ref: ../storefront/GeoPoint.yaml
+      - type: "null"
+    description: Where the Agent is, kept as the first position of the stretch.
+examples:
+  - on_duty: true
+    zone_id: 01a13a48-9e00-7000-8000-00000000a011
+    position:
+      lat: 17.4401
+      lng: 78.3489

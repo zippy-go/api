@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.duty.ended.v1.schema.json",
+  "title": "FleetDutyEndedPayload",
+  "description": "Payload of `fleet.duty.ended` version 1. A duty stretch closed: switched off, closed at the last report after 30 minutes with nothing heard, or ended by a suspension or an offboarding. The envelope's `partner_id` is the Agent's Partner. No payload carries a phone number, an email address or a document number. Read the Agent at `GET /v1/partners/{partner_id}/agents/{agent_id}`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "user_id",
+    "stretch_id",
+    "zone_id",
+    "started_at",
+    "at",
+    "ended_at",
+    "reason"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent's person; `null` for the simulator's Agents.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "stretch_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The duty stretch.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a95"
+      ]
+    },
+    "zone_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The zone chosen.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000a011"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the stretch started.",
+      "examples": [
+        "2026-10-16T09:00:00Z"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T09:00:00Z"
+      ]
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the stretch ended: the last report for a silent one.",
+      "examples": [
+        "2026-10-16T13:00:00Z"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "switched_off",
+        "silent",
+        "suspended",
+        "offboarded"
+      ],
+      "description": "Why.",
+      "examples": [
+        "switched_off"
+      ]
+    }
+  }
+}

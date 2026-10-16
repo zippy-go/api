@@ -1,0 +1,9 @@
+type: string
+description: "What an Agent moves with, which decides the documents the membership needs and what the Agent can carry: `walker` (10 kg), `bicycle` (15 kg), `two_wheeler` (25 kg), `van` (300 kg). A delivery service takes the kinds its vehicle types name (a walker always, a bicycle for `bicycle`, a two-wheeler for `two_wheeler`, a van for `four_wheeler`), every kind when it names none. Clients must tolerate values they do not know."
+enum:
+  - walker
+  - bicycle
+  - two_wheeler
+  - van
+examples:
+  - two_wheeler

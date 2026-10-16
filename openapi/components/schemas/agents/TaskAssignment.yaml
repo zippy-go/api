@@ -1,0 +1,7 @@
+type: string
+description: "How the task reached the Agent: an `offer` the Agent accepted, or a `direct` assignment, which lands with a sound and may be handed back with a reason within 60 seconds of the app receiving it."
+enum:
+  - offer
+  - direct
+examples:
+  - direct

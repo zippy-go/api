@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a04",
+  "type": "fleet.document.rejected",
+  "version": 1,
+  "occurred_at": "2026-10-16T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": null,
+  "payload": {
+    "document_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01",
+    "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10",
+    "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+    "service_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45",
+    "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "kind": "driving_licence",
+    "status": "rejected",
+    "by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71",
+    "at": "2026-10-16T09:00:00Z",
+    "reason": "Unreadable, please upload a clearer photo"
+  }
+}

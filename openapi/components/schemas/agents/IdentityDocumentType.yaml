@@ -1,0 +1,9 @@
+type: string
+description: The government identity document an `identity` document is.
+enum:
+  - aadhaar
+  - pan
+  - passport
+  - voter_id
+examples:
+  - aadhaar

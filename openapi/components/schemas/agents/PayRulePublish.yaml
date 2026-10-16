@@ -1,0 +1,57 @@
+type: object
+description: A new version of the pay rule, in force for offers made after it. Amounts in the service's currency, 0 or more.
+required:
+  - pickup
+  - drop_off
+  - per_km
+  - waiting_per_minute
+  - waiting_free_minutes
+  - call_off
+properties:
+  pickup:
+    $ref: ../common/Money.yaml
+    description: Per pickup.
+  drop_off:
+    $ref: ../common/Money.yaml
+    description: Per drop-off.
+  per_km:
+    $ref: ../common/Money.yaml
+    description: Per kilometre.
+  waiting_per_minute:
+    $ref: ../common/Money.yaml
+    description: Per minute of waiting beyond the free minutes.
+  waiting_free_minutes:
+    type: integer
+    format: int32
+    minimum: 0
+    maximum: 60
+    description: Free minutes at a pickup, 0 to 60.
+    examples:
+      - 10
+  call_off:
+    $ref: ../common/Money.yaml
+    description: For a task called off after the Agent started towards it.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: What changed, at most 200 characters.
+examples:
+  - pickup:
+      minor_units: 2500
+      currency: INR
+    drop_off:
+      minor_units: 3000
+      currency: INR
+    per_km:
+      minor_units: 600
+      currency: INR
+    waiting_per_minute:
+      minor_units: 100
+      currency: INR
+    waiting_free_minutes: 10
+    call_off:
+      minor_units: 2000
+      currency: INR
+    note: null

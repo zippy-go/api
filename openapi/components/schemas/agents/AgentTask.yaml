@@ -1,0 +1,306 @@
+type: object
+description: "A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first."
+required:
+  - id
+  - trip_id
+  - agent_id
+  - partner_id
+  - service_id
+  - delivery_id
+  - order_id
+  - order_number
+  - kind
+  - sequence
+  - status
+  - assignment
+  - stop
+  - lines
+  - customer
+  - cash_to_collect
+  - tip
+  - code_required
+  - code_attempts_left
+  - steps
+  - failure_reasons
+  - pay
+  - planned_at
+  - assigned_at
+  - received_at
+  - started_at
+  - arrived_at
+  - completed_at
+  - ended_at
+  - end_reason
+  - hand_back_until
+  - arrive_override_reason
+  - measured_distance_m
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The task.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+  trip_id:
+    type: string
+    format: uuid
+    description: The trip bundling the delivery's pickup and drop.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership holding it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  partner_id:
+    type: string
+    format: uuid
+    description: The Agent's Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  delivery_id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  order_id:
+    type: string
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: The order's number, as its label carries it.
+    examples:
+      - AB1234
+  kind:
+    $ref: ./TaskKind.yaml
+    description: The stop's kind.
+  sequence:
+    type: integer
+    format: int32
+    description: Its place in the trip, from 1.
+    examples:
+      - 1
+  status:
+    $ref: ./TaskStatus.yaml
+    description: Where it stands.
+  assignment:
+    $ref: ./TaskAssignment.yaml
+    description: How it reached the Agent.
+  stop:
+    $ref: ./TaskStop.yaml
+    description: Where it takes the Agent.
+  lines:
+    type: array
+    items:
+      $ref: ./CarriedLine.yaml
+    description: What is carried.
+    examples:
+      - - name: Chicken Biryani
+          quantity: 2
+          choices:
+            - Full
+            - Extra raita
+  customer:
+    oneOf:
+      - $ref: ./TaskCustomer.yaml
+      - type: "null"
+    description: The customer; the number only while under way and only for the Agent.
+  cash_to_collect:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Cash to collect at the drop.
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The order's tip, the Agent's in full.
+  code_required:
+    type: boolean
+    description: Whether the drop asks for the customer's 4-digit code.
+    examples:
+      - false
+  code_attempts_left:
+    type:
+      - integer
+      - "null"
+    format: int32
+    description: Wrong codes left before the Agent is told to call the customer.
+  steps:
+    type: array
+    items:
+      $ref: ./WorkflowStep.yaml
+    description: The workflow's steps in order.
+    examples:
+      - - kind: arrive
+          required: true
+          done: false
+          done_at: null
+  failure_reasons:
+    type: array
+    items:
+      type: string
+    description: The reasons a drop may fail with.
+    examples:
+      - - Customer not reachable
+        - Address not found
+        - Customer refused
+  pay:
+    $ref: ./PayQuote.yaml
+    description: The delivery's pay under its rule version.
+  planned_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent should be at the stop.
+    examples:
+      - 2026-10-16T09:20:00Z
+  assigned_at:
+    type: string
+    format: date-time
+    description: When the Agent was given it.
+    examples:
+      - 2026-10-16T09:00:00Z
+  received_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent app received it.
+    examples:
+      - 2026-10-16T09:00:00Z
+  started_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent started towards the stop.
+  arrived_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent arrived.
+  completed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it completed, as recorded on the device.
+  ended_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ended without completing.
+  end_reason:
+    type:
+      - string
+      - "null"
+    description: Why it failed, was called off, handed back or returned.
+  hand_back_until:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: Until when a direct assignment may be handed back.
+  arrive_override_reason:
+    type:
+      - string
+      - "null"
+    description: The reason given for arriving from outside the geofence.
+  measured_distance_m:
+    type: integer
+    format: int32
+    description: The distance measured along the Agent's route for this stop.
+    examples:
+      - 0
+  version:
+    type: integer
+    format: int64
+    description: Raised by one on every change.
+    examples:
+      - 2
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
+    trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10
+    agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB1234
+    kind: pickup
+    sequence: 1
+    status: on_the_way
+    assignment: direct
+    stop:
+      name: Dev Kitchen Gachibowli
+      address: Plot 12, DLF Cyber City, Gachibowli, 500032
+      point:
+        lat: 17.4401
+        lng: 78.3489
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      geofence_metres: 100
+    lines:
+      - name: Chicken Biryani
+        quantity: 2
+        choices:
+          - Full
+          - Extra raita
+    customer:
+      first_name: Priya
+      phone: "+919812345678"
+      address: Flat 402, Aparna Towers, Kondapur, 500084
+      note: Ring the bell twice
+    cash_to_collect: null
+    tip:
+      minor_units: 2000
+      currency: INR
+    code_required: false
+    code_attempts_left: null
+    steps:
+      - kind: arrive
+        required: true
+        done: false
+        done_at: null
+    failure_reasons:
+      - Customer not reachable
+      - Address not found
+      - Customer refused
+    pay:
+      rule_version: 3
+      lines:
+        - kind: distance
+          label: 3.2 km at ₹6.00 per km
+          amount:
+            minor_units: 1920
+            currency: INR
+      total:
+        minor_units: 7420
+        currency: INR
+    planned_at: 2026-10-16T09:20:00Z
+    assigned_at: 2026-10-16T09:00:00Z
+    received_at: 2026-10-16T09:00:00Z
+    started_at: null
+    arrived_at: null
+    completed_at: null
+    ended_at: null
+    end_reason: null
+    hand_back_until: null
+    arrive_override_reason: null
+    measured_distance_m: 0
+    version: 2

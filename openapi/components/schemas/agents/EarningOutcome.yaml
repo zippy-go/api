@@ -1,0 +1,8 @@
+type: string
+description: "Why a task paid: it was `completed`, it `failed_after_arrival` (a drop failed once the Agent had arrived pays its base and the distance), or it was `called_off` after the Agent started towards it."
+enum:
+  - completed
+  - failed_after_arrival
+  - called_off
+examples:
+  - completed

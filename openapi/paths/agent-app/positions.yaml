@@ -1,0 +1,68 @@
+# Path item for /v1/agent/memberships/{agent_id}/positions. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+post:
+  operationId: reportAgentPositions
+  summary: Report positions
+  description: "Positions from the Agent's device, 1 to 500 in a batch, each with when it was recorded: every 30 seconds on duty, every 5 while a delivery is under way, never off duty. Applied only while the Agent is on duty: a report off duty is dropped and never kept. The newest position wins; the Agent goes online on the first and offline 60 seconds after reports stop, busy while a task is under way, and each position travels on the live streams with its age. A position during a task is added to the task's route and its measured distance. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The positions.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/AgentPositionBatch.yaml
+  responses:
+    "202":
+      description: The batch was applied, or dropped off duty.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentPositionsAccepted.yaml
+    "400":
+      description: "`validation_failed`: a batch of 0 or more than 500, or a position out of range; `errors` points at each, and nothing is applied."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

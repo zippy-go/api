@@ -1,0 +1,9 @@
+type: string
+description: "An onboarding document: `identity` for every kind of Agent; `driving_licence` and `vehicle_registration` for two-wheelers and vans; `police_verification` where the service requires it."
+enum:
+  - identity
+  - driving_licence
+  - vehicle_registration
+  - police_verification
+examples:
+  - driving_licence

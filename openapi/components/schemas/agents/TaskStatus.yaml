@@ -1,0 +1,13 @@
+type: string
+description: "Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way)."
+enum:
+  - accepted
+  - on_the_way
+  - arrived
+  - completed
+  - failed
+  - called_off
+  - handed_back
+  - returned
+examples:
+  - on_the_way

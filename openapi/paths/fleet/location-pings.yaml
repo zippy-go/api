@@ -8,7 +8,10 @@ post:
     applied; `GET /v1/fleet/agents` and the live streams reflect them shortly
     after. Pings are applied per agent in `recorded_at` order, so a device
     that buffered pings while it had no connectivity can submit them in one
-    batch.
+    batch. Since contract 0.17.0 a ping is applied only while its agent is
+    on duty; a ping for an agent off duty is dropped and never kept, and
+    counted in `dropped`. The Agent app reports its own positions at
+    `POST /v1/agent/memberships/{agent_id}/positions`.
 
     The operation authenticates with a service token of the job
     `simulator` (`Bearer`, minted at `POST /v1/auth/service-tokens`), the

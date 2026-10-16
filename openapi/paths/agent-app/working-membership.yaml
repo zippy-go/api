@@ -1,0 +1,65 @@
+# Path item for /v1/agent/working-membership. Referenced from openapi.yaml.
+put:
+  operationId: chooseWorkingMembership
+  summary: Choose the membership to work under
+  description: Chooses which of the person's memberships the app works under, for a person who holds more than one; the app shows only its tasks. The membership on duty is always the working one. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one.
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The membership.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/AgentWorkingChoice.yaml
+  responses:
+    "200":
+      description: The memberships, the chosen one working.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentMembershipList.yaml
+    "400":
+      description: "`validation_failed`: a malformed `agent_id`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`duty_refused`: the person is on duty in another membership; go off duty there first."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

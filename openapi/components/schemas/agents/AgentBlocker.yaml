@@ -1,0 +1,24 @@
+type: object
+description: One reason an Agent cannot be activated, go on duty or take work, with the sentence a screen shows.
+required:
+  - code
+  - sentence
+  - document_kind
+properties:
+  code:
+    $ref: ./AgentBlockerCode.yaml
+    description: What stands in the way.
+  sentence:
+    type: string
+    description: The reason in words, for the Agent or the Partner.
+    examples:
+      - The driving licence is missing.
+  document_kind:
+    oneOf:
+      - $ref: ./AgentDocumentKind.yaml
+      - type: "null"
+    description: The document concerned, for the document codes.
+examples:
+  - code: document_missing
+    sentence: The driving licence is missing.
+    document_kind: driving_licence

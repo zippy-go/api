@@ -1,0 +1,55 @@
+type: object
+description: A document to file for the membership, once its files are posted with upload grants. The identity type and number are required for an identity document; the number and the expiry date for a licence and a registration; the date done for police verification.
+required:
+  - kind
+  - asset_ids
+properties:
+  kind:
+    $ref: ./AgentDocumentKind.yaml
+    description: What it is.
+  identity_type:
+    oneOf:
+      - $ref: ./IdentityDocumentType.yaml
+      - type: "null"
+    description: For an identity document, which one.
+  number:
+    type:
+      - string
+      - "null"
+    minLength: 1
+    maxLength: 40
+    description: "Its number: 12 digits for Aadhaar, five letters, four digits and a letter for PAN, a letter and seven digits for a passport, three letters and seven digits for a voter id; 5 to 20 letters and digits for a licence or a registration."
+    examples:
+      - TS0920230001234
+  expires_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its expiry, after today, for a licence and a registration.
+    examples:
+      - 2030-04-30
+  verified_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: For police verification, the date it was done, not after today.
+  asset_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    minItems: 1
+    maxItems: 4
+    description: "The files, granted by `POST .../document-uploads` and posted to the store: one to four."
+    examples:
+      - - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
+examples:
+  - kind: driving_licence
+    identity_type: null
+    number: TS0920230001234
+    expires_on: 2030-04-30
+    verified_on: null
+    asset_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01

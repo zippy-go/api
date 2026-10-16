@@ -1,0 +1,7 @@
+type: string
+description: "How an invitation reached the person: by SMS to a mobile number, or by email."
+enum:
+  - phone
+  - email
+examples:
+  - phone

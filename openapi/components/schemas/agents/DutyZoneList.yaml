@@ -1,0 +1,21 @@
+type: object
+description: The zones an Agent may choose, the one they are in first, then the service's area, then the rest of the city by name.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./DutyZone.yaml
+    description: The zones.
+    examples:
+      - - id: 01a13a48-9e00-7000-8000-00000000a011
+          name: Gachibowli
+          here: true
+          in_area: true
+examples:
+  - items:
+      - id: 01a13a48-9e00-7000-8000-00000000a011
+        name: Gachibowli
+        here: true
+        in_area: true

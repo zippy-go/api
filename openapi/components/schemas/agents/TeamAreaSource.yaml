@@ -1,0 +1,8 @@
+type: string
+description: "Where a team's area comes from: the zones the service delivers in (`service_zones`), else the zones of the Locations it is switched on at (`location_zones`), else `none`."
+enum:
+  - service_zones
+  - location_zones
+  - none
+examples:
+  - location_zones

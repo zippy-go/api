@@ -1,0 +1,27 @@
+type: object
+description: "A file the Agent app is about to upload: what it reads of the file, checked against the purpose before any byte is sent."
+required:
+  - file_name
+  - content_type
+  - size_bytes
+properties:
+  file_name:
+    type: string
+    description: The file name as the person has it.
+    examples:
+      - licence-front.jpg
+  content_type:
+    type: string
+    description: "Its type: `application/pdf`, `image/png` or `image/jpeg` for a document; `image/jpeg`, `image/png` or `image/webp` for proof."
+    examples:
+      - image/jpeg
+  size_bytes:
+    type: integer
+    format: int64
+    description: "Its size in bytes: at most 10 MB for a document, 8 MB for proof."
+    examples:
+      - 482113
+examples:
+  - file_name: licence-front.jpg
+    content_type: image/jpeg
+    size_bytes: 482113
