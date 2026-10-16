@@ -82,6 +82,15 @@ takes the next free minor when it merges after this one. Additive only.
   `.help_requested`, each with the Agent, the Partner and the service and,
   for tasks, the delivery and the order; never a phone number, an email
   address or a document number.
+- An Agent's own channel (`private-agent-{agent_id}-tasks`) carries
+  `task.changed`, `membership.changed`, `document.changed` and
+  `duty.changed` signals (subjects `task`, `membership`, `document`,
+  `duty`): the Agent app reads the record again.
+- `RecipientKind` gains `agent` (the person of an Agent membership, by their
+  Agent app devices, number or email): the invitation by SMS or email, and
+  the decisions about an Agent (documents, activation, suspension,
+  reinstatement, offboarding) by push, else SMS, else email, appear in the
+  delivery log.
 
 ### Changed
 

@@ -6767,7 +6767,7 @@ export type MessageDevice = {
 export type MessageRecipient = {
     kind: RecipientKind;
     /**
-     * The customer, for a customer's message.
+     * The customer, for a customer's message; the Agent's person once they accepted, for an Agent's.
      */
     user_id: string | null;
     /**
@@ -7241,9 +7241,9 @@ export type PushRegistrationInput = {
 };
 
 /**
- * Who a message is for: `customer` (a customer's devices, number or email), `location` (every device signed in to a Location, resolved when the message is sent) or `contact` (a person a Location lists as a contact, by the channel they agreed to).
+ * Who a message is for: `customer` (a customer's devices, number or email), `location` (every device signed in to a Location, resolved when the message is sent), `contact` (a person a Location lists as a contact, by the channel they agreed to) or `agent` (the person of an Agent membership: their Agent app devices, number or email, the invited one before they accept).
  */
-export type RecipientKind = 'customer' | 'location' | 'contact';
+export type RecipientKind = 'customer' | 'location' | 'contact' | 'agent';
 
 /**
  * A stream of server-sent events, as defined by the WHATWG HTML standard,
@@ -9622,7 +9622,8 @@ export type Signal = {
     /**
      * What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
      * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
-     * `table.changed`, `task.changed`.
+     * `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
+     * `duty.changed`.
      */
     kind: string;
     /**
@@ -9663,7 +9664,7 @@ export type SignalSubject = {
      */
     id: string;
     /**
-     * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`.
+     * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`, `membership`, `document`, `duty`.
      */
     kind: string;
 };

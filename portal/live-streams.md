@@ -80,6 +80,17 @@ order's id, its new status and its version) on the order's channel
 orders, the store's board, kitchen mode and Mission Control read the order
 again.
 
+An Agent's own channel (`private-agent-{agent_id}-tasks`) carries what the
+Agent app reads again: `task.changed` (subject `task`, with the task's new
+status and version) on every move of one of the Agent's tasks, assignments,
+call-offs and returns included; `membership.changed` (subject `membership`,
+the Agent's id, with the new status) when the membership is activated,
+suspended, reinstated or offboarded; `document.changed` (subject
+`document`) when a document is approved or rejected; and `duty.changed`
+(subject `duty`, status `off_duty`) when the platform closes a duty
+stretch. A reason never travels on the channel: the app reads it from the
+record.
+
 | Event            | Data                                                        | When                                              |
 | ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
 | `snapshot`       | `AgentsSnapshot`: `{ "channel", "agents": [Agent, ...] }`    | On open, per agent channel                        |

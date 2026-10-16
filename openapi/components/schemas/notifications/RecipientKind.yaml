@@ -1,8 +1,9 @@
 type: string
-description: "Who a message is for: `customer` (a customer's devices, number or email), `location` (every device signed in to a Location, resolved when the message is sent) or `contact` (a person a Location lists as a contact, by the channel they agreed to)."
+description: "Who a message is for: `customer` (a customer's devices, number or email), `location` (every device signed in to a Location, resolved when the message is sent), `contact` (a person a Location lists as a contact, by the channel they agreed to) or `agent` (the person of an Agent membership: their Agent app devices, number or email, the invited one before they accept)."
 enum:
   - customer
   - location
   - contact
+  - agent
 examples:
   - customer

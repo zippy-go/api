@@ -17,7 +17,8 @@ properties:
     description: |-
       What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
       `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
-      `table.changed`, `task.changed`.
+      `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
+      `duty.changed`.
     examples:
       - vertical.transitioned
   status:

@@ -13,7 +13,7 @@ properties:
       - string
       - 'null'
     format: uuid
-    description: The customer, for a customer's message.
+    description: The customer, for a customer's message; the Agent's person once they accepted, for an Agent's.
   location_id:
     type:
       - string
