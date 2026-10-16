@@ -1,0 +1,19 @@
+type: object
+description: A store cancelling an order it accepted, with a reason and a note. The customer gets back everything they paid, each part where it came from, and the Partner bears it.
+required:
+  - reason
+  - note
+properties:
+  reason:
+    $ref: ./StoreCancelReason.yaml
+    description: Why.
+  note:
+    type: string
+    minLength: 1
+    maxLength: 500
+    examples:
+      - The oven failed
+    description: A note, 1 to 500 characters.
+examples:
+  - reason: cannot_make
+    note: The oven failed

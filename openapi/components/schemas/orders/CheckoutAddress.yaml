@@ -1,0 +1,59 @@
+type: object
+description: "One of the customer's saved addresses as checkout offers it: whether the store delivers there, how far it is and what delivering there costs."
+required:
+  - address_id
+  - label
+  - summary
+  - deliverable
+  - reason
+  - distance_metres
+  - delivery_fee
+properties:
+  address_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    description: The address.
+  label:
+    type: string
+    examples:
+      - home
+    description: Home, work or other.
+  summary:
+    type: string
+    examples:
+      - 402, Lake View Residency, Road No 36, Jubilee Hills
+    description: The address on one line.
+  deliverable:
+    type: boolean
+    examples:
+      - true
+    description: Whether the store delivers there.
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - Dev Kitchen Gachibowli doesn't deliver there; pickup is open.
+    description: Why not, when it does not.
+  distance_metres:
+    type: integer
+    examples:
+      - 3100
+    description: The straight-line distance from the store in metres.
+  delivery_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What delivering there costs.
+examples:
+  - address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    label: home
+    summary: 402, Lake View Residency, Road No 36, Jubilee Hills
+    deliverable: true
+    reason: Dev Kitchen Gachibowli doesn't deliver there; pickup is open.
+    distance_metres: 3100
+    delivery_fee:
+      minor_units: 4000
+      currency: INR

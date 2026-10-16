@@ -1,0 +1,11 @@
+type: string
+description: What went wrong, as the customer says it.
+enum:
+  - missing_item
+  - wrong_item
+  - damaged
+  - late
+  - cancel_order
+  - other
+examples:
+  - missing_item

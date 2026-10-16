@@ -1,0 +1,43 @@
+# Path item for /v1/baskets. Referenced from openapi.yaml.
+get:
+  operationId: listBaskets
+  summary: List every basket
+  description: Every basket of the caller, one per store, most recently changed first, each with its store, item count and total, so a basket left half-filled at another store is never lost. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  responses:
+    "200":
+      description: The baskets.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/BasketList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

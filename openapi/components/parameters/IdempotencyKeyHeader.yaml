@@ -11,7 +11,9 @@ description: |
   the header `Idempotent-Replayed: true`, and makes nothing new; the same
   key with a different method, path or body is `409`
   (`idempotency_key_reuse`); a repeat that arrives while the first is still
-  being processed waits for it. Writes that move money or place an order
+  being processed waits for it; a first that failed with a `5xx`, or was
+  refused before it could act (`401`, `403` such as `step_up_required`,
+  `429`), is processed afresh. Writes that move money or place an order
   require the header (`400`, `validation_failed` with
   `idempotency_key_missing`); every other write may carry it.
 schema:

@@ -1,0 +1,25 @@
+type: object
+description: "What a live order counts towards: accept it by, ready by, or due at; `late` once past it (an order waiting to be accepted reads late after five minutes)."
+required:
+  - kind
+  - at
+  - late
+properties:
+  kind:
+    $ref: ./OrderTimerKind.yaml
+    description: What it counts towards.
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:30:00Z
+    description: The moment.
+  late:
+    type: boolean
+    examples:
+      - false
+    description: Whether it is past.
+examples:
+  - kind: accept
+    at: 2026-10-16T13:30:00Z
+    late: false

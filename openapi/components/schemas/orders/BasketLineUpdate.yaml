@@ -1,0 +1,22 @@
+type: object
+description: "A change to one line: its quantity (0 removes the line) or its note. To change answers, remove the line and add the new choice."
+required: []
+properties:
+  quantity:
+    type: integer
+    minimum: 0
+    maximum: 99
+    examples:
+      - 2
+    description: The new quantity, 0 to 99; 0 removes the line.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    examples:
+      - No onions
+    description: The new note; `null` clears it.
+examples:
+  - quantity: 2
+    note: No onions

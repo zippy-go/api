@@ -114,9 +114,26 @@ components/
     ledger/        The ledger: LedgerAccount, LedgerAccountKind, LedgerAccountClass, LedgerSide, LedgerAccountPage,
                    LedgerEntry, LedgerEntryKind, LedgerPosting, LedgerEntryPage, OrderMoneySplit, OrderSplitStatus,
                    TrialBalance, TrialBalanceLine
+    orders/        Baskets, checkout and orders: OrderStatus, OrderFulfilment, PaymentMethod, PaymentState, IfUnavailable,
+                   BasketOwner, VisitorToken, BasketClaim, BasketAnswerInput, BasketLineInput, BasketLineUpdate,
+                   BasketChoicesUpdate, Basket, BasketStore, BasketLine, BasketAnswer, LineRefusal, BasketChoices,
+                   BasketPricing, DeliveryFee, TaxShare, BasketRefusal, BasketSummary, BasketList; checkout: Checkout,
+                   CheckoutFulfilment, CheckoutAddress, CheckoutPayment, PaymentOption, WalletBalance, CheckoutTip,
+                   CheckoutCutlery, SavedMethodOption; placing: OrderPlacement, PlacedOrder, PaymentStep, NextAction; the customer's order:
+                   CustomerOrder, CustomerOrderSummary, CustomerOrderPage, OrderStore, OrderAddress, OrderLine, OrderAnswer,
+                   LineRemoval, OrderStep, OrderPromise, OrderEnd, Receipt, PaymentSplit, OrderRefund, RefundLine,
+                   RefundFeePart, CustomerCancellation, CustomerCancelReason, RefundDestination, HelpRequest,
+                   HelpRequestInput, HelpKind, OrderHelp, Reorder, NotCopied; the store's: StoreOrder, OrderCustomer,
+                   OrderTimer, OrderTimerKind, OrderMove, OrderHistoryEntry, OrderActorKind, LiveOrders, LiveOrderCounts,
+                   OrderTaking, AcceptOrder, DeclineOrder, DeclineReason, ExtendPreparation, StoreCancellation,
+                   StoreCancelReason, OrderPause, OrderHistory, OrderHistoryRow, OrderHistoryTotals; Mission Control's:
+                   PlatformOrderRow, PlatformOrderPage, PlatformOrder, AttentionReason, PlatformCancellation, RefundInput,
+                   RefundLineInput, RefundReason, RefundPayer, RefundFee, RefundPreview, HelpResolution,
+                   PlatformOrderSummary, OrderStatusCounts, AttentionCounts
     <domain>/      One folder per further domain, one file per schema
   parameters/      Shared query, path and header parameters: PartnerIdQuery, PartnerIdPath,
-                   IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader
+                   IdempotencyKeyHeader, IfMatchHeader, IfNoneMatchHeader, CorrelationIdHeader,
+                   VisitorTokenHeader
   headers/         Shared response headers: ETag
   responses/       Shared responses such as the standard error responses (planned)
 ```

@@ -1,0 +1,68 @@
+type: object
+description: "What a refund would give back and where, before it is made: the source first, up to what it was charged less what was refunded to it, the rest to the Wallet."
+required:
+  - amount
+  - to_source
+  - to_wallet
+  - refundable_before
+  - refundable_after
+  - payer
+  - lines
+  - fees
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it gives back.
+  to_source:
+    $ref: ../common/Money.yaml
+    description: To the UPI account or the card.
+  to_wallet:
+    $ref: ../common/Money.yaml
+    description: To the Wallet.
+  refundable_before:
+    $ref: ../common/Money.yaml
+    description: What was left to refund before it.
+  refundable_after:
+    $ref: ../common/Money.yaml
+    description: What will be left after it.
+  payer:
+    $ref: ./RefundPayer.yaml
+    description: Who bears it.
+  lines:
+    type: array
+    items:
+      $ref: ./RefundLine.yaml
+    description: The lines it gives back.
+  fees:
+    type: array
+    items:
+      $ref: ./RefundFeePart.yaml
+    description: The fees it gives back.
+examples:
+  - amount:
+      minor_units: 4000
+      currency: INR
+    to_source:
+      minor_units: 4000
+      currency: INR
+    to_wallet:
+      minor_units: 0
+      currency: INR
+    refundable_before:
+      minor_units: 75800
+      currency: INR
+    refundable_after:
+      minor_units: 71800
+      currency: INR
+    payer: partner
+    lines:
+      - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+        quantity: 1
+        amount:
+          minor_units: 4000
+          currency: INR
+    fees:
+      - fee: delivery
+        amount:
+          minor_units: 4000
+          currency: INR

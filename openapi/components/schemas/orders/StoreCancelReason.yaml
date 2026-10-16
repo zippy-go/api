@@ -1,0 +1,10 @@
+type: string
+description: Why a store cancels an order it accepted. A note is always needed.
+enum:
+  - cannot_make
+  - taking_too_long
+  - accepted_by_mistake
+  - customer_asked
+  - other
+examples:
+  - cannot_make

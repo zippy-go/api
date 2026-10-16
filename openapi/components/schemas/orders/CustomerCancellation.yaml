@@ -1,0 +1,25 @@
+type: object
+description: A customer cancelling an order the store has not accepted.
+required:
+  - reason
+properties:
+  reason:
+    $ref: ./CustomerCancelReason.yaml
+    description: Why.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    examples:
+      - Ordered the wrong biryani
+    description: A note; required for `other`, at most 500 characters.
+  refund_to:
+    oneOf:
+      - $ref: ./RefundDestination.yaml
+      - type: "null"
+    description: "Where a captured payment goes back: to its source (the default) or into the Wallet at once."
+examples:
+  - reason: changed_my_mind
+    note: Ordered the wrong biryani
+    refund_to: source

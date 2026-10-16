@@ -1,0 +1,38 @@
+type: object
+description: "What the customer does next to pay: open the provider's page, or approve the request waiting in their UPI app."
+required:
+  - kind
+  - url
+  - expires_at
+  - message
+properties:
+  kind:
+    type: string
+    examples:
+      - open_page
+    description: "`open_page`: open `url`, the provider's page, and pay there; `approve_in_app`: approve the request waiting in the UPI app (the page at `url` follows it)."
+  url:
+    type: string
+    examples:
+      - https://pay.example/checkout/0192b6f4
+    description: The provider's page.
+  expires_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:15:00Z
+    description: Until when it works.
+  message:
+    type:
+      - string
+      - "null"
+    examples:
+      - Pay in your UPI app on the page that opens.
+    description: A sentence a screen may show as it is.
+examples:
+  - kind: open_page
+    url: https://pay.example/checkout/0192b6f4
+    expires_at: 2026-10-16T13:15:00Z
+    message: Pay in your UPI app on the page that opens.

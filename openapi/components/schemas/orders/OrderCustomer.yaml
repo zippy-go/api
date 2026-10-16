@@ -1,0 +1,49 @@
+type: object
+description: "The customer as the store sees them: the first name, and the mobile, address and instructions only when the store delivers the order with its own agents. Mission Control sees all."
+required:
+  - first_name
+  - mobile
+  - address
+  - instructions
+properties:
+  first_name:
+    type: string
+    examples:
+      - Asha
+    description: The first name.
+  mobile:
+    type:
+      - string
+      - "null"
+    examples:
+      - "+919876543210"
+    description: The mobile, E.164; `null` when the store may not see it.
+  address:
+    oneOf:
+      - $ref: ./OrderAddress.yaml
+      - type: "null"
+    description: The delivery address; `null` when the store may not see it.
+  instructions:
+    type:
+      - string
+      - "null"
+    examples:
+      - Ring the bell twice
+    description: The instructions.
+examples:
+  - first_name: Asha
+    mobile: "+919876543210"
+    address:
+      label: home
+      line1: Road No 36
+      line2: Near the park
+      locality: Jubilee Hills
+      city: Hyderabad
+      postal_code: "500033"
+      lat: 17.4326
+      lng: 78.4071
+      flat_number: "402"
+      building_name: Lake View Residency
+      floor: "4"
+      landmark: opposite the water tank
+    instructions: Ring the bell twice

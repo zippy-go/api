@@ -1,0 +1,114 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/orders/pause. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+put:
+  operationId: pauseOrders
+  summary: Pause new orders for a while
+  description: Pauses new orders at the store for 1 to 240 minutes with a reason customers see; the pause lifts by itself. Orders already placed carry on; placing is refused (`store_not_trading`) while it lasts. It is the Location's pause (`PUT .../locations/{location_id}/pause` sets the same one with `location:write`), here with `order:manage`. Members need `order:read` at the Location to read and `order:manage` to move an order; platform staff use the same routes with their platform permissions, every move written to the audit log. A Location of another Partner, and an order of another store, answer `404` before any permission is looked at.
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: How long and why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/OrderPause.yaml
+  responses:
+    "200":
+      description: Whether the store takes orders now.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/OrderTaking.yaml
+    "400":
+      description: "`validation_failed`: minutes outside 1 to 240, or a custom reason without its message."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission at the Location) or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Location or the order."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: resumeOrders
+  summary: Take orders again
+  description: Lifts the store's pause now. Members need `order:read` at the Location to read and `order:manage` to move an order; platform staff use the same routes with their platform permissions, every move written to the audit log. A Location of another Partner, and an order of another store, answer `404` before any permission is looked at.
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: Whether the store takes orders now.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/OrderTaking.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission at the Location) or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Location or the order."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

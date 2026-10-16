@@ -1,0 +1,40 @@
+type: object
+description: "How an order was paid: what the Wallet paid and what the method paid, with the provider's reference masked."
+required:
+  - method
+  - state
+  - wallet
+  - method_amount
+  - reference
+properties:
+  method:
+    oneOf:
+      - $ref: ./PaymentMethod.yaml
+      - type: "null"
+    description: The method that paid the rest.
+  state:
+    $ref: ./PaymentState.yaml
+    description: How the payment stands.
+  wallet:
+    $ref: ../common/Money.yaml
+    description: What the Wallet paid.
+  method_amount:
+    $ref: ../common/Money.yaml
+    description: What the method paid.
+  reference:
+    type:
+      - string
+      - "null"
+    examples:
+      - UPI 4821
+    description: The UPI transaction reference or the card's brand and last four digits, never more.
+examples:
+  - method: upi
+    state: none
+    wallet:
+      minor_units: 0
+      currency: INR
+    method_amount:
+      minor_units: 79800
+      currency: INR
+    reference: UPI 4821

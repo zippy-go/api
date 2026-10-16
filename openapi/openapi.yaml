@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.15.0
+  version: 0.16.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -246,8 +246,12 @@ tags:
     description: "A customer's money on ZippyGo in rupees, a ledger that explains itself: every balance is the sum of its entries, each with its reason, never edited, nothing expiring. Two balances: paid (the customer's own money, which may go back to its source) and promotional (money given, spent first and never paid out). The Wallet pays first and cannot be spent twice: held when an order is placed, spent when the Location accepts, returned otherwise. It is checked every night against its entries and against the ledger."
   - name: Ledger
     description: "The double-entry journal every money move is posted to from the moment it is confirmed: immutable, every entry's debits equal to its credits, enforced by the database when it is written. Accounts for every customer's Wallet, every Partner's payable, the platform's commission and delivery fee revenue, GST payable, tips owed to the platform fleet, money at the provider and cash in transit. An order's money is split when the Location accepts: the Partner's share after the commission its Location's policy sets and the GST on it, the delivery fee and tips to the platform fleet (or to the Partner when its own agents carry), the small-order fee to the platform. Mission Control reads accounts, entries, an order's split and the trial balance with `ledger:read`."
+  - name: Baskets
+    description: "A customer's baskets, one per store, kept on the server and priced by the platform on every read as they will be charged: prices from the store's published menu, tax included, the MRP never exceeded, the delivery fee by straight-line distance, the tip for the platform's agents, the Wallet's share; and checkout, which asks only what the store offers and saves each answer as it is given. A visitor's baskets wait under a visitor token (`X-Visitor-Token`) and become the customer's when they sign in."
   - name: Orders
-    description: Commercial purchases placed by customers.
+    description: "A customer's orders: placing the basket with every check made again and the price shown, paying for it, the order's one status and its live page, cancelling until the store accepts, help after that, My orders, the receipt and reorder. Every move signals `order.changed` on the order's channel and the customer's orders channel."
+  - name: Order handling
+    description: "How a store runs the orders it receives and how Mission Control watches and intervenes: the live board with the one move each order waits for and its timer, accepting with a preparation time and lines left out, declining with a reason, more preparation time, pausing new orders, ready, collected, handed over and delivered (a stand-in for dispatch until step 4), the store's cancellation and its history; Mission Control's board across every store with what needs attention, cancellation at any point, refunds of lines bounded by what was paid, and help resolved. Members need `order:read` and `order:manage` at the Location; platform staff `order:read`, `order:manage` and `order:refund`."
   - name: Deliveries
     description: Fulfilment of orders from pickup to dropoff, including tasks and trips.
   - name: Fleet
@@ -811,6 +815,70 @@ paths:
   /v1/platform/ledger/trial-balance:
     $ref: ./paths/ledger/trial-balance.yaml
 
+  # Step 3 orders: baskets, checkout, placing, the order, order handling
+  /v1/visitor-tokens:
+    $ref: ./paths/baskets/visitor-tokens.yaml
+  /v1/baskets:
+    $ref: ./paths/baskets/baskets.yaml
+  /v1/baskets/claim:
+    $ref: ./paths/baskets/claim.yaml
+  /v1/baskets/{location_id}:
+    $ref: ./paths/baskets/basket.yaml
+  /v1/baskets/{location_id}/lines:
+    $ref: ./paths/baskets/lines.yaml
+  /v1/baskets/{location_id}/lines/{line_id}:
+    $ref: ./paths/baskets/line.yaml
+  /v1/baskets/{location_id}/checkout:
+    $ref: ./paths/baskets/checkout.yaml
+  /v1/customer/orders:
+    $ref: ./paths/orders/orders.yaml
+  /v1/customer/orders/{order_id}:
+    $ref: ./paths/orders/order.yaml
+  /v1/customer/orders/{order_id}/cancel:
+    $ref: ./paths/orders/cancel.yaml
+  /v1/customer/orders/{order_id}/help:
+    $ref: ./paths/orders/help.yaml
+  /v1/customer/orders/{order_id}/reorder:
+    $ref: ./paths/orders/reorder.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/live:
+    $ref: ./paths/order-handling/live.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/history:
+    $ref: ./paths/order-handling/history.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/pause:
+    $ref: ./paths/order-handling/pause.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}:
+    $ref: ./paths/order-handling/order.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/accept:
+    $ref: ./paths/order-handling/accept.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/decline:
+    $ref: ./paths/order-handling/decline.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/extend:
+    $ref: ./paths/order-handling/extend.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/ready:
+    $ref: ./paths/order-handling/ready.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/collected:
+    $ref: ./paths/order-handling/collected.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/handed-over:
+    $ref: ./paths/order-handling/handed-over.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/delivered:
+    $ref: ./paths/order-handling/delivered.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/cancel:
+    $ref: ./paths/order-handling/cancel.yaml
+  /v1/platform/orders:
+    $ref: ./paths/order-handling/platform-orders.yaml
+  /v1/platform/orders/summary:
+    $ref: ./paths/order-handling/platform-summary.yaml
+  /v1/platform/orders/{order_id}:
+    $ref: ./paths/order-handling/platform-order.yaml
+  /v1/platform/orders/{order_id}/cancel:
+    $ref: ./paths/order-handling/platform-cancel.yaml
+  /v1/platform/orders/{order_id}/refunds/preview:
+    $ref: ./paths/order-handling/refund-preview.yaml
+  /v1/platform/orders/{order_id}/refunds:
+    $ref: ./paths/order-handling/refunds.yaml
+  /v1/platform/orders/{order_id}/help/{help_id}/resolve:
+    $ref: ./paths/order-handling/help-resolve.yaml
+
 components:
   securitySchemes:
     ApiKey:
@@ -850,6 +918,8 @@ components:
       $ref: ./components/parameters/IfNoneMatchHeader.yaml
     CorrelationIdHeader:
       $ref: ./components/parameters/CorrelationIdHeader.yaml
+    VisitorTokenHeader:
+      $ref: ./components/parameters/VisitorTokenHeader.yaml
 
   headers:
     ETag:
@@ -2060,3 +2130,198 @@ components:
       $ref: ./components/schemas/ledger/TrialBalanceLine.yaml
     TrialBalance:
       $ref: ./components/schemas/ledger/TrialBalance.yaml
+    # Orders
+    OrderStatus:
+      $ref: ./components/schemas/orders/OrderStatus.yaml
+    OrderFulfilment:
+      $ref: ./components/schemas/orders/OrderFulfilment.yaml
+    PaymentMethod:
+      $ref: ./components/schemas/orders/PaymentMethod.yaml
+    IfUnavailable:
+      $ref: ./components/schemas/orders/IfUnavailable.yaml
+    PaymentState:
+      $ref: ./components/schemas/orders/PaymentState.yaml
+    OrderMove:
+      $ref: ./components/schemas/orders/OrderMove.yaml
+    OrderTimerKind:
+      $ref: ./components/schemas/orders/OrderTimerKind.yaml
+    OrderActorKind:
+      $ref: ./components/schemas/orders/OrderActorKind.yaml
+    CustomerCancelReason:
+      $ref: ./components/schemas/orders/CustomerCancelReason.yaml
+    DeclineReason:
+      $ref: ./components/schemas/orders/DeclineReason.yaml
+    StoreCancelReason:
+      $ref: ./components/schemas/orders/StoreCancelReason.yaml
+    RefundReason:
+      $ref: ./components/schemas/orders/RefundReason.yaml
+    RefundPayer:
+      $ref: ./components/schemas/orders/RefundPayer.yaml
+    RefundFee:
+      $ref: ./components/schemas/orders/RefundFee.yaml
+    RefundDestination:
+      $ref: ./components/schemas/orders/RefundDestination.yaml
+    HelpKind:
+      $ref: ./components/schemas/orders/HelpKind.yaml
+    AttentionReason:
+      $ref: ./components/schemas/orders/AttentionReason.yaml
+    BasketOwner:
+      $ref: ./components/schemas/orders/BasketOwner.yaml
+    VisitorToken:
+      $ref: ./components/schemas/orders/VisitorToken.yaml
+    BasketClaim:
+      $ref: ./components/schemas/orders/BasketClaim.yaml
+    BasketAnswerInput:
+      $ref: ./components/schemas/orders/BasketAnswerInput.yaml
+    BasketLineInput:
+      $ref: ./components/schemas/orders/BasketLineInput.yaml
+    BasketLineUpdate:
+      $ref: ./components/schemas/orders/BasketLineUpdate.yaml
+    BasketChoicesUpdate:
+      $ref: ./components/schemas/orders/BasketChoicesUpdate.yaml
+    BasketAnswer:
+      $ref: ./components/schemas/orders/BasketAnswer.yaml
+    LineRefusal:
+      $ref: ./components/schemas/orders/LineRefusal.yaml
+    BasketLine:
+      $ref: ./components/schemas/orders/BasketLine.yaml
+    BasketChoices:
+      $ref: ./components/schemas/orders/BasketChoices.yaml
+    DeliveryFee:
+      $ref: ./components/schemas/orders/DeliveryFee.yaml
+    TaxShare:
+      $ref: ./components/schemas/orders/TaxShare.yaml
+    BasketPricing:
+      $ref: ./components/schemas/orders/BasketPricing.yaml
+    BasketRefusal:
+      $ref: ./components/schemas/orders/BasketRefusal.yaml
+    BasketStore:
+      $ref: ./components/schemas/orders/BasketStore.yaml
+    Basket:
+      $ref: ./components/schemas/orders/Basket.yaml
+    BasketSummary:
+      $ref: ./components/schemas/orders/BasketSummary.yaml
+    BasketList:
+      $ref: ./components/schemas/orders/BasketList.yaml
+    CheckoutFulfilment:
+      $ref: ./components/schemas/orders/CheckoutFulfilment.yaml
+    CheckoutAddress:
+      $ref: ./components/schemas/orders/CheckoutAddress.yaml
+    SavedMethodOption:
+      $ref: ./components/schemas/orders/SavedMethodOption.yaml
+    PaymentOption:
+      $ref: ./components/schemas/orders/PaymentOption.yaml
+    WalletBalance:
+      $ref: ./components/schemas/orders/WalletBalance.yaml
+    CheckoutPayment:
+      $ref: ./components/schemas/orders/CheckoutPayment.yaml
+    CheckoutTip:
+      $ref: ./components/schemas/orders/CheckoutTip.yaml
+    CheckoutCutlery:
+      $ref: ./components/schemas/orders/CheckoutCutlery.yaml
+    Checkout:
+      $ref: ./components/schemas/orders/Checkout.yaml
+    OrderPlacement:
+      $ref: ./components/schemas/orders/OrderPlacement.yaml
+    NextAction:
+      $ref: ./components/schemas/orders/NextAction.yaml
+    PaymentStep:
+      $ref: ./components/schemas/orders/PaymentStep.yaml
+    PlacedOrder:
+      $ref: ./components/schemas/orders/PlacedOrder.yaml
+    OrderAnswer:
+      $ref: ./components/schemas/orders/OrderAnswer.yaml
+    LineRemoval:
+      $ref: ./components/schemas/orders/LineRemoval.yaml
+    OrderLine:
+      $ref: ./components/schemas/orders/OrderLine.yaml
+    OrderAddress:
+      $ref: ./components/schemas/orders/OrderAddress.yaml
+    OrderStore:
+      $ref: ./components/schemas/orders/OrderStore.yaml
+    PaymentSplit:
+      $ref: ./components/schemas/orders/PaymentSplit.yaml
+    RefundLine:
+      $ref: ./components/schemas/orders/RefundLine.yaml
+    RefundFeePart:
+      $ref: ./components/schemas/orders/RefundFeePart.yaml
+    OrderRefund:
+      $ref: ./components/schemas/orders/OrderRefund.yaml
+    Receipt:
+      $ref: ./components/schemas/orders/Receipt.yaml
+    OrderStep:
+      $ref: ./components/schemas/orders/OrderStep.yaml
+    OrderPromise:
+      $ref: ./components/schemas/orders/OrderPromise.yaml
+    OrderEnd:
+      $ref: ./components/schemas/orders/OrderEnd.yaml
+    HelpRequest:
+      $ref: ./components/schemas/orders/HelpRequest.yaml
+    OrderHelp:
+      $ref: ./components/schemas/orders/OrderHelp.yaml
+    CustomerOrder:
+      $ref: ./components/schemas/orders/CustomerOrder.yaml
+    CustomerOrderSummary:
+      $ref: ./components/schemas/orders/CustomerOrderSummary.yaml
+    CustomerOrderPage:
+      $ref: ./components/schemas/orders/CustomerOrderPage.yaml
+    CustomerCancellation:
+      $ref: ./components/schemas/orders/CustomerCancellation.yaml
+    HelpRequestInput:
+      $ref: ./components/schemas/orders/HelpRequestInput.yaml
+    NotCopied:
+      $ref: ./components/schemas/orders/NotCopied.yaml
+    Reorder:
+      $ref: ./components/schemas/orders/Reorder.yaml
+    OrderCustomer:
+      $ref: ./components/schemas/orders/OrderCustomer.yaml
+    OrderTimer:
+      $ref: ./components/schemas/orders/OrderTimer.yaml
+    OrderHistoryEntry:
+      $ref: ./components/schemas/orders/OrderHistoryEntry.yaml
+    StoreOrder:
+      $ref: ./components/schemas/orders/StoreOrder.yaml
+    OrderTaking:
+      $ref: ./components/schemas/orders/OrderTaking.yaml
+    LiveOrderCounts:
+      $ref: ./components/schemas/orders/LiveOrderCounts.yaml
+    LiveOrders:
+      $ref: ./components/schemas/orders/LiveOrders.yaml
+    AcceptOrder:
+      $ref: ./components/schemas/orders/AcceptOrder.yaml
+    DeclineOrder:
+      $ref: ./components/schemas/orders/DeclineOrder.yaml
+    ExtendPreparation:
+      $ref: ./components/schemas/orders/ExtendPreparation.yaml
+    StoreCancellation:
+      $ref: ./components/schemas/orders/StoreCancellation.yaml
+    OrderPause:
+      $ref: ./components/schemas/orders/OrderPause.yaml
+    OrderHistoryRow:
+      $ref: ./components/schemas/orders/OrderHistoryRow.yaml
+    OrderHistoryTotals:
+      $ref: ./components/schemas/orders/OrderHistoryTotals.yaml
+    OrderHistory:
+      $ref: ./components/schemas/orders/OrderHistory.yaml
+    PlatformOrderRow:
+      $ref: ./components/schemas/orders/PlatformOrderRow.yaml
+    PlatformOrderPage:
+      $ref: ./components/schemas/orders/PlatformOrderPage.yaml
+    PlatformOrder:
+      $ref: ./components/schemas/orders/PlatformOrder.yaml
+    PlatformCancellation:
+      $ref: ./components/schemas/orders/PlatformCancellation.yaml
+    RefundLineInput:
+      $ref: ./components/schemas/orders/RefundLineInput.yaml
+    RefundInput:
+      $ref: ./components/schemas/orders/RefundInput.yaml
+    RefundPreview:
+      $ref: ./components/schemas/orders/RefundPreview.yaml
+    HelpResolution:
+      $ref: ./components/schemas/orders/HelpResolution.yaml
+    OrderStatusCounts:
+      $ref: ./components/schemas/orders/OrderStatusCounts.yaml
+    AttentionCounts:
+      $ref: ./components/schemas/orders/AttentionCounts.yaml
+    PlatformOrderSummary:
+      $ref: ./components/schemas/orders/PlatformOrderSummary.yaml

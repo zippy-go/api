@@ -1,0 +1,63 @@
+type: object
+description: "An answer on a basket line, priced: the question it answers, the answer, how many, its price at that question for this item, its mark, and the answers it carries in turn."
+required:
+  - modifier_id
+  - question
+  - item_id
+  - name
+  - quantity
+  - unit_price
+  - food_mark
+  - answers
+properties:
+  modifier_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    description: The question.
+  question:
+    type: string
+    examples:
+      - Choose your raita
+    description: The question as the store words it, in English.
+  item_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    description: The answer.
+  name:
+    type: string
+    examples:
+      - Boondi raita
+    description: The answer's name, in English.
+  quantity:
+    type: integer
+    examples:
+      - 1
+    description: How many.
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: Its price each, tax included.
+  food_mark:
+    oneOf:
+      - $ref: ../catalog/FoodMark.yaml
+      - type: "null"
+    description: Veg or non-veg, where the store marks it.
+  answers:
+    type: array
+    items:
+      $ref: ./BasketAnswer.yaml
+    description: The answers it carries in turn.
+examples:
+  - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    question: Choose your raita
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    name: Boondi raita
+    quantity: 1
+    unit_price:
+      minor_units: 4000
+      currency: INR
+    food_mark: veg
+    answers: []

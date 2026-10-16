@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.cancelled.v1.schema.json",
+  "title": "OrderingOrderCancelledPayload",
+  "description": "Payload of `ordering.order.cancelled` version 1. An order was cancelled: by the customer before acceptance (while still paying too, when they gave up paying: `previous_status` `paying`, nothing taken and the store never told), by the store after it, or by Mission Control at any point. Everything held is released and everything paid goes back, each part where it came from; `payer` bears a refund after acceptance. Consumers: notifications, payments (releases what ordering's own call did not), the ledger (reverses an accepted order's split). The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. Read the order at `GET /v1/platform/orders/{order_id}`, `GET /v1/customer/orders/{order_id}` or the store's route. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "by",
+    "reason",
+    "released_amount",
+    "refunded_amount",
+    "payer"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ],
+      "description": "The status after the change.",
+      "examples": [
+        "placed"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before; `null` for a first status.",
+      "examples": [
+        "paying"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The order's version after the change; it only rises, and signals carry it.",
+      "examples": [
+        2
+      ]
+    },
+    "fulfilment": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "pickup"
+      ],
+      "description": "Delivery or pickup.",
+      "examples": [
+        "delivery"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "The currency of every amount, in its minor unit.",
+      "examples": [
+        "INR"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T13:00:00Z"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "staff",
+        "platform",
+        "system"
+      ],
+      "description": "Who made the move.",
+      "examples": [
+        "staff"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "The reason code: a customer's, a store's or Mission Control's.",
+      "examples": [
+        "changed_my_mind"
+      ]
+    },
+    "released_amount": {
+      "type": "integer",
+      "description": "What was held and let go.",
+      "examples": [
+        0
+      ]
+    },
+    "refunded_amount": {
+      "type": "integer",
+      "description": "What was taken and goes back.",
+      "examples": [
+        79800
+      ]
+    },
+    "payer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "partner",
+        "platform",
+        null
+      ],
+      "description": "Who bears the refund; `null` when the money went back before acceptance.",
+      "examples": [
+        null
+      ]
+    }
+  }
+}

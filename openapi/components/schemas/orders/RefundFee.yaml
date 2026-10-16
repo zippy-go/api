@@ -1,0 +1,9 @@
+type: string
+description: A fee a refund may give back whole, what is left of it.
+enum:
+  - delivery
+  - tip
+  - cutlery
+  - small_order
+examples:
+  - delivery

@@ -1,0 +1,27 @@
+# Path item for /v1/visitor-tokens. Referenced from openapi.yaml.
+post:
+  operationId: createVisitorToken
+  summary: Mint a visitor token
+  description: "A new visitor token: 256 random bits the visitor's baskets are kept under until they sign in, sent back as `X-Visitor-Token`. The token is a secret the device keeps; the platform keeps only its digest. A basket kept under it and not changed for the platform's idle days (`ordering.basket_idle_days`, 7) is emptied."
+  tags:
+    - Baskets
+  security: []
+  responses:
+    "201":
+      description: The token.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/VisitorToken.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

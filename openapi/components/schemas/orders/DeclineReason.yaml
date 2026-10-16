@@ -1,0 +1,12 @@
+type: string
+description: Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own.
+enum:
+  - out_of_stock
+  - too_busy
+  - closing
+  - customer_asked
+  - other
+  - not_answered
+  - payment_failed
+examples:
+  - out_of_stock

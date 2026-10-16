@@ -1,0 +1,17 @@
+type: object
+description: A fee a refund gives back.
+required:
+  - fee
+  - amount
+properties:
+  fee:
+    $ref: ./RefundFee.yaml
+    description: The fee.
+  amount:
+    $ref: ../common/Money.yaml
+    description: What of it is given back.
+examples:
+  - fee: delivery
+    amount:
+      minor_units: 4000
+      currency: INR

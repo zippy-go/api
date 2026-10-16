@@ -1,0 +1,21 @@
+type: object
+description: Whether checkout asks about disposable cutlery and what it costs.
+required:
+  - asked
+  - fee
+properties:
+  asked:
+    type: boolean
+    examples:
+      - false
+    description: Whether the store asks.
+  fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What saying yes costs.
+examples:
+  - asked: false
+    fee:
+      minor_units: 500
+      currency: INR

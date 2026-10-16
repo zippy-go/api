@@ -1,0 +1,57 @@
+type: object
+description: "One move of an order: the status it moved to, when, who and why."
+required:
+  - status
+  - previous_status
+  - at
+  - by
+  - name
+  - reason
+  - note
+properties:
+  status:
+    $ref: ./OrderStatus.yaml
+    description: The status it moved to.
+  previous_status:
+    oneOf:
+      - $ref: ./OrderStatus.yaml
+      - type: "null"
+    description: The status before.
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:02:00Z
+    description: When.
+  by:
+    $ref: ./OrderActorKind.yaml
+    description: Who.
+  name:
+    type:
+      - string
+      - "null"
+    examples:
+      - Dev owner
+    description: A staff member's name to the Partner; an operator's to Mission Control; `null` for the customer, the platform as the Partner sees it, and the clock.
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - too_busy
+    description: The reason code given.
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - Kitchen at capacity
+    description: The note given.
+examples:
+  - status: paying
+    previous_status: paying
+    at: 2026-10-16T13:02:00Z
+    by: customer
+    name: Dev owner
+    reason: too_busy
+    note: Kitchen at capacity

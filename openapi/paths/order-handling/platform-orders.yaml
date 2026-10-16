@@ -1,0 +1,112 @@
+# Path item for /v1/platform/orders. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformOrders
+  summary: List orders across every store
+  description: "Every order on the platform, most recently placed first, a page at a time: by default the live ones (not final, or finished in the last 24 hours), each with the move it waits for, its timer and what needs attention (a store not answering after five minutes, an order past its promise, an open help request, a payment that failed). Narrow by status, store, Partner, attention, or a number or a store's name typed. Mission Control tokens only, with `order:read` to read; Mission Control moves an order through the store's routes with `order:manage`."
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  parameters:
+    - name: scope
+      in: query
+      required: false
+      description: "`live` (the default) or `all`."
+      schema:
+        type: string
+        enum:
+          - live
+          - all
+        default: live
+    - name: status
+      in: query
+      required: false
+      description: Only orders in this status.
+      schema:
+        $ref: ../../components/schemas/orders/OrderStatus.yaml
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's orders.
+      schema:
+        type: string
+        format: uuid
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's orders.
+      schema:
+        type: string
+        format: uuid
+    - name: zone_id
+      in: query
+      required: false
+      description: Only orders placed in this zone.
+      schema:
+        type: string
+        format: uuid
+    - name: attention
+      in: query
+      required: false
+      description: Only orders that need attention.
+      schema:
+        type: boolean
+    - name: q
+      in: query
+      required: false
+      description: An order number, or a store's name, at most 100 characters.
+      schema:
+        type: string
+        maxLength: 100
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: Where the page starts.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of orders.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/PlatformOrderPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission) or `forbidden` (another surface)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

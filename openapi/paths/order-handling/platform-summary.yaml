@@ -1,0 +1,78 @@
+# Path item for /v1/platform/orders/summary. Referenced from openapi.yaml.
+get:
+  operationId: getPlatformOrderSummary
+  summary: Count orders across every store
+  description: "How many orders are in each status, how many are not final and how many need attention for each reason (a store not answering after five minutes, an order past its promise, an open help request, a payment that failed), counted where the orders are kept rather than from a page of them: by default the live ones (not final, or finished in the last 24 hours), narrowed by Partner, store and zone. Mission Control tokens only, with `order:read` to read; Mission Control moves an order through the store's routes with `order:manage`."
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  parameters:
+    - name: scope
+      in: query
+      required: false
+      description: "`live` (the default) or `all`."
+      schema:
+        type: string
+        enum:
+          - live
+          - all
+        default: live
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's orders.
+      schema:
+        type: string
+        format: uuid
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's orders.
+      schema:
+        type: string
+        format: uuid
+    - name: zone_id
+      in: query
+      required: false
+      description: Only orders placed in this zone.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: The counts.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/PlatformOrderSummary.yaml
+    "400":
+      description: "`validation_failed`: a scope or an identifier malformed."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission) or `forbidden` (another surface)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,53 @@
+# Path item for /v1/baskets/claim. Referenced from openapi.yaml.
+post:
+  operationId: claimBaskets
+  summary: Take a visitor's baskets after signing in
+  description: "Makes every basket kept under the visitor token the signed-in customer's: a store where the customer had no basket takes the visitor's as it is; at a store where both had one, the visitor's lines join the customer's, the same choice raising a line's quantity. The visitor's baskets are then gone. Claiming an unknown or spent token answers the customer's baskets unchanged. Customer tokens only."
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The visitor token.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/BasketClaim.yaml
+  responses:
+    "200":
+      description: The customer's baskets.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/BasketList.yaml
+    "400":
+      description: "`validation_failed`: the token is malformed."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

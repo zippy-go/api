@@ -1,0 +1,20 @@
+type: object
+description: Every basket of the caller, one per store, most recently changed first, so a half-filled basket at another store is never lost.
+required:
+  - baskets
+properties:
+  baskets:
+    type: array
+    items:
+      $ref: ./BasketSummary.yaml
+    description: The baskets.
+examples:
+  - baskets:
+      - location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        store_name: Dev Kitchen Gachibowli
+        item_count: 2
+        total:
+          minor_units: 73800
+          currency: INR
+        updated_at: 2026-10-16T12:58:00Z

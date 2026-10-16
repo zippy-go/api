@@ -1,0 +1,7 @@
+type: string
+description: "How an order leaves the store: delivered to the customer, or collected at the counter."
+enum:
+  - delivery
+  - pickup
+examples:
+  - delivery

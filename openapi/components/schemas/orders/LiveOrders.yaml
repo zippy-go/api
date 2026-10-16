@@ -1,0 +1,716 @@
+type: object
+description: "A store's live orders: new ones oldest first, those being prepared soonest due first, ready ones longest waiting first, deliveries on their way longest on their way first (they stay until delivered or cancelled), and those finished in the last 24 hours. Kitchen mode shows `next_new_order_id` on the whole screen until it is answered. Read it again on `order.changed`, and every 30 seconds without live updates."
+required:
+  - location_id
+  - at
+  - taking
+  - counts
+  - new
+  - preparing
+  - ready
+  - on_its_way
+  - recent
+  - next_new_order_id
+properties:
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:05:00Z
+    description: The instant the answer is for.
+  taking:
+    $ref: ./OrderTaking.yaml
+    description: Whether it takes new orders now.
+  counts:
+    $ref: ./LiveOrderCounts.yaml
+    description: How many in each group.
+  new:
+    type: array
+    items:
+      $ref: ./StoreOrder.yaml
+    description: Placed, oldest first.
+  preparing:
+    type: array
+    items:
+      $ref: ./StoreOrder.yaml
+    description: Accepted, soonest due first.
+  ready:
+    type: array
+    items:
+      $ref: ./StoreOrder.yaml
+    description: Ready, longest waiting first.
+  on_its_way:
+    type: array
+    items:
+      $ref: ./StoreOrder.yaml
+    description: Deliveries handed over and on their way (and any not delivered), longest on their way first, until delivered or cancelled. Delivered by hand from the board until dispatch arrives in step 4.
+  recent:
+    type: array
+    items:
+      $ref: ./StoreOrder.yaml
+    description: Finished in the last 24 hours, newest first.
+  next_new_order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    description: "The oldest new order: the one kitchen mode shows."
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    at: 2026-10-16T13:05:00Z
+    taking:
+      state: online
+      reason: paused
+      until: 2026-10-16T13:15:00Z
+      pause:
+        until: 2026-10-15T13:40:00Z
+        reason: high_demand
+        message: Back after the rush
+        paused_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+        paused_at: 2026-10-15T13:00:00Z
+      preparation_minutes: 20
+    counts:
+      new: 1
+      preparing: 2
+      ready: 0
+      on_its_way: 1
+      recent: 5
+    new:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        fulfilment: delivery
+        carrier: platform_fleet
+        customer:
+          first_name: Asha
+          mobile: "+919876543210"
+          address:
+            label: home
+            line1: Road No 36
+            line2: Near the park
+            locality: Jubilee Hills
+            city: Hyderabad
+            postal_code: "500033"
+            lat: 17.4326
+            lng: 78.4071
+            flat_number: "402"
+            building_name: Lake View Residency
+            floor: "4"
+            landmark: opposite the water tank
+          instructions: Ring the bell twice
+        placed_at: 2026-10-16T13:00:00Z
+        accept_by: 2026-10-16T13:30:00Z
+        accepted_at: 2026-10-16T13:02:00Z
+        preparation_minutes: 20
+        ready_by: 2026-10-16T13:22:00Z
+        due_by: 2026-10-16T13:52:00Z
+        ready_at: 2026-10-16T13:20:00Z
+        completed_at: 2026-10-16T13:45:00Z
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        if_unavailable: remove
+        lines:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            name: Hyderabadi Chicken Biryani
+            variant_label: Full
+            food_mark: veg
+            answers:
+              - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+                question: Choose your raita
+                item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+                name: Boondi raita
+                quantity: 1
+                unit_price:
+                  minor_units: 4000
+                  currency: INR
+                food_mark: veg
+                answers: []
+            quantity: 1
+            note: Less oil
+            unit_price:
+              minor_units: 34900
+              currency: INR
+            price:
+              minor_units: 34900
+              currency: INR
+            saving:
+              minor_units: 3000
+              currency: INR
+            tax_rate_percent: 5
+            removed:
+              at: 2026-10-16T13:02:00Z
+              reason: left_out_at_acceptance
+            refunded_quantity: 0
+        item_count: 2
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        to_collect:
+          minor_units: 75800
+          currency: INR
+        payment_method: upi
+        cutlery: false
+        history:
+          - status: paying
+            previous_status: paying
+            at: 2026-10-16T13:02:00Z
+            by: customer
+            name: Dev owner
+            reason: too_busy
+            note: Kitchen at capacity
+        refunds:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+            amount:
+              minor_units: 4000
+              currency: INR
+            to_source:
+              minor_units: 4000
+              currency: INR
+            to_wallet:
+              minor_units: 0
+              currency: INR
+            reason: missing_items
+            note: Raita missing from the bag
+            payer: partner
+            lines:
+              - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+                quantity: 1
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            fees:
+              - fee: delivery
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            created_at: 2026-10-16T14:10:00Z
+            by: Platform admin
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+        cancellable: false
+    preparing:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        fulfilment: delivery
+        carrier: platform_fleet
+        customer:
+          first_name: Asha
+          mobile: "+919876543210"
+          address:
+            label: home
+            line1: Road No 36
+            line2: Near the park
+            locality: Jubilee Hills
+            city: Hyderabad
+            postal_code: "500033"
+            lat: 17.4326
+            lng: 78.4071
+            flat_number: "402"
+            building_name: Lake View Residency
+            floor: "4"
+            landmark: opposite the water tank
+          instructions: Ring the bell twice
+        placed_at: 2026-10-16T13:00:00Z
+        accept_by: 2026-10-16T13:30:00Z
+        accepted_at: 2026-10-16T13:02:00Z
+        preparation_minutes: 20
+        ready_by: 2026-10-16T13:22:00Z
+        due_by: 2026-10-16T13:52:00Z
+        ready_at: 2026-10-16T13:20:00Z
+        completed_at: 2026-10-16T13:45:00Z
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        if_unavailable: remove
+        lines:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            name: Hyderabadi Chicken Biryani
+            variant_label: Full
+            food_mark: veg
+            answers:
+              - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+                question: Choose your raita
+                item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+                name: Boondi raita
+                quantity: 1
+                unit_price:
+                  minor_units: 4000
+                  currency: INR
+                food_mark: veg
+                answers: []
+            quantity: 1
+            note: Less oil
+            unit_price:
+              minor_units: 34900
+              currency: INR
+            price:
+              minor_units: 34900
+              currency: INR
+            saving:
+              minor_units: 3000
+              currency: INR
+            tax_rate_percent: 5
+            removed:
+              at: 2026-10-16T13:02:00Z
+              reason: left_out_at_acceptance
+            refunded_quantity: 0
+        item_count: 2
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        to_collect:
+          minor_units: 75800
+          currency: INR
+        payment_method: upi
+        cutlery: false
+        history:
+          - status: paying
+            previous_status: paying
+            at: 2026-10-16T13:02:00Z
+            by: customer
+            name: Dev owner
+            reason: too_busy
+            note: Kitchen at capacity
+        refunds:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+            amount:
+              minor_units: 4000
+              currency: INR
+            to_source:
+              minor_units: 4000
+              currency: INR
+            to_wallet:
+              minor_units: 0
+              currency: INR
+            reason: missing_items
+            note: Raita missing from the bag
+            payer: partner
+            lines:
+              - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+                quantity: 1
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            fees:
+              - fee: delivery
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            created_at: 2026-10-16T14:10:00Z
+            by: Platform admin
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+        cancellable: false
+    ready:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        fulfilment: delivery
+        carrier: platform_fleet
+        customer:
+          first_name: Asha
+          mobile: "+919876543210"
+          address:
+            label: home
+            line1: Road No 36
+            line2: Near the park
+            locality: Jubilee Hills
+            city: Hyderabad
+            postal_code: "500033"
+            lat: 17.4326
+            lng: 78.4071
+            flat_number: "402"
+            building_name: Lake View Residency
+            floor: "4"
+            landmark: opposite the water tank
+          instructions: Ring the bell twice
+        placed_at: 2026-10-16T13:00:00Z
+        accept_by: 2026-10-16T13:30:00Z
+        accepted_at: 2026-10-16T13:02:00Z
+        preparation_minutes: 20
+        ready_by: 2026-10-16T13:22:00Z
+        due_by: 2026-10-16T13:52:00Z
+        ready_at: 2026-10-16T13:20:00Z
+        completed_at: 2026-10-16T13:45:00Z
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        if_unavailable: remove
+        lines:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            name: Hyderabadi Chicken Biryani
+            variant_label: Full
+            food_mark: veg
+            answers:
+              - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+                question: Choose your raita
+                item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+                name: Boondi raita
+                quantity: 1
+                unit_price:
+                  minor_units: 4000
+                  currency: INR
+                food_mark: veg
+                answers: []
+            quantity: 1
+            note: Less oil
+            unit_price:
+              minor_units: 34900
+              currency: INR
+            price:
+              minor_units: 34900
+              currency: INR
+            saving:
+              minor_units: 3000
+              currency: INR
+            tax_rate_percent: 5
+            removed:
+              at: 2026-10-16T13:02:00Z
+              reason: left_out_at_acceptance
+            refunded_quantity: 0
+        item_count: 2
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        to_collect:
+          minor_units: 75800
+          currency: INR
+        payment_method: upi
+        cutlery: false
+        history:
+          - status: paying
+            previous_status: paying
+            at: 2026-10-16T13:02:00Z
+            by: customer
+            name: Dev owner
+            reason: too_busy
+            note: Kitchen at capacity
+        refunds:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+            amount:
+              minor_units: 4000
+              currency: INR
+            to_source:
+              minor_units: 4000
+              currency: INR
+            to_wallet:
+              minor_units: 0
+              currency: INR
+            reason: missing_items
+            note: Raita missing from the bag
+            payer: partner
+            lines:
+              - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+                quantity: 1
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            fees:
+              - fee: delivery
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            created_at: 2026-10-16T14:10:00Z
+            by: Platform admin
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+        cancellable: false
+    on_its_way:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        fulfilment: delivery
+        carrier: platform_fleet
+        customer:
+          first_name: Asha
+          mobile: "+919876543210"
+          address:
+            label: home
+            line1: Road No 36
+            line2: Near the park
+            locality: Jubilee Hills
+            city: Hyderabad
+            postal_code: "500033"
+            lat: 17.4326
+            lng: 78.4071
+            flat_number: "402"
+            building_name: Lake View Residency
+            floor: "4"
+            landmark: opposite the water tank
+          instructions: Ring the bell twice
+        placed_at: 2026-10-16T13:00:00Z
+        accept_by: 2026-10-16T13:30:00Z
+        accepted_at: 2026-10-16T13:02:00Z
+        preparation_minutes: 20
+        ready_by: 2026-10-16T13:22:00Z
+        due_by: 2026-10-16T13:52:00Z
+        ready_at: 2026-10-16T13:20:00Z
+        completed_at: 2026-10-16T13:45:00Z
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        if_unavailable: remove
+        lines:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            name: Hyderabadi Chicken Biryani
+            variant_label: Full
+            food_mark: veg
+            answers:
+              - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+                question: Choose your raita
+                item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+                name: Boondi raita
+                quantity: 1
+                unit_price:
+                  minor_units: 4000
+                  currency: INR
+                food_mark: veg
+                answers: []
+            quantity: 1
+            note: Less oil
+            unit_price:
+              minor_units: 34900
+              currency: INR
+            price:
+              minor_units: 34900
+              currency: INR
+            saving:
+              minor_units: 3000
+              currency: INR
+            tax_rate_percent: 5
+            removed:
+              at: 2026-10-16T13:02:00Z
+              reason: left_out_at_acceptance
+            refunded_quantity: 0
+        item_count: 2
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        to_collect:
+          minor_units: 75800
+          currency: INR
+        payment_method: upi
+        cutlery: false
+        history:
+          - status: paying
+            previous_status: paying
+            at: 2026-10-16T13:02:00Z
+            by: customer
+            name: Dev owner
+            reason: too_busy
+            note: Kitchen at capacity
+        refunds:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+            amount:
+              minor_units: 4000
+              currency: INR
+            to_source:
+              minor_units: 4000
+              currency: INR
+            to_wallet:
+              minor_units: 0
+              currency: INR
+            reason: missing_items
+            note: Raita missing from the bag
+            payer: partner
+            lines:
+              - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+                quantity: 1
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            fees:
+              - fee: delivery
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            created_at: 2026-10-16T14:10:00Z
+            by: Platform admin
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+        cancellable: false
+    recent:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        fulfilment: delivery
+        carrier: platform_fleet
+        customer:
+          first_name: Asha
+          mobile: "+919876543210"
+          address:
+            label: home
+            line1: Road No 36
+            line2: Near the park
+            locality: Jubilee Hills
+            city: Hyderabad
+            postal_code: "500033"
+            lat: 17.4326
+            lng: 78.4071
+            flat_number: "402"
+            building_name: Lake View Residency
+            floor: "4"
+            landmark: opposite the water tank
+          instructions: Ring the bell twice
+        placed_at: 2026-10-16T13:00:00Z
+        accept_by: 2026-10-16T13:30:00Z
+        accepted_at: 2026-10-16T13:02:00Z
+        preparation_minutes: 20
+        ready_by: 2026-10-16T13:22:00Z
+        due_by: 2026-10-16T13:52:00Z
+        ready_at: 2026-10-16T13:20:00Z
+        completed_at: 2026-10-16T13:45:00Z
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        if_unavailable: remove
+        lines:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+            name: Hyderabadi Chicken Biryani
+            variant_label: Full
+            food_mark: veg
+            answers:
+              - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+                question: Choose your raita
+                item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+                name: Boondi raita
+                quantity: 1
+                unit_price:
+                  minor_units: 4000
+                  currency: INR
+                food_mark: veg
+                answers: []
+            quantity: 1
+            note: Less oil
+            unit_price:
+              minor_units: 34900
+              currency: INR
+            price:
+              minor_units: 34900
+              currency: INR
+            saving:
+              minor_units: 3000
+              currency: INR
+            tax_rate_percent: 5
+            removed:
+              at: 2026-10-16T13:02:00Z
+              reason: left_out_at_acceptance
+            refunded_quantity: 0
+        item_count: 2
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        to_collect:
+          minor_units: 75800
+          currency: INR
+        payment_method: upi
+        cutlery: false
+        history:
+          - status: paying
+            previous_status: paying
+            at: 2026-10-16T13:02:00Z
+            by: customer
+            name: Dev owner
+            reason: too_busy
+            note: Kitchen at capacity
+        refunds:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+            amount:
+              minor_units: 4000
+              currency: INR
+            to_source:
+              minor_units: 4000
+              currency: INR
+            to_wallet:
+              minor_units: 0
+              currency: INR
+            reason: missing_items
+            note: Raita missing from the bag
+            payer: partner
+            lines:
+              - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+                quantity: 1
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            fees:
+              - fee: delivery
+                amount:
+                  minor_units: 4000
+                  currency: INR
+            created_at: 2026-10-16T14:10:00Z
+            by: Platform admin
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+        cancellable: false
+    next_new_order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01

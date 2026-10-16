@@ -1,0 +1,8 @@
+type: string
+description: "How what the Wallet does not cover is paid: UPI, a card, or cash to the agent or at the counter."
+enum:
+  - upi
+  - card
+  - cash
+examples:
+  - upi

@@ -1,0 +1,8 @@
+type: string
+description: "What the store does when an item is unavailable at acceptance: leave it out (the default), send something similar at no extra cost, or cancel the whole order."
+enum:
+  - remove
+  - similar
+  - cancel
+examples:
+  - remove

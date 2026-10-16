@@ -1,0 +1,41 @@
+type: object
+description: "The promise still open: when the order should be ready and when it should be at the door or the counter."
+required:
+  - preparation_minutes
+  - ready_by
+  - due_by
+  - late
+properties:
+  preparation_minutes:
+    type:
+      - integer
+      - "null"
+    examples:
+      - 20
+    description: The preparation time the store accepted with.
+  ready_by:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:22:00Z
+    description: When it should be ready.
+  due_by:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:52:00Z
+    description: When it should be at the door, or ready to collect.
+  late:
+    type: boolean
+    examples:
+      - false
+    description: Whether it is past its promise.
+examples:
+  - preparation_minutes: 20
+    ready_by: 2026-10-16T13:22:00Z
+    due_by: 2026-10-16T13:52:00Z
+    late: false

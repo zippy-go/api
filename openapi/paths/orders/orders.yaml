@@ -1,0 +1,128 @@
+# Path item for /v1/customer/orders. Referenced from openapi.yaml.
+post:
+  operationId: placeOrder
+  summary: Place the basket as an order
+  description: "Places the customer's basket at a store, checking everything again against this moment: the store live and open, every item available and in stock and sold this way, the address deliverable, the way to pay accepted and within its limit, and the price unchanged since it was shown (`quote`). The price charged is the price shown. The order keeps what was sold as it was: names, marks, answers, prices, the store and the address. Paying starts at once through the payments module: the Wallet first when it is used, the rest by the chosen method (a saved card or UPI ID when `saved_method_id` names one). An order with something to take waits as `paying` with `payment.next_action`: the customer opens the provider's page (or approves the request in their UPI app), the provider's page sends them back to `return_url` (the order's page on the storefront by default), and the order is `placed` once the provider confirms the payment; read the order again on `order.changed`. An order with nothing to take now (cash, or the Wallet paying everything) is placed at once. An order not paid within the platform's window expires with everything held released; the customer may give up paying with `POST /v1/customer/orders/{order_id}/cancel`. A try that failed leaves the order paying: another try is `POST /v1/customer/payments/{payment_id}/attempts` (the payment is `GET /v1/customer/payments?order_id=`). `Idempotency-Key` is required: placing again with the same key answers the order the first placed, and places nothing new. Nothing is charged or held when placing is refused. `409` with a stable code and a sentence a screen may show as it is: `basket_empty`; `store_not_trading` (closed, paused or not live); `method_not_offered` (the store does not offer delivery, or pickup); `address_missing` or `address_outside_area` (offering pickup where the store has it); `lines_refused` with each line's code (`item_unavailable`, `item_out_of_hours`, `item_pre_order_only`, `item_not_this_way`, `over_limit`, `choice_invalid`); `below_minimum`; `age_not_confirmed` or `age_under_18`; `payment_method_missing`, `payment_method_not_offered` or `cod_over_limit`; `tip_not_allowed` or `tip_too_high`; `price_changed` when anything changed since the quote was shown (read the basket again and show the difference)."
+  tags:
+    - Orders
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The store and the quote shown.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/OrderPlacement.yaml
+  responses:
+    "201":
+      description: The order, with where its payment stands.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/PlacedOrder.yaml
+    "400":
+      description: "`validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`) or malformed, the body is malformed, `return_url` is not an address of the platform's apps (`return_url_not_allowed`), or `saved_method_id` names no usable saved method of the basket's way to pay."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the store."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: A refusal, as listed above, or `idempotency_key_reuse`.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+get:
+  operationId: listCustomerOrders
+  summary: List the customer's orders
+  description: "My orders: the ones still moving first (\"Happening now\"), then the rest newest first, a page at a time, each with its store, date, status in plain words, way of ordering, item count and total. An order never paid for is not listed. Read it again on `order.changed` on the customer's orders channel."
+  tags:
+    - Orders
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 50; 20 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of orders.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/CustomerOrderPage.yaml
+    "400":
+      description: "`validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

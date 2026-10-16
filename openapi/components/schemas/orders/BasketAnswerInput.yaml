@@ -1,0 +1,36 @@
+type: object
+description: "An answer to one of the questions an item, or an answer, asks; answers are items. Answers nest three deep at most: a meal's burger, the burger's cooking."
+required:
+  - modifier_id
+  - item_id
+properties:
+  modifier_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    description: The question.
+  item_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    description: The answer, an item of the store.
+  quantity:
+    type: integer
+    minimum: 1
+    maximum: 99
+    default: 1
+    examples:
+      - 1
+    description: How many of it, where the question lets an answer repeat; 1 otherwise.
+  answers:
+    type: array
+    items:
+      $ref: ./BasketAnswerInput.yaml
+    description: The answers to the questions this answer asks in turn.
+examples:
+  - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+    quantity: 1
+    answers: []

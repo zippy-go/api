@@ -1,0 +1,75 @@
+type: object
+description: How many orders are in each status.
+required:
+  - paying
+  - placed
+  - accepted
+  - ready
+  - on_its_way
+  - undelivered
+  - completed
+  - declined
+  - cancelled
+  - expired
+properties:
+  paying:
+    type: integer
+    examples:
+      - 1
+    description: Waiting for the payment.
+  placed:
+    type: integer
+    examples:
+      - 3
+    description: Waiting to be accepted.
+  accepted:
+    type: integer
+    examples:
+      - 5
+    description: Being prepared.
+  ready:
+    type: integer
+    examples:
+      - 2
+    description: Ready.
+  on_its_way:
+    type: integer
+    examples:
+      - 4
+    description: On its way.
+  undelivered:
+    type: integer
+    examples:
+      - 0
+    description: Not delivered.
+  completed:
+    type: integer
+    examples:
+      - 41
+    description: Collected or delivered.
+  declined:
+    type: integer
+    examples:
+      - 2
+    description: Declined.
+  cancelled:
+    type: integer
+    examples:
+      - 1
+    description: Cancelled.
+  expired:
+    type: integer
+    examples:
+      - 1
+    description: Never paid for.
+examples:
+  - paying: 1
+    placed: 3
+    accepted: 5
+    ready: 2
+    on_its_way: 4
+    undelivered: 0
+    completed: 41
+    declined: 2
+    cancelled: 1
+    expired: 1

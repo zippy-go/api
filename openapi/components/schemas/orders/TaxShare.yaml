@@ -1,0 +1,26 @@
+type: object
+description: "The GST a total includes at one rate: the taxable amount times the rate over 100 plus the rate, rounded half up once."
+required:
+  - rate_percent
+  - taxable
+  - tax
+properties:
+  rate_percent:
+    type: number
+    examples:
+      - 5
+    description: The rate.
+  taxable:
+    $ref: ../common/Money.yaml
+    description: The amount, tax included, charged at the rate.
+  tax:
+    $ref: ../common/Money.yaml
+    description: The tax it includes.
+examples:
+  - rate_percent: 5
+    taxable:
+      minor_units: 73800
+      currency: INR
+    tax:
+      minor_units: 3514
+      currency: INR

@@ -1,0 +1,40 @@
+type: object
+description: How many orders need attention, for each reason and in all.
+required:
+  - not_answered
+  - late
+  - help
+  - payment_failed
+  - orders
+properties:
+  not_answered:
+    type: integer
+    examples:
+      - 1
+    description: Placed and not answered after the alert's minutes (`ordering.not_answered_alert_minutes`, 5).
+  late:
+    type: integer
+    examples:
+      - 2
+    description: Past the promised time by more than the grace (`ordering.late_grace_minutes`, 5).
+  help:
+    type: integer
+    examples:
+      - 1
+    description: With an open help request.
+  payment_failed:
+    type: integer
+    examples:
+      - 0
+    description: Still paying after the payment failed.
+  orders:
+    type: integer
+    examples:
+      - 3
+    description: Orders needing attention for any of these, each counted once.
+examples:
+  - not_answered: 1
+    late: 2
+    help: 1
+    payment_failed: 0
+    orders: 3

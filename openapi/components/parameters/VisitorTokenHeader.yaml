@@ -1,0 +1,14 @@
+# Shared header parameter `X-Visitor-Token`. Referenced from the basket operations and
+# registered under components.parameters in openapi.yaml.
+name: X-Visitor-Token
+in: header
+required: false
+description: |
+  A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+  visitor who is not signed in are kept under it until they sign in and
+  `POST /v1/baskets/claim` makes them the customer's. A customer token in
+  `Authorization` wins over it. It is a secret: keep it on the device.
+schema:
+  type: string
+  pattern: ^zgv_[A-Za-z0-9_-]{43}$
+example: zgv_7Q2xk9V0c3mWm1h8rJbqgS1vYdQ4u2eZpK5aN6tLwX0

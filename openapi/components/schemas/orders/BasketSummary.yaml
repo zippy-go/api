@@ -1,0 +1,50 @@
+type: object
+description: "A basket as the list of every basket shows it: the store, how many items and the total."
+required:
+  - location_id
+  - partner_id
+  - store_name
+  - item_count
+  - total
+  - updated_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  partner_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+    description: Its Partner.
+  store_name:
+    type: string
+    examples:
+      - Dev Kitchen Gachibowli
+    description: The store's name.
+  item_count:
+    type: integer
+    examples:
+      - 2
+    description: How many items.
+  total:
+    $ref: ../common/Money.yaml
+    description: The lines' total at today's prices.
+  updated_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T12:58:00Z
+    description: When it last changed.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    store_name: Dev Kitchen Gachibowli
+    item_count: 2
+    total:
+      minor_units: 73800
+      currency: INR
+    updated_at: 2026-10-16T12:58:00Z

@@ -1,0 +1,19 @@
+type: object
+description: What went wrong with an order, for support.
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./HelpKind.yaml
+    description: What went wrong.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 1000
+    examples:
+      - The raita is missing.
+    description: A note, at most 1,000 characters; required for `other`.
+examples:
+  - kind: missing_item
+    note: The raita is missing.

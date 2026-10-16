@@ -1,0 +1,51 @@
+type: object
+description: "How a delivery's fee was worked out, tax included: the store's fee plus the band of the distance ladder the straight-line distance from the store falls in (each band's upper bound included, the last open-ended). Before an address is chosen the nearest band is charged. A store delivering with its own agents is not charged by distance."
+required:
+  - fee
+  - base
+  - distance_fee
+  - distance_metres
+  - band_up_to_metres
+  - rule
+properties:
+  fee:
+    $ref: ../common/Money.yaml
+    description: The delivery fee.
+  base:
+    $ref: ../common/Money.yaml
+    description: The store's fee before distance.
+  distance_fee:
+    $ref: ../common/Money.yaml
+    description: The distance band's fee.
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    examples:
+      - 3100
+    description: The straight-line distance from the store to the address in metres; `null` before an address is chosen.
+  band_up_to_metres:
+    type:
+      - integer
+      - "null"
+    examples:
+      - 4000
+    description: The band's upper bound in metres; `null` for the open-ended last band.
+  rule:
+    type: string
+    examples:
+      - settings
+    description: "Where the ladder comes from: `policy` (the store's service policy) or `settings` (the platform's delivery settings)."
+examples:
+  - fee:
+      minor_units: 4000
+      currency: INR
+    base:
+      minor_units: 2500
+      currency: INR
+    distance_fee:
+      minor_units: 1500
+      currency: INR
+    distance_metres: 3100
+    band_up_to_metres: 4000
+    rule: settings

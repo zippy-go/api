@@ -1,0 +1,43 @@
+type: object
+description: The store an order is from, kept as it was when the order was placed.
+required:
+  - location_id
+  - name
+  - address_line
+  - phone
+  - time_zone
+properties:
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  name:
+    type: string
+    examples:
+      - Dev Kitchen Gachibowli
+    description: Its name as it was.
+  address_line:
+    type: string
+    examples:
+      - Plot 12, Financial District Road, Gachibowli, Hyderabad 500032
+    description: Its address on one line.
+  phone:
+    type:
+      - string
+      - "null"
+    examples:
+      - "+919848000001"
+    description: How to ring it.
+  time_zone:
+    type: string
+    examples:
+      - Asia/Kolkata
+    description: Its clock, which the order's times are shown on.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
+    address_line: Plot 12, Financial District Road, Gachibowli, Hyderabad 500032
+    phone: "+919848000001"
+    time_zone: Asia/Kolkata

@@ -527,3 +527,151 @@ events:
     description: "A nightly check found a difference: a payment or refund the provider does not know, one it holds that nobody recorded, an amount the two disagree on, the ledger's provider clearing against the payments, or a Wallet against its entries or the ledger. Listed in Mission Control's Finance section until resolved. The envelope's `partner_id` is `null`."
     payload_schema: ./payloads/payments.alert.raised.v1.schema.json
     example: ./examples/payments.alert.raised.v1.json
+
+  - type: ordering.order.placed
+    version: 1
+    domain: ordering
+    description: >-
+      An order was placed: paid, held, or with nothing to take now
+      (cash); the store hears it. Consumers: notifications (the
+      customer, the store's new order with its sound), the ledger and
+      payments.
+    payload_schema: ./payloads/ordering.order.placed.v1.schema.json
+    example: ./examples/ordering.order.placed.v1.json
+
+  - type: ordering.order.accepted
+    version: 1
+    domain: ordering
+    description: >-
+      The store, or Mission Control, accepted an order with a
+      preparation time: it is promised ready at acceptance plus that
+      time. Consumers: notifications (the customer, with the time), the
+      ledger, dispatch from step 4.
+    payload_schema: ./payloads/ordering.order.accepted.v1.schema.json
+    example: ./examples/ordering.order.accepted.v1.json
+
+  - type: ordering.order.lines_removed
+    version: 1
+    domain: ordering
+    description: >-
+      Lines were left out as the store accepted: never charged. A
+      payment taken at checkout has what they cost refunded the way it
+      was paid (an `ordering.order.refunded` follows); a held card is
+      charged less. Published with `ordering.order.accepted`.
+    payload_schema: ./payloads/ordering.order.lines_removed.v1.schema.json
+    example: ./examples/ordering.order.lines_removed.v1.json
+
+  - type: ordering.order.declined
+    version: 1
+    domain: ordering
+    description: >-
+      A placed order was declined: by the store with a reason, by
+      Mission Control, or by the platform when nobody answered in time
+      (`not_answered`) or the card could not be charged
+      (`payment_failed`). Every hold is released and a payment taken at
+      checkout refunded. Consumers: notifications (the customer, whether
+      they were charged), payments, the ledger.
+    payload_schema: ./payloads/ordering.order.declined.v1.schema.json
+    example: ./examples/ordering.order.declined.v1.json
+
+  - type: ordering.order.cancelled
+    version: 1
+    domain: ordering
+    description: >-
+      An order was cancelled: by the customer before acceptance (while
+      still paying too, when they gave up paying: `previous_status`
+      `paying`, nothing taken and the store never told), by the store
+      after it, or by Mission Control at any point. Everything held is
+      released and everything paid goes back, each part where it came
+      from; `payer` bears a refund after acceptance. Consumers:
+      notifications, payments (releases what ordering's own call did
+      not), the ledger (reverses an accepted order's split).
+    payload_schema: ./payloads/ordering.order.cancelled.v1.schema.json
+    example: ./examples/ordering.order.cancelled.v1.json
+
+  - type: ordering.order.expired
+    version: 1
+    domain: ordering
+    description: >-
+      An order was not paid within the platform's window
+      (`ordering.unpaid_expiry_minutes`) and expired: every hold
+      released, anything taken refunded; the customer's basket still
+      holds what they chose and the order is not listed.
+    payload_schema: ./payloads/ordering.order.expired.v1.schema.json
+    example: ./examples/ordering.order.expired.v1.json
+
+  - type: ordering.order.preparation_extended
+    version: 1
+    domain: ordering
+    description: >-
+      An accepted order was given more preparation time; its promise
+      moved and the customer is told.
+    payload_schema: ./payloads/ordering.order.preparation_extended.v1.schema.json
+    example: ./examples/ordering.order.preparation_extended.v1.json
+
+  - type: ordering.order.ready
+    version: 1
+    domain: ordering
+    description: >-
+      An accepted order was marked ready: a pickup waits to be
+      collected, a delivery for its agent. Consumers: notifications (a
+      pickup's customer), dispatch from step 4.
+    payload_schema: ./payloads/ordering.order.ready.v1.schema.json
+    example: ./examples/ordering.order.ready.v1.json
+
+  - type: ordering.order.handed_over
+    version: 1
+    domain: ordering
+    description: >-
+      A ready delivery was handed to the agent and is on its way.
+    payload_schema: ./payloads/ordering.order.handed_over.v1.schema.json
+    example: ./examples/ordering.order.handed_over.v1.json
+
+  - type: ordering.order.collected
+    version: 1
+    domain: ordering
+    description: >-
+      A ready pickup was collected at the counter: the order is
+      complete.
+    payload_schema: ./payloads/ordering.order.collected.v1.schema.json
+    example: ./examples/ordering.order.collected.v1.json
+
+  - type: ordering.order.delivered
+    version: 1
+    domain: ordering
+    description: >-
+      A delivery on its way was delivered: the order is complete.
+    payload_schema: ./payloads/ordering.order.delivered.v1.schema.json
+    example: ./examples/ordering.order.delivered.v1.json
+
+  - type: ordering.order.refunded
+    version: 1
+    domain: ordering
+    description: >-
+      Money went back on an order: lines left out at acceptance, a
+      decline or a cancellation of a paid order, Mission Control's
+      refund of lines and fees with a reason, or a payment confirmed
+      after its order ended. The payments module made the refund (to the
+      source first, up to what it was charged less what was refunded to
+      it, the rest to the Wallet) and `refund_id` is its id; the ledger
+      posts it from `payments.refund.issued`. Consumers: notifications.
+    payload_schema: ./payloads/ordering.order.refunded.v1.schema.json
+    example: ./examples/ordering.order.refunded.v1.json
+
+  - type: ordering.order.help_requested
+    version: 1
+    domain: ordering
+    description: >-
+      A customer asked for help with an order; Mission Control sees it
+      at once as needing somebody.
+    payload_schema: ./payloads/ordering.order.help_requested.v1.schema.json
+    example: ./examples/ordering.order.help_requested.v1.json
+
+  - type: ordering.order.help_resolved
+    version: 1
+    domain: ordering
+    description: >-
+      Support resolved a help request with a sentence saying what was
+      done; the customer is told.
+    payload_schema: ./payloads/ordering.order.help_resolved.v1.schema.json
+    example: ./examples/ordering.order.help_resolved.v1.json

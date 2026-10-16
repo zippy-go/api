@@ -1,0 +1,40 @@
+type: object
+description: How many live orders wait in each group.
+required:
+  - new
+  - preparing
+  - ready
+  - on_its_way
+  - recent
+properties:
+  new:
+    type: integer
+    examples:
+      - 1
+    description: Placed and waiting to be accepted; the console's entry and the page title carry it.
+  preparing:
+    type: integer
+    examples:
+      - 2
+    description: Accepted.
+  ready:
+    type: integer
+    examples:
+      - 0
+    description: Ready.
+  on_its_way:
+    type: integer
+    examples:
+      - 1
+    description: Deliveries handed over and on their way, until delivered or cancelled.
+  recent:
+    type: integer
+    examples:
+      - 5
+    description: Finished in the last 24 hours.
+examples:
+  - new: 1
+    preparing: 2
+    ready: 0
+    on_its_way: 1
+    recent: 5

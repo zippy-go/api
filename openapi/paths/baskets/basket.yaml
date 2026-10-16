@@ -1,0 +1,157 @@
+# Path item for /v1/baskets/{location_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store the basket is at: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getBasket
+  summary: Read a basket, priced
+  description: "The basket at the store, priced by the platform from the published menu as it will be charged, every amount tax included: its lines (a line that can no longer be ordered stays, marked with why), the fees, the tip, the total, the GST included, what the Wallet pays once a way to pay is chosen, what remains, and everything that stops it being placed now, each in a sentence a screen may show as it is. A store where the caller has no basket answers an empty one (version 0). Read it again when the store's menu changes (`menu.published`). A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`)."
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  responses:
+    "200":
+      description: The basket.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Basket.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the store does not exist, is not live, sells nothing, or has published no menu."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updateBasketChoices
+  summary: Save checkout's answers
+  description: Saves each of checkout's answers as it is given (delivery or pickup, the address, instructions, the tip, the Wallet, the way to pay, what to do with an unavailable item, cutlery) and answers the basket priced with them. An answer the store would not accept is saved anyway and shows among the basket's refusals with why (a pickup-only store's delivery, a tip on a pickup, cash over the limit); switching to pickup takes the delivery fee and the tip off. The address must be one of the customer's own (`404` otherwise); visitors choose no address and no way to pay. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  requestBody:
+    required: true
+    description: The answers to save.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/BasketChoicesUpdate.yaml
+  responses:
+    "200":
+      description: The basket, priced with the answers.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Basket.yaml
+    "400":
+      description: "`validation_failed`: a member out of range, such as a negative tip or instructions over 500 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the store, or the address is not the customer's."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: emptyBasket
+  summary: Empty a basket
+  description: Empties the basket at the store and forgets its answers. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  responses:
+    "204":
+      description: Emptied.
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

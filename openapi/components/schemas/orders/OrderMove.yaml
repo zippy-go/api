@@ -1,0 +1,10 @@
+type: string
+description: "The one move a live order waits for: `accept` a placed order, mark an accepted one `ready`, `collect` a ready pickup, `hand_over` a ready delivery to the agent, `deliver` one on its way."
+enum:
+  - accept
+  - ready
+  - collect
+  - hand_over
+  - deliver
+examples:
+  - accept

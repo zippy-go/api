@@ -13828,6 +13828,2414 @@ export type TrialBalance = {
 };
 
 /**
+ * Where an order is. It moves only along these paths: `paying` to `placed`, `expired` or `cancelled` (the customer gave up paying, or Mission Control cancelled it); `placed` to `accepted`, `declined` or `cancelled`; `accepted` to `ready` or `cancelled`; `ready` to `on_its_way`, `completed` (collected) or `cancelled`; `on_its_way` to `completed` (delivered) or `undelivered`; `undelivered` to `on_its_way` or `cancelled`. `completed`, `declined`, `cancelled` and `expired` are final.
+ */
+export type OrderStatus = 'paying' | 'placed' | 'accepted' | 'ready' | 'on_its_way' | 'completed' | 'undelivered' | 'declined' | 'cancelled' | 'expired';
+
+/**
+ * How an order leaves the store: delivered to the customer, or collected at the counter.
+ */
+export type OrderFulfilment = 'delivery' | 'pickup';
+
+/**
+ * How what the Wallet does not cover is paid: UPI, a card, or cash to the agent or at the counter.
+ */
+export type PaymentMethod = 'upi' | 'card' | 'cash';
+
+/**
+ * What the store does when an item is unavailable at acceptance: leave it out (the default), send something similar at no extra cost, or cancel the whole order.
+ */
+export type IfUnavailable = 'remove' | 'similar' | 'cancel';
+
+/**
+ * How an order's payment stands: `none` (cash, nothing taken yet), `pending` (waiting for the customer or the provider), `authorised` (held until the store accepts), `captured` (taken), `failed`, `released` (a hold let go) or `refunded`.
+ */
+export type PaymentState = 'none' | 'pending' | 'authorised' | 'captured' | 'failed' | 'released' | 'refunded';
+
+/**
+ * The one move a live order waits for: `accept` a placed order, mark an accepted one `ready`, `collect` a ready pickup, `hand_over` a ready delivery to the agent, `deliver` one on its way.
+ */
+export type OrderMove = 'accept' | 'ready' | 'collect' | 'hand_over' | 'deliver';
+
+/**
+ * What a live order's timer counts towards: the moment it must be accepted by, the moment it was promised ready, or the moment it was promised at the door or the counter.
+ */
+export type OrderTimerKind = 'accept' | 'ready' | 'due';
+
+/**
+ * Who moved an order: the customer, a named member of the Partner's staff, the platform (Mission Control, never named to the Partner) or the platform's own clock.
+ */
+export type OrderActorKind = 'customer' | 'staff' | 'platform' | 'system';
+
+/**
+ * Why a customer cancels an order the store has not accepted; `other` needs a note.
+ */
+export type CustomerCancelReason = 'changed_my_mind' | 'ordered_by_mistake' | 'taking_too_long' | 'other';
+
+/**
+ * Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own.
+ */
+export type DeclineReason = 'out_of_stock' | 'too_busy' | 'closing' | 'customer_asked' | 'other' | 'not_answered' | 'payment_failed';
+
+/**
+ * Why a store cancels an order it accepted. A note is always needed.
+ */
+export type StoreCancelReason = 'cannot_make' | 'taking_too_long' | 'accepted_by_mistake' | 'customer_asked' | 'other';
+
+/**
+ * Why Mission Control refunds or cancels. Each suggests who pays: the Partner for `late_prep_time`, `accepted_in_error`, `incorrect_order`, `missing_items` and `allergen_ignored`; the platform for the rest.
+ */
+export type RefundReason = 'missing_items' | 'late_prep_time' | 'accepted_in_error' | 'incorrect_order' | 'allergen_ignored' | 'late_delivery' | 'wrong_address' | 'damaged_on_arrival' | 'agent_behaviour' | 'promo_issue' | 'technical_issue' | 'billing_discrepancy' | 'customer_asked_to_cancel' | 'other';
+
+/**
+ * Who bears a refund: the Partner or the platform.
+ */
+export type RefundPayer = 'partner' | 'platform';
+
+/**
+ * A fee a refund may give back whole, what is left of it.
+ */
+export type RefundFee = 'delivery' | 'tip' | 'cutlery' | 'small_order';
+
+/**
+ * Where money given back goes: to the source it was paid from (a UPI or card refund, within the provider's window) or into the Wallet at once.
+ */
+export type RefundDestination = 'source' | 'wallet';
+
+/**
+ * What went wrong, as the customer says it.
+ */
+export type HelpKind = 'missing_item' | 'wrong_item' | 'damaged' | 'late' | 'cancel_order' | 'other';
+
+/**
+ * Why Mission Control should look at an order: a store not answering after five minutes, an order past its promise, an open help request, or a payment that failed.
+ */
+export type AttentionReason = 'not_answered' | 'late' | 'help' | 'payment_failed';
+
+/**
+ * Whose basket it is: a signed-in customer's, or a visitor's kept under a visitor token until sign-in.
+ */
+export type BasketOwner = 'customer' | 'visitor';
+
+/**
+ * A visitor token: the key a visitor's baskets are kept under until they sign in. Send it as `X-Visitor-Token`; it is a secret, kept on the device.
+ */
+export type VisitorToken = {
+    /**
+     * The token, 47 characters starting `zgv_`.
+     */
+    visitor_token: string;
+};
+
+/**
+ * The visitor token whose baskets become the signed-in customer's.
+ */
+export type BasketClaim = {
+    /**
+     * The token the visitor's baskets were kept under.
+     */
+    visitor_token: string;
+};
+
+/**
+ * An answer to one of the questions an item, or an answer, asks; answers are items. Answers nest three deep at most: a meal's burger, the burger's cooking.
+ */
+export type BasketAnswerInput = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * The answer, an item of the store.
+     */
+    item_id: string;
+    /**
+     * How many of it, where the question lets an answer repeat; 1 otherwise.
+     */
+    quantity?: number;
+    /**
+     * The answers to the questions this answer asks in turn.
+     */
+    answers?: Array<BasketAnswerInput>;
+};
+
+/**
+ * A choice to add to the basket: an item, its variant, the answers to its questions and how many. The same choice already in the basket raises that line's quantity and keeps its note unless a new one is given. Prices are never sent: the platform prices every line from the store's published menu.
+ */
+export type BasketLineInput = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant; may be left out when the item has a single variant.
+     */
+    variant_id?: string | null;
+    /**
+     * How many, 1 to 99.
+     */
+    quantity: number;
+    /**
+     * The answers to the item's questions.
+     */
+    answers?: Array<BasketAnswerInput>;
+    /**
+     * A note for the store, at most 200 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * A change to one line: its quantity (0 removes the line) or its note. To change answers, remove the line and add the new choice.
+ */
+export type BasketLineUpdate = {
+    /**
+     * The new quantity, 0 to 99; 0 removes the line.
+     */
+    quantity?: number;
+    /**
+     * The new note; `null` clears it.
+     */
+    note?: string | null;
+};
+
+/**
+ * Checkout's answers, each saved on the basket as it is given; members left out keep what is saved, `null` clears. The answer is the basket priced with them, so the summary beside the questions is always the price placing will carry.
+ */
+export type BasketChoicesUpdate = {
+    /**
+     * Delivery or pickup, from what the store offers.
+     */
+    fulfilment?: OrderFulfilment;
+    /**
+     * The customer's saved address to deliver to; `null` clears it. Customers only.
+     */
+    address_id?: string | null;
+    /**
+     * Instructions for the store or the agent, at most 500 characters.
+     */
+    instructions?: string | null;
+    /**
+     * A tip for the platform's agent in minor units: a preset or an amount of the customer's own up to the most; 0 or `null` is none. Offered only on deliveries by the platform's agents and never with cash.
+     */
+    tip?: number | null;
+    /**
+     * Whether the Wallet pays first; on by default.
+     */
+    use_wallet?: boolean;
+    /**
+     * How the rest is paid; `null` clears it.
+     */
+    payment_method?: PaymentMethod | null;
+    /**
+     * What the store does when an item is unavailable.
+     */
+    if_unavailable?: IfUnavailable;
+    /**
+     * Whether to send disposable cutlery, where the store asks, at its fee.
+     */
+    cutlery?: boolean;
+};
+
+/**
+ * An answer on a basket line, priced: the question it answers, the answer, how many, its price at that question for this item, its mark, and the answers it carries in turn.
+ */
+export type BasketAnswer = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * The question as the store words it, in English.
+     */
+    question: string;
+    /**
+     * The answer.
+     */
+    item_id: string;
+    /**
+     * The answer's name, in English.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * Its price each, tax included.
+     */
+    unit_price: Money;
+    /**
+     * Veg or non-veg, where the store marks it.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The answers it carries in turn.
+     */
+    answers: Array<BasketAnswer>;
+};
+
+/**
+ * Why a line cannot be ordered now, in a sentence a screen may show as it is. The line stays in the basket, marked, until the customer removes it.
+ */
+export type LineRefusal = {
+    /**
+     * `item_unavailable`, `item_out_of_hours`, `item_pre_order_only`, `item_not_this_way`, `over_limit` or `choice_invalid`.
+     */
+    code: string;
+    /**
+     * The sentence.
+     */
+    message: string;
+};
+
+/**
+ * A line of a basket, priced by the platform as it will be charged: prices include tax and never exceed the MRP.
+ */
+export type BasketLine = {
+    /**
+     * The line.
+     */
+    id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item's name, in English.
+     */
+    name: string;
+    /**
+     * The variant's values, such as "Full"; `null` for an item with one variant.
+     */
+    variant_label: string | null;
+    /**
+     * Veg or non-veg.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The answers to its questions.
+     */
+    answers: Array<BasketAnswer>;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The note for the store.
+     */
+    note: string | null;
+    /**
+     * The price of one, its answers included, after the variant's own offer; tax included.
+     */
+    unit_price: Money;
+    /**
+     * The line's price: the unit price times the quantity.
+     */
+    price: Money;
+    /**
+     * What the variant's offer saves on the line, when it has one.
+     */
+    saving: Money | null;
+    /**
+     * The maximum retail price of one, where the store's items carry one; the price never exceeds it.
+     */
+    mrp: Money | null;
+    /**
+     * The GST rate the line's price includes.
+     */
+    tax_rate_percent: number;
+    /**
+     * Why the line cannot be ordered now; `null` when it can.
+     */
+    refusal: LineRefusal | null;
+};
+
+/**
+ * Checkout's answers as saved on the basket.
+ */
+export type BasketChoices = {
+    /**
+     * Delivery or pickup; `null` until chosen, when the store offers both.
+     */
+    fulfilment: OrderFulfilment | null;
+    /**
+     * The saved address to deliver to.
+     */
+    address_id: string | null;
+    /**
+     * Instructions for the store or the agent.
+     */
+    instructions: string | null;
+    /**
+     * The tip.
+     */
+    tip: Money | null;
+    /**
+     * Whether the Wallet pays first.
+     */
+    use_wallet: boolean;
+    /**
+     * How the rest is paid.
+     */
+    payment_method: PaymentMethod | null;
+    /**
+     * What the store does when an item is unavailable.
+     */
+    if_unavailable: IfUnavailable;
+    /**
+     * Whether disposable cutlery is wanted.
+     */
+    cutlery: boolean;
+};
+
+/**
+ * How a delivery's fee was worked out, tax included: the store's fee plus the band of the distance ladder the straight-line distance from the store falls in (each band's upper bound included, the last open-ended). Before an address is chosen the nearest band is charged. A store delivering with its own agents is not charged by distance.
+ */
+export type DeliveryFee = {
+    /**
+     * The delivery fee.
+     */
+    fee: Money;
+    /**
+     * The store's fee before distance.
+     */
+    base: Money;
+    /**
+     * The distance band's fee.
+     */
+    distance_fee: Money;
+    /**
+     * The straight-line distance from the store to the address in metres; `null` before an address is chosen.
+     */
+    distance_metres: number | null;
+    /**
+     * The band's upper bound in metres; `null` for the open-ended last band.
+     */
+    band_up_to_metres: number | null;
+    /**
+     * Where the ladder comes from: `policy` (the store's service policy) or `settings` (the platform's delivery settings).
+     */
+    rule: string;
+};
+
+/**
+ * The GST a total includes at one rate: the taxable amount times the rate over 100 plus the rate, rounded half up once.
+ */
+export type TaxShare = {
+    /**
+     * The rate.
+     */
+    rate_percent: number;
+    /**
+     * The amount, tax included, charged at the rate.
+     */
+    taxable: Money;
+    /**
+     * The tax it includes.
+     */
+    tax: Money;
+};
+
+/**
+ * What the basket will be charged, every amount tax included: the lines, the offers they save, the fees, the tip, the total, the GST it includes, and once a way to pay is chosen what the Wallet pays and what remains.
+ */
+export type BasketPricing = {
+    /**
+     * The lines' prices.
+     */
+    subtotal: Money;
+    /**
+     * What the offers save.
+     */
+    savings: Money;
+    /**
+     * The delivery fee and how it was worked out; `null` for a pickup.
+     */
+    delivery: DeliveryFee | null;
+    /**
+     * The fee below the store's minimum order, where it charges one instead of refusing.
+     */
+    small_order_fee: Money | null;
+    /**
+     * The cutlery fee, when cutlery is wanted.
+     */
+    cutlery_fee: Money | null;
+    /**
+     * The tip, never taxed.
+     */
+    tip: Money | null;
+    /**
+     * Everything above.
+     */
+    total: Money;
+    /**
+     * The GST the total includes, rate by rate.
+     */
+    tax_included: Array<TaxShare>;
+    /**
+     * All the GST the total includes.
+     */
+    tax_total: Money;
+    /**
+     * What the Wallet pays, once a way to pay is chosen and while the Wallet is used; `null` before.
+     */
+    wallet: Money | null;
+    /**
+     * What remains to pay by the chosen method.
+     */
+    to_pay: Money;
+    /**
+     * The chosen method.
+     */
+    method: PaymentMethod | null;
+};
+
+/**
+ * Something that stops the basket being placed now, with the stable code placing would refuse with and a sentence a screen may show as it is.
+ */
+export type BasketRefusal = {
+    /**
+     * The code: `store_not_trading`, `method_not_offered`, `address_missing`, `address_outside_area`, `below_minimum`, `payment_method_missing`, `payment_method_not_offered`, `cod_over_limit`, `tip_not_allowed`, `tip_too_high`, or a line's code.
+     */
+    code: string;
+    /**
+     * The sentence.
+     */
+    message: string;
+    /**
+     * The line it is about, for a line's refusal.
+     */
+    line_id: string | null;
+};
+
+/**
+ * The store a basket is at, with what it is doing now.
+ */
+export type BasketStore = {
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * Open now, or why not and until when.
+     */
+    live: StoreLive;
+};
+
+/**
+ * A basket at one store, kept on the server and priced by the platform on every read as it will be charged. One per customer per store; a visitor's waits under its visitor token and becomes the customer's at sign-in. `quote` names exactly this price: send it back to place the order.
+ */
+export type Basket = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The store's name and what it is doing now.
+     */
+    store: BasketStore;
+    /**
+     * A customer's or a visitor's.
+     */
+    owner: BasketOwner;
+    /**
+     * Raised by one on every change, so a client keeps the newest answer whatever order answers arrive in; 0 for a basket with nothing in it yet.
+     */
+    version: number;
+    /**
+     * The lines, in the order they were added.
+     */
+    lines: Array<BasketLine>;
+    /**
+     * How many items, quantities counted.
+     */
+    item_count: number;
+    /**
+     * Checkout's answers as saved.
+     */
+    choices: BasketChoices;
+    /**
+     * What it will be charged.
+     */
+    pricing: BasketPricing;
+    /**
+     * What stops it being placed now; empty when nothing does.
+     */
+    refusals: Array<BasketRefusal>;
+    /**
+     * Whether it can be placed now: a customer's basket with lines and no refusal.
+     */
+    placeable: boolean;
+    /**
+     * A digest of the price shown; placing with another is refused with `price_changed`.
+     */
+    quote: string;
+    /**
+     * The version of the published menu it was priced from.
+     */
+    menu_version: number | null;
+    /**
+     * When it last changed; `null` for an empty basket never changed.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * A basket as the list of every basket shows it: the store, how many items and the total.
+ */
+export type BasketSummary = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The store's name.
+     */
+    store_name: string;
+    /**
+     * How many items.
+     */
+    item_count: number;
+    /**
+     * The lines' total at today's prices.
+     */
+    total: Money;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * Every basket of the caller, one per store, most recently changed first, so a half-filled basket at another store is never lost.
+ */
+export type BasketList = {
+    /**
+     * The baskets.
+     */
+    baskets: Array<BasketSummary>;
+};
+
+/**
+ * The ways the store offers: delivery, with who carries it, and pickup; scheduled orders arrive in a later step.
+ */
+export type CheckoutFulfilment = {
+    /**
+     * Whether it delivers.
+     */
+    delivery: boolean;
+    /**
+     * Whether it offers pickup.
+     */
+    pickup: boolean;
+    /**
+     * Who carries its deliveries.
+     */
+    carrier: Carrier | null;
+    /**
+     * Whether it takes scheduled orders now; always `false` until scheduled orders arrive.
+     */
+    scheduled: boolean;
+};
+
+/**
+ * One of the customer's saved addresses as checkout offers it: whether the store delivers there, how far it is and what delivering there costs.
+ */
+export type CheckoutAddress = {
+    /**
+     * The address.
+     */
+    address_id: string;
+    /**
+     * Home, work or other.
+     */
+    label: string;
+    /**
+     * The address on one line.
+     */
+    summary: string;
+    /**
+     * Whether the store delivers there.
+     */
+    deliverable: boolean;
+    /**
+     * Why not, when it does not.
+     */
+    reason: string | null;
+    /**
+     * The straight-line distance from the store in metres.
+     */
+    distance_metres: number;
+    /**
+     * What delivering there costs.
+     */
+    delivery_fee: Money | null;
+};
+
+/**
+ * A card or UPI ID the customer saved, as checkout offers it to pay with: placing names it in `saved_method_id`.
+ */
+export type SavedMethodOption = {
+    /**
+     * The saved method, as `GET /v1/customer/payment-methods` lists it.
+     */
+    id: string;
+    /**
+     * How it reads: a card's brand and last four, or a UPI ID's handle.
+     */
+    label: string;
+    /**
+     * Checkout chooses it first.
+     */
+    is_default: boolean;
+    /**
+     * Whether it can pay now: a card past its month cannot.
+     */
+    usable: boolean;
+};
+
+/**
+ * A way to pay as checkout offers it: whether it may be chosen for this order, why not as a code and a sentence when it may not, the most it may pay where there is a limit, and the cards or UPI IDs of it the customer saved. The payments module decides every one.
+ */
+export type PaymentOption = {
+    /**
+     * The method.
+     */
+    method: PaymentMethod;
+    /**
+     * Whether it may be chosen for this order.
+     */
+    available: boolean;
+    /**
+     * Why not, as a code a client may branch on: `cod_over_limit`, `cod_not_offered`, `cod_not_accepted`, `cod_withheld`, `upi_over_limit`, `provider_unavailable`, `nothing_left_to_pay`; `null` when it may be chosen.
+     */
+    code: string | null;
+    /**
+     * Why not, as a sentence a screen may show as it is.
+     */
+    reason: string | null;
+    /**
+     * The most an order may be paid this way, where there is a limit.
+     */
+    limit: Money | null;
+    /**
+     * The cards or UPI IDs of this method the customer saved, the default first; empty for cash.
+     */
+    saved: Array<SavedMethodOption>;
+};
+
+/**
+ * The customer's Wallet as checkout shows it: its balance and what is available now, the balance less what other orders hold.
+ */
+export type WalletBalance = {
+    /**
+     * The balance.
+     */
+    balance: Money;
+    /**
+     * What may be spent now.
+     */
+    available: Money;
+};
+
+/**
+ * The ways to pay as the payments module offers them for this amount at this store (the Wallet first when it is used, each method for what is left, the cash ceiling and the store's own cash settings applied), and the Wallet.
+ */
+export type CheckoutPayment = {
+    /**
+     * The ways to pay.
+     */
+    methods: Array<PaymentOption>;
+    /**
+     * The Wallet; `null` when the customer has none yet.
+     */
+    wallet: WalletBalance | null;
+};
+
+/**
+ * The tip offered for the platform's agent: the presets and the most, or why none is offered.
+ */
+export type CheckoutTip = {
+    /**
+     * Whether a tip is offered for this order.
+     */
+    offered: boolean;
+    /**
+     * The presets, from the platform settings.
+     */
+    presets: Array<Money>;
+    /**
+     * The most a tip may be.
+     */
+    max: Money;
+    /**
+     * Why no tip is offered, when none is.
+     */
+    reason: string | null;
+};
+
+/**
+ * Whether checkout asks about disposable cutlery and what it costs.
+ */
+export type CheckoutCutlery = {
+    /**
+     * Whether the store asks.
+     */
+    asked: boolean;
+    /**
+     * What saying yes costs.
+     */
+    fee: Money | null;
+};
+
+/**
+ * Checkout at one store: only the questions placing would accept there, the customer's addresses with whether the store delivers to each, the ways to pay, the tip and cutlery where offered, and the basket priced with the answers saved so far.
+ */
+export type Checkout = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The ways the store offers.
+     */
+    fulfilment: CheckoutFulfilment;
+    /**
+     * The customer's saved addresses, the selected first; empty when none is saved.
+     */
+    addresses: Array<CheckoutAddress>;
+    /**
+     * The ways to pay.
+     */
+    payment: CheckoutPayment;
+    /**
+     * The tip.
+     */
+    tip: CheckoutTip;
+    /**
+     * Cutlery.
+     */
+    cutlery: CheckoutCutlery;
+    /**
+     * The choices offered for an unavailable item.
+     */
+    if_unavailable: Array<IfUnavailable>;
+    /**
+     * The basket, priced with the answers saved.
+     */
+    basket: Basket;
+};
+
+/**
+ * Placing the basket at a store as an order, at the price shown.
+ */
+export type OrderPlacement = {
+    /**
+     * The store whose basket is placed.
+     */
+    location_id: string;
+    /**
+     * The `quote` of the basket the customer saw; placing with another is refused with `price_changed`.
+     */
+    quote: string;
+    /**
+     * The customer confirms they are 18 or over and will show ID, for a basket holding age-restricted items.
+     */
+    age_confirmed?: boolean;
+    /**
+     * Where the provider's page sends the customer back once they paid or gave up, with `payment_id` and `attempt_id` added to its query: an address of the storefront (`STOREFRONT_URL`) or of another of the platform's own apps, refused otherwise (`validation_failed` with `return_url_not_allowed`). The order's page on the storefront, `/orders/{order_id}`, when left out.
+     */
+    return_url?: string | null;
+    /**
+     * A card or UPI ID the customer saved, of the basket's way to pay, to pay with; checkout lists them under each method (`saved`). Another is refused (`validation_failed` on `/saved_method_id`). A saved UPI ID is asked by a request waiting in the customer's UPI app.
+     */
+    saved_method_id?: string | null;
+};
+
+/**
+ * What the customer does next to pay: open the provider's page, or approve the request waiting in their UPI app.
+ */
+export type NextAction = {
+    /**
+     * `open_page`: open `url`, the provider's page, and pay there; `approve_in_app`: approve the request waiting in the UPI app (the page at `url` follows it).
+     */
+    kind: string;
+    /**
+     * The provider's page.
+     */
+    url: string;
+    /**
+     * Until when it works.
+     */
+    expires_at: string | null;
+    /**
+     * A sentence a screen may show as it is.
+     */
+    message: string | null;
+};
+
+/**
+ * Where paying for a just-placed order stands: taken or held at once, waiting for the customer at the provider, or nothing to take now.
+ */
+export type PaymentStep = {
+    /**
+     * How the payment stands.
+     */
+    state: PaymentState;
+    /**
+     * The method paying the rest.
+     */
+    method: PaymentMethod | null;
+    /**
+     * What the Wallet pays.
+     */
+    wallet: Money | null;
+    /**
+     * What the method pays.
+     */
+    method_amount: Money | null;
+    /**
+     * The provider's reference, masked, once there is one.
+     */
+    reference: string | null;
+    /**
+     * What the customer does next; `null` when nothing is left to do.
+     */
+    next_action: NextAction | null;
+};
+
+/**
+ * An order just placed, with where its payment stands.
+ */
+export type PlacedOrder = {
+    /**
+     * The order.
+     */
+    order: CustomerOrder;
+    /**
+     * Where paying for it stands.
+     */
+    payment: PaymentStep;
+};
+
+/**
+ * An answer on an order line, as it was sold.
+ */
+export type OrderAnswer = {
+    /**
+     * The question.
+     */
+    modifier_id: string;
+    /**
+     * The question as it was worded.
+     */
+    question: string;
+    /**
+     * The answer.
+     */
+    item_id: string;
+    /**
+     * The answer's name as it was.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * Its price each, as charged.
+     */
+    unit_price: Money;
+    /**
+     * Veg or non-veg, as marked.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The answers it carried in turn.
+     */
+    answers: Array<OrderAnswer>;
+};
+
+/**
+ * A line the store left out at acceptance: never charged.
+ */
+export type LineRemoval = {
+    /**
+     * When it was left out.
+     */
+    at: string;
+    /**
+     * Why, as the store said it.
+     */
+    reason: string;
+};
+
+/**
+ * A line of an order, kept as it was sold: names, marks, answers and prices from the moment it was placed.
+ */
+export type OrderLine = {
+    /**
+     * The line.
+     */
+    id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item's name as it was.
+     */
+    name: string;
+    /**
+     * The variant's values.
+     */
+    variant_label: string | null;
+    /**
+     * Veg or non-veg; the ticket shows it.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The answers, under the part of the item each belongs to.
+     */
+    answers: Array<OrderAnswer>;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The customer's note.
+     */
+    note: string | null;
+    /**
+     * The price of one as charged, tax included.
+     */
+    unit_price: Money;
+    /**
+     * The line's price.
+     */
+    price: Money;
+    /**
+     * What the variant's offer saved.
+     */
+    saving: Money | null;
+    /**
+     * The GST rate it included.
+     */
+    tax_rate_percent: number;
+    /**
+     * Set when the store left the line out at acceptance: never charged.
+     */
+    removed: LineRemoval | null;
+    /**
+     * How many of it refunds have given back.
+     */
+    refunded_quantity: number;
+};
+
+/**
+ * Where a delivery goes, kept as it was when the order was placed.
+ */
+export type OrderAddress = {
+    /**
+     * Home, work or other.
+     */
+    label: string;
+    /**
+     * The address line.
+     */
+    line1: string;
+    /**
+     * A second line.
+     */
+    line2: string | null;
+    /**
+     * The area.
+     */
+    locality: string | null;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * The PIN code.
+     */
+    postal_code: string | null;
+    /**
+     * Latitude of the pin.
+     */
+    lat: number;
+    /**
+     * Longitude of the pin.
+     */
+    lng: number;
+    /**
+     * Flat or door number.
+     */
+    flat_number: string | null;
+    /**
+     * Building or society name.
+     */
+    building_name: string | null;
+    /**
+     * Floor.
+     */
+    floor: string | null;
+    /**
+     * A landmark that finds the gate.
+     */
+    landmark: string | null;
+};
+
+/**
+ * The store an order is from, kept as it was when the order was placed.
+ */
+export type OrderStore = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name as it was.
+     */
+    name: string;
+    /**
+     * Its address on one line.
+     */
+    address_line: string;
+    /**
+     * How to ring it.
+     */
+    phone: string | null;
+    /**
+     * Its clock, which the order's times are shown on.
+     */
+    time_zone: string;
+};
+
+/**
+ * How an order was paid: what the Wallet paid and what the method paid, with the provider's reference masked.
+ */
+export type PaymentSplit = {
+    /**
+     * The method that paid the rest.
+     */
+    method: PaymentMethod | null;
+    /**
+     * How the payment stands.
+     */
+    state: PaymentState;
+    /**
+     * What the Wallet paid.
+     */
+    wallet: Money;
+    /**
+     * What the method paid.
+     */
+    method_amount: Money;
+    /**
+     * The UPI transaction reference or the card's brand and last four digits, never more.
+     */
+    reference: string | null;
+};
+
+/**
+ * A line a refund gives back, with how many and what they cost the customer.
+ */
+export type RefundLine = {
+    /**
+     * The line.
+     */
+    line_id: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * What they cost the customer.
+     */
+    amount: Money;
+};
+
+/**
+ * A fee a refund gives back.
+ */
+export type RefundFeePart = {
+    /**
+     * The fee.
+     */
+    fee: RefundFee;
+    /**
+     * What of it is given back.
+     */
+    amount: Money;
+};
+
+/**
+ * Money given back on an order: how much, to the source and to the Wallet, why and who bears it. Lines left out at acceptance, a decline or a cancellation of a paid order and Mission Control's refunds each make one.
+ */
+export type OrderRefund = {
+    /**
+     * The refund: the payment's refund of the same id (`Payment.refunds`), so `POST /v1/customer/refunds/{refund_id}/to-wallet` takes it.
+     */
+    id: string;
+    /**
+     * How much.
+     */
+    amount: Money;
+    /**
+     * What goes back to the UPI account or the card, within the provider's window; it moves to `to_wallet` when the customer takes it in the Wallet before it is sent or the provider refuses it.
+     */
+    to_source: Money;
+    /**
+     * What goes into the Wallet at once.
+     */
+    to_wallet: Money;
+    /**
+     * Why: a `RefundReason`, or `lines_left_out`, `declined`, `cancelled` or `expired` for the platform's own, or `paid_after_end` for a payment confirmed after its order ended, given back at once.
+     */
+    reason: string;
+    /**
+     * The note given; shown to the Partner and Mission Control, never to the customer.
+     */
+    note: string | null;
+    /**
+     * Who bears it; `null` when the money went back before the order was accepted.
+     */
+    payer: RefundPayer | null;
+    /**
+     * The lines it gives back.
+     */
+    lines: Array<RefundLine>;
+    /**
+     * The fees it gives back.
+     */
+    fees: Array<RefundFeePart>;
+    /**
+     * When.
+     */
+    created_at: string;
+    /**
+     * Who made it, for Mission Control; `null` elsewhere.
+     */
+    by: string | null;
+};
+
+/**
+ * An order's receipt: every amount tax included, what was charged when less than the total, the GST included, how it was paid and every refund.
+ */
+export type Receipt = {
+    /**
+     * The lines as ordered.
+     */
+    subtotal: Money;
+    /**
+     * What offers saved.
+     */
+    savings: Money;
+    /**
+     * The delivery fee.
+     */
+    delivery_fee: Money | null;
+    /**
+     * The small order fee.
+     */
+    small_order_fee: Money | null;
+    /**
+     * The cutlery fee.
+     */
+    cutlery_fee: Money | null;
+    /**
+     * The tip.
+     */
+    tip: Money | null;
+    /**
+     * The total as ordered.
+     */
+    total: Money;
+    /**
+     * What was kept when the store accepted, when it left lines out; `null` otherwise.
+     */
+    charged: Money | null;
+    /**
+     * The GST the total includes, rate by rate.
+     */
+    tax_included: Array<TaxShare>;
+    /**
+     * All the GST included.
+     */
+    tax_total: Money;
+    /**
+     * The store's GST number, where it is registered.
+     */
+    gstin: string | null;
+    /**
+     * How it was paid.
+     */
+    payment: PaymentSplit;
+    /**
+     * Every refund, oldest first.
+     */
+    refunds: Array<OrderRefund>;
+    /**
+     * What refunds gave back in all.
+     */
+    refunded: Money;
+};
+
+/**
+ * A step the order went through, with when, on the store's clock.
+ */
+export type OrderStep = {
+    /**
+     * The status it moved to.
+     */
+    status: OrderStatus;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * The step in plain words.
+     */
+    label: string;
+};
+
+/**
+ * The promise still open: when the order should be ready and when it should be at the door or the counter.
+ */
+export type OrderPromise = {
+    /**
+     * The preparation time the store accepted with.
+     */
+    preparation_minutes: number | null;
+    /**
+     * When it should be ready.
+     */
+    ready_by: string | null;
+    /**
+     * When it should be at the door, or ready to collect.
+     */
+    due_by: string | null;
+    /**
+     * Whether it is past its promise.
+     */
+    late: boolean;
+};
+
+/**
+ * How an order ended, when it did not complete: the reason code, who ended it and, for the Partner and Mission Control, the note.
+ */
+export type OrderEnd = {
+    /**
+     * The reason code: a `DeclineReason`, `CustomerCancelReason`, `StoreCancelReason` or `RefundReason`, or `not_paid`.
+     */
+    reason: string;
+    /**
+     * Who ended it.
+     */
+    by: OrderActorKind;
+    /**
+     * The note; never shown to the customer.
+     */
+    note: string | null;
+};
+
+/**
+ * A customer's request for help on an order, kept for support with how it was resolved.
+ */
+export type HelpRequest = {
+    /**
+     * The request.
+     */
+    id: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * What went wrong.
+     */
+    kind: HelpKind;
+    /**
+     * The customer's note.
+     */
+    note: string | null;
+    /**
+     * When it was asked.
+     */
+    created_at: string;
+    /**
+     * When support resolved it.
+     */
+    resolved_at: string | null;
+    /**
+     * What support did, as they said it.
+     */
+    resolution: string | null;
+};
+
+/**
+ * The help an order offers now, and the requests made.
+ */
+export type OrderHelp = {
+    /**
+     * What the customer may ask about now: what arrived once it has, cancelling while there is still something to stop.
+     */
+    offered: Array<HelpKind>;
+    /**
+     * The requests made, oldest first.
+     */
+    requests: Array<HelpRequest>;
+};
+
+/**
+ * An order as its customer reads it: one status in plain words, the steps it went through, the promise still open, what was sold, the receipt, whether it can still be cancelled and the help it offers. Read it again on `order.changed`, and every 30 seconds without live updates.
+ */
+export type CustomerOrder = {
+    /**
+     * The order.
+     */
+    id: string;
+    /**
+     * The order's number, as said aloud.
+     */
+    number: string;
+    /**
+     * The status.
+     */
+    status: OrderStatus;
+    /**
+     * The status in plain words, on the store's clock.
+     */
+    status_text: string;
+    /**
+     * Raised on every change; the entity tag.
+     */
+    version: number;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The store as it was.
+     */
+    store: OrderStore;
+    /**
+     * Delivery or pickup.
+     */
+    fulfilment: OrderFulfilment;
+    /**
+     * When it was placed; `null` while paying.
+     */
+    placed_at: string | null;
+    /**
+     * When the customer pressed place.
+     */
+    created_at: string;
+    /**
+     * The steps it went through, oldest first.
+     */
+    steps: Array<OrderStep>;
+    /**
+     * The promise still open.
+     */
+    promise: OrderPromise;
+    /**
+     * Where it goes, for a delivery.
+     */
+    delivery_address: OrderAddress | null;
+    /**
+     * The customer's instructions.
+     */
+    instructions: string | null;
+    /**
+     * What the customer asked the store to do with an unavailable item.
+     */
+    if_unavailable: IfUnavailable;
+    /**
+     * What was sold.
+     */
+    lines: Array<OrderLine>;
+    /**
+     * The receipt.
+     */
+    receipt: Receipt;
+    /**
+     * Whether the customer may still cancel it alone: until the store accepts.
+     */
+    can_cancel: boolean;
+    /**
+     * The help it offers.
+     */
+    help: OrderHelp;
+    /**
+     * How it ended, when it was declined, cancelled or expired; the note is never shown here.
+     */
+    ended: OrderEnd | null;
+};
+
+/**
+ * An order as My orders lists it.
+ */
+export type CustomerOrderSummary = {
+    /**
+     * The order.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Its status.
+     */
+    status: OrderStatus;
+    /**
+     * The status in plain words.
+     */
+    status_text: string;
+    /**
+     * Whether it is still moving.
+     */
+    happening_now: boolean;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name as it was.
+     */
+    store_name: string;
+    /**
+     * Delivery or pickup.
+     */
+    fulfilment: OrderFulfilment;
+    /**
+     * When it was placed.
+     */
+    placed_at: string;
+    /**
+     * How many items.
+     */
+    item_count: number;
+    /**
+     * Its total as ordered.
+     */
+    total: Money;
+};
+
+/**
+ * A page of the customer's orders: the ones still moving first under "Happening now", then the rest newest first. An order never paid for is not listed.
+ */
+export type CustomerOrderPage = {
+    /**
+     * The orders.
+     */
+    items: Array<CustomerOrderSummary>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A customer cancelling an order the store has not accepted.
+ */
+export type CustomerCancellation = {
+    /**
+     * Why.
+     */
+    reason: CustomerCancelReason;
+    /**
+     * A note; required for `other`, at most 500 characters.
+     */
+    note?: string | null;
+    /**
+     * Where a captured payment goes back: to its source (the default) or into the Wallet at once.
+     */
+    refund_to?: RefundDestination | null;
+};
+
+/**
+ * What went wrong with an order, for support.
+ */
+export type HelpRequestInput = {
+    /**
+     * What went wrong.
+     */
+    kind: HelpKind;
+    /**
+     * A note, at most 1,000 characters; required for `other`.
+     */
+    note?: string | null;
+};
+
+/**
+ * A line reorder could not copy into the basket, and why.
+ */
+export type NotCopied = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name on the old order.
+     */
+    name: string;
+    /**
+     * Why, in a sentence.
+     */
+    reason: string;
+};
+
+/**
+ * An order's lines copied into the store's basket at today's prices, and the lines that could not be copied.
+ */
+export type Reorder = {
+    /**
+     * The basket, ready for checkout.
+     */
+    basket: Basket;
+    /**
+     * The lines not copied.
+     */
+    not_copied: Array<NotCopied>;
+};
+
+/**
+ * The customer as the store sees them: the first name, and the mobile, address and instructions only when the store delivers the order with its own agents. Mission Control sees all.
+ */
+export type OrderCustomer = {
+    /**
+     * The first name.
+     */
+    first_name: string;
+    /**
+     * The mobile, E.164; `null` when the store may not see it.
+     */
+    mobile: string | null;
+    /**
+     * The delivery address; `null` when the store may not see it.
+     */
+    address: OrderAddress | null;
+    /**
+     * The instructions.
+     */
+    instructions: string | null;
+};
+
+/**
+ * What a live order counts towards: accept it by, ready by, or due at; `late` once past it (an order waiting to be accepted reads late after five minutes).
+ */
+export type OrderTimer = {
+    /**
+     * What it counts towards.
+     */
+    kind: OrderTimerKind;
+    /**
+     * The moment.
+     */
+    at: string;
+    /**
+     * Whether it is past.
+     */
+    late: boolean;
+};
+
+/**
+ * One move of an order: the status it moved to, when, who and why.
+ */
+export type OrderHistoryEntry = {
+    /**
+     * The status it moved to.
+     */
+    status: OrderStatus;
+    /**
+     * The status before.
+     */
+    previous_status: OrderStatus | null;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Who.
+     */
+    by: OrderActorKind;
+    /**
+     * A staff member's name to the Partner; an operator's to Mission Control; `null` for the customer, the platform as the Partner sees it, and the clock.
+     */
+    name: string | null;
+    /**
+     * The reason code given.
+     */
+    reason: string | null;
+    /**
+     * The note given.
+     */
+    note: string | null;
+};
+
+/**
+ * An order as its store runs it: the one move it waits for and its timer, the customer as the store may see them, every line with its answers under the part they belong to and its mark, what to collect for cash, and its history.
+ */
+export type StoreOrder = {
+    /**
+     * The order.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Its status.
+     */
+    status: OrderStatus;
+    /**
+     * Raised on every change; the entity tag.
+     */
+    version: number;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Delivery or pickup.
+     */
+    fulfilment: OrderFulfilment;
+    /**
+     * Who carries a delivery.
+     */
+    carrier: Carrier | null;
+    /**
+     * The customer, as the store may see them.
+     */
+    customer: OrderCustomer;
+    /**
+     * When it was placed.
+     */
+    placed_at: string | null;
+    /**
+     * When it is declined as not answered unless accepted.
+     */
+    accept_by: string | null;
+    /**
+     * When it was accepted.
+     */
+    accepted_at: string | null;
+    /**
+     * The preparation time it was accepted with.
+     */
+    preparation_minutes: number | null;
+    /**
+     * When it was promised ready.
+     */
+    ready_by: string | null;
+    /**
+     * When it was promised at the door or the counter.
+     */
+    due_by: string | null;
+    /**
+     * When it was marked ready.
+     */
+    ready_at: string | null;
+    /**
+     * When it was collected or delivered.
+     */
+    completed_at: string | null;
+    /**
+     * The one move it waits for; `null` once it waits for none of the store's.
+     */
+    waits_for: OrderMove | null;
+    /**
+     * What it counts towards.
+     */
+    timer: OrderTimer | null;
+    /**
+     * What the customer asked for an unavailable item.
+     */
+    if_unavailable: IfUnavailable;
+    /**
+     * Every line.
+     */
+    lines: Array<OrderLine>;
+    /**
+     * How many items.
+     */
+    item_count: number;
+    /**
+     * The total as ordered.
+     */
+    total: Money;
+    /**
+     * What is kept after lines left out; `null` until accepted.
+     */
+    charged: Money | null;
+    /**
+     * For cash, what the agent or the counter collects.
+     */
+    to_collect: Money | null;
+    /**
+     * How the rest was paid.
+     */
+    payment_method: PaymentMethod | null;
+    /**
+     * Whether cutlery is wanted.
+     */
+    cutlery: boolean;
+    /**
+     * Every move, oldest first.
+     */
+    history: Array<OrderHistoryEntry>;
+    /**
+     * The refunds charged to the Partner.
+     */
+    refunds: Array<OrderRefund>;
+    /**
+     * How it ended, with the note.
+     */
+    ended: OrderEnd | null;
+    /**
+     * Whether the store may cancel it now (accepted or ready).
+     */
+    cancellable: boolean;
+};
+
+/**
+ * Whether a store takes new orders now: online, closed by its hours, paused and until when, or not live; and the preparation time it quotes.
+ */
+export type OrderTaking = {
+    /**
+     * What it is doing now.
+     */
+    state: LocationLiveState;
+    /**
+     * Why it is not online.
+     */
+    reason: string | null;
+    /**
+     * When that changes.
+     */
+    until: string | null;
+    /**
+     * The pause in force.
+     */
+    pause: Pause | null;
+    /**
+     * The preparation time it quotes now.
+     */
+    preparation_minutes: number;
+};
+
+/**
+ * How many live orders wait in each group.
+ */
+export type LiveOrderCounts = {
+    /**
+     * Placed and waiting to be accepted; the console's entry and the page title carry it.
+     */
+    new: number;
+    /**
+     * Accepted.
+     */
+    preparing: number;
+    /**
+     * Ready.
+     */
+    ready: number;
+    /**
+     * Deliveries handed over and on their way, until delivered or cancelled.
+     */
+    on_its_way: number;
+    /**
+     * Finished in the last 24 hours.
+     */
+    recent: number;
+};
+
+/**
+ * A store's live orders: new ones oldest first, those being prepared soonest due first, ready ones longest waiting first, deliveries on their way longest on their way first (they stay until delivered or cancelled), and those finished in the last 24 hours. Kitchen mode shows `next_new_order_id` on the whole screen until it is answered. Read it again on `order.changed`, and every 30 seconds without live updates.
+ */
+export type LiveOrders = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The instant the answer is for.
+     */
+    at: string;
+    /**
+     * Whether it takes new orders now.
+     */
+    taking: OrderTaking;
+    /**
+     * How many in each group.
+     */
+    counts: LiveOrderCounts;
+    /**
+     * Placed, oldest first.
+     */
+    new: Array<StoreOrder>;
+    /**
+     * Accepted, soonest due first.
+     */
+    preparing: Array<StoreOrder>;
+    /**
+     * Ready, longest waiting first.
+     */
+    ready: Array<StoreOrder>;
+    /**
+     * Deliveries handed over and on their way (and any not delivered), longest on their way first, until delivered or cancelled. Delivered by hand from the board until dispatch arrives in step 4.
+     */
+    on_its_way: Array<StoreOrder>;
+    /**
+     * Finished in the last 24 hours, newest first.
+     */
+    recent: Array<StoreOrder>;
+    /**
+     * The oldest new order: the one kitchen mode shows.
+     */
+    next_new_order_id: string | null;
+};
+
+/**
+ * Accepting a placed order: the preparation time and the lines the store cannot supply. Each line left out takes off exactly what it cost the customer; leaving out every line is declining.
+ */
+export type AcceptOrder = {
+    /**
+     * Minutes to prepare, 1 to 180; the store's quoted time when left out.
+     */
+    preparation_minutes?: number;
+    /**
+     * The lines left out.
+     */
+    removed_line_ids?: Array<string>;
+};
+
+/**
+ * Declining a placed order with a reason; `other` needs a note. The note is kept for the Partner and Mission Control and never shown to the customer. Lines named sold out have their variants marked sold out for today through the catalogue in the same act (back at the store's midnight), which needs `catalog:stock` or `catalog:write` at the Location; Mission Control never names them.
+ */
+export type DeclineOrder = {
+    /**
+     * Why: `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other`.
+     */
+    reason: DeclineReason;
+    /**
+     * A note, at most 500 characters.
+     */
+    note?: string | null;
+    /**
+     * The order's lines whose variants sold out, each marked sold out for today and recorded with the decline.
+     */
+    sold_out_line_ids?: Array<string>;
+};
+
+/**
+ * More preparation time for an accepted order; the promise moves with it and the customer is told.
+ */
+export type ExtendPreparation = {
+    /**
+     * Minutes to add, 1 to 60.
+     */
+    minutes: number;
+};
+
+/**
+ * A store cancelling an order it accepted, with a reason and a note. The customer gets back everything they paid, each part where it came from, and the Partner bears it.
+ */
+export type StoreCancellation = {
+    /**
+     * Why.
+     */
+    reason: StoreCancelReason;
+    /**
+     * A note, 1 to 500 characters.
+     */
+    note: string;
+};
+
+/**
+ * Pausing new orders at a store for a while, with a reason customers see; it lifts by itself.
+ */
+export type OrderPause = {
+    /**
+     * Minutes, 1 to 240.
+     */
+    minutes: number;
+    /**
+     * Why.
+     */
+    reason: PauseReason;
+    /**
+     * The message customers read, for a `custom` reason, at most 200 characters.
+     */
+    message?: string | null;
+};
+
+/**
+ * A finished order in a store's history.
+ */
+export type OrderHistoryRow = {
+    /**
+     * The order.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * How it finished: `completed`, `declined` or `cancelled`.
+     */
+    status: OrderStatus;
+    /**
+     * How it left.
+     */
+    fulfilment: OrderFulfilment;
+    /**
+     * When it was placed.
+     */
+    placed_at: string;
+    /**
+     * When it finished.
+     */
+    ended_at: string;
+    /**
+     * Its total as ordered.
+     */
+    total: Money;
+    /**
+     * What was kept.
+     */
+    charged: Money | null;
+    /**
+     * What refunds gave back.
+     */
+    refunded: Money;
+    /**
+     * What of that the Partner bears.
+     */
+    refunded_by_partner: Money;
+    /**
+     * Why it was declined or cancelled.
+     */
+    ended: OrderEnd | null;
+};
+
+/**
+ * A store's history in figures, each counting the orders listed.
+ */
+export type OrderHistoryTotals = {
+    /**
+     * Every order listed.
+     */
+    orders: number;
+    /**
+     * Completed.
+     */
+    completed: number;
+    /**
+     * With a refund.
+     */
+    refunded: number;
+    /**
+     * Declined or cancelled.
+     */
+    declined_or_cancelled: number;
+    /**
+     * What completed orders were charged.
+     */
+    sales: Money;
+    /**
+     * The average completed order.
+     */
+    average: Money;
+    /**
+     * What refunds the Partner bears.
+     */
+    refunds_charged_to_partner: Money;
+};
+
+/**
+ * A store's finished orders between two dates of its own calendar, newest first, at most the newest 1,000, with the figures above them.
+ */
+export type OrderHistory = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The last day.
+     */
+    to: string;
+    /**
+     * The store's clock.
+     */
+    time_zone: string;
+    /**
+     * The figures.
+     */
+    totals: OrderHistoryTotals;
+    /**
+     * The orders, newest first.
+     */
+    orders: Array<OrderHistoryRow>;
+    /**
+     * Whether the range held more than the 1,000 listed.
+     */
+    truncated: boolean;
+};
+
+/**
+ * An order as Mission Control's board lists it, with what needs attention.
+ */
+export type PlatformOrderRow = {
+    /**
+     * The order.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Its status.
+     */
+    status: OrderStatus;
+    /**
+     * Its version.
+     */
+    version: number;
+    /**
+     * The store; the store's routes open it.
+     */
+    location_id: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The store's name as it was.
+     */
+    store_name: string;
+    /**
+     * The customer's first name.
+     */
+    customer_first_name: string;
+    /**
+     * Delivery or pickup.
+     */
+    fulfilment: OrderFulfilment;
+    /**
+     * When it was placed.
+     */
+    placed_at: string | null;
+    /**
+     * Its total.
+     */
+    total: Money;
+    /**
+     * The move it waits for.
+     */
+    waits_for: OrderMove | null;
+    /**
+     * What it counts towards.
+     */
+    timer: OrderTimer | null;
+    /**
+     * What needs attention; empty when nothing does.
+     */
+    attention: Array<AttentionReason>;
+};
+
+/**
+ * A page of orders across every store, most recently placed first.
+ */
+export type PlatformOrderPage = {
+    /**
+     * The orders.
+     */
+    items: Array<PlatformOrderRow>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An order as Mission Control reads it: the store's view with operators named, the customer, the receipt with every refund, the help asked for and what needs attention.
+ */
+export type PlatformOrder = {
+    /**
+     * The order as its store runs it, operators named in its history.
+     */
+    order: StoreOrder;
+    /**
+     * The customer who placed it (a user id), to open their account and their Wallet.
+     */
+    customer_id: string;
+    /**
+     * The customer.
+     */
+    customer: OrderCustomer;
+    /**
+     * The receipt, refunds with who made them.
+     */
+    receipt: Receipt;
+    /**
+     * The help asked for, oldest first.
+     */
+    help: Array<HelpRequest>;
+    /**
+     * What needs attention.
+     */
+    attention: Array<AttentionReason>;
+    /**
+     * The commission rate kept on the order when it was placed.
+     */
+    commission_percent: number | null;
+    /**
+     * The store's name as it was.
+     */
+    store_name: string;
+};
+
+/**
+ * Mission Control cancelling an order at any point before it is final, with a reason, a note and who pays. Before acceptance every hold is released and a captured payment refunded; after it everything paid is refunded, which needs `order:refund`.
+ */
+export type PlatformCancellation = {
+    /**
+     * Why.
+     */
+    reason: RefundReason;
+    /**
+     * A note, 1 to 1,000 characters.
+     */
+    note: string;
+    /**
+     * Who bears the refund; the reason's usual payer when left out.
+     */
+    payer?: RefundPayer | null;
+};
+
+/**
+ * A line to refund and how many of it.
+ */
+export type RefundLineInput = {
+    /**
+     * The line.
+     */
+    line_id: string;
+    /**
+     * How many, at most what earlier refunds left.
+     */
+    quantity: number;
+};
+
+/**
+ * A refund of lines and fees with a reason, a note and who pays. A line gives back what it cost the customer; a fee is given back whole, what is left of it; all refunds together never exceed what was paid.
+ */
+export type RefundInput = {
+    /**
+     * The lines.
+     */
+    lines?: Array<RefundLineInput>;
+    /**
+     * The fees.
+     */
+    fees?: Array<RefundFee>;
+    /**
+     * Why.
+     */
+    reason: RefundReason;
+    /**
+     * A note, 1 to 1,000 characters.
+     */
+    note: string;
+    /**
+     * Who bears it; the reason's usual payer when left out.
+     */
+    payer?: RefundPayer | null;
+};
+
+/**
+ * What a refund would give back and where, before it is made: the source first, up to what it was charged less what was refunded to it, the rest to the Wallet.
+ */
+export type RefundPreview = {
+    /**
+     * What it gives back.
+     */
+    amount: Money;
+    /**
+     * To the UPI account or the card.
+     */
+    to_source: Money;
+    /**
+     * To the Wallet.
+     */
+    to_wallet: Money;
+    /**
+     * What was left to refund before it.
+     */
+    refundable_before: Money;
+    /**
+     * What will be left after it.
+     */
+    refundable_after: Money;
+    /**
+     * Who bears it.
+     */
+    payer: RefundPayer;
+    /**
+     * The lines it gives back.
+     */
+    lines: Array<RefundLine>;
+    /**
+     * The fees it gives back.
+     */
+    fees: Array<RefundFeePart>;
+};
+
+/**
+ * What support did about a help request, kept on the order and told to the customer.
+ */
+export type HelpResolution = {
+    /**
+     * A sentence, 1 to 1,000 characters.
+     */
+    resolution: string;
+};
+
+/**
+ * How many orders are in each status.
+ */
+export type OrderStatusCounts = {
+    /**
+     * Waiting for the payment.
+     */
+    paying: number;
+    /**
+     * Waiting to be accepted.
+     */
+    placed: number;
+    /**
+     * Being prepared.
+     */
+    accepted: number;
+    /**
+     * Ready.
+     */
+    ready: number;
+    /**
+     * On its way.
+     */
+    on_its_way: number;
+    /**
+     * Not delivered.
+     */
+    undelivered: number;
+    /**
+     * Collected or delivered.
+     */
+    completed: number;
+    /**
+     * Declined.
+     */
+    declined: number;
+    /**
+     * Cancelled.
+     */
+    cancelled: number;
+    /**
+     * Never paid for.
+     */
+    expired: number;
+};
+
+/**
+ * How many orders need attention, for each reason and in all.
+ */
+export type AttentionCounts = {
+    /**
+     * Placed and not answered after the alert's minutes (`ordering.not_answered_alert_minutes`, 5).
+     */
+    not_answered: number;
+    /**
+     * Past the promised time by more than the grace (`ordering.late_grace_minutes`, 5).
+     */
+    late: number;
+    /**
+     * With an open help request.
+     */
+    help: number;
+    /**
+     * Still paying after the payment failed.
+     */
+    payment_failed: number;
+    /**
+     * Orders needing attention for any of these, each counted once.
+     */
+    orders: number;
+};
+
+/**
+ * Mission Control's orders at a glance, counted where the orders are kept rather than from a page of them: how many in each status, how many are not final, and how many need attention, for every order or as narrowed by Partner, store and zone.
+ */
+export type PlatformOrderSummary = {
+    /**
+     * The instant the counts are for.
+     */
+    at: string;
+    /**
+     * `live` (not final, or finished in the last 24 hours) or `all`.
+     */
+    scope: 'live' | 'all';
+    /**
+     * How many in each status.
+     */
+    counts: OrderStatusCounts;
+    /**
+     * How many are not final.
+     */
+    live: number;
+    /**
+     * What needs attention.
+     */
+    attention: AttentionCounts;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -13844,7 +16252,9 @@ export type PartnerIdPath = string;
  * the header `Idempotent-Replayed: true`, and makes nothing new; the same
  * key with a different method, path or body is `409`
  * (`idempotency_key_reuse`); a repeat that arrives while the first is still
- * being processed waits for it. Writes that move money or place an order
+ * being processed waits for it; a first that failed with a `5xx`, or was
+ * refused before it could act (`401`, `403` such as `step_up_required`,
+ * `429`), is processed afresh. Writes that move money or place an order
  * require the header (`400`, `validation_failed` with
  * `idempotency_key_missing`); every other write may carry it.
  *
@@ -13870,6 +16280,15 @@ export type IfNoneMatchHeader = string;
  * A UUID that follows the request through logs, events and the audit log. When absent the platform mints one; every response carries the value in `X-Correlation-Id`.
  */
 export type CorrelationIdHeader = string;
+
+/**
+ * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+ * visitor who is not signed in are kept under it until they sign in and
+ * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+ * `Authorization` wins over it. It is a secret: keep it on the device.
+ *
+ */
+export type VisitorTokenHeader = string;
 
 export type GetHealthData = {
     body?: never;
@@ -15175,7 +17594,9 @@ export type CreatePartnerData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -26444,7 +28865,9 @@ export type ResendMessageData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -26558,7 +28981,9 @@ export type CreateNoticeTemplateData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -26793,7 +29218,9 @@ export type SendNoticeData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -29073,7 +31500,9 @@ export type CreateCatalogCategoryData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -29729,7 +32158,9 @@ export type CreateCatalogItemData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -30593,7 +33024,9 @@ export type CreateCatalogModifierData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -32071,7 +34504,9 @@ export type StartPaymentAttemptData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -32140,7 +34575,9 @@ export type TakeRefundInWalletData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -32249,7 +34686,9 @@ export type SavePaymentMethodData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -32599,7 +35038,9 @@ export type TopUpWalletData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -32666,7 +35107,9 @@ export type WithdrawFromWalletData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -33024,7 +35467,9 @@ export type RefundPaymentData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -33201,7 +35646,9 @@ export type CreditCustomerWalletData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -33273,7 +35720,9 @@ export type CorrectCustomerWalletData = {
          * the header `Idempotent-Replayed: true`, and makes nothing new; the same
          * key with a different method, path or body is `409`
          * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it. Writes that move money or place an order
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
          * require the header (`400`, `validation_failed` with
          * `idempotency_key_missing`); every other write may carry it.
          *
@@ -33823,3 +36272,2068 @@ export type GetTrialBalanceResponses = {
 };
 
 export type GetTrialBalanceResponse = GetTrialBalanceResponses[keyof GetTrialBalanceResponses];
+
+export type CreateVisitorTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/visitor-tokens';
+};
+
+export type CreateVisitorTokenErrors = {
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateVisitorTokenError = CreateVisitorTokenErrors[keyof CreateVisitorTokenErrors];
+
+export type CreateVisitorTokenResponses = {
+    /**
+     * The token.
+     */
+    201: VisitorToken;
+};
+
+export type CreateVisitorTokenResponse = CreateVisitorTokenResponses[keyof CreateVisitorTokenResponses];
+
+export type ListBasketsData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/baskets';
+};
+
+export type ListBasketsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListBasketsError = ListBasketsErrors[keyof ListBasketsErrors];
+
+export type ListBasketsResponses = {
+    /**
+     * The baskets.
+     */
+    200: BasketList;
+};
+
+export type ListBasketsResponse = ListBasketsResponses[keyof ListBasketsResponses];
+
+export type ClaimBasketsData = {
+    /**
+     * The visitor token.
+     */
+    body: BasketClaim;
+    path?: never;
+    query?: never;
+    url: '/v1/baskets/claim';
+};
+
+export type ClaimBasketsErrors = {
+    /**
+     * `validation_failed`: the token is malformed.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ClaimBasketsError = ClaimBasketsErrors[keyof ClaimBasketsErrors];
+
+export type ClaimBasketsResponses = {
+    /**
+     * The customer's baskets.
+     */
+    200: BasketList;
+};
+
+export type ClaimBasketsResponse = ClaimBasketsResponses[keyof ClaimBasketsResponses];
+
+export type EmptyBasketData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}';
+};
+
+export type EmptyBasketErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EmptyBasketError = EmptyBasketErrors[keyof EmptyBasketErrors];
+
+export type EmptyBasketResponses = {
+    /**
+     * Emptied.
+     */
+    204: void;
+};
+
+export type EmptyBasketResponse = EmptyBasketResponses[keyof EmptyBasketResponses];
+
+export type GetBasketData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}';
+};
+
+export type GetBasketErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the store does not exist, is not live, sells nothing, or has published no menu.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetBasketError = GetBasketErrors[keyof GetBasketErrors];
+
+export type GetBasketResponses = {
+    /**
+     * The basket.
+     */
+    200: Basket;
+};
+
+export type GetBasketResponse = GetBasketResponses[keyof GetBasketResponses];
+
+export type UpdateBasketChoicesData = {
+    /**
+     * The answers to save.
+     */
+    body: BasketChoicesUpdate;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}';
+};
+
+export type UpdateBasketChoicesErrors = {
+    /**
+     * `validation_failed`: a member out of range, such as a negative tip or instructions over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the store, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateBasketChoicesError = UpdateBasketChoicesErrors[keyof UpdateBasketChoicesErrors];
+
+export type UpdateBasketChoicesResponses = {
+    /**
+     * The basket, priced with the answers.
+     */
+    200: Basket;
+};
+
+export type UpdateBasketChoicesResponse = UpdateBasketChoicesResponses[keyof UpdateBasketChoicesResponses];
+
+export type AddBasketLineData = {
+    /**
+     * The choice.
+     */
+    body: BasketLineInput;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/lines';
+};
+
+export type AddBasketLineErrors = {
+    /**
+     * `validation_failed`: a quantity outside 1 to 99 or a note over 200 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the store does not exist, is not live, sells nothing, or has published no menu.
+     */
+    404: Problem;
+    /**
+     * `lines_refused`: the item is unavailable (`item_unavailable`), outside its hours (`item_out_of_hours`), pre-order only (`item_pre_order_only`), or the answers break its questions (`choice_invalid`); the basket holds 100 lines already (`conflict`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddBasketLineError = AddBasketLineErrors[keyof AddBasketLineErrors];
+
+export type AddBasketLineResponses = {
+    /**
+     * The basket.
+     */
+    200: Basket;
+};
+
+export type AddBasketLineResponse = AddBasketLineResponses[keyof AddBasketLineResponses];
+
+export type RemoveBasketLineData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+        /**
+         * The line.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/lines/{line_id}';
+};
+
+export type RemoveBasketLineErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such line in the basket.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveBasketLineError = RemoveBasketLineErrors[keyof RemoveBasketLineErrors];
+
+export type RemoveBasketLineResponses = {
+    /**
+     * The basket.
+     */
+    200: Basket;
+};
+
+export type RemoveBasketLineResponse = RemoveBasketLineResponses[keyof RemoveBasketLineResponses];
+
+export type UpdateBasketLineData = {
+    /**
+     * The change.
+     */
+    body: BasketLineUpdate;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+        /**
+         * The line.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/lines/{line_id}';
+};
+
+export type UpdateBasketLineErrors = {
+    /**
+     * `validation_failed`: a quantity outside 0 to 99 or a note over 200 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or neither a customer token nor a visitor token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such line in the basket.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateBasketLineError = UpdateBasketLineErrors[keyof UpdateBasketLineErrors];
+
+export type UpdateBasketLineResponses = {
+    /**
+     * The basket.
+     */
+    200: Basket;
+};
+
+export type UpdateBasketLineResponse = UpdateBasketLineResponses[keyof UpdateBasketLineResponses];
+
+export type GetCheckoutData = {
+    body?: never;
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/checkout';
+};
+
+export type GetCheckoutErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the store does not exist, is not live, sells nothing, or has published no menu.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCheckoutError = GetCheckoutErrors[keyof GetCheckoutErrors];
+
+export type GetCheckoutResponses = {
+    /**
+     * Checkout.
+     */
+    200: Checkout;
+};
+
+export type GetCheckoutResponse = GetCheckoutResponses[keyof GetCheckoutResponses];
+
+export type ListCustomerOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 50; 20 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/orders';
+};
+
+export type ListCustomerOrdersErrors = {
+    /**
+     * `validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerOrdersError = ListCustomerOrdersErrors[keyof ListCustomerOrdersErrors];
+
+export type ListCustomerOrdersResponses = {
+    /**
+     * A page of orders.
+     */
+    200: CustomerOrderPage;
+};
+
+export type ListCustomerOrdersResponse = ListCustomerOrdersResponses[keyof ListCustomerOrdersResponses];
+
+export type PlaceOrderData = {
+    /**
+     * The store and the quote shown.
+     */
+    body: OrderPlacement;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/orders';
+};
+
+export type PlaceOrderErrors = {
+    /**
+     * `validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`) or malformed, the body is malformed, `return_url` is not an address of the platform's apps (`return_url_not_allowed`), or `saved_method_id` names no usable saved method of the basket's way to pay.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the store.
+     */
+    404: Problem;
+    /**
+     * A refusal, as listed above, or `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PlaceOrderError = PlaceOrderErrors[keyof PlaceOrderErrors];
+
+export type PlaceOrderResponses = {
+    /**
+     * The order, with where its payment stands.
+     */
+    201: PlacedOrder;
+};
+
+export type PlaceOrderResponse = PlaceOrderResponses[keyof PlaceOrderResponses];
+
+export type GetCustomerOrderData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}';
+};
+
+export type GetCustomerOrderErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of this customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerOrderError = GetCustomerOrderErrors[keyof GetCustomerOrderErrors];
+
+export type GetCustomerOrderResponses = {
+    /**
+     * The order.
+     */
+    200: CustomerOrder;
+};
+
+export type GetCustomerOrderResponse = GetCustomerOrderResponses[keyof GetCustomerOrderResponses];
+
+export type CancelCustomerOrderData = {
+    /**
+     * The reason.
+     */
+    body: CustomerCancellation;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/cancel';
+};
+
+export type CancelCustomerOrderErrors = {
+    /**
+     * `validation_failed`: `other` without a note.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `order_not_cancellable`: the store has already accepted the order (or it ended), with the status it is in.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelCustomerOrderError = CancelCustomerOrderErrors[keyof CancelCustomerOrderErrors];
+
+export type CancelCustomerOrderResponses = {
+    /**
+     * The order, cancelled.
+     */
+    200: CustomerOrder;
+};
+
+export type CancelCustomerOrderResponse = CancelCustomerOrderResponses[keyof CancelCustomerOrderResponses];
+
+export type RequestOrderHelpData = {
+    /**
+     * What went wrong.
+     */
+    body: HelpRequestInput;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/help';
+};
+
+export type RequestOrderHelpErrors = {
+    /**
+     * `validation_failed`: `other` without a note, or a note over 1,000 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `help_not_offered`: that help does not make sense for the order now, saying why.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestOrderHelpError = RequestOrderHelpErrors[keyof RequestOrderHelpErrors];
+
+export type RequestOrderHelpResponses = {
+    /**
+     * The request, received.
+     */
+    201: HelpRequest;
+};
+
+export type RequestOrderHelpResponse = RequestOrderHelpResponses[keyof RequestOrderHelpResponses];
+
+export type ReorderCustomerOrderData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/reorder';
+};
+
+export type ReorderCustomerOrderErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the order, or its store has no menu any more.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReorderCustomerOrderError = ReorderCustomerOrderErrors[keyof ReorderCustomerOrderErrors];
+
+export type ReorderCustomerOrderResponses = {
+    /**
+     * The basket and what was not copied.
+     */
+    200: Reorder;
+};
+
+export type ReorderCustomerOrderResponse = ReorderCustomerOrderResponses[keyof ReorderCustomerOrderResponses];
+
+export type GetLiveOrdersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/live';
+};
+
+export type GetLiveOrdersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLiveOrdersError = GetLiveOrdersErrors[keyof GetLiveOrdersErrors];
+
+export type GetLiveOrdersResponses = {
+    /**
+     * The board.
+     */
+    200: LiveOrders;
+};
+
+export type GetLiveOrdersResponse = GetLiveOrdersResponses[keyof GetLiveOrdersResponses];
+
+export type GetOrderHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The first day, on the store's calendar; today by default.
+         */
+        from?: string;
+        /**
+         * The last day; `from` by default.
+         */
+        to?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/history';
+};
+
+export type GetOrderHistoryErrors = {
+    /**
+     * `validation_failed`: a malformed date, `to` before `from`, or more than 366 days.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOrderHistoryError = GetOrderHistoryErrors[keyof GetOrderHistoryErrors];
+
+export type GetOrderHistoryResponses = {
+    /**
+     * The history.
+     */
+    200: OrderHistory;
+};
+
+export type GetOrderHistoryResponse = GetOrderHistoryResponses[keyof GetOrderHistoryResponses];
+
+export type ResumeOrdersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/pause';
+};
+
+export type ResumeOrdersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumeOrdersError = ResumeOrdersErrors[keyof ResumeOrdersErrors];
+
+export type ResumeOrdersResponses = {
+    /**
+     * Whether the store takes orders now.
+     */
+    200: OrderTaking;
+};
+
+export type ResumeOrdersResponse = ResumeOrdersResponses[keyof ResumeOrdersResponses];
+
+export type PauseOrdersData = {
+    /**
+     * How long and why.
+     */
+    body: OrderPause;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/pause';
+};
+
+export type PauseOrdersErrors = {
+    /**
+     * `validation_failed`: minutes outside 1 to 240, or a custom reason without its message.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PauseOrdersError = PauseOrdersErrors[keyof PauseOrdersErrors];
+
+export type PauseOrdersResponses = {
+    /**
+     * Whether the store takes orders now.
+     */
+    200: OrderTaking;
+};
+
+export type PauseOrdersResponse = PauseOrdersResponses[keyof PauseOrdersResponses];
+
+export type GetStoreOrderData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}';
+};
+
+export type GetStoreOrderErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreOrderError = GetStoreOrderErrors[keyof GetStoreOrderErrors];
+
+export type GetStoreOrderResponses = {
+    /**
+     * The order.
+     */
+    200: StoreOrder;
+};
+
+export type GetStoreOrderResponse = GetStoreOrderResponses[keyof GetStoreOrderResponses];
+
+export type AcceptOrderData = {
+    /**
+     * The preparation time and the lines left out.
+     */
+    body: AcceptOrder;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/accept';
+};
+
+export type AcceptOrderErrors = {
+    /**
+     * `validation_failed`: a preparation time outside 1 to 180, or a line that is not the order's.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again. `remove_everything` when every line is left out (decline instead); `customer_wants_all` when the customer asked to cancel rather than leave anything out; `stock_short` naming the lines that ask for more than remains; `payment_failed` when the card cannot be charged, the order then declined as `payment_failed` and the customer told they have not been charged.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptOrderError = AcceptOrderErrors[keyof AcceptOrderErrors];
+
+export type AcceptOrderResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type AcceptOrderResponse = AcceptOrderResponses[keyof AcceptOrderResponses];
+
+export type DeclineOrderData = {
+    /**
+     * The reason.
+     */
+    body: DeclineOrder;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/decline';
+};
+
+export type DeclineOrderErrors = {
+    /**
+     * `validation_failed`: `other` without a note, a reason that is the platform's own, or a sold-out line that is not the order's.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineOrderError = DeclineOrderErrors[keyof DeclineOrderErrors];
+
+export type DeclineOrderResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type DeclineOrderResponse = DeclineOrderResponses[keyof DeclineOrderResponses];
+
+export type ExtendPreparationData = {
+    /**
+     * The minutes.
+     */
+    body: ExtendPreparation;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/extend';
+};
+
+export type ExtendPreparationErrors = {
+    /**
+     * `validation_failed`: minutes outside 1 to 60.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ExtendPreparationError = ExtendPreparationErrors[keyof ExtendPreparationErrors];
+
+export type ExtendPreparationResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type ExtendPreparationResponse = ExtendPreparationResponses[keyof ExtendPreparationResponses];
+
+export type MarkOrderReadyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/ready';
+};
+
+export type MarkOrderReadyErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrderReadyError = MarkOrderReadyErrors[keyof MarkOrderReadyErrors];
+
+export type MarkOrderReadyResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type MarkOrderReadyResponse = MarkOrderReadyResponses[keyof MarkOrderReadyResponses];
+
+export type MarkOrderCollectedData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/collected';
+};
+
+export type MarkOrderCollectedErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again. `order_moved` too for a delivery, which is handed over instead.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrderCollectedError = MarkOrderCollectedErrors[keyof MarkOrderCollectedErrors];
+
+export type MarkOrderCollectedResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type MarkOrderCollectedResponse = MarkOrderCollectedResponses[keyof MarkOrderCollectedResponses];
+
+export type MarkOrderHandedOverData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/handed-over';
+};
+
+export type MarkOrderHandedOverErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again. `order_moved` too for a pickup, which is collected instead.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrderHandedOverError = MarkOrderHandedOverErrors[keyof MarkOrderHandedOverErrors];
+
+export type MarkOrderHandedOverResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type MarkOrderHandedOverResponse = MarkOrderHandedOverResponses[keyof MarkOrderHandedOverResponses];
+
+export type MarkOrderDeliveredData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/delivered';
+};
+
+export type MarkOrderDeliveredErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrderDeliveredError = MarkOrderDeliveredErrors[keyof MarkOrderDeliveredErrors];
+
+export type MarkOrderDeliveredResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type MarkOrderDeliveredResponse = MarkOrderDeliveredResponses[keyof MarkOrderDeliveredResponses];
+
+export type CancelStoreOrderData = {
+    /**
+     * The reason and the note.
+     */
+    body: StoreCancellation;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The order, which must be one of the store's; another store's answers `404`.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/cancel';
+};
+
+export type CancelStoreOrderErrors = {
+    /**
+     * `validation_failed`: a note missing or over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission at the Location) or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the order.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is not where the move needs it (another screen moved it first, or its status does not allow the move), with the status it is in now; read it again. `order_moved` too for a placed order (decline it) and for one on its way.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelStoreOrderError = CancelStoreOrderErrors[keyof CancelStoreOrderErrors];
+
+export type CancelStoreOrderResponses = {
+    /**
+     * The order, moved.
+     */
+    200: StoreOrder;
+};
+
+export type CancelStoreOrderResponse = CancelStoreOrderResponses[keyof CancelStoreOrderResponses];
+
+export type ListPlatformOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `live` (the default) or `all`.
+         */
+        scope?: 'live' | 'all';
+        /**
+         * Only orders in this status.
+         */
+        status?: OrderStatus;
+        /**
+         * Only this store's orders.
+         */
+        location_id?: string;
+        /**
+         * Only this Partner's orders.
+         */
+        partner_id?: string;
+        /**
+         * Only orders placed in this zone.
+         */
+        zone_id?: string;
+        /**
+         * Only orders that need attention.
+         */
+        attention?: boolean;
+        /**
+         * An order number, or a store's name, at most 100 characters.
+         */
+        q?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/orders';
+};
+
+export type ListPlatformOrdersErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformOrdersError = ListPlatformOrdersErrors[keyof ListPlatformOrdersErrors];
+
+export type ListPlatformOrdersResponses = {
+    /**
+     * A page of orders.
+     */
+    200: PlatformOrderPage;
+};
+
+export type ListPlatformOrdersResponse = ListPlatformOrdersResponses[keyof ListPlatformOrdersResponses];
+
+export type GetPlatformOrderSummaryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `live` (the default) or `all`.
+         */
+        scope?: 'live' | 'all';
+        /**
+         * Only this store's orders.
+         */
+        location_id?: string;
+        /**
+         * Only this Partner's orders.
+         */
+        partner_id?: string;
+        /**
+         * Only orders placed in this zone.
+         */
+        zone_id?: string;
+    };
+    url: '/v1/platform/orders/summary';
+};
+
+export type GetPlatformOrderSummaryErrors = {
+    /**
+     * `validation_failed`: a scope or an identifier malformed.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOrderSummaryError = GetPlatformOrderSummaryErrors[keyof GetPlatformOrderSummaryErrors];
+
+export type GetPlatformOrderSummaryResponses = {
+    /**
+     * The counts.
+     */
+    200: PlatformOrderSummary;
+};
+
+export type GetPlatformOrderSummaryResponse = GetPlatformOrderSummaryResponses[keyof GetPlatformOrderSummaryResponses];
+
+export type GetPlatformOrderData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}';
+};
+
+export type GetPlatformOrderErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOrderError = GetPlatformOrderErrors[keyof GetPlatformOrderErrors];
+
+export type GetPlatformOrderResponses = {
+    /**
+     * The order.
+     */
+    200: PlatformOrder;
+};
+
+export type GetPlatformOrderResponse = GetPlatformOrderResponses[keyof GetPlatformOrderResponses];
+
+export type CancelPlatformOrderData = {
+    /**
+     * The reason, the note and who pays.
+     */
+    body: PlatformCancellation;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/cancel';
+};
+
+export type CancelPlatformOrderErrors = {
+    /**
+     * `validation_failed`: the note missing or too long.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is final already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelPlatformOrderError = CancelPlatformOrderErrors[keyof CancelPlatformOrderErrors];
+
+export type CancelPlatformOrderResponses = {
+    /**
+     * The order, cancelled.
+     */
+    200: StoreOrder;
+};
+
+export type CancelPlatformOrderResponse = CancelPlatformOrderResponses[keyof CancelPlatformOrderResponses];
+
+export type PreviewOrderRefundData = {
+    /**
+     * The lines, fees, reason, note and payer.
+     */
+    body: RefundInput;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/refunds/preview';
+};
+
+export type PreviewOrderRefundErrors = {
+    /**
+     * `validation_failed`: a line that is not the order's or is named twice, a quantity out of range, a fee the order did not charge or named twice, nothing named, or the note missing.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `refund_exceeds_paid`: more than is left to refund, naming the most; `order_moved` for an order nothing was charged on.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PreviewOrderRefundError = PreviewOrderRefundErrors[keyof PreviewOrderRefundErrors];
+
+export type PreviewOrderRefundResponses = {
+    /**
+     * The split.
+     */
+    200: RefundPreview;
+};
+
+export type PreviewOrderRefundResponse = PreviewOrderRefundResponses[keyof PreviewOrderRefundResponses];
+
+export type RefundOrderData = {
+    /**
+     * The lines, fees, reason, note and payer.
+     */
+    body: RefundInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/refunds';
+};
+
+export type RefundOrderErrors = {
+    /**
+     * `validation_failed`: as for the preview, or `Idempotency-Key` missing (`idempotency_key_missing`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `refund_exceeds_paid`, `order_moved`, or `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RefundOrderError = RefundOrderErrors[keyof RefundOrderErrors];
+
+export type RefundOrderResponses = {
+    /**
+     * The refund.
+     */
+    201: OrderRefund;
+};
+
+export type RefundOrderResponse = RefundOrderResponses[keyof RefundOrderResponses];
+
+export type ResolveOrderHelpData = {
+    /**
+     * What was done.
+     */
+    body: HelpResolution;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+        /**
+         * The help request.
+         */
+        help_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/help/{help_id}/resolve';
+};
+
+export type ResolveOrderHelpErrors = {
+    /**
+     * `validation_failed`: the sentence missing or too long.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: the order or the request.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the request was resolved already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolveOrderHelpError = ResolveOrderHelpErrors[keyof ResolveOrderHelpErrors];
+
+export type ResolveOrderHelpResponses = {
+    /**
+     * The request, resolved.
+     */
+    200: HelpRequest;
+};
+
+export type ResolveOrderHelpResponse = ResolveOrderHelpResponses[keyof ResolveOrderHelpResponses];

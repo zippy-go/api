@@ -1,0 +1,55 @@
+type: object
+description: "Where paying for a just-placed order stands: taken or held at once, waiting for the customer at the provider, or nothing to take now."
+required:
+  - state
+  - method
+  - wallet
+  - method_amount
+  - reference
+  - next_action
+properties:
+  state:
+    $ref: ./PaymentState.yaml
+    description: How the payment stands.
+  method:
+    oneOf:
+      - $ref: ./PaymentMethod.yaml
+      - type: "null"
+    description: The method paying the rest.
+  wallet:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What the Wallet pays.
+  method_amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What the method pays.
+  reference:
+    type:
+      - string
+      - "null"
+    examples:
+      - UPI 4821
+    description: The provider's reference, masked, once there is one.
+  next_action:
+    oneOf:
+      - $ref: ./NextAction.yaml
+      - type: "null"
+    description: What the customer does next; `null` when nothing is left to do.
+examples:
+  - state: none
+    method: upi
+    wallet:
+      minor_units: 0
+      currency: INR
+    method_amount:
+      minor_units: 79800
+      currency: INR
+    reference: UPI 4821
+    next_action:
+      kind: open_page
+      url: https://pay.example/checkout/0192b6f4
+      expires_at: 2026-10-16T13:15:00Z
+      message: Pay in your UPI app on the page that opens.

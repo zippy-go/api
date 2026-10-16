@@ -1,0 +1,41 @@
+type: object
+description: A page of orders across every store, most recently placed first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PlatformOrderRow.yaml
+    description: The orders.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: The cursor of the next page; `null` on the last.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        version: 3
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        store_name: Dev Kitchen Gachibowli
+        customer_first_name: Asha
+        fulfilment: delivery
+        placed_at: 2026-10-16T13:00:00Z
+        total:
+          minor_units: 79800
+          currency: INR
+        waits_for: accept
+        timer:
+          kind: accept
+          at: 2026-10-16T13:30:00Z
+          late: false
+        attention:
+          - not_answered
+    next_cursor: eyJ2IjoxfQ.c2ln

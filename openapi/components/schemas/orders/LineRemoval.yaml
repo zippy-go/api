@@ -1,0 +1,20 @@
+type: object
+description: "A line the store left out at acceptance: never charged."
+required:
+  - at
+  - reason
+properties:
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:02:00Z
+    description: When it was left out.
+  reason:
+    type: string
+    examples:
+      - left_out_at_acceptance
+    description: Why, as the store said it.
+examples:
+  - at: 2026-10-16T13:02:00Z
+    reason: left_out_at_acceptance

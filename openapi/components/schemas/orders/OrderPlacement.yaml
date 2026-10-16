@@ -1,0 +1,43 @@
+type: object
+description: Placing the basket at a store as an order, at the price shown.
+required:
+  - location_id
+  - quote
+properties:
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store whose basket is placed.
+  quote:
+    type: string
+    examples:
+      - q1-5f0c9d2e7b1a4c3d
+    description: The `quote` of the basket the customer saw; placing with another is refused with `price_changed`.
+  age_confirmed:
+    type: boolean
+    examples:
+      - false
+    description: The customer confirms they are 18 or over and will show ID, for a basket holding age-restricted items.
+  return_url:
+    type:
+      - string
+      - "null"
+    examples:
+      - https://zippygo.in/orders/return
+    description: "Where the provider's page sends the customer back once they paid or gave up, with `payment_id` and `attempt_id` added to its query: an address of the storefront (`STOREFRONT_URL`) or of another of the platform's own apps, refused otherwise (`validation_failed` with `return_url_not_allowed`). The order's page on the storefront, `/orders/{order_id}`, when left out."
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c41
+    description: A card or UPI ID the customer saved, of the basket's way to pay, to pay with; checkout lists them under each method (`saved`). Another is refused (`validation_failed` on `/saved_method_id`). A saved UPI ID is asked by a request waiting in the customer's UPI app.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    quote: q1-5f0c9d2e7b1a4c3d
+    age_confirmed: false
+    return_url: https://zippygo.in/orders/return
+    saved_method_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c41

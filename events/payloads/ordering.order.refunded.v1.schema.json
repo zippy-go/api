@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.refunded.v1.schema.json",
+  "title": "OrderingOrderRefundedPayload",
+  "description": "Payload of `ordering.order.refunded` version 1. Money went back on an order: lines left out at acceptance, a decline or a cancellation of a paid order, Mission Control's refund of lines and fees with a reason, or a payment confirmed after its order ended. The payments module made the refund (to the source first, up to what it was charged less what was refunded to it, the rest to the Wallet) and `refund_id` is its id; the ledger posts it from `payments.refund.issued`. Consumers: notifications. The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. Read the order at `GET /v1/platform/orders/{order_id}`, `GET /v1/customer/orders/{order_id}` or the store's route. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "by",
+    "payment_method",
+    "refund_id",
+    "amount",
+    "to_source",
+    "to_wallet",
+    "reason",
+    "payer",
+    "lines",
+    "fees",
+    "refunded_total"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ],
+      "description": "The status after the change.",
+      "examples": [
+        "placed"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before; `null` for a first status.",
+      "examples": [
+        "paying"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The order's version after the change; it only rises, and signals carry it.",
+      "examples": [
+        2
+      ]
+    },
+    "fulfilment": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "pickup"
+      ],
+      "description": "Delivery or pickup.",
+      "examples": [
+        "delivery"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "The currency of every amount, in its minor unit.",
+      "examples": [
+        "INR"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T13:00:00Z"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "staff",
+        "platform",
+        "system"
+      ],
+      "description": "Who made the move.",
+      "examples": [
+        "staff"
+      ]
+    },
+    "payment_method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        null
+      ],
+      "description": "How the order was paid beyond the Wallet: where `to_source` went back (a cash order's goes to the Wallet); `null` when the Wallet paid everything.",
+      "examples": [
+        "upi"
+      ]
+    },
+    "refund_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The refund: the payment's refund of the same id.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21"
+      ]
+    },
+    "amount": {
+      "type": "integer",
+      "description": "What went back.",
+      "examples": [
+        4000
+      ]
+    },
+    "to_source": {
+      "type": "integer",
+      "description": "What went back to the UPI account or the card.",
+      "examples": [
+        4000
+      ]
+    },
+    "to_wallet": {
+      "type": "integer",
+      "description": "What went into the Wallet.",
+      "examples": [
+        0
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why: a Mission Control refund reason, or `lines_left_out`, `declined`, `cancelled`, `expired` or `paid_after_end`.",
+      "examples": [
+        "missing_items"
+      ]
+    },
+    "payer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "partner",
+        "platform",
+        null
+      ],
+      "description": "Who bears it; `null` when the money went back before acceptance.",
+      "examples": [
+        "partner"
+      ]
+    },
+    "lines": {
+      "type": "array",
+      "description": "The lines it gives back.",
+      "items": {
+        "type": "object",
+        "required": [
+          "line_id",
+          "quantity",
+          "amount"
+        ],
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The line.",
+            "examples": [
+              "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "How many.",
+            "examples": [
+              1
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "description": "What they cost the customer.",
+            "examples": [
+              4000
+            ]
+          }
+        }
+      },
+      "examples": [
+        [
+          {
+            "line_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12",
+            "quantity": 1,
+            "amount": 4000
+          }
+        ]
+      ]
+    },
+    "fees": {
+      "type": "array",
+      "description": "The fees it gives back.",
+      "items": {
+        "type": "object",
+        "required": [
+          "fee",
+          "amount"
+        ],
+        "properties": {
+          "fee": {
+            "type": "string",
+            "enum": [
+              "delivery",
+              "tip",
+              "cutlery",
+              "small_order"
+            ],
+            "description": "The fee.",
+            "examples": [
+              "delivery"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "description": "What of it.",
+            "examples": [
+              4000
+            ]
+          }
+        }
+      },
+      "examples": [
+        []
+      ]
+    },
+    "refunded_total": {
+      "type": "integer",
+      "description": "What refunds on the order gave back in all, this one included.",
+      "examples": [
+        4000
+      ]
+    }
+  }
+}

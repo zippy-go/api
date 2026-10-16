@@ -1,0 +1,81 @@
+type: object
+description: An order as My orders lists it.
+required:
+  - id
+  - number
+  - status
+  - status_text
+  - happening_now
+  - location_id
+  - store_name
+  - fulfilment
+  - placed_at
+  - item_count
+  - total
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    description: The order.
+  number:
+    type: string
+    examples:
+      - AB0042
+    description: Its number.
+  status:
+    $ref: ./OrderStatus.yaml
+    description: Its status.
+  status_text:
+    type: string
+    examples:
+      - Delivered at 19:05
+    description: The status in plain words.
+  happening_now:
+    type: boolean
+    examples:
+      - false
+    description: Whether it is still moving.
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  store_name:
+    type: string
+    examples:
+      - Dev Kitchen Gachibowli
+    description: The store's name as it was.
+  fulfilment:
+    $ref: ./OrderFulfilment.yaml
+    description: Delivery or pickup.
+  placed_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:00:00Z
+    description: When it was placed.
+  item_count:
+    type: integer
+    examples:
+      - 2
+    description: How many items.
+  total:
+    $ref: ../common/Money.yaml
+    description: Its total as ordered.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    number: AB0042
+    status: paying
+    status_text: Delivered at 19:05
+    happening_now: false
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    store_name: Dev Kitchen Gachibowli
+    fulfilment: delivery
+    placed_at: 2026-10-16T13:00:00Z
+    item_count: 2
+    total:
+      minor_units: 79800
+      currency: INR

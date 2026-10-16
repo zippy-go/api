@@ -139,8 +139,6 @@ paths/
   wallet/platform-customer-wallet*.yaml GET /v1/platform/customers/{customer_id}/wallet, entries; POST credits, corrections
   ledger/*.yaml                 GET /v1/platform/ledger/accounts (+ {account_id}), entries (+ {entry_id}), orders/{order_id},
                                 trial-balance
-  orders/orders.yaml            /v1/orders            (collection, planned)
-  orders/order.yaml             /v1/orders/{order_id} (single resource, planned)
   notifications/me-push.yaml    GET, PUT, DELETE /v1/me/push (+ me-push-opened.yaml, POST /v1/me/push/opened)
   notifications/messages.yaml   GET /v1/platform/messages (+ messages-filters.yaml, message.yaml,
                                 message-resend.yaml, POST .../{message_id}/resend)
@@ -149,6 +147,18 @@ paths/
   notifications/location-notices.yaml GET /v1/partners/{partner_id}/locations/{location_id}/notices
                                 (+ location-notices-seen.yaml, location-notices-clear.yaml, location-notice.yaml)
   notifications/notice-presentation.yaml GET, PUT .../locations/{location_id}/notice-presentation
+  baskets/visitor-tokens.yaml   POST /v1/visitor-tokens (a visitor's token for baskets kept before sign-in)
+  baskets/baskets.yaml          GET /v1/baskets (+ claim.yaml, POST /v1/baskets/claim)
+  baskets/basket.yaml           GET, PATCH, DELETE /v1/baskets/{location_id} (+ checkout.yaml, GET .../checkout)
+  baskets/lines.yaml            POST /v1/baskets/{location_id}/lines (+ line.yaml, PATCH, DELETE .../lines/{line_id})
+  orders/orders.yaml            POST, GET /v1/customer/orders (placing, My orders)
+  orders/order.yaml             GET /v1/customer/orders/{order_id} (+ cancel.yaml, help.yaml, reorder.yaml)
+  order-handling/live.yaml      GET /v1/partners/{partner_id}/locations/{location_id}/orders/live (+ history.yaml,
+                                pause.yaml PUT, DELETE)
+  order-handling/order.yaml     GET .../orders/{order_id}; accept, decline, extend, ready, collected, handed-over,
+                                delivered, cancel (POST, one file each)
+  order-handling/platform-*.yaml GET /v1/platform/orders (+ platform-summary.yaml, .../summary), GET .../{order_id},
+                                POST .../cancel; refund-preview.yaml, refunds.yaml, help-resolve.yaml
 ```
 
 Rules:
@@ -156,7 +166,7 @@ Rules:
 - Folder names are the lowercase domain, matching the tag in `openapi.yaml`
   (`platform`, `auth`, `partners`, `locations`, `memberships`,
   `invitations`, `services`, `access`, `oversight`, `audit`, `catalog`,
-  `orders`, `deliveries`, `fleet`, `live`, `events`, `subscriptions`,
+  `orders`, `baskets`, `order-handling`, `deliveries`, `fleet`, `live`, `events`, `subscriptions`,
   `webhooks`). Sub-resources of a
   partner live in the folder of their own tag, not under `partners/`.
 - The file name is the resource: plural for collections (`orders.yaml`),

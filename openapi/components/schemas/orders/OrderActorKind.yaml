@@ -1,0 +1,9 @@
+type: string
+description: "Who moved an order: the customer, a named member of the Partner's staff, the platform (Mission Control, never named to the Partner) or the platform's own clock."
+enum:
+  - customer
+  - staff
+  - platform
+  - system
+examples:
+  - customer

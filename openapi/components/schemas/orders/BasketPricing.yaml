@@ -1,0 +1,116 @@
+type: object
+description: "What the basket will be charged, every amount tax included: the lines, the offers they save, the fees, the tip, the total, the GST it includes, and once a way to pay is chosen what the Wallet pays and what remains."
+required:
+  - subtotal
+  - savings
+  - delivery
+  - small_order_fee
+  - cutlery_fee
+  - tip
+  - total
+  - tax_included
+  - tax_total
+  - wallet
+  - to_pay
+  - method
+properties:
+  subtotal:
+    $ref: ../common/Money.yaml
+    description: The lines' prices.
+  savings:
+    $ref: ../common/Money.yaml
+    description: What the offers save.
+  delivery:
+    oneOf:
+      - $ref: ./DeliveryFee.yaml
+      - type: "null"
+    description: The delivery fee and how it was worked out; `null` for a pickup.
+  small_order_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The fee below the store's minimum order, where it charges one instead of refusing.
+  cutlery_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The cutlery fee, when cutlery is wanted.
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The tip, never taxed.
+  total:
+    $ref: ../common/Money.yaml
+    description: Everything above.
+  tax_included:
+    type: array
+    items:
+      $ref: ./TaxShare.yaml
+    description: The GST the total includes, rate by rate.
+  tax_total:
+    $ref: ../common/Money.yaml
+    description: All the GST the total includes.
+  wallet:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What the Wallet pays, once a way to pay is chosen and while the Wallet is used; `null` before.
+  to_pay:
+    $ref: ../common/Money.yaml
+    description: What remains to pay by the chosen method.
+  method:
+    oneOf:
+      - $ref: ./PaymentMethod.yaml
+      - type: "null"
+    description: The chosen method.
+examples:
+  - subtotal:
+      minor_units: 73800
+      currency: INR
+    savings:
+      minor_units: 6000
+      currency: INR
+    delivery:
+      fee:
+        minor_units: 4000
+        currency: INR
+      base:
+        minor_units: 2500
+        currency: INR
+      distance_fee:
+        minor_units: 1500
+        currency: INR
+      distance_metres: 3100
+      band_up_to_metres: 4000
+      rule: settings
+    small_order_fee:
+      minor_units: 1500
+      currency: INR
+    cutlery_fee:
+      minor_units: 500
+      currency: INR
+    tip:
+      minor_units: 2000
+      currency: INR
+    total:
+      minor_units: 79800
+      currency: INR
+    tax_included:
+      - rate_percent: 5
+        taxable:
+          minor_units: 73800
+          currency: INR
+        tax:
+          minor_units: 3514
+          currency: INR
+    tax_total:
+      minor_units: 4124
+      currency: INR
+    wallet:
+      minor_units: 0
+      currency: INR
+    to_pay:
+      minor_units: 79800
+      currency: INR
+    method: upi

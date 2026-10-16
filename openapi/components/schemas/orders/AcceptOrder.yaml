@@ -1,0 +1,23 @@
+type: object
+description: "Accepting a placed order: the preparation time and the lines the store cannot supply. Each line left out takes off exactly what it cost the customer; leaving out every line is declining."
+required: []
+properties:
+  preparation_minutes:
+    type: integer
+    minimum: 1
+    maximum: 180
+    examples:
+      - 20
+    description: Minutes to prepare, 1 to 180; the store's quoted time when left out.
+  removed_line_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+      examples:
+        - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12
+    description: The lines left out.
+examples:
+  - preparation_minutes: 20
+    removed_line_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12

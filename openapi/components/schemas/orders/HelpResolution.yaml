@@ -1,0 +1,14 @@
+type: object
+description: What support did about a help request, kept on the order and told to the customer.
+required:
+  - resolution
+properties:
+  resolution:
+    type: string
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Refunded the raita.
+    description: A sentence, 1 to 1,000 characters.
+examples:
+  - resolution: Refunded the raita.

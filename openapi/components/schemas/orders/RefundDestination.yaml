@@ -1,0 +1,7 @@
+type: string
+description: "Where money given back goes: to the source it was paid from (a UPI or card refund, within the provider's window) or into the Wallet at once."
+enum:
+  - source
+  - wallet
+examples:
+  - source

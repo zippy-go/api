@@ -1,0 +1,33 @@
+type: object
+description: "The ways the store offers: delivery, with who carries it, and pickup; scheduled orders arrive in a later step."
+required:
+  - delivery
+  - pickup
+  - carrier
+  - scheduled
+properties:
+  delivery:
+    type: boolean
+    examples:
+      - true
+    description: Whether it delivers.
+  pickup:
+    type: boolean
+    examples:
+      - true
+    description: Whether it offers pickup.
+  carrier:
+    oneOf:
+      - $ref: ../locations/Carrier.yaml
+      - type: "null"
+    description: Who carries its deliveries.
+  scheduled:
+    type: boolean
+    examples:
+      - false
+    description: Whether it takes scheduled orders now; always `false` until scheduled orders arrive.
+examples:
+  - delivery: true
+    pickup: true
+    carrier: platform_fleet
+    scheduled: false

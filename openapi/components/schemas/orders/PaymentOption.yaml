@@ -1,0 +1,55 @@
+type: object
+description: "A way to pay as checkout offers it: whether it may be chosen for this order, why not as a code and a sentence when it may not, the most it may pay where there is a limit, and the cards or UPI IDs of it the customer saved. The payments module decides every one."
+required:
+  - method
+  - available
+  - code
+  - reason
+  - limit
+  - saved
+properties:
+  method:
+    $ref: ./PaymentMethod.yaml
+    description: The method.
+  available:
+    type: boolean
+    examples:
+      - true
+    description: Whether it may be chosen for this order.
+  code:
+    type:
+      - string
+      - "null"
+    examples:
+      - cod_over_limit
+    description: "Why not, as a code a client may branch on: `cod_over_limit`, `cod_not_offered`, `cod_not_accepted`, `cod_withheld`, `upi_over_limit`, `provider_unavailable`, `nothing_left_to_pay`; `null` when it may be chosen."
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - Cash orders are up to ₹2,000.
+    description: Why not, as a sentence a screen may show as it is.
+  limit:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most an order may be paid this way, where there is a limit.
+  saved:
+    type: array
+    items:
+      $ref: ./SavedMethodOption.yaml
+    description: The cards or UPI IDs of this method the customer saved, the default first; empty for cash.
+examples:
+  - method: upi
+    available: true
+    code: cod_over_limit
+    reason: Cash orders are up to ₹2,000.
+    limit:
+      minor_units: 200000
+      currency: INR
+    saved:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c41
+        label: Visa •••• 4242
+        is_default: true
+        usable: true

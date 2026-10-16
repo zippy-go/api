@@ -1,0 +1,25 @@
+type: object
+description: Mission Control cancelling an order at any point before it is final, with a reason, a note and who pays. Before acceptance every hold is released and a captured payment refunded; after it everything paid is refunded, which needs `order:refund`.
+required:
+  - reason
+  - note
+properties:
+  reason:
+    $ref: ./RefundReason.yaml
+    description: Why.
+  note:
+    type: string
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Customer asked to cancel on the phone
+    description: A note, 1 to 1,000 characters.
+  payer:
+    oneOf:
+      - $ref: ./RefundPayer.yaml
+      - type: "null"
+    description: Who bears the refund; the reason's usual payer when left out.
+examples:
+  - reason: missing_items
+    note: Customer asked to cancel on the phone
+    payer: partner

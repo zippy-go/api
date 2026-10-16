@@ -1,0 +1,29 @@
+type: object
+description: Declining a placed order with a reason; `other` needs a note. The note is kept for the Partner and Mission Control and never shown to the customer. Lines named sold out have their variants marked sold out for today through the catalogue in the same act (back at the store's midnight), which needs `catalog:stock` or `catalog:write` at the Location; Mission Control never names them.
+required:
+  - reason
+properties:
+  reason:
+    $ref: ./DeclineReason.yaml
+    description: "Why: `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other`."
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    examples:
+      - Kitchen at capacity
+    description: A note, at most 500 characters.
+  sold_out_line_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+      examples:
+        - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12
+    description: The order's lines whose variants sold out, each marked sold out for today and recorded with the decline.
+examples:
+  - reason: out_of_stock
+    note: Kitchen at capacity
+    sold_out_line_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12

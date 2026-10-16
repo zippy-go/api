@@ -1,0 +1,14 @@
+type: object
+description: More preparation time for an accepted order; the promise moves with it and the customer is told.
+required:
+  - minutes
+properties:
+  minutes:
+    type: integer
+    minimum: 1
+    maximum: 60
+    examples:
+      - 10
+    description: Minutes to add, 1 to 60.
+examples:
+  - minutes: 10

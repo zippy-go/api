@@ -1,0 +1,127 @@
+# Path item for /v1/baskets/{location_id}/lines/{line_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store the basket is at: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+  - name: line_id
+    in: path
+    required: true
+    description: The line.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+patch:
+  operationId: updateBasketLine
+  summary: Change a line's quantity or note
+  description: Sets a line's quantity (0 removes it) or its note. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  requestBody:
+    required: true
+    description: The change.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/BasketLineUpdate.yaml
+  responses:
+    "200":
+      description: The basket.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Basket.yaml
+    "400":
+      description: "`validation_failed`: a quantity outside 0 to 99 or a note over 200 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such line in the basket."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: removeBasketLine
+  summary: Remove a line
+  description: Removes a line from the basket. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  responses:
+    "200":
+      description: The basket.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Basket.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such line in the basket."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

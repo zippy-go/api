@@ -1,0 +1,12 @@
+type: string
+description: "How an order's payment stands: `none` (cash, nothing taken yet), `pending` (waiting for the customer or the provider), `authorised` (held until the store accepts), `captured` (taken), `failed`, `released` (a hold let go) or `refunded`."
+enum:
+  - none
+  - pending
+  - authorised
+  - captured
+  - failed
+  - released
+  - refunded
+examples:
+  - none

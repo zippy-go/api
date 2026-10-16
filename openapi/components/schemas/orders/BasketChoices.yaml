@@ -1,0 +1,66 @@
+type: object
+description: Checkout's answers as saved on the basket.
+required:
+  - fulfilment
+  - address_id
+  - instructions
+  - tip
+  - use_wallet
+  - payment_method
+  - if_unavailable
+  - cutlery
+properties:
+  fulfilment:
+    oneOf:
+      - $ref: ./OrderFulfilment.yaml
+      - type: "null"
+    description: Delivery or pickup; `null` until chosen, when the store offers both.
+  address_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    description: The saved address to deliver to.
+  instructions:
+    type:
+      - string
+      - "null"
+    examples:
+      - Ring the bell twice
+    description: Instructions for the store or the agent.
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The tip.
+  use_wallet:
+    type: boolean
+    examples:
+      - true
+    description: Whether the Wallet pays first.
+  payment_method:
+    oneOf:
+      - $ref: ./PaymentMethod.yaml
+      - type: "null"
+    description: How the rest is paid.
+  if_unavailable:
+    $ref: ./IfUnavailable.yaml
+    description: What the store does when an item is unavailable.
+  cutlery:
+    type: boolean
+    examples:
+      - false
+    description: Whether disposable cutlery is wanted.
+examples:
+  - fulfilment: delivery
+    address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    instructions: Ring the bell twice
+    tip:
+      minor_units: 2000
+      currency: INR
+    use_wallet: true
+    payment_method: upi
+    if_unavailable: remove
+    cutlery: false

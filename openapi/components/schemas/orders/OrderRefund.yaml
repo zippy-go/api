@@ -1,0 +1,97 @@
+type: object
+description: "Money given back on an order: how much, to the source and to the Wallet, why and who bears it. Lines left out at acceptance, a decline or a cancellation of a paid order and Mission Control's refunds each make one."
+required:
+  - id
+  - amount
+  - to_source
+  - to_wallet
+  - reason
+  - note
+  - payer
+  - lines
+  - fees
+  - created_at
+  - by
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+    description: "The refund: the payment's refund of the same id (`Payment.refunds`), so `POST /v1/customer/refunds/{refund_id}/to-wallet` takes it."
+  amount:
+    $ref: ../common/Money.yaml
+    description: How much.
+  to_source:
+    $ref: ../common/Money.yaml
+    description: What goes back to the UPI account or the card, within the provider's window; it moves to `to_wallet` when the customer takes it in the Wallet before it is sent or the provider refuses it.
+  to_wallet:
+    $ref: ../common/Money.yaml
+    description: What goes into the Wallet at once.
+  reason:
+    type: string
+    examples:
+      - missing_items
+    description: "Why: a `RefundReason`, or `lines_left_out`, `declined`, `cancelled` or `expired` for the platform's own, or `paid_after_end` for a payment confirmed after its order ended, given back at once."
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - Raita missing from the bag
+    description: The note given; shown to the Partner and Mission Control, never to the customer.
+  payer:
+    oneOf:
+      - $ref: ./RefundPayer.yaml
+      - type: "null"
+    description: Who bears it; `null` when the money went back before the order was accepted.
+  lines:
+    type: array
+    items:
+      $ref: ./RefundLine.yaml
+    description: The lines it gives back.
+  fees:
+    type: array
+    items:
+      $ref: ./RefundFeePart.yaml
+    description: The fees it gives back.
+  created_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T14:10:00Z
+    description: When.
+  by:
+    type:
+      - string
+      - "null"
+    examples:
+      - Platform admin
+    description: Who made it, for Mission Control; `null` elsewhere.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+    amount:
+      minor_units: 4000
+      currency: INR
+    to_source:
+      minor_units: 4000
+      currency: INR
+    to_wallet:
+      minor_units: 0
+      currency: INR
+    reason: missing_items
+    note: Raita missing from the bag
+    payer: partner
+    lines:
+      - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+        quantity: 1
+        amount:
+          minor_units: 4000
+          currency: INR
+    fees:
+      - fee: delivery
+        amount:
+          minor_units: 4000
+          currency: INR
+    created_at: 2026-10-16T14:10:00Z
+    by: Platform admin

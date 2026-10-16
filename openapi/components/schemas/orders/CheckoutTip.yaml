@@ -1,0 +1,37 @@
+type: object
+description: "The tip offered for the platform's agent: the presets and the most, or why none is offered."
+required:
+  - offered
+  - presets
+  - max
+  - reason
+properties:
+  offered:
+    type: boolean
+    examples:
+      - true
+    description: Whether a tip is offered for this order.
+  presets:
+    type: array
+    items:
+      $ref: ../common/Money.yaml
+    description: The presets, from the platform settings.
+  max:
+    $ref: ../common/Money.yaml
+    description: The most a tip may be.
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - Tips are for the platform's agents on deliveries.
+    description: Why no tip is offered, when none is.
+examples:
+  - offered: true
+    presets:
+      - minor_units: 1000
+        currency: INR
+    max:
+      minor_units: 50000
+      currency: INR
+    reason: Tips are for the platform's agents on deliveries.

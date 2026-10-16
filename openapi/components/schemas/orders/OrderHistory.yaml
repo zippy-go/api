@@ -1,0 +1,90 @@
+type: object
+description: A store's finished orders between two dates of its own calendar, newest first, at most the newest 1,000, with the figures above them.
+required:
+  - location_id
+  - from
+  - to
+  - time_zone
+  - totals
+  - orders
+  - truncated
+properties:
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  from:
+    type: string
+    format: date
+    examples:
+      - 2026-10-10
+    description: The first day.
+  to:
+    type: string
+    format: date
+    examples:
+      - 2026-10-16
+    description: The last day.
+  time_zone:
+    type: string
+    examples:
+      - Asia/Kolkata
+    description: The store's clock.
+  totals:
+    $ref: ./OrderHistoryTotals.yaml
+    description: The figures.
+  orders:
+    type: array
+    items:
+      $ref: ./OrderHistoryRow.yaml
+    description: The orders, newest first.
+  truncated:
+    type: boolean
+    examples:
+      - false
+    description: Whether the range held more than the 1,000 listed.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    from: 2026-10-10
+    to: 2026-10-16
+    time_zone: Asia/Kolkata
+    totals:
+      orders: 12
+      completed: 10
+      refunded: 1
+      declined_or_cancelled: 2
+      sales:
+        minor_units: 798000
+        currency: INR
+      average:
+        minor_units: 79800
+        currency: INR
+      refunds_charged_to_partner:
+        minor_units: 4000
+        currency: INR
+    orders:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        status: paying
+        fulfilment: delivery
+        placed_at: 2026-10-16T13:00:00Z
+        ended_at: 2026-10-16T13:45:00Z
+        total:
+          minor_units: 79800
+          currency: INR
+        charged:
+          minor_units: 75800
+          currency: INR
+        refunded:
+          minor_units: 0
+          currency: INR
+        refunded_by_partner:
+          minor_units: 0
+          currency: INR
+        ended:
+          reason: too_busy
+          by: customer
+          note: Kitchen at capacity
+    truncated: false

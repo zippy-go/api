@@ -1,0 +1,9 @@
+type: string
+description: "Why Mission Control should look at an order: a store not answering after five minutes, an order past its promise, an open help request, or a payment that failed."
+enum:
+  - not_answered
+  - late
+  - help
+  - payment_failed
+examples:
+  - not_answered

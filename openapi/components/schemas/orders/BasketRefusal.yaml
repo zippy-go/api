@@ -1,0 +1,29 @@
+type: object
+description: Something that stops the basket being placed now, with the stable code placing would refuse with and a sentence a screen may show as it is.
+required:
+  - code
+  - message
+  - line_id
+properties:
+  code:
+    type: string
+    examples:
+      - store_not_trading
+    description: "The code: `store_not_trading`, `method_not_offered`, `address_missing`, `address_outside_area`, `below_minimum`, `payment_method_missing`, `payment_method_not_offered`, `cod_over_limit`, `tip_not_allowed`, `tip_too_high`, or a line's code."
+  message:
+    type: string
+    examples:
+      - Dev Kitchen Gachibowli is closed now; it opens at 11:00.
+    description: The sentence.
+  line_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+    description: The line it is about, for a line's refusal.
+examples:
+  - code: store_not_trading
+    message: Dev Kitchen Gachibowli is closed now; it opens at 11:00.
+    line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11

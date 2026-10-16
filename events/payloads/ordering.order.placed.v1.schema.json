@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.placed.v1.schema.json",
+  "title": "OrderingOrderPlacedPayload",
+  "description": "Payload of `ordering.order.placed` version 1. An order was placed: paid, held, or with nothing to take now (cash); the store hears it. Consumers: notifications (the customer, the store's new order with its sound), the ledger and payments. The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. Read the order at `GET /v1/platform/orders/{order_id}`, `GET /v1/customer/orders/{order_id}` or the store's route. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "placed_at",
+    "accept_by",
+    "subtotal",
+    "delivery_fee",
+    "small_order_fee",
+    "cutlery_fee",
+    "tip",
+    "total",
+    "tax_included",
+    "payment_method",
+    "payment_state",
+    "wallet_amount",
+    "method_amount",
+    "carrier"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ],
+      "description": "The status after the change.",
+      "examples": [
+        "placed"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before; `null` for a first status.",
+      "examples": [
+        "paying"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The order's version after the change; it only rises, and signals carry it.",
+      "examples": [
+        2
+      ]
+    },
+    "fulfilment": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "pickup"
+      ],
+      "description": "Delivery or pickup.",
+      "examples": [
+        "delivery"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "The currency of every amount, in its minor unit.",
+      "examples": [
+        "INR"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-10-16T13:00:00Z"
+      ]
+    },
+    "placed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was placed.",
+      "examples": [
+        "2026-10-16T13:00:00Z"
+      ]
+    },
+    "accept_by": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it is declined as not answered unless the store accepts.",
+      "examples": [
+        "2026-10-16T13:30:00Z"
+      ]
+    },
+    "subtotal": {
+      "type": "integer",
+      "description": "The lines.",
+      "examples": [
+        73800
+      ]
+    },
+    "delivery_fee": {
+      "type": "integer",
+      "description": "The delivery fee; 0 for a pickup.",
+      "examples": [
+        4000
+      ]
+    },
+    "small_order_fee": {
+      "type": "integer",
+      "description": "The small-order fee.",
+      "examples": [
+        0
+      ]
+    },
+    "cutlery_fee": {
+      "type": "integer",
+      "description": "The cutlery fee.",
+      "examples": [
+        0
+      ]
+    },
+    "tip": {
+      "type": "integer",
+      "description": "The tip.",
+      "examples": [
+        2000
+      ]
+    },
+    "total": {
+      "type": "integer",
+      "description": "The total, tax included.",
+      "examples": [
+        79800
+      ]
+    },
+    "tax_included": {
+      "type": "integer",
+      "description": "The GST the total includes.",
+      "examples": [
+        4124
+      ]
+    },
+    "payment_method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "upi",
+        "card",
+        "cash",
+        null
+      ],
+      "description": "The method paying what the Wallet does not.",
+      "examples": [
+        "upi"
+      ]
+    },
+    "payment_state": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pending",
+        "authorised",
+        "captured",
+        "failed",
+        "released",
+        "refunded"
+      ],
+      "description": "How the payment stands.",
+      "examples": [
+        "captured"
+      ]
+    },
+    "wallet_amount": {
+      "type": "integer",
+      "description": "What the Wallet pays.",
+      "examples": [
+        0
+      ]
+    },
+    "method_amount": {
+      "type": "integer",
+      "description": "What the method pays.",
+      "examples": [
+        79800
+      ]
+    },
+    "carrier": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "own_agents",
+        "platform_fleet",
+        "external_carrier",
+        null
+      ],
+      "description": "Who carries a delivery, as the store offered it when the order was placed; `null` for a pickup.",
+      "examples": [
+        "platform_fleet"
+      ]
+    }
+  }
+}

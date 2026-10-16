@@ -1,0 +1,55 @@
+# Path item for /v1/baskets/{location_id}/checkout. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store the basket is at: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getCheckout
+  summary: Open checkout at a store
+  description: "Checkout asks only what the store offers: delivery or pickup as the store does, the customer's saved addresses each with whether the store delivers there and what it costs, the ways to pay as the payments module offers them for this amount (each with why it may not be used, as a code and a sentence, and the cards and UPI IDs the customer saved) and the Wallet, a tip only on deliveries by the platform's agents, cutlery only where the store asks; and the basket priced with the answers saved so far. There is no form to submit: each answer is saved with `PATCH /v1/baskets/{location_id}`. Customer tokens only."
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: Checkout.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Checkout.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the store does not exist, is not live, sells nothing, or has published no menu."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

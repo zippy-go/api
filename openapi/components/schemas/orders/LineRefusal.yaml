@@ -1,0 +1,19 @@
+type: object
+description: Why a line cannot be ordered now, in a sentence a screen may show as it is. The line stays in the basket, marked, until the customer removes it.
+required:
+  - code
+  - message
+properties:
+  code:
+    type: string
+    examples:
+      - item_unavailable
+    description: "`item_unavailable`, `item_out_of_hours`, `item_pre_order_only`, `item_not_this_way`, `over_limit` or `choice_invalid`."
+  message:
+    type: string
+    examples:
+      - Hyderabadi Biryani (Full) is sold out today.
+    description: The sentence.
+examples:
+  - code: item_unavailable
+    message: Hyderabadi Biryani (Full) is sold out today.

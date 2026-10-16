@@ -1,0 +1,77 @@
+# Path item for /v1/baskets/{location_id}/lines. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store the basket is at: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+post:
+  operationId: addBasketLine
+  summary: Add a choice to a basket
+  description: "Adds an item, its variant and the answers to its questions (answers are items, three deep at most) to the basket at the store. The same choice already there raises that line's quantity rather than adding a line, and keeps its note unless a new one is given. The choice is checked against the published menu as it stands: an item that cannot be had now, or answers that break the item's questions, are refused with `lines_refused` naming why. Prices are never sent. Changes to a basket are applied one at a time in the order they arrive. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`)."
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  requestBody:
+    required: true
+    description: The choice.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/orders/BasketLineInput.yaml
+  responses:
+    "200":
+      description: The basket.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/Basket.yaml
+    "400":
+      description: "`validation_failed`: a quantity outside 1 to 99 or a note over 200 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or neither a customer token nor a visitor token."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the store does not exist, is not live, sells nothing, or has published no menu."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`lines_refused`: the item is unavailable (`item_unavailable`), outside its hours (`item_out_of_hours`), pre-order only (`item_pre_order_only`), or the answers break its questions (`choice_invalid`); the basket holds 100 lines already (`conflict`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

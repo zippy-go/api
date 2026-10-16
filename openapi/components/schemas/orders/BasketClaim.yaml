@@ -1,0 +1,12 @@
+type: object
+description: The visitor token whose baskets become the signed-in customer's.
+required:
+  - visitor_token
+properties:
+  visitor_token:
+    type: string
+    examples:
+      - zgv_7Q2xk9V0c3mWm1h8rJbqgS1vYdQ4u2eZpK5aN6tLwX0
+    description: The token the visitor's baskets were kept under.
+examples:
+  - visitor_token: zgv_7Q2xk9V0c3mWm1h8rJbqgS1vYdQ4u2eZpK5aN6tLwX0

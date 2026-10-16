@@ -1,0 +1,26 @@
+type: object
+description: "How an order ended, when it did not complete: the reason code, who ended it and, for the Partner and Mission Control, the note."
+required:
+  - reason
+  - by
+  - note
+properties:
+  reason:
+    type: string
+    examples:
+      - too_busy
+    description: "The reason code: a `DeclineReason`, `CustomerCancelReason`, `StoreCancelReason` or `RefundReason`, or `not_paid`."
+  by:
+    $ref: ./OrderActorKind.yaml
+    description: Who ended it.
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - Kitchen at capacity
+    description: The note; never shown to the customer.
+examples:
+  - reason: too_busy
+    by: customer
+    note: Kitchen at capacity

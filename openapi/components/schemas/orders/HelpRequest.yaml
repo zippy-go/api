@@ -1,0 +1,62 @@
+type: object
+description: A customer's request for help on an order, kept for support with how it was resolved.
+required:
+  - id
+  - order_id
+  - kind
+  - note
+  - created_at
+  - resolved_at
+  - resolution
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b31
+    description: The request.
+  order_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    description: The order.
+  kind:
+    $ref: ./HelpKind.yaml
+    description: What went wrong.
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - The raita is missing.
+    description: The customer's note.
+  created_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T14:05:00Z
+    description: When it was asked.
+  resolved_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T14:10:00Z
+    description: When support resolved it.
+  resolution:
+    type:
+      - string
+      - "null"
+    examples:
+      - Refunded the raita.
+    description: What support did, as they said it.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b31
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    kind: missing_item
+    note: The raita is missing.
+    created_at: 2026-10-16T14:05:00Z
+    resolved_at: 2026-10-16T14:10:00Z
+    resolution: Refunded the raita.

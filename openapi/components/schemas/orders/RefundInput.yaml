@@ -1,0 +1,40 @@
+type: object
+description: A refund of lines and fees with a reason, a note and who pays. A line gives back what it cost the customer; a fee is given back whole, what is left of it; all refunds together never exceed what was paid.
+required:
+  - reason
+  - note
+properties:
+  lines:
+    type: array
+    items:
+      $ref: ./RefundLineInput.yaml
+    description: The lines.
+  fees:
+    type: array
+    items:
+      $ref: ./RefundFee.yaml
+    description: The fees.
+  reason:
+    $ref: ./RefundReason.yaml
+    description: Why.
+  note:
+    type: string
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Raita missing from the bag
+    description: A note, 1 to 1,000 characters.
+  payer:
+    oneOf:
+      - $ref: ./RefundPayer.yaml
+      - type: "null"
+    description: Who bears it; the reason's usual payer when left out.
+examples:
+  - lines:
+      - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+        quantity: 1
+    fees:
+      - delivery
+    reason: missing_items
+    note: Raita missing from the bag
+    payer: partner

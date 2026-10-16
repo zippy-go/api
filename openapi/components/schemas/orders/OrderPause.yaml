@@ -1,0 +1,28 @@
+type: object
+description: Pausing new orders at a store for a while, with a reason customers see; it lifts by itself.
+required:
+  - minutes
+  - reason
+properties:
+  minutes:
+    type: integer
+    minimum: 1
+    maximum: 240
+    examples:
+      - 15
+    description: Minutes, 1 to 240.
+  reason:
+    $ref: ../locations/PauseReason.yaml
+    description: Why.
+  message:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    examples:
+      - Back after the lunch rush
+    description: The message customers read, for a `custom` reason, at most 200 characters.
+examples:
+  - minutes: 15
+    reason: high_demand
+    message: Back after the lunch rush

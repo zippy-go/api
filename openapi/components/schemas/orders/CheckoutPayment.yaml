@@ -1,0 +1,37 @@
+type: object
+description: The ways to pay as the payments module offers them for this amount at this store (the Wallet first when it is used, each method for what is left, the cash ceiling and the store's own cash settings applied), and the Wallet.
+required:
+  - methods
+  - wallet
+properties:
+  methods:
+    type: array
+    items:
+      $ref: ./PaymentOption.yaml
+    description: The ways to pay.
+  wallet:
+    oneOf:
+      - $ref: ./WalletBalance.yaml
+      - type: "null"
+    description: The Wallet; `null` when the customer has none yet.
+examples:
+  - methods:
+      - method: upi
+        available: true
+        code: cod_over_limit
+        reason: Cash orders are up to ₹2,000.
+        limit:
+          minor_units: 200000
+          currency: INR
+        saved:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c41
+            label: Visa •••• 4242
+            is_default: true
+            usable: true
+    wallet:
+      balance:
+        minor_units: 0
+        currency: INR
+      available:
+        minor_units: 0
+        currency: INR

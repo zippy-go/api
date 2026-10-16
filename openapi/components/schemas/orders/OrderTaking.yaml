@@ -1,0 +1,48 @@
+type: object
+description: "Whether a store takes new orders now: online, closed by its hours, paused and until when, or not live; and the preparation time it quotes."
+required:
+  - state
+  - reason
+  - until
+  - pause
+  - preparation_minutes
+properties:
+  state:
+    $ref: ../locations/LocationLiveState.yaml
+    description: What it is doing now.
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - paused
+    description: Why it is not online.
+  until:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:15:00Z
+    description: When that changes.
+  pause:
+    oneOf:
+      - $ref: ../locations/Pause.yaml
+      - type: "null"
+    description: The pause in force.
+  preparation_minutes:
+    type: integer
+    examples:
+      - 20
+    description: The preparation time it quotes now.
+examples:
+  - state: online
+    reason: paused
+    until: 2026-10-16T13:15:00Z
+    pause:
+      until: 2026-10-15T13:40:00Z
+      reason: high_demand
+      message: Back after the rush
+      paused_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+      paused_at: 2026-10-15T13:00:00Z
+    preparation_minutes: 20

@@ -1,0 +1,131 @@
+type: object
+description: "A line of an order, kept as it was sold: names, marks, answers and prices from the moment it was placed."
+required:
+  - id
+  - item_id
+  - variant_id
+  - name
+  - variant_label
+  - food_mark
+  - answers
+  - quantity
+  - note
+  - unit_price
+  - price
+  - saving
+  - tax_rate_percent
+  - removed
+  - refunded_quantity
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+    description: The line.
+  item_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    description: The item.
+  variant_id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+    description: The variant.
+  name:
+    type: string
+    examples:
+      - Hyderabadi Chicken Biryani
+    description: The item's name as it was.
+  variant_label:
+    type:
+      - string
+      - "null"
+    examples:
+      - Full
+    description: The variant's values.
+  food_mark:
+    oneOf:
+      - $ref: ../catalog/FoodMark.yaml
+      - type: "null"
+    description: Veg or non-veg; the ticket shows it.
+  answers:
+    type: array
+    items:
+      $ref: ./OrderAnswer.yaml
+    description: The answers, under the part of the item each belongs to.
+  quantity:
+    type: integer
+    examples:
+      - 1
+    description: How many.
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - Less oil
+    description: The customer's note.
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: The price of one as charged, tax included.
+  price:
+    $ref: ../common/Money.yaml
+    description: The line's price.
+  saving:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What the variant's offer saved.
+  tax_rate_percent:
+    type: number
+    examples:
+      - 5
+    description: The GST rate it included.
+  removed:
+    oneOf:
+      - $ref: ./LineRemoval.yaml
+      - type: "null"
+    description: "Set when the store left the line out at acceptance: never charged."
+  refunded_quantity:
+    type: integer
+    examples:
+      - 0
+    description: How many of it refunds have given back.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+    name: Hyderabadi Chicken Biryani
+    variant_label: Full
+    food_mark: veg
+    answers:
+      - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+        question: Choose your raita
+        item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+        name: Boondi raita
+        quantity: 1
+        unit_price:
+          minor_units: 4000
+          currency: INR
+        food_mark: veg
+        answers: []
+    quantity: 1
+    note: Less oil
+    unit_price:
+      minor_units: 34900
+      currency: INR
+    price:
+      minor_units: 34900
+      currency: INR
+    saving:
+      minor_units: 3000
+      currency: INR
+    tax_rate_percent: 5
+    removed:
+      at: 2026-10-16T13:02:00Z
+      reason: left_out_at_acceptance
+    refunded_quantity: 0

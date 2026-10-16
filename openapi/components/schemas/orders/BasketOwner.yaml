@@ -1,0 +1,7 @@
+type: string
+description: "Whose basket it is: a signed-in customer's, or a visitor's kept under a visitor token until sign-in."
+enum:
+  - customer
+  - visitor
+examples:
+  - customer

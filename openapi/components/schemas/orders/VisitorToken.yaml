@@ -1,0 +1,13 @@
+type: object
+description: "A visitor token: the key a visitor's baskets are kept under until they sign in. Send it as `X-Visitor-Token`; it is a secret, kept on the device."
+required:
+  - visitor_token
+properties:
+  visitor_token:
+    type: string
+    pattern: ^zgv_[A-Za-z0-9_-]{43}$
+    examples:
+      - zgv_7Q2xk9V0c3mWm1h8rJbqgS1vYdQ4u2eZpK5aN6tLwX0
+    description: The token, 47 characters starting `zgv_`.
+examples:
+  - visitor_token: zgv_7Q2xk9V0c3mWm1h8rJbqgS1vYdQ4u2eZpK5aN6tLwX0

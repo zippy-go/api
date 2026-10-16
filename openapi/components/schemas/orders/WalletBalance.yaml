@@ -1,0 +1,19 @@
+type: object
+description: "The customer's Wallet as checkout shows it: its balance and what is available now, the balance less what other orders hold."
+required:
+  - balance
+  - available
+properties:
+  balance:
+    $ref: ../common/Money.yaml
+    description: The balance.
+  available:
+    $ref: ../common/Money.yaml
+    description: What may be spent now.
+examples:
+  - balance:
+      minor_units: 0
+      currency: INR
+    available:
+      minor_units: 0
+      currency: INR

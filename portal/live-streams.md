@@ -73,6 +73,13 @@ location of another partner answers `404`, like one that does not exist.
 What a member holds is read when the stream opens and again every 30
 seconds; a permission no longer held closes the stream with `revoked`.
 
+Every move of an order signals `order.changed` (subject `order` with the
+order's id, its new status and its version) on the order's channel
+(`private-order-{order_id}`), the customer's orders channel, the store's
+`-orders` and `-kitchen` channels and `private-orders`: the order page, My
+orders, the store's board, kitchen mode and Mission Control read the order
+again.
+
 | Event            | Data                                                        | When                                              |
 | ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
 | `snapshot`       | `AgentsSnapshot`: `{ "channel", "agents": [Agent, ...] }`    | On open, per agent channel                        |

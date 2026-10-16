@@ -1,0 +1,155 @@
+type: object
+description: "An order's receipt: every amount tax included, what was charged when less than the total, the GST included, how it was paid and every refund."
+required:
+  - subtotal
+  - savings
+  - delivery_fee
+  - small_order_fee
+  - cutlery_fee
+  - tip
+  - total
+  - charged
+  - tax_included
+  - tax_total
+  - gstin
+  - payment
+  - refunds
+  - refunded
+properties:
+  subtotal:
+    $ref: ../common/Money.yaml
+    description: The lines as ordered.
+  savings:
+    $ref: ../common/Money.yaml
+    description: What offers saved.
+  delivery_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The delivery fee.
+  small_order_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The small order fee.
+  cutlery_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The cutlery fee.
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The tip.
+  total:
+    $ref: ../common/Money.yaml
+    description: The total as ordered.
+  charged:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What was kept when the store accepted, when it left lines out; `null` otherwise.
+  tax_included:
+    type: array
+    items:
+      $ref: ./TaxShare.yaml
+    description: The GST the total includes, rate by rate.
+  tax_total:
+    $ref: ../common/Money.yaml
+    description: All the GST included.
+  gstin:
+    type:
+      - string
+      - "null"
+    examples:
+      - 36AAACZ4321D1Z5
+    description: The store's GST number, where it is registered.
+  payment:
+    $ref: ./PaymentSplit.yaml
+    description: How it was paid.
+  refunds:
+    type: array
+    items:
+      $ref: ./OrderRefund.yaml
+    description: Every refund, oldest first.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What refunds gave back in all.
+examples:
+  - subtotal:
+      minor_units: 73800
+      currency: INR
+    savings:
+      minor_units: 6000
+      currency: INR
+    delivery_fee:
+      minor_units: 4000
+      currency: INR
+    small_order_fee:
+      minor_units: 1500
+      currency: INR
+    cutlery_fee:
+      minor_units: 500
+      currency: INR
+    tip:
+      minor_units: 2000
+      currency: INR
+    total:
+      minor_units: 79800
+      currency: INR
+    charged:
+      minor_units: 75800
+      currency: INR
+    tax_included:
+      - rate_percent: 5
+        taxable:
+          minor_units: 73800
+          currency: INR
+        tax:
+          minor_units: 3514
+          currency: INR
+    tax_total:
+      minor_units: 4124
+      currency: INR
+    gstin: 36AAACZ4321D1Z5
+    payment:
+      method: upi
+      state: none
+      wallet:
+        minor_units: 0
+        currency: INR
+      method_amount:
+        minor_units: 79800
+        currency: INR
+      reference: UPI 4821
+    refunds:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+        amount:
+          minor_units: 4000
+          currency: INR
+        to_source:
+          minor_units: 4000
+          currency: INR
+        to_wallet:
+          minor_units: 0
+          currency: INR
+        reason: missing_items
+        note: Raita missing from the bag
+        payer: partner
+        lines:
+          - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+            quantity: 1
+            amount:
+              minor_units: 4000
+              currency: INR
+        fees:
+          - fee: delivery
+            amount:
+              minor_units: 4000
+              currency: INR
+        created_at: 2026-10-16T14:10:00Z
+        by: Platform admin
+    refunded:
+      minor_units: 4000
+      currency: INR

@@ -664,6 +664,203 @@ errors:
       An item needing a prescription is sold only at a store whose order
       settings accept prescriptions, which platform staff switch on.
 
+  - code: basket_empty
+    status: 409
+    title: Basket empty
+    message: There is nothing in the basket to place.
+    retryable: false
+    description: The basket at the store holds no line; add something first.
+
+  - code: store_not_trading
+    status: 409
+    title: Store not trading
+    message: "{store} isn't taking orders right now."
+    retryable: false
+    description: The store is closed by its hours, paused, or not live; the
+      detail says which and when it opens or resumes. Nothing is charged
+      or held.
+
+  - code: method_not_offered
+    status: 409
+    title: Way of ordering not offered
+    message: The store does not offer {method}.
+    retryable: false
+    description: The basket asks for delivery or pickup and the store does
+      not offer it.
+
+  - code: address_missing
+    status: 409
+    title: Address missing
+    message: Choose an address to deliver to.
+    retryable: false
+    description: A delivery needs one of the customer's saved addresses;
+      none is chosen, or the customer has none yet.
+
+  - code: address_outside_area
+    status: 409
+    title: Address outside the area
+    message: The store doesn't deliver there.
+    retryable: false
+    description: The address lies outside the store's drawn delivery zone or
+      beyond its coverage radius; the detail offers pickup where the store
+      has it.
+
+  - code: lines_refused
+    status: 409
+    title: Lines refused
+    message: "{count} line(s) cannot be ordered now."
+    retryable: false
+    description: Lines of the basket, or the choice being added, cannot be
+      ordered now. The `errors` member names each line by its id
+      (`/lines/{line_id}`) with a field-level code below and a sentence;
+      such a line stays in the basket, marked, until the customer removes
+      it.
+    details:
+      - code: item_unavailable
+        message: The item is unavailable.
+        description: The item or its variant is off the menu, sold out today,
+          out of stock or counted down to nothing, or an answer it carries
+          is.
+      - code: item_out_of_hours
+        message: The item is not sold at this hour.
+        description: The item, or its category, has hours of its own and now is
+          outside them; the sentence says when it can next be ordered.
+      - code: item_pre_order_only
+        message: The item is sold ahead of time only.
+        description: The item is sold only as a pre-order into a scheduled slot,
+          which arrives in a later step.
+      - code: item_not_this_way
+        message: The item is not sold this way.
+        description: The item is sold for delivery only, or for pickup only, and
+          the basket asks for the other.
+      - code: over_limit
+        message: More than one order may take.
+        description: The line asks for more of the item than one order may take;
+          the sentence names the limit.
+      - code: choice_invalid
+        message: The answers do not fit the item's questions.
+        description: An answer is not offered at its question, a required
+          question is unanswered, too few or too many answers are chosen,
+          an answer repeats where it may not, or the answers nest deeper
+          than three.
+
+  - code: below_minimum
+    status: 409
+    title: Below the minimum order
+    message: Add {amount} more to order from this store.
+    retryable: false
+    description: The basket is below the store's minimum order and the store
+      charges no small-order fee instead.
+
+  - code: age_not_confirmed
+    status: 409
+    title: Age not confirmed
+    message: Confirm you are 18 or over and will show ID to order this.
+    retryable: false
+    description: The basket holds an age-restricted item and the customer
+      has not confirmed they are 18 or over.
+
+  - code: age_under_18
+    status: 409
+    title: Under 18
+    message: Items for over-18s only cannot be ordered on this account.
+    retryable: false
+    description: The customer's date of birth says they are under 18 and the
+      basket holds an age-restricted item.
+
+  - code: payment_method_missing
+    status: 409
+    title: Way to pay missing
+    message: Choose how to pay.
+    retryable: false
+    description: The Wallet does not cover the order and no way to pay the
+      rest is chosen.
+
+  - code: tip_not_allowed
+    status: 409
+    title: Tip not allowed
+    message: Tips are for the platform's agents on deliveries.
+    retryable: false
+    description: A tip was given on a pickup, a delivery by the store's own
+      agents, or a cash order.
+
+  - code: tip_too_high
+    status: 409
+    title: Tip too high
+    message: The most a tip may be is {max}.
+    retryable: false
+    description: The tip is above the most the platform allows.
+
+  - code: price_changed
+    status: 409
+    title: Price changed
+    message: The price changed since it was shown; check the basket again.
+    retryable: false
+    description: "Something changed since the quote was shown (a price, an
+      offer, a fee, what the Wallet covers): nothing was placed. Read the
+      basket again and show the customer the difference before they
+      confirm."
+
+  - code: order_moved
+    status: 409
+    title: Order moved
+    message: The order is {status} now.
+    retryable: false
+    description: The move is not one the order's status allows, or somebody
+      else made a move first; the detail names the status the order is in
+      now. Read it again.
+
+  - code: order_not_cancellable
+    status: 409
+    title: Order not cancellable
+    message: The store has already accepted your order; ask for help to cancel it.
+    retryable: false
+    description: The customer may cancel alone only until the store accepts;
+      from then on "Get help" asks support.
+
+  - code: remove_everything
+    status: 409
+    title: Every line left out
+    message: Leaving every line out is declining the order.
+    retryable: false
+    description: An acceptance left out every line; decline the order instead.
+
+  - code: customer_wants_all
+    status: 409
+    title: All or nothing
+    message: The customer wants all of it or none; decline instead.
+    retryable: false
+    description: The customer asked for the whole order to be cancelled if
+      anything is unavailable, so no line may be left out.
+
+  - code: stock_short
+    status: 409
+    title: Stock short
+    message: "{count} line(s) ask for more than remains."
+    retryable: false
+    description: Accepting would spend more of a tracked item than remains;
+      the `errors` member names each line. Leave them out or restock, then
+      accept again.
+
+  - code: payment_failed
+    status: 409
+    title: Payment failed
+    message: The card could not be charged; the order was declined and
+      nothing was taken.
+    retryable: false
+    description: "Charging the held card as the store accepted failed: the
+      order is declined as `payment_failed`, every hold released, and the
+      store told not to prepare it."
+
+  - code: help_not_offered
+    status: 409
+    title: Help not offered
+    message: That help is not offered for this order now.
+    retryable: false
+    description: "The help asked for does not make sense for the order now:
+      what arrived before it has, cancelling once it is complete, or any
+      help on an order never placed."
+
   - code: idempotency_key_reuse
     status: 409
     title: Idempotency key reused

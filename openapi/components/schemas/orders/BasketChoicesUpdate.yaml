@@ -1,0 +1,58 @@
+type: object
+description: Checkout's answers, each saved on the basket as it is given; members left out keep what is saved, `null` clears. The answer is the basket priced with them, so the summary beside the questions is always the price placing will carry.
+required: []
+properties:
+  fulfilment:
+    $ref: ./OrderFulfilment.yaml
+    description: Delivery or pickup, from what the store offers.
+  address_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    description: The customer's saved address to deliver to; `null` clears it. Customers only.
+  instructions:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    examples:
+      - Ring the bell twice
+    description: Instructions for the store or the agent, at most 500 characters.
+  tip:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    examples:
+      - 2000
+    description: "A tip for the platform's agent in minor units: a preset or an amount of the customer's own up to the most; 0 or `null` is none. Offered only on deliveries by the platform's agents and never with cash."
+  use_wallet:
+    type: boolean
+    examples:
+      - true
+    description: Whether the Wallet pays first; on by default.
+  payment_method:
+    oneOf:
+      - $ref: ./PaymentMethod.yaml
+      - type: "null"
+    description: How the rest is paid; `null` clears it.
+  if_unavailable:
+    $ref: ./IfUnavailable.yaml
+    description: What the store does when an item is unavailable.
+  cutlery:
+    type: boolean
+    examples:
+      - false
+    description: Whether to send disposable cutlery, where the store asks, at its fee.
+examples:
+  - fulfilment: delivery
+    address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    instructions: Ring the bell twice
+    tip: 2000
+    use_wallet: true
+    payment_method: upi
+    if_unavailable: remove
+    cutlery: false

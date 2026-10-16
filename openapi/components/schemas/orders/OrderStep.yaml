@@ -1,0 +1,25 @@
+type: object
+description: A step the order went through, with when, on the store's clock.
+required:
+  - status
+  - at
+  - label
+properties:
+  status:
+    $ref: ./OrderStatus.yaml
+    description: The status it moved to.
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:02:00Z
+    description: When.
+  label:
+    type: string
+    examples:
+      - Accepted at 18:32
+    description: The step in plain words.
+examples:
+  - status: paying
+    at: 2026-10-16T13:02:00Z
+    label: Accepted at 18:32

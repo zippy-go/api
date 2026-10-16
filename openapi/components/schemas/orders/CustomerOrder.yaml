@@ -1,0 +1,293 @@
+type: object
+description: "An order as its customer reads it: one status in plain words, the steps it went through, the promise still open, what was sold, the receipt, whether it can still be cancelled and the help it offers. Read it again on `order.changed`, and every 30 seconds without live updates."
+required:
+  - id
+  - number
+  - status
+  - status_text
+  - version
+  - location_id
+  - partner_id
+  - store
+  - fulfilment
+  - placed_at
+  - created_at
+  - steps
+  - promise
+  - delivery_address
+  - instructions
+  - if_unavailable
+  - lines
+  - receipt
+  - can_cancel
+  - help
+  - ended
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    description: The order.
+  number:
+    type: string
+    examples:
+      - AB0042
+    description: The order's number, as said aloud.
+  status:
+    $ref: ./OrderStatus.yaml
+    description: The status.
+  status_text:
+    type: string
+    examples:
+      - Being prepared, ready about 18:52
+    description: The status in plain words, on the store's clock.
+  version:
+    type: integer
+    examples:
+      - 3
+    description: Raised on every change; the entity tag.
+  location_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+    description: The store.
+  partner_id:
+    type: string
+    format: uuid
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+    description: Its Partner.
+  store:
+    $ref: ./OrderStore.yaml
+    description: The store as it was.
+  fulfilment:
+    $ref: ./OrderFulfilment.yaml
+    description: Delivery or pickup.
+  placed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - 2026-10-16T13:00:00Z
+    description: When it was placed; `null` while paying.
+  created_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:00:00Z
+    description: When the customer pressed place.
+  steps:
+    type: array
+    items:
+      $ref: ./OrderStep.yaml
+    description: The steps it went through, oldest first.
+  promise:
+    $ref: ./OrderPromise.yaml
+    description: The promise still open.
+  delivery_address:
+    oneOf:
+      - $ref: ./OrderAddress.yaml
+      - type: "null"
+    description: Where it goes, for a delivery.
+  instructions:
+    type:
+      - string
+      - "null"
+    examples:
+      - Ring the bell twice
+    description: The customer's instructions.
+  if_unavailable:
+    $ref: ./IfUnavailable.yaml
+    description: What the customer asked the store to do with an unavailable item.
+  lines:
+    type: array
+    items:
+      $ref: ./OrderLine.yaml
+    description: What was sold.
+  receipt:
+    $ref: ./Receipt.yaml
+    description: The receipt.
+  can_cancel:
+    type: boolean
+    examples:
+      - false
+    description: "Whether the customer may still cancel it alone: until the store accepts."
+  help:
+    $ref: ./OrderHelp.yaml
+    description: The help it offers.
+  ended:
+    oneOf:
+      - $ref: ./OrderEnd.yaml
+      - type: "null"
+    description: How it ended, when it was declined, cancelled or expired; the note is never shown here.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    number: AB0042
+    status: paying
+    status_text: Being prepared, ready about 18:52
+    version: 3
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    store:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      name: Dev Kitchen Gachibowli
+      address_line: Plot 12, Financial District Road, Gachibowli, Hyderabad 500032
+      phone: "+919848000001"
+      time_zone: Asia/Kolkata
+    fulfilment: delivery
+    placed_at: 2026-10-16T13:00:00Z
+    created_at: 2026-10-16T13:00:00Z
+    steps:
+      - status: paying
+        at: 2026-10-16T13:02:00Z
+        label: Accepted at 18:32
+    promise:
+      preparation_minutes: 20
+      ready_by: 2026-10-16T13:22:00Z
+      due_by: 2026-10-16T13:52:00Z
+      late: false
+    delivery_address:
+      label: home
+      line1: Road No 36
+      line2: Near the park
+      locality: Jubilee Hills
+      city: Hyderabad
+      postal_code: "500033"
+      lat: 17.4326
+      lng: 78.4071
+      flat_number: "402"
+      building_name: Lake View Residency
+      floor: "4"
+      landmark: opposite the water tank
+    instructions: Ring the bell twice
+    if_unavailable: remove
+    lines:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+        item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+        name: Hyderabadi Chicken Biryani
+        variant_label: Full
+        food_mark: veg
+        answers:
+          - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+            question: Choose your raita
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+            name: Boondi raita
+            quantity: 1
+            unit_price:
+              minor_units: 4000
+              currency: INR
+            food_mark: veg
+            answers: []
+        quantity: 1
+        note: Less oil
+        unit_price:
+          minor_units: 34900
+          currency: INR
+        price:
+          minor_units: 34900
+          currency: INR
+        saving:
+          minor_units: 3000
+          currency: INR
+        tax_rate_percent: 5
+        removed:
+          at: 2026-10-16T13:02:00Z
+          reason: left_out_at_acceptance
+        refunded_quantity: 0
+    receipt:
+      subtotal:
+        minor_units: 73800
+        currency: INR
+      savings:
+        minor_units: 6000
+        currency: INR
+      delivery_fee:
+        minor_units: 4000
+        currency: INR
+      small_order_fee:
+        minor_units: 1500
+        currency: INR
+      cutlery_fee:
+        minor_units: 500
+        currency: INR
+      tip:
+        minor_units: 2000
+        currency: INR
+      total:
+        minor_units: 79800
+        currency: INR
+      charged:
+        minor_units: 75800
+        currency: INR
+      tax_included:
+        - rate_percent: 5
+          taxable:
+            minor_units: 73800
+            currency: INR
+          tax:
+            minor_units: 3514
+            currency: INR
+      tax_total:
+        minor_units: 4124
+        currency: INR
+      gstin: 36AAACZ4321D1Z5
+      payment:
+        method: upi
+        state: none
+        wallet:
+          minor_units: 0
+          currency: INR
+        method_amount:
+          minor_units: 79800
+          currency: INR
+        reference: UPI 4821
+      refunds:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b21
+          amount:
+            minor_units: 4000
+            currency: INR
+          to_source:
+            minor_units: 4000
+            currency: INR
+          to_wallet:
+            minor_units: 0
+            currency: INR
+          reason: missing_items
+          note: Raita missing from the bag
+          payer: partner
+          lines:
+            - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+              quantity: 1
+              amount:
+                minor_units: 4000
+                currency: INR
+          fees:
+            - fee: delivery
+              amount:
+                minor_units: 4000
+                currency: INR
+          created_at: 2026-10-16T14:10:00Z
+          by: Platform admin
+      refunded:
+        minor_units: 4000
+        currency: INR
+    can_cancel: false
+    help:
+      offered:
+        - missing_item
+      requests:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b31
+          order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+          kind: missing_item
+          note: The raita is missing.
+          created_at: 2026-10-16T14:05:00Z
+          resolved_at: 2026-10-16T14:10:00Z
+          resolution: Refunded the raita.
+    ended:
+      reason: too_busy
+      by: customer
+      note: Kitchen at capacity

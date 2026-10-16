@@ -1,0 +1,7 @@
+type: string
+description: "Who bears a refund: the Partner or the platform."
+enum:
+  - partner
+  - platform
+examples:
+  - partner

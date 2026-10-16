@@ -1,0 +1,15 @@
+type: string
+description: "Where an order is. It moves only along these paths: `paying` to `placed`, `expired` or `cancelled` (the customer gave up paying, or Mission Control cancelled it); `placed` to `accepted`, `declined` or `cancelled`; `accepted` to `ready` or `cancelled`; `ready` to `on_its_way`, `completed` (collected) or `cancelled`; `on_its_way` to `completed` (delivered) or `undelivered`; `undelivered` to `on_its_way` or `cancelled`. `completed`, `declined`, `cancelled` and `expired` are final."
+enum:
+  - paying
+  - placed
+  - accepted
+  - ready
+  - on_its_way
+  - completed
+  - undelivered
+  - declined
+  - cancelled
+  - expired
+examples:
+  - paying

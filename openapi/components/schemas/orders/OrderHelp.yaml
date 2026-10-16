@@ -1,0 +1,27 @@
+type: object
+description: The help an order offers now, and the requests made.
+required:
+  - offered
+  - requests
+properties:
+  offered:
+    type: array
+    items:
+      $ref: ./HelpKind.yaml
+    description: "What the customer may ask about now: what arrived once it has, cancelling while there is still something to stop."
+  requests:
+    type: array
+    items:
+      $ref: ./HelpRequest.yaml
+    description: The requests made, oldest first.
+examples:
+  - offered:
+      - missing_item
+    requests:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b31
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        kind: missing_item
+        note: The raita is missing.
+        created_at: 2026-10-16T14:05:00Z
+        resolved_at: 2026-10-16T14:10:00Z
+        resolution: Refunded the raita.

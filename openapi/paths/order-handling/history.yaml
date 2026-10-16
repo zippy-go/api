@@ -1,0 +1,77 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/orders/history. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getOrderHistory
+  summary: Read a store's order history
+  description: The store's finished orders (completed, declined, cancelled) between two dates of its own calendar, newest first, at most the newest 1,000 with a note when the range held more, and above them the orders, sales, average order, refunds charged to the Partner and the counts, each counting the orders listed. Today when no date is given; at most 366 days. Members need `order:read` at the Location to read and `order:manage` to move an order; platform staff use the same routes with their platform permissions, every move written to the audit log. A Location of another Partner, and an order of another store, answer `404` before any permission is looked at.
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: The first day, on the store's calendar; today by default.
+      schema:
+        type: string
+        format: date
+    - name: to
+      in: query
+      required: false
+      description: The last day; `from` by default.
+      schema:
+        type: string
+        format: date
+  responses:
+    "200":
+      description: The history.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/OrderHistory.yaml
+    "400":
+      description: "`validation_failed`: a malformed date, `to` before `from`, or more than 366 days."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission at the Location) or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Location or the order."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

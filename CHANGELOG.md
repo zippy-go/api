@@ -6,6 +6,116 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-16
+
+Step 3, orders: server baskets priced by the platform, checkout, placing
+with every check made again and paid through the payments module, the
+order's one status and its live page, the customer's cancel and help, My
+orders, the receipt and reorder, a store's handling of its orders, and
+Mission Control on any order. Written as 0.14.0 on its own branch,
+renumbered after the notifications (0.14.0) and money (0.15.0) slices
+merged first. Additive only.
+
+### Added
+
+- The `Baskets` operations: a visitor token for baskets kept before
+  sign-in (`POST /v1/visitor-tokens`, `VisitorToken`, sent back as
+  `X-Visitor-Token`), every basket of the caller (`GET /v1/baskets`,
+  `BasketList`), a visitor's baskets taken by the signed-in customer
+  (`POST /v1/baskets/claim`), a basket at a store priced by the platform
+  as it will be charged (`GET`, `PATCH` checkout's answers, `DELETE` at
+  `/v1/baskets/{location_id}`, `Basket`, `BasketChoicesUpdate`), its lines
+  (`POST .../lines`, `PATCH`, `DELETE .../lines/{line_id}`,
+  `BasketLineInput` with answers three deep, `BasketLineUpdate`) and
+  checkout (`GET .../checkout`, `Checkout`): delivery or pickup as the store
+  offers, the customer's addresses with whether the store delivers there,
+  the ways to pay as the payments module offers them (`PaymentOption` with
+  why one may not be used as a `code` and a sentence, and the cards and UPI
+  IDs the customer saved, `SavedMethodOption`) and the Wallet, the tip
+  presets and cutlery. Every amount is `Money`, tax included; the delivery
+  fee is the store's fee plus the band of the distance ladder
+  (`DeliveryFee`).
+- The `Orders` operations for customers: placing the basket at the price
+  shown (`POST /v1/customer/orders` with `OrderPlacement`, `quote` and a
+  required `Idempotency-Key`, answering `PlacedOrder` with the
+  `PaymentStep`), My orders (`GET /v1/customer/orders`,
+  `CustomerOrderPage`), the order's page with its receipt
+  (`GET /v1/customer/orders/{order_id}`, `CustomerOrder`, `Receipt`, with
+  its `ETag`), cancelling until the store accepts (`POST .../cancel`,
+  `CustomerCancellation`), help (`POST .../help`, `HelpRequestInput`,
+  `HelpRequest`) and reorder (`POST .../reorder`, `Reorder`).
+- Paying through the payments module: placing starts the order's payment
+  (the Wallet first, the rest by UPI, a card or cash) and, while something
+  is to be taken, answers the order `paying` with `PaymentStep.next_action`
+  (`NextAction`: `open_page` for the provider's page, or `approve_in_app`
+  for a request waiting in the UPI app, with `expires_at` and a `message`);
+  the provider's page sends the customer back to `OrderPlacement.return_url`
+  (an address of the storefront or another of the platform's apps,
+  `validation_failed` with `return_url_not_allowed` otherwise; the order's
+  page on the storefront by default) and the order is `placed` once the
+  provider confirms the payment. `OrderPlacement.saved_method_id` pays with
+  a saved card or UPI ID. A customer who gives up paying cancels the order
+  still `paying` (`paying` may now become `cancelled`): whatever was held is
+  released and nothing is charged; the store is told nothing.
+- An order's refund is the payment's refund of the same id
+  (`OrderRefund.id`, `ordering.order.refunded`'s `refund_id`):
+  `POST /v1/customer/refunds/{refund_id}/to-wallet` takes it, and the
+  order's refund follows where its money went in the end. A payment
+  confirmed after its order ended is given back at once and recorded on
+  the order (`paid_after_end`).
+- The `Order handling` operations for a store, under
+  `/v1/partners/{partner_id}/locations/{location_id}/orders`: the live
+  board (`GET .../live`, `LiveOrders`, with `next_new_order_id` for kitchen
+  mode and deliveries on their way in a group of their own until delivered
+  or cancelled), the history (`GET .../history`, `OrderHistory`), pausing
+  new orders (`PUT`, `DELETE .../pause`, `OrderPause`, `OrderTaking`), one
+  order (`GET .../{order_id}`, `StoreOrder`) and its moves: `accept`
+  (`AcceptOrder`, with lines left out), `decline` (`DeclineOrder`, which may
+  name the lines that sold out, their variants marked sold out for today
+  with `catalog:stock` or `catalog:write`), `extend` (`ExtendPreparation`),
+  `ready`, `collected`, `handed-over`, `delivered` and `cancel`
+  (`StoreCancellation`). Members need `order:read` and `order:manage` at the
+  Location; platform staff use the same routes.
+- Mission Control's operations under `/v1/platform/orders`: every order
+  with what needs attention (`GET`, `PlatformOrderPage`, `AttentionReason`,
+  narrowed by zone), the orders at a glance (`GET .../summary`,
+  `PlatformOrderSummary`, `OrderStatusCounts`, `AttentionCounts`), any
+  order with its customer's id (`GET .../{order_id}`, `PlatformOrder`),
+  cancelling at any point (`POST .../cancel`, `PlatformCancellation`),
+  refunds of lines and fees bounded by what was paid, previewed
+  (`POST .../refunds/preview`, `RefundPreview`) and made with a fresh
+  step-up and `Idempotency-Key` (`POST .../refunds`, `RefundInput`,
+  `OrderRefund`), and help resolved (`POST .../help/{help_id}/resolve`,
+  `HelpResolution`).
+- The problem codes `basket_empty`, `store_not_trading`,
+  `method_not_offered`, `address_missing`, `address_outside_area`,
+  `lines_refused` (with the field codes `item_unavailable`,
+  `item_out_of_hours`, `item_pre_order_only`, `item_not_this_way`,
+  `over_limit` and `choice_invalid`), `below_minimum`,
+  `age_not_confirmed`, `age_under_18`, `payment_method_missing`,
+  `tip_not_allowed`, `tip_too_high`, `price_changed`, `order_moved`,
+  `order_not_cancellable`, `remove_everything`, `customer_wants_all`,
+  `stock_short`, `payment_failed` and `help_not_offered`, all `409`;
+  ordering also answers money's `payment_method_not_offered`,
+  `cod_over_limit`, `refund_exceeds_paid` and `not_refundable`.
+- The events `ordering.order.placed` (with `carrier`), `.accepted`,
+  `.lines_removed`, `.declined` (with `sold_out_line_ids`), `.cancelled`,
+  `.expired`, `.preparation_extended`, `.ready`, `.handed_over`,
+  `.collected`, `.delivered`, `.refunded` (with `payment_method`),
+  `.help_requested` and `.help_resolved`, each with the order, its store,
+  Partner and customer, its status and version, and the amounts it
+  changes; the payments module and the ledger read them.
+- Every move of an order signals `order.changed` (subject `order`, its
+  status and version) on the order's channel, the customer's orders
+  channel, the store's orders and kitchen channels and `private-orders`.
+- The `X-Visitor-Token` request header (`VisitorTokenHeader`), allowed by
+  CORS.
+- The platform serves every operation of the slice
+  (`generated/platform-openapi.json` re-synced). `Idempotency-Key` (the
+  header and the conventions) says that a first refused before it could act
+  (`401`, `403` such as `step_up_required`, `429`) is processed afresh,
+  like a `5xx`.
+
 ## [0.15.0] - 2026-10-16
 
 Step 3, money: payments against a simulated provider with sandbox semantics,

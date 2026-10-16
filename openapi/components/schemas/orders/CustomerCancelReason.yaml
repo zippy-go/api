@@ -1,0 +1,9 @@
+type: string
+description: Why a customer cancels an order the store has not accepted; `other` needs a note.
+enum:
+  - changed_my_mind
+  - ordered_by_mistake
+  - taking_too_long
+  - other
+examples:
+  - changed_my_mind

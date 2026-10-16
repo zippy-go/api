@@ -1,0 +1,8 @@
+type: string
+description: "What a live order's timer counts towards: the moment it must be accepted by, the moment it was promised ready, or the moment it was promised at the door or the counter."
+enum:
+  - accept
+  - ready
+  - due
+examples:
+  - accept

@@ -1,0 +1,86 @@
+type: object
+description: A finished order in a store's history.
+required:
+  - id
+  - number
+  - status
+  - fulfilment
+  - placed_at
+  - ended_at
+  - total
+  - charged
+  - refunded
+  - refunded_by_partner
+  - ended
+properties:
+  id:
+    type: string
+    format: uuid
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    description: The order.
+  number:
+    type: string
+    examples:
+      - AB0042
+    description: Its number.
+  status:
+    $ref: ./OrderStatus.yaml
+    description: "How it finished: `completed`, `declined` or `cancelled`."
+  fulfilment:
+    $ref: ./OrderFulfilment.yaml
+    description: How it left.
+  placed_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:00:00Z
+    description: When it was placed.
+  ended_at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:45:00Z
+    description: When it finished.
+  total:
+    $ref: ../common/Money.yaml
+    description: Its total as ordered.
+  charged:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What was kept.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What refunds gave back.
+  refunded_by_partner:
+    $ref: ../common/Money.yaml
+    description: What of that the Partner bears.
+  ended:
+    oneOf:
+      - $ref: ./OrderEnd.yaml
+      - type: "null"
+    description: Why it was declined or cancelled.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    number: AB0042
+    status: paying
+    fulfilment: delivery
+    placed_at: 2026-10-16T13:00:00Z
+    ended_at: 2026-10-16T13:45:00Z
+    total:
+      minor_units: 79800
+      currency: INR
+    charged:
+      minor_units: 75800
+      currency: INR
+    refunded:
+      minor_units: 0
+      currency: INR
+    refunded_by_partner:
+      minor_units: 0
+      currency: INR
+    ended:
+      reason: too_busy
+      by: customer
+      note: Kitchen at capacity

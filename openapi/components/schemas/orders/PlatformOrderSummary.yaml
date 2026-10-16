@@ -1,0 +1,55 @@
+type: object
+description: "Mission Control's orders at a glance, counted where the orders are kept rather than from a page of them: how many in each status, how many are not final, and how many need attention, for every order or as narrowed by Partner, store and zone."
+required:
+  - at
+  - scope
+  - counts
+  - live
+  - attention
+properties:
+  at:
+    type: string
+    format: date-time
+    examples:
+      - 2026-10-16T13:05:00Z
+    description: The instant the counts are for.
+  scope:
+    type: string
+    enum:
+      - live
+      - all
+    examples:
+      - live
+    description: "`live` (not final, or finished in the last 24 hours) or `all`."
+  counts:
+    $ref: ./OrderStatusCounts.yaml
+    description: How many in each status.
+  live:
+    type: integer
+    examples:
+      - 15
+    description: How many are not final.
+  attention:
+    $ref: ./AttentionCounts.yaml
+    description: What needs attention.
+examples:
+  - at: 2026-10-16T13:05:00Z
+    scope: live
+    counts:
+      paying: 1
+      placed: 3
+      accepted: 5
+      ready: 2
+      on_its_way: 4
+      undelivered: 0
+      completed: 41
+      declined: 2
+      cancelled: 1
+      expired: 1
+    live: 15
+    attention:
+      not_answered: 1
+      late: 2
+      help: 1
+      payment_failed: 0
+      orders: 3

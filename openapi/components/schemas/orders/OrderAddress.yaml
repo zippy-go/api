@@ -1,0 +1,103 @@
+type: object
+description: Where a delivery goes, kept as it was when the order was placed.
+required:
+  - label
+  - line1
+  - line2
+  - locality
+  - city
+  - postal_code
+  - lat
+  - lng
+  - flat_number
+  - building_name
+  - floor
+  - landmark
+properties:
+  label:
+    type: string
+    examples:
+      - home
+    description: Home, work or other.
+  line1:
+    type: string
+    examples:
+      - Road No 36
+    description: The address line.
+  line2:
+    type:
+      - string
+      - "null"
+    examples:
+      - Near the park
+    description: A second line.
+  locality:
+    type:
+      - string
+      - "null"
+    examples:
+      - Jubilee Hills
+    description: The area.
+  city:
+    type: string
+    examples:
+      - Hyderabad
+    description: The city.
+  postal_code:
+    type:
+      - string
+      - "null"
+    examples:
+      - "500033"
+    description: The PIN code.
+  lat:
+    type: number
+    examples:
+      - 17.4326
+    description: Latitude of the pin.
+  lng:
+    type: number
+    examples:
+      - 78.4071
+    description: Longitude of the pin.
+  flat_number:
+    type:
+      - string
+      - "null"
+    examples:
+      - "402"
+    description: Flat or door number.
+  building_name:
+    type:
+      - string
+      - "null"
+    examples:
+      - Lake View Residency
+    description: Building or society name.
+  floor:
+    type:
+      - string
+      - "null"
+    examples:
+      - "4"
+    description: Floor.
+  landmark:
+    type:
+      - string
+      - "null"
+    examples:
+      - opposite the water tank
+    description: A landmark that finds the gate.
+examples:
+  - label: home
+    line1: Road No 36
+    line2: Near the park
+    locality: Jubilee Hills
+    city: Hyderabad
+    postal_code: "500033"
+    lat: 17.4326
+    lng: 78.4071
+    flat_number: "402"
+    building_name: Lake View Residency
+    floor: "4"
+    landmark: opposite the water tank

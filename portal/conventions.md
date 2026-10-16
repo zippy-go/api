@@ -104,7 +104,9 @@ request answers what the first made, with the same status and body and
 `Idempotent-Replayed: true`, and makes nothing new; the same key with a
 different method, path or body is `409` (`idempotency_key_reuse`); a
 repeat that arrives while the first is still being processed waits for
-it; a first that failed with a `5xx` is processed afresh.
+it; a first that failed with a `5xx`, or was refused before it could act
+(`401`, `403` such as `step_up_required`, `429`), is processed afresh, so a
+caller who proves who they are, or waits, repeats the request as it was.
 
 ## Conditional requests
 

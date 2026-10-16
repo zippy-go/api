@@ -1,0 +1,54 @@
+type: object
+description: A store's history in figures, each counting the orders listed.
+required:
+  - orders
+  - completed
+  - refunded
+  - declined_or_cancelled
+  - sales
+  - average
+  - refunds_charged_to_partner
+properties:
+  orders:
+    type: integer
+    examples:
+      - 12
+    description: Every order listed.
+  completed:
+    type: integer
+    examples:
+      - 10
+    description: Completed.
+  refunded:
+    type: integer
+    examples:
+      - 1
+    description: With a refund.
+  declined_or_cancelled:
+    type: integer
+    examples:
+      - 2
+    description: Declined or cancelled.
+  sales:
+    $ref: ../common/Money.yaml
+    description: What completed orders were charged.
+  average:
+    $ref: ../common/Money.yaml
+    description: The average completed order.
+  refunds_charged_to_partner:
+    $ref: ../common/Money.yaml
+    description: What refunds the Partner bears.
+examples:
+  - orders: 12
+    completed: 10
+    refunded: 1
+    declined_or_cancelled: 2
+    sales:
+      minor_units: 798000
+      currency: INR
+    average:
+      minor_units: 79800
+      currency: INR
+    refunds_charged_to_partner:
+      minor_units: 4000
+      currency: INR

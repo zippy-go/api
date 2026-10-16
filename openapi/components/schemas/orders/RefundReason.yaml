@@ -1,0 +1,19 @@
+type: string
+description: "Why Mission Control refunds or cancels. Each suggests who pays: the Partner for `late_prep_time`, `accepted_in_error`, `incorrect_order`, `missing_items` and `allergen_ignored`; the platform for the rest."
+enum:
+  - missing_items
+  - late_prep_time
+  - accepted_in_error
+  - incorrect_order
+  - allergen_ignored
+  - late_delivery
+  - wrong_address
+  - damaged_on_arrival
+  - agent_behaviour
+  - promo_issue
+  - technical_issue
+  - billing_discrepancy
+  - customer_asked_to_cancel
+  - other
+examples:
+  - missing_items
