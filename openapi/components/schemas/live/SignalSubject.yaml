@@ -11,7 +11,7 @@ properties:
       - 01a13a48-9e00-7000-8000-00000000b001
   kind:
     type: string
-    description: 'The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`, `membership`, `document`, `duty`.'
+    description: 'The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`, `membership`, `document`, `duty`, `agent`.'
     examples:
       - vertical
 examples:

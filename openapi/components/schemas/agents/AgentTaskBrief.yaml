@@ -1,8 +1,9 @@
 type: object
-description: "An Agent's current task in short, for live maps and lists: the delivery, the order number and the stop the Agent is heading to."
+description: "An Agent's current task in short, for live maps and lists: the delivery, the order with its number and the stop the Agent is heading to."
 required:
   - task_id
   - delivery_id
+  - order_id
   - order_number
   - kind
   - status
@@ -20,6 +21,12 @@ properties:
     description: The delivery.
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+  order_id:
+    type: string
+    format: uuid
+    description: The order the delivery serves.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
   order_number:
     type: string
     description: The order's number.
@@ -37,6 +44,7 @@ properties:
 examples:
   - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
     delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
     order_number: AB1234
     kind: pickup
     status: on_the_way

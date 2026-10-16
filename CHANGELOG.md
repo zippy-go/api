@@ -63,12 +63,14 @@ takes the next free minor when it merges after this one. Additive only.
   `order:read`). The customer reads their own order's (`GET
   /v1/customer/orders/{order_id}/proof-of-delivery`).
 - `Agent` (the live agent read of `GET /v1/fleet/agents` and the agent
-  streams) carries `kind`, `on_duty`, `zone_id` and `current_task` (the
-  task under way in short: the delivery, the order number and the stop it
-  is heading to); `AgentStatus` gains `busy` (online with a task under
-  way); the `status` frames (`AgentStatusUpdate`, `AgentStatusFrame`) carry
-  `current_task`; `LocationPingsAccepted` counts the pings `dropped` off
-  duty.
+  streams) carries `kind`, `on_duty`, `zone_id`, `current_task` (the task
+  under way in short: the delivery, the order with its id and number, and
+  the stop it is heading to) and the service it works in (`service_id`,
+  `service_name`, so a live map filters by service); `AgentStatus` gains
+  `busy` (online with a task under way); the `status` frames
+  (`AgentStatusUpdate`, `AgentStatusFrame`) carry `current_task`, and the
+  `position` and `status` frames carry `service_id` and `service_name`;
+  `LocationPingsAccepted` counts the pings `dropped` off duty.
 - Problem codes `service_not_agent_based`, `kind_not_allowed`,
   `agent_already_member`, `duty_refused` (field codes `duty_not_active`,
   `duty_document_expired`, `duty_elsewhere`), `tasks_under_way`,
@@ -85,7 +87,9 @@ takes the next free minor when it merges after this one. Additive only.
 - An Agent's own channel (`private-agent-{agent_id}-tasks`) carries
   `task.changed`, `membership.changed`, `document.changed` and
   `duty.changed` signals (subjects `task`, `membership`, `document`,
-  `duty`): the Agent app reads the record again.
+  `duty`): the Agent app reads the record again. The Partner's agents
+  channel and `private-agents` carry `agent.changed` (subject `agent`) when
+  an Agent's membership, documents or duty change.
 - `RecipientKind` gains `agent` (the person of an Agent membership, by their
   Agent app devices, number or email): the invitation by SMS or email, and
   the decisions about an Agent (documents, activation, suspension,

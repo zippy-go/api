@@ -269,6 +269,7 @@ examples:
     current_task:
       task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
       delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
+      order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
       order_number: AB1234
       kind: pickup
       status: on_the_way

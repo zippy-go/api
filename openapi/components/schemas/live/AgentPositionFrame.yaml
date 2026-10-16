@@ -21,6 +21,21 @@ properties:
   status:
     $ref: ../fleet/AgentStatus.yaml
     description: Its status at the time.
+  service_id:
+    type:
+      - string
+      - 'null'
+    format: uuid
+    description: The service the agent works in; absent when unknown.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  service_name:
+    type:
+      - string
+      - 'null'
+    description: The service's name; absent when unknown.
+    examples:
+      - ZippyGo Fleet
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-00000000a014
     channel: private-agents

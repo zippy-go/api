@@ -91,6 +91,13 @@ suspended, reinstated or offboarded; `document.changed` (subject
 stretch. A reason never travels on the channel: the app reads it from the
 record.
 
+The Partner's agents channel (`private-partner-{partner_id}-agents`) and
+Mission Control's (`private-agents`) also carry `agent.changed` (subject
+`agent`, the Agent's id, with the membership's new status on a change of
+status) whenever an Agent's membership, documents or duty change: a new
+document, a decision, duty on or off, an activation or a suspension. The
+consoles read the Agent again without a reload.
+
 | Event            | Data                                                        | When                                              |
 | ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
 | `snapshot`       | `AgentsSnapshot`: `{ "channel", "agents": [Agent, ...] }`    | On open, per agent channel                        |
@@ -118,6 +125,10 @@ stream with `revoked` within a minute.
 | `position`  | `AgentPositionUpdate`: `{ "agent_id", "position", "status" }`   | An agent's position changed     |
 | `status`    | `AgentStatusUpdate`: `{ "agent_id", "status", "last_seen_at" }` | An agent went online or offline |
 | `heartbeat` | empty                                                           | Every 15 seconds                |
+
+A `status` frame also carries the agent's `current_task` while it is busy,
+and both frames carry the service the agent works in (`service_id`,
+`service_name`) when the platform knows it, so a map filters by service.
 
 The `snapshot` holds every agent that matches the filters at the moment the
 stream opens, with the same shape as `GET /v1/fleet/agents`; apply the

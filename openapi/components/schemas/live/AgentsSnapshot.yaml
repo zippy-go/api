@@ -34,4 +34,6 @@ examples:
         on_duty: true
         zone_id: 01a13a48-9e00-7000-8000-00000000a011
         current_task: null
+        service_id: 01a13a48-9e00-7000-8000-000000000202
+        service_name: ZippyGo Fleet
     channel: private-agents

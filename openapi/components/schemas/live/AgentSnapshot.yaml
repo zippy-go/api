@@ -19,6 +19,8 @@ examples:
         on_duty: true
         zone_id: 01a13a48-9e00-7000-8000-00000000a011
         current_task: null
+        service_id: 01a13a48-9e00-7000-8000-000000000202
+        service_name: ZippyGo Fleet
         last_seen_at: 2026-10-14T08:00:00Z
         position:
           lat: 12.9716

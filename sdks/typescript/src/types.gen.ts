@@ -4466,6 +4466,14 @@ export type Agent = {
      * The task under way, the next stop first, so a live map can show what a busy agent is doing; `null` when none.
      */
     current_task: AgentTaskBrief | null;
+    /**
+     * The service the agent works in, or `null` for an agent attached to none.
+     */
+    service_id: string | null;
+    /**
+     * The service's name, or `null` when the agent is attached to none or the name cannot be read now.
+     */
+    service_name: string | null;
 };
 
 /**
@@ -4996,7 +5004,7 @@ export type TaskStop = {
 };
 
 /**
- * An Agent's current task in short, for live maps and lists: the delivery, the order number and the stop the Agent is heading to.
+ * An Agent's current task in short, for live maps and lists: the delivery, the order with its number and the stop the Agent is heading to.
  */
 export type AgentTaskBrief = {
     /**
@@ -5007,6 +5015,10 @@ export type AgentTaskBrief = {
      * The delivery.
      */
     delivery_id: string;
+    /**
+     * The order the delivery serves.
+     */
+    order_id: string;
     /**
      * The order's number.
      */
@@ -7282,6 +7294,14 @@ export type AgentPositionUpdate = {
      * The agent's status at the time of the update.
      */
     status: AgentStatus;
+    /**
+     * The service the agent works in; absent when unknown.
+     */
+    service_id?: string | null;
+    /**
+     * The service's name; absent when unknown.
+     */
+    service_name?: string | null;
 };
 
 /**
@@ -7304,6 +7324,14 @@ export type AgentStatusUpdate = {
      * The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
      */
     current_task?: AgentTaskBrief | null;
+    /**
+     * The service the agent works in; absent when unknown.
+     */
+    service_id?: string | null;
+    /**
+     * The service's name; absent when unknown.
+     */
+    service_name?: string | null;
 };
 
 /**
@@ -9519,6 +9547,14 @@ export type AgentPositionFrame = {
      * Its status at the time.
      */
     status: AgentStatus;
+    /**
+     * The service the agent works in; absent when unknown.
+     */
+    service_id?: string | null;
+    /**
+     * The service's name; absent when unknown.
+     */
+    service_name?: string | null;
 };
 
 /**
@@ -9545,6 +9581,14 @@ export type AgentStatusFrame = {
      * The task under way when the agent is busy, with the stop it is heading to; `null` or absent otherwise.
      */
     current_task?: AgentTaskBrief | null;
+    /**
+     * The service the agent works in; absent when unknown.
+     */
+    service_id?: string | null;
+    /**
+     * The service's name; absent when unknown.
+     */
+    service_name?: string | null;
 };
 
 /**
@@ -9623,7 +9667,7 @@ export type Signal = {
      * What happened: `vertical.transitioned`, `menu.published`, `offers.changed`,
      * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
      * `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
-     * `duty.changed`.
+     * `duty.changed`, `agent.changed`.
      */
     kind: string;
     /**
@@ -9664,7 +9708,7 @@ export type SignalSubject = {
      */
     id: string;
     /**
-     * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`, `membership`, `document`, `duty`.
+     * The kind of record: `vertical`, `order`, `menu`, `notice`, `ticket`, `table`, `task`, `membership`, `document`, `duty`, `agent`.
      */
     kind: string;
 };
