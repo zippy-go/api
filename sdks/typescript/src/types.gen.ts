@@ -12727,7 +12727,7 @@ export type PaymentRefundRequest = {
  */
 export type PaymentRefusal = {
     /**
-     * The reason: `upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`, `wallet_empty`, `wallet_off`, `nothing_left_to_pay`.
+     * The reason: `upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`, `wallet_empty`, `wallet_off`, `wallet_short` (the Wallet pays part; choose how to pay the rest), `nothing_left_to_pay`.
      */
     code: string;
     /**
@@ -13459,9 +13459,9 @@ export type WalletCorrectionRequest = {
 };
 
 /**
- * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet).
+ * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet).
  */
-export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional';
+export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional';
 
 /**
  * The account's class: an asset, a liability, revenue, an expense, or a memorandum account that records a promise (a card hold) without moving money.
@@ -13682,7 +13682,7 @@ export type OrderMoneySplit = {
      */
     status: OrderSplitStatus;
     /**
-     * What the customer paid: taken by UPI or card, spent from the Wallet, collected in cash, less what never was kept.
+     * What the order kept, which its split shares out: taken by UPI or card, spent from the Wallet, or cash to collect, less the lines left out; nothing until the Location accepts.
      */
     paid: Money;
     /**
@@ -13694,11 +13694,11 @@ export type OrderMoneySplit = {
      */
     delivery_fee: Money;
     /**
-     * The tip for the platform fleet's agent.
+     * The tip, owed to the platform fleet's agent, or the Partner's when its own agents carry.
      */
     tip: Money;
     /**
-     * Other fees the order carries, such as cutlery.
+     * Other fees the order carries: the small-order fee (the platform's, GST included) and the cutlery fee (the Partner's).
      */
     other_fees: Money;
     /**
@@ -13710,11 +13710,11 @@ export type OrderMoneySplit = {
      */
     commission: Money;
     /**
-     * The commission rate in basis points, by the Partner's plan.
+     * The commission rate in basis points, as the reference data's policy layers set it at the order's Location when it was placed.
      */
     commission_rate_bp: number;
     /**
-     * The Partner's plan the rate came from.
+     * The policy layer the commission rate came from, such as `country India`.
      */
     plan: string | null;
     /**

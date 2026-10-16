@@ -6,7 +6,7 @@ required:
 properties:
   code:
     type: string
-    description: "The reason: `upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`, `wallet_empty`, `wallet_off`, `nothing_left_to_pay`."
+    description: "The reason: `upi_over_limit`, `cod_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`, `provider_unavailable`, `wallet_empty`, `wallet_off`, `wallet_short` (the Wallet pays part; choose how to pay the rest), `nothing_left_to_pay`."
     examples:
       - cod_over_limit
   message:

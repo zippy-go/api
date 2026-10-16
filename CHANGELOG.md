@@ -50,7 +50,14 @@ slice of step 3 takes the other free minor when it merges. Additive only.
   operations: accounts, entries, an order's money split and the trial
   balance (`/v1/platform/ledger/accounts`, `.../entries`,
   `.../orders/{order_id}`, `.../trial-balance`) with the new permissions
-  `ledger:read` and `ledger:write`.
+  `ledger:read` and `ledger:write`. The ledger's accounts include
+  `fee_revenue` (the small-order fee, net of GST); an order's commission is
+  the rate its Location's policy layers set when it was placed, the layer
+  named in `OrderMoneySplit.plan`.
+- The refusal `wallet_short` in `PaymentRefusal`: the Wallet pays part of
+  the order and another way pays the rest.
+- `generated/platform-openapi.json` synced from the platform's step 3 money
+  branch, which serves every operation of this slice.
 - The problem codes `payment_method_not_offered` (409, with the field codes
   `upi_over_limit`, `cod_withheld`, `cod_not_offered`, `cod_not_accepted`,
   `provider_unavailable` and `card_expired`), `cod_over_limit`,

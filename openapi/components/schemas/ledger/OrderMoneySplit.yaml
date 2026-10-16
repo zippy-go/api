@@ -49,7 +49,7 @@ properties:
     description: Whether the money is split.
   paid:
     $ref: ../common/Money.yaml
-    description: "What the customer paid: taken by UPI or card, spent from the Wallet, collected in cash, less what never was kept."
+    description: "What the order kept, which its split shares out: taken by UPI or card, spent from the Wallet, or cash to collect, less the lines left out; nothing until the Location accepts."
   items:
     $ref: ../common/Money.yaml
     description: The items the Location sends, tax included.
@@ -58,10 +58,10 @@ properties:
     description: The delivery fee, tax included.
   tip:
     $ref: ../common/Money.yaml
-    description: The tip for the platform fleet's agent.
+    description: The tip, owed to the platform fleet's agent, or the Partner's when its own agents carry.
   other_fees:
     $ref: ../common/Money.yaml
-    description: Other fees the order carries, such as cutlery.
+    description: "Other fees the order carries: the small-order fee (the platform's, GST included) and the cutlery fee (the Partner's)."
   partner_share:
     $ref: ../common/Money.yaml
     description: "What the Partner is owed: the items less the commission and its GST, with its own delivery fee and fees."
@@ -70,17 +70,17 @@ properties:
     description: The platform's commission.
   commission_rate_bp:
     type: integer
-    description: The commission rate in basis points, by the Partner's plan.
+    description: The commission rate in basis points, as the reference data's policy layers set it at the order's Location when it was placed.
     minimum: 0
     examples:
-      - 800
+      - 1200
   plan:
     type:
       - string
       - "null"
-    description: The Partner's plan the rate came from.
+    description: The policy layer the commission rate came from, such as `country India`.
     examples:
-      - pro
+      - country India
   commission_gst:
     $ref: ../common/Money.yaml
     description: GST on the commission.
@@ -134,15 +134,15 @@ examples:
       minor_units: 0
       currency: INR
     partner_share:
-      minor_units: 42564
+      minor_units: 40345
       currency: INR
     commission:
-      minor_units: 3760
+      minor_units: 5640
       currency: INR
-    commission_rate_bp: 800
-    plan: pro
+    commission_rate_bp: 1200
+    plan: country India
     commission_gst:
-      minor_units: 676
+      minor_units: 1015
       currency: INR
     delivery_fee_revenue:
       minor_units: 2542
@@ -165,7 +165,7 @@ examples:
     entries:
       - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f01
         kind: payment_captured
-        description: UPI payment captured for an order
+        description: UPI paid
         currency: INR
         order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
         payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01
@@ -183,7 +183,7 @@ examples:
               currency: INR
           - account_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f12
             account_code: order_clearing
-            account_name: Orders awaiting their split
+            account_name: Order clearing
             side: credit
             amount:
               minor_units: 32000

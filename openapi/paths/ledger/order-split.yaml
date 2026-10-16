@@ -6,7 +6,7 @@ get:
     - Bearer: []
   operationId: getOrderMoneySplit
   summary: An order's money split
-  description: "What an order's money became: what the customer paid, the Partner's share after the commission by its plan and the GST on it, the platform fleet's delivery fee and its GST, the tips owed to agents, the refunds and who bore them, with every journal entry of the order. An order the ledger has not seen answers with nothing split. `ledger:read`."
+  description: "What an order's money became: what the customer paid, the Partner's share after the commission its Location's policy set when the order was placed and the GST on it, the platform fleet's delivery fee and its GST, the tips owed to agents, the refunds and who bore them, with every journal entry of the order. An order the ledger has not seen answers with nothing split. `ledger:read`."
   parameters:
     - name: order_id
       in: path

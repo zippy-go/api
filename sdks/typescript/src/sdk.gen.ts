@@ -4979,7 +4979,7 @@ export const getLedgerEntry = <ThrowOnError extends boolean = false>(options: Op
 /**
  * An order's money split
  *
- * What an order's money became: what the customer paid, the Partner's share after the commission by its plan and the GST on it, the platform fleet's delivery fee and its GST, the tips owed to agents, the refunds and who bore them, with every journal entry of the order. An order the ledger has not seen answers with nothing split. `ledger:read`.
+ * What an order's money became: what the customer paid, the Partner's share after the commission its Location's policy set when the order was placed and the GST on it, the platform fleet's delivery fee and its GST, the tips owed to agents, the refunds and who bore them, with every journal entry of the order. An order the ledger has not seen answers with nothing split. `ledger:read`.
  */
 export const getOrderMoneySplit = <ThrowOnError extends boolean = false>(options: Options<GetOrderMoneySplitData, ThrowOnError>): RequestResult<GetOrderMoneySplitResponses, GetOrderMoneySplitErrors, ThrowOnError> => (options.client ?? client).get<GetOrderMoneySplitResponses, GetOrderMoneySplitErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
