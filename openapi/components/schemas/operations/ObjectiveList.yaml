@@ -1,0 +1,36 @@
+type: object
+description: "Every service level objective with its figures."
+required:
+  - computed_at
+  - items
+properties:
+  computed_at:
+    type: string
+    format: date-time
+    description: "When the figures were worked out."
+  items:
+    type: array
+    items:
+      $ref: ./Objective.yaml
+    description: "The objectives."
+examples:
+  - computed_at: "2026-10-22T10:00:00Z"
+    items:
+      - key: assignment
+        name: Assignment
+        description: "Accepted on-demand orders with an Agent notified within 60 seconds."
+        target_percent: 95.0
+        threshold: "60 s"
+        measured: true
+        not_measured_reason: null
+        window:
+          from: "2026-09-22T10:00:00Z"
+          to: "2026-10-22T10:00:00Z"
+          days: 30
+        total: 120
+        good: 117
+        attainment_percent: 97.5
+        error_budget_remaining_percent: 50.0
+        burn_rate_1h: 0.0
+        burn_rate_6h: 0.4
+        runbook: "runbooks/objectives.md#assignment"

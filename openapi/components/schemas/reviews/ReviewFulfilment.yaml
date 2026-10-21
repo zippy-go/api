@@ -1,0 +1,8 @@
+type: string
+description: "How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered) or `collected`."
+enum:
+  - delivered
+  - delivered_by_own_agent
+  - collected
+examples:
+  - delivered

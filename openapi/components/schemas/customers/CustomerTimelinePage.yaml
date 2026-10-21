@@ -1,0 +1,31 @@
+type: object
+description: "A customer's timeline, newest first."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CustomerTimelineEntry.yaml
+    description: "The entries, newest first."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000c"
+        at: "2026-10-20T13:00:00Z"
+        kind: order_placed
+        summary: "Placed order AB0042 at Dev Kitchen Gachibowli for ₹580.00"
+        actor:
+          kind: customer
+          name: Ana
+        order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+        order_number: AB0042
+        event_type: ordering.order.placed
+    next_cursor: null

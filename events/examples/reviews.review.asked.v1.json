@@ -1,0 +1,17 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0004",
+  "type": "reviews.review.asked",
+  "version": 1,
+  "occurred_at": "2026-10-22T10:06:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c99",
+  "payload": {
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "completed_at": "2026-10-22T10:00:00Z",
+    "at": "2026-10-22T10:06:00Z"
+  }
+}

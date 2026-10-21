@@ -2,7 +2,7 @@
 get:
   operationId: listPlatformOrders
   summary: List orders across every store
-  description: "Every order on the platform, most recently placed first, a page at a time: by default the live ones (not final, or finished in the last 24 hours), each with the move it waits for, its timer and what needs attention (a store not answering after five minutes, an order past its promise, an open help request, a payment that failed). Narrow by status, store, Partner, attention, or a number or a store's name typed. Mission Control tokens only, with `order:read` to read; Mission Control moves an order through the store's routes with `order:manage`."
+  description: "Every order on the platform, most recently placed first, a page at a time: by default the live ones (not final, or finished in the last 24 hours), each with the move it waits for, its timer and what needs attention (a store not answering after five minutes, an order past its promise, an open help request, a payment that failed). Narrow by status, store, Partner, customer, attention, or a number or a store's name typed. Mission Control tokens only, with `order:read` to read; Mission Control moves an order through the store's routes with `order:manage`."
   tags:
     - Order handling
   security:
@@ -35,6 +35,13 @@ get:
       in: query
       required: false
       description: Only this Partner's orders.
+      schema:
+        type: string
+        format: uuid
+    - name: customer_id
+      in: query
+      required: false
+      description: Only this customer's orders, newest first; with `scope` `all` for their whole history. Since 0.19.0.
       schema:
         type: string
         format: uuid

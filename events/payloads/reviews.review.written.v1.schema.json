@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reviews.review.written.v1.schema.json",
+  "title": "ReviewsReviewWrittenPayload",
+  "description": "Payload of `reviews.review.written` version 1: a customer reviewed a completed order once, with a thumb, tags, perhaps a note and photos. The envelope's `partner_id` is the store's Partner and its `correlation_id` follows the order. The payload carries no note text; read the review at `GET /v1/platform/reviews?order_id=`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "review_id",
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "thumb",
+    "tags",
+    "has_note",
+    "photos",
+    "fulfilment",
+    "agent_id",
+    "at"
+  ],
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The review.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "thumb": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down"
+      ],
+      "description": "The thumb.",
+      "examples": [
+        "down"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The tag codes chosen.",
+      "examples": [
+        [
+          "cold_damaged"
+        ]
+      ]
+    },
+    "has_note": {
+      "type": "boolean",
+      "description": "Whether a note came with it.",
+      "examples": [
+        true
+      ]
+    },
+    "photos": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "How many photos came with it.",
+      "examples": [
+        1
+      ]
+    },
+    "fulfilment": {
+      "type": "string",
+      "enum": [
+        "delivered",
+        "delivered_by_own_agent",
+        "collected"
+      ],
+      "description": "How the order reached the customer.",
+      "examples": [
+        "delivered"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent who carried a delivery; `null` for a collection.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

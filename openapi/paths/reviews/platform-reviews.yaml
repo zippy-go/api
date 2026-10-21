@@ -1,0 +1,116 @@
+# Path item for /v1/platform/reviews. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformReviews
+  summary: "Read every review"
+  description: "Every review, newest first, hidden ones included and marked, with the note and photos, filtered by thumb, dates, one store, a market (a service area and everything beneath it), an Agent or an order. Mission Control tokens only, with `review:read`."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  parameters:
+    - name: thumb
+      in: query
+      required: false
+      description: "Only this thumb."
+      schema:
+        $ref: ../../components/schemas/reviews/ReviewThumb.yaml
+    - name: from
+      in: query
+      required: false
+      description: "Only reviews written at or after this."
+      schema:
+        type: string
+        format: date-time
+    - name: to
+      in: query
+      required: false
+      description: "Only reviews written before this."
+      schema:
+        type: string
+        format: date-time
+    - name: location_id
+      in: query
+      required: false
+      description: "Only this store's."
+      schema:
+        type: string
+        format: uuid
+    - name: service_area_id
+      in: query
+      required: false
+      description: "Only stores in this service area or beneath it."
+      schema:
+        type: string
+        format: uuid
+    - name: agent_id
+      in: query
+      required: false
+      description: "Only orders this Agent carried."
+      schema:
+        type: string
+        format: uuid
+    - name: order_id
+      in: query
+      required: false
+      description: "Only this order's."
+      schema:
+        type: string
+        format: uuid
+    - name: hidden
+      in: query
+      required: false
+      description: "Only hidden ones (`true`) or only shown ones (`false`)."
+      schema:
+        type: boolean
+    - name: limit
+      in: query
+      required: false
+      description: "How many, 1 to 100; 50 by default."
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "A page of reviews."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/PlatformReviewPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range, a range over a year (`range_too_long`), or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission) or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

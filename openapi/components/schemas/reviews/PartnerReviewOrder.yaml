@@ -1,0 +1,45 @@
+type: object
+description: "The order a review was about, as the store reads it."
+required:
+  - order_id
+  - number
+  - lines
+  - total
+  - refunded
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: "The order."
+  number:
+    type: string
+    examples:
+      - AB0042
+    description: "Its number."
+  lines:
+    type: array
+    items:
+      $ref: ./PartnerReviewOrderLine.yaml
+    description: "Its lines, with what the store left out."
+  total:
+    $ref: ../common/Money.yaml
+    description: "What the customer was charged in total."
+  refunded:
+    type: boolean
+    description: "Whether anything was refunded since."
+examples:
+  - order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+    number: AB0042
+    lines:
+      - name: "Hyderabadi Biryani"
+        variant_label: Full
+        quantity: 1
+        left_out: false
+      - name: "Boondi raita"
+        variant_label: null
+        quantity: 1
+        left_out: true
+    total:
+      minor_units: 58000
+      currency: INR
+    refunded: false

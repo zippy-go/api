@@ -1,0 +1,7 @@
+type: string
+description: "A thumb: `up` or `down`. Reviews have no stars."
+enum:
+  - up
+  - down
+examples:
+  - down

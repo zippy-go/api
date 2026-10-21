@@ -1,0 +1,113 @@
+# Path item for /v1/platform/customers/{customer_id}/notes. Referenced from openapi.yaml.
+parameters:
+  - name: customer_id
+    in: path
+    required: true
+    description: "The customer (a user id)."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+get:
+  operationId: listCustomerNotes
+  summary: "Read support's notes"
+  description: "Support's notes on the account, the newest 200, newest first, each signed with the operator and the moment and the day on the market's clock for grouping. The customer never sees a note. Mission Control tokens only, with `customer:read`."
+  tags:
+    - Customers
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The notes."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/customers/CustomerNoteList.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `customer:read`, or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such customer."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: writeCustomerNote
+  summary: "Write a note"
+  description: "Keeps a note on the account: a complaint to watch for, a promise made on the phone, why Wallet credit was given. Not empty, at most 2,000 characters; signed with the operator and the moment, never edited or removed. Written to the audit log; publishes `customers.note.written`. Mission Control tokens only, with `customer:note`."
+  tags:
+    - Customers
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The note."
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/customers/CustomerNoteInput.yaml
+  responses:
+    "201":
+      description: "The note, kept."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/customers/CustomerNote.yaml
+    "400":
+      description: "`validation_failed`: an empty note, or `note_too_long`, saying a note is 2,000 characters at most and how long this one is."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `customer:note`, or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such customer."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

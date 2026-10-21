@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.18.0
+  version: 0.19.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -268,6 +268,12 @@ tags:
     description: Plans and schedules that generate recurring orders.
   - name: Webhooks
     description: Webhook endpoints and event delivery.
+  - name: Reviews
+    description: "What customers say about what they bought, and how Agents are rated: a thumb up or down on one completed order with tags from a short list, a note and photos, asked once by push; the delivery rated apart from the food; a store's rating as the share of thumbs up, counted when asked for; the Partner's reading and its one reply, moderated by the platform; Mission Control's reading, hiding a note and moderating replies; an Agent's rating, one per delivery over 90 days, and the flags an Agent raises on a rating they find unfair. Customers read reviews with no account; Partner staff with `review:read` at the Location and reply with `review:reply`; platform staff read with `review:read` and moderate with `review:manage`."
+  - name: Customers
+    description: "Mission Control's Customers section: finding a customer by what a caller can say, their page read and never edited, the timeline of what happened on the account drawn from the domain events, support's notes signed and kept for good, and blocking and unblocking with a reason. Reading needs `customer:read`, writing a note `customer:note`, blocking and unblocking `customer:block`. Partner staff never see this section."
+  - name: Operations
+    description: "Mission Control's Operations section beyond health, events and the audit log: the service level objectives with their attainment, error budget and burn; the alerts they and the jobs, the outbox and the payouts open, acknowledged by name; the registry of jobs with their runs and run now; the outbox's pending and failed rows with replay. Reading needs a Mission Control token; acting needs `operations:manage`."
 
 paths:
   /v1/health:
@@ -1013,6 +1019,86 @@ paths:
     $ref: ./paths/deliveries/platform-delivery-send-again.yaml
   /v1/platform/orders/{order_id}/deliveries:
     $ref: ./paths/deliveries/platform-order-deliveries.yaml
+
+  # Step 5 trust: reviews and ratings, Mission Control's customers, operations
+  /v1/customer/orders/{order_id}/review:
+    $ref: ./paths/reviews/customer-order-review.yaml
+  /v1/customer/orders/{order_id}/review/photo-uploads:
+    $ref: ./paths/reviews/customer-order-review-photo-uploads.yaml
+  /v1/customer/orders/{order_id}/review/not-now:
+    $ref: ./paths/reviews/customer-order-review-not-now.yaml
+  /v1/customer/orders/{order_id}/delivery-rating:
+    $ref: ./paths/reviews/customer-order-delivery-rating.yaml
+  /v1/storefront/stores/{location_id}/reviews:
+    $ref: ./paths/reviews/store-reviews.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reviews:
+    $ref: ./paths/reviews/partner-location-reviews.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reviews/summary:
+    $ref: ./paths/reviews/partner-location-reviews-summary.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reviews/{review_id}/reply:
+    $ref: ./paths/reviews/partner-review-reply.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/ratings:
+    $ref: ./paths/reviews/partner-agent-ratings.yaml
+  /v1/partners/{partner_id}/rating-flags:
+    $ref: ./paths/reviews/partner-rating-flags.yaml
+  /v1/partners/{partner_id}/rating-flags/{flag_id}/decision:
+    $ref: ./paths/reviews/partner-rating-flag-decision.yaml
+  /v1/agent/memberships/{agent_id}/ratings:
+    $ref: ./paths/reviews/agent-ratings.yaml
+  /v1/agent/memberships/{agent_id}/ratings/{rating_id}/flag:
+    $ref: ./paths/reviews/agent-rating-flag.yaml
+  /v1/platform/reviews:
+    $ref: ./paths/reviews/platform-reviews.yaml
+  /v1/platform/reviews/locations:
+    $ref: ./paths/reviews/platform-reviews-locations.yaml
+  /v1/platform/locations/{location_id}/rating:
+    $ref: ./paths/reviews/platform-location-rating.yaml
+  /v1/platform/reviews/{review_id}/hide:
+    $ref: ./paths/reviews/platform-review-hide.yaml
+  /v1/platform/reviews/{review_id}/show:
+    $ref: ./paths/reviews/platform-review-show.yaml
+  /v1/platform/review-replies:
+    $ref: ./paths/reviews/platform-review-replies.yaml
+  /v1/platform/review-replies/{reply_id}/approve:
+    $ref: ./paths/reviews/platform-review-reply-approve.yaml
+  /v1/platform/review-replies/{reply_id}/reject:
+    $ref: ./paths/reviews/platform-review-reply-reject.yaml
+  /v1/platform/agents/{agent_id}/ratings:
+    $ref: ./paths/reviews/platform-agent-ratings.yaml
+  /v1/platform/rating-flags:
+    $ref: ./paths/reviews/platform-rating-flags.yaml
+  /v1/platform/rating-flags/{flag_id}/decision:
+    $ref: ./paths/reviews/platform-rating-flag-decision.yaml
+  /v1/platform/customers:
+    $ref: ./paths/customers/platform-customers.yaml
+  /v1/platform/customers/summary:
+    $ref: ./paths/customers/platform-customers-summary.yaml
+  /v1/platform/customers/{customer_id}:
+    $ref: ./paths/customers/platform-customer.yaml
+  /v1/platform/customers/{customer_id}/timeline:
+    $ref: ./paths/customers/platform-customer-timeline.yaml
+  /v1/platform/customers/{customer_id}/notes:
+    $ref: ./paths/customers/platform-customer-notes.yaml
+  /v1/platform/customers/{customer_id}/block:
+    $ref: ./paths/customers/platform-customer-block.yaml
+  /v1/platform/customers/{customer_id}/unblock:
+    $ref: ./paths/customers/platform-customer-unblock.yaml
+  /v1/platform/operations/objectives:
+    $ref: ./paths/operations/objectives.yaml
+  /v1/platform/operations/alerts:
+    $ref: ./paths/operations/alerts.yaml
+  /v1/platform/operations/alerts/{alert_id}/acknowledge:
+    $ref: ./paths/operations/alert-acknowledge.yaml
+  /v1/platform/operations/jobs:
+    $ref: ./paths/operations/jobs.yaml
+  /v1/platform/operations/jobs/{job}/runs:
+    $ref: ./paths/operations/job-runs.yaml
+  /v1/platform/operations/jobs/{job}/run:
+    $ref: ./paths/operations/job-run.yaml
+  /v1/platform/operations/outbox:
+    $ref: ./paths/operations/outbox.yaml
+  /v1/platform/operations/outbox/replay:
+    $ref: ./paths/operations/outbox-replay.yaml
 
 components:
   securitySchemes:
@@ -2714,3 +2800,186 @@ components:
       $ref: ./components/schemas/orders/StoreCourier.yaml
     OrderProof:
       $ref: ./components/schemas/orders/OrderProof.yaml
+    # Reviews
+    ReviewThumb:
+      $ref: ./components/schemas/reviews/ReviewThumb.yaml
+    ReviewTagOption:
+      $ref: ./components/schemas/reviews/ReviewTagOption.yaml
+    ReviewTagOffer:
+      $ref: ./components/schemas/reviews/ReviewTagOffer.yaml
+    LocationRating:
+      $ref: ./components/schemas/reviews/LocationRating.yaml
+    RatingShare:
+      $ref: ./components/schemas/reviews/RatingShare.yaml
+    ReviewFulfilment:
+      $ref: ./components/schemas/reviews/ReviewFulfilment.yaml
+    ReviewPhoto:
+      $ref: ./components/schemas/reviews/ReviewPhoto.yaml
+    PublishedReply:
+      $ref: ./components/schemas/reviews/PublishedReply.yaml
+    CustomerReview:
+      $ref: ./components/schemas/reviews/CustomerReview.yaml
+    DeliveryRating:
+      $ref: ./components/schemas/reviews/DeliveryRating.yaml
+    ReviewStatus:
+      $ref: ./components/schemas/reviews/ReviewStatus.yaml
+    DeliveryRatingState:
+      $ref: ./components/schemas/reviews/DeliveryRatingState.yaml
+    OrderReviewState:
+      $ref: ./components/schemas/reviews/OrderReviewState.yaml
+    OrderReviewInput:
+      $ref: ./components/schemas/reviews/OrderReviewInput.yaml
+    DeliveryRatingInput:
+      $ref: ./components/schemas/reviews/DeliveryRatingInput.yaml
+    ReviewPhotoUpload:
+      $ref: ./components/schemas/reviews/ReviewPhotoUpload.yaml
+    StoreReview:
+      $ref: ./components/schemas/reviews/StoreReview.yaml
+    StoreReviewPage:
+      $ref: ./components/schemas/reviews/StoreReviewPage.yaml
+    PartnerReviewOrderLine:
+      $ref: ./components/schemas/reviews/PartnerReviewOrderLine.yaml
+    PartnerReviewOrder:
+      $ref: ./components/schemas/reviews/PartnerReviewOrder.yaml
+    ReviewReplyStatus:
+      $ref: ./components/schemas/reviews/ReviewReplyStatus.yaml
+    ReviewReply:
+      $ref: ./components/schemas/reviews/ReviewReply.yaml
+    ReviewAgent:
+      $ref: ./components/schemas/reviews/ReviewAgent.yaml
+    PartnerReview:
+      $ref: ./components/schemas/reviews/PartnerReview.yaml
+    PartnerReviewPage:
+      $ref: ./components/schemas/reviews/PartnerReviewPage.yaml
+    ReviewPeriod:
+      $ref: ./components/schemas/reviews/ReviewPeriod.yaml
+    ReviewSummary:
+      $ref: ./components/schemas/reviews/ReviewSummary.yaml
+    ReviewReplyInput:
+      $ref: ./components/schemas/reviews/ReviewReplyInput.yaml
+    AgentRatingSource:
+      $ref: ./components/schemas/reviews/AgentRatingSource.yaml
+    RatingFlagStatus:
+      $ref: ./components/schemas/reviews/RatingFlagStatus.yaml
+    RatingFlag:
+      $ref: ./components/schemas/reviews/RatingFlag.yaml
+    AgentRating:
+      $ref: ./components/schemas/reviews/AgentRating.yaml
+    AgentRatingFigure:
+      $ref: ./components/schemas/reviews/AgentRatingFigure.yaml
+    AgentRatings:
+      $ref: ./components/schemas/reviews/AgentRatings.yaml
+    AgentRatingFlagInput:
+      $ref: ./components/schemas/reviews/AgentRatingFlagInput.yaml
+    StaffAgentRating:
+      $ref: ./components/schemas/reviews/StaffAgentRating.yaml
+    StaffAgentRatings:
+      $ref: ./components/schemas/reviews/StaffAgentRatings.yaml
+    RatingFlagDetail:
+      $ref: ./components/schemas/reviews/RatingFlagDetail.yaml
+    RatingFlagPage:
+      $ref: ./components/schemas/reviews/RatingFlagPage.yaml
+    RatingFlagDecision:
+      $ref: ./components/schemas/reviews/RatingFlagDecision.yaml
+    ReviewHide:
+      $ref: ./components/schemas/reviews/ReviewHide.yaml
+    ReviewHiding:
+      $ref: ./components/schemas/reviews/ReviewHiding.yaml
+    PlatformReview:
+      $ref: ./components/schemas/reviews/PlatformReview.yaml
+    PlatformReviewPage:
+      $ref: ./components/schemas/reviews/PlatformReviewPage.yaml
+    RatedLocation:
+      $ref: ./components/schemas/reviews/RatedLocation.yaml
+    RatedLocationPage:
+      $ref: ./components/schemas/reviews/RatedLocationPage.yaml
+    LocationRatingDay:
+      $ref: ./components/schemas/reviews/LocationRatingDay.yaml
+    LocationRatingReport:
+      $ref: ./components/schemas/reviews/LocationRatingReport.yaml
+    ModeratedReplyReview:
+      $ref: ./components/schemas/reviews/ModeratedReplyReview.yaml
+    ModeratedReply:
+      $ref: ./components/schemas/reviews/ModeratedReply.yaml
+    ModeratedReplyPage:
+      $ref: ./components/schemas/reviews/ModeratedReplyPage.yaml
+    ReplyRejection:
+      $ref: ./components/schemas/reviews/ReplyRejection.yaml
+    OrderReviewSummary:
+      $ref: ./components/schemas/reviews/OrderReviewSummary.yaml
+    # Customers in Mission Control
+    CustomerStatus:
+      $ref: ./components/schemas/customers/CustomerStatus.yaml
+    PlatformCustomerRow:
+      $ref: ./components/schemas/customers/PlatformCustomerRow.yaml
+    PlatformCustomerPage:
+      $ref: ./components/schemas/customers/PlatformCustomerPage.yaml
+    PlatformCustomerSummary:
+      $ref: ./components/schemas/customers/PlatformCustomerSummary.yaml
+    CustomerBlock:
+      $ref: ./components/schemas/customers/CustomerBlock.yaml
+    PlatformCustomerActions:
+      $ref: ./components/schemas/customers/PlatformCustomerActions.yaml
+    PlatformCustomer:
+      $ref: ./components/schemas/customers/PlatformCustomer.yaml
+    CustomerTimelineKind:
+      $ref: ./components/schemas/customers/CustomerTimelineKind.yaml
+    CustomerTimelineActor:
+      $ref: ./components/schemas/customers/CustomerTimelineActor.yaml
+    CustomerTimelineEntry:
+      $ref: ./components/schemas/customers/CustomerTimelineEntry.yaml
+    CustomerTimelinePage:
+      $ref: ./components/schemas/customers/CustomerTimelinePage.yaml
+    CustomerNoteAuthor:
+      $ref: ./components/schemas/customers/CustomerNoteAuthor.yaml
+    CustomerNote:
+      $ref: ./components/schemas/customers/CustomerNote.yaml
+    CustomerNoteList:
+      $ref: ./components/schemas/customers/CustomerNoteList.yaml
+    CustomerNoteInput:
+      $ref: ./components/schemas/customers/CustomerNoteInput.yaml
+    CustomerBlockInput:
+      $ref: ./components/schemas/customers/CustomerBlockInput.yaml
+    # Operations
+    ObjectiveWindow:
+      $ref: ./components/schemas/operations/ObjectiveWindow.yaml
+    Objective:
+      $ref: ./components/schemas/operations/Objective.yaml
+    ObjectiveList:
+      $ref: ./components/schemas/operations/ObjectiveList.yaml
+    AlertSource:
+      $ref: ./components/schemas/operations/AlertSource.yaml
+    AlertSeverity:
+      $ref: ./components/schemas/operations/AlertSeverity.yaml
+    AlertStatus:
+      $ref: ./components/schemas/operations/AlertStatus.yaml
+    Alert:
+      $ref: ./components/schemas/operations/Alert.yaml
+    AlertList:
+      $ref: ./components/schemas/operations/AlertList.yaml
+    JobKind:
+      $ref: ./components/schemas/operations/JobKind.yaml
+    JobRunOutcome:
+      $ref: ./components/schemas/operations/JobRunOutcome.yaml
+    JobRun:
+      $ref: ./components/schemas/operations/JobRun.yaml
+    Job:
+      $ref: ./components/schemas/operations/Job.yaml
+    JobList:
+      $ref: ./components/schemas/operations/JobList.yaml
+    JobRunPage:
+      $ref: ./components/schemas/operations/JobRunPage.yaml
+    OutboxRowStatus:
+      $ref: ./components/schemas/operations/OutboxRowStatus.yaml
+    OutboxEntry:
+      $ref: ./components/schemas/operations/OutboxEntry.yaml
+    OutboxTypeCount:
+      $ref: ./components/schemas/operations/OutboxTypeCount.yaml
+    OutboxCounts:
+      $ref: ./components/schemas/operations/OutboxCounts.yaml
+    OutboxPage:
+      $ref: ./components/schemas/operations/OutboxPage.yaml
+    OutboxReplayInput:
+      $ref: ./components/schemas/operations/OutboxReplayInput.yaml
+    OutboxReplay:
+      $ref: ./components/schemas/operations/OutboxReplay.yaml

@@ -263,6 +263,16 @@ errors:
           Clearing a Location's notices named none and did not ask for all;
           the entry points at the request body.
 
+      - code: note_too_long
+        message: "A note is 2,000 characters at most; this one is {length}."
+        description: >-
+          A support note on a customer's account longer than 2,000
+          characters; the detail says how long it is.
+      - code: range_too_long
+        message: A range is a year at most; ask for a shorter one.
+        description: >-
+          A store's rating or its reviews asked for over more than a year of
+          days.
   - code: channel_unknown
     status: 400
     title: Unknown channel
@@ -1523,3 +1533,124 @@ errors:
       - code: agent_not_in_service
         message: "The Agent is not of a delivery service that may carry this delivery."
         description: "The Agent belongs to no delivery service of the delivery's chain that the caller may choose from."
+
+  - code: order_not_completed
+    status: 409
+    title: Order not completed
+    message: The order has not completed; it can be rated once it is delivered or collected.
+    retryable: false
+    description: >-
+      A review, a review photo or a delivery rating asked for an order that
+      is not completed yet, or ended without completing.
+
+  - code: reviews_off
+    status: 409
+    title: Reviews off
+    message: This store does not take reviews.
+    retryable: false
+    description: >-
+      The store's listing says it takes no reviews: customers are not asked,
+      and a review is refused. Reviews written before stay readable.
+
+  - code: tag_not_offered
+    status: 409
+    title: Tag not offered
+    message: "{tag} is not offered here."
+    retryable: false
+    description: >-
+      A review or a rating named a tag its thumb or its way of ordering does
+      not offer, such as "Late delivery" on a collection or a thumbs-up tag
+      with a thumbs down.
+
+  - code: already_reviewed
+    status: 409
+    title: Already reviewed
+    message: The order was reviewed already; a review is written once.
+    retryable: false
+    description: >-
+      The order has its review. A review is never edited; of two sent at the
+      same moment one is kept.
+
+  - code: delivery_not_rateable
+    status: 409
+    title: Delivery not rateable
+    message: Only a delivery an Agent carried can be rated.
+    retryable: false
+    description: >-
+      A delivery rating for an order that no Agent delivered: a collection,
+      or a delivery not completed.
+
+  - code: already_rated
+    status: 409
+    title: Already rated
+    message: The delivery was rated already; a delivery is rated once.
+    retryable: false
+    description: The delivery has its rating, which is never edited.
+
+  - code: reply_not_allowed
+    status: 409
+    title: Reply not allowed
+    message: "{reason}"
+    retryable: false
+    description: >-
+      A reply to a review cannot be written now: one is waiting or published,
+      one was withdrawn, both replies a rejection allows were used, the
+      platform hid the review, or the review is older than 90 days. The
+      detail says which.
+
+  - code: reply_decided
+    status: 409
+    title: Reply decided
+    message: The reply was {status} already.
+    retryable: false
+    description: >-
+      Moderation of a reply that is no longer waiting: approved, rejected or
+      withdrawn.
+
+  - code: nothing_to_hide
+    status: 409
+    title: Nothing to hide
+    message: The review has no note or photos to hide.
+    retryable: false
+    description: >-
+      Hiding a review with neither a note nor photos: its thumb and tags
+      always count and show.
+
+  - code: flag_window_closed
+    status: 409
+    title: Flag window closed
+    message: A rating can be flagged within 14 days of it.
+    retryable: false
+    description: An Agent flagged a rating older than 14 days.
+
+  - code: already_flagged
+    status: 409
+    title: Already flagged
+    message: The rating is flagged already.
+    retryable: false
+    description: An Agent flags a rating once; the decision answers it.
+
+  - code: flag_decided
+    status: 409
+    title: Flag decided
+    message: The flag was decided already.
+    retryable: false
+    description: A decision on a flag that was excluded or kept already.
+
+  - code: job_running
+    status: 409
+    title: Job running
+    message: "{job} is running now."
+    retryable: true
+    description: >-
+      Run now asked for a job with a run under way; its outcome shows in its
+      runs.
+
+  - code: job_not_runnable
+    status: 409
+    title: Job not runnable
+    message: "{job} runs all the time; it cannot be run now."
+    retryable: false
+    description: >-
+      Run now asked for a continuous job, such as the outbox relay or a
+      durable consumer, which has no schedule to run outside.

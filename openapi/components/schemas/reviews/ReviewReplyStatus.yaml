@@ -1,0 +1,9 @@
+type: string
+description: "Where a reply stands: `pending` moderation, `approved` and shown, `rejected` with a reason, or `withdrawn` by the Partner."
+enum:
+  - pending
+  - approved
+  - rejected
+  - withdrawn
+examples:
+  - pending

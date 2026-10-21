@@ -1,0 +1,7 @@
+type: string
+description: "`pending` (waiting to publish, perhaps backing off after a failure) or `failed` (given up after ten attempts until replayed)."
+enum:
+  - pending
+  - failed
+examples:
+  - failed

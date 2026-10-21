@@ -1,0 +1,40 @@
+# Path item for /v1/platform/operations/objectives. Referenced from openapi.yaml.
+get:
+  operationId: listObjectives
+  summary: "Read the service level objectives"
+  description: "Each service level objective with its target, its attainment over the rolling 30 days, the error budget left, the burn over the last hour and the last six hours, and the window the figures cover. An objective not measured yet, such as the tracking page's first paint on a phone, says so instead of a figure. Burn-rate alerts open at 14.4 times over an hour confirmed over five minutes (page) and at 6 times over six hours confirmed over thirty minutes (ticket). Mission Control tokens only."
+  tags:
+    - Operations
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The objectives."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/operations/ObjectiveList.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: not a Mission Control token."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

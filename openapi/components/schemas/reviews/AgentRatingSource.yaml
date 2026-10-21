@@ -1,0 +1,7 @@
+type: string
+description: "Where an Agent's rating came from: the customer's `delivery_rating`, or an `order_review` that says the delivery was late."
+enum:
+  - delivery_rating
+  - order_review
+examples:
+  - delivery_rating

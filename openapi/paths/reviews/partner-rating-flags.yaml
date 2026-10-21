@@ -1,0 +1,83 @@
+# Path item for /v1/partners/{partner_id}/rating-flags. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: "The Partner."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000001"
+get:
+  operationId: listPartnerRatingFlags
+  summary: "Read the flags of the Partner's Agents"
+  description: "The flags the Partner's own Agents raised on ratings they find unfair, which the Partner decides within seven days: open ones oldest first, decided ones newest first. `agent:read` at the Partner."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  parameters:
+    - name: status
+      in: query
+      required: false
+      description: "Only flags in this state; open ones by default."
+      schema:
+        $ref: ../../components/schemas/reviews/RatingFlagStatus.yaml
+    - name: limit
+      in: query
+      required: false
+      description: "How many, 1 to 100; 50 by default."
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "A page of flags."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/RatingFlagPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:read`, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such Partner of the caller's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

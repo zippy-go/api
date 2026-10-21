@@ -1,0 +1,44 @@
+type: object
+description: "Stores with their ratings, sorted as asked, unrated last."
+required:
+  - items
+  - total
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./RatedLocation.yaml
+    description: "The stores."
+  total:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "How many stores the search found."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - items:
+      - location_id: "01a13a48-9e00-7000-8000-000000000301"
+        partner_id: "01a13a48-9e00-7000-8000-000000000001"
+        name: "Dev Kitchen Gachibowli"
+        partner_name: "ZippyGo Dev Partner"
+        store_type: Restaurant
+        vertical_ids:
+          - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000e"
+        takes_reviews: true
+        last_reviewed_at: "2026-10-22T10:10:00Z"
+        rating:
+          percent: 72
+          count: 18
+          great: false
+        up: 13
+        down: 5
+    total: 1
+    next_cursor: null

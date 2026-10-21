@@ -1,0 +1,84 @@
+type: object
+description: "A store's reviews over a period: its rating with the counts of each thumb, and the share of its orders completed in the period that were rated, whenever the rating came."
+required:
+  - location_id
+  - period
+  - from
+  - to
+  - rating
+  - positive
+  - negative
+  - completed_orders
+  - rated_orders
+  - rated_share
+  - taking_reviews
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: "The store."
+  period:
+    $ref: ./ReviewPeriod.yaml
+    description: "The period."
+  from:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "Where the period starts; `null` for all time."
+  to:
+    type: string
+    format: date-time
+    description: "Where it ends: now."
+  rating:
+    oneOf:
+      - $ref: ./LocationRating.yaml
+      - type: "null"
+    description: "The rating over the period; `null` without reviews."
+  positive:
+    type: integer
+    minimum: 0
+    examples:
+      - 9
+    description: "Thumbs up in the period."
+  negative:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "Thumbs down in the period."
+  completed_orders:
+    type: integer
+    minimum: 0
+    examples:
+      - 40
+    description: "Orders completed in the period."
+  rated_orders:
+    type: integer
+    minimum: 0
+    examples:
+      - 10
+    description: "Of those, how many were rated."
+  rated_share:
+    type: string
+    examples:
+      - "25%"
+    description: "The share rated as said: \"25%\", \"under 1%\" when some were and the share rounds to nothing, never above \"100%\"."
+  taking_reviews:
+    type: boolean
+    description: "Whether customers are asked for reviews now."
+examples:
+  - location_id: "01a13a48-9e00-7000-8000-000000000301"
+    period: last_30_days
+    from: "2026-09-22T10:00:00Z"
+    to: "2026-10-22T10:00:00Z"
+    rating:
+      percent: 90
+      count: 10
+      great: false
+    positive: 9
+    negative: 1
+    completed_orders: 40
+    rated_orders: 10
+    rated_share: "25%"
+    taking_reviews: true

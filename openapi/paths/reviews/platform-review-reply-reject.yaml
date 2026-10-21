@@ -1,0 +1,74 @@
+# Path item for /v1/platform/review-replies/{reply_id}/reject. Referenced from openapi.yaml.
+parameters:
+  - name: reply_id
+    in: path
+    required: true
+    description: "The reply."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0002"
+post:
+  operationId: rejectReviewReply
+  summary: "Reject a reply"
+  description: "Rejects a waiting reply with a reason the Partner reads: one that names the customer beyond their first name, carries contact details, an offer or a code, or abuses the customer. The Partner may write one more. Written to the audit log; publishes `reviews.reply.rejected`, which tells the store. Mission Control tokens only, with `review:manage`."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Why.
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/ReplyRejection.yaml
+  responses:
+    "200":
+      description: "The reply, rejected."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/ModeratedReply.yaml
+    "400":
+      description: "`validation_failed`: an empty reason or one over 300 characters."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission) or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such reply."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`reply_decided`: it was approved, rejected or withdrawn already."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

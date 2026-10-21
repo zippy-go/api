@@ -1,0 +1,31 @@
+type: object
+description: "A rating of the delivery, for the Agent who carried it: a thumb and tags, no note, no photo."
+required:
+  - id
+  - thumb
+  - tags
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The rating."
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "The tags chosen."
+  created_at:
+    type: string
+    format: date-time
+    description: "When it was given."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+    thumb: up
+    tags:
+      - code: on_time
+        label: "On time"
+    created_at: "2026-10-22T10:11:00Z"

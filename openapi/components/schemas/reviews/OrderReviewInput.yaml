@@ -1,0 +1,38 @@
+type: object
+description: "A review of a completed order: a thumb, tags from the thumb's list, an optional note and up to three photos uploaded for this order."
+required:
+  - thumb
+properties:
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      type: string
+    uniqueItems: true
+    maxItems: 4
+    description: "Tag codes from the thumb's list, as many as apply."
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    examples:
+      - "The biryani arrived cold."
+    description: "A note, at most 500 characters."
+  photo_asset_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    uniqueItems: true
+    maxItems: 3
+    description: "Photos uploaded for this order's review and confirmed, at most three."
+examples:
+  - thumb: down
+    tags:
+      - cold_damaged
+    note: "The biryani arrived cold."
+    photo_asset_ids:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0005"

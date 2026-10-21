@@ -1,0 +1,27 @@
+type: object
+description: "Who blocked an account, when and why."
+required:
+  - at
+  - by
+  - reason
+properties:
+  at:
+    type: string
+    format: date-time
+    description: "When it was blocked."
+  by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Who blocked it."
+  reason:
+    type: string
+    examples:
+      - "Repeated abuse of delivery Agents"
+    description: Why.
+examples:
+  - at: "2026-10-22T12:00:00Z"
+    by: "Platform admin"
+    reason: "Repeated abuse of delivery Agents"

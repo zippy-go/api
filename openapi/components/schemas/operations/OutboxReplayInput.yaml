@@ -1,0 +1,25 @@
+type: object
+description: "What to replay: the rows named, or every failed row whose event occurred in a period."
+properties:
+  event_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    maxItems: 100
+    description: "The rows, at most 100."
+  failed_from:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "Every failed row whose event occurred at or after this."
+  failed_to:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "And before this."
+examples:
+  - event_ids:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000c"

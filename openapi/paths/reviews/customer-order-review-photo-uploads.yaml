@@ -1,0 +1,74 @@
+# Path item for /v1/customer/orders/{order_id}/review/photo-uploads. Referenced from openapi.yaml.
+parameters:
+  - name: order_id
+    in: path
+    required: true
+    description: "The order."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+post:
+  operationId: grantReviewPhotoUpload
+  summary: "Get an upload grant for a review photo"
+  description: "Issues a five-minute grant to post one photo for the customer's review of this order straight to private storage (purpose `review_photo`: JPEG, PNG or WebP, at most 10 MB, in the reviews folder, never an avatar's), for the customer's own completed, unreviewed order at a store that takes reviews; at most ten grants per order. Confirm the photo with `POST /v1/assets/{asset_id}/confirm` once posted, then send its asset id with the review."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "What the photo is."
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/ReviewPhotoUpload.yaml
+  responses:
+    "201":
+      description: "The reservation and the form to post the file with."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/assets/AssetGrant.yaml
+    "400":
+      description: "`validation_failed` with `unsupported_file_type` or `file_too_large`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such order of the customer's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`order_not_completed`, `reviews_off`, `already_reviewed`, or `conflict` when ten photos were granted for the order already."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

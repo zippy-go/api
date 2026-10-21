@@ -1,0 +1,85 @@
+# Path item for /v1/partners/{partner_id}/agents/{agent_id}/ratings. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: "The Partner."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000001"
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+get:
+  operationId: listPartnerAgentRatings
+  summary: "Read one of the Partner's Agents' ratings"
+  description: "The rating of one of the Partner's own Agents over the last 90 days, one rating per delivery (the delivery's own rating, else the order's review only when it says the delivery was late), with every rating newest first, whether it counts and any flag on it. `agent:read` at the Partner."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: "How many, 1 to 100; 50 by default."
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "The Agent's ratings."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/StaffAgentRatings.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:read`, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such Agent of the Partner's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

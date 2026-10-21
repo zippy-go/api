@@ -1,0 +1,8 @@
+type: string
+description: "Where an alert stands: `open`, `acknowledged` by name (it stops repeating while it stays open), or `closed` once what fired it cleared."
+enum:
+  - open
+  - acknowledged
+  - closed
+examples:
+  - open

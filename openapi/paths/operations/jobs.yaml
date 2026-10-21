@@ -1,0 +1,40 @@
+# Path item for /v1/platform/operations/jobs. Referenced from openapi.yaml.
+get:
+  operationId: listJobs
+  summary: "Read the jobs"
+  description: "Every job of the registry with its schedule, its last run with how it ended, when it runs next, whether it is running and whether it is late: overdue by twice its interval, which opens an alert naming it. A job runs on one instance at a time. Mission Control tokens only."
+  tags:
+    - Operations
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The jobs."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/operations/JobList.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: not a Mission Control token."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

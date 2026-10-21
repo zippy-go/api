@@ -1,0 +1,19 @@
+type: object
+description: "A tag a customer may choose, with its code and the words it shows."
+required:
+  - code
+  - label
+properties:
+  code:
+    type: string
+    examples:
+      - cold_damaged
+    description: "The tag's code, sent back in a review or a rating."
+  label:
+    type: string
+    examples:
+      - Cold/damaged
+    description: "The words shown for it."
+examples:
+  - code: cold_damaged
+    label: Cold/damaged

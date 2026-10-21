@@ -1,0 +1,74 @@
+# Path item for /v1/platform/reviews/{review_id}/hide. Referenced from openapi.yaml.
+parameters:
+  - name: review_id
+    in: path
+    required: true
+    description: "The review."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+post:
+  operationId: hideReview
+  summary: "Hide a review's note and photos"
+  description: "Hides a review's note and photos from the Partner and from customers, with a reason of at most 300 characters for the platform alone. Its thumb and tags still count; Mission Control still reads the note, with who hid it, when and why. Written to the audit log; publishes `reviews.review.hidden`. Hiding a hidden review changes nothing. Mission Control tokens only, with `review:manage`."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Why.
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/ReviewHide.yaml
+  responses:
+    "200":
+      description: "The review, hidden."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/PlatformReview.yaml
+    "400":
+      description: "`validation_failed`: an empty reason or one over 300 characters."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks the permission) or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such review."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`nothing_to_hide`: the review has neither note nor photos."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

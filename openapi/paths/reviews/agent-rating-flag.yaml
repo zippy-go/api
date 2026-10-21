@@ -1,0 +1,82 @@
+# Path item for /v1/agent/memberships/{agent_id}/ratings/{rating_id}/flag. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+  - name: rating_id
+    in: path
+    required: true
+    description: "The rating: a delivery rating's id, or an order review's."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+post:
+  operationId: flagAgentRating
+  summary: "Flag a rating as unfair"
+  description: "Flags one of the Agent's ratings as unfair, within 14 days of it, with a reason: the Partner decides for its own Agents and Mission Control for the platform fleet's, within seven days. Takes an Agent app token (audience `agent`) of the person holding the membership."
+  tags:
+    - "Agent app"
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Why.
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/AgentRatingFlagInput.yaml
+  responses:
+    "201":
+      description: "The flag, open."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/RatingFlag.yaml
+    "400":
+      description: "`validation_failed`: an empty reason or one over 500 characters."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such rating of the caller's membership."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`flag_window_closed` (older than 14 days) or `already_flagged`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

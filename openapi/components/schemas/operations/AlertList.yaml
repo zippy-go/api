@@ -1,0 +1,38 @@
+type: object
+description: "Alerts, open ones first, then the recent ones newest first."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Alert.yaml
+    description: "The alerts."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0008"
+        key: "objective_burn_page:assignment"
+        source: objective
+        severity: page
+        status: open
+        title: "Assignment is burning its error budget 16.0 times too fast"
+        detail: "Over the last hour 80% of accepted orders waited more than 60 seconds for an Agent; over the last 5 minutes 83%."
+        subject: assignment
+        runbook: "runbooks/objectives.md#assignment"
+        opened_at: "2026-10-22T10:00:00Z"
+        last_fired_at: "2026-10-22T10:05:00Z"
+        fired_count: 6
+        acknowledged_at: null
+        acknowledged_by: null
+        closed_at: null
+        closed_reason: null
+        sent: false
+    next_cursor: null

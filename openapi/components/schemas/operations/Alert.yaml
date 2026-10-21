@@ -1,0 +1,122 @@
+type: object
+description: "An alert: what fired it, its severity, when, whether somebody acknowledged it, and its runbook."
+required:
+  - id
+  - key
+  - source
+  - severity
+  - status
+  - title
+  - detail
+  - subject
+  - runbook
+  - opened_at
+  - last_fired_at
+  - fired_count
+  - acknowledged_at
+  - acknowledged_by
+  - closed_at
+  - closed_reason
+  - sent
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The alert."
+  key:
+    type: string
+    examples:
+      - "objective_burn_page:assignment"
+    description: "The definition and its subject; one open alert per key."
+  source:
+    $ref: ./AlertSource.yaml
+    description: "What fired it."
+  severity:
+    $ref: ./AlertSeverity.yaml
+    description: "Page or ticket."
+  status:
+    $ref: ./AlertStatus.yaml
+    description: "Where it stands."
+  title:
+    type: string
+    examples:
+      - "Assignment is burning its error budget 16.0 times too fast"
+    description: "What fired, in a line."
+  detail:
+    type: string
+    examples:
+      - "Over the last hour 80% of accepted orders waited more than 60 seconds for an Agent; over the last 5 minutes 83%."
+    description: "The figures behind it."
+  subject:
+    type:
+      - string
+      - "null"
+    examples:
+      - assignment
+    description: "What it is about: an objective, a job, an event type, a statement or a Partner."
+  runbook:
+    type: string
+    examples:
+      - "runbooks/objectives.md#assignment"
+    description: "The runbook to follow."
+  opened_at:
+    type: string
+    format: date-time
+    description: "When it opened."
+  last_fired_at:
+    type: string
+    format: date-time
+    description: "When it last fired (repeats stop once acknowledged)."
+  fired_count:
+    type: integer
+    minimum: 1
+    examples:
+      - 6
+    description: "How many times it fired."
+  acknowledged_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it was acknowledged."
+  acknowledged_by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Who acknowledged it."
+  closed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it closed."
+  closed_reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - "The burn fell below 14.4 times."
+    description: "Why it closed, in words."
+  sent:
+    type: boolean
+    description: "Whether it was sent to anybody; always `false` on a developer's machine and in `dev`, where alerts are shown, never sent."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0008"
+    key: "objective_burn_page:assignment"
+    source: objective
+    severity: page
+    status: open
+    title: "Assignment is burning its error budget 16.0 times too fast"
+    detail: "Over the last hour 80% of accepted orders waited more than 60 seconds for an Agent; over the last 5 minutes 83%."
+    subject: assignment
+    runbook: "runbooks/objectives.md#assignment"
+    opened_at: "2026-10-22T10:00:00Z"
+    last_fired_at: "2026-10-22T10:05:00Z"
+    fired_count: 6
+    acknowledged_at: null
+    acknowledged_by: null
+    closed_at: null
+    closed_reason: null
+    sent: false

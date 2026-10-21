@@ -1,0 +1,96 @@
+type: object
+description: "One rating of an Agent as the Partner (for its own Agents) and Mission Control read it, with the order it was about and whether it counts."
+required:
+  - id
+  - source
+  - thumb
+  - tags
+  - at
+  - order_id
+  - order_number
+  - location_id
+  - store_name
+  - counts
+  - not_counted_reason
+  - flag
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The rating: a delivery rating's id, or the order review's."
+  source:
+    $ref: ./AgentRatingSource.yaml
+    description: "Where it came from."
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "Its tags."
+  at:
+    type: string
+    format: date-time
+    description: "When it was given."
+  order_id:
+    type: string
+    format: uuid
+    description: "The order."
+  order_number:
+    type: string
+    examples:
+      - AB0042
+    description: "Its number."
+  location_id:
+    type: string
+    format: uuid
+    description: "The store it came from."
+  store_name:
+    type: string
+    examples:
+      - "Dev Kitchen Gachibowli"
+    description: "The store's name."
+  counts:
+    type: boolean
+    description: "Whether it counts in the rating now."
+  not_counted_reason:
+    type:
+      - string
+      - "null"
+    enum:
+      - superseded
+      - not_about_delivery
+      - excluded
+      - outside_window
+      - null
+    examples:
+      - excluded
+    description: "Why it does not count: `superseded` (the delivery has its own rating), `not_about_delivery` (a review that does not say the delivery was late), `excluded` on a flag, or `outside_window`."
+  flag:
+    oneOf:
+      - $ref: ./RatingFlag.yaml
+      - type: "null"
+    description: "The Agent's flag on it."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+    source: delivery_rating
+    thumb: down
+    tags:
+      - code: late
+        label: Late
+    at: "2026-10-22T10:11:00Z"
+    order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+    order_number: AB0042
+    location_id: "01a13a48-9e00-7000-8000-000000000301"
+    store_name: "Dev Kitchen Gachibowli"
+    counts: false
+    not_counted_reason: excluded
+    flag:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004"
+      status: excluded
+      reason: "The store handed it over 40 minutes late."
+      flagged_at: "2026-10-22T12:00:00Z"
+      due_by: "2026-10-29T12:00:00Z"
+      decided_at: "2026-10-23T09:00:00Z"
+      decision_reason: "Late at the store, not the Agent"

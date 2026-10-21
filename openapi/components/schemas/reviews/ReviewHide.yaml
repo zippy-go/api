@@ -1,0 +1,14 @@
+type: object
+description: "Why a review's note and photos are hidden, for the platform alone."
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Names a member of staff"
+    description: "The reason, at most 300 characters."
+examples:
+  - reason: "Names a member of staff"

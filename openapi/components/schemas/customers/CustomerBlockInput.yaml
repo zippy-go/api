@@ -1,0 +1,14 @@
+type: object
+description: "Why an account is blocked or unblocked, for the timeline and the audit log."
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Repeated abuse of delivery Agents"
+    description: "The reason, at most 300 characters."
+examples:
+  - reason: "Repeated abuse of delivery Agents"

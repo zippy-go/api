@@ -1,0 +1,27 @@
+type: object
+description: "Who hid a review's note and photos, when and why."
+required:
+  - at
+  - by
+  - reason
+properties:
+  at:
+    type: string
+    format: date-time
+    description: "When it was hidden."
+  by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Who hid it."
+  reason:
+    type: string
+    examples:
+      - "Names a member of staff"
+    description: "Why, for the platform alone."
+examples:
+  - at: "2026-10-22T12:30:00Z"
+    by: "Platform admin"
+    reason: "Names a member of staff"

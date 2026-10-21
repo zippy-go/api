@@ -6,6 +6,107 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-22
+
+Step 5, trust: reviews and ratings, Mission Control's customers, and
+operations. Written as 0.19.0 on its own branch beside the settlement slice
+of step 5; renumbered if settlement merges first. Additive only.
+
+### Added
+
+- Rating an order and its delivery (`Reviews` tag): "How was your order?"
+  (`GET /v1/customer/orders/{order_id}/review`, `OrderReviewState` with
+  `ReviewStatus`, `CustomerReview`, `ReviewTagOffer` and `ReviewTagOption`),
+  a review written once with a thumb (`ReviewThumb`), tags from that thumb's
+  list, a note of at most 500 characters and at most three photos
+  (`POST .../review`, `OrderReviewInput`; `409` `order_not_completed`,
+  `reviews_off`, `tag_not_offered`, `already_reviewed`, `asset_not_usable`),
+  a photo's upload grant for the order's review
+  (`POST .../review/photo-uploads`, `ReviewPhotoUpload`, purpose
+  `review_photo`, ten grants an order), "Not now" to the ask
+  (`POST .../review/not-now`), and "How was your delivery?" rated apart from
+  the food for the Agent who carried it
+  (`POST /v1/customer/orders/{order_id}/delivery-rating`,
+  `DeliveryRatingInput`, `DeliveryRating`, `DeliveryRatingState`; `409`
+  `delivery_not_rateable`, `already_rated`).
+- A store's rating and reviews on the storefront: `rating`
+  (`LocationRating`, "72% (18)", `null` rather than 0%) on `StoreCard`,
+  `SearchStore` and `StorePage`, and the reviews newest first, signed in or
+  not, never the order or the photos
+  (`GET /v1/storefront/stores/{location_id}/reviews`, `StoreReviewPage`,
+  `StoreReview`, `PublishedReply`).
+- The Partner's reviews: a store's reviews with the order each was about
+  (`GET /v1/partners/{partner_id}/locations/{location_id}/reviews`,
+  `PartnerReviewPage`, `PartnerReview`, `PartnerReviewOrder`, `ReviewAgent`),
+  the period's figures with the share of orders rated
+  (`GET .../reviews/summary`, `ReviewSummary`, `ReviewPeriod`), and one
+  reply per review, moderated (`POST`, `DELETE .../reviews/{review_id}/reply`,
+  `ReviewReplyInput`, `ReviewReply`, `ReviewReplyStatus`; `409`
+  `reply_not_allowed`), with `review:reply`, a new permission managers hold
+  by default.
+- Agents' ratings: one per delivery over 90 days in the Agent app with the
+  flag of an unfair rating within 14 days
+  (`GET /v1/agent/memberships/{agent_id}/ratings`, `AgentRatings`,
+  `AgentRating`, `AgentRatingFigure`, `RatingFlag`;
+  `POST .../ratings/{rating_id}/flag`, `AgentRatingFlagInput`; `409`
+  `flag_window_closed`, `already_flagged`), a Partner's own Agents' ratings
+  and flags (`GET /v1/partners/{partner_id}/agents/{agent_id}/ratings`,
+  `StaffAgentRatings`, `StaffAgentRating`, `RatingShare`;
+  `GET /v1/partners/{partner_id}/rating-flags`, `RatingFlagPage`,
+  `RatingFlagDetail`; `POST .../rating-flags/{flag_id}/decision`,
+  `RatingFlagDecision`; `409` `flag_decided`).
+- Mission Control's reviews: every review with filters
+  (`GET /v1/platform/reviews`, `PlatformReviewPage`, `PlatformReview`), every
+  store's rating, also as a spreadsheet
+  (`GET /v1/platform/reviews/locations`, `RatedLocationPage`,
+  `RatedLocation`), a store's rating over a range a year at most
+  (`GET /v1/platform/locations/{location_id}/rating`,
+  `LocationRatingReport`, `LocationRatingDay`; `range_too_long`), hiding a
+  note and photos and showing them again (`POST .../reviews/{review_id}/hide`,
+  `ReviewHide`, `ReviewHiding`, `.../show`; `409` `nothing_to_hide`), the
+  replies to moderate (`GET /v1/platform/review-replies`,
+  `ModeratedReplyPage`, `ModeratedReply`, `ModeratedReplyReview`;
+  `POST .../{reply_id}/approve`, `.../reject`, `ReplyRejection`; `409`
+  `reply_decided`), an Agent's ratings and the flags
+  (`GET /v1/platform/agents/{agent_id}/ratings`,
+  `GET /v1/platform/rating-flags`,
+  `POST /v1/platform/rating-flags/{flag_id}/decision`), and the order's
+  review on `PlatformOrder` (`review`, `OrderReviewSummary`;
+  `delivery_rating`).
+- Mission Control's customers (`Customers` tag): finding a customer by what
+  a caller can say (`GET /v1/platform/customers`, `PlatformCustomerPage`,
+  `PlatformCustomerRow`, `CustomerStatus`), how many joined
+  (`GET /v1/platform/customers/summary`, `PlatformCustomerSummary`), the
+  customer's page, read only (`GET /v1/platform/customers/{customer_id}`,
+  `PlatformCustomer`, `PlatformCustomerActions`, `CustomerBlock`), the
+  timeline drawn from the events (`GET .../timeline`,
+  `CustomerTimelinePage`, `CustomerTimelineEntry`, `CustomerTimelineKind`,
+  `CustomerTimelineActor`), support's notes (`GET`, `POST .../notes`,
+  `CustomerNoteList`, `CustomerNote`, `CustomerNoteAuthor`,
+  `CustomerNoteInput`; `note_too_long`), blocking and unblocking with a
+  reason (`POST .../block`, `.../unblock`, `CustomerBlockInput`; `409`
+  `illegal_transition`), and the `customer_id` filter on
+  `GET /v1/platform/orders`.
+- Operations (`Operations` tag): the service level objectives
+  (`GET /v1/platform/operations/objectives`, `ObjectiveList`, `Objective`,
+  `ObjectiveWindow`), the alerts and their acknowledgement
+  (`GET /v1/platform/operations/alerts`, `AlertList`, `Alert`,
+  `AlertSource`, `AlertSeverity`, `AlertStatus`;
+  `POST .../alerts/{alert_id}/acknowledge`), the jobs registry with runs
+  and run now (`GET /v1/platform/operations/jobs`, `JobList`, `Job`,
+  `JobKind`; `GET .../jobs/{job}/runs`, `JobRunPage`, `JobRun`,
+  `JobRunOutcome`; `POST .../jobs/{job}/run`; `409` `job_running`,
+  `job_not_runnable`), and the outbox's pending and failed rows with replay
+  (`GET /v1/platform/operations/outbox`, `OutboxPage`, `OutboxEntry`,
+  `OutboxCounts`, `OutboxTypeCount`, `OutboxRowStatus`;
+  `POST .../outbox/replay`, `OutboxReplayInput`, `OutboxReplay`), with
+  `operations:manage`, a new platform permission.
+- Events: `reviews.review.written`, `.hidden`, `.shown` and `.asked`,
+  `reviews.reply.published` and `.rejected`, `reviews.task_rating.written`,
+  `reviews.flag.decided`, `customers.customer.blocked` and `.unblocked`,
+  `customers.note.written`, `operations.alert.opened`, `.acknowledged` and
+  `.closed`.
+
 ## [0.18.0] - 2026-10-16
 
 Step 4, dispatch: an accepted delivery order becomes one delivery, asked of

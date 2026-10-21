@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.note.written.v1.schema.json",
+  "title": "CustomersNoteWrittenPayload",
+  "description": "Payload of `customers.note.written` version 1: support kept a note on a customer's account, signed and for good. The envelope's `partner_id` is `null`. The payload carries no note text. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "note_id",
+    "customer_id",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "note_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The note.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0007"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who acted.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

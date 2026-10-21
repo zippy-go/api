@@ -1,0 +1,18 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0008",
+  "type": "reviews.flag.decided",
+  "version": 1,
+  "occurred_at": "2026-10-23T09:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+  "correlation_id": null,
+  "payload": {
+    "flag_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004",
+    "rating_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003",
+    "source": "delivery_rating",
+    "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+    "outcome": "excluded",
+    "by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d",
+    "at": "2026-10-23T09:00:00Z"
+  }
+}

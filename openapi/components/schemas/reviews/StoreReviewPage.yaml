@@ -1,0 +1,51 @@
+type: object
+description: "A store's reviews, newest first, twenty at a time, with its rating."
+required:
+  - location_id
+  - rating
+  - items
+  - next_cursor
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: "The store."
+  rating:
+    oneOf:
+      - $ref: ./LocationRating.yaml
+      - type: "null"
+    description: "The store's rating; `null` with no reviews or when it takes none."
+  items:
+    type: array
+    items:
+      $ref: ./StoreReview.yaml
+    description: "The reviews, newest first."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - location_id: "01a13a48-9e00-7000-8000-000000000301"
+    rating:
+      percent: 72
+      count: 18
+      great: false
+    items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+        first_name: Asha
+        thumb: down
+        tags:
+          - code: cold_damaged
+            label: Cold/damaged
+        note: "The biryani arrived cold."
+        note_hidden: false
+        fulfilment: delivered
+        created_at: "2026-10-22T10:10:00Z"
+        reply:
+          text: "Sorry, we have changed our packaging"
+          store_name: "Dev Kitchen Gachibowli"
+          published_at: "2026-10-22T11:00:00Z"
+    next_cursor: null

@@ -1,0 +1,13 @@
+type: object
+description: "A note to keep on an account."
+required:
+  - text
+properties:
+  text:
+    type: string
+    minLength: 1
+    examples:
+      - "Promised a call back about the cold biryani on order AB0042."
+    description: "The note: not empty, at most 2,000 characters."
+examples:
+  - text: "Promised a call back about the cold biryani on order AB0042."

@@ -1,0 +1,182 @@
+type: object
+description: "A customer's page in Mission Control, read only: who they are, how to reach them, their consent channel by channel, their addresses with the selected one first, the devices they are signed in on as each app described itself, and whether the account is blocked. Never the date of birth. The Wallet and the orders have their own operations."
+required:
+  - customer_id
+  - status
+  - blocked
+  - given_name
+  - family_name
+  - joined_at
+  - city
+  - mobile
+  - email
+  - email_verified
+  - market
+  - language
+  - consent
+  - terms_accepted_at
+  - favourite_stores
+  - addresses
+  - devices
+  - actions
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: "The customer (a user id)."
+  status:
+    $ref: ./CustomerStatus.yaml
+    description: "Active, blocked or erased."
+  blocked:
+    oneOf:
+      - $ref: ./CustomerBlock.yaml
+      - type: "null"
+    description: "Who blocked it, when and why; `null` unless blocked."
+  given_name:
+    type: string
+    examples:
+      - Ana
+    description: "Their given name."
+  family_name:
+    type:
+      - string
+      - "null"
+    examples:
+      - "García"
+    description: "Their family name."
+  joined_at:
+    type: string
+    format: date-time
+    description: "When they registered."
+  city:
+    type:
+      - string
+      - "null"
+    examples:
+      - Hyderabad
+    description: "The city of their selected address."
+  mobile:
+    type:
+      - string
+      - "null"
+    examples:
+      - "+919876543210"
+    description: "Their mobile number (E.164)."
+  email:
+    type:
+      - string
+      - "null"
+    examples:
+      - "ana@example.com"
+    description: "Their email."
+  email_verified:
+    type: boolean
+    description: "Whether a code proved the email."
+  market:
+    type:
+      - string
+      - "null"
+    examples:
+      - IN
+    description: "The market of their number (alpha-2)."
+  language:
+    $ref: ./CustomerLanguage.yaml
+    description: "Their language."
+  consent:
+    $ref: ./MarketingConsent.yaml
+    description: "The marketing consent they gave, channel by channel."
+  terms_accepted_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When they accepted the terms."
+  favourite_stores:
+    type:
+      - integer
+      - "null"
+    examples:
+      - 3
+    description: "How many stores they favourited; `null` until favourites exist."
+  addresses:
+    type: array
+    items:
+      $ref: ./CustomerAddress.yaml
+    description: "Their saved addresses, the selected one first."
+  devices:
+    type: array
+    items:
+      $ref: ./CustomerSessionSummary.yaml
+    description: "The sessions they are signed in on now, each device as its app described itself: a claim, not a proof."
+  actions:
+    $ref: ./PlatformCustomerActions.yaml
+    description: "What the caller may do."
+examples:
+  - customer_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+    status: blocked
+    blocked:
+      at: "2026-10-22T12:00:00Z"
+      by: "Platform admin"
+      reason: "Repeated abuse of delivery Agents"
+    given_name: Ana
+    family_name: "García"
+    joined_at: "2026-10-15T09:00:00Z"
+    city: Hyderabad
+    mobile: "+919876543210"
+    email: "ana@example.com"
+    email_verified: false
+    market: IN
+    language: en
+    consent:
+      email: true
+      push: false
+      sms: false
+      whatsapp: true
+      agreed_at: "2026-10-15T09:00:00Z"
+    terms_accepted_at: "2026-10-15T09:00:00Z"
+    favourite_stores: null
+    addresses:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000b"
+        label: home
+        label_name: null
+        line1: "Road No 36"
+        line2: null
+        locality: "Jubilee Hills"
+        city: Hyderabad
+        state: Telangana
+        postal_code: "500033"
+        country: IN
+        lat: 17.4326
+        lng: 78.4071
+        building_type: apartment
+        flat_number: "402"
+        block: null
+        building_name: "Lake View Residency"
+        floor: "4"
+        landmark: "opposite the water tank"
+        instructions: "Ring the bell twice"
+        receiver_name: null
+        receiver_phone: null
+        selected: true
+        created_at: "2026-10-15T09:00:00Z"
+        updated_at: "2026-10-15T09:00:00Z"
+        version: 1
+    devices:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000a"
+        current: false
+        client: native
+        device:
+          id: ios-3f2a9c1d8e7b6a50
+          platform: ios
+          model: "iPhone 17"
+          app_version: "1.0.0"
+          os_version: "26.1"
+        recognised: true
+        last_address: "203.0.113.9"
+        started_at: "2026-10-15T09:00:00Z"
+        last_active_at: "2026-10-22T09:00:00Z"
+        expires_at: "2026-12-21T09:00:00Z"
+    actions:
+      write_note: true
+      block: false
+      unblock: true

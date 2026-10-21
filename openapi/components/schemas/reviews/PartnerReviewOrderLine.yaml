@@ -1,0 +1,34 @@
+type: object
+description: "A line of the reviewed order."
+required:
+  - name
+  - variant_label
+  - quantity
+  - left_out
+properties:
+  name:
+    type: string
+    examples:
+      - "Hyderabadi Biryani"
+    description: "The item."
+  variant_label:
+    type:
+      - string
+      - "null"
+    examples:
+      - Full
+    description: "The variant chosen."
+  quantity:
+    type: integer
+    minimum: 1
+    examples:
+      - 1
+    description: "How many."
+  left_out:
+    type: boolean
+    description: "Whether the store left it out."
+examples:
+  - name: "Hyderabadi Biryani"
+    variant_label: Full
+    quantity: 1
+    left_out: false

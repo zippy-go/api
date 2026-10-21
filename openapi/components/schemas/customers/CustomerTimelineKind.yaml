@@ -1,0 +1,23 @@
+type: string
+description: "What happened on the account."
+enum:
+  - registered
+  - signed_in
+  - order_placed
+  - order_accepted
+  - order_delivered
+  - order_collected
+  - order_cancelled
+  - order_declined
+  - order_expired
+  - order_refunded
+  - help_requested
+  - help_resolved
+  - wallet_credit
+  - wallet_correction
+  - review_written
+  - note_written
+  - blocked
+  - unblocked
+examples:
+  - order_placed

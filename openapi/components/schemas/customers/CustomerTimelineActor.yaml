@@ -1,0 +1,26 @@
+type: object
+description: "Who did it: the customer, a named operator, a named Partner user or the store, or the platform."
+required:
+  - kind
+  - name
+properties:
+  kind:
+    type: string
+    enum:
+      - customer
+      - operator
+      - partner_user
+      - platform
+    description: "Which kind of actor."
+    examples:
+      - operator
+  name:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Their name, when known: the customer's first name, the operator's, or the store's for its staff."
+examples:
+  - kind: operator
+    name: "Platform admin"

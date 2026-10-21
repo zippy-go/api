@@ -1,0 +1,55 @@
+type: object
+description: "A Partner's reply to a review, as the Partner reads it."
+required:
+  - id
+  - text
+  - status
+  - written_at
+  - written_by
+  - decided_at
+  - reason
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The reply."
+  text:
+    type: string
+    examples:
+      - "Sorry, we have changed our packaging"
+    description: "The reply, at most 300 characters."
+  status:
+    $ref: ./ReviewReplyStatus.yaml
+    description: "Where it stands."
+  written_at:
+    type: string
+    format: date-time
+    description: "When it was written."
+  written_by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Dev owner"
+    description: "Who wrote it."
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When the platform approved or rejected it, or the Partner withdrew it."
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Replies may not carry a phone number."
+    description: "Why the platform rejected it, for the Partner to read."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0002"
+    text: "Sorry, we have changed our packaging"
+    status: approved
+    written_at: "2026-10-22T10:30:00Z"
+    written_by: "Dev owner"
+    decided_at: "2026-10-22T11:00:00Z"
+    reason: null

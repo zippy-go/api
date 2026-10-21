@@ -1,0 +1,17 @@
+type: object
+description: "A photo of a review: never shown to customers."
+required:
+  - asset_id
+  - url
+properties:
+  asset_id:
+    type: string
+    format: uuid
+    description: "The photo's asset."
+  url:
+    type: string
+    format: uri
+    description: "A signed link to the photo, valid for ten minutes."
+examples:
+  - asset_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0005"
+    url: "https://objects.zippygo.example/zippygo-private/reviews/0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0005.jpg?signature=example"

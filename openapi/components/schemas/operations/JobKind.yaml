@@ -1,0 +1,7 @@
+type: string
+description: "`scheduled` jobs run a pass on a schedule and can be run now; `continuous` ones listen all the time (the outbox relay, the subscribers, the durable consumers) and report their last activity."
+enum:
+  - scheduled
+  - continuous
+examples:
+  - scheduled

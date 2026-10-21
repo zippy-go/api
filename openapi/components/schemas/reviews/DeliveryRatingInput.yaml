@@ -1,0 +1,19 @@
+type: object
+description: "A rating of the delivery: a thumb and tags from its list."
+required:
+  - thumb
+properties:
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      type: string
+    uniqueItems: true
+    maxItems: 4
+    description: "Tag codes from the thumb's list."
+examples:
+  - thumb: up
+    tags:
+      - on_time

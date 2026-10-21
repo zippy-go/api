@@ -1,0 +1,20 @@
+type: object
+description: "What the caller may do on the page. A control the caller lacks the grant for is not shown, and a sentence names the grant: `customer:note` to write a note, `customer:block` to block and unblock."
+required:
+  - write_note
+  - block
+  - unblock
+properties:
+  write_note:
+    type: boolean
+    description: "Whether the caller may write a note (`customer:note`)."
+  block:
+    type: boolean
+    description: "Whether the caller may block the account now (`customer:block`, and the account is active)."
+  unblock:
+    type: boolean
+    description: "Whether the caller may unblock it now (`customer:block`, and the account is blocked)."
+examples:
+  - write_note: true
+    block: false
+    unblock: true

@@ -1,0 +1,64 @@
+type: object
+description: "A customer in Mission Control's list."
+required:
+  - customer_id
+  - name
+  - email
+  - mobile
+  - joined_at
+  - last_purchase_at
+  - city
+  - status
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: "The customer (a user id)."
+  name:
+    type: string
+    examples:
+      - "Ana García"
+    description: "Their name."
+  email:
+    type:
+      - string
+      - "null"
+    examples:
+      - "ana@example.com"
+    description: "Their email, unverified unless said."
+  mobile:
+    type:
+      - string
+      - "null"
+    examples:
+      - "+919876543210"
+    description: "Their mobile number (E.164)."
+  joined_at:
+    type: string
+    format: date-time
+    description: "When they registered."
+  last_purchase_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When they last placed an order; `null` with none, or for a caller without `order:read`."
+  city:
+    type:
+      - string
+      - "null"
+    examples:
+      - Hyderabad
+    description: "The city of their selected address."
+  status:
+    $ref: ./CustomerStatus.yaml
+    description: "Active, blocked or erased."
+examples:
+  - customer_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+    name: "Ana García"
+    email: "ana@example.com"
+    mobile: "+919876543210"
+    joined_at: "2026-10-15T09:00:00Z"
+    last_purchase_at: "2026-10-20T13:00:00Z"
+    city: Hyderabad
+    status: active

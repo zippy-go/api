@@ -1,0 +1,37 @@
+type: object
+description: "Customers, newest first by when they joined, with the whole search's total."
+required:
+  - items
+  - total
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PlatformCustomerRow.yaml
+    description: "The customers."
+  total:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "How many customers the search found."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - items:
+      - customer_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+        name: "Ana García"
+        email: "ana@example.com"
+        mobile: "+919876543210"
+        joined_at: "2026-10-15T09:00:00Z"
+        last_purchase_at: "2026-10-20T13:00:00Z"
+        city: Hyderabad
+        status: active
+    total: 1
+    next_cursor: null

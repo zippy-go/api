@@ -926,3 +926,115 @@ events:
       An accepted, ready or on-its-way order is expected more than 5 minutes past its promise: the customer is told once, with the new time. The status does not change; told once per order however late it runs after.
     payload_schema: ./payloads/ordering.order.running_late.v1.schema.json
     example: ./examples/ordering.order.running_late.v1.json
+
+  - type: reviews.review.written
+    version: 1
+    domain: reviews
+    description: >-
+      A customer reviewed a completed order, once and for good: a thumb, the tags chosen, whether a note and how many photos came with it, and the Agent who carried a delivery. It counts in the store's rating at once and, when it says the delivery was late and the delivery has no rating of its own, in the Agent's. Carries no note text.
+    payload_schema: ./payloads/reviews.review.written.v1.schema.json
+    example: ./examples/reviews.review.written.v1.json
+
+  - type: reviews.review.hidden
+    version: 1
+    domain: reviews
+    description: >-
+      Mission Control hid a review's note and photos from the Partner and from customers, with a reason kept for the platform alone; its thumb and tags still count.
+    payload_schema: ./payloads/reviews.review.hidden.v1.schema.json
+    example: ./examples/reviews.review.hidden.v1.json
+
+  - type: reviews.review.shown
+    version: 1
+    domain: reviews
+    description: >-
+      Mission Control showed a hidden review's note and photos again.
+    payload_schema: ./payloads/reviews.review.shown.v1.schema.json
+    example: ./examples/reviews.review.shown.v1.json
+
+  - type: reviews.review.asked
+    version: 1
+    domain: reviews
+    description: >-
+      The platform asks a customer how their order was, once, between five and thirty minutes after it completed, at a store that takes reviews, unless it was reviewed already or the customer said "Not now": notifications pushes "How was your experience?" to the customer's devices.
+    payload_schema: ./payloads/reviews.review.asked.v1.schema.json
+    example: ./examples/reviews.review.asked.v1.json
+
+  - type: reviews.reply.published
+    version: 1
+    domain: reviews
+    description: >-
+      Mission Control approved a Partner's reply to a review: it shows under the review on the store's page as the store's, by name, with its date, and the reviewer is told once.
+    payload_schema: ./payloads/reviews.reply.published.v1.schema.json
+    example: ./examples/reviews.reply.published.v1.json
+
+  - type: reviews.reply.rejected
+    version: 1
+    domain: reviews
+    description: >-
+      Mission Control rejected a Partner's reply to a review with a reason the Partner reads (a reply naming the customer beyond their first name, carrying contact details, an offer or a code, or abusing the customer); the store's devices are told, and the Partner may write one more.
+    payload_schema: ./payloads/reviews.reply.rejected.v1.schema.json
+    example: ./examples/reviews.reply.rejected.v1.json
+
+  - type: reviews.task_rating.written
+    version: 1
+    domain: reviews
+    description: >-
+      A customer rated a delivery once, apart from the food, for the Agent who carried it: a thumb and tags. It counts in the Agent's rating in place of the order's review.
+    payload_schema: ./payloads/reviews.task_rating.written.v1.schema.json
+    example: ./examples/reviews.task_rating.written.v1.json
+
+  - type: reviews.flag.decided
+    version: 1
+    domain: reviews
+    description: >-
+      An Agent's flag on a rating they found unfair was decided: `excluded` stops the rating counting for the Agent with the reason kept, the order's review unchanged; `kept` leaves it.
+    payload_schema: ./payloads/reviews.flag.decided.v1.schema.json
+    example: ./examples/reviews.flag.decided.v1.json
+
+  - type: customers.customer.blocked
+    version: 1
+    domain: customers
+    description: >-
+      Support blocked a customer's account with a reason: every session ended at once, refreshes and sign-in answer `account_blocked`, and placing an order is refused, while orders already placed run to their end. On the customer's timeline.
+    payload_schema: ./payloads/customers.customer.blocked.v1.schema.json
+    example: ./examples/customers.customer.blocked.v1.json
+
+  - type: customers.customer.unblocked
+    version: 1
+    domain: customers
+    description: >-
+      Support unblocked a customer's account with a reason: they can sign in again with nothing else changed. On the customer's timeline.
+    payload_schema: ./payloads/customers.customer.unblocked.v1.schema.json
+    example: ./examples/customers.customer.unblocked.v1.json
+
+  - type: customers.note.written
+    version: 1
+    domain: customers
+    description: >-
+      Support kept a note on a customer's account, signed with the operator and the moment, never edited or removed, never shown to the customer. On the customer's timeline. Carries no note text.
+    payload_schema: ./payloads/customers.note.written.v1.schema.json
+    example: ./examples/customers.note.written.v1.json
+
+  - type: operations.alert.opened
+    version: 1
+    domain: operations
+    description: >-
+      An alert opened: an objective burning its error budget (a page at 14.4 times over an hour confirmed over five minutes, a ticket at 6 times over six hours confirmed over thirty minutes), a job overdue by twice its interval, an outbox row failed for five minutes, a statement unpaid or an account check failed. Locally and in `dev` it is recorded and shown, never sent.
+    payload_schema: ./payloads/operations.alert.opened.v1.schema.json
+    example: ./examples/operations.alert.opened.v1.json
+
+  - type: operations.alert.acknowledged
+    version: 1
+    domain: operations
+    description: >-
+      A platform member acknowledged an alert by name: it stops repeating while it stays open, and closes by itself once what fired it clears.
+    payload_schema: ./payloads/operations.alert.acknowledged.v1.schema.json
+    example: ./examples/operations.alert.acknowledged.v1.json
+
+  - type: operations.alert.closed
+    version: 1
+    domain: operations
+    description: >-
+      An alert closed because what fired it cleared: the burn fell, the job ran, the row published, the statement was paid or the account checked.
+    payload_schema: ./payloads/operations.alert.closed.v1.schema.json
+    example: ./examples/operations.alert.closed.v1.json

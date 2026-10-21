@@ -1,0 +1,8 @@
+type: string
+description: "Where a customer's account stands: `active`, `blocked` by support (signed out, sign-in and placing orders refused), or `erased` at their request."
+enum:
+  - active
+  - blocked
+  - erased
+examples:
+  - active

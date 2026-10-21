@@ -1,0 +1,125 @@
+type: object
+description: "A service level objective: its target, its attainment over the rolling 30 days, the error budget left, and the burn now over the last hour and the last six. An objective not measured yet says so instead of a figure. Targets are provisional until the first measurements from Hyderabad."
+required:
+  - key
+  - name
+  - description
+  - target_percent
+  - threshold
+  - measured
+  - not_measured_reason
+  - window
+  - total
+  - good
+  - attainment_percent
+  - error_budget_remaining_percent
+  - burn_rate_1h
+  - burn_rate_6h
+  - runbook
+properties:
+  key:
+    type: string
+    examples:
+      - assignment
+    description: "The objective."
+  name:
+    type: string
+    examples:
+      - Assignment
+    description: "Its name."
+  description:
+    type: string
+    examples:
+      - "Accepted on-demand orders with an Agent notified within 60 seconds."
+    description: "What it promises."
+  target_percent:
+    type: number
+    examples:
+      - 95.0
+    description: "The share of good events it promises."
+  threshold:
+    type: string
+    examples:
+      - "60 s"
+    description: "What makes an event good, as said."
+  measured:
+    type: boolean
+    description: "Whether it is measured yet."
+  not_measured_reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Needs the apps to report timings, which waits on the analytics consent of step 11."
+    description: "Why not, in words; `null` when measured."
+  window:
+    $ref: ./ObjectiveWindow.yaml
+    description: "The window the figures cover."
+  total:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    examples:
+      - 120
+    description: "Events counted in the window."
+  good:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    examples:
+      - 117
+    description: "Of those, the good ones."
+  attainment_percent:
+    type:
+      - number
+      - "null"
+    examples:
+      - 97.5
+    description: "The share of good events over the window; `null` until measured or with no events."
+  error_budget_remaining_percent:
+    type:
+      - number
+      - "null"
+    examples:
+      - 50.0
+    description: "The error budget left over the window, 100 when nothing went wrong, negative when spent."
+  burn_rate_1h:
+    type:
+      - number
+      - "null"
+    examples:
+      - 0.0
+    description: "How many times faster than the budget allows it burned over the last hour."
+  burn_rate_6h:
+    type:
+      - number
+      - "null"
+    examples:
+      - 0.4
+    description: "The same over the last six hours."
+  runbook:
+    type: string
+    examples:
+      - "runbooks/objectives.md#assignment"
+    description: "The runbook to follow when it burns."
+examples:
+  - key: assignment
+    name: Assignment
+    description: "Accepted on-demand orders with an Agent notified within 60 seconds."
+    target_percent: 95.0
+    threshold: "60 s"
+    measured: true
+    not_measured_reason: null
+    window:
+      from: "2026-09-22T10:00:00Z"
+      to: "2026-10-22T10:00:00Z"
+      days: 30
+    total: 120
+    good: 117
+    attainment_percent: 97.5
+    error_budget_remaining_percent: 50.0
+    burn_rate_1h: 0.0
+    burn_rate_6h: 0.4
+    runbook: "runbooks/objectives.md#assignment"

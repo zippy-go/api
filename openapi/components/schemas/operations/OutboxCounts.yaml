@@ -1,0 +1,41 @@
+type: object
+description: "The outbox's rows not published yet, counted."
+required:
+  - pending
+  - failed
+  - oldest_pending_age_seconds
+  - by_type
+properties:
+  pending:
+    type: integer
+    minimum: 0
+    examples:
+      - 0
+    description: "Pending rows."
+  failed:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "Failed rows."
+  oldest_pending_age_seconds:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    examples:
+      - 3
+    description: "The oldest pending row's age."
+  by_type:
+    type: array
+    items:
+      $ref: ./OutboxTypeCount.yaml
+    description: "The counts by event type."
+examples:
+  - pending: 0
+    failed: 1
+    oldest_pending_age_seconds: null
+    by_type:
+      - type: ordering.order.placed
+        pending: 0
+        failed: 1

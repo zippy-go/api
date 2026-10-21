@@ -1,0 +1,27 @@
+type: object
+description: "A day's thumbs on the store's clock."
+required:
+  - date
+  - up
+  - down
+properties:
+  date:
+    type: string
+    format: date
+    description: "The day."
+  up:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "Thumbs up that day."
+  down:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "Thumbs down that day."
+examples:
+  - date: "2026-10-22"
+    up: 1
+    down: 1

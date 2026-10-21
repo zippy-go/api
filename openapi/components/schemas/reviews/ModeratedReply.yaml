@@ -1,0 +1,96 @@
+type: object
+description: "A Partner's reply as Mission Control moderates it. A reply is rejected when it names the customer beyond their first name, carries contact details, an offer or a code, or abuses the customer."
+required:
+  - id
+  - status
+  - text
+  - written_at
+  - written_by
+  - decided_at
+  - decided_by
+  - reason
+  - location_id
+  - store_name
+  - partner_id
+  - review
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The reply."
+  status:
+    $ref: ./ReviewReplyStatus.yaml
+    description: "Where it stands."
+  text:
+    type: string
+    examples:
+      - "Sorry, we have changed our packaging"
+    description: "The reply."
+  written_at:
+    type: string
+    format: date-time
+    description: "When it was written."
+  written_by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Dev owner"
+    description: "Who wrote it."
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it was decided."
+  decided_by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Who decided it."
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Replies may not carry a phone number."
+    description: "Why it was rejected."
+  location_id:
+    type: string
+    format: uuid
+    description: "The store."
+  store_name:
+    type: string
+    examples:
+      - "Dev Kitchen Gachibowli"
+    description: "The store's name."
+  partner_id:
+    type: string
+    format: uuid
+    description: "The store's Partner."
+  review:
+    $ref: ./ModeratedReplyReview.yaml
+    description: "The review it answers."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0002"
+    status: pending
+    text: "Sorry, we have changed our packaging"
+    written_at: "2026-10-22T10:30:00Z"
+    written_by: "Dev owner"
+    decided_at: null
+    decided_by: null
+    reason: null
+    location_id: "01a13a48-9e00-7000-8000-000000000301"
+    store_name: "Dev Kitchen Gachibowli"
+    partner_id: "01a13a48-9e00-7000-8000-000000000001"
+    review:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      thumb: down
+      tags:
+        - code: cold_damaged
+          label: Cold/damaged
+      note: "The biryani arrived cold."
+      first_name: Asha
+      created_at: "2026-10-22T10:10:00Z"

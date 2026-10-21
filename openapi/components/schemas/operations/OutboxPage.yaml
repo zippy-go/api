@@ -1,0 +1,44 @@
+type: object
+description: "The outbox's pending and failed rows, oldest first, with their counts."
+required:
+  - counts
+  - items
+  - next_cursor
+properties:
+  counts:
+    $ref: ./OutboxCounts.yaml
+    description: "The counts, whatever the filter."
+  items:
+    type: array
+    items:
+      $ref: ./OutboxEntry.yaml
+    description: "The rows, oldest first."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - counts:
+      pending: 0
+      failed: 1
+      oldest_pending_age_seconds: null
+      by_type:
+        - type: ordering.order.placed
+          pending: 0
+          failed: 1
+    items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000c"
+        type: ordering.order.placed
+        version: 1
+        occurred_at: "2026-10-22T10:00:00Z"
+        partner_id: "01a13a48-9e00-7000-8000-000000000001"
+        correlation_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c99"
+        status: failed
+        attempts: 10
+        next_attempt_at: null
+        last_error: "publish to Valkey: connection refused"
+        age_seconds: 7200
+    next_cursor: null

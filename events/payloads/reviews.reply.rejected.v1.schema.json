@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reviews.reply.rejected.v1.schema.json",
+  "title": "ReviewsReplyRejectedPayload",
+  "description": "Payload of `reviews.reply.rejected` version 1: Mission Control rejected a Partner's reply with a reason the Partner reads; the Partner may write one more. The envelope's `partner_id` is the store's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "reply_id",
+    "review_id",
+    "order_id",
+    "location_id",
+    "partner_id",
+    "written_by",
+    "by",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "reply_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The reply.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0002"
+      ]
+    },
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The review.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "written_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The member who wrote the reply.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who acted.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "The reason the Partner reads.",
+      "examples": [
+        "Replies may not carry a phone number."
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

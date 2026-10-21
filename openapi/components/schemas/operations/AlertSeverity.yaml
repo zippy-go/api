@@ -1,0 +1,7 @@
+type: string
+description: "`page` reaches the on-call person; `ticket` waits for working hours. Locally and in `dev`, alerts are recorded and shown, never sent."
+enum:
+  - page
+  - ticket
+examples:
+  - page

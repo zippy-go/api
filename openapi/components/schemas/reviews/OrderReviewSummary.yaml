@@ -1,0 +1,45 @@
+type: object
+description: "The review of an order, on the order's page in Mission Control."
+required:
+  - id
+  - thumb
+  - tags
+  - note
+  - hidden
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The review."
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "The tags chosen."
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - "The biryani arrived cold."
+    description: "The note, hidden or not."
+  hidden:
+    type: boolean
+    description: "Whether the platform hid the note and photos."
+  created_at:
+    type: string
+    format: date-time
+    description: "When it was written."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+    thumb: down
+    tags:
+      - code: cold_damaged
+        label: Cold/damaged
+    note: "The biryani arrived cold."
+    hidden: false
+    created_at: "2026-10-22T10:10:00Z"

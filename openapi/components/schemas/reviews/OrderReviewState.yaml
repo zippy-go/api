@@ -1,0 +1,130 @@
+type: object
+description: "\"How was your order?\": whether the order may be reviewed, the review once written, the tags offered and the delivery's rating. The row is not shown when the status is `unavailable`."
+required:
+  - order_id
+  - number
+  - status
+  - unavailable_reason
+  - not_now
+  - review
+  - tags
+  - note_max_chars
+  - photos_max
+  - delivery
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: "The order."
+  number:
+    type: string
+    examples:
+      - AB0042
+    description: "The order's number."
+  status:
+    $ref: ./ReviewStatus.yaml
+    description: "Whether it may be reviewed now."
+  unavailable_reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - "This store does not take reviews."
+    description: "Why it cannot be reviewed, in words; `null` unless unavailable."
+  not_now:
+    type: boolean
+    description: "Whether the customer said \"Not now\" to the ask; they may still review it from the order."
+  review:
+    oneOf:
+      - $ref: ./CustomerReview.yaml
+      - type: "null"
+    description: "The review once written."
+  tags:
+    $ref: ./ReviewTagOffer.yaml
+    description: "The tags offered under each thumb; \"Late delivery\" only on a delivery."
+  note_max_chars:
+    type: integer
+    examples:
+      - 500
+    description: "The longest note, 500."
+  photos_max:
+    type: integer
+    examples:
+      - 3
+    description: "The most photos, 3."
+  delivery:
+    oneOf:
+      - $ref: ./DeliveryRatingState.yaml
+      - type: "null"
+    description: "The delivery's rating; `null` for an order no Agent carried."
+examples:
+  - order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+    number: AB0042
+    status: written
+    unavailable_reason: null
+    not_now: false
+    review:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      thumb: down
+      tags:
+        - code: cold_damaged
+          label: Cold/damaged
+      note: "The biryani arrived cold."
+      photos:
+        - asset_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0005"
+          url: "https://objects.zippygo.example/zippygo-private/reviews/0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0005.jpg?signature=example"
+      created_at: "2026-10-22T10:10:00Z"
+      reply:
+        text: "Sorry, we have changed our packaging"
+        store_name: "Dev Kitchen Gachibowli"
+        published_at: "2026-10-22T11:00:00Z"
+    tags:
+      up:
+        - code: tasted_great
+          label: "Tasted great"
+        - code: great_value
+          label: "Great value"
+        - code: accurate_order
+          label: "Accurate order"
+        - code: well_packed
+          label: "Well packed"
+      down:
+        - code: late_delivery
+          label: "Late delivery"
+        - code: missing_items
+          label: "Missing item(s)"
+        - code: wrong_items
+          label: "Wrong item(s)"
+        - code: cold_damaged
+          label: Cold/damaged
+    note_max_chars: 500
+    photos_max: 3
+    delivery:
+      status: written
+      agent_first_name: Ravi
+      rating:
+        id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+        thumb: up
+        tags:
+          - code: on_time
+            label: "On time"
+        created_at: "2026-10-22T10:11:00Z"
+      tags:
+        up:
+          - code: on_time
+            label: "On time"
+          - code: friendly
+            label: Friendly
+          - code: careful
+            label: "Careful with the order"
+          - code: followed_instructions
+            label: "Followed instructions"
+        down:
+          - code: late
+            label: Late
+          - code: rude
+            label: Rude
+          - code: order_damaged
+            label: "Order damaged"
+          - code: ignored_instructions
+            label: "Did not follow instructions"

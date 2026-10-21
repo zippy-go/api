@@ -1,0 +1,8 @@
+type: string
+description: "A period of reviews: `all` time, the last 7 days or the last 30."
+enum:
+  - all
+  - last_7_days
+  - last_30_days
+examples:
+  - last_30_days

@@ -1,0 +1,35 @@
+type: object
+description: "The tags offered under each thumb. A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note."
+required:
+  - up
+  - down
+properties:
+  up:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "The tags offered with a thumbs up."
+  down:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "The tags offered with a thumbs down."
+examples:
+  - up:
+      - code: tasted_great
+        label: "Tasted great"
+      - code: great_value
+        label: "Great value"
+      - code: accurate_order
+        label: "Accurate order"
+      - code: well_packed
+        label: "Well packed"
+    down:
+      - code: late_delivery
+        label: "Late delivery"
+      - code: missing_items
+        label: "Missing item(s)"
+      - code: wrong_items
+        label: "Wrong item(s)"
+      - code: cold_damaged
+        label: Cold/damaged

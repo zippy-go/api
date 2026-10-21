@@ -1,0 +1,73 @@
+type: object
+description: "A store's rating over a range of days on its clock, a year at most, with each day's thumbs."
+required:
+  - location_id
+  - name
+  - time_zone
+  - from
+  - to
+  - rating
+  - up
+  - down
+  - days
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: "The store."
+  name:
+    type: string
+    examples:
+      - "Dev Kitchen Gachibowli"
+    description: "The store's name."
+  time_zone:
+    type: string
+    examples:
+      - Asia/Kolkata
+    description: "The store's clock."
+  from:
+    type: string
+    format: date
+    description: "The first day."
+  to:
+    type: string
+    format: date
+    description: "The last day."
+  rating:
+    oneOf:
+      - $ref: ./LocationRating.yaml
+      - type: "null"
+    description: "The rating over the range; `null` without reviews."
+  up:
+    type: integer
+    minimum: 0
+    examples:
+      - 13
+    description: "Thumbs up in the range."
+  down:
+    type: integer
+    minimum: 0
+    examples:
+      - 5
+    description: "Thumbs down in the range."
+  days:
+    type: array
+    items:
+      $ref: ./LocationRatingDay.yaml
+    description: "The days with reviews, oldest first."
+examples:
+  - location_id: "01a13a48-9e00-7000-8000-000000000301"
+    name: "Dev Kitchen Gachibowli"
+    time_zone: Asia/Kolkata
+    from: "2026-09-23"
+    to: "2026-10-22"
+    rating:
+      percent: 72
+      count: 18
+      great: false
+    up: 13
+    down: 5
+    days:
+      - date: "2026-10-22"
+        up: 1
+        down: 1

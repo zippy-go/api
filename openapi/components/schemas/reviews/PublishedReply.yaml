@@ -1,0 +1,25 @@
+type: object
+description: "The store's reply under a review, once the platform approved it: from the store, by name, with its date."
+required:
+  - text
+  - store_name
+  - published_at
+properties:
+  text:
+    type: string
+    examples:
+      - "Sorry, we have changed our packaging"
+    description: "The reply, at most 300 characters."
+  store_name:
+    type: string
+    examples:
+      - "Dev Kitchen Gachibowli"
+    description: "The store, by name."
+  published_at:
+    type: string
+    format: date-time
+    description: "When the platform approved it."
+examples:
+  - text: "Sorry, we have changed our packaging"
+    store_name: "Dev Kitchen Gachibowli"
+    published_at: "2026-10-22T11:00:00Z"

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/operations.alert.opened.v1.schema.json",
+  "title": "OperationsAlertOpenedPayload",
+  "description": "Payload of `operations.alert.opened` version 1: an alert opened: an objective burning its error budget, a job running late, a failed outbox row, or a payout that came back or an account check that failed. Locally and in `dev` it is recorded and shown, never sent. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "alert_id",
+    "key",
+    "source",
+    "severity",
+    "title",
+    "subject",
+    "runbook",
+    "at"
+  ],
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The alert.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0008"
+      ]
+    },
+    "key": {
+      "type": "string",
+      "description": "The definition and its subject.",
+      "examples": [
+        "objective_burn_page:assignment"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "objective",
+        "job",
+        "outbox",
+        "payouts"
+      ],
+      "description": "What fired it.",
+      "examples": [
+        "objective"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "page",
+        "ticket"
+      ],
+      "description": "Page or ticket.",
+      "examples": [
+        "page"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "description": "What fired, in a line.",
+      "examples": [
+        "Assignment is burning its error budget 16.0 times too fast"
+      ]
+    },
+    "subject": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "What it is about.",
+      "examples": [
+        "assignment"
+      ]
+    },
+    "runbook": {
+      "type": "string",
+      "description": "The runbook.",
+      "examples": [
+        "runbooks/objectives.md#assignment"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

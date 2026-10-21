@@ -1,0 +1,55 @@
+type: object
+description: "\"How was your delivery?\": whether the delivery may be rated, the rating once given and the tags offered."
+required:
+  - status
+  - agent_first_name
+  - rating
+  - tags
+properties:
+  status:
+    $ref: ./ReviewStatus.yaml
+    description: "Whether it may be rated now."
+  agent_first_name:
+    type:
+      - string
+      - "null"
+    examples:
+      - Ravi
+    description: "The first name of the Agent who carried it."
+  rating:
+    oneOf:
+      - $ref: ./DeliveryRating.yaml
+      - type: "null"
+    description: "The rating once given."
+  tags:
+    $ref: ./ReviewTagOffer.yaml
+    description: "The tags offered under each thumb."
+examples:
+  - status: written
+    agent_first_name: Ravi
+    rating:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+      thumb: up
+      tags:
+        - code: on_time
+          label: "On time"
+      created_at: "2026-10-22T10:11:00Z"
+    tags:
+      up:
+        - code: on_time
+          label: "On time"
+        - code: friendly
+          label: Friendly
+        - code: careful
+          label: "Careful with the order"
+        - code: followed_instructions
+          label: "Followed instructions"
+      down:
+        - code: late
+          label: Late
+        - code: rude
+          label: Rude
+        - code: order_damaged
+          label: "Order damaged"
+        - code: ignored_instructions
+          label: "Did not follow instructions"

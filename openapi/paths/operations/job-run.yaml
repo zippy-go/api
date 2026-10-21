@@ -1,0 +1,60 @@
+# Path item for /v1/platform/operations/jobs/{job}/run. Referenced from openapi.yaml.
+parameters:
+  - name: job
+    in: path
+    required: true
+    description: "The job, as the registry names it."
+    schema:
+      type: string
+    example: review_asks
+post:
+  operationId: runJobNow
+  summary: "Run a job now"
+  description: "Starts a scheduled job's run within seconds, outside its schedule; its progress and outcome appear in its runs. Written to the audit log. `operations:manage`."
+  tags:
+    - Operations
+  security:
+    - Bearer: []
+  responses:
+    "202":
+      description: "The run asked for."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/operations/Job.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `operations:manage`, or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such job."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`job_running` (a run is under way) or `job_not_runnable` (a continuous job, which runs all the time)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

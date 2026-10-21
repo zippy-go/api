@@ -1,0 +1,22 @@
+type: object
+description: "What a replay reset to pending: each row is published again with its own event id, so a consumer that already took it does nothing twice."
+required:
+  - replayed
+  - event_ids
+properties:
+  replayed:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "How many rows."
+  event_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "The rows replayed."
+examples:
+  - replayed: 1
+    event_ids:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000c"

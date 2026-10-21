@@ -1,0 +1,8 @@
+type: string
+description: "Where a flag stands: `open` until decided, then `excluded` (the rating stops counting) or `kept`."
+enum:
+  - open
+  - excluded
+  - kept
+examples:
+  - open

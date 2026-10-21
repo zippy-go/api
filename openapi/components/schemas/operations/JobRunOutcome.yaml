@@ -1,0 +1,10 @@
+type: string
+description: "How a run ended: `running` still, `succeeded`, `failed` with its error, `abandoned` (its lock went stale and was released), or `skipped` (another instance held it)."
+enum:
+  - running
+  - succeeded
+  - failed
+  - abandoned
+  - skipped
+examples:
+  - succeeded

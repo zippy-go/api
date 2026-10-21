@@ -1,0 +1,27 @@
+type: object
+description: "A store's rating: the share of its reviews that are thumbs up, rounded to a whole percent, with how many there are, read as \"72% (18)\". Counted from the reviews when asked for, never kept. A store with no reviews, or one that takes none, has no rating rather than 0%."
+required:
+  - percent
+  - count
+  - great
+properties:
+  percent:
+    type: integer
+    minimum: 0
+    maximum: 100
+    examples:
+      - 72
+    description: "The share of thumbs up, 0 to 100."
+  count:
+    type: integer
+    minimum: 1
+    examples:
+      - 18
+    description: "How many reviews it counts."
+  great:
+    type: boolean
+    description: "`true` above ninety percent, read as great."
+examples:
+  - percent: 72
+    count: 18
+    great: false

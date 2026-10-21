@@ -1,0 +1,70 @@
+type: object
+description: "The Agent's own ratings in the Agent app, newest first: their rating and each thumb with its tags. Ratings are the Agent's own and never shown to customers."
+required:
+  - agent_id
+  - rating
+  - window_days
+  - flag_days
+  - items
+  - next_cursor
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: "The Agent membership."
+  rating:
+    oneOf:
+      - $ref: ./AgentRatingFigure.yaml
+      - type: "null"
+    description: "Their rating; `null` with no rating in the window."
+  window_days:
+    type: integer
+    examples:
+      - 90
+    description: "The days the rating covers, 90."
+  flag_days:
+    type: integer
+    examples:
+      - 14
+    description: "The days a rating may be flagged in, 14."
+  items:
+    type: array
+    items:
+      $ref: ./AgentRating.yaml
+    description: "The ratings, newest first."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - agent_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+    rating:
+      percent: 80
+      count: 5
+      from: "2026-07-24T10:00:00Z"
+      to: "2026-10-22T10:00:00Z"
+    window_days: 90
+    flag_days: 14
+    items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+        source: delivery_rating
+        thumb: down
+        tags:
+          - code: late
+            label: Late
+        at: "2026-10-22T10:11:00Z"
+        order_number: AB0042
+        counts: false
+        flaggable: false
+        flag:
+          id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004"
+          status: excluded
+          reason: "The store handed it over 40 minutes late."
+          flagged_at: "2026-10-22T12:00:00Z"
+          due_by: "2026-10-29T12:00:00Z"
+          decided_at: "2026-10-23T09:00:00Z"
+          decision_reason: "Late at the store, not the Agent"
+    next_cursor: null

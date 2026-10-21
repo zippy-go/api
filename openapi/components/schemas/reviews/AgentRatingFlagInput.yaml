@@ -1,0 +1,14 @@
+type: object
+description: "Why the Agent finds a rating unfair."
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 500
+    examples:
+      - "The store handed it over 40 minutes late."
+    description: "The reason, at most 500 characters."
+examples:
+  - reason: "The store handed it over 40 minutes late."

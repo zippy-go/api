@@ -1,0 +1,24 @@
+type: object
+description: "The window an objective's figures cover."
+required:
+  - from
+  - to
+  - days
+properties:
+  from:
+    type: string
+    format: date-time
+    description: "Where it starts."
+  to:
+    type: string
+    format: date-time
+    description: "Where it ends: now."
+  days:
+    type: integer
+    examples:
+      - 30
+    description: "Its length in days, 30."
+examples:
+  - from: "2026-09-22T10:00:00Z"
+    to: "2026-10-22T10:00:00Z"
+    days: 30

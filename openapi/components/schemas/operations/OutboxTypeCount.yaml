@@ -1,0 +1,28 @@
+type: object
+description: "Rows not published yet of one event type."
+required:
+  - type
+  - pending
+  - failed
+properties:
+  type:
+    type: string
+    examples:
+      - ordering.order.placed
+    description: "The event type."
+  pending:
+    type: integer
+    minimum: 0
+    examples:
+      - 0
+    description: "Pending rows."
+  failed:
+    type: integer
+    minimum: 0
+    examples:
+      - 1
+    description: "Failed rows."
+examples:
+  - type: ordering.order.placed
+    pending: 0
+    failed: 1

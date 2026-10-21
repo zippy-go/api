@@ -1,0 +1,88 @@
+type: object
+description: "A store with its rating, for Mission Control's list of rated stores."
+required:
+  - location_id
+  - partner_id
+  - name
+  - partner_name
+  - store_type
+  - vertical_ids
+  - takes_reviews
+  - last_reviewed_at
+  - rating
+  - up
+  - down
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: "The store."
+  partner_id:
+    type: string
+    format: uuid
+    description: "Its Partner."
+  name:
+    type: string
+    examples:
+      - "Dev Kitchen Gachibowli"
+    description: "The store's name."
+  partner_name:
+    type: string
+    examples:
+      - "ZippyGo Dev Partner"
+    description: "The Partner's name."
+  store_type:
+    type:
+      - string
+      - "null"
+    examples:
+      - Restaurant
+    description: "Its store type."
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "The Verticals it trades in."
+  takes_reviews:
+    type: boolean
+    description: "Whether it takes reviews."
+  last_reviewed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it was last reviewed."
+  rating:
+    oneOf:
+      - $ref: ./LocationRating.yaml
+      - type: "null"
+    description: "Its rating; `null` without reviews."
+  up:
+    type: integer
+    minimum: 0
+    examples:
+      - 13
+    description: "Thumbs up, all time."
+  down:
+    type: integer
+    minimum: 0
+    examples:
+      - 5
+    description: "Thumbs down, all time."
+examples:
+  - location_id: "01a13a48-9e00-7000-8000-000000000301"
+    partner_id: "01a13a48-9e00-7000-8000-000000000001"
+    name: "Dev Kitchen Gachibowli"
+    partner_name: "ZippyGo Dev Partner"
+    store_type: Restaurant
+    vertical_ids:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000e"
+    takes_reviews: true
+    last_reviewed_at: "2026-10-22T10:10:00Z"
+    rating:
+      percent: 72
+      count: 18
+      great: false
+    up: 13
+    down: 5

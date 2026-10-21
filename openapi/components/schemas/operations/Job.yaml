@@ -1,0 +1,108 @@
+type: object
+description: "A job of the registry: what it does, its schedule, its last run and the next, and whether it is late (overdue by twice its interval, which opens an alert)."
+required:
+  - name
+  - title
+  - module
+  - owner
+  - description
+  - kind
+  - schedule
+  - interval_seconds
+  - last_run
+  - last_activity_at
+  - next_run_at
+  - late
+  - running
+  - runnable
+properties:
+  name:
+    type: string
+    examples:
+      - review_asks
+    description: "The job, as the registry names it."
+  title:
+    type: string
+    examples:
+      - "Review asks"
+    description: "Its name in words."
+  module:
+    type: string
+    examples:
+      - reviews
+    description: "The module that owns it."
+  owner:
+    type: string
+    examples:
+      - reviews
+    description: "Who answers for it."
+  description:
+    type: string
+    examples:
+      - "Asks customers how their order was, once, five to thirty minutes after it completed."
+    description: "What it does."
+  kind:
+    $ref: ./JobKind.yaml
+    description: "Scheduled or continuous."
+  schedule:
+    type: string
+    examples:
+      - "every minute"
+    description: "Its schedule, as said."
+  interval_seconds:
+    type:
+      - integer
+      - "null"
+    examples:
+      - 60
+    description: "Its interval in seconds; `null` for a continuous job or a daily one."
+  last_run:
+    oneOf:
+      - $ref: ./JobRun.yaml
+      - type: "null"
+    description: "Its last run kept."
+  last_activity_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it was last heard from: its last pass, quiet or not, or a continuous job's last work."
+  next_run_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it runs next; `null` for a continuous job."
+  late:
+    type: boolean
+    description: "Whether it is overdue by twice its interval."
+  running:
+    type: boolean
+    description: "Whether a run is under way."
+  runnable:
+    type: boolean
+    description: "Whether it can be run now (scheduled jobs only)."
+examples:
+  - name: review_asks
+    title: "Review asks"
+    module: reviews
+    owner: reviews
+    description: "Asks customers how their order was, once, five to thirty minutes after it completed."
+    kind: scheduled
+    schedule: "every minute"
+    interval_seconds: 60
+    last_run:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0009"
+      job: review_asks
+      started_at: "2026-10-22T10:00:00Z"
+      finished_at: "2026-10-22T10:00:01Z"
+      outcome: succeeded
+      items: 2
+      error: null
+      trigger: run_now
+      requested_by: "Platform admin"
+    last_activity_at: "2026-10-22T10:00:01Z"
+    next_run_at: "2026-10-22T10:01:00Z"
+    late: false
+    running: false
+    runnable: true

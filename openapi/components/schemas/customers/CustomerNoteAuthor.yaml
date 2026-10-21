@@ -1,0 +1,20 @@
+type: object
+description: "The operator who wrote a note."
+required:
+  - user_id
+  - name
+properties:
+  user_id:
+    type: string
+    format: uuid
+    description: "The operator."
+  name:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Their name."
+examples:
+  - user_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+    name: "Platform admin"

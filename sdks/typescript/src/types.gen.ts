@@ -11308,6 +11308,10 @@ export type StoreCard = {
      * The zone the store is in.
      */
     zone_id?: string | null;
+    /**
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     */
+    rating?: LocationRating | null;
 };
 
 /**
@@ -13921,6 +13925,10 @@ export type StorePage = {
      * The strip of its categories, from the published menu.
      */
     categories: Array<StoreCategoryTab>;
+    /**
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     */
+    rating?: LocationRating | null;
 };
 
 /**
@@ -14027,6 +14035,10 @@ export type SearchStore = {
      * Orders may be collected, offered where it does not deliver here.
      */
     pickup: boolean;
+    /**
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     */
+    rating?: LocationRating | null;
 };
 
 /**
@@ -18103,6 +18115,14 @@ export type PlatformOrder = {
      * The store's name as it was.
      */
     store_name: string;
+    /**
+     * The customer's review of the order, hidden note included; `null` until written.
+     */
+    review?: OrderReviewSummary | null;
+    /**
+     * The customer's rating of the delivery; `null` until given or for an order no Agent carried.
+     */
+    delivery_rating?: DeliveryRating | null;
 };
 
 /**
@@ -19482,6 +19502,2147 @@ export type OrderProof = {
      * A link to the photo, valid for ten minutes; read the order again for a fresh one.
      */
     photo_url: string | null;
+};
+
+/**
+ * A thumb: `up` or `down`. Reviews have no stars.
+ */
+export type ReviewThumb = 'up' | 'down';
+
+/**
+ * A tag a customer may choose, with its code and the words it shows.
+ */
+export type ReviewTagOption = {
+    /**
+     * The tag's code, sent back in a review or a rating.
+     */
+    code: string;
+    /**
+     * The words shown for it.
+     */
+    label: string;
+};
+
+/**
+ * The tags offered under each thumb. A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note.
+ */
+export type ReviewTagOffer = {
+    /**
+     * The tags offered with a thumbs up.
+     */
+    up: Array<ReviewTagOption>;
+    /**
+     * The tags offered with a thumbs down.
+     */
+    down: Array<ReviewTagOption>;
+};
+
+/**
+ * A store's rating: the share of its reviews that are thumbs up, rounded to a whole percent, with how many there are, read as "72% (18)". Counted from the reviews when asked for, never kept. A store with no reviews, or one that takes none, has no rating rather than 0%.
+ */
+export type LocationRating = {
+    /**
+     * The share of thumbs up, 0 to 100.
+     */
+    percent: number;
+    /**
+     * How many reviews it counts.
+     */
+    count: number;
+    /**
+     * `true` above ninety percent, read as great.
+     */
+    great: boolean;
+};
+
+/**
+ * A share of thumbs up with how many ratings it counts.
+ */
+export type RatingShare = {
+    /**
+     * The share of thumbs up, 0 to 100.
+     */
+    percent: number;
+    /**
+     * How many it counts.
+     */
+    count: number;
+};
+
+/**
+ * How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered) or `collected`.
+ */
+export type ReviewFulfilment = 'delivered' | 'delivered_by_own_agent' | 'collected';
+
+/**
+ * A photo of a review: never shown to customers.
+ */
+export type ReviewPhoto = {
+    /**
+     * The photo's asset.
+     */
+    asset_id: string;
+    /**
+     * A signed link to the photo, valid for ten minutes.
+     */
+    url: string;
+};
+
+/**
+ * The store's reply under a review, once the platform approved it: from the store, by name, with its date.
+ */
+export type PublishedReply = {
+    /**
+     * The reply, at most 300 characters.
+     */
+    text: string;
+    /**
+     * The store, by name.
+     */
+    store_name: string;
+    /**
+     * When the platform approved it.
+     */
+    published_at: string;
+};
+
+/**
+ * The customer's own review of an order, as they wrote it, with the store's reply once published.
+ */
+export type CustomerReview = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note, at most 500 characters.
+     */
+    note: string | null;
+    /**
+     * The photos, at most three.
+     */
+    photos: Array<ReviewPhoto>;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+    /**
+     * The store's reply once the platform approved it.
+     */
+    reply: PublishedReply | null;
+};
+
+/**
+ * A rating of the delivery, for the Agent who carried it: a thumb and tags, no note, no photo.
+ */
+export type DeliveryRating = {
+    /**
+     * The rating.
+     */
+    id: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * When it was given.
+     */
+    created_at: string;
+};
+
+/**
+ * Whether something may be rated now: `waiting` until the order completes, `open`, `written` once rated, `unavailable` at a store that takes no reviews, for an order that ended without completing, or for a delivery no Agent carried.
+ */
+export type ReviewStatus = 'waiting' | 'open' | 'written' | 'unavailable';
+
+/**
+ * "How was your delivery?": whether the delivery may be rated, the rating once given and the tags offered.
+ */
+export type DeliveryRatingState = {
+    /**
+     * Whether it may be rated now.
+     */
+    status: ReviewStatus;
+    /**
+     * The first name of the Agent who carried it.
+     */
+    agent_first_name: string | null;
+    /**
+     * The rating once given.
+     */
+    rating: DeliveryRating | null;
+    /**
+     * The tags offered under each thumb.
+     */
+    tags: ReviewTagOffer;
+};
+
+/**
+ * "How was your order?": whether the order may be reviewed, the review once written, the tags offered and the delivery's rating. The row is not shown when the status is `unavailable`.
+ */
+export type OrderReviewState = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The order's number.
+     */
+    number: string;
+    /**
+     * Whether it may be reviewed now.
+     */
+    status: ReviewStatus;
+    /**
+     * Why it cannot be reviewed, in words; `null` unless unavailable.
+     */
+    unavailable_reason: string | null;
+    /**
+     * Whether the customer said "Not now" to the ask; they may still review it from the order.
+     */
+    not_now: boolean;
+    /**
+     * The review once written.
+     */
+    review: CustomerReview | null;
+    /**
+     * The tags offered under each thumb; "Late delivery" only on a delivery.
+     */
+    tags: ReviewTagOffer;
+    /**
+     * The longest note, 500.
+     */
+    note_max_chars: number;
+    /**
+     * The most photos, 3.
+     */
+    photos_max: number;
+    /**
+     * The delivery's rating; `null` for an order no Agent carried.
+     */
+    delivery: DeliveryRatingState | null;
+};
+
+/**
+ * A review of a completed order: a thumb, tags from the thumb's list, an optional note and up to three photos uploaded for this order.
+ */
+export type OrderReviewInput = {
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * Tag codes from the thumb's list, as many as apply.
+     */
+    tags?: Array<string>;
+    /**
+     * A note, at most 500 characters.
+     */
+    note?: string | null;
+    /**
+     * Photos uploaded for this order's review and confirmed, at most three.
+     */
+    photo_asset_ids?: Array<string>;
+};
+
+/**
+ * A rating of the delivery: a thumb and tags from its list.
+ */
+export type DeliveryRatingInput = {
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * Tag codes from the thumb's list.
+     */
+    tags?: Array<string>;
+};
+
+/**
+ * A photo the customer is about to upload for their review of one order.
+ */
+export type ReviewPhotoUpload = {
+    /**
+     * The file name.
+     */
+    file_name: string;
+    /**
+     * Its type: `image/jpeg`, `image/png` or `image/webp`.
+     */
+    content_type: string;
+    /**
+     * Its size in bytes, at most 10 MB.
+     */
+    size_bytes: number;
+};
+
+/**
+ * A review as customers read it on a store's page: the reviewer's first name, the thumb, the tags, the note unless the platform hid it, delivered or collected, when, and the store's published reply. Never the order and never the photos.
+ */
+export type StoreReview = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * The reviewer's first name; "A customer" once their account is erased.
+     */
+    first_name: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note; `null` when there is none or the platform hid it.
+     */
+    note: string | null;
+    /**
+     * Whether the platform hid the note; the thumb and tags still count.
+     */
+    note_hidden: boolean;
+    /**
+     * Delivered or collected.
+     */
+    fulfilment: ReviewFulfilment;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+    /**
+     * The store's published reply.
+     */
+    reply: PublishedReply | null;
+};
+
+/**
+ * A store's reviews, newest first, twenty at a time, with its rating.
+ */
+export type StoreReviewPage = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's rating; `null` with no reviews or when it takes none.
+     */
+    rating: LocationRating | null;
+    /**
+     * The reviews, newest first.
+     */
+    items: Array<StoreReview>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A line of the reviewed order.
+ */
+export type PartnerReviewOrderLine = {
+    /**
+     * The item.
+     */
+    name: string;
+    /**
+     * The variant chosen.
+     */
+    variant_label: string | null;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * Whether the store left it out.
+     */
+    left_out: boolean;
+};
+
+/**
+ * The order a review was about, as the store reads it.
+ */
+export type PartnerReviewOrder = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Its lines, with what the store left out.
+     */
+    lines: Array<PartnerReviewOrderLine>;
+    /**
+     * What the customer was charged in total.
+     */
+    total: Money;
+    /**
+     * Whether anything was refunded since.
+     */
+    refunded: boolean;
+};
+
+/**
+ * Where a reply stands: `pending` moderation, `approved` and shown, `rejected` with a reason, or `withdrawn` by the Partner.
+ */
+export type ReviewReplyStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn';
+
+/**
+ * A Partner's reply to a review, as the Partner reads it.
+ */
+export type ReviewReply = {
+    /**
+     * The reply.
+     */
+    id: string;
+    /**
+     * The reply, at most 300 characters.
+     */
+    text: string;
+    /**
+     * Where it stands.
+     */
+    status: ReviewReplyStatus;
+    /**
+     * When it was written.
+     */
+    written_at: string;
+    /**
+     * Who wrote it.
+     */
+    written_by: string | null;
+    /**
+     * When the platform approved or rejected it, or the Partner withdrew it.
+     */
+    decided_at: string | null;
+    /**
+     * Why the platform rejected it, for the Partner to read.
+     */
+    reason: string | null;
+};
+
+/**
+ * An Agent, by name.
+ */
+export type ReviewAgent = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    name: string;
+};
+
+/**
+ * A review as the store reads it in the Partner console: the customer's first name, how the order reached them, when, the tags, the note, the photos, the order it was about and the replies. A review the platform hid arrives without its note and photos. The Agent who carried the order is named only when the Agent is the Partner's own.
+ */
+export type PartnerReview = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The reviewer's first name.
+     */
+    first_name: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note; `null` when there is none or the platform hid it.
+     */
+    note: string | null;
+    /**
+     * The photos; empty when the platform hid them.
+     */
+    photos: Array<ReviewPhoto>;
+    /**
+     * Whether the platform hid its note and photos.
+     */
+    hidden: boolean;
+    /**
+     * Delivered, delivered by the Partner's own Agent, or collected.
+     */
+    fulfilment: ReviewFulfilment;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+    /**
+     * The order it was about.
+     */
+    order: PartnerReviewOrder;
+    /**
+     * The Partner's own Agent who carried it; `null` otherwise.
+     */
+    agent: ReviewAgent | null;
+    /**
+     * The Partner's replies, oldest first.
+     */
+    replies: Array<ReviewReply>;
+    /**
+     * Whether a reply may be written now.
+     */
+    reply_allowed: boolean;
+    /**
+     * Why not, in words; `null` when a reply may be written.
+     */
+    reply_refusal: string | null;
+};
+
+/**
+ * A store's reviews in the Partner console, newest first, twenty at a time.
+ */
+export type PartnerReviewPage = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's clock, for showing when each was written.
+     */
+    time_zone: string;
+    /**
+     * Whether customers are asked for reviews now; the reviews written before are listed either way.
+     */
+    taking_reviews: boolean;
+    /**
+     * The reviews, newest first.
+     */
+    items: Array<PartnerReview>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A period of reviews: `all` time, the last 7 days or the last 30.
+ */
+export type ReviewPeriod = 'all' | 'last_7_days' | 'last_30_days';
+
+/**
+ * A store's reviews over a period: its rating with the counts of each thumb, and the share of its orders completed in the period that were rated, whenever the rating came.
+ */
+export type ReviewSummary = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The period.
+     */
+    period: ReviewPeriod;
+    /**
+     * Where the period starts; `null` for all time.
+     */
+    from: string | null;
+    /**
+     * Where it ends: now.
+     */
+    to: string;
+    /**
+     * The rating over the period; `null` without reviews.
+     */
+    rating: LocationRating | null;
+    /**
+     * Thumbs up in the period.
+     */
+    positive: number;
+    /**
+     * Thumbs down in the period.
+     */
+    negative: number;
+    /**
+     * Orders completed in the period.
+     */
+    completed_orders: number;
+    /**
+     * Of those, how many were rated.
+     */
+    rated_orders: number;
+    /**
+     * The share rated as said: "25%", "under 1%" when some were and the share rounds to nothing, never above "100%".
+     */
+    rated_share: string;
+    /**
+     * Whether customers are asked for reviews now.
+     */
+    taking_reviews: boolean;
+};
+
+/**
+ * A reply to a review: one per review, at most 300 characters, within 90 days of it; it waits for the platform's moderation.
+ */
+export type ReviewReplyInput = {
+    /**
+     * The reply.
+     */
+    text: string;
+};
+
+/**
+ * Where an Agent's rating came from: the customer's `delivery_rating`, or an `order_review` that says the delivery was late.
+ */
+export type AgentRatingSource = 'delivery_rating' | 'order_review';
+
+/**
+ * Where a flag stands: `open` until decided, then `excluded` (the rating stops counting) or `kept`.
+ */
+export type RatingFlagStatus = 'open' | 'excluded' | 'kept';
+
+/**
+ * An Agent's flag on a rating they find unfair, raised within 14 days and decided within 7: by the Partner for its own Agents, by Mission Control for the platform fleet's.
+ */
+export type RatingFlag = {
+    /**
+     * The flag.
+     */
+    id: string;
+    /**
+     * Where it stands.
+     */
+    status: RatingFlagStatus;
+    /**
+     * The Agent's reason.
+     */
+    reason: string;
+    /**
+     * When it was raised.
+     */
+    flagged_at: string;
+    /**
+     * When it should be decided by: seven days after it was raised.
+     */
+    due_by: string;
+    /**
+     * When it was decided.
+     */
+    decided_at: string | null;
+    /**
+     * The reason recorded with the decision.
+     */
+    decision_reason: string | null;
+};
+
+/**
+ * One rating as the Agent reads it: the thumb and its tags, never the customer's name, note or photos.
+ */
+export type AgentRating = {
+    /**
+     * The rating: a delivery rating's id, or the order review's.
+     */
+    id: string;
+    /**
+     * Where it came from.
+     */
+    source: AgentRatingSource;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * Its tags.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * When it was given.
+     */
+    at: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * Whether it counts in the rating now: within 90 days and not excluded.
+     */
+    counts: boolean;
+    /**
+     * Whether the Agent may flag it now: within 14 days and not flagged.
+     */
+    flaggable: boolean;
+    /**
+     * The Agent's flag on it.
+     */
+    flag: RatingFlag | null;
+};
+
+/**
+ * An Agent's rating: the share of thumbs up over the last 90 days, one rating per delivery (the delivery's own rating, else the order's review only when it says the delivery was late), excluded ratings left out, counted when asked for.
+ */
+export type AgentRatingFigure = {
+    /**
+     * The share of thumbs up, 0 to 100.
+     */
+    percent: number;
+    /**
+     * How many ratings it counts.
+     */
+    count: number;
+    /**
+     * Where the window starts.
+     */
+    from: string;
+    /**
+     * Where it ends: now.
+     */
+    to: string;
+};
+
+/**
+ * The Agent's own ratings in the Agent app, newest first: their rating and each thumb with its tags. Ratings are the Agent's own and never shown to customers.
+ */
+export type AgentRatings = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * Their rating; `null` with no rating in the window.
+     */
+    rating: AgentRatingFigure | null;
+    /**
+     * The days the rating covers, 90.
+     */
+    window_days: number;
+    /**
+     * The days a rating may be flagged in, 14.
+     */
+    flag_days: number;
+    /**
+     * The ratings, newest first.
+     */
+    items: Array<AgentRating>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Why the Agent finds a rating unfair.
+ */
+export type AgentRatingFlagInput = {
+    /**
+     * The reason, at most 500 characters.
+     */
+    reason: string;
+};
+
+/**
+ * One rating of an Agent as the Partner (for its own Agents) and Mission Control read it, with the order it was about and whether it counts.
+ */
+export type StaffAgentRating = {
+    /**
+     * The rating: a delivery rating's id, or the order review's.
+     */
+    id: string;
+    /**
+     * Where it came from.
+     */
+    source: AgentRatingSource;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * Its tags.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * When it was given.
+     */
+    at: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    order_number: string;
+    /**
+     * The store it came from.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    store_name: string;
+    /**
+     * Whether it counts in the rating now.
+     */
+    counts: boolean;
+    /**
+     * Why it does not count: `superseded` (the delivery has its own rating), `not_about_delivery` (a review that does not say the delivery was late), `excluded` on a flag, or `outside_window`.
+     */
+    not_counted_reason: 'superseded' | 'not_about_delivery' | 'excluded' | 'outside_window' | null;
+    /**
+     * The Agent's flag on it.
+     */
+    flag: RatingFlag | null;
+};
+
+/**
+ * An Agent's ratings for the Partner's console (its own Agents) and Mission Control: the rating that counts, beside the share among reviews of the orders they carried and among delivery ratings, and every rating newest first.
+ */
+export type StaffAgentRatings = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    agent_name: string;
+    /**
+     * The Agent's Partner.
+     */
+    partner_id: string;
+    /**
+     * The rating that counts; `null` with none in the window.
+     */
+    rating: AgentRatingFigure | null;
+    /**
+     * The share of thumbs up among the reviews of orders they carried in the window, for reading only.
+     */
+    from_reviews: RatingShare | null;
+    /**
+     * The share of thumbs up among their delivery ratings in the window.
+     */
+    from_deliveries: RatingShare | null;
+    /**
+     * The days the rating covers, 90.
+     */
+    window_days: number;
+    /**
+     * The ratings, newest first.
+     */
+    items: Array<StaffAgentRating>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A flag in a decision queue: the Agent, the rating it is about and where it stands.
+ */
+export type RatingFlagDetail = {
+    /**
+     * The flag.
+     */
+    id: string;
+    /**
+     * Where it stands.
+     */
+    status: RatingFlagStatus;
+    /**
+     * The Agent's reason.
+     */
+    reason: string;
+    /**
+     * When it was raised.
+     */
+    flagged_at: string;
+    /**
+     * When it should be decided by.
+     */
+    due_by: string;
+    /**
+     * Whether it is open past its seven days.
+     */
+    overdue: boolean;
+    /**
+     * When it was decided.
+     */
+    decided_at: string | null;
+    /**
+     * Who decided it.
+     */
+    decided_by: string | null;
+    /**
+     * The reason recorded with the decision.
+     */
+    decision_reason: string | null;
+    /**
+     * The Agent who raised it.
+     */
+    agent: ReviewAgent;
+    /**
+     * The Agent's Partner.
+     */
+    partner_id: string;
+    /**
+     * The rating it is about.
+     */
+    rating: StaffAgentRating;
+};
+
+/**
+ * Flags, open ones oldest first, decided ones newest first.
+ */
+export type RatingFlagPage = {
+    /**
+     * The flags.
+     */
+    items: Array<RatingFlagDetail>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A decision on a flag: `exclude` the rating, which stops counting with the reason kept, or `keep` it.
+ */
+export type RatingFlagDecision = {
+    /**
+     * Exclude the rating, or keep it.
+     */
+    outcome: 'exclude' | 'keep';
+    /**
+     * The reason, at most 300 characters.
+     */
+    reason: string;
+};
+
+/**
+ * Why a review's note and photos are hidden, for the platform alone.
+ */
+export type ReviewHide = {
+    /**
+     * The reason, at most 300 characters.
+     */
+    reason: string;
+};
+
+/**
+ * Who hid a review's note and photos, when and why.
+ */
+export type ReviewHiding = {
+    /**
+     * When it was hidden.
+     */
+    at: string;
+    /**
+     * Who hid it.
+     */
+    by: string | null;
+    /**
+     * Why, for the platform alone.
+     */
+    reason: string;
+};
+
+/**
+ * A review as Mission Control reads it: everything, the note and photos even when hidden, with who hid them.
+ */
+export type PlatformReview = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    order_number: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    store_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The reviewer's first name.
+     */
+    first_name: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note.
+     */
+    note: string | null;
+    /**
+     * The photos.
+     */
+    photos: Array<ReviewPhoto>;
+    /**
+     * How the order reached the customer.
+     */
+    fulfilment: ReviewFulfilment;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+    /**
+     * Who hid the note and photos, when and why; `null` while shown.
+     */
+    hidden: ReviewHiding | null;
+    /**
+     * The Agent who carried the order.
+     */
+    agent: ReviewAgent | null;
+    /**
+     * The delivery's own rating.
+     */
+    delivery_rating: DeliveryRating | null;
+    /**
+     * The Partner's replies, oldest first.
+     */
+    replies: Array<ReviewReply>;
+};
+
+/**
+ * Reviews across every store, newest first, hidden ones included and marked.
+ */
+export type PlatformReviewPage = {
+    /**
+     * The reviews.
+     */
+    items: Array<PlatformReview>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A store with its rating, for Mission Control's list of rated stores.
+ */
+export type RatedLocation = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Its store type.
+     */
+    store_type: string | null;
+    /**
+     * The Verticals it trades in.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Whether it takes reviews.
+     */
+    takes_reviews: boolean;
+    /**
+     * When it was last reviewed.
+     */
+    last_reviewed_at: string | null;
+    /**
+     * Its rating; `null` without reviews.
+     */
+    rating: LocationRating | null;
+    /**
+     * Thumbs up, all time.
+     */
+    up: number;
+    /**
+     * Thumbs down, all time.
+     */
+    down: number;
+};
+
+/**
+ * Stores with their ratings, sorted as asked, unrated last.
+ */
+export type RatedLocationPage = {
+    /**
+     * The stores.
+     */
+    items: Array<RatedLocation>;
+    /**
+     * How many stores the search found.
+     */
+    total: number;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A day's thumbs on the store's clock.
+ */
+export type LocationRatingDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Thumbs up that day.
+     */
+    up: number;
+    /**
+     * Thumbs down that day.
+     */
+    down: number;
+};
+
+/**
+ * A store's rating over a range of days on its clock, a year at most, with each day's thumbs.
+ */
+export type LocationRatingReport = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * The store's clock.
+     */
+    time_zone: string;
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The last day.
+     */
+    to: string;
+    /**
+     * The rating over the range; `null` without reviews.
+     */
+    rating: LocationRating | null;
+    /**
+     * Thumbs up in the range.
+     */
+    up: number;
+    /**
+     * Thumbs down in the range.
+     */
+    down: number;
+    /**
+     * The days with reviews, oldest first.
+     */
+    days: Array<LocationRatingDay>;
+};
+
+/**
+ * The review a reply answers, as the moderator reads it.
+ */
+export type ModeratedReplyReview = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note.
+     */
+    note: string | null;
+    /**
+     * The reviewer's first name.
+     */
+    first_name: string;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+};
+
+/**
+ * A Partner's reply as Mission Control moderates it. A reply is rejected when it names the customer beyond their first name, carries contact details, an offer or a code, or abuses the customer.
+ */
+export type ModeratedReply = {
+    /**
+     * The reply.
+     */
+    id: string;
+    /**
+     * Where it stands.
+     */
+    status: ReviewReplyStatus;
+    /**
+     * The reply.
+     */
+    text: string;
+    /**
+     * When it was written.
+     */
+    written_at: string;
+    /**
+     * Who wrote it.
+     */
+    written_by: string | null;
+    /**
+     * When it was decided.
+     */
+    decided_at: string | null;
+    /**
+     * Who decided it.
+     */
+    decided_by: string | null;
+    /**
+     * Why it was rejected.
+     */
+    reason: string | null;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    store_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The review it answers.
+     */
+    review: ModeratedReplyReview;
+};
+
+/**
+ * Replies to moderate: pending ones oldest first, decided ones newest first.
+ */
+export type ModeratedReplyPage = {
+    /**
+     * The replies.
+     */
+    items: Array<ModeratedReply>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Why a reply is rejected, for the Partner to read.
+ */
+export type ReplyRejection = {
+    /**
+     * The reason, at most 300 characters.
+     */
+    reason: string;
+};
+
+/**
+ * The review of an order, on the order's page in Mission Control.
+ */
+export type OrderReviewSummary = {
+    /**
+     * The review.
+     */
+    id: string;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * The tags chosen.
+     */
+    tags: Array<ReviewTagOption>;
+    /**
+     * The note, hidden or not.
+     */
+    note: string | null;
+    /**
+     * Whether the platform hid the note and photos.
+     */
+    hidden: boolean;
+    /**
+     * When it was written.
+     */
+    created_at: string;
+};
+
+/**
+ * Where a customer's account stands: `active`, `blocked` by support (signed out, sign-in and placing orders refused), or `erased` at their request.
+ */
+export type CustomerStatus = 'active' | 'blocked' | 'erased';
+
+/**
+ * A customer in Mission Control's list.
+ */
+export type PlatformCustomerRow = {
+    /**
+     * The customer (a user id).
+     */
+    customer_id: string;
+    /**
+     * Their name.
+     */
+    name: string;
+    /**
+     * Their email, unverified unless said.
+     */
+    email: string | null;
+    /**
+     * Their mobile number (E.164).
+     */
+    mobile: string | null;
+    /**
+     * When they registered.
+     */
+    joined_at: string;
+    /**
+     * When they last placed an order; `null` with none, or for a caller without `order:read`.
+     */
+    last_purchase_at: string | null;
+    /**
+     * The city of their selected address.
+     */
+    city: string | null;
+    /**
+     * Active, blocked or erased.
+     */
+    status: CustomerStatus;
+};
+
+/**
+ * Customers, newest first by when they joined, with the whole search's total.
+ */
+export type PlatformCustomerPage = {
+    /**
+     * The customers.
+     */
+    items: Array<PlatformCustomerRow>;
+    /**
+     * How many customers the search found.
+     */
+    total: number;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * How many customers joined in the days chosen, whatever is typed in the search box. The orders and the average order value for the same days come from the orders report.
+ */
+export type PlatformCustomerSummary = {
+    /**
+     * Where the days start; `null` for all time.
+     */
+    from: string | null;
+    /**
+     * Where they end; `null` for now.
+     */
+    to: string | null;
+    /**
+     * Customers who joined.
+     */
+    joined: number;
+};
+
+/**
+ * Who blocked an account, when and why.
+ */
+export type CustomerBlock = {
+    /**
+     * When it was blocked.
+     */
+    at: string;
+    /**
+     * Who blocked it.
+     */
+    by: string | null;
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * What the caller may do on the page. A control the caller lacks the grant for is not shown, and a sentence names the grant: `customer:note` to write a note, `customer:block` to block and unblock.
+ */
+export type PlatformCustomerActions = {
+    /**
+     * Whether the caller may write a note (`customer:note`).
+     */
+    write_note: boolean;
+    /**
+     * Whether the caller may block the account now (`customer:block`, and the account is active).
+     */
+    block: boolean;
+    /**
+     * Whether the caller may unblock it now (`customer:block`, and the account is blocked).
+     */
+    unblock: boolean;
+};
+
+/**
+ * A customer's page in Mission Control, read only: who they are, how to reach them, their consent channel by channel, their addresses with the selected one first, the devices they are signed in on as each app described itself, and whether the account is blocked. Never the date of birth. The Wallet and the orders have their own operations.
+ */
+export type PlatformCustomer = {
+    /**
+     * The customer (a user id).
+     */
+    customer_id: string;
+    /**
+     * Active, blocked or erased.
+     */
+    status: CustomerStatus;
+    /**
+     * Who blocked it, when and why; `null` unless blocked.
+     */
+    blocked: CustomerBlock | null;
+    /**
+     * Their given name.
+     */
+    given_name: string;
+    /**
+     * Their family name.
+     */
+    family_name: string | null;
+    /**
+     * When they registered.
+     */
+    joined_at: string;
+    /**
+     * The city of their selected address.
+     */
+    city: string | null;
+    /**
+     * Their mobile number (E.164).
+     */
+    mobile: string | null;
+    /**
+     * Their email.
+     */
+    email: string | null;
+    /**
+     * Whether a code proved the email.
+     */
+    email_verified: boolean;
+    /**
+     * The market of their number (alpha-2).
+     */
+    market: string | null;
+    /**
+     * Their language.
+     */
+    language: CustomerLanguage;
+    /**
+     * The marketing consent they gave, channel by channel.
+     */
+    consent: MarketingConsent;
+    /**
+     * When they accepted the terms.
+     */
+    terms_accepted_at: string | null;
+    /**
+     * How many stores they favourited; `null` until favourites exist.
+     */
+    favourite_stores: number | null;
+    /**
+     * Their saved addresses, the selected one first.
+     */
+    addresses: Array<CustomerAddress>;
+    /**
+     * The sessions they are signed in on now, each device as its app described itself: a claim, not a proof.
+     */
+    devices: Array<CustomerSessionSummary>;
+    /**
+     * What the caller may do.
+     */
+    actions: PlatformCustomerActions;
+};
+
+/**
+ * What happened on the account.
+ */
+export type CustomerTimelineKind = 'registered' | 'signed_in' | 'order_placed' | 'order_accepted' | 'order_delivered' | 'order_collected' | 'order_cancelled' | 'order_declined' | 'order_expired' | 'order_refunded' | 'help_requested' | 'help_resolved' | 'wallet_credit' | 'wallet_correction' | 'review_written' | 'note_written' | 'blocked' | 'unblocked';
+
+/**
+ * Who did it: the customer, a named operator, a named Partner user or the store, or the platform.
+ */
+export type CustomerTimelineActor = {
+    /**
+     * Which kind of actor.
+     */
+    kind: 'customer' | 'operator' | 'partner_user' | 'platform';
+    /**
+     * Their name, when known: the customer's first name, the operator's, or the store's for its staff.
+     */
+    name: string | null;
+};
+
+/**
+ * One dated entry of a customer's timeline, drawn from the domain events.
+ */
+export type CustomerTimelineEntry = {
+    /**
+     * The entry: the id of the event it was drawn from.
+     */
+    id: string;
+    /**
+     * When it happened.
+     */
+    at: string;
+    /**
+     * What happened.
+     */
+    kind: CustomerTimelineKind;
+    /**
+     * What happened, in a sentence.
+     */
+    summary: string;
+    /**
+     * Who did it.
+     */
+    actor: CustomerTimelineActor;
+    /**
+     * The order it was about.
+     */
+    order_id: string | null;
+    /**
+     * Its number.
+     */
+    order_number: string | null;
+    /**
+     * The event it was drawn from.
+     */
+    event_type: string;
+};
+
+/**
+ * A customer's timeline, newest first.
+ */
+export type CustomerTimelinePage = {
+    /**
+     * The entries, newest first.
+     */
+    items: Array<CustomerTimelineEntry>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * The operator who wrote a note.
+ */
+export type CustomerNoteAuthor = {
+    /**
+     * The operator.
+     */
+    user_id: string;
+    /**
+     * Their name.
+     */
+    name: string | null;
+};
+
+/**
+ * A support note on an account: signed with the operator and the moment, never edited or removed, never shown to the customer.
+ */
+export type CustomerNote = {
+    /**
+     * The note.
+     */
+    id: string;
+    /**
+     * The note, at most 2,000 characters.
+     */
+    text: string;
+    /**
+     * Who wrote it.
+     */
+    written_by: CustomerNoteAuthor;
+    /**
+     * When.
+     */
+    written_at: string;
+    /**
+     * The day it was written on the market's clock, for grouping.
+     */
+    day: string;
+};
+
+/**
+ * An account's notes, the newest 200, newest first.
+ */
+export type CustomerNoteList = {
+    /**
+     * The notes, newest first.
+     */
+    items: Array<CustomerNote>;
+    /**
+     * How many notes the account has.
+     */
+    total: number;
+};
+
+/**
+ * A note to keep on an account.
+ */
+export type CustomerNoteInput = {
+    /**
+     * The note: not empty, at most 2,000 characters.
+     */
+    text: string;
+};
+
+/**
+ * Why an account is blocked or unblocked, for the timeline and the audit log.
+ */
+export type CustomerBlockInput = {
+    /**
+     * The reason, at most 300 characters.
+     */
+    reason: string;
+};
+
+/**
+ * The window an objective's figures cover.
+ */
+export type ObjectiveWindow = {
+    /**
+     * Where it starts.
+     */
+    from: string;
+    /**
+     * Where it ends: now.
+     */
+    to: string;
+    /**
+     * Its length in days, 30.
+     */
+    days: number;
+};
+
+/**
+ * A service level objective: its target, its attainment over the rolling 30 days, the error budget left, and the burn now over the last hour and the last six. An objective not measured yet says so instead of a figure. Targets are provisional until the first measurements from Hyderabad.
+ */
+export type Objective = {
+    /**
+     * The objective.
+     */
+    key: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it promises.
+     */
+    description: string;
+    /**
+     * The share of good events it promises.
+     */
+    target_percent: number;
+    /**
+     * What makes an event good, as said.
+     */
+    threshold: string;
+    /**
+     * Whether it is measured yet.
+     */
+    measured: boolean;
+    /**
+     * Why not, in words; `null` when measured.
+     */
+    not_measured_reason: string | null;
+    /**
+     * The window the figures cover.
+     */
+    window: ObjectiveWindow;
+    /**
+     * Events counted in the window.
+     */
+    total: number | null;
+    /**
+     * Of those, the good ones.
+     */
+    good: number | null;
+    /**
+     * The share of good events over the window; `null` until measured or with no events.
+     */
+    attainment_percent: number | null;
+    /**
+     * The error budget left over the window, 100 when nothing went wrong, negative when spent.
+     */
+    error_budget_remaining_percent: number | null;
+    /**
+     * How many times faster than the budget allows it burned over the last hour.
+     */
+    burn_rate_1h: number | null;
+    /**
+     * The same over the last six hours.
+     */
+    burn_rate_6h: number | null;
+    /**
+     * The runbook to follow when it burns.
+     */
+    runbook: string;
+};
+
+/**
+ * Every service level objective with its figures.
+ */
+export type ObjectiveList = {
+    /**
+     * When the figures were worked out.
+     */
+    computed_at: string;
+    /**
+     * The objectives.
+     */
+    items: Array<Objective>;
+};
+
+/**
+ * What fired an alert: an `objective` burning its budget, a `job` running late, a failed `outbox` row, or `payouts` (a statement unpaid, an account check failed).
+ */
+export type AlertSource = 'objective' | 'job' | 'outbox' | 'payouts';
+
+/**
+ * `page` reaches the on-call person; `ticket` waits for working hours. Locally and in `dev`, alerts are recorded and shown, never sent.
+ */
+export type AlertSeverity = 'page' | 'ticket';
+
+/**
+ * Where an alert stands: `open`, `acknowledged` by name (it stops repeating while it stays open), or `closed` once what fired it cleared.
+ */
+export type AlertStatus = 'open' | 'acknowledged' | 'closed';
+
+/**
+ * An alert: what fired it, its severity, when, whether somebody acknowledged it, and its runbook.
+ */
+export type Alert = {
+    /**
+     * The alert.
+     */
+    id: string;
+    /**
+     * The definition and its subject; one open alert per key.
+     */
+    key: string;
+    /**
+     * What fired it.
+     */
+    source: AlertSource;
+    /**
+     * Page or ticket.
+     */
+    severity: AlertSeverity;
+    /**
+     * Where it stands.
+     */
+    status: AlertStatus;
+    /**
+     * What fired, in a line.
+     */
+    title: string;
+    /**
+     * The figures behind it.
+     */
+    detail: string;
+    /**
+     * What it is about: an objective, a job, an event type, a statement or a Partner.
+     */
+    subject: string | null;
+    /**
+     * The runbook to follow.
+     */
+    runbook: string;
+    /**
+     * When it opened.
+     */
+    opened_at: string;
+    /**
+     * When it last fired (repeats stop once acknowledged).
+     */
+    last_fired_at: string;
+    /**
+     * How many times it fired.
+     */
+    fired_count: number;
+    /**
+     * When it was acknowledged.
+     */
+    acknowledged_at: string | null;
+    /**
+     * Who acknowledged it.
+     */
+    acknowledged_by: string | null;
+    /**
+     * When it closed.
+     */
+    closed_at: string | null;
+    /**
+     * Why it closed, in words.
+     */
+    closed_reason: string | null;
+    /**
+     * Whether it was sent to anybody; always `false` on a developer's machine and in `dev`, where alerts are shown, never sent.
+     */
+    sent: boolean;
+};
+
+/**
+ * Alerts, open ones first, then the recent ones newest first.
+ */
+export type AlertList = {
+    /**
+     * The alerts.
+     */
+    items: Array<Alert>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * `scheduled` jobs run a pass on a schedule and can be run now; `continuous` ones listen all the time (the outbox relay, the subscribers, the durable consumers) and report their last activity.
+ */
+export type JobKind = 'scheduled' | 'continuous';
+
+/**
+ * How a run ended: `running` still, `succeeded`, `failed` with its error, `abandoned` (its lock went stale and was released), or `skipped` (another instance held it).
+ */
+export type JobRunOutcome = 'running' | 'succeeded' | 'failed' | 'abandoned' | 'skipped';
+
+/**
+ * One run of a job. Runs are kept 30 days; a frequent job's quiet runs, which found nothing to do, are counted on the job rather than kept.
+ */
+export type JobRun = {
+    /**
+     * The run.
+     */
+    id: string;
+    /**
+     * The job.
+     */
+    job: string;
+    /**
+     * When it started.
+     */
+    started_at: string;
+    /**
+     * When it finished; `null` while running.
+     */
+    finished_at: string | null;
+    /**
+     * How it ended.
+     */
+    outcome: JobRunOutcome;
+    /**
+     * How many items it processed.
+     */
+    items: number | null;
+    /**
+     * Its error.
+     */
+    error: string | null;
+    /**
+     * What started it: the schedule, or somebody asking to run it now.
+     */
+    trigger: 'schedule' | 'run_now';
+    /**
+     * Who asked to run it now.
+     */
+    requested_by: string | null;
+};
+
+/**
+ * A job of the registry: what it does, its schedule, its last run and the next, and whether it is late (overdue by twice its interval, which opens an alert).
+ */
+export type Job = {
+    /**
+     * The job, as the registry names it.
+     */
+    name: string;
+    /**
+     * Its name in words.
+     */
+    title: string;
+    /**
+     * The module that owns it.
+     */
+    module: string;
+    /**
+     * Who answers for it.
+     */
+    owner: string;
+    /**
+     * What it does.
+     */
+    description: string;
+    /**
+     * Scheduled or continuous.
+     */
+    kind: JobKind;
+    /**
+     * Its schedule, as said.
+     */
+    schedule: string;
+    /**
+     * Its interval in seconds; `null` for a continuous job or a daily one.
+     */
+    interval_seconds: number | null;
+    /**
+     * Its last run kept.
+     */
+    last_run: JobRun | null;
+    /**
+     * When it was last heard from: its last pass, quiet or not, or a continuous job's last work.
+     */
+    last_activity_at: string | null;
+    /**
+     * When it runs next; `null` for a continuous job.
+     */
+    next_run_at: string | null;
+    /**
+     * Whether it is overdue by twice its interval.
+     */
+    late: boolean;
+    /**
+     * Whether a run is under way.
+     */
+    running: boolean;
+    /**
+     * Whether it can be run now (scheduled jobs only).
+     */
+    runnable: boolean;
+};
+
+/**
+ * Every job of the registry.
+ */
+export type JobList = {
+    /**
+     * The jobs, by module and name.
+     */
+    items: Array<Job>;
+};
+
+/**
+ * A job's runs, newest first.
+ */
+export type JobRunPage = {
+    /**
+     * The runs.
+     */
+    items: Array<JobRun>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * `pending` (waiting to publish, perhaps backing off after a failure) or `failed` (given up after ten attempts until replayed).
+ */
+export type OutboxRowStatus = 'pending' | 'failed';
+
+/**
+ * An outbox row not published yet: its event, its attempts, when it is tried next and its last error.
+ */
+export type OutboxEntry = {
+    /**
+     * The event id; a replay publishes it again with the same id.
+     */
+    id: string;
+    /**
+     * The event type.
+     */
+    type: string;
+    /**
+     * Its payload version.
+     */
+    version: number;
+    /**
+     * When it happened.
+     */
+    occurred_at: string;
+    /**
+     * The Partner it belongs to.
+     */
+    partner_id: string | null;
+    /**
+     * Its correlation id.
+     */
+    correlation_id: string | null;
+    /**
+     * Pending or failed.
+     */
+    status: OutboxRowStatus;
+    /**
+     * Attempts so far.
+     */
+    attempts: number;
+    /**
+     * When it is tried next; `null` when failed or due now.
+     */
+    next_attempt_at: string | null;
+    /**
+     * Its last error.
+     */
+    last_error: string | null;
+    /**
+     * How old it is.
+     */
+    age_seconds: number;
+};
+
+/**
+ * Rows not published yet of one event type.
+ */
+export type OutboxTypeCount = {
+    /**
+     * The event type.
+     */
+    type: string;
+    /**
+     * Pending rows.
+     */
+    pending: number;
+    /**
+     * Failed rows.
+     */
+    failed: number;
+};
+
+/**
+ * The outbox's rows not published yet, counted.
+ */
+export type OutboxCounts = {
+    /**
+     * Pending rows.
+     */
+    pending: number;
+    /**
+     * Failed rows.
+     */
+    failed: number;
+    /**
+     * The oldest pending row's age.
+     */
+    oldest_pending_age_seconds: number | null;
+    /**
+     * The counts by event type.
+     */
+    by_type: Array<OutboxTypeCount>;
+};
+
+/**
+ * The outbox's pending and failed rows, oldest first, with their counts.
+ */
+export type OutboxPage = {
+    /**
+     * The counts, whatever the filter.
+     */
+    counts: OutboxCounts;
+    /**
+     * The rows, oldest first.
+     */
+    items: Array<OutboxEntry>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * What to replay: the rows named, or every failed row whose event occurred in a period.
+ */
+export type OutboxReplayInput = {
+    /**
+     * The rows, at most 100.
+     */
+    event_ids?: Array<string>;
+    /**
+     * Every failed row whose event occurred at or after this.
+     */
+    failed_from?: string | null;
+    /**
+     * And before this.
+     */
+    failed_to?: string | null;
+};
+
+/**
+ * What a replay reset to pending: each row is published again with its own event id, so a consumer that already took it does nothing twice.
+ */
+export type OutboxReplay = {
+    /**
+     * How many rows.
+     */
+    replayed: number;
+    /**
+     * The rows replayed.
+     */
+    event_ids: Array<string>;
 };
 
 /**
@@ -43974,6 +46135,10 @@ export type ListPlatformOrdersData = {
          */
         partner_id?: string;
         /**
+         * Only this customer's orders, newest first; with `scope` `all` for their whole history.
+         */
+        customer_id?: string;
+        /**
          * Only orders placed in this zone.
          */
         zone_id?: string;
@@ -45667,3 +47832,2345 @@ export type AskPlatformOrderDeliveryResponses = {
 };
 
 export type AskPlatformOrderDeliveryResponse = AskPlatformOrderDeliveryResponses[keyof AskPlatformOrderDeliveryResponses];
+
+export type GetOrderReviewData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/review';
+};
+
+export type GetOrderReviewErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOrderReviewError = GetOrderReviewErrors[keyof GetOrderReviewErrors];
+
+export type GetOrderReviewResponses = {
+    /**
+     * The order's rating state.
+     */
+    200: OrderReviewState;
+};
+
+export type GetOrderReviewResponse = GetOrderReviewResponses[keyof GetOrderReviewResponses];
+
+export type WriteOrderReviewData = {
+    /**
+     * The review.
+     */
+    body: OrderReviewInput;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/review';
+};
+
+export type WriteOrderReviewErrors = {
+    /**
+     * `validation_failed`: a note over 500 characters, more than three photos, a tag named twice.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of the customer's.
+     */
+    404: Problem;
+    /**
+     * `order_not_completed` (the order has not completed), `reviews_off` (the store takes no reviews), `tag_not_offered` (a tag its thumb or its way of ordering does not offer, such as "Late delivery" on a collection), `already_reviewed`, or `asset_not_usable` (a photo not uploaded for this order's review by this customer, or not stored); nothing is kept.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WriteOrderReviewError = WriteOrderReviewErrors[keyof WriteOrderReviewErrors];
+
+export type WriteOrderReviewResponses = {
+    /**
+     * The review, kept; the order thanks the customer.
+     */
+    201: OrderReviewState;
+};
+
+export type WriteOrderReviewResponse = WriteOrderReviewResponses[keyof WriteOrderReviewResponses];
+
+export type GrantReviewPhotoUploadData = {
+    /**
+     * What the photo is.
+     */
+    body: ReviewPhotoUpload;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/review/photo-uploads';
+};
+
+export type GrantReviewPhotoUploadErrors = {
+    /**
+     * `validation_failed` with `unsupported_file_type` or `file_too_large`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of the customer's.
+     */
+    404: Problem;
+    /**
+     * `order_not_completed`, `reviews_off`, `already_reviewed`, or `conflict` when ten photos were granted for the order already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GrantReviewPhotoUploadError = GrantReviewPhotoUploadErrors[keyof GrantReviewPhotoUploadErrors];
+
+export type GrantReviewPhotoUploadResponses = {
+    /**
+     * The reservation and the form to post the file with.
+     */
+    201: AssetGrant;
+};
+
+export type GrantReviewPhotoUploadResponse = GrantReviewPhotoUploadResponses[keyof GrantReviewPhotoUploadResponses];
+
+export type DeclineOrderReviewAskData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/review/not-now';
+};
+
+export type DeclineOrderReviewAskErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineOrderReviewAskError = DeclineOrderReviewAskErrors[keyof DeclineOrderReviewAskErrors];
+
+export type DeclineOrderReviewAskResponses = {
+    /**
+     * The order's rating state.
+     */
+    200: OrderReviewState;
+};
+
+export type DeclineOrderReviewAskResponse = DeclineOrderReviewAskResponses[keyof DeclineOrderReviewAskResponses];
+
+export type RateOrderDeliveryData = {
+    /**
+     * The rating.
+     */
+    body: DeliveryRatingInput;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/orders/{order_id}/delivery-rating';
+};
+
+export type RateOrderDeliveryErrors = {
+    /**
+     * `validation_failed`: a tag named twice.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such order of the customer's.
+     */
+    404: Problem;
+    /**
+     * `delivery_not_rateable` (no Agent delivered the order), `tag_not_offered`, or `already_rated`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RateOrderDeliveryError = RateOrderDeliveryErrors[keyof RateOrderDeliveryErrors];
+
+export type RateOrderDeliveryResponses = {
+    /**
+     * The order's rating state with the delivery's rating.
+     */
+    201: OrderReviewState;
+};
+
+export type RateOrderDeliveryResponse = RateOrderDeliveryResponses[keyof RateOrderDeliveryResponses];
+
+export type ListStoreReviewsData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 50; 20 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/storefront/stores/{location_id}/reviews';
+};
+
+export type ListStoreReviewsErrors = {
+    /**
+     * `validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * `not_found`: no such store live on the storefront.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStoreReviewsError = ListStoreReviewsErrors[keyof ListStoreReviewsErrors];
+
+export type ListStoreReviewsResponses = {
+    /**
+     * A page of the store's reviews.
+     */
+    200: StoreReviewPage;
+};
+
+export type ListStoreReviewsResponse = ListStoreReviewsResponses[keyof ListStoreReviewsResponses];
+
+export type ListPartnerLocationReviewsData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The period, all time by default.
+         */
+        period?: ReviewPeriod;
+        /**
+         * Only this thumb.
+         */
+        thumb?: ReviewThumb;
+        /**
+         * How many, 1 to 50; 20 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reviews';
+};
+
+export type ListPartnerLocationReviewsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `review:read` at the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner of the caller's, or no such store of it.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerLocationReviewsError = ListPartnerLocationReviewsErrors[keyof ListPartnerLocationReviewsErrors];
+
+export type ListPartnerLocationReviewsResponses = {
+    /**
+     * A page of the store's reviews.
+     */
+    200: PartnerReviewPage;
+};
+
+export type ListPartnerLocationReviewsResponse = ListPartnerLocationReviewsResponses[keyof ListPartnerLocationReviewsResponses];
+
+export type GetPartnerLocationReviewSummaryData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The period, all time by default.
+         */
+        period?: ReviewPeriod;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reviews/summary';
+};
+
+export type GetPartnerLocationReviewSummaryErrors = {
+    /**
+     * `validation_failed`: an unknown period.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `review:read` at the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner of the caller's, or no such store of it.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerLocationReviewSummaryError = GetPartnerLocationReviewSummaryErrors[keyof GetPartnerLocationReviewSummaryErrors];
+
+export type GetPartnerLocationReviewSummaryResponses = {
+    /**
+     * The period's figures.
+     */
+    200: ReviewSummary;
+};
+
+export type GetPartnerLocationReviewSummaryResponse = GetPartnerLocationReviewSummaryResponses[keyof GetPartnerLocationReviewSummaryResponses];
+
+export type WithdrawReviewReplyData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+        /**
+         * The review.
+         */
+        review_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reviews/{review_id}/reply';
+};
+
+export type WithdrawReviewReplyErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `review:reply` at the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such review of the store's, or no reply waiting or published.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WithdrawReviewReplyError = WithdrawReviewReplyErrors[keyof WithdrawReviewReplyErrors];
+
+export type WithdrawReviewReplyResponses = {
+    /**
+     * Withdrawn.
+     */
+    204: void;
+};
+
+export type WithdrawReviewReplyResponse = WithdrawReviewReplyResponses[keyof WithdrawReviewReplyResponses];
+
+export type ReplyToReviewData = {
+    /**
+     * The reply.
+     */
+    body: ReviewReplyInput;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+        /**
+         * The review.
+         */
+        review_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reviews/{review_id}/reply';
+};
+
+export type ReplyToReviewErrors = {
+    /**
+     * `validation_failed`: an empty reply or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `review:reply` at the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such review of the store's.
+     */
+    404: Problem;
+    /**
+     * `reply_not_allowed`, saying why: a reply waiting or published, one withdrawn, both replies used, a review the platform hid, or a review older than 90 days.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReplyToReviewError = ReplyToReviewErrors[keyof ReplyToReviewErrors];
+
+export type ReplyToReviewResponses = {
+    /**
+     * The reply, waiting for moderation.
+     */
+    201: ReviewReply;
+};
+
+export type ReplyToReviewResponse = ReplyToReviewResponses[keyof ReplyToReviewResponses];
+
+export type ListPartnerAgentRatingsData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/ratings';
+};
+
+export type ListPartnerAgentRatingsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read`, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Agent of the Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerAgentRatingsError = ListPartnerAgentRatingsErrors[keyof ListPartnerAgentRatingsErrors];
+
+export type ListPartnerAgentRatingsResponses = {
+    /**
+     * The Agent's ratings.
+     */
+    200: StaffAgentRatings;
+};
+
+export type ListPartnerAgentRatingsResponse = ListPartnerAgentRatingsResponses[keyof ListPartnerAgentRatingsResponses];
+
+export type ListPartnerRatingFlagsData = {
+    body?: never;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only flags in this state; open ones by default.
+         */
+        status?: RatingFlagStatus;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/rating-flags';
+};
+
+export type ListPartnerRatingFlagsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read`, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner of the caller's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerRatingFlagsError = ListPartnerRatingFlagsErrors[keyof ListPartnerRatingFlagsErrors];
+
+export type ListPartnerRatingFlagsResponses = {
+    /**
+     * A page of flags.
+     */
+    200: RatingFlagPage;
+};
+
+export type ListPartnerRatingFlagsResponse = ListPartnerRatingFlagsResponses[keyof ListPartnerRatingFlagsResponses];
+
+export type DecidePartnerRatingFlagData = {
+    /**
+     * The decision.
+     */
+    body: RatingFlagDecision;
+    path: {
+        /**
+         * The Partner.
+         */
+        partner_id: string;
+        /**
+         * The flag.
+         */
+        flag_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/rating-flags/{flag_id}/decision';
+};
+
+export type DecidePartnerRatingFlagErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage`, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such flag of the Partner's Agents.
+     */
+    404: Problem;
+    /**
+     * `flag_decided`: it was decided already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DecidePartnerRatingFlagError = DecidePartnerRatingFlagErrors[keyof DecidePartnerRatingFlagErrors];
+
+export type DecidePartnerRatingFlagResponses = {
+    /**
+     * The flag, decided.
+     */
+    200: RatingFlagDetail;
+};
+
+export type DecidePartnerRatingFlagResponse = DecidePartnerRatingFlagResponses[keyof DecidePartnerRatingFlagResponses];
+
+export type ListAgentRatingsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/agent/memberships/{agent_id}/ratings';
+};
+
+export type ListAgentRatingsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentRatingsError = ListAgentRatingsErrors[keyof ListAgentRatingsErrors];
+
+export type ListAgentRatingsResponses = {
+    /**
+     * The Agent's ratings.
+     */
+    200: AgentRatings;
+};
+
+export type ListAgentRatingsResponse = ListAgentRatingsResponses[keyof ListAgentRatingsResponses];
+
+export type FlagAgentRatingData = {
+    /**
+     * Why.
+     */
+    body: AgentRatingFlagInput;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The rating: a delivery rating's id, or an order review's.
+         */
+        rating_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/ratings/{rating_id}/flag';
+};
+
+export type FlagAgentRatingErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such rating of the caller's membership.
+     */
+    404: Problem;
+    /**
+     * `flag_window_closed` (older than 14 days) or `already_flagged`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type FlagAgentRatingError = FlagAgentRatingErrors[keyof FlagAgentRatingErrors];
+
+export type FlagAgentRatingResponses = {
+    /**
+     * The flag, open.
+     */
+    201: RatingFlag;
+};
+
+export type FlagAgentRatingResponse = FlagAgentRatingResponses[keyof FlagAgentRatingResponses];
+
+export type ListPlatformReviewsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this thumb.
+         */
+        thumb?: ReviewThumb;
+        /**
+         * Only reviews written at or after this.
+         */
+        from?: string;
+        /**
+         * Only reviews written before this.
+         */
+        to?: string;
+        /**
+         * Only this store's.
+         */
+        location_id?: string;
+        /**
+         * Only stores in this service area or beneath it.
+         */
+        service_area_id?: string;
+        /**
+         * Only orders this Agent carried.
+         */
+        agent_id?: string;
+        /**
+         * Only this order's.
+         */
+        order_id?: string;
+        /**
+         * Only hidden ones (`true`) or only shown ones (`false`).
+         */
+        hidden?: boolean;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/reviews';
+};
+
+export type ListPlatformReviewsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range, a range over a year (`range_too_long`), or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformReviewsError = ListPlatformReviewsErrors[keyof ListPlatformReviewsErrors];
+
+export type ListPlatformReviewsResponses = {
+    /**
+     * A page of reviews.
+     */
+    200: PlatformReviewPage;
+};
+
+export type ListPlatformReviewsResponse = ListPlatformReviewsResponses[keyof ListPlatformReviewsResponses];
+
+export type ListRatedLocationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Words of the store's name, at most 100 characters.
+         */
+        q?: string;
+        /**
+         * Only stores trading in this Vertical.
+         */
+        vertical_id?: string;
+        /**
+         * `rating` (lowest first), `-rating` (highest first, the default) or `last_reviewed` (most recent first); unrated stores last either way.
+         */
+        sort?: 'rating' | '-rating' | 'last_reviewed';
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/reviews/locations';
+};
+
+export type ListRatedLocationsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListRatedLocationsError = ListRatedLocationsErrors[keyof ListRatedLocationsErrors];
+
+export type ListRatedLocationsResponses = {
+    /**
+     * A page of stores with their ratings.
+     */
+    200: RatedLocationPage;
+};
+
+export type ListRatedLocationsResponse = ListRatedLocationsResponses[keyof ListRatedLocationsResponses];
+
+export type GetPlatformLocationRatingData = {
+    body?: never;
+    path: {
+        /**
+         * The store (a Location).
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The first day, on the store's clock.
+         */
+        from?: string;
+        /**
+         * The last day, on the store's clock.
+         */
+        to?: string;
+    };
+    url: '/v1/platform/locations/{location_id}/rating';
+};
+
+export type GetPlatformLocationRatingErrors = {
+    /**
+     * `validation_failed`: a range that ends before it starts, or one over a year (`range_too_long`), saying to ask for a shorter range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such store.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformLocationRatingError = GetPlatformLocationRatingErrors[keyof GetPlatformLocationRatingErrors];
+
+export type GetPlatformLocationRatingResponses = {
+    /**
+     * The store's rating over the range.
+     */
+    200: LocationRatingReport;
+};
+
+export type GetPlatformLocationRatingResponse = GetPlatformLocationRatingResponses[keyof GetPlatformLocationRatingResponses];
+
+export type HideReviewData = {
+    /**
+     * Why.
+     */
+    body: ReviewHide;
+    path: {
+        /**
+         * The review.
+         */
+        review_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reviews/{review_id}/hide';
+};
+
+export type HideReviewErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such review.
+     */
+    404: Problem;
+    /**
+     * `nothing_to_hide`: the review has neither note nor photos.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type HideReviewError = HideReviewErrors[keyof HideReviewErrors];
+
+export type HideReviewResponses = {
+    /**
+     * The review, hidden.
+     */
+    200: PlatformReview;
+};
+
+export type HideReviewResponse = HideReviewResponses[keyof HideReviewResponses];
+
+export type ShowReviewData = {
+    body?: never;
+    path: {
+        /**
+         * The review.
+         */
+        review_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reviews/{review_id}/show';
+};
+
+export type ShowReviewErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such review.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ShowReviewError = ShowReviewErrors[keyof ShowReviewErrors];
+
+export type ShowReviewResponses = {
+    /**
+     * The review, shown.
+     */
+    200: PlatformReview;
+};
+
+export type ShowReviewResponse = ShowReviewResponses[keyof ShowReviewResponses];
+
+export type ListReviewRepliesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only replies in this state; `pending` by default.
+         */
+        status?: ReviewReplyStatus;
+        /**
+         * Only this store's.
+         */
+        location_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/review-replies';
+};
+
+export type ListReviewRepliesErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListReviewRepliesError = ListReviewRepliesErrors[keyof ListReviewRepliesErrors];
+
+export type ListReviewRepliesResponses = {
+    /**
+     * A page of replies.
+     */
+    200: ModeratedReplyPage;
+};
+
+export type ListReviewRepliesResponse = ListReviewRepliesResponses[keyof ListReviewRepliesResponses];
+
+export type ApproveReviewReplyData = {
+    body?: never;
+    path: {
+        /**
+         * The reply.
+         */
+        reply_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/review-replies/{reply_id}/approve';
+};
+
+export type ApproveReviewReplyErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such reply.
+     */
+    404: Problem;
+    /**
+     * `reply_decided`: it was approved, rejected or withdrawn already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveReviewReplyError = ApproveReviewReplyErrors[keyof ApproveReviewReplyErrors];
+
+export type ApproveReviewReplyResponses = {
+    /**
+     * The reply, approved.
+     */
+    200: ModeratedReply;
+};
+
+export type ApproveReviewReplyResponse = ApproveReviewReplyResponses[keyof ApproveReviewReplyResponses];
+
+export type RejectReviewReplyData = {
+    /**
+     * Why.
+     */
+    body: ReplyRejection;
+    path: {
+        /**
+         * The reply.
+         */
+        reply_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/review-replies/{reply_id}/reject';
+};
+
+export type RejectReviewReplyErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such reply.
+     */
+    404: Problem;
+    /**
+     * `reply_decided`: it was approved, rejected or withdrawn already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RejectReviewReplyError = RejectReviewReplyErrors[keyof RejectReviewReplyErrors];
+
+export type RejectReviewReplyResponses = {
+    /**
+     * The reply, rejected.
+     */
+    200: ModeratedReply;
+};
+
+export type RejectReviewReplyResponse = RejectReviewReplyResponses[keyof RejectReviewReplyResponses];
+
+export type ListPlatformAgentRatingsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agents/{agent_id}/ratings';
+};
+
+export type ListPlatformAgentRatingsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Agent.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformAgentRatingsError = ListPlatformAgentRatingsErrors[keyof ListPlatformAgentRatingsErrors];
+
+export type ListPlatformAgentRatingsResponses = {
+    /**
+     * The Agent's ratings.
+     */
+    200: StaffAgentRatings;
+};
+
+export type ListPlatformAgentRatingsResponse = ListPlatformAgentRatingsResponses[keyof ListPlatformAgentRatingsResponses];
+
+export type ListPlatformRatingFlagsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only flags in this state; open ones by default.
+         */
+        status?: RatingFlagStatus;
+        /**
+         * Only this Partner's Agents'; the platform fleet's by default.
+         */
+        partner_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/rating-flags';
+};
+
+export type ListPlatformRatingFlagsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformRatingFlagsError = ListPlatformRatingFlagsErrors[keyof ListPlatformRatingFlagsErrors];
+
+export type ListPlatformRatingFlagsResponses = {
+    /**
+     * A page of flags.
+     */
+    200: RatingFlagPage;
+};
+
+export type ListPlatformRatingFlagsResponse = ListPlatformRatingFlagsResponses[keyof ListPlatformRatingFlagsResponses];
+
+export type DecidePlatformRatingFlagData = {
+    /**
+     * The decision.
+     */
+    body: RatingFlagDecision;
+    path: {
+        /**
+         * The flag.
+         */
+        flag_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/rating-flags/{flag_id}/decision';
+};
+
+export type DecidePlatformRatingFlagErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks the permission) or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such flag.
+     */
+    404: Problem;
+    /**
+     * `flag_decided`: it was decided already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DecidePlatformRatingFlagError = DecidePlatformRatingFlagErrors[keyof DecidePlatformRatingFlagErrors];
+
+export type DecidePlatformRatingFlagResponses = {
+    /**
+     * The flag, decided.
+     */
+    200: RatingFlagDetail;
+};
+
+export type DecidePlatformRatingFlagResponse = DecidePlatformRatingFlagResponses[keyof DecidePlatformRatingFlagResponses];
+
+export type ListPlatformCustomersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * What the caller said: an id, digits of a mobile number, part of an email, or words of a name; at most 100 characters.
+         */
+        q?: string;
+        /**
+         * Only customers who joined at or after this.
+         */
+        joined_from?: string;
+        /**
+         * Only customers who joined before this.
+         */
+        joined_to?: string;
+        /**
+         * 25, 50 or 100; 25 by default.
+         */
+        limit?: 25 | 50 | 100;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/customers';
+};
+
+export type ListPlatformCustomersErrors = {
+    /**
+     * `validation_failed`: fewer than three digits of a number, a limit other than 25, 50 or 100, or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformCustomersError = ListPlatformCustomersErrors[keyof ListPlatformCustomersErrors];
+
+export type ListPlatformCustomersResponses = {
+    /**
+     * A page of customers.
+     */
+    200: PlatformCustomerPage;
+};
+
+export type ListPlatformCustomersResponse = ListPlatformCustomersResponses[keyof ListPlatformCustomersResponses];
+
+export type GetPlatformCustomerSummaryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Customers who joined at or after this; all time without it.
+         */
+        joined_from?: string;
+        /**
+         * Customers who joined before this.
+         */
+        joined_to?: string;
+    };
+    url: '/v1/platform/customers/summary';
+};
+
+export type GetPlatformCustomerSummaryErrors = {
+    /**
+     * `validation_failed`: a range that ends before it starts.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformCustomerSummaryError = GetPlatformCustomerSummaryErrors[keyof GetPlatformCustomerSummaryErrors];
+
+export type GetPlatformCustomerSummaryResponses = {
+    /**
+     * The count.
+     */
+    200: PlatformCustomerSummary;
+};
+
+export type GetPlatformCustomerSummaryResponse = GetPlatformCustomerSummaryResponses[keyof GetPlatformCustomerSummaryResponses];
+
+export type GetPlatformCustomerData = {
+    body?: never;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}';
+};
+
+export type GetPlatformCustomerErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformCustomerError = GetPlatformCustomerErrors[keyof GetPlatformCustomerErrors];
+
+export type GetPlatformCustomerResponses = {
+    /**
+     * The customer.
+     */
+    200: PlatformCustomer;
+};
+
+export type GetPlatformCustomerResponse = GetPlatformCustomerResponses[keyof GetPlatformCustomerResponses];
+
+export type ListCustomerTimelineData = {
+    body?: never;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/customers/{customer_id}/timeline';
+};
+
+export type ListCustomerTimelineErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerTimelineError = ListCustomerTimelineErrors[keyof ListCustomerTimelineErrors];
+
+export type ListCustomerTimelineResponses = {
+    /**
+     * A page of the timeline.
+     */
+    200: CustomerTimelinePage;
+};
+
+export type ListCustomerTimelineResponse = ListCustomerTimelineResponses[keyof ListCustomerTimelineResponses];
+
+export type ListCustomerNotesData = {
+    body?: never;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/notes';
+};
+
+export type ListCustomerNotesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerNotesError = ListCustomerNotesErrors[keyof ListCustomerNotesErrors];
+
+export type ListCustomerNotesResponses = {
+    /**
+     * The notes.
+     */
+    200: CustomerNoteList;
+};
+
+export type ListCustomerNotesResponse = ListCustomerNotesResponses[keyof ListCustomerNotesResponses];
+
+export type WriteCustomerNoteData = {
+    /**
+     * The note.
+     */
+    body: CustomerNoteInput;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/notes';
+};
+
+export type WriteCustomerNoteErrors = {
+    /**
+     * `validation_failed`: an empty note, or `note_too_long`, saying a note is 2,000 characters at most and how long this one is.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:note`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WriteCustomerNoteError = WriteCustomerNoteErrors[keyof WriteCustomerNoteErrors];
+
+export type WriteCustomerNoteResponses = {
+    /**
+     * The note, kept.
+     */
+    201: CustomerNote;
+};
+
+export type WriteCustomerNoteResponse = WriteCustomerNoteResponses[keyof WriteCustomerNoteResponses];
+
+export type BlockCustomerData = {
+    /**
+     * Why.
+     */
+    body: CustomerBlockInput;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/block';
+};
+
+export type BlockCustomerErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:block`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`: the account is blocked already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type BlockCustomerError = BlockCustomerErrors[keyof BlockCustomerErrors];
+
+export type BlockCustomerResponses = {
+    /**
+     * The customer, blocked.
+     */
+    200: PlatformCustomer;
+};
+
+export type BlockCustomerResponse = BlockCustomerResponses[keyof BlockCustomerResponses];
+
+export type UnblockCustomerData = {
+    /**
+     * Why.
+     */
+    body: CustomerBlockInput;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/unblock';
+};
+
+export type UnblockCustomerErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:block`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`: the account is not blocked.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UnblockCustomerError = UnblockCustomerErrors[keyof UnblockCustomerErrors];
+
+export type UnblockCustomerResponses = {
+    /**
+     * The customer, active again.
+     */
+    200: PlatformCustomer;
+};
+
+export type UnblockCustomerResponse = UnblockCustomerResponses[keyof UnblockCustomerResponses];
+
+export type ListObjectivesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/operations/objectives';
+};
+
+export type ListObjectivesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListObjectivesError = ListObjectivesErrors[keyof ListObjectivesErrors];
+
+export type ListObjectivesResponses = {
+    /**
+     * The objectives.
+     */
+    200: ObjectiveList;
+};
+
+export type ListObjectivesResponse = ListObjectivesResponses[keyof ListObjectivesResponses];
+
+export type ListAlertsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `open` (open and acknowledged ones) or `all`; `all` by default.
+         */
+        status?: 'open' | 'all';
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/operations/alerts';
+};
+
+export type ListAlertsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAlertsError = ListAlertsErrors[keyof ListAlertsErrors];
+
+export type ListAlertsResponses = {
+    /**
+     * A page of alerts.
+     */
+    200: AlertList;
+};
+
+export type ListAlertsResponse = ListAlertsResponses[keyof ListAlertsResponses];
+
+export type AcknowledgeAlertData = {
+    body?: never;
+    path: {
+        /**
+         * The alert.
+         */
+        alert_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/operations/alerts/{alert_id}/acknowledge';
+};
+
+export type AcknowledgeAlertErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `operations:manage`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such alert.
+     */
+    404: Problem;
+    /**
+     * `illegal_transition`: the alert is closed.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcknowledgeAlertError = AcknowledgeAlertErrors[keyof AcknowledgeAlertErrors];
+
+export type AcknowledgeAlertResponses = {
+    /**
+     * The alert, acknowledged.
+     */
+    200: Alert;
+};
+
+export type AcknowledgeAlertResponse = AcknowledgeAlertResponses[keyof AcknowledgeAlertResponses];
+
+export type ListJobsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/operations/jobs';
+};
+
+export type ListJobsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListJobsError = ListJobsErrors[keyof ListJobsErrors];
+
+export type ListJobsResponses = {
+    /**
+     * The jobs.
+     */
+    200: JobList;
+};
+
+export type ListJobsResponse = ListJobsResponses[keyof ListJobsResponses];
+
+export type ListJobRunsData = {
+    body?: never;
+    path: {
+        /**
+         * The job, as the registry names it.
+         */
+        job: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/operations/jobs/{job}/runs';
+};
+
+export type ListJobRunsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such job.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListJobRunsError = ListJobRunsErrors[keyof ListJobRunsErrors];
+
+export type ListJobRunsResponses = {
+    /**
+     * A page of runs.
+     */
+    200: JobRunPage;
+};
+
+export type ListJobRunsResponse = ListJobRunsResponses[keyof ListJobRunsResponses];
+
+export type RunJobNowData = {
+    body?: never;
+    path: {
+        /**
+         * The job, as the registry names it.
+         */
+        job: string;
+    };
+    query?: never;
+    url: '/v1/platform/operations/jobs/{job}/run';
+};
+
+export type RunJobNowErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `operations:manage`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such job.
+     */
+    404: Problem;
+    /**
+     * `job_running` (a run is under way) or `job_not_runnable` (a continuous job, which runs all the time).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RunJobNowError = RunJobNowErrors[keyof RunJobNowErrors];
+
+export type RunJobNowResponses = {
+    /**
+     * The run asked for.
+     */
+    202: Job;
+};
+
+export type RunJobNowResponse = RunJobNowResponses[keyof RunJobNowResponses];
+
+export type ListOutboxData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only `pending` or only `failed` rows; both by default.
+         */
+        status?: OutboxRowStatus;
+        /**
+         * Only this event type.
+         */
+        type?: string;
+        /**
+         * Only this Partner's events.
+         */
+        partner_id?: string;
+        /**
+         * Only events with this correlation id.
+         */
+        correlation_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/operations/outbox';
+};
+
+export type ListOutboxErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: not a Mission Control token.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOutboxError = ListOutboxErrors[keyof ListOutboxErrors];
+
+export type ListOutboxResponses = {
+    /**
+     * A page of rows with the counts.
+     */
+    200: OutboxPage;
+};
+
+export type ListOutboxResponse = ListOutboxResponses[keyof ListOutboxResponses];
+
+export type ReplayOutboxData = {
+    /**
+     * What to replay.
+     */
+    body: OutboxReplayInput;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/operations/outbox/replay';
+};
+
+export type ReplayOutboxErrors = {
+    /**
+     * `validation_failed`: neither rows nor a period, more than 100 rows, or a period that ends before it starts.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `operations:manage`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReplayOutboxError = ReplayOutboxErrors[keyof ReplayOutboxErrors];
+
+export type ReplayOutboxResponses = {
+    /**
+     * What was reset.
+     */
+    200: OutboxReplay;
+};
+
+export type ReplayOutboxResponse = ReplayOutboxResponses[keyof ReplayOutboxResponses];

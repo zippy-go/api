@@ -1,0 +1,14 @@
+type: object
+description: "Why a reply is rejected, for the Partner to read."
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Replies may not carry a phone number."
+    description: "The reason, at most 300 characters."
+examples:
+  - reason: "Replies may not carry a phone number."

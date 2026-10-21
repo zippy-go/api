@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reviews.task_rating.written.v1.schema.json",
+  "title": "ReviewsTaskRatingWrittenPayload",
+  "description": "Payload of `reviews.task_rating.written` version 1: a customer rated the delivery of their order, apart from the food, for the Agent who carried it. The envelope's `partner_id` is the Agent's Partner, the platform fleet's for its Agents, and its `correlation_id` follows the order. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "rating_id",
+    "order_id",
+    "number",
+    "delivery_id",
+    "agent_id",
+    "partner_id",
+    "location_id",
+    "customer_id",
+    "thumb",
+    "tags",
+    "at"
+  ],
+  "properties": {
+    "rating_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The rating.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "delivery_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The delivery, when dispatch made one.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0006"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent who carried it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "thumb": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down"
+      ],
+      "description": "The thumb.",
+      "examples": [
+        "down"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The tag codes chosen.",
+      "examples": [
+        [
+          "on_time"
+        ]
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

@@ -1,0 +1,89 @@
+# Path item for /v1/platform/operations/outbox. Referenced from openapi.yaml.
+get:
+  operationId: listOutbox
+  summary: "Read the outbox"
+  description: "The outbox's rows not published yet, oldest first: pending ones (perhaps backing off after a failure, at 5 seconds, 30 seconds, 2, 10 and 30 minutes) and failed ones (given up after ten attempts), with their age, attempts, next attempt and last error, and the counts by type with the oldest pending age. A failed row present for five minutes opens an alert. Mission Control tokens only."
+  tags:
+    - Operations
+  security:
+    - Bearer: []
+  parameters:
+    - name: status
+      in: query
+      required: false
+      description: "Only `pending` or only `failed` rows; both by default."
+      schema:
+        $ref: ../../components/schemas/operations/OutboxRowStatus.yaml
+    - name: type
+      in: query
+      required: false
+      description: "Only this event type."
+      schema:
+        type: string
+        maxLength: 100
+    - name: partner_id
+      in: query
+      required: false
+      description: "Only this Partner's events."
+      schema:
+        type: string
+        format: uuid
+    - name: correlation_id
+      in: query
+      required: false
+      description: "Only events with this correlation id."
+      schema:
+        type: string
+        maxLength: 100
+    - name: limit
+      in: query
+      required: false
+      description: "How many, 1 to 100; 50 by default."
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "A page of rows with the counts."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/operations/OutboxPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: not a Mission Control token."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

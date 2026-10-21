@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.customer.unblocked.v1.schema.json",
+  "title": "CustomersCustomerUnblockedPayload",
+  "description": "Payload of `customers.customer.unblocked` version 1: support unblocked a customer's account with a reason; they can sign in again with nothing else changed. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "customer_id",
+    "by",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who acted.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why, as support wrote it.",
+      "examples": [
+        "Spoke to the customer; warned"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

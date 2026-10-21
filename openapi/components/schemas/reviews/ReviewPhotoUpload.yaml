@@ -1,0 +1,27 @@
+type: object
+description: "A photo the customer is about to upload for their review of one order."
+required:
+  - file_name
+  - content_type
+  - size_bytes
+properties:
+  file_name:
+    type: string
+    examples:
+      - biryani.jpg
+    description: "The file name."
+  content_type:
+    type: string
+    examples:
+      - image/jpeg
+    description: "Its type: `image/jpeg`, `image/png` or `image/webp`."
+  size_bytes:
+    type: integer
+    format: int64
+    examples:
+      - 482113
+    description: "Its size in bytes, at most 10 MB."
+examples:
+  - file_name: biryani.jpg
+    content_type: image/jpeg
+    size_bytes: 482113

@@ -1,0 +1,9 @@
+type: string
+description: "Whether something may be rated now: `waiting` until the order completes, `open`, `written` once rated, `unavailable` at a store that takes no reviews, for an order that ended without completing, or for a delivery no Agent carried."
+enum:
+  - waiting
+  - open
+  - written
+  - unavailable
+examples:
+  - open

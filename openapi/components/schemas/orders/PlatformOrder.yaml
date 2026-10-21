@@ -47,6 +47,16 @@ properties:
     examples:
       - Dev Kitchen Gachibowli
     description: The store's name as it was.
+  review:
+    oneOf:
+      - $ref: ../reviews/OrderReviewSummary.yaml
+      - type: "null"
+    description: "The customer's review of the order, hidden note included; `null` until written. Since 0.19.0."
+  delivery_rating:
+    oneOf:
+      - $ref: ../reviews/DeliveryRating.yaml
+      - type: "null"
+    description: "The customer's rating of the delivery; `null` until given or for an order no Agent carried. Since 0.19.0."
 examples:
   - order:
       id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
@@ -281,3 +291,19 @@ examples:
       - not_answered
     commission_percent: 12
     store_name: Dev Kitchen Gachibowli
+    review:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      thumb: down
+      tags:
+        - code: cold_damaged
+          label: Cold/damaged
+      note: "The biryani arrived cold."
+      hidden: false
+      created_at: "2026-10-22T10:10:00Z"
+    delivery_rating:
+      id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+      thumb: up
+      tags:
+        - code: on_time
+          label: "On time"
+      created_at: "2026-10-22T10:11:00Z"

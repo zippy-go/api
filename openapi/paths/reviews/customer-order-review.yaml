@@ -1,0 +1,119 @@
+# Path item for /v1/customer/orders/{order_id}/review. Referenced from openapi.yaml.
+parameters:
+  - name: order_id
+    in: path
+    required: true
+    description: "The order."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+get:
+  operationId: getOrderReview
+  summary: "Read how the order may be rated"
+  description: "\"How was your order?\": whether the order may be reviewed now (`waiting` until it completes, `open`, `written`, or `unavailable` at a store that takes no reviews and for an order that ended without completing), the review once written with the store's published reply, the tags offered under each thumb (\"Late delivery\" only on a delivery), whether the customer said \"Not now\", and the delivery's own rating (\"How was your delivery?\") for an order an Agent carried. The customer's own orders only; any other order is not found."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The order's rating state."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/OrderReviewState.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such order of the customer's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: writeOrderReview
+  summary: "Review an order"
+  description: "Reviews a completed order once, never edited: a thumb, tags from that thumb's list (as many as apply), an optional note of at most 500 characters and at most three photos uploaded for this order. Two reviews sent at the same moment keep one; the other is refused as already written. Publishes `reviews.review.written`."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The review."
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/OrderReviewInput.yaml
+  responses:
+    "201":
+      description: "The review, kept; the order thanks the customer."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/OrderReviewState.yaml
+    "400":
+      description: "`validation_failed`: a note over 500 characters, more than three photos, a tag named twice."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such order of the customer's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`order_not_completed` (the order has not completed), `reviews_off` (the store takes no reviews), `tag_not_offered` (a tag its thumb or its way of ordering does not offer, such as \"Late delivery\" on a collection), `already_reviewed`, or `asset_not_usable` (a photo not uploaded for this order's review by this customer, or not stored); nothing is kept."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

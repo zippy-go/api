@@ -1,0 +1,35 @@
+type: object
+description: "Every job of the registry."
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Job.yaml
+    description: "The jobs, by module and name."
+examples:
+  - items:
+      - name: review_asks
+        title: "Review asks"
+        module: reviews
+        owner: reviews
+        description: "Asks customers how their order was, once, five to thirty minutes after it completed."
+        kind: scheduled
+        schedule: "every minute"
+        interval_seconds: 60
+        last_run:
+          id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0009"
+          job: review_asks
+          started_at: "2026-10-22T10:00:00Z"
+          finished_at: "2026-10-22T10:00:01Z"
+          outcome: succeeded
+          items: 2
+          error: null
+          trigger: run_now
+          requested_by: "Platform admin"
+        last_activity_at: "2026-10-22T10:00:01Z"
+        next_run_at: "2026-10-22T10:01:00Z"
+        late: false
+        running: false
+        runnable: true

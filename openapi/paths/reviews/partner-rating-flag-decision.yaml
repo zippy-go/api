@@ -1,0 +1,82 @@
+# Path item for /v1/partners/{partner_id}/rating-flags/{flag_id}/decision. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: "The Partner."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000001"
+  - name: flag_id
+    in: path
+    required: true
+    description: "The flag."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004"
+post:
+  operationId: decidePartnerRatingFlag
+  summary: "Decide a flag"
+  description: "Decides a flag one of the Partner's own Agents raised: `exclude` stops the rating counting for the Agent with the reason kept (the order's review is unchanged), `keep` leaves it. Publishes `reviews.flag.decided`. `agent:manage` at the Partner."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The decision."
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/RatingFlagDecision.yaml
+  responses:
+    "200":
+      description: "The flag, decided."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/RatingFlagDetail.yaml
+    "400":
+      description: "`validation_failed`: an empty reason or one over 300 characters."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:manage`, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such flag of the Partner's Agents."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`flag_decided`: it was decided already."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

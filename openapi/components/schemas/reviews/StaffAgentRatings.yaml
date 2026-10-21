@@ -1,0 +1,97 @@
+type: object
+description: "An Agent's ratings for the Partner's console (its own Agents) and Mission Control: the rating that counts, beside the share among reviews of the orders they carried and among delivery ratings, and every rating newest first."
+required:
+  - agent_id
+  - agent_name
+  - partner_id
+  - rating
+  - from_reviews
+  - from_deliveries
+  - window_days
+  - items
+  - next_cursor
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: "The Agent membership."
+  agent_name:
+    type: string
+    examples:
+      - "Ravi Kumar"
+    description: "The Agent's name."
+  partner_id:
+    type: string
+    format: uuid
+    description: "The Agent's Partner."
+  rating:
+    oneOf:
+      - $ref: ./AgentRatingFigure.yaml
+      - type: "null"
+    description: "The rating that counts; `null` with none in the window."
+  from_reviews:
+    oneOf:
+      - $ref: ./RatingShare.yaml
+      - type: "null"
+    description: "The share of thumbs up among the reviews of orders they carried in the window, for reading only."
+  from_deliveries:
+    oneOf:
+      - $ref: ./RatingShare.yaml
+      - type: "null"
+    description: "The share of thumbs up among their delivery ratings in the window."
+  window_days:
+    type: integer
+    examples:
+      - 90
+    description: "The days the rating covers, 90."
+  items:
+    type: array
+    items:
+      $ref: ./StaffAgentRating.yaml
+    description: "The ratings, newest first."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    examples:
+      - eyJ2IjoxfQ.c2ln
+    description: "The cursor of the next page; `null` on the last."
+examples:
+  - agent_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+    agent_name: "Ravi Kumar"
+    partner_id: "01a13a48-9e00-7000-8000-000000000002"
+    rating:
+      percent: 80
+      count: 5
+      from: "2026-07-24T10:00:00Z"
+      to: "2026-10-22T10:00:00Z"
+    from_reviews:
+      percent: 80
+      count: 5
+    from_deliveries:
+      percent: 80
+      count: 5
+    window_days: 90
+    items:
+      - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+        source: delivery_rating
+        thumb: down
+        tags:
+          - code: late
+            label: Late
+        at: "2026-10-22T10:11:00Z"
+        order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+        order_number: AB0042
+        location_id: "01a13a48-9e00-7000-8000-000000000301"
+        store_name: "Dev Kitchen Gachibowli"
+        counts: false
+        not_counted_reason: excluded
+        flag:
+          id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004"
+          status: excluded
+          reason: "The store handed it over 40 minutes late."
+          flagged_at: "2026-10-22T12:00:00Z"
+          due_by: "2026-10-29T12:00:00Z"
+          decided_at: "2026-10-23T09:00:00Z"
+          decision_reason: "Late at the store, not the Agent"
+    next_cursor: null

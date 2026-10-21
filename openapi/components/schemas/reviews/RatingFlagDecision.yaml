@@ -1,0 +1,24 @@
+type: object
+description: "A decision on a flag: `exclude` the rating, which stops counting with the reason kept, or `keep` it."
+required:
+  - outcome
+  - reason
+properties:
+  outcome:
+    type: string
+    enum:
+      - exclude
+      - keep
+    description: "Exclude the rating, or keep it."
+    examples:
+      - exclude
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Late at the store, not the Agent"
+    description: "The reason, at most 300 characters."
+examples:
+  - outcome: exclude
+    reason: "Late at the store, not the Agent"

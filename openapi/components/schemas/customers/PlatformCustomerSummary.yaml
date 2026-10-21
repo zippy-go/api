@@ -1,0 +1,29 @@
+type: object
+description: "How many customers joined in the days chosen, whatever is typed in the search box. The orders and the average order value for the same days come from the orders report."
+required:
+  - from
+  - to
+  - joined
+properties:
+  from:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "Where the days start; `null` for all time."
+  to:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "Where they end; `null` for now."
+  joined:
+    type: integer
+    minimum: 0
+    examples:
+      - 42
+    description: "Customers who joined."
+examples:
+  - from: "2026-09-01T00:00:00+05:30"
+    to: "2026-10-01T00:00:00+05:30"
+    joined: 42

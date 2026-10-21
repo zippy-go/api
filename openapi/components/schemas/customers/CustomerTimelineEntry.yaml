@@ -1,0 +1,60 @@
+type: object
+description: "One dated entry of a customer's timeline, drawn from the domain events."
+required:
+  - id
+  - at
+  - kind
+  - summary
+  - actor
+  - order_id
+  - order_number
+  - event_type
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The entry: the id of the event it was drawn from."
+  at:
+    type: string
+    format: date-time
+    description: "When it happened."
+  kind:
+    $ref: ./CustomerTimelineKind.yaml
+    description: "What happened."
+  summary:
+    type: string
+    examples:
+      - "Placed order AB0042 at Dev Kitchen Gachibowli for ₹580.00"
+    description: "What happened, in a sentence."
+  actor:
+    $ref: ./CustomerTimelineActor.yaml
+    description: "Who did it."
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The order it was about."
+  order_number:
+    type:
+      - string
+      - "null"
+    examples:
+      - AB0042
+    description: "Its number."
+  event_type:
+    type: string
+    examples:
+      - ordering.order.placed
+    description: "The event it was drawn from."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000c"
+    at: "2026-10-20T13:00:00Z"
+    kind: order_placed
+    summary: "Placed order AB0042 at Dev Kitchen Gachibowli for ₹580.00"
+    actor:
+      kind: customer
+      name: Ana
+    order_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+    order_number: AB0042
+    event_type: ordering.order.placed

@@ -1,0 +1,75 @@
+type: object
+description: "One run of a job. Runs are kept 30 days; a frequent job's quiet runs, which found nothing to do, are counted on the job rather than kept."
+required:
+  - id
+  - job
+  - started_at
+  - finished_at
+  - outcome
+  - items
+  - error
+  - trigger
+  - requested_by
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The run."
+  job:
+    type: string
+    examples:
+      - review_asks
+    description: "The job."
+  started_at:
+    type: string
+    format: date-time
+    description: "When it started."
+  finished_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it finished; `null` while running."
+  outcome:
+    $ref: ./JobRunOutcome.yaml
+    description: "How it ended."
+  items:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    examples:
+      - 2
+    description: "How many items it processed."
+  error:
+    type:
+      - string
+      - "null"
+    examples:
+      - "database: connection refused"
+    description: "Its error."
+  trigger:
+    type: string
+    enum:
+      - schedule
+      - run_now
+    description: "What started it: the schedule, or somebody asking to run it now."
+    examples:
+      - run_now
+  requested_by:
+    type:
+      - string
+      - "null"
+    examples:
+      - "Platform admin"
+    description: "Who asked to run it now."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0009"
+    job: review_asks
+    started_at: "2026-10-22T10:00:00Z"
+    finished_at: "2026-10-22T10:00:01Z"
+    outcome: succeeded
+    items: 2
+    error: null
+    trigger: run_now
+    requested_by: "Platform admin"

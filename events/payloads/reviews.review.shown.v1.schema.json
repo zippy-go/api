@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reviews.review.shown.v1.schema.json",
+  "title": "ReviewsReviewShownPayload",
+  "description": "Payload of `reviews.review.shown` version 1: a platform member showed a review's note and photos. The envelope's `partner_id` is the store's Partner. The payload carries no note text and no reason. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "review_id",
+    "order_id",
+    "location_id",
+    "partner_id",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The review.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who acted.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+type: object
+description: "A review as customers read it on a store's page: the reviewer's first name, the thumb, the tags, the note unless the platform hid it, delivered or collected, when, and the store's published reply. Never the order and never the photos."
+required:
+  - id
+  - first_name
+  - thumb
+  - tags
+  - note
+  - note_hidden
+  - fulfilment
+  - created_at
+  - reply
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The review."
+  first_name:
+    type: string
+    examples:
+      - Asha
+    description: "The reviewer's first name; \"A customer\" once their account is erased."
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: "Up or down."
+  tags:
+    type: array
+    items:
+      $ref: ./ReviewTagOption.yaml
+    description: "The tags chosen."
+  note:
+    type:
+      - string
+      - "null"
+    examples:
+      - "The biryani arrived cold."
+    description: "The note; `null` when there is none or the platform hid it."
+  note_hidden:
+    type: boolean
+    description: "Whether the platform hid the note; the thumb and tags still count."
+  fulfilment:
+    $ref: ./ReviewFulfilment.yaml
+    description: "Delivered or collected."
+  created_at:
+    type: string
+    format: date-time
+    description: "When it was written."
+  reply:
+    oneOf:
+      - $ref: ./PublishedReply.yaml
+      - type: "null"
+    description: "The store's published reply."
+examples:
+  - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+    first_name: Asha
+    thumb: down
+    tags:
+      - code: cold_damaged
+        label: Cold/damaged
+    note: "The biryani arrived cold."
+    note_hidden: false
+    fulfilment: delivered
+    created_at: "2026-10-22T10:10:00Z"
+    reply:
+      text: "Sorry, we have changed our packaging"
+      store_name: "Dev Kitchen Gachibowli"
+      published_at: "2026-10-22T11:00:00Z"

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reviews.flag.decided.v1.schema.json",
+  "title": "ReviewsFlagDecidedPayload",
+  "description": "Payload of `reviews.flag.decided` version 1: an Agent's flag on a rating was decided, by the Partner for its own Agents or by Mission Control for the platform fleet's. The envelope's `partner_id` is the Agent's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "flag_id",
+    "rating_id",
+    "source",
+    "agent_id",
+    "partner_id",
+    "outcome",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "flag_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The flag.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0004"
+      ]
+    },
+    "rating_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The rating.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "delivery_rating",
+        "order_review"
+      ],
+      "description": "Where the rating came from.",
+      "examples": [
+        "delivery_rating"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "excluded",
+        "kept"
+      ],
+      "description": "The decision.",
+      "examples": [
+        "excluded"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who decided it: a platform member or one of the Partner's.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c000d"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-22T10:10:00Z"
+      ]
+    }
+  }
+}

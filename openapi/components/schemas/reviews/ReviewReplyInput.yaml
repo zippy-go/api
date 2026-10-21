@@ -1,0 +1,14 @@
+type: object
+description: "A reply to a review: one per review, at most 300 characters, within 90 days of it; it waits for the platform's moderation."
+required:
+  - text
+properties:
+  text:
+    type: string
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Sorry, we have changed our packaging"
+    description: "The reply."
+examples:
+  - text: "Sorry, we have changed our packaging"

@@ -1,0 +1,23 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0007",
+  "type": "reviews.task_rating.written",
+  "version": 1,
+  "occurred_at": "2026-10-22T10:11:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c99",
+  "payload": {
+    "rating_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0003",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0006",
+    "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "thumb": "up",
+    "tags": [
+      "on_time"
+    ],
+    "at": "2026-10-22T10:11:00Z"
+  }
+}

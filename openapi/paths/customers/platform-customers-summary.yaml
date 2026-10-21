@@ -1,0 +1,61 @@
+# Path item for /v1/platform/customers/summary. Referenced from openapi.yaml.
+get:
+  operationId: getPlatformCustomerSummary
+  summary: "Count the customers who joined"
+  description: "How many customers joined in the days chosen, whatever is typed in the search box. The orders placed and the average order value for the same days are the orders report's (`GET /v1/platform/reports/orders`). Mission Control tokens only, with `customer:read`."
+  tags:
+    - Customers
+  security:
+    - Bearer: []
+  parameters:
+    - name: joined_from
+      in: query
+      required: false
+      description: "Customers who joined at or after this; all time without it."
+      schema:
+        type: string
+        format: date-time
+    - name: joined_to
+      in: query
+      required: false
+      description: "Customers who joined before this."
+      schema:
+        type: string
+        format: date-time
+  responses:
+    "200":
+      description: "The count."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/customers/PlatformCustomerSummary.yaml
+    "400":
+      description: "`validation_failed`: a range that ends before it starts."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `customer:read`, or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

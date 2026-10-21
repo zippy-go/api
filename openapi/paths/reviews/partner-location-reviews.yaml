@@ -1,0 +1,97 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/reviews. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: "The Partner."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000001"
+  - name: location_id
+    in: path
+    required: true
+    description: "The store (a Location)."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000301"
+get:
+  operationId: listPartnerLocationReviews
+  summary: "Read a store's reviews"
+  description: "The store's reviews in the Partner console, newest first, twenty at a time: the customer's first name, whether the order was delivered, delivered by the Partner's own Agent or collected, when on the store's clock, the tags, the note, the photos, the order it was about (number, lines with what the store left out, total, whether it was refunded since) and the replies. A review the platform hid arrives without its note and photos. The Agent who carried the order is named only when the Agent is the Partner's own. `review:read` at the Location."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  parameters:
+    - name: period
+      in: query
+      required: false
+      description: "The period, all time by default."
+      schema:
+        $ref: ../../components/schemas/reviews/ReviewPeriod.yaml
+    - name: thumb
+      in: query
+      required: false
+      description: "Only this thumb."
+      schema:
+        $ref: ../../components/schemas/reviews/ReviewThumb.yaml
+    - name: limit
+      in: query
+      required: false
+      description: "How many, 1 to 50; 20 by default."
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "A page of the store's reviews."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/PartnerReviewPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `review:read` at the Location, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such Partner of the caller's, or no such store of it."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,22 @@
+type: object
+description: "A share of thumbs up with how many ratings it counts."
+required:
+  - percent
+  - count
+properties:
+  percent:
+    type: integer
+    minimum: 0
+    maximum: 100
+    examples:
+      - 80
+    description: "The share of thumbs up, 0 to 100."
+  count:
+    type: integer
+    minimum: 1
+    examples:
+      - 5
+    description: "How many it counts."
+examples:
+  - percent: 80
+    count: 5

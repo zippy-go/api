@@ -1,0 +1,131 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/reviews/{review_id}/reply. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: "The Partner."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000001"
+  - name: location_id
+    in: path
+    required: true
+    description: "The store (a Location)."
+    schema:
+      type: string
+      format: uuid
+    example: "01a13a48-9e00-7000-8000-000000000301"
+  - name: review_id
+    in: path
+    required: true
+    description: "The review."
+    schema:
+      type: string
+      format: uuid
+    example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+post:
+  operationId: replyToReview
+  summary: "Reply to a review"
+  description: "Writes the store's one reply to a review, at most 300 characters, within 90 days of it. The reply waits for the platform's moderation and customers see nothing until it is approved; once approved it shows under the review as the store's, and the reviewer is told once. A reply is never edited. A rejected reply lets the store write one more; a withdrawn one ends replying. `review:reply` at the Location, which managers hold by default."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The reply."
+    content:
+      "application/json":
+        schema:
+          $ref: ../../components/schemas/reviews/ReviewReplyInput.yaml
+  responses:
+    "201":
+      description: "The reply, waiting for moderation."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/reviews/ReviewReply.yaml
+    "400":
+      description: "`validation_failed`: an empty reply or one over 300 characters."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `review:reply` at the Location, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such review of the store's."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`reply_not_allowed`, saying why: a reply waiting or published, one withdrawn, both replies used, a review the platform hid, or a review older than 90 days."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: withdrawReviewReply
+  summary: "Withdraw the reply"
+  description: "Withdraws the store's reply, waiting or published: customers no longer see it, and no second reply is possible. `review:reply` at the Location."
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  responses:
+    "204":
+      description: Withdrawn.
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `review:reply` at the Location, or `not_enabled_for_partner`."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such review of the store's, or no reply waiting or published."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,86 @@
+# Path item for /v1/platform/customers. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformCustomers
+  summary: "Find customers"
+  description: "Every customer account, newest first by when they joined, narrowed to the days they joined in when a range is given, 25, 50 or 100 a page with the whole search's total. One box takes whatever a caller can say about themselves, and what it looks like decides where it is looked for: an id, pasted from an order, is that account exactly; digits, however spaced and with or without a plus, are part of a mobile number, a leading trunk zero dropped and at least three digits; anything with an at sign is part of an email; anything else is words, and every word must appear in the given name, the family name or the email. Erased accounts are left out. The last purchase needs `order:read` and is `null`, not refused, without it. Mission Control tokens only, with `customer:read`."
+  tags:
+    - Customers
+  security:
+    - Bearer: []
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: "What the caller said: an id, digits of a mobile number, part of an email, or words of a name; at most 100 characters."
+      schema:
+        type: string
+        maxLength: 100
+      example: "098765 43210"
+    - name: joined_from
+      in: query
+      required: false
+      description: "Only customers who joined at or after this."
+      schema:
+        type: string
+        format: date-time
+    - name: joined_to
+      in: query
+      required: false
+      description: "Only customers who joined before this."
+      schema:
+        type: string
+        format: date-time
+    - name: limit
+      in: query
+      required: false
+      description: "25, 50 or 100; 25 by default."
+      schema:
+        type: integer
+        enum:
+          - 25
+          - 50
+          - 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "A page of customers."
+      content:
+        "application/json":
+          schema:
+            $ref: ../../components/schemas/customers/PlatformCustomerPage.yaml
+    "400":
+      description: "`validation_failed`: fewer than three digits of a number, a limit other than 25, 50 or 100, or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `customer:read`, or `forbidden` (another surface)."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: "Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: "An unexpected server error, returned as an RFC 9457 problem details document."
+      content:
+        "application/problem+json":
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

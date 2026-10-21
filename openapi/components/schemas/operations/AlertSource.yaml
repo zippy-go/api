@@ -1,0 +1,9 @@
+type: string
+description: "What fired an alert: an `objective` burning its budget, a `job` running late, a failed `outbox` row, or `payouts` (a statement unpaid, an account check failed)."
+enum:
+  - objective
+  - job
+  - outbox
+  - payouts
+examples:
+  - objective
