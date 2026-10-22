@@ -11309,7 +11309,7 @@ export type StoreCard = {
      */
     zone_id?: string | null;
     /**
-     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
 };
@@ -13926,7 +13926,7 @@ export type StorePage = {
      */
     categories: Array<StoreCategoryTab>;
     /**
-     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
 };
@@ -14036,7 +14036,7 @@ export type SearchStore = {
      */
     pickup: boolean;
     /**
-     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%.
+     * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
 };
@@ -18116,11 +18116,11 @@ export type PlatformOrder = {
      */
     store_name: string;
     /**
-     * The customer's review of the order, hidden note included; `null` until written.
+     * The customer's review of the order, hidden note included; `null` until written. Since 0.19.0.
      */
     review?: OrderReviewSummary | null;
     /**
-     * The customer's rating of the delivery; `null` until given or for an order no Agent carried.
+     * The customer's rating of the delivery; `null` until given or for an order no Agent carried. Since 0.19.0.
      */
     delivery_rating?: DeliveryRating | null;
 };
@@ -46135,7 +46135,7 @@ export type ListPlatformOrdersData = {
          */
         partner_id?: string;
         /**
-         * Only this customer's orders, newest first; with `scope` `all` for their whole history.
+         * Only this customer's orders, newest first; with `scope` `all` for their whole history. Since 0.19.0.
          */
         customer_id?: string;
         /**
