@@ -1,0 +1,45 @@
+type: object
+description: "The one-rupee check of a payout destination: the payout provider sends ₹1.00, which stays with the holder, and compares the name the bank returns with the holder's legal name. A match checks the destination; a different name or a failed transfer fails it with the reason. Every write of the destination checks it again."
+required:
+  - state
+  - reason
+  - checked_at
+  - by
+  - reference
+properties:
+  state:
+    $ref: ./PayoutAccountCheckState.yaml
+    description: Where it stands.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why it failed, such as "The account is not in your legal name"; or staff's reason for checking it by hand.
+    examples:
+      - null
+  checked_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was decided.
+    examples:
+      - 2026-10-22T06:30:05Z
+  by:
+    oneOf:
+      - $ref: ./PayoutAccountCheckBy.yaml
+      - type: "null"
+    description: Who decided it; `null` until decided.
+  reference:
+    type:
+      - string
+      - "null"
+    description: The payout provider's reference for the ₹1.00 transfer.
+    examples:
+      - SIMCHK-7F3A21
+examples:
+  - state: passed
+    reason: null
+    checked_at: 2026-10-22T06:30:05Z
+    by: provider
+    reference: SIMCHK-7F3A21

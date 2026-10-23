@@ -1,0 +1,17 @@
+type: object
+description: "Where the money stands, in a sentence: so far, locking on Tuesday, due on Friday, on its way, held and why, paid on a day with its reference, could not be paid and why, or nothing to pay and why."
+required:
+  - code
+  - sentence
+properties:
+  code:
+    $ref: ./StatementStandingCode.yaml
+    description: Where it stands.
+  sentence:
+    type: string
+    description: The sentence.
+    examples:
+      - Due on Friday 30 October
+examples:
+  - code: due
+    sentence: Due on Friday 30 October

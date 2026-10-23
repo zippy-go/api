@@ -1,0 +1,77 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}/questions. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, which must be one of the Partner's; a sister Location's statement answers `404`.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+  - name: statement_id
+    in: path
+    required: true
+    description: The statement.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
+post:
+  operationId: askAboutLocationStatement
+  summary: Ask about a week
+  description: "\"Something look wrong?\": a question about a locked week in up to 2,000 characters. Mission Control lists it on the week's statement and answers it once; the answer appears under the week signed by the platform and cannot be changed. `payout:read` at the Location."
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The question.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payouts/PayoutQuestionInput.yaml
+  responses:
+    "201":
+      description: The question, unanswered.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutQuestion.yaml
+    "400":
+      description: "`validation_failed`: an empty question or one over 2,000 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: A member without `payout:read` at the Location (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The Partner, the Location or the statement does not exist or is not the caller's (`not_found`); a sister Location's statement answers the same.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

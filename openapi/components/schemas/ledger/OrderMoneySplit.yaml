@@ -14,6 +14,7 @@ required:
   - commission
   - commission_rate_bp
   - plan
+  - carrier
   - commission_gst
   - delivery_fee_revenue
   - delivery_fee_gst
@@ -81,6 +82,16 @@ properties:
     description: The policy layer the commission rate came from, such as `country India`.
     examples:
       - country India
+  carrier:
+    type: string
+    enum:
+      - platform_fleet
+      - own_agents
+      - external_carrier
+      - none
+    description: "Who carries the order's delivery, which decides whose its delivery fee and tip are: the platform fleet, the Location's own Agents, an external carrier, or `none` for a pickup. Since contract 0.19.0."
+    examples:
+      - platform_fleet
   commission_gst:
     $ref: ../common/Money.yaml
     description: GST on the commission.
@@ -141,6 +152,7 @@ examples:
       currency: INR
     commission_rate_bp: 1200
     plan: country India
+    carrier: platform_fleet
     commission_gst:
       minor_units: 1015
       currency: INR

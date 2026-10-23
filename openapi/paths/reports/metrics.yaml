@@ -1,0 +1,80 @@
+# Path item for /v1/platform/reports/metrics. Referenced from openapi.yaml.
+get:
+  operationId: getMetricsBoard
+  summary: Read the metrics board
+  description: What is under way now, and for the last hour, the day so far or chosen times of up to 31 days the average preparation, delivery and fulfilment times with how many orders were on time and late, each against its own promise; split by store and by Provider; 90% on time or more reads good, 75% to 90% a warning, below 75% critical, nothing measured "No orders". Computed from the event warehouse. `report:read`.
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  parameters:
+    - name: window
+      in: query
+      required: false
+      description: "`last_hour` by default, `today`, or `custom` with `from` and `until`."
+      schema:
+        $ref: ../../components/schemas/reports/MetricsWindow.yaml
+    - name: from
+      in: query
+      required: false
+      description: Where a custom window starts.
+      schema:
+        type: string
+        format: date-time
+    - name: until
+      in: query
+      required: false
+      description: Where it ends; 31 days at most after `from`.
+      schema:
+        type: string
+        format: date-time
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's.
+      schema:
+        type: string
+        format: uuid
+    - name: provider_kind
+      in: query
+      required: false
+      description: Only this kind of Provider's deliveries.
+      schema:
+        $ref: ../../components/schemas/dispatch/ProviderKind.yaml
+  responses:
+    "200":
+      description: The board.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/MetricsBoard.yaml
+    "400":
+      description: "`validation_failed`: `range_too_long` (31 days at most), or a custom window without both ends."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,150 @@
+type: object
+description: "The orders report: orders placed in a range of up to a year, by how they ended, by way of ordering, by vertical and by store, with sales, average order value and refunds per currency, computed from the event warehouse and current to the minute it says. Narrowed by status, store, fulfilment, vertical and city; compared with the period before or the year before. Also served as a spreadsheet (`Accept: text/csv`), every export written to the audit log with who, the range and the columns."
+required:
+  - from
+  - until
+  - time_zone
+  - current_to
+  - group_by
+  - comparison
+  - totals
+  - groups
+  - previous
+  - previous_from
+  - previous_until
+  - customers
+properties:
+  from:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first day, on the report's clock; `null` for all time.
+    examples:
+      - 2026-09-01
+  until:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day, included.
+    examples:
+      - 2026-09-30
+  time_zone:
+    type: string
+    description: The clock the days are read on.
+    examples:
+      - Asia/Kolkata
+  current_to:
+    type: string
+    format: date-time
+    description: The moment the warehouse's data is current to.
+    examples:
+      - 2026-10-22T08:00:00Z
+  group_by:
+    $ref: ./OrdersReportGrouping.yaml
+    description: How it is grouped.
+  comparison:
+    $ref: ./OrdersReportComparison.yaml
+    description: What it is compared with.
+  totals:
+    $ref: ./OrdersReportFigures.yaml
+    description: Every order in the range.
+  groups:
+    type: array
+    items:
+      $ref: ./OrdersReportGroup.yaml
+      description: A group.
+    description: The groups, largest first; empty when not grouped.
+  previous:
+    oneOf:
+      - $ref: ./OrdersReportFigures.yaml
+      - type: "null"
+    description: The figures it is compared with.
+  previous_from:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first day compared with.
+    examples:
+      - null
+  previous_until:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day compared with.
+    examples:
+      - null
+  customers:
+    $ref: ./OrdersReportCustomers.yaml
+    description: Customers over the range.
+examples:
+  - from: 2026-09-01
+    until: 2026-09-30
+    time_zone: Asia/Kolkata
+    current_to: 2026-10-22T08:00:00Z
+    group_by: store
+    comparison: none
+    totals:
+      placed: 21
+      completed: 18
+      declined: 1
+      cancelled: 2
+      expired: 0
+      in_progress: 0
+      ways:
+        delivery: 16
+        pickup: 2
+        dine_in: 0
+        scheduled: 0
+        subscription: 0
+      money:
+        - currency: INR
+          orders: 18
+          sales:
+            minor_units: 1234500
+            currency: INR
+          average_order_value:
+            minor_units: 68583
+            currency: INR
+          refunds:
+            minor_units: 12000
+            currency: INR
+    groups:
+      - key: 01a13a48-9e00-7000-8000-000000000301
+        label: Dev Kitchen Gachibowli
+        figures:
+          placed: 21
+          completed: 18
+          declined: 1
+          cancelled: 2
+          expired: 0
+          in_progress: 0
+          ways:
+            delivery: 16
+            pickup: 2
+            dine_in: 0
+            scheduled: 0
+            subscription: 0
+          money:
+            - currency: INR
+              orders: 18
+              sales:
+                minor_units: 1234500
+                currency: INR
+              average_order_value:
+                minor_units: 68583
+                currency: INR
+              refunds:
+                minor_units: 12000
+                currency: INR
+    previous: null
+    previous_from: null
+    previous_until: null
+    customers:
+      joined: 4
+      ordered: 12
+      orders: 21
+      sentence: null

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payouts.account_check.failed.v1.schema.json",
+  "title": "PayoutsAccountCheckFailedPayload",
+  "description": "Payload of `payouts.account_check.failed` version 1. A payout destination failed its one-rupee check: the bank returned a different name, \"The account is not in your legal name\", or the transfer failed. Statements stay held, the Partner or the Agent is told, and Mission Control is alerted. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "holder_kind",
+    "partner_id",
+    "agent_id",
+    "destination_kind",
+    "destination_last4",
+    "reference",
+    "by",
+    "at",
+    "reason"
+  ],
+  "properties": {
+    "holder_kind": {
+      "type": "string",
+      "description": "Whose destination: a Partner's payout account, or a platform fleet Agent's.",
+      "examples": [
+        "partner"
+      ],
+      "enum": [
+        "partner",
+        "agent"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner, or the Agent's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent membership, for an Agent's destination.",
+      "examples": [
+        null
+      ]
+    },
+    "destination_kind": {
+      "type": "string",
+      "description": "How the money goes: `bank` or `upi`.",
+      "examples": [
+        "bank"
+      ],
+      "enum": [
+        "bank",
+        "upi"
+      ]
+    },
+    "destination_last4": {
+      "type": "string",
+      "description": "The bank account's last four digits, or the last four characters of the UPI ID's handle.",
+      "examples": [
+        "6789"
+      ]
+    },
+    "reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The payout provider's reference for the ₹1.00 transfer; `null` when checked by hand.",
+      "examples": [
+        "SIMCHK-7F3A21"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "description": "Who decided: the `provider`, or `staff` by hand.",
+      "examples": [
+        "provider"
+      ],
+      "enum": [
+        "provider",
+        "staff"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-22T06:30:05Z"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why, in words.",
+      "examples": [
+        "The account is not in your legal name"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

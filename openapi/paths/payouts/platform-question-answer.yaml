@@ -1,0 +1,74 @@
+# Path item for /v1/platform/payout-questions/{question_id}/answer. Referenced from openapi.yaml.
+parameters:
+  - name: question_id
+    in: path
+    required: true
+    description: The question.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5301
+post:
+  operationId: answerPayoutQuestion
+  summary: Answer a question about a week
+  description: "Answers a question once: the payee reads it under the week, signed by the platform, and is told; it cannot be changed after. Written to the audit log. `payout:manage`."
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The answer.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payouts/PayoutAnswerInput.yaml
+  responses:
+    "200":
+      description: The question, answered.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutQuestion.yaml
+    "400":
+      description: "`validation_failed`: an empty answer or one over 2,000 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such question (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`question_answered`: it was answered already."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

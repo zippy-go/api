@@ -1,5 +1,5 @@
 type: string
-description: "What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected."
+description: "What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected; since contract 0.19.0 a week settled when its statement was locked (the GST its invoice bills beyond the orders' own, cancellation fees, fee credits, adjustments, the cash a Location or an Agent kept, an Agent's pay and tips), a payout paid, and a payout reversed when a paid statement came back unpaid."
 enum:
   - payment_captured
   - card_held
@@ -10,5 +10,8 @@ enum:
   - refund_to_wallet
   - wallet_credit
   - wallet_correction
+  - statement_settled
+  - payout_paid
+  - payout_reversed
 examples:
   - order_split

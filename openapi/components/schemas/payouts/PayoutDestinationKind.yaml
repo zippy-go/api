@@ -1,0 +1,7 @@
+type: string
+description: "How the money goes: a bank transfer or UPI."
+enum:
+  - bank
+  - upi
+examples:
+  - bank

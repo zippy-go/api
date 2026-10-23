@@ -1,0 +1,141 @@
+type: object
+description: "The metrics board: what is under way now and, for the window, the average preparation, delivery and fulfilment times with how many orders were on time and late, each order against its own promise as the customer was last told: the store's quoted times when placed, the promise when accepted, and the later time once it ran late. Split by store and by Provider. Computed from the event warehouse, current to the moment it says."
+required:
+  - window
+  - from
+  - until
+  - current_to
+  - now
+  - preparation
+  - delivery
+  - fulfilment
+  - by_location
+  - by_provider
+properties:
+  window:
+    $ref: ./MetricsWindow.yaml
+    description: The window.
+  from:
+    type: string
+    format: date-time
+    description: Where the window starts.
+    examples:
+      - 2026-10-22T07:00:00Z
+  until:
+    type: string
+    format: date-time
+    description: Where it ends.
+    examples:
+      - 2026-10-22T08:00:00Z
+  current_to:
+    type: string
+    format: date-time
+    description: The moment the warehouse's data is current to.
+    examples:
+      - 2026-10-22T08:00:00Z
+  now:
+    $ref: ./MetricsNow.yaml
+    description: What is under way now.
+  preparation:
+    $ref: ./MetricFigure.yaml
+    description: From acceptance to ready.
+  delivery:
+    $ref: ./MetricFigure.yaml
+    description: From leaving the store to the door.
+  fulfilment:
+    $ref: ./MetricFigure.yaml
+    description: From placing to the door or the counter.
+  by_location:
+    type: array
+    items:
+      $ref: ./MetricsByLocation.yaml
+      description: A store.
+    description: By store, the most orders first.
+  by_provider:
+    type: array
+    items:
+      $ref: ./MetricsByProvider.yaml
+      description: A Provider.
+    description: By Provider.
+examples:
+  - window: last_hour
+    from: 2026-10-22T07:00:00Z
+    until: 2026-10-22T08:00:00Z
+    current_to: 2026-10-22T08:00:00Z
+    now:
+      in_progress: 6
+      preparing: 3
+      out_for_delivery: 2
+      waiting_for_agent: 1
+    preparation:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    delivery:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    fulfilment:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    by_location:
+      - location_id: 01a13a48-9e00-7000-8000-000000000301
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        name: Dev Kitchen Gachibowli
+        preparation:
+          orders: 50
+          measured: 50
+          on_time: 10
+          late: 40
+          on_time_share: 0.2
+          average_minutes: 34.5
+          standing: critical
+        delivery:
+          orders: 50
+          measured: 50
+          on_time: 10
+          late: 40
+          on_time_share: 0.2
+          average_minutes: 34.5
+          standing: critical
+        fulfilment:
+          orders: 50
+          measured: 50
+          on_time: 10
+          late: 40
+          on_time_share: 0.2
+          average_minutes: 34.5
+          standing: critical
+    by_provider:
+      - provider_kind: platform_fleet
+        provider_partner_id: 01a13a48-9e00-7000-8000-000000000002
+        name: ZippyGo Fleet
+        delivery:
+          orders: 50
+          measured: 50
+          on_time: 10
+          late: 40
+          on_time_share: 0.2
+          average_minutes: 34.5
+          standing: critical
+        fulfilment:
+          orders: 50
+          measured: 50
+          on_time: 10
+          late: 40
+          on_time_share: 0.2
+          average_minutes: 34.5
+          standing: critical

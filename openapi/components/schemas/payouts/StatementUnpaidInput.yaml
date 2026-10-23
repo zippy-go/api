@@ -1,0 +1,14 @@
+type: object
+description: Marking a statement unpaid, with why.
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    description: Why, 1 to 200 characters, as the payee reads it.
+    examples:
+      - The bank returned the transfer
+    minLength: 1
+    maxLength: 200
+examples:
+  - reason: The bank returned the transfer

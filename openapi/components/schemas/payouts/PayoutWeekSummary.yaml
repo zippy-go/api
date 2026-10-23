@@ -1,0 +1,88 @@
+type: object
+description: "The next payment: the oldest locked week not paid yet; else the week just ended until it locks; else the week in progress so far, as an estimate while it can still change."
+required:
+  - week
+  - reference
+  - starts_on
+  - ends_on
+  - statement_id
+  - estimate
+  - state
+  - standing
+  - total
+  - locks_on
+  - pays_on
+properties:
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week.
+    examples:
+      - 2026W43
+  reference:
+    type: string
+    description: Its reference.
+    examples:
+      - ZG-2026W43
+  starts_on:
+    type: string
+    format: date
+    description: Its Monday.
+    examples:
+      - 2026-10-19
+  ends_on:
+    type: string
+    format: date
+    description: Its Sunday.
+    examples:
+      - 2026-10-25
+  statement_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its statement, once locked.
+    examples:
+      - null
+  estimate:
+    type: boolean
+    description: "`true` while the week is not locked and its figures can still change."
+  state:
+    oneOf:
+      - $ref: ./StatementState.yaml
+      - type: "null"
+    description: Its statement's state; `null` before the lock.
+  standing:
+    $ref: ./StatementStanding.yaml
+    description: Where the money stands.
+  total:
+    $ref: ../common/Money.yaml
+    description: Its total, or the estimate so far.
+  locks_on:
+    type: string
+    format: date
+    description: The Tuesday the clock locks it.
+    examples:
+      - 2026-10-27
+  pays_on:
+    type: string
+    format: date
+    description: Its payday.
+    examples:
+      - 2026-10-30
+examples:
+  - week: 2026W43
+    reference: ZG-2026W43
+    starts_on: 2026-10-19
+    ends_on: 2026-10-25
+    statement_id: null
+    estimate: true
+    state: null
+    standing:
+      code: locking
+      sentence: Locking on Tuesday 27 October, paid on Friday 30 October
+    total:
+      minor_units: 42920
+      currency: INR
+    locks_on: 2026-10-27
+    pays_on: 2026-10-30

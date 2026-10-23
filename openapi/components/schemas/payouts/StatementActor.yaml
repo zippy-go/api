@@ -1,0 +1,19 @@
+type: object
+description: Who made a move. A Location and an Agent never read the names of the people at the platform who moved their statements.
+required:
+  - kind
+  - name
+properties:
+  kind:
+    $ref: ./StatementActorKind.yaml
+    description: The clock, the provider or staff.
+  name:
+    type:
+      - string
+      - "null"
+    description: The operator's name, in Mission Control only; `null` for the clock, the provider and in every payee's view.
+    examples:
+      - null
+examples:
+  - kind: clock
+    name: null

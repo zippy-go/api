@@ -6,6 +6,115 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-10-23
+
+Step 5, settlement: what ZippyGo pays each Location every week for what it
+sold and each platform fleet Agent for the work they did, and the reports
+Mission Control and the Partner console draw from the event warehouse.
+Written as 0.19.0 beside the trust slice of step 5 and renumbered 0.20.0 when
+it merged second; an Agent's rating in the numbers is the one reviews counts
+(0.19.0). Additive only.
+
+### Added
+
+- A Location's payouts (`Payouts` tag): what it will be paid and why, the
+  next payment, the week so far, six months of statements, where it is paid
+  and what holds a payout (`GET /v1/partners/{partner_id}/locations/{location_id}/payouts`,
+  `LocationPayouts`, `PayoutWeekSummary`, `PayoutWorking`, `PayoutDestination`,
+  `PayoutHold`); a statement worked out order by order with its GST invoice,
+  credit notes, refunds, adjustments, days, questions, history and documents
+  (`GET .../statements/{statement_id}`, `Statement`, `StatementFigures`,
+  `StatementOrderRow`, `StatementRefund`, `StatementDay`, `StatementInvoice`,
+  `StatementInvoiceLine`, `InvoiceParty`, `StatementCreditNote`,
+  `StatementMove`, `StatementActor`, `StatementStanding`, `StatementDocument`);
+  its documents drawn when asked for, the statement and the invoice as PDF and
+  the order list as CSV (`GET .../statements/{statement_id}/documents/{document}`);
+  and "Something look wrong?" (`POST .../statements/{statement_id}/questions`,
+  `PayoutQuestionInput`, `PayoutQuestion`). `payout:read` at the Location.
+- Mission Control's settlements and payouts: every Location's statements
+  (`GET /v1/platform/statements`, `StatementPage`, `StatementSummary`), one
+  statement and its documents, the moves paid, unpaid, archive, back to due
+  and send (`POST /v1/platform/statements/{statement_id}/paid`, `.../unpaid`,
+  `.../archive`, `.../due`, `.../send`, `StatementPaidInput`,
+  `StatementUnpaidInput`, `StatementArchiveInput`), locking a Location's week
+  (`POST /v1/platform/locations/{location_id}/weeks/{week}/lock`), a
+  Location's payouts with any range of its days worked out
+  (`GET /v1/platform/locations/{location_id}/payouts`), adjustments
+  (`GET`, `POST /v1/platform/locations/{location_id}/payout-adjustments`,
+  `DELETE .../{adjustment_id}`, `PayoutAdjustment`, `PayoutAdjustmentInput`,
+  `PayoutAdjustmentPage`), questions and their answers
+  (`GET /v1/platform/payout-questions`, `POST .../{question_id}/answer`,
+  `PayoutAnswerInput`, `PayoutQuestionPage`) and the payouts date, moved
+  forward on a developer's machine or in the sandbox only
+  (`GET`, `PUT /v1/platform/payouts/date`, `PayoutsDate`, `PayoutsDateMove`,
+  `PayoutsDateMoveRecord`).
+- A platform fleet Agent's statements: in the Agent app the week so far, the
+  next payment, past statements with their PDFs, one statement, its PDF, a
+  question, any week, and where the Agent is paid with its check
+  (`GET /v1/agent/memberships/{agent_id}/statements`, `AgentStatementList`,
+  `GET .../statements/{statement_id}`, `AgentStatement`,
+  `AgentStatementFigures`, `AgentStatementTask`, `AgentPayPart`,
+  `GET .../statements/{statement_id}/document`,
+  `POST .../statements/{statement_id}/questions`, `GET .../weeks/{week}`,
+  `AgentWeek`, `AgentWeekSummary`, `GET`, `PUT .../payout-account`,
+  `AgentPayoutAccount`, `AgentPayoutAccountUpdate`); a Partner's own Agent
+  reads its weeks reported to the Partner (`AgentPaidBy`, `paid_by_partner`);
+  in Mission Control every Agent's statements with the same moves, locking an
+  Agent's week, an Agent's week, adjustments and where the Agent is paid,
+  checked by hand with a reason (`GET /v1/platform/agent-statements`,
+  `AgentStatementPage`, `AgentStatementSummary`, `GET .../{statement_id}`,
+  `.../document`, `POST .../paid`, `.../unpaid`, `.../archive`, `.../due`,
+  `.../send`, `POST /v1/platform/agents/{agent_id}/weeks/{week}/lock`,
+  `GET /v1/platform/agents/{agent_id}/weeks/{week}`,
+  `GET`, `POST /v1/platform/agents/{agent_id}/payout-adjustments`,
+  `DELETE .../{adjustment_id}`, `GET .../payout-account`,
+  `POST .../payout-account/verify`, `PayoutAccountVerification`).
+- Reports (`Reports` tag) from the event warehouse: the orders report with
+  its spreadsheet (`GET /v1/platform/reports/orders`, `OrdersReport`,
+  `OrdersReportFigures`, `OrdersReportGroup`, `OrdersReportMoney`,
+  `OrdersReportWays`, `OrdersReportCustomers`, `OrdersReportGrouping`,
+  `OrdersReportComparison`), the metrics board (`GET /v1/platform/reports/metrics`,
+  `MetricsBoard`, `MetricFigure`, `MetricsNow`, `MetricsByLocation`,
+  `MetricsByProvider`, `MetricsWindow`, `MetricStanding`), the Agents numbers
+  for Mission Control and a Partner (`GET /v1/platform/agent-numbers`,
+  `GET /v1/platform/agents/{agent_id}/numbers`,
+  `GET /v1/partners/{partner_id}/agent-numbers`,
+  `GET /v1/partners/{partner_id}/agents/{agent_id}/numbers`,
+  `AgentNumbersPage`, `AgentNumbers`, `AgentNumbersTotals`,
+  `AgentNumbersRating`, `AgentNumbersDetail`, `AgentNumbersDelivery`,
+  `AgentNumbersDay`, `AgentDutyStretch`, `AgentActivityDay`,
+  `AgentActivityItem`, `AgentActivityKind`) and the weekly report of a
+  Partner's own Agents with its spreadsheet
+  (`GET /v1/partners/{partner_id}/services/{service_id}/agent-weeks`,
+  `AgentWeeksReport`, `AgentWeeksRow`, `AgentWeeksTotals`).
+- The payout account's one-rupee check: `PayoutAccount.check`
+  (`PayoutAccountCheck`, `PayoutAccountCheckState`, `PayoutAccountCheckBy`);
+  `POST /v1/partners/{partner_id}/payout-account/verify` takes an optional
+  reason.
+- `OrderMoneySplit.carrier`; the ledger's account kinds `agent_payable`,
+  `agent_pay_expense`, `payout_adjustments` and `payouts_clearing`, and its
+  entry kinds `statement_settled`, `payout_paid` and `payout_reversed`.
+- Twelve events, which a Location's and an Agent's statements share:
+  `payouts.statement.locked`, `.sent`, `.paid`, `.unpaid`, `.archived`,
+  `.reopened`, `payouts.adjustment.added`, `.removed`,
+  `payouts.question.asked`, `.answered`, `payouts.account_check.passed` and
+  `.failed`; none carries an account number, a UPI ID, a phone number, an
+  email or the words of a question.
+- Problem codes `week_not_over`, `week_locked`, `week_carried_on`,
+  `week_empty`, `statement_move_refused` (with `statement_state`,
+  `nothing_to_pay`, `destination_not_checked` and `payee_gone`),
+  `adjustment_settled`, `question_answered`, `payouts_date_fixed` and
+  `paid_by_partner`; field codes `adjustment_out_of_range`, `range_too_long`,
+  `payouts_date_backwards`, `paid_on_in_future` and `week_invalid`.
+
+### Changed
+
+- Mission Control's `operations` and `support` roles read the reports
+  (`report:read`), in the platform's default roles' edition 6.
+- `PUT /v1/partners/{partner_id}/payout-account` and the verification say
+  the account is checked by the payout provider's one-rupee transfer, whose
+  pass verifies it and lifts the hold after a change of account.
+
 ## [0.19.0] - 2026-10-22
 
 Step 5, trust: reviews and ratings, Mission Control's customers, and

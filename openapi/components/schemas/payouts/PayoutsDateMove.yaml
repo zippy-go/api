@@ -1,0 +1,22 @@
+type: object
+description: Moving the payouts date forward, never back. The lock clock and then the payday run take the new date at once.
+required:
+  - to
+properties:
+  to:
+    type: string
+    format: date-time
+    description: The new payouts date, later than the current one.
+    examples:
+      - 2026-10-26T03:30:00Z
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, at most 200 characters.
+    examples:
+      - Checking week 2026W43
+    maxLength: 200
+examples:
+  - to: 2026-10-26T03:30:00Z
+    reason: Checking week 2026W43

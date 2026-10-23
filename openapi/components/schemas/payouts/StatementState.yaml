@@ -1,0 +1,10 @@
+type: string
+description: "Where a statement stands: `due` once locked with something to pay; `sending` while the payout provider has the transfer; `paid` with its day and reference; `unpaid` with why; `archived` when there is nothing to pay or platform staff archived it."
+enum:
+  - due
+  - sending
+  - paid
+  - unpaid
+  - archived
+examples:
+  - due

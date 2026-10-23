@@ -1,0 +1,36 @@
+type: object
+description: "An adjustment to add: at most ₹100,000.00 either way and never nothing, with a reason the payee reads."
+required:
+  - amount_minor
+  - reason
+properties:
+  amount_minor:
+    type: integer
+    description: "The amount in paise: positive adds to the payout, negative takes off it; never zero, at most 10,000,000 either way. A fee correction is positive: the fee credited back, its GST added."
+    examples:
+      - 150000
+    format: int64
+  reason:
+    type: string
+    description: Why, as the payee reads it; 1 to 140 characters.
+    examples:
+      - Goodwill for the outage on 21 October
+    minLength: 1
+    maxLength: 140
+  note:
+    type:
+      - string
+      - "null"
+    description: Staff's note, never shown to the payee; at most 1,000 characters.
+    examples:
+      - Agreed with the owner on the phone.
+    maxLength: 1000
+  fee_correction:
+    type: boolean
+    description: Whether it credits back a fee found wrong, with a credit note on the statement that settles it; `false` by default.
+    default: false
+examples:
+  - amount_minor: 150000
+    reason: Goodwill for the outage on 21 October
+    note: Agreed with the owner on the phone.
+    fee_correction: false

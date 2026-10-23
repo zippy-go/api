@@ -1,0 +1,62 @@
+type: object
+description: A refund given in the week and charged to the Partner, whatever week its order ended in.
+required:
+  - refund_id
+  - order_id
+  - number
+  - given_at
+  - amount
+  - reason
+  - order_week
+properties:
+  refund_id:
+    type: string
+    format: uuid
+    description: The refund.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5701
+  order_id:
+    type: string
+    format: uuid
+    description: Its order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a91
+  number:
+    type: string
+    description: The order's number.
+    examples:
+      - AB0031
+  given_at:
+    type: string
+    format: date-time
+    description: When it was given.
+    examples:
+      - 2026-10-21T10:00:00Z
+  amount:
+    $ref: ../common/Money.yaml
+    description: What the Partner bore of it.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, in words.
+    examples:
+      - Item missing
+  order_week:
+    type:
+      - string
+      - "null"
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week its order counted in, when that was an earlier week.
+    examples:
+      - 2026W42
+examples:
+  - refund_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5701
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a91
+    number: AB0031
+    given_at: 2026-10-21T10:00:00Z
+    amount:
+      minor_units: 12000
+      currency: INR
+    reason: Item missing
+    order_week: 2026W42

@@ -1,0 +1,25 @@
+type: object
+description: An Agent's activity on one day, on the Location's clock.
+required:
+  - date
+  - items
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-10-22
+  items:
+    type: array
+    items:
+      $ref: ./AgentActivityItem.yaml
+      description: An item.
+    description: What they did, in order.
+examples:
+  - date: 2026-10-22
+    items:
+      - at: 2026-10-22T13:40:00Z
+        kind: delivered
+        text: Delivered AB0042
+        order_number: AB0042

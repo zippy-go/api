@@ -1,0 +1,113 @@
+type: object
+description: Everyone's totals over the same range.
+required:
+  - agents
+  - online
+  - deliveries
+  - average_minutes_to_door
+  - average_km
+  - minutes_on_duty
+  - deliveries_per_hour
+  - offers_made
+  - offers_accepted_share
+  - on_time_share
+  - failed_drops
+  - geofence_overrides
+  - tips
+  - earnings
+properties:
+  agents:
+    type: integer
+    description: Agents counted.
+    examples:
+      - 20
+  online:
+    type: integer
+    description: Agents online now.
+    examples:
+      - 8
+  deliveries:
+    type: integer
+    description: Deliveries made.
+    examples:
+      - 41
+  average_minutes_to_door:
+    type:
+      - number
+      - "null"
+    description: The average minutes from taking a delivery to the door.
+    examples:
+      - 26.1
+  average_km:
+    type:
+      - number
+      - "null"
+    description: The average kilometres of a delivery.
+    examples:
+      - 3.8
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty.
+    examples:
+      - 3600
+  deliveries_per_hour:
+    type:
+      - number
+      - "null"
+    description: Deliveries per hour on duty.
+    examples:
+      - 0.68
+  offers_made:
+    type: integer
+    description: Offers made.
+    examples:
+      - 60
+  offers_accepted_share:
+    type:
+      - number
+      - "null"
+    description: The share of offers accepted.
+    examples:
+      - 0.7
+  on_time_share:
+    type:
+      - number
+      - "null"
+    description: The share of deliveries by the promise.
+    examples:
+      - 0.9
+  failed_drops:
+    type: integer
+    description: Failed drops.
+    examples:
+      - 1
+  geofence_overrides:
+    type: integer
+    description: Geofence overrides.
+    examples:
+      - 2
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips.
+  earnings:
+    $ref: ../common/Money.yaml
+    description: Earnings, tips included.
+examples:
+  - agents: 20
+    online: 8
+    deliveries: 41
+    average_minutes_to_door: 26.1
+    average_km: 3.8
+    minutes_on_duty: 3600
+    deliveries_per_hour: 0.68
+    offers_made: 60
+    offers_accepted_share: 0.7
+    on_time_share: 0.9
+    failed_drops: 1
+    geofence_overrides: 2
+    tips:
+      minor_units: 31000
+      currency: INR
+    earnings:
+      minor_units: 250000
+      currency: INR

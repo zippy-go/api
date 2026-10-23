@@ -1,5 +1,5 @@
 type: object
-description: 'The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits.'
+description: 'The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider''s one-rupee transfer (`check`): a pass marks it verified and lifts the hold after a change of account, a different name or a failed transfer fails it with the reason.'
 required:
   - holder_name
   - account_type
@@ -9,6 +9,7 @@ required:
   - state
   - updated_at
   - version
+  - check
 properties:
   holder_name:
     type: string
@@ -71,6 +72,9 @@ properties:
       - 'null'
     format: date-time
     description: When it was verified.
+  check:
+    $ref: ./PayoutAccountCheck.yaml
+    description: The one-rupee check of the account as it stands now; since contract 0.19.0.
   verified_by:
     type:
       - string
@@ -91,3 +95,9 @@ examples:
     payouts_held_until: 2026-10-17T09:00:00Z
     updated_at: 2026-10-15T09:00:00Z
     version: 1
+    check:
+      state: checking
+      reason: null
+      checked_at: null
+      by: null
+      reference: null

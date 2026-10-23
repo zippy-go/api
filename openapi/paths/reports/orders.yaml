@@ -1,0 +1,133 @@
+# Path item for /v1/platform/reports/orders. Referenced from openapi.yaml.
+get:
+  operationId: getOrdersReport
+  summary: Report on orders
+  description: "Orders placed in a range of up to a year, by how they ended, by way of ordering, by vertical and by store, with sales, average order value and refunds per currency, never added across two; narrowed by status, store, fulfilment, vertical and city, compared with the period before or the year before, computed from the event warehouse and saying the moment its data is current to. An order placed a minute ago is counted. With `Accept: text/csv` it is a spreadsheet of the groups with the columns and time zone chosen, and the export is written to the audit log with who, the range and the columns. Without `from` and `until` it covers all time, and the customers' figures are dashes saying why. `report:read`."
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: The first day, on the report's clock.
+      schema:
+        type: string
+        format: date
+    - name: until
+      in: query
+      required: false
+      description: The last day, included; a year at most after `from`.
+      schema:
+        type: string
+        format: date
+    - name: group_by
+      in: query
+      required: false
+      description: How to group; `none` by default.
+      schema:
+        $ref: ../../components/schemas/reports/OrdersReportGrouping.yaml
+    - name: compare
+      in: query
+      required: false
+      description: What to compare with; `none` by default.
+      schema:
+        $ref: ../../components/schemas/reports/OrdersReportComparison.yaml
+    - name: status
+      in: query
+      required: false
+      description: "Only orders that ended so: `completed`, `declined`, `cancelled`, `expired` or `in_progress`."
+      schema:
+        type: string
+        enum:
+          - completed
+          - declined
+          - cancelled
+          - expired
+          - in_progress
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's.
+      schema:
+        type: string
+        format: uuid
+    - name: fulfilment
+      in: query
+      required: false
+      description: Only this way of ordering.
+      schema:
+        type: string
+        enum:
+          - delivery
+          - pickup
+          - dine_in
+          - scheduled
+          - subscription
+    - name: vertical
+      in: query
+      required: false
+      description: Only this vertical's, by code.
+      schema:
+        type: string
+    - name: city_id
+      in: query
+      required: false
+      description: Only this city's, a service area.
+      schema:
+        type: string
+        format: uuid
+    - name: time_zone
+      in: query
+      required: false
+      description: The clock days are read on, an IANA name; `Asia/Kolkata` by default.
+      schema:
+        type: string
+    - name: columns
+      in: query
+      required: false
+      description: "For the spreadsheet: the columns, comma separated, of `group`, `placed`, `completed`, `declined`, `cancelled`, `expired`, `in_progress`, `currency`, `sales`, `average_order_value` and `refunds`; all by default."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The report, or the spreadsheet.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/OrdersReport.yaml
+        text/csv:
+          schema:
+            type: string
+            description: The report as a spreadsheet, one row per group and currency.
+    "400":
+      description: "`validation_failed`: `range_too_long` (a year at most), `from` after `until`, an unknown time zone or column."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

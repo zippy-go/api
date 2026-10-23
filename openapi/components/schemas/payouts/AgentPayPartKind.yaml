@@ -1,0 +1,9 @@
+type: string
+description: "A part of an Agent's pay: the base per stop, the distance, the waiting, or the pay for a task called off after the Agent started."
+enum:
+  - base
+  - distance
+  - waiting
+  - call_off
+examples:
+  - base

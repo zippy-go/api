@@ -1,0 +1,14 @@
+type: object
+description: The answer to a question, given once.
+required:
+  - answer
+properties:
+  answer:
+    type: string
+    description: The answer, 1 to 2,000 characters; the payee reads it signed by the platform.
+    examples:
+      - The customer reported the biryani missing and support refunded it from your share.
+    minLength: 1
+    maxLength: 2000
+examples:
+  - answer: The customer reported the biryani missing and support refunded it from your share.

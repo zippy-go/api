@@ -1,0 +1,33 @@
+type: object
+description: What is under way now.
+required:
+  - in_progress
+  - preparing
+  - out_for_delivery
+  - waiting_for_agent
+properties:
+  in_progress:
+    type: integer
+    description: Orders accepted and not finished.
+    examples:
+      - 6
+  preparing:
+    type: integer
+    description: Orders being prepared.
+    examples:
+      - 3
+  out_for_delivery:
+    type: integer
+    description: Orders on their way.
+    examples:
+      - 2
+  waiting_for_agent:
+    type: integer
+    description: Deliveries waiting for an Agent.
+    examples:
+      - 1
+examples:
+  - in_progress: 6
+    preparing: 3
+    out_for_delivery: 2
+    waiting_for_agent: 1

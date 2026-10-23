@@ -1,0 +1,51 @@
+type: object
+description: The metrics of one Provider, so a slow Partner fleet and a slow kitchen are told apart.
+required:
+  - provider_kind
+  - provider_partner_id
+  - name
+  - delivery
+  - fulfilment
+properties:
+  provider_kind:
+    $ref: ../dispatch/ProviderKind.yaml
+    description: The kind of Provider.
+  provider_partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Provider's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  name:
+    type: string
+    description: The Provider in words.
+    examples:
+      - ZippyGo Fleet
+  delivery:
+    $ref: ./MetricFigure.yaml
+    description: From leaving the store to the door.
+  fulfilment:
+    $ref: ./MetricFigure.yaml
+    description: From placing to the door.
+examples:
+  - provider_kind: platform_fleet
+    provider_partner_id: 01a13a48-9e00-7000-8000-000000000002
+    name: ZippyGo Fleet
+    delivery:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    fulfilment:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical

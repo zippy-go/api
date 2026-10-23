@@ -1,0 +1,12 @@
+type: string
+description: "How the orders report groups its figures: not at all, by store, by how orders ended, by way of ordering, by vertical, by city or by day."
+enum:
+  - none
+  - store
+  - status
+  - fulfilment
+  - vertical
+  - city
+  - day
+examples:
+  - store

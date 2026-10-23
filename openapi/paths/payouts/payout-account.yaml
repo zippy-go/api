@@ -4,7 +4,7 @@ parameters:
 get:
   operationId: getPayoutAccount
   summary: Get the payout account
-  description: The payout account, every number masked to its last four digits; members and platform staff.
+  description: "The payout account, every number masked to its last four digits, with its one-rupee check's state and reason (since contract 0.19.0); members and platform staff."
   tags:
     - Payout accounts
   security:
@@ -55,7 +55,7 @@ get:
 put:
   operationId: putPayoutAccount
   summary: State the payout account
-  description: "States or changes the payout account: it is unverified again after every write, a change of account holds the next payout for at least 48 hours and until platform staff verify it, and the masked number sent back unchanged keeps the account. `partner:profile:write`, or platform staff with `partner:write`."
+  description: "States or changes the payout account: it is unverified again after every write, and the masked number sent back unchanged keeps the account. Since contract 0.19.0 every write is checked by the payout provider: it sends ₹1.00, which stays with the holder, and compares the name the bank returns with the Partner's legal name; a match verifies the account and lifts the hold after a change of account, so a statement held for it is due at once; a different name or a failed transfer fails the check with the reason (\"The account is not in your legal name\"), the Partner is told and its statements stay held. A change of account still holds the next payout until the account is verified. `partner:profile:write`, or platform staff with `partner:write`."
   tags:
     - Payout accounts
   security:
@@ -69,7 +69,7 @@ put:
           $ref: ../../components/schemas/payouts/PayoutAccountUpdate.yaml
   responses:
     '200':
-      description: The account as saved, masked and unverified.
+      description: The account as saved, masked and unverified, its check `checking`.
       content:
         application/json:
           schema:

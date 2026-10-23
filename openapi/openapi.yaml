@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.19.0
+  version: 0.20.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -140,6 +140,10 @@ tags:
     description: "A partner's compliance documents (GST registration, PAN, FSSAI licence, shop and establishment registration, identity, bank proof), what it must have on file and the review queue platform staff work through."
   - name: Payout accounts
     description: "The bank account a partner is paid into, held until platform staff verify it."
+  - name: Payouts
+    description: "What ZippyGo pays each Location every week for what it sold, and each platform fleet Agent for the work they did, and how both are shown and explained. A week runs Monday to Sunday on the payee's clock, is locked once, by the clock on the Tuesday after or by Mission Control once it is over, and is paid on the Friday at 10:00 through a payout provider behind a port (a simulated one on a developer's machine and in the sandbox), to a destination checked by a one-rupee transfer. A Location's statement adds up order by order: sales, the platform's fee with the GST its invoice bills, the charges that are the Location's, refunds, cash it collected, adjustments and the carry. Statements move between due, sending, paid, unpaid and archived, each move kept with who made it. Documents are drawn when asked for. A Partner's own Agents are reported, not paid. Members need `payout:read` at the Location; platform staff `payout:read` and `payout:manage`."
+  - name: Reports
+    description: "Reports computed from the event warehouse, which every domain event published through the outbox reaches within a minute, each saying the moment its data is current to: the orders report and its spreadsheet, the metrics board of preparation, delivery and fulfilment times against each order's promise, the Agents numbers, and the weekly report of a Partner's own Agents. Mission Control needs `report:read` (`agent:read` for the Agents numbers); a Partner sees its own Agents with `agent:read`."
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
   - name: Access
@@ -1099,6 +1103,99 @@ paths:
     $ref: ./paths/operations/outbox.yaml
   /v1/platform/operations/outbox/replay:
     $ref: ./paths/operations/outbox-replay.yaml
+  # Step 5 settlement: payouts (a Location's weeks and statements, the platform fleet's Agents' statements), reports
+  /v1/partners/{partner_id}/locations/{location_id}/payouts:
+    $ref: ./paths/payouts/location-payouts.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}:
+    $ref: ./paths/payouts/location-statement.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}/documents/{document}:
+    $ref: ./paths/payouts/location-statement-document.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}/questions:
+    $ref: ./paths/payouts/location-statement-questions.yaml
+  /v1/agent/memberships/{agent_id}/statements:
+    $ref: ./paths/payouts/agent-statements.yaml
+  /v1/agent/memberships/{agent_id}/statements/{statement_id}:
+    $ref: ./paths/payouts/agent-statement.yaml
+  /v1/agent/memberships/{agent_id}/statements/{statement_id}/document:
+    $ref: ./paths/payouts/agent-statement-document.yaml
+  /v1/agent/memberships/{agent_id}/statements/{statement_id}/questions:
+    $ref: ./paths/payouts/agent-statement-questions.yaml
+  /v1/agent/memberships/{agent_id}/weeks/{week}:
+    $ref: ./paths/payouts/agent-week.yaml
+  /v1/agent/memberships/{agent_id}/payout-account:
+    $ref: ./paths/payouts/agent-payout-account.yaml
+  /v1/platform/statements:
+    $ref: ./paths/payouts/platform-statements.yaml
+  /v1/platform/statements/{statement_id}:
+    $ref: ./paths/payouts/platform-statement.yaml
+  /v1/platform/statements/{statement_id}/documents/{document}:
+    $ref: ./paths/payouts/platform-statement-document.yaml
+  /v1/platform/statements/{statement_id}/paid:
+    $ref: ./paths/payouts/platform-statement-paid.yaml
+  /v1/platform/statements/{statement_id}/unpaid:
+    $ref: ./paths/payouts/platform-statement-unpaid.yaml
+  /v1/platform/statements/{statement_id}/archive:
+    $ref: ./paths/payouts/platform-statement-archive.yaml
+  /v1/platform/statements/{statement_id}/due:
+    $ref: ./paths/payouts/platform-statement-due.yaml
+  /v1/platform/statements/{statement_id}/send:
+    $ref: ./paths/payouts/platform-statement-send.yaml
+  /v1/platform/locations/{location_id}/weeks/{week}/lock:
+    $ref: ./paths/payouts/platform-location-week-lock.yaml
+  /v1/platform/locations/{location_id}/payouts:
+    $ref: ./paths/payouts/platform-location-payouts.yaml
+  /v1/platform/locations/{location_id}/payout-adjustments:
+    $ref: ./paths/payouts/platform-location-adjustments.yaml
+  /v1/platform/locations/{location_id}/payout-adjustments/{adjustment_id}:
+    $ref: ./paths/payouts/platform-location-adjustment.yaml
+  /v1/platform/payout-questions:
+    $ref: ./paths/payouts/platform-questions.yaml
+  /v1/platform/payout-questions/{question_id}/answer:
+    $ref: ./paths/payouts/platform-question-answer.yaml
+  /v1/platform/payouts/date:
+    $ref: ./paths/payouts/platform-payouts-date.yaml
+  /v1/platform/agent-statements:
+    $ref: ./paths/payouts/platform-agent-statements.yaml
+  /v1/platform/agent-statements/{statement_id}:
+    $ref: ./paths/payouts/platform-agent-statement.yaml
+  /v1/platform/agent-statements/{statement_id}/document:
+    $ref: ./paths/payouts/platform-agent-statement-document.yaml
+  /v1/platform/agent-statements/{statement_id}/paid:
+    $ref: ./paths/payouts/platform-agent-statement-paid.yaml
+  /v1/platform/agent-statements/{statement_id}/unpaid:
+    $ref: ./paths/payouts/platform-agent-statement-unpaid.yaml
+  /v1/platform/agent-statements/{statement_id}/archive:
+    $ref: ./paths/payouts/platform-agent-statement-archive.yaml
+  /v1/platform/agent-statements/{statement_id}/due:
+    $ref: ./paths/payouts/platform-agent-statement-due.yaml
+  /v1/platform/agent-statements/{statement_id}/send:
+    $ref: ./paths/payouts/platform-agent-statement-send.yaml
+  /v1/platform/agents/{agent_id}/weeks/{week}/lock:
+    $ref: ./paths/payouts/platform-agent-week-lock.yaml
+  /v1/platform/agents/{agent_id}/weeks/{week}:
+    $ref: ./paths/payouts/platform-agent-week.yaml
+  /v1/platform/agents/{agent_id}/payout-adjustments:
+    $ref: ./paths/payouts/platform-agent-adjustments.yaml
+  /v1/platform/agents/{agent_id}/payout-adjustments/{adjustment_id}:
+    $ref: ./paths/payouts/platform-agent-adjustment.yaml
+  /v1/platform/agents/{agent_id}/payout-account:
+    $ref: ./paths/payouts/platform-agent-payout-account.yaml
+  /v1/platform/agents/{agent_id}/payout-account/verify:
+    $ref: ./paths/payouts/platform-agent-payout-account-verify.yaml
+  /v1/platform/reports/orders:
+    $ref: ./paths/reports/orders.yaml
+  /v1/platform/reports/metrics:
+    $ref: ./paths/reports/metrics.yaml
+  /v1/platform/agent-numbers:
+    $ref: ./paths/reports/platform-agent-numbers.yaml
+  /v1/platform/agents/{agent_id}/numbers:
+    $ref: ./paths/reports/platform-agent-numbers-detail.yaml
+  /v1/partners/{partner_id}/agent-numbers:
+    $ref: ./paths/reports/partner-agent-numbers.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/numbers:
+    $ref: ./paths/reports/partner-agent-numbers-detail.yaml
+  /v1/partners/{partner_id}/services/{service_id}/agent-weeks:
+    $ref: ./paths/reports/partner-agent-weeks.yaml
 
 components:
   securitySchemes:
@@ -2983,3 +3080,184 @@ components:
       $ref: ./components/schemas/operations/OutboxReplayInput.yaml
     OutboxReplay:
       $ref: ./components/schemas/operations/OutboxReplay.yaml
+    # Step 5 settlement: payouts and reports
+    PayeeKind:
+      $ref: ./components/schemas/payouts/PayeeKind.yaml
+    StatementState:
+      $ref: ./components/schemas/payouts/StatementState.yaml
+    StatementStandingCode:
+      $ref: ./components/schemas/payouts/StatementStandingCode.yaml
+    PayoutHoldCode:
+      $ref: ./components/schemas/payouts/PayoutHoldCode.yaml
+    StatementMoveKind:
+      $ref: ./components/schemas/payouts/StatementMoveKind.yaml
+    StatementActorKind:
+      $ref: ./components/schemas/payouts/StatementActorKind.yaml
+    StatementDocumentKind:
+      $ref: ./components/schemas/payouts/StatementDocumentKind.yaml
+    StatementOrderOutcome:
+      $ref: ./components/schemas/payouts/StatementOrderOutcome.yaml
+    StatementCarrier:
+      $ref: ./components/schemas/payouts/StatementCarrier.yaml
+    PayoutQuestionState:
+      $ref: ./components/schemas/payouts/PayoutQuestionState.yaml
+    PayoutDestinationKind:
+      $ref: ./components/schemas/payouts/PayoutDestinationKind.yaml
+    PayoutAccountCheckState:
+      $ref: ./components/schemas/payouts/PayoutAccountCheckState.yaml
+    PayoutAccountCheckBy:
+      $ref: ./components/schemas/payouts/PayoutAccountCheckBy.yaml
+    AgentPaidBy:
+      $ref: ./components/schemas/payouts/AgentPaidBy.yaml
+    AgentPayPartKind:
+      $ref: ./components/schemas/payouts/AgentPayPartKind.yaml
+    PayoutHold:
+      $ref: ./components/schemas/payouts/PayoutHold.yaml
+    StatementStanding:
+      $ref: ./components/schemas/payouts/StatementStanding.yaml
+    StatementActor:
+      $ref: ./components/schemas/payouts/StatementActor.yaml
+    StatementMove:
+      $ref: ./components/schemas/payouts/StatementMove.yaml
+    StatementFigures:
+      $ref: ./components/schemas/payouts/StatementFigures.yaml
+    StatementOrderRow:
+      $ref: ./components/schemas/payouts/StatementOrderRow.yaml
+    StatementRefund:
+      $ref: ./components/schemas/payouts/StatementRefund.yaml
+    StatementDay:
+      $ref: ./components/schemas/payouts/StatementDay.yaml
+    InvoiceParty:
+      $ref: ./components/schemas/payouts/InvoiceParty.yaml
+    StatementInvoiceLine:
+      $ref: ./components/schemas/payouts/StatementInvoiceLine.yaml
+    StatementInvoice:
+      $ref: ./components/schemas/payouts/StatementInvoice.yaml
+    StatementCreditNote:
+      $ref: ./components/schemas/payouts/StatementCreditNote.yaml
+    StatementDocument:
+      $ref: ./components/schemas/payouts/StatementDocument.yaml
+    PayoutAdjustment:
+      $ref: ./components/schemas/payouts/PayoutAdjustment.yaml
+    PayoutAdjustmentInput:
+      $ref: ./components/schemas/payouts/PayoutAdjustmentInput.yaml
+    PayoutAdjustmentPage:
+      $ref: ./components/schemas/payouts/PayoutAdjustmentPage.yaml
+    PayoutQuestion:
+      $ref: ./components/schemas/payouts/PayoutQuestion.yaml
+    PayoutQuestionInput:
+      $ref: ./components/schemas/payouts/PayoutQuestionInput.yaml
+    PayoutAnswerInput:
+      $ref: ./components/schemas/payouts/PayoutAnswerInput.yaml
+    PayoutQuestionPage:
+      $ref: ./components/schemas/payouts/PayoutQuestionPage.yaml
+    PayoutAccountCheck:
+      $ref: ./components/schemas/payouts/PayoutAccountCheck.yaml
+    PayoutAccountVerification:
+      $ref: ./components/schemas/payouts/PayoutAccountVerification.yaml
+    PayoutDestination:
+      $ref: ./components/schemas/payouts/PayoutDestination.yaml
+    AgentPayoutAccount:
+      $ref: ./components/schemas/payouts/AgentPayoutAccount.yaml
+    AgentPayoutAccountUpdate:
+      $ref: ./components/schemas/payouts/AgentPayoutAccountUpdate.yaml
+    Statement:
+      $ref: ./components/schemas/payouts/Statement.yaml
+    StatementSummary:
+      $ref: ./components/schemas/payouts/StatementSummary.yaml
+    StatementPage:
+      $ref: ./components/schemas/payouts/StatementPage.yaml
+    PayoutWeekSummary:
+      $ref: ./components/schemas/payouts/PayoutWeekSummary.yaml
+    PayoutWorking:
+      $ref: ./components/schemas/payouts/PayoutWorking.yaml
+    LocationPayouts:
+      $ref: ./components/schemas/payouts/LocationPayouts.yaml
+    StatementPaidInput:
+      $ref: ./components/schemas/payouts/StatementPaidInput.yaml
+    StatementUnpaidInput:
+      $ref: ./components/schemas/payouts/StatementUnpaidInput.yaml
+    StatementArchiveInput:
+      $ref: ./components/schemas/payouts/StatementArchiveInput.yaml
+    PayoutsDateMoveRecord:
+      $ref: ./components/schemas/payouts/PayoutsDateMoveRecord.yaml
+    PayoutsDate:
+      $ref: ./components/schemas/payouts/PayoutsDate.yaml
+    PayoutsDateMove:
+      $ref: ./components/schemas/payouts/PayoutsDateMove.yaml
+    AgentPayPart:
+      $ref: ./components/schemas/payouts/AgentPayPart.yaml
+    AgentStatementFigures:
+      $ref: ./components/schemas/payouts/AgentStatementFigures.yaml
+    AgentStatementTask:
+      $ref: ./components/schemas/payouts/AgentStatementTask.yaml
+    AgentStatement:
+      $ref: ./components/schemas/payouts/AgentStatement.yaml
+    AgentStatementSummary:
+      $ref: ./components/schemas/payouts/AgentStatementSummary.yaml
+    AgentStatementPage:
+      $ref: ./components/schemas/payouts/AgentStatementPage.yaml
+    AgentWeek:
+      $ref: ./components/schemas/payouts/AgentWeek.yaml
+    AgentWeekSummary:
+      $ref: ./components/schemas/payouts/AgentWeekSummary.yaml
+    AgentStatementList:
+      $ref: ./components/schemas/payouts/AgentStatementList.yaml
+    OrdersReportGrouping:
+      $ref: ./components/schemas/reports/OrdersReportGrouping.yaml
+    OrdersReportComparison:
+      $ref: ./components/schemas/reports/OrdersReportComparison.yaml
+    MetricsWindow:
+      $ref: ./components/schemas/reports/MetricsWindow.yaml
+    MetricStanding:
+      $ref: ./components/schemas/reports/MetricStanding.yaml
+    AgentActivityKind:
+      $ref: ./components/schemas/reports/AgentActivityKind.yaml
+    OrdersReportMoney:
+      $ref: ./components/schemas/reports/OrdersReportMoney.yaml
+    OrdersReportWays:
+      $ref: ./components/schemas/reports/OrdersReportWays.yaml
+    OrdersReportFigures:
+      $ref: ./components/schemas/reports/OrdersReportFigures.yaml
+    OrdersReportGroup:
+      $ref: ./components/schemas/reports/OrdersReportGroup.yaml
+    OrdersReportCustomers:
+      $ref: ./components/schemas/reports/OrdersReportCustomers.yaml
+    OrdersReport:
+      $ref: ./components/schemas/reports/OrdersReport.yaml
+    MetricFigure:
+      $ref: ./components/schemas/reports/MetricFigure.yaml
+    MetricsNow:
+      $ref: ./components/schemas/reports/MetricsNow.yaml
+    MetricsByLocation:
+      $ref: ./components/schemas/reports/MetricsByLocation.yaml
+    MetricsByProvider:
+      $ref: ./components/schemas/reports/MetricsByProvider.yaml
+    MetricsBoard:
+      $ref: ./components/schemas/reports/MetricsBoard.yaml
+    AgentNumbersRating:
+      $ref: ./components/schemas/reports/AgentNumbersRating.yaml
+    AgentNumbers:
+      $ref: ./components/schemas/reports/AgentNumbers.yaml
+    AgentNumbersTotals:
+      $ref: ./components/schemas/reports/AgentNumbersTotals.yaml
+    AgentNumbersPage:
+      $ref: ./components/schemas/reports/AgentNumbersPage.yaml
+    AgentNumbersDelivery:
+      $ref: ./components/schemas/reports/AgentNumbersDelivery.yaml
+    AgentNumbersDay:
+      $ref: ./components/schemas/reports/AgentNumbersDay.yaml
+    AgentDutyStretch:
+      $ref: ./components/schemas/reports/AgentDutyStretch.yaml
+    AgentActivityItem:
+      $ref: ./components/schemas/reports/AgentActivityItem.yaml
+    AgentActivityDay:
+      $ref: ./components/schemas/reports/AgentActivityDay.yaml
+    AgentNumbersDetail:
+      $ref: ./components/schemas/reports/AgentNumbersDetail.yaml
+    AgentWeeksRow:
+      $ref: ./components/schemas/reports/AgentWeeksRow.yaml
+    AgentWeeksTotals:
+      $ref: ./components/schemas/reports/AgentWeeksTotals.yaml
+    AgentWeeksReport:
+      $ref: ./components/schemas/reports/AgentWeeksReport.yaml

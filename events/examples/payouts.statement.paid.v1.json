@@ -1,0 +1,31 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9002",
+  "type": "payouts.statement.paid",
+  "version": 1,
+  "occurred_at": "2026-10-30T04:30:05Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "payee_kind": "location",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "agent_id": null,
+    "statement_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101",
+    "reference": "ZG-2026W43",
+    "week": "2026W43",
+    "state": "paid",
+    "previous_state": "sending",
+    "version": 3,
+    "currency": "INR",
+    "at": "2026-10-30T04:30:05Z",
+    "amount": {
+      "minor_units": 42920,
+      "currency": "INR"
+    },
+    "paid_on": "2026-10-30",
+    "transfer_reference": "SIMPAY-20261030-0001",
+    "how": "provider",
+    "destination_kind": "bank",
+    "destination_last4": "6789"
+  }
+}

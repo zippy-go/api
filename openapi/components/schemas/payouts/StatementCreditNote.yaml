@@ -1,0 +1,70 @@
+type: object
+description: A credit note putting right a fee found wrong after its invoice, numbered from its own counter on the statement that settles the adjustment; the invoice itself never changes.
+required:
+  - number
+  - issued_on
+  - adjustment_id
+  - reason
+  - taxable_value
+  - cgst
+  - sgst
+  - igst
+  - total
+properties:
+  number:
+    type: string
+    description: The credit note's number, `CN-{year}-{nnnnn}`.
+    examples:
+      - CN-2026-00003
+  issued_on:
+    type: string
+    format: date
+    description: When it was issued.
+    examples:
+      - 2026-11-03
+  adjustment_id:
+    type: string
+    format: uuid
+    description: The adjustment that credits the fee back.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5401
+  reason:
+    type: string
+    description: Why.
+    examples:
+      - Fee charged twice on AB0042
+  taxable_value:
+    $ref: ../common/Money.yaml
+    description: The fee credited back.
+  cgst:
+    $ref: ../common/Money.yaml
+    description: Central GST credited back.
+  sgst:
+    $ref: ../common/Money.yaml
+    description: State GST credited back.
+  igst:
+    $ref: ../common/Money.yaml
+    description: Integrated GST credited back.
+  total:
+    $ref: ../common/Money.yaml
+    description: Everything credited back.
+examples:
+  - number: CN-2026-00003
+    issued_on: 2026-11-03
+    adjustment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5401
+    reason: Fee charged twice on AB0042
+    taxable_value:
+      minor_units: 6000
+      currency: INR
+    cgst:
+      minor_units: 540
+      currency: INR
+    sgst:
+      minor_units: 540
+      currency: INR
+    igst:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 7080
+      currency: INR

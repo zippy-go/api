@@ -1,5 +1,5 @@
 type: string
-description: "What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet)."
+description: "What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), the memorandum pair `card_holds` and `card_holds_contra`, and since contract 0.19.0 `agent_pay_expense` (the platform fleet's pay to its Agents), `payout_adjustments` (adjustments to Partners' and Agents' payouts) and `payouts_clearing` (money the payout provider sends to Partners and Agents). Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet), and since 0.19.0 `agent_payable` (owed to a platform fleet Agent)."
 enum:
   - provider_clearing
   - cash_in_transit
@@ -17,5 +17,9 @@ enum:
   - partner_payable
   - customer_wallet_paid
   - customer_wallet_promotional
+  - agent_payable
+  - agent_pay_expense
+  - payout_adjustments
+  - payouts_clearing
 examples:
   - partner_payable

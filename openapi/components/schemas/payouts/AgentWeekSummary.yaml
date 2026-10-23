@@ -1,0 +1,71 @@
+type: object
+description: A past week of a Partner's own Agent, reported to the Partner.
+required:
+  - week
+  - starts_on
+  - ends_on
+  - tasks
+  - deliveries
+  - distance_metres
+  - pay
+  - tips
+  - cash_collected
+properties:
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week.
+    examples:
+      - 2026W43
+  starts_on:
+    type: string
+    format: date
+    description: Its Monday.
+    examples:
+      - 2026-10-19
+  ends_on:
+    type: string
+    format: date
+    description: Its Sunday.
+    examples:
+      - 2026-10-25
+  tasks:
+    type: integer
+    description: Tasks that paid.
+    examples:
+      - 2
+  deliveries:
+    type: integer
+    description: Drop-offs completed.
+    examples:
+      - 1
+  distance_metres:
+    type: integer
+    description: The measured distance, in metres.
+    examples:
+      - 3600
+  pay:
+    $ref: ../common/Money.yaml
+    description: Pay under the Partner's rule.
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash collected.
+examples:
+  - week: 2026W43
+    starts_on: 2026-10-19
+    ends_on: 2026-10-25
+    tasks: 2
+    deliveries: 1
+    distance_metres: 3600
+    pay:
+      minor_units: 7660
+      currency: INR
+    tips:
+      minor_units: 2000
+      currency: INR
+    cash_collected:
+      minor_units: 0
+      currency: INR

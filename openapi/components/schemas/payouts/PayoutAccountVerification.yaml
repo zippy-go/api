@@ -1,0 +1,14 @@
+type: object
+description: "Checking a destination by hand, for the day the payout provider is not there: written to the audit log with the reason."
+required: []
+properties:
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why it is checked by hand, such as the bank letter seen; at most 500 characters.
+    examples:
+      - Cancelled cheque matches the legal name
+    maxLength: 500
+examples:
+  - reason: Cancelled cheque matches the legal name

@@ -1,0 +1,125 @@
+type: object
+description: "The weekly report of a Partner's own Agents in one delivery service: per Agent the tasks completed, distance, hours, tips, cash collected and the pay the Partner's own pay rule gives. No money moves from the platform to them. Also served as a spreadsheet (`Accept: text/csv`)."
+required:
+  - partner_id
+  - service_id
+  - service_name
+  - week
+  - starts_on
+  - ends_on
+  - time_zone
+  - currency
+  - rule_version
+  - sentence
+  - items
+  - totals
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000203
+  service_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen delivery
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week.
+    examples:
+      - 2026W43
+  starts_on:
+    type: string
+    format: date
+    description: Its Monday.
+    examples:
+      - 2026-10-19
+  ends_on:
+    type: string
+    format: date
+    description: Its Sunday.
+    examples:
+      - 2026-10-25
+  time_zone:
+    type: string
+    description: The clock it is read on.
+    examples:
+      - Asia/Kolkata
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  rule_version:
+    type:
+      - integer
+      - "null"
+    description: The pay rule version in force at the week's end.
+    examples:
+      - 1
+  sentence:
+    type: string
+    description: That the Partner pays them, in words.
+    examples:
+      - "Reported, not paid: ZippyGo Dev Partner pays its own Agents."
+  items:
+    type: array
+    items:
+      $ref: ./AgentWeeksRow.yaml
+      description: An Agent.
+    description: Each Agent who worked or was a member, by name.
+  totals:
+    $ref: ./AgentWeeksTotals.yaml
+    description: Everyone together.
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000001
+    service_id: 01a13a48-9e00-7000-8000-000000000203
+    service_name: Dev Kitchen delivery
+    week: 2026W43
+    starts_on: 2026-10-19
+    ends_on: 2026-10-25
+    time_zone: Asia/Kolkata
+    currency: INR
+    rule_version: 1
+    sentence: "Reported, not paid: ZippyGo Dev Partner pays its own Agents."
+    items:
+      - agent_id: 01a13a48-9e00-7000-8000-000000000107
+        name: Ravi Kumar
+        status: active
+        tasks_completed: 4
+        deliveries: 2
+        distance_metres: 7200
+        minutes_on_duty: 300
+        tips:
+          minor_units: 2000
+          currency: INR
+        cash_collected:
+          minor_units: 45000
+          currency: INR
+        pay:
+          minor_units: 15320
+          currency: INR
+    totals:
+      agents: 1
+      tasks_completed: 4
+      deliveries: 2
+      distance_metres: 7200
+      minutes_on_duty: 300
+      tips:
+        minor_units: 2000
+        currency: INR
+      cash_collected:
+        minor_units: 45000
+        currency: INR
+      pay:
+        minor_units: 15320
+        currency: INR

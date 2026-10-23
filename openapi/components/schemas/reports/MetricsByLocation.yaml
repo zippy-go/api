@@ -1,0 +1,64 @@
+type: object
+description: The metrics of one store.
+required:
+  - location_id
+  - partner_id
+  - name
+  - preparation
+  - delivery
+  - fulfilment
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  preparation:
+    $ref: ./MetricFigure.yaml
+    description: From acceptance to ready, against the time the store gave.
+  delivery:
+    $ref: ./MetricFigure.yaml
+    description: From leaving the store to the door, against the promise.
+  fulfilment:
+    $ref: ./MetricFigure.yaml
+    description: From placing to the door or the counter, against the promise.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    name: Dev Kitchen Gachibowli
+    preparation:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    delivery:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical
+    fulfilment:
+      orders: 50
+      measured: 50
+      on_time: 10
+      late: 40
+      on_time_share: 0.2
+      average_minutes: 34.5
+      standing: critical

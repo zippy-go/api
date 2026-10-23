@@ -1,0 +1,106 @@
+type: object
+description: "One task of an Agent's week: what it paid under the rule version it was offered under, the tip in full and the cash collected on it."
+required:
+  - task_id
+  - delivery_id
+  - order_number
+  - kind
+  - outcome
+  - earned_at
+  - rule_version
+  - lines
+  - pay
+  - tip
+  - cash_collected
+  - distance_metres
+properties:
+  task_id:
+    type: string
+    format: uuid
+    description: The task.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5501
+  delivery_id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+  order_number:
+    type: string
+    description: The order's number.
+    examples:
+      - AB0042
+  kind:
+    $ref: ../agents/TaskKind.yaml
+    description: The stop.
+  outcome:
+    $ref: ../agents/EarningOutcome.yaml
+    description: Why it paid.
+  earned_at:
+    type: string
+    format: date-time
+    description: When it was earned.
+    examples:
+      - 2026-10-22T13:40:00Z
+  rule_version:
+    type: integer
+    description: The pay rule version.
+    examples:
+      - 1
+  lines:
+    type: array
+    items:
+      $ref: ../agents/EarningLine.yaml
+      description: A line.
+    description: The breakdown, the tip included.
+  pay:
+    $ref: ../common/Money.yaml
+    description: Its pay, the tip not included.
+  tip:
+    $ref: ../common/Money.yaml
+    description: Its tip, in full.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash collected on it.
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The measured distance of a drop-off, in metres.
+    examples:
+      - 3600
+examples:
+  - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5501
+    delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+    order_number: AB0042
+    kind: drop_off
+    outcome: completed
+    earned_at: 2026-10-22T13:40:00Z
+    rule_version: 1
+    lines:
+      - kind: drop_off
+        label: Drop-off
+        amount:
+          minor_units: 3000
+          currency: INR
+      - kind: distance
+        label: 3.6 km at ₹6.00 per km
+        amount:
+          minor_units: 2160
+          currency: INR
+      - kind: tip
+        label: Tip, in full
+        amount:
+          minor_units: 2000
+          currency: INR
+    pay:
+      minor_units: 5160
+      currency: INR
+    tip:
+      minor_units: 2000
+      currency: INR
+    cash_collected:
+      minor_units: 0
+      currency: INR
+    distance_metres: 3600

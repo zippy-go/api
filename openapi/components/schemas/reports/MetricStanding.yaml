@@ -1,0 +1,9 @@
+type: string
+description: "How a share of orders on time reads: `good` at 90% or more, `warning` from 75% to 90%, `critical` below 75%, `no_orders` when nothing was measured."
+enum:
+  - good
+  - warning
+  - critical
+  - no_orders
+examples:
+  - critical

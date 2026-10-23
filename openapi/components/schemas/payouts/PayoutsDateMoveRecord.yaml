@@ -1,0 +1,47 @@
+type: object
+description: One move of the payouts date.
+required:
+  - moved_at
+  - from
+  - to
+  - by_name
+  - reason
+properties:
+  moved_at:
+    type: string
+    format: date-time
+    description: When it was moved, in real time.
+    examples:
+      - 2026-10-22T08:00:00Z
+  from:
+    type: string
+    format: date-time
+    description: The payouts date before.
+    examples:
+      - 2026-10-22T08:00:00Z
+  to:
+    type: string
+    format: date-time
+    description: The payouts date after.
+    examples:
+      - 2026-10-26T03:30:00Z
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Who moved it.
+    examples:
+      - Platform Admin
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why.
+    examples:
+      - Checking week 2026W43
+examples:
+  - moved_at: 2026-10-22T08:00:00Z
+    from: 2026-10-22T08:00:00Z
+    to: 2026-10-26T03:30:00Z
+    by_name: Platform Admin
+    reason: Checking week 2026W43

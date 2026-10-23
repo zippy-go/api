@@ -1,0 +1,11 @@
+type: string
+description: What an Agent did, on their activity log.
+enum:
+  - duty_started
+  - duty_ended
+  - delivery_taken
+  - delivery_collected
+  - delivered
+  - drop_failed
+examples:
+  - delivered

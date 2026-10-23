@@ -1,0 +1,23 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9004",
+  "type": "payouts.statement.archived",
+  "version": 1,
+  "occurred_at": "2026-10-27T00:15:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "payee_kind": "location",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "agent_id": null,
+    "statement_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101",
+    "reference": "ZG-2026W43",
+    "week": "2026W43",
+    "state": "archived",
+    "previous_state": null,
+    "version": 1,
+    "currency": "INR",
+    "at": "2026-10-27T00:15:00Z",
+    "reason": "Nothing to pay: the week came to −₹170.00, carried to the next statement"
+  }
+}

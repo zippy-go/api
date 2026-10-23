@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payouts.adjustment.added.v1.schema.json",
+  "title": "PayoutsAdjustmentAddedPayload",
+  "description": "Payload of `payouts.adjustment.added` version 1. Platform staff added money to a payee's payout or took money off it, with a reason the payee reads; it lands in the first week not locked yet and is settled into the statement that locks it. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "payee_kind",
+    "partner_id",
+    "location_id",
+    "agent_id",
+    "adjustment_id",
+    "week",
+    "amount",
+    "fee_correction",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "payee_kind": {
+      "type": "string",
+      "description": "Whom the statement pays: a Location, or a platform fleet Agent.",
+      "examples": [
+        "location"
+      ],
+      "enum": [
+        "location",
+        "agent"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner, or the Agent's; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Location, for a Location's statement; `null` for an Agent's.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent membership, for an Agent's statement; `null` for a Location's.",
+      "examples": [
+        null
+      ]
+    },
+    "adjustment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The adjustment.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5401"
+      ]
+    },
+    "week": {
+      "type": "string",
+      "description": "The week it landed in.",
+      "examples": [
+        "2026W43"
+      ],
+      "pattern": "^[0-9]{4}W[0-9]{2}$"
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "Positive adds, negative takes off."
+    },
+    "fee_correction": {
+      "type": "boolean",
+      "description": "Whether it credits back a fee found wrong, with its GST and a credit note.",
+      "examples": [
+        false
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why, as the payee reads it.",
+      "examples": [
+        "Goodwill for the outage on 21 October"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-26T05:00:00Z"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,8 @@
+type: string
+description: "What the orders report is compared with: nothing, the period just before of the same length, or the same dates a year before."
+enum:
+  - none
+  - previous_period
+  - previous_year
+examples:
+  - none

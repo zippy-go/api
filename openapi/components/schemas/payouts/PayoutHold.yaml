@@ -1,0 +1,17 @@
+type: object
+description: What holds a due statement, in words.
+required:
+  - code
+  - sentence
+properties:
+  code:
+    $ref: ./PayoutHoldCode.yaml
+    description: The hold.
+  sentence:
+    type: string
+    description: 'The hold in words: "No bank account yet", "Bank account not checked yet", "Bank account check failed" or "The Partner is gone".'
+    examples:
+      - Bank account not checked yet
+examples:
+  - code: account_not_checked
+    sentence: Bank account not checked yet

@@ -1,0 +1,197 @@
+type: object
+description: Days of a Location not locked yet, or any range of its days up to a year, worked out as a payout would be. An estimate while it can still change.
+required:
+  - from
+  - until
+  - week
+  - estimate
+  - sentence
+  - figures
+  - rows
+  - refunds
+  - adjustments
+  - days
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day.
+    examples:
+      - 2026-10-26
+  until:
+    type: string
+    format: date
+    description: The last day, included.
+    examples:
+      - 2026-11-01
+  week:
+    type:
+      - string
+      - "null"
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week, when the range is one week.
+    examples:
+      - 2026W44
+  estimate:
+    type: boolean
+    description: "`true` while any of its days can still change."
+  sentence:
+    type: string
+    description: What it is, in words.
+    examples:
+      - "So far this week: an estimate while it can still change."
+  figures:
+    $ref: ./StatementFigures.yaml
+    description: How it works out; no carry and no invoice GST until the lock, so the fee's GST is the orders' own.
+  rows:
+    type: array
+    items:
+      $ref: ./StatementOrderRow.yaml
+      description: An order's part.
+    description: Its orders.
+  refunds:
+    type: array
+    items:
+      $ref: ./StatementRefund.yaml
+      description: A refund.
+    description: Its refunds.
+  adjustments:
+    type: array
+    items:
+      $ref: ./PayoutAdjustment.yaml
+      description: An adjustment.
+    description: Adjustments waiting for its lock.
+  days:
+    type: array
+    items:
+      $ref: ./StatementDay.yaml
+      description: A day.
+    description: Day by day.
+examples:
+  - from: 2026-10-26
+    until: 2026-11-01
+    week: 2026W44
+    estimate: true
+    sentence: "So far this week: an estimate while it can still change."
+    figures:
+      sales:
+        minor_units: 50000
+        currency: INR
+      promotions:
+        minor_units: 0
+        currency: INR
+      net_sales:
+        minor_units: 50000
+        currency: INR
+      fee:
+        minor_units: 6000
+        currency: INR
+      fee_gst:
+        minor_units: 1080
+        currency: INR
+      cancellation_fees:
+        minor_units: 0
+        currency: INR
+      cancellation_fees_gst:
+        minor_units: 0
+        currency: INR
+      delivery_charges:
+        minor_units: 0
+        currency: INR
+      tips:
+        minor_units: 0
+        currency: INR
+      cutlery_charges:
+        minor_units: 0
+        currency: INR
+      refunds:
+        minor_units: 0
+        currency: INR
+      cash_collected:
+        minor_units: 0
+        currency: INR
+      tax_deducted:
+        minor_units: 0
+        currency: INR
+      adjustments:
+        minor_units: 0
+        currency: INR
+      carried_in:
+        minor_units: 0
+        currency: INR
+      total:
+        minor_units: 42920
+        currency: INR
+      payable:
+        minor_units: 42920
+        currency: INR
+      carried_out:
+        minor_units: 0
+        currency: INR
+    rows:
+      - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        number: AB0042
+        outcome: completed
+        ended_at: 2026-10-22T13:40:00Z
+        carrier: platform_fleet
+        sales:
+          minor_units: 50000
+          currency: INR
+        promotions:
+          minor_units: 0
+          currency: INR
+        net_sales:
+          minor_units: 50000
+          currency: INR
+        plan: country India
+        rate_bp: 1200
+        fee:
+          minor_units: 6000
+          currency: INR
+        fee_gst:
+          minor_units: 1080
+          currency: INR
+        delivery_charge:
+          minor_units: 0
+          currency: INR
+        tip:
+          minor_units: 0
+          currency: INR
+        cutlery_charge:
+          minor_units: 0
+          currency: INR
+        cash_collected:
+          minor_units: 0
+          currency: INR
+        refunds:
+          minor_units: 0
+          currency: INR
+        partner_gets:
+          minor_units: 42920
+          currency: INR
+    refunds: []
+    adjustments: []
+    days:
+      - date: 2026-10-22
+        orders: 1
+        sales:
+          minor_units: 50000
+          currency: INR
+        fee:
+          minor_units: 6000
+          currency: INR
+        fee_gst:
+          minor_units: 1080
+          currency: INR
+        charges:
+          minor_units: 0
+          currency: INR
+        refunds:
+          minor_units: 0
+          currency: INR
+        cash_collected:
+          minor_units: 0
+          currency: INR
+        total:
+          minor_units: 42920
+          currency: INR

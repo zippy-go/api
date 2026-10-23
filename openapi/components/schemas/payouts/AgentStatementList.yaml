@@ -1,0 +1,195 @@
+type: object
+description: "An Agent's money in the Agent app: the week so far, the next payment and where it stands, past statements with their PDFs, and where they are paid. A Partner's own Agent has no statements: their past weeks are reported to the Partner, who pays them."
+required:
+  - agent_id
+  - partner_id
+  - partner_name
+  - paid_by
+  - sentence
+  - today
+  - week_so_far
+  - next_payment
+  - statements
+  - weeks
+  - destination
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  partner_id:
+    type: string
+    format: uuid
+    description: The Agent's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  partner_name:
+    type: string
+    description: The Partner's name.
+    examples:
+      - ZippyGo Fleet
+  paid_by:
+    $ref: ./AgentPaidBy.yaml
+    description: Who pays the Agent.
+  sentence:
+    type: string
+    description: How the Agent is paid, in words.
+    examples:
+      - Paid every Friday by ZippyGo to your checked UPI ID.
+  today:
+    type: string
+    format: date
+    description: The day payouts work to, on the fleet's clock.
+    examples:
+      - 2026-10-26
+  week_so_far:
+    $ref: ./AgentWeek.yaml
+    description: The week in progress.
+  next_payment:
+    oneOf:
+      - $ref: ./PayoutWeekSummary.yaml
+      - type: "null"
+    description: The next payment from the platform; `null` for a Partner's own Agent and before any work.
+  statements:
+    type: array
+    items:
+      $ref: ./AgentStatementSummary.yaml
+      description: A statement.
+    description: Six months of statements, newest first; empty for a Partner's own Agent.
+  weeks:
+    type: array
+    items:
+      $ref: ./AgentWeekSummary.yaml
+      description: A week.
+    description: A Partner's own Agent's past weeks, newest first, eight at most; empty for the platform fleet.
+  destination:
+    oneOf:
+      - $ref: ./PayoutDestination.yaml
+      - type: "null"
+    description: Where the platform pays the Agent; `null` for a Partner's own Agent and before one is given.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    partner_name: ZippyGo Fleet
+    paid_by: platform
+    sentence: Paid every Friday by ZippyGo to your checked UPI ID.
+    today: 2026-10-26
+    week_so_far:
+      agent_id: 01a13a48-9e00-7000-8000-000000000107
+      agent_name: Ravi Kumar
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      partner_name: ZippyGo Fleet
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      week: 2026W44
+      starts_on: 2026-10-26
+      ends_on: 2026-11-01
+      time_zone: Asia/Kolkata
+      currency: INR
+      paid_by: platform
+      estimate: true
+      statement_id: null
+      sentence: "So far this week: an estimate while it can still change."
+      tasks:
+        - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5501
+          delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+          order_number: AB0042
+          kind: drop_off
+          outcome: completed
+          earned_at: 2026-10-22T13:40:00Z
+          rule_version: 1
+          lines:
+            - kind: drop_off
+              label: Drop-off
+              amount:
+                minor_units: 3000
+                currency: INR
+            - kind: distance
+              label: 3.6 km at ₹6.00 per km
+              amount:
+                minor_units: 2160
+                currency: INR
+            - kind: tip
+              label: Tip, in full
+              amount:
+                minor_units: 2000
+                currency: INR
+          pay:
+            minor_units: 5160
+            currency: INR
+          tip:
+            minor_units: 2000
+            currency: INR
+          cash_collected:
+            minor_units: 0
+            currency: INR
+          distance_metres: 3600
+      deliveries: 1
+      distance_metres: 3600
+      minutes_on_duty: 180
+      pay:
+        minor_units: 5160
+        currency: INR
+      tips:
+        minor_units: 2000
+        currency: INR
+      cash_collected:
+        minor_units: 0
+        currency: INR
+      total:
+        minor_units: 7160
+        currency: INR
+    next_payment:
+      week: 2026W43
+      reference: AG-2026W43
+      starts_on: 2026-10-19
+      ends_on: 2026-10-25
+      statement_id: null
+      estimate: true
+      state: null
+      standing:
+        code: locking
+        sentence: Locking on Tuesday 27 October, paid on Friday 30 October
+      total:
+        minor_units: 269000
+        currency: INR
+      locks_on: 2026-10-27
+      pays_on: 2026-10-30
+    statements:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5201
+        reference: AG-2026W43
+        agent_id: 01a13a48-9e00-7000-8000-000000000107
+        agent_name: Ravi Kumar
+        partner_id: 01a13a48-9e00-7000-8000-000000000002
+        week: 2026W43
+        starts_on: 2026-10-19
+        ends_on: 2026-10-25
+        state: due
+        standing:
+          code: due
+          sentence: Due on Friday 30 October
+        holds: []
+        total:
+          minor_units: 269000
+          currency: INR
+        payable:
+          minor_units: 269000
+          currency: INR
+        pays_on: 2026-10-30
+        paid_on: null
+        transfer_reference: null
+        unanswered_questions: 0
+        locked_at: 2026-10-27T00:15:00Z
+    weeks: []
+    destination:
+      kind: upi
+      holder_name: Ravi Kumar
+      last4: null
+      upi_id: ravi.kumar@okaxis
+      check:
+        state: passed
+        reason: null
+        checked_at: 2026-10-22T06:30:05Z
+        by: provider
+        reference: SIMCHK-7F3A21

@@ -1,0 +1,9 @@
+type: string
+description: "Where the one-rupee check stands: `not_checked` before it is asked, `checking` while the payout provider sends ₹1.00, `passed` when the name the bank returns is the holder's legal name (or staff checked it by hand), `failed` with the reason."
+enum:
+  - not_checked
+  - checking
+  - passed
+  - failed
+examples:
+  - passed

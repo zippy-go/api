@@ -1,0 +1,9 @@
+type: string
+description: "Who carried an order: the platform fleet (the delivery fee and the tip are not the Location's), the Location's own Agents (both are), an external carrier, or nobody for a pickup."
+enum:
+  - platform_fleet
+  - own_agents
+  - external_carrier
+  - none
+examples:
+  - platform_fleet

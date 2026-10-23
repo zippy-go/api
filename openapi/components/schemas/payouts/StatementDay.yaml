@@ -1,0 +1,69 @@
+type: object
+description: "One day of a week, on the Location's clock: what its orders, refunds and cash came to."
+required:
+  - date
+  - orders
+  - sales
+  - fee
+  - fee_gst
+  - charges
+  - refunds
+  - cash_collected
+  - total
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-10-22
+  orders:
+    type: integer
+    description: Orders that ended that day.
+    examples:
+      - 1
+  sales:
+    $ref: ../common/Money.yaml
+    description: Their sales.
+  fee:
+    $ref: ../common/Money.yaml
+    description: The fee on them, cancellation fees included.
+  fee_gst:
+    $ref: ../common/Money.yaml
+    description: GST on the fee, as the orders were split.
+  charges:
+    $ref: ../common/Money.yaml
+    description: Delivery charges, tips and cutlery charges that are the Location's.
+  refunds:
+    $ref: ../common/Money.yaml
+    description: Refunds charged that day.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash the Location collected that day.
+  total:
+    $ref: ../common/Money.yaml
+    description: The day's part of the week's total, before adjustments and the carry.
+examples:
+  - date: 2026-10-22
+    orders: 1
+    sales:
+      minor_units: 50000
+      currency: INR
+    fee:
+      minor_units: 6000
+      currency: INR
+    fee_gst:
+      minor_units: 1080
+      currency: INR
+    charges:
+      minor_units: 0
+      currency: INR
+    refunds:
+      minor_units: 0
+      currency: INR
+    cash_collected:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 42920
+      currency: INR

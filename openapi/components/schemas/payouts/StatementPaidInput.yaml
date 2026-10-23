@@ -1,0 +1,22 @@
+type: object
+description: Marking a statement paid outside the payout provider.
+required:
+  - paid_on
+  - reference
+properties:
+  paid_on:
+    type: string
+    format: date
+    description: The day it was paid, not in the future.
+    examples:
+      - 2026-10-30
+  reference:
+    type: string
+    description: The transfer's reference, 1 to 64 characters.
+    examples:
+      - UTR2026103012345
+    minLength: 1
+    maxLength: 64
+examples:
+  - paid_on: 2026-10-30
+    reference: UTR2026103012345

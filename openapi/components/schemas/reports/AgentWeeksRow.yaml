@@ -1,0 +1,74 @@
+type: object
+description: One Agent's week in a Partner's own delivery service, reported for the Partner to pay.
+required:
+  - agent_id
+  - name
+  - status
+  - tasks_completed
+  - deliveries
+  - distance_metres
+  - minutes_on_duty
+  - tips
+  - cash_collected
+  - pay
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  status:
+    $ref: ../agents/AgentMembershipStatus.yaml
+    description: Their membership's status.
+  tasks_completed:
+    type: integer
+    description: Tasks completed.
+    examples:
+      - 4
+  deliveries:
+    type: integer
+    description: Drop-offs completed.
+    examples:
+      - 2
+  distance_metres:
+    type: integer
+    description: The measured distance, in metres.
+    examples:
+      - 7200
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty.
+    examples:
+      - 300
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips customers gave, which the Partner's statement pays it to pass on.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash collected.
+  pay:
+    $ref: ../common/Money.yaml
+    description: What the Partner's pay rule gives.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    name: Ravi Kumar
+    status: active
+    tasks_completed: 4
+    deliveries: 2
+    distance_metres: 7200
+    minutes_on_duty: 300
+    tips:
+      minor_units: 2000
+      currency: INR
+    cash_collected:
+      minor_units: 45000
+      currency: INR
+    pay:
+      minor_units: 15320
+      currency: INR

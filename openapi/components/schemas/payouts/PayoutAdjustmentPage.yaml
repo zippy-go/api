@@ -1,0 +1,38 @@
+type: object
+description: A page of adjustments, newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PayoutAdjustment.yaml
+      description: An adjustment.
+    description: The adjustments on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5401
+        payee_kind: location
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        agent_id: null
+        week: 2026W43
+        amount:
+          minor_units: 150000
+          currency: INR
+        fee_correction: false
+        reason: Goodwill for the outage on 21 October
+        note: null
+        statement_id: null
+        settled: false
+        added_at: 2026-10-26T05:00:00Z
+        added_by_name: null
+    next_cursor: null

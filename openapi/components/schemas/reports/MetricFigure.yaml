@@ -1,0 +1,56 @@
+type: object
+description: "One measure of the metrics board: each order measured against its own promise as the customer was last told it."
+required:
+  - orders
+  - measured
+  - on_time
+  - late
+  - on_time_share
+  - average_minutes
+  - standing
+properties:
+  orders:
+    type: integer
+    description: Orders in the window.
+    examples:
+      - 50
+  measured:
+    type: integer
+    description: "Orders measured: those that reached the end of this measure."
+    examples:
+      - 50
+  on_time:
+    type: integer
+    description: Measured orders within their promise.
+    examples:
+      - 10
+  late:
+    type: integer
+    description: Measured orders after their promise.
+    examples:
+      - 40
+  on_time_share:
+    type:
+      - number
+      - "null"
+    description: The share on time, from 0 to 1; `null` with nothing measured.
+    examples:
+      - 0.2
+  average_minutes:
+    type:
+      - number
+      - "null"
+    description: The average minutes the measure took; `null` with nothing measured.
+    examples:
+      - 34.5
+  standing:
+    $ref: ./MetricStanding.yaml
+    description: How it reads.
+examples:
+  - orders: 50
+    measured: 50
+    on_time: 10
+    late: 40
+    on_time_share: 0.2
+    average_minutes: 34.5
+    standing: critical

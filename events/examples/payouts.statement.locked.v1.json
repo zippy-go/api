@@ -1,0 +1,132 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9000",
+  "type": "payouts.statement.locked",
+  "version": 1,
+  "occurred_at": "2026-10-27T00:15:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "payee_kind": "location",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "agent_id": null,
+    "statement_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101",
+    "reference": "ZG-2026W43",
+    "week": "2026W43",
+    "state": "due",
+    "previous_state": null,
+    "version": 1,
+    "currency": "INR",
+    "at": "2026-10-27T00:15:00Z",
+    "locked_by": "clock",
+    "starts_on": "2026-10-19",
+    "ends_on": "2026-10-25",
+    "time_zone": "Asia/Kolkata",
+    "figures": {
+      "sales": {
+        "minor_units": 50000,
+        "currency": "INR"
+      },
+      "fee": {
+        "minor_units": 6000,
+        "currency": "INR"
+      },
+      "fee_gst": {
+        "minor_units": 1080,
+        "currency": "INR"
+      },
+      "cancellation_fees": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "cancellation_fees_gst": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "fee_credits": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "fee_credits_gst": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "delivery_charges": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "tips": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "cutlery_charges": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "refunds": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "cash_collected": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "pay": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "cash_kept": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "adjustments": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "carried_in": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "total": {
+        "minor_units": 42920,
+        "currency": "INR"
+      },
+      "payable": {
+        "minor_units": 42920,
+        "currency": "INR"
+      },
+      "carried_out": {
+        "minor_units": 0,
+        "currency": "INR"
+      }
+    },
+    "invoice": {
+      "number": "INV-2026-00017",
+      "taxable_value": {
+        "minor_units": 6000,
+        "currency": "INR"
+      },
+      "cgst": {
+        "minor_units": 540,
+        "currency": "INR"
+      },
+      "sgst": {
+        "minor_units": 540,
+        "currency": "INR"
+      },
+      "igst": {
+        "minor_units": 0,
+        "currency": "INR"
+      },
+      "total": {
+        "minor_units": 7080,
+        "currency": "INR"
+      }
+    },
+    "credit_note_numbers": [],
+    "gst_difference": {
+      "minor_units": 0,
+      "currency": "INR"
+    }
+  }
+}

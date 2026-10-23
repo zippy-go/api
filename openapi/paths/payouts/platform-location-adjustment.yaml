@@ -1,0 +1,71 @@
+# Path item for /v1/platform/locations/{location_id}/payout-adjustments/{adjustment_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The Location.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+  - name: adjustment_id
+    in: path
+    required: true
+    description: The adjustment.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5401
+delete:
+  operationId: removeLocationPayoutAdjustment
+  summary: Take an adjustment back
+  description: Takes back an adjustment while its week is not locked; after the lock it is refused, saying only another adjustment can undo it now. Written to the audit log. `payout:manage`.
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  responses:
+    "204":
+      description: Taken back.
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such adjustment of the payee (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`adjustment_settled`: its week is locked; only another adjustment can undo it now."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

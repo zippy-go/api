@@ -1,0 +1,24 @@
+type: object
+description: One part of an Agent's pay over a week.
+required:
+  - kind
+  - label
+  - amount
+properties:
+  kind:
+    $ref: ./AgentPayPartKind.yaml
+    description: Which part.
+  label:
+    type: string
+    description: The part in words.
+    examples:
+      - Base pay
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it came to.
+examples:
+  - kind: base
+    label: Base pay
+    amount:
+      minor_units: 210000
+      currency: INR

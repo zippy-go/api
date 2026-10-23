@@ -1,0 +1,131 @@
+type: object
+description: "How a Location's week was worked out: its item sales; less what the Partner paid towards its promotions; less the platform's fee on the rest with the GST the invoice bills on it; less the fee and its GST on each order the Partner cancelled after the customer paid; plus delivery charges and tips for the Location's own Agents, and cutlery charges; less the refunds charged to the Partner; less the cash the Location collected itself; less tax deducted at source; plus or less adjustments; plus what was carried in. Every amount but `adjustments`, `carried_in`, `total` and `carried_out` is positive and named for what it is; the order rows, the refunds, the adjustments and the carry add up to `total`."
+required:
+  - sales
+  - promotions
+  - net_sales
+  - fee
+  - fee_gst
+  - cancellation_fees
+  - cancellation_fees_gst
+  - delivery_charges
+  - tips
+  - cutlery_charges
+  - refunds
+  - cash_collected
+  - tax_deducted
+  - adjustments
+  - carried_in
+  - total
+  - payable
+  - carried_out
+properties:
+  sales:
+    $ref: ../common/Money.yaml
+    description: Item sales of the orders that ended in the week, tax included.
+  promotions:
+    $ref: ../common/Money.yaml
+    description: What the Partner paid towards its promotions; nothing until promotions arrive.
+  net_sales:
+    $ref: ../common/Money.yaml
+    description: Sales after the Partner's promotions, which the fee is worked out on.
+  fee:
+    $ref: ../common/Money.yaml
+    description: The platform's fee on net sales, rounded half up on each order.
+  fee_gst:
+    $ref: ../common/Money.yaml
+    description: "GST on the fee as the invoice bills it: worked out on the week's fee, each half rounded half up once."
+  cancellation_fees:
+    $ref: ../common/Money.yaml
+    description: The fee on each order the Partner cancelled after the customer paid.
+  cancellation_fees_gst:
+    $ref: ../common/Money.yaml
+    description: GST on the cancellation fees, as the invoice bills it.
+  delivery_charges:
+    $ref: ../common/Money.yaml
+    description: Delivery charges of orders the Location's own Agents carried; the platform takes no fee on them.
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips customers gave the Location's own Agents, for the Partner to pass on.
+  cutlery_charges:
+    $ref: ../common/Money.yaml
+    description: Cutlery charges, which are the Location's.
+  refunds:
+    $ref: ../common/Money.yaml
+    description: Refunds given in the week and charged to the Partner, whatever week their order ended in.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: "Cash the Location collected itself: cash orders its own Agents delivered and bills taken at the counter."
+  tax_deducted:
+    $ref: ../common/Money.yaml
+    description: Tax deducted or collected at source; nothing until the rates are settled.
+  adjustments:
+    $ref: ../common/Money.yaml
+    description: "Adjustments settled into the week: positive adds, negative takes off."
+  carried_in:
+    $ref: ../common/Money.yaml
+    description: "What the week before carried in: a shortfall is negative."
+  total:
+    $ref: ../common/Money.yaml
+    description: The week's total; negative when the charges came to more than the sales.
+  payable:
+    $ref: ../common/Money.yaml
+    description: "What is paid: the total, or nothing when it is below nothing."
+  carried_out:
+    $ref: ../common/Money.yaml
+    description: A shortfall taken off the next statement, once, as a negative amount; zero otherwise.
+examples:
+  - sales:
+      minor_units: 50000
+      currency: INR
+    promotions:
+      minor_units: 0
+      currency: INR
+    net_sales:
+      minor_units: 50000
+      currency: INR
+    fee:
+      minor_units: 6000
+      currency: INR
+    fee_gst:
+      minor_units: 1080
+      currency: INR
+    cancellation_fees:
+      minor_units: 0
+      currency: INR
+    cancellation_fees_gst:
+      minor_units: 0
+      currency: INR
+    delivery_charges:
+      minor_units: 0
+      currency: INR
+    tips:
+      minor_units: 0
+      currency: INR
+    cutlery_charges:
+      minor_units: 0
+      currency: INR
+    refunds:
+      minor_units: 0
+      currency: INR
+    cash_collected:
+      minor_units: 0
+      currency: INR
+    tax_deducted:
+      minor_units: 0
+      currency: INR
+    adjustments:
+      minor_units: 0
+      currency: INR
+    carried_in:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 42920
+      currency: INR
+    payable:
+      minor_units: 42920
+      currency: INR
+    carried_out:
+      minor_units: 0
+      currency: INR

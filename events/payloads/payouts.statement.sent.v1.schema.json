@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payouts.statement.sent.v1.schema.json",
+  "title": "PayoutsStatementSentPayload",
+  "description": "Payload of `payouts.statement.sent` version 1. A due statement was sent as a transfer through the payout provider, recorded before it was sent with a key so it is sent at most once: it shows as sending until the provider answers. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "payee_kind",
+    "partner_id",
+    "location_id",
+    "agent_id",
+    "statement_id",
+    "reference",
+    "week",
+    "state",
+    "previous_state",
+    "version",
+    "currency",
+    "at",
+    "transfer_id",
+    "amount",
+    "destination_kind",
+    "destination_last4"
+  ],
+  "properties": {
+    "payee_kind": {
+      "type": "string",
+      "description": "Whom the statement pays: a Location, or a platform fleet Agent.",
+      "examples": [
+        "location"
+      ],
+      "enum": [
+        "location",
+        "agent"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner, or the Agent's; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Location, for a Location's statement; `null` for an Agent's.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent membership, for an Agent's statement; `null` for a Location's.",
+      "examples": [
+        null
+      ]
+    },
+    "statement_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The statement.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101"
+      ]
+    },
+    "reference": {
+      "type": "string",
+      "description": "Its reference, `ZG-{year}W{week}` for a Location or `AG-{year}W{week}` for an Agent.",
+      "examples": [
+        "ZG-2026W43"
+      ]
+    },
+    "week": {
+      "type": "string",
+      "description": "The ISO week, `YYYYWww`.",
+      "examples": [
+        "2026W43"
+      ],
+      "pattern": "^[0-9]{4}W[0-9]{2}$"
+    },
+    "state": {
+      "type": "string",
+      "description": "The state after the change.",
+      "examples": [
+        "due"
+      ],
+      "enum": [
+        "due",
+        "sending",
+        "paid",
+        "unpaid",
+        "archived"
+      ]
+    },
+    "previous_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "due",
+        "sending",
+        "paid",
+        "unpaid",
+        "archived",
+        null
+      ],
+      "description": "The state before; `null` for the lock.",
+      "examples": [
+        null
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "The statement's version after the change; it only rises.",
+      "examples": [
+        1
+      ],
+      "minimum": 1
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency.",
+      "examples": [
+        "INR"
+      ],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-27T00:15:00Z"
+      ]
+    },
+    "transfer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The transfer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5801"
+      ]
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "The amount sent."
+    },
+    "destination_kind": {
+      "type": "string",
+      "description": "How the money goes: `bank` or `upi`.",
+      "examples": [
+        "bank"
+      ],
+      "enum": [
+        "bank",
+        "upi"
+      ]
+    },
+    "destination_last4": {
+      "type": "string",
+      "description": "The bank account's last four digits, or the last four characters of the UPI ID's handle.",
+      "examples": [
+        "6789"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,10 @@
+type: string
+description: What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once.
+enum:
+  - no_account
+  - account_not_checked
+  - account_check_failed
+  - partner_gone
+  - agent_gone
+examples:
+  - account_not_checked

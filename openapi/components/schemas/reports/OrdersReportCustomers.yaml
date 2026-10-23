@@ -1,0 +1,39 @@
+type: object
+description: "Customers over the same range, for the Customers page: who joined and who ordered. Dashes, `null`, when the range is all time, with the sentence saying why."
+required:
+  - joined
+  - ordered
+  - orders
+  - sentence
+properties:
+  joined:
+    type:
+      - integer
+      - "null"
+    description: Customers who registered in the range.
+    examples:
+      - 4
+  ordered:
+    type:
+      - integer
+      - "null"
+    description: Customers who placed an order in the range.
+    examples:
+      - 12
+  orders:
+    type: integer
+    description: Orders placed in the range.
+    examples:
+      - 21
+  sentence:
+    type:
+      - string
+      - "null"
+    description: Why the figures are dashes, when they are.
+    examples:
+      - null
+examples:
+  - joined: 4
+    ordered: 12
+    orders: 21
+    sentence: null

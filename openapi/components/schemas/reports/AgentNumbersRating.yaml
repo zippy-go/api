@@ -1,0 +1,28 @@
+type: object
+description: "An Agent's rating, counted when asked for: the share of thumbs up among the ratings of the deliveries they carried, read \"80% (5)\", and a dash with no ratings."
+required:
+  - thumbs_up
+  - count
+  - share
+properties:
+  thumbs_up:
+    type: integer
+    description: Thumbs up.
+    examples:
+      - 4
+  count:
+    type: integer
+    description: Ratings counted.
+    examples:
+      - 5
+  share:
+    type:
+      - number
+      - "null"
+    description: The share of thumbs up, from 0 to 1; `null` with no ratings.
+    examples:
+      - 0.8
+examples:
+  - thumbs_up: 4
+    count: 5
+    share: 0.8

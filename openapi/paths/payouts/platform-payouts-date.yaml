@@ -1,0 +1,98 @@
+# Path item for /v1/platform/payouts/date. Referenced from openapi.yaml.
+get:
+  operationId: getPayoutsDate
+  summary: Read the payouts date
+  description: The date payouts work to, the real time, whether it was moved and can be moved here, and every move. `payout:read`.
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The payouts date.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutsDate.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: movePayoutsDate
+  summary: Move the payouts date forward
+  description: Moves the date payouts work to forward, never back, on a developer's machine or in the sandbox only, so a week can be locked and paid without waiting for it to end; the lock clock and then the payday run take the new date at once. Orders, payments and deliveries keep the real time. Written to the audit log. `payout:manage`.
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The new date.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payouts/PayoutsDateMove.yaml
+  responses:
+    "200":
+      description: The payouts date after the move.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutsDate.yaml
+    "400":
+      description: "`validation_failed`: `payouts_date_backwards`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`payouts_date_fixed`: anywhere but a developer's machine or the sandbox the date cannot move."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

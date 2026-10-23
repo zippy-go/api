@@ -1,0 +1,76 @@
+# Path item for /v1/platform/agents/{agent_id}/numbers. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000107
+get:
+  operationId: getAgentNumbers
+  summary: Read one Agent's numbers
+  description: "One Agent on the range: their numbers, the deliveries they made with when they took, collected and delivered each, their time on duty as stretches, deliveries and hours on duty day by day (a night stretch split at the Location's midnight), and an activity log by day. Platform `agent:read`."
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: The first day; the first of this month by default.
+      schema:
+        type: string
+        format: date
+    - name: until
+      in: query
+      required: false
+      description: The last day, included; 92 days at most after `from`.
+      schema:
+        type: string
+        format: date
+  responses:
+    "200":
+      description: The Agent's numbers.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/AgentNumbersDetail.yaml
+    "400":
+      description: "`validation_failed`: `range_too_long` (92 days at most)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `agent:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such Agent (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

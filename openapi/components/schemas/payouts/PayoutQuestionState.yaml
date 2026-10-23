@@ -1,0 +1,7 @@
+type: string
+description: Whether platform staff answered a question.
+enum:
+  - unanswered
+  - answered
+examples:
+  - unanswered

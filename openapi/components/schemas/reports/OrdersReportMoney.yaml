@@ -1,0 +1,40 @@
+type: object
+description: Money of the orders report in one currency, never added across two.
+required:
+  - currency
+  - orders
+  - sales
+  - average_order_value
+  - refunds
+properties:
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  orders:
+    type: integer
+    description: Completed orders in it.
+    examples:
+      - 18
+  sales:
+    $ref: ../common/Money.yaml
+    description: What the completed orders were charged.
+  average_order_value:
+    $ref: ../common/Money.yaml
+    description: Sales over completed orders, rounded half up.
+  refunds:
+    $ref: ../common/Money.yaml
+    description: Refunds given on the orders.
+examples:
+  - currency: INR
+    orders: 18
+    sales:
+      minor_units: 1234500
+      currency: INR
+    average_order_value:
+      minor_units: 68583
+      currency: INR
+    refunds:
+      minor_units: 12000
+      currency: INR

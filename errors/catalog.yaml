@@ -22,6 +22,18 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: adjustment_out_of_range
+        message: An adjustment is at most ₹100,000.00 either way and never nothing.
+        description: An adjustment of nothing, or of more than ₹100,000.00 added or taken off; a fee correction must add.
+      - code: payouts_date_backwards
+        message: The payouts date only moves forward.
+        description: A move of the payouts date to a moment at or before the date payouts work to now.
+      - code: paid_on_in_future
+        message: The day it was paid cannot be in the future.
+        description: A statement marked paid by hand with a day after today.
+      - code: week_invalid
+        message: A week is written YYYYWww, such as 2026W43.
+        description: A week that is not an ISO week-based year and a week number from 01 to its last week.
       - code: top_up_out_of_range
         message: A top-up is from ₹100.00 to ₹10,000.00.
         description: A Wallet top-up below the least or above the most one top-up may add (`wallet.top_up_min_minor`, `wallet.top_up_max_minor`).
@@ -271,8 +283,10 @@ errors:
       - code: range_too_long
         message: A range is a year at most; ask for a shorter one.
         description: >-
-          A store's rating or its reviews asked for over more than a year of
-          days.
+          A range longer than it may be: a store's rating or its reviews, the
+          orders report or a Location's worked-out payouts over more than a
+          year, the metrics board over 31 days, the Agents numbers over 92.
+          The message says the limit that applies.
   - code: channel_unknown
     status: 400
     title: Unknown channel
@@ -1654,3 +1668,98 @@ errors:
     description: >-
       Run now asked for a continuous job, such as the outbox relay or a
       durable consumer, which has no schedule to run outside.
+  - code: week_not_over
+    status: 409
+    title: Week not over
+    message: "Week {week} is not over yet: it can be locked from {from}."
+    retryable: false
+    description: >-
+      A week can be locked only once its Sunday has passed on the payee's
+      clock (as the payouts date reads it); the detail says when it can be.
+
+  - code: week_locked
+    status: 409
+    title: Week locked
+    message: "Week {week} is locked already, as {reference}."
+    retryable: false
+    description: >-
+      A week is locked at most once, whoever locks it: one statement per
+      payee and week. The detail names the statement.
+
+  - code: week_carried_on
+    status: 409
+    title: Week carried on
+    message: "Week {week} is before the latest statement, {reference}: its money was carried on."
+    retryable: false
+    description: >-
+      A week before the payee's latest statement cannot be locked, because
+      what it held was carried into the statements after it.
+
+  - code: week_empty
+    status: 409
+    title: Nothing to lock
+    message: "Nothing happened in week {week}, so it makes no statement."
+    retryable: false
+    description: >-
+      A week with no order, refund, adjustment, cash or task makes no
+      statement, whether the clock or platform staff lock it.
+
+  - code: statement_move_refused
+    status: 409
+    title: Statement move refused
+    message: "{reference} is {state}: it cannot be {move}."
+    retryable: false
+    description: >-
+      A statement moves between due, sending, paid, unpaid and archived only
+      as allowed: paid from due or unpaid, unpaid from due or paid, archived
+      from due or unpaid, back to due from paid, unpaid or archived when
+      there is something to pay, sent from due or unpaid once its
+      destination is checked. The detail says why in words and
+      `errors[].code` names it.
+    details:
+      - code: statement_state
+        message: The statement's state does not allow the move.
+        description: The move is not allowed from the statement's state.
+      - code: nothing_to_pay
+        message: The statement has nothing to pay.
+        description: A statement whose week came to nothing or less cannot be due, sent or paid.
+      - code: destination_not_checked
+        message: The payout destination is not checked yet.
+        description: A statement is sent only to a destination whose one-rupee check passed.
+      - code: payee_gone
+        message: The payee is gone.
+        description: The Partner is archived, or the Agent's membership ended, so nothing is sent.
+
+  - code: adjustment_settled
+    status: 409
+    title: Adjustment settled
+    message: "The adjustment is settled into {reference}, which is locked: only another adjustment can undo it now."
+    retryable: false
+    description: >-
+      An adjustment can be taken back only while its week is not locked;
+      after the lock a new adjustment undoes it.
+
+  - code: question_answered
+    status: 409
+    title: Question answered
+    message: The question was answered already; an answer cannot be changed.
+    retryable: false
+    description: A question about a week is answered once, and the answer is kept as written.
+
+  - code: payouts_date_fixed
+    status: 409
+    title: Payouts date fixed
+    message: The payouts date moves only on a developer's machine or in the sandbox.
+    retryable: false
+    description: >-
+      Platform staff may move the date payouts work to forward only where
+      `APP_PROFILE` is `local` or `sandbox`; anywhere else it is the real date.
+
+  - code: paid_by_partner
+    status: 409
+    title: Paid by the Partner
+    message: "{partner} pays you, so ZippyGo needs no payout account."
+    retryable: false
+    description: >-
+      A Partner's own Agents are reported, not paid: the platform keeps no
+      payout account for them.

@@ -1,0 +1,7 @@
+type: string
+description: "How an order counts on a statement: `completed` (delivered or collected), or `cancelled_by_partner` after the customer paid, which costs its fee and nothing else."
+enum:
+  - completed
+  - cancelled_by_partner
+examples:
+  - completed

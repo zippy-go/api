@@ -1,0 +1,80 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/agent-weeks. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service, one of the Partner's.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000203
+get:
+  operationId: getPartnerAgentWeeks
+  summary: Report a week of the Partner's own Agents
+  description: "The weekly earnings report of a Partner's own delivery service: per Agent the tasks completed, distance, hours on duty, tips, cash collected and the pay its own pay rule gives. Reported, not paid: no money moves from the platform to them, and their tips are paid to the Partner on its Locations' statements to pass on. With `Accept: text/csv` it is a spreadsheet. Members need `agent:read`."
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  parameters:
+    - name: week
+      in: query
+      required: false
+      description: The week, `YYYYWww`; the week just ended by default.
+      schema:
+        type: string
+        pattern: ^[0-9]{4}W[0-9]{2}$
+  responses:
+    "200":
+      description: The report, or the spreadsheet.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/AgentWeeksReport.yaml
+        text/csv:
+          schema:
+            type: string
+            description: The report as a spreadsheet, one row per Agent.
+    "400":
+      description: "`validation_failed`: a week not written `YYYYWww`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: A member without `agent:read` (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The Partner or the service does not exist or is not the caller's (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`service_not_agent_based`: the service has no Agents."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

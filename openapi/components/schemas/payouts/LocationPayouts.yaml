@@ -1,0 +1,278 @@
+type: object
+description: "What a Location will be paid and why: its next payment, the week so far, six months of past statements with their documents, where it is paid and whether that is checked, and what would hold a payout now. Mission Control may also ask for any range of its days, worked out."
+required:
+  - location_id
+  - location_name
+  - partner_id
+  - currency
+  - time_zone
+  - today
+  - fee_explained
+  - next_payment
+  - week_so_far
+  - statements
+  - destination
+  - holds
+  - range
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  time_zone:
+    type: string
+    description: Its clock.
+    examples:
+      - Asia/Kolkata
+  today:
+    type: string
+    format: date
+    description: "The day on its clock that payouts work to: today, unless platform staff moved the payouts date on a developer's machine or in the sandbox."
+    examples:
+      - 2026-10-26
+  fee_explained:
+    type: string
+    description: What the fee is for, in plain words.
+    examples:
+      - The platform's fee is 12% of what you sold through ZippyGo, for the orders, the payments and the customers it brings; GST is charged on the fee.
+  next_payment:
+    oneOf:
+      - $ref: ./PayoutWeekSummary.yaml
+      - type: "null"
+    description: The next payment; `null` when nothing has happened yet.
+  week_so_far:
+    $ref: ./PayoutWorking.yaml
+    description: The week in progress, as an estimate.
+  statements:
+    type: array
+    items:
+      $ref: ./StatementSummary.yaml
+      description: A statement.
+    description: Six months of statements, newest first.
+  destination:
+    oneOf:
+      - $ref: ./PayoutDestination.yaml
+      - type: "null"
+    description: Where it is paid; `null` when no account is stated.
+  holds:
+    type: array
+    items:
+      $ref: ./PayoutHold.yaml
+      description: A hold.
+    description: What would hold a payout now.
+  range:
+    oneOf:
+      - $ref: ./PayoutWorking.yaml
+      - type: "null"
+    description: The range asked for with `from` and `until`, in Mission Control; `null` otherwise.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    currency: INR
+    time_zone: Asia/Kolkata
+    today: 2026-10-26
+    fee_explained: The platform's fee is 12% of what you sold through ZippyGo, for the orders, the payments and the customers it brings; GST is charged on the fee.
+    next_payment:
+      week: 2026W43
+      reference: ZG-2026W43
+      starts_on: 2026-10-19
+      ends_on: 2026-10-25
+      statement_id: null
+      estimate: true
+      state: null
+      standing:
+        code: locking
+        sentence: Locking on Tuesday 27 October, paid on Friday 30 October
+      total:
+        minor_units: 42920
+        currency: INR
+      locks_on: 2026-10-27
+      pays_on: 2026-10-30
+    week_so_far:
+      from: 2026-10-26
+      until: 2026-11-01
+      week: 2026W44
+      estimate: true
+      sentence: "So far this week: an estimate while it can still change."
+      figures:
+        sales:
+          minor_units: 50000
+          currency: INR
+        promotions:
+          minor_units: 0
+          currency: INR
+        net_sales:
+          minor_units: 50000
+          currency: INR
+        fee:
+          minor_units: 6000
+          currency: INR
+        fee_gst:
+          minor_units: 1080
+          currency: INR
+        cancellation_fees:
+          minor_units: 0
+          currency: INR
+        cancellation_fees_gst:
+          minor_units: 0
+          currency: INR
+        delivery_charges:
+          minor_units: 0
+          currency: INR
+        tips:
+          minor_units: 0
+          currency: INR
+        cutlery_charges:
+          minor_units: 0
+          currency: INR
+        refunds:
+          minor_units: 0
+          currency: INR
+        cash_collected:
+          minor_units: 0
+          currency: INR
+        tax_deducted:
+          minor_units: 0
+          currency: INR
+        adjustments:
+          minor_units: 0
+          currency: INR
+        carried_in:
+          minor_units: 0
+          currency: INR
+        total:
+          minor_units: 42920
+          currency: INR
+        payable:
+          minor_units: 42920
+          currency: INR
+        carried_out:
+          minor_units: 0
+          currency: INR
+      rows:
+        - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+          number: AB0042
+          outcome: completed
+          ended_at: 2026-10-22T13:40:00Z
+          carrier: platform_fleet
+          sales:
+            minor_units: 50000
+            currency: INR
+          promotions:
+            minor_units: 0
+            currency: INR
+          net_sales:
+            minor_units: 50000
+            currency: INR
+          plan: country India
+          rate_bp: 1200
+          fee:
+            minor_units: 6000
+            currency: INR
+          fee_gst:
+            minor_units: 1080
+            currency: INR
+          delivery_charge:
+            minor_units: 0
+            currency: INR
+          tip:
+            minor_units: 0
+            currency: INR
+          cutlery_charge:
+            minor_units: 0
+            currency: INR
+          cash_collected:
+            minor_units: 0
+            currency: INR
+          refunds:
+            minor_units: 0
+            currency: INR
+          partner_gets:
+            minor_units: 42920
+            currency: INR
+      refunds: []
+      adjustments: []
+      days:
+        - date: 2026-10-22
+          orders: 1
+          sales:
+            minor_units: 50000
+            currency: INR
+          fee:
+            minor_units: 6000
+            currency: INR
+          fee_gst:
+            minor_units: 1080
+            currency: INR
+          charges:
+            minor_units: 0
+            currency: INR
+          refunds:
+            minor_units: 0
+            currency: INR
+          cash_collected:
+            minor_units: 0
+            currency: INR
+          total:
+            minor_units: 42920
+            currency: INR
+    statements:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
+        reference: ZG-2026W43
+        payee_kind: location
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        partner_name: ZippyGo Dev Partner
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        location_name: Dev Kitchen Gachibowli
+        week: 2026W43
+        starts_on: 2026-10-19
+        ends_on: 2026-10-25
+        state: due
+        standing:
+          code: due
+          sentence: Due on Friday 30 October
+        holds: []
+        total:
+          minor_units: 42920
+          currency: INR
+        payable:
+          minor_units: 42920
+          currency: INR
+        pays_on: 2026-10-30
+        paid_on: null
+        transfer_reference: null
+        invoice_number: INV-2026-00017
+        unanswered_questions: 0
+        locked_at: 2026-10-27T00:15:00Z
+    destination:
+      kind: bank
+      holder_name: ZippyGo Dev Partner Private Limited
+      last4: "6789"
+      upi_id: null
+      check:
+        state: passed
+        reason: null
+        checked_at: 2026-10-22T06:30:05Z
+        by: provider
+        reference: SIMCHK-7F3A21
+    holds: []
+    range: null

@@ -1,0 +1,30 @@
+type: object
+description: A stretch on duty.
+required:
+  - started_at
+  - ended_at
+  - minutes
+properties:
+  started_at:
+    type: string
+    format: date-time
+    description: When it started.
+    examples:
+      - 2026-10-22T10:00:00Z
+  ended_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ended; `null` while on duty.
+    examples:
+      - 2026-10-22T13:00:00Z
+  minutes:
+    type: integer
+    description: Its minutes within the range.
+    examples:
+      - 180
+examples:
+  - started_at: 2026-10-22T10:00:00Z
+    ended_at: 2026-10-22T13:00:00Z
+    minutes: 180

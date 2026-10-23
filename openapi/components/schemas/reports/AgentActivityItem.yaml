@@ -1,0 +1,34 @@
+type: object
+description: One thing an Agent did.
+required:
+  - at
+  - kind
+  - text
+  - order_number
+properties:
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-22T13:40:00Z
+  kind:
+    $ref: ./AgentActivityKind.yaml
+    description: What.
+  text:
+    type: string
+    description: It in words.
+    examples:
+      - Delivered AB0042
+  order_number:
+    type:
+      - string
+      - "null"
+    description: The order, for a delivery.
+    examples:
+      - AB0042
+examples:
+  - at: 2026-10-22T13:40:00Z
+    kind: delivered
+    text: Delivered AB0042
+    order_number: AB0042

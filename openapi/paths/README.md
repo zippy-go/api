@@ -47,6 +47,17 @@ paths/
   documents/document-review.yaml POST /v1/partners/{partner_id}/documents/{document_id}/review
   documents/review-queue.yaml   GET /v1/partner-documents
   payouts/payout-account.yaml   GET, PUT /v1/partners/{partner_id}/payout-account (+ payout-account-verify.yaml)
+  payouts/location-payouts.yaml GET /v1/partners/{partner_id}/locations/{location_id}/payouts (+ location-statement*.yaml,
+                                .../statements/{statement_id}, its documents/{document} and questions)
+  payouts/agent-*.yaml          /v1/agent/memberships/{agent_id}/statements (+ {statement_id}, document, questions),
+                                weeks/{week}, payout-account
+  payouts/platform-*.yaml       /v1/platform/statements (+ {statement_id}, documents, paid, unpaid, archive, due, send),
+                                /v1/platform/locations/{location_id}/weeks/{week}/lock, .../payouts, .../payout-adjustments,
+                                /v1/platform/payout-questions (+ answer), /v1/platform/payouts/date, the same for
+                                /v1/platform/agent-statements and /v1/platform/agents/{agent_id}/...
+  reports/orders.yaml           GET /v1/platform/reports/orders (+ metrics.yaml, GET /v1/platform/reports/metrics)
+  reports/*agent-numbers*.yaml  GET /v1/platform/agent-numbers, /v1/platform/agents/{agent_id}/numbers and the Partner's
+  reports/partner-agent-weeks.yaml GET /v1/partners/{partner_id}/services/{service_id}/agent-weeks
   plans/plan.yaml               GET, PUT /v1/partners/{partner_id}/plan (+ plan-impact.yaml)
   locations/locations.yaml      POST, GET /v1/partners/{partner_id}/locations
   locations/location.yaml       GET, PATCH, DELETE /v1/partners/{partner_id}/locations/{location_id}

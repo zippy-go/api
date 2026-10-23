@@ -1,0 +1,86 @@
+type: object
+description: "Where a platform fleet Agent is paid: a UPI ID or a bank account, checked by a one-rupee transfer before the first payout. The account number is masked to its last four digits in every view."
+required:
+  - agent_id
+  - kind
+  - holder_name
+  - upi_id
+  - account_number
+  - last4
+  - ifsc
+  - check
+  - updated_at
+  - version
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  kind:
+    $ref: ./PayoutDestinationKind.yaml
+    description: UPI or bank.
+  holder_name:
+    type: string
+    description: The holder's name, which the bank must return.
+    examples:
+      - Ravi Kumar
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID.
+    examples:
+      - ravi.kumar@okaxis
+  account_number:
+    type:
+      - string
+      - "null"
+    description: The account number, all but the last four digits masked; sending it back unchanged keeps it.
+    examples:
+      - null
+  last4:
+    type:
+      - string
+      - "null"
+    description: The account's last four digits.
+    examples:
+      - null
+  ifsc:
+    type:
+      - string
+      - "null"
+    description: The IFSC.
+    examples:
+      - null
+  check:
+    $ref: ./PayoutAccountCheck.yaml
+    description: The one-rupee check.
+  updated_at:
+    type: string
+    format: date-time
+    description: When it was last written.
+    examples:
+      - 2026-10-22T06:30:00Z
+  version:
+    type: integer
+    description: The version, raised on every write.
+    examples:
+      - 1
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    kind: upi
+    holder_name: Ravi Kumar
+    upi_id: ravi.kumar@okaxis
+    account_number: null
+    last4: null
+    ifsc: null
+    check:
+      state: passed
+      reason: null
+      checked_at: 2026-10-22T06:30:05Z
+      by: provider
+      reference: SIMCHK-7F3A21
+    updated_at: 2026-10-22T06:30:00Z
+    version: 1

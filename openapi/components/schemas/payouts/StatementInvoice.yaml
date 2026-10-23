@@ -1,0 +1,113 @@
+type: object
+description: "The tax invoice for the platform's fee in a week, numbered from one counter and taken only by the statement that won the lock: each fee line with its SAC code and taxable value, GST split as CGST and SGST for a Partner registered in the platform's state and as IGST otherwise, rounded half up once on each line, and the total, settled by deduction from the payout."
+required:
+  - number
+  - issued_on
+  - place_of_supply
+  - platform
+  - partner
+  - lines
+  - taxable_value
+  - cgst
+  - sgst
+  - igst
+  - total
+  - sentence
+properties:
+  number:
+    type: string
+    description: The invoice number, `INV-{year}-{nnnnn}`.
+    examples:
+      - INV-2026-00017
+  issued_on:
+    type: string
+    format: date
+    description: "The day it was issued: the lock's."
+    examples:
+      - 2026-10-27
+  place_of_supply:
+    type: string
+    description: The place of supply.
+    examples:
+      - Telangana
+  platform:
+    $ref: ./InvoiceParty.yaml
+    description: The platform, which bills the fee.
+  partner:
+    $ref: ./InvoiceParty.yaml
+    description: The Partner's legal entity, billed.
+  lines:
+    type: array
+    items:
+      $ref: ./StatementInvoiceLine.yaml
+      description: A line.
+    description: The fee lines.
+  taxable_value:
+    $ref: ../common/Money.yaml
+    description: The fees together.
+  cgst:
+    $ref: ../common/Money.yaml
+    description: Central GST together.
+  sgst:
+    $ref: ../common/Money.yaml
+    description: State GST together.
+  igst:
+    $ref: ../common/Money.yaml
+    description: Integrated GST together.
+  total:
+    $ref: ../common/Money.yaml
+    description: "The fees and their GST: exactly what the statement deducts."
+  sentence:
+    type: string
+    description: That the total was settled by deduction from the payout.
+    examples:
+      - The ₹70.80 was settled by deduction from the payout.
+examples:
+  - number: INV-2026-00017
+    issued_on: 2026-10-27
+    place_of_supply: Telangana
+    platform:
+      legal_name: ZippyGo (legal name to be confirmed)
+      address: Registered address to be confirmed, Hyderabad, Telangana
+      gstin: 36AAAAA0000A1Z5
+      state: Telangana
+      state_code: "36"
+      placeholder: true
+    partner:
+      legal_name: ZippyGo Dev Partner Private Limited
+      address: Gachibowli, Hyderabad, Telangana 500032
+      gstin: 36ABCDE1234F1Z5
+      state: Telangana
+      state_code: "36"
+      placeholder: false
+    lines:
+      - description: Marketplace fee, week 2026W43
+        sac: "998599"
+        taxable_value:
+          minor_units: 6000
+          currency: INR
+        cgst:
+          minor_units: 540
+          currency: INR
+        sgst:
+          minor_units: 540
+          currency: INR
+        igst:
+          minor_units: 0
+          currency: INR
+    taxable_value:
+      minor_units: 6000
+      currency: INR
+    cgst:
+      minor_units: 540
+      currency: INR
+    sgst:
+      minor_units: 540
+      currency: INR
+    igst:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 7080
+      currency: INR
+    sentence: The ₹70.80 was settled by deduction from the payout.

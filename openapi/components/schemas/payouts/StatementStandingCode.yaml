@@ -1,0 +1,14 @@
+type: string
+description: "Where the money stands, for the sentence beside it: `so_far` for the week in progress, `locking` for a week over and not yet locked, `due` for its Friday, `held` with what holds it, `sending`, `paid`, `unpaid`, `nothing_to_pay` and `archived`."
+enum:
+  - so_far
+  - locking
+  - due
+  - held
+  - sending
+  - paid
+  - unpaid
+  - nothing_to_pay
+  - archived
+examples:
+  - due

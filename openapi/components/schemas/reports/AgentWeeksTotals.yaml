@@ -1,0 +1,61 @@
+type: object
+description: Every Agent of the report together.
+required:
+  - agents
+  - tasks_completed
+  - deliveries
+  - distance_metres
+  - minutes_on_duty
+  - tips
+  - cash_collected
+  - pay
+properties:
+  agents:
+    type: integer
+    description: Agents.
+    examples:
+      - 1
+  tasks_completed:
+    type: integer
+    description: Tasks completed.
+    examples:
+      - 4
+  deliveries:
+    type: integer
+    description: Drop-offs completed.
+    examples:
+      - 2
+  distance_metres:
+    type: integer
+    description: The measured distance, in metres.
+    examples:
+      - 7200
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty.
+    examples:
+      - 300
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash collected.
+  pay:
+    $ref: ../common/Money.yaml
+    description: Pay under the Partner's rule.
+examples:
+  - agents: 1
+    tasks_completed: 4
+    deliveries: 2
+    distance_metres: 7200
+    minutes_on_duty: 300
+    tips:
+      minor_units: 2000
+      currency: INR
+    cash_collected:
+      minor_units: 45000
+      currency: INR
+    pay:
+      minor_units: 15320
+      currency: INR

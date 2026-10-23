@@ -1,0 +1,44 @@
+type: object
+description: "The date payouts work to: the real date, unless platform staff moved it forward on a developer's machine or in the sandbox, so a week can be locked and paid without waiting for it to end. Orders, payments and deliveries keep the real time: an order delivered before a move counts in the week it was delivered in, one delivered after it from the moved date on."
+required:
+  - now
+  - real_now
+  - moved
+  - movable
+  - moves
+properties:
+  now:
+    type: string
+    format: date-time
+    description: The payouts date now.
+    examples:
+      - 2026-10-26T03:31:00Z
+  real_now:
+    type: string
+    format: date-time
+    description: The real time now.
+    examples:
+      - 2026-10-22T08:01:00Z
+  moved:
+    type: boolean
+    description: Whether it was ever moved.
+  movable:
+    type: boolean
+    description: "Whether it can be moved here: only on a developer's machine or in the sandbox."
+  moves:
+    type: array
+    items:
+      $ref: ./PayoutsDateMoveRecord.yaml
+      description: A move.
+    description: Every move, oldest first; each is in the audit log too.
+examples:
+  - now: 2026-10-26T03:31:00Z
+    real_now: 2026-10-22T08:01:00Z
+    moved: true
+    movable: true
+    moves:
+      - moved_at: 2026-10-22T08:00:00Z
+        from: 2026-10-22T08:00:00Z
+        to: 2026-10-26T03:30:00Z
+        by_name: Platform Admin
+        reason: Checking week 2026W43

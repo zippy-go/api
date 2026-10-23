@@ -1,0 +1,53 @@
+type: object
+description: "A party on a GST invoice: its legal name, address, GSTIN where recorded, and its state."
+required:
+  - legal_name
+  - address
+  - gstin
+  - state
+  - state_code
+  - placeholder
+properties:
+  legal_name:
+    type: string
+    description: The legal name.
+    examples:
+      - ZippyGo (legal name to be confirmed)
+  address:
+    type:
+      - string
+      - "null"
+    description: The address.
+    examples:
+      - Registered address to be confirmed, Hyderabad, Telangana
+  gstin:
+    type:
+      - string
+      - "null"
+    description: The GSTIN, where recorded.
+    examples:
+      - 36AAAAA0000A1Z5
+  state:
+    type:
+      - string
+      - "null"
+    description: The state, for the place of supply.
+    examples:
+      - Telangana
+  state_code:
+    type:
+      - string
+      - "null"
+    description: The GST state code.
+    examples:
+      - "36"
+  placeholder:
+    type: boolean
+    description: "`true` while the platform's legal identity is a placeholder, until the founder gives it; printed as one."
+examples:
+  - legal_name: ZippyGo (legal name to be confirmed)
+    address: Registered address to be confirmed, Hyderabad, Telangana
+    gstin: 36AAAAA0000A1Z5
+    state: Telangana
+    state_code: "36"
+    placeholder: true

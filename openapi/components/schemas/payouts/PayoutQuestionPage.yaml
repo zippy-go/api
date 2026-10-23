@@ -1,0 +1,37 @@
+type: object
+description: A page of questions, oldest unanswered first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PayoutQuestion.yaml
+      description: A question.
+    description: The questions on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5301
+        statement_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
+        reference: ZG-2026W43
+        payee_kind: location
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        agent_id: null
+        week: 2026W43
+        text: Order AB0115 was refunded and I never heard why
+        asked_at: 2026-10-28T06:00:00Z
+        asked_by_name: Asha Rao
+        state: answered
+        answer: The customer reported the biryani missing and support refunded it from your share.
+        answered_at: 2026-10-28T09:00:00Z
+        answered_by: ZippyGo
+    next_cursor: null

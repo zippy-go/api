@@ -1,0 +1,125 @@
+type: object
+description: "One Agent on the same range: their numbers, the deliveries they made, their time on duty as stretches, deliveries and hours on duty day by day, and an activity log by day."
+required:
+  - from
+  - until
+  - time_zone
+  - current_to
+  - numbers
+  - deliveries
+  - duty
+  - days
+  - activity
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day.
+    examples:
+      - 2026-10-01
+  until:
+    type: string
+    format: date
+    description: The last day, included.
+    examples:
+      - 2026-10-22
+  time_zone:
+    type: string
+    description: The clock the days are read on.
+    examples:
+      - Asia/Kolkata
+  current_to:
+    type: string
+    format: date-time
+    description: The moment the warehouse's data is current to.
+    examples:
+      - 2026-10-22T08:00:00Z
+  numbers:
+    $ref: ./AgentNumbers.yaml
+    description: Their numbers.
+  deliveries:
+    type: array
+    items:
+      $ref: ./AgentNumbersDelivery.yaml
+      description: A delivery.
+    description: The deliveries they made, newest first.
+  duty:
+    type: array
+    items:
+      $ref: ./AgentDutyStretch.yaml
+      description: A stretch.
+    description: Their stretches on duty, newest first.
+  days:
+    type: array
+    items:
+      $ref: ./AgentNumbersDay.yaml
+      description: A day.
+    description: Day by day, newest first.
+  activity:
+    type: array
+    items:
+      $ref: ./AgentActivityDay.yaml
+      description: A day.
+    description: Their activity log by day, newest first.
+examples:
+  - from: 2026-10-01
+    until: 2026-10-22
+    time_zone: Asia/Kolkata
+    current_to: 2026-10-22T08:00:00Z
+    numbers:
+      agent_id: 01a13a48-9e00-7000-8000-000000000107
+      name: Ravi Kumar
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      partner_name: ZippyGo Fleet
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      service_name: ZippyGo Fleet delivery
+      team_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5601
+      team_name: Hyderabad
+      status: active
+      online: true
+      deliveries: 2
+      average_minutes_to_door: 24.5
+      average_km: 3.4
+      minutes_on_duty: 180
+      deliveries_per_hour: 0.67
+      rating:
+        thumbs_up: 4
+        count: 5
+        share: 0.8
+      offers_made: 3
+      offers_accepted_share: 0.67
+      on_time_share: 1
+      failed_drops: 0
+      geofence_overrides: 0
+      tips:
+        minor_units: 2000
+        currency: INR
+      earnings:
+        minor_units: 12320
+        currency: INR
+    deliveries:
+      - delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        order_number: AB0042
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        taken_at: 2026-10-22T13:12:00Z
+        collected_at: 2026-10-22T13:25:00Z
+        delivered_at: 2026-10-22T13:40:00Z
+        minutes_to_door: 28
+        km: 3.6
+        on_time: true
+    duty:
+      - started_at: 2026-10-22T10:00:00Z
+        ended_at: 2026-10-22T13:00:00Z
+        minutes: 180
+    days:
+      - date: 2026-10-22
+        deliveries: 2
+        minutes_on_duty: 180
+    activity:
+      - date: 2026-10-22
+        items:
+          - at: 2026-10-22T13:40:00Z
+            kind: delivered
+            text: Delivered AB0042
+            order_number: AB0042

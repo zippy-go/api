@@ -1,0 +1,69 @@
+# Path item for /v1/platform/agents/{agent_id}/weeks/{week}. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000107
+  - name: week
+    in: path
+    required: true
+    description: The ISO week, `YYYYWww`, Monday to Sunday on the payee's clock.
+    schema:
+      type: string
+      pattern: ^[0-9]{4}W[0-9]{2}$
+    example: 2026W43
+get:
+  operationId: getPlatformAgentWeek
+  summary: Read an Agent's week
+  description: "Any Agent's week as the Agent reads it: an estimate until a platform fleet Agent's statement is locked, reported to the Partner for a Partner's own Agent. `payout:read`."
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The week.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/AgentWeek.yaml
+    "400":
+      description: "`validation_failed`: a week not written `YYYYWww`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such Agent (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

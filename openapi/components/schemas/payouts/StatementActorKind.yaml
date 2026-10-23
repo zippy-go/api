@@ -1,0 +1,8 @@
+type: string
+description: "Who made a move: the statement clock, the payout provider, or platform staff."
+enum:
+  - clock
+  - provider
+  - staff
+examples:
+  - clock

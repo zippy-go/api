@@ -1,0 +1,104 @@
+# Path item for /v1/partners/{partner_id}/agent-numbers. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerAgentNumbers
+  summary: Read the Partner's Agents' numbers
+  description: The numbers of the Agents of the Partner's delivery services, never another's, as Mission Control reads them. Members need `agent:read`.
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: The first day; the first of this month by default.
+      schema:
+        type: string
+        format: date
+    - name: until
+      in: query
+      required: false
+      description: The last day, included; today by default; 92 days at most after `from`.
+      schema:
+        type: string
+        format: date
+    - name: q
+      in: query
+      required: false
+      description: Find Agents by name, or by the last digits of their mobile number.
+      schema:
+        type: string
+    - name: team_id
+      in: query
+      required: false
+      description: Only this team's.
+      schema:
+        type: string
+        format: uuid
+    - name: service_id
+      in: query
+      required: false
+      description: Only this delivery service's.
+      schema:
+        type: string
+        format: uuid
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 25 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of Agents' numbers.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/AgentNumbersPage.yaml
+    "400":
+      description: "`validation_failed`: `range_too_long` (92 days at most), or `from` after `until`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: A member without `agent:read` (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: The Partner does not exist or is not the caller's (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

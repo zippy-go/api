@@ -1,0 +1,31 @@
+type: object
+description: A document of a locked week, drawn when it is asked for and never stored; its link never expires.
+required:
+  - kind
+  - title
+  - media_type
+  - href
+properties:
+  kind:
+    $ref: ./StatementDocumentKind.yaml
+    description: Which document.
+  title:
+    type: string
+    description: Its title.
+    examples:
+      - Statement ZG-2026W43
+  media_type:
+    type: string
+    description: "`application/pdf` or `text/csv`."
+    examples:
+      - application/pdf
+  href:
+    type: string
+    description: Where it is drawn, on the API.
+    examples:
+      - /v1/partners/01a13a48-9e00-7000-8000-000000000001/locations/01a13a48-9e00-7000-8000-000000000301/statements/0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101/documents/statement
+examples:
+  - kind: statement
+    title: Statement ZG-2026W43
+    media_type: application/pdf
+    href: /v1/partners/01a13a48-9e00-7000-8000-000000000001/locations/01a13a48-9e00-7000-8000-000000000301/statements/0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101/documents/statement

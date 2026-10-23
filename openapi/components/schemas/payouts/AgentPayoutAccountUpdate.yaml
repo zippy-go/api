@@ -1,0 +1,41 @@
+type: object
+description: Where an Agent wants to be paid. Every write is checked again before anything is paid to it.
+required:
+  - kind
+  - holder_name
+properties:
+  kind:
+    $ref: ./PayoutDestinationKind.yaml
+    description: UPI or bank.
+  holder_name:
+    type: string
+    description: The holder's name, 1 to 120 characters.
+    examples:
+      - Ravi Kumar
+    minLength: 1
+    maxLength: 120
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID, for `upi`.
+    examples:
+      - ravi.kumar@okaxis
+  account_number:
+    type:
+      - string
+      - "null"
+    description: The account number, nine to eighteen digits, for `bank`; the masked number sent back unchanged keeps it.
+    examples:
+      - null
+  ifsc:
+    type:
+      - string
+      - "null"
+    description: The IFSC, for `bank`.
+    examples:
+      - null
+examples:
+  - kind: upi
+    holder_name: Ravi Kumar
+    upi_id: ravi.kumar@okaxis

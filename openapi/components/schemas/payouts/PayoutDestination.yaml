@@ -1,0 +1,45 @@
+type: object
+description: "Where a payee is paid: a bank account by its last four digits, or a UPI ID, and whether it is checked."
+required:
+  - kind
+  - holder_name
+  - last4
+  - upi_id
+  - check
+properties:
+  kind:
+    $ref: ./PayoutDestinationKind.yaml
+    description: Bank or UPI.
+  holder_name:
+    type: string
+    description: The holder's name.
+    examples:
+      - ZippyGo Dev Partner Private Limited
+  last4:
+    type:
+      - string
+      - "null"
+    description: The bank account's last four digits.
+    examples:
+      - "6789"
+  upi_id:
+    type:
+      - string
+      - "null"
+    description: The UPI ID, when paid by UPI.
+    examples:
+      - null
+  check:
+    $ref: ./PayoutAccountCheck.yaml
+    description: Whether it is checked.
+examples:
+  - kind: bank
+    holder_name: ZippyGo Dev Partner Private Limited
+    last4: "6789"
+    upi_id: null
+    check:
+      state: passed
+      reason: null
+      checked_at: 2026-10-22T06:30:05Z
+      by: provider
+      reference: SIMCHK-7F3A21

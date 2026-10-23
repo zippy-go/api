@@ -1,0 +1,7 @@
+type: string
+description: "Who decided a check: the payout provider's one-rupee transfer, or platform staff by hand with a reason."
+enum:
+  - provider
+  - staff
+examples:
+  - provider

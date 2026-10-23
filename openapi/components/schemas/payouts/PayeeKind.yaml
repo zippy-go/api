@@ -1,0 +1,7 @@
+type: string
+description: "Whom a statement pays: a Location for what it sold, or a platform fleet Agent for the work they did."
+enum:
+  - location
+  - agent
+examples:
+  - location

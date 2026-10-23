@@ -1,0 +1,14 @@
+type: object
+description: Archiving a statement.
+required: []
+properties:
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, at most 200 characters.
+    examples:
+      - Settled in cash at the office
+    maxLength: 200
+examples:
+  - reason: Settled in cash at the office

@@ -1,0 +1,27 @@
+type: object
+description: One day of an Agent on the Location's clock; a night stretch counts on both days it covered.
+required:
+  - date
+  - deliveries
+  - minutes_on_duty
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-10-22
+  deliveries:
+    type: integer
+    description: Deliveries that day.
+    examples:
+      - 2
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty that day.
+    examples:
+      - 180
+examples:
+  - date: 2026-10-22
+    deliveries: 2
+    minutes_on_duty: 180

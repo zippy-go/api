@@ -1,0 +1,61 @@
+# Path item for /v1/agent/memberships/{agent_id}/statements. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's delivery services."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000107
+get:
+  operationId: listOwnAgentStatements
+  summary: Read the Agent's money
+  description: "The week so far task by task, the next payment and where it stands, six months of statements with their PDFs, and where the Agent is paid. A Partner's own Agent has no statements: their weeks are reported to the Partner, who pays them, and none shows a payment from the platform. Takes an Agent app token (audience `agent`) of the person holding the membership."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The Agent's money.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/AgentStatementList.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller (another person's answers the same)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

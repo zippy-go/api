@@ -1,0 +1,40 @@
+type: object
+description: Orders by way of ordering.
+required:
+  - delivery
+  - pickup
+  - dine_in
+  - scheduled
+  - subscription
+properties:
+  delivery:
+    type: integer
+    description: Delivered orders.
+    examples:
+      - 16
+  pickup:
+    type: integer
+    description: Orders collected at the store.
+    examples:
+      - 2
+  dine_in:
+    type: integer
+    description: Dine-in tabs.
+    examples:
+      - 0
+  scheduled:
+    type: integer
+    description: Orders scheduled for later.
+    examples:
+      - 0
+  subscription:
+    type: integer
+    description: Orders a subscription made.
+    examples:
+      - 0
+examples:
+  - delivery: 16
+    pickup: 2
+    dine_in: 0
+    scheduled: 0
+    subscription: 0

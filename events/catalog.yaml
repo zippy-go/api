@@ -1038,3 +1038,98 @@ events:
       An alert closed because what fired it cleared: the burn fell, the job ran, the row published, the statement was paid or the account checked.
     payload_schema: ./payloads/operations.alert.closed.v1.schema.json
     example: ./examples/operations.alert.closed.v1.json
+  - type: payouts.statement.locked
+    version: 1
+    domain: payouts
+    description: >-
+      A week was locked into its statement, once, by the clock on the Tuesday after it or by platform staff once it was over: its figures never change after. The ledger settles the week from it: the GST the invoice bills beyond the orders' own, the cancellation fees, fee credits, adjustments and the cash the Location or the Agent kept, and an Agent's pay and tips into what the Agent is owed.
+    payload_schema: ./payloads/payouts.statement.locked.v1.schema.json
+    example: ./examples/payouts.statement.locked.v1.json
+
+  - type: payouts.statement.sent
+    version: 1
+    domain: payouts
+    description: >-
+      A due statement was sent as a transfer through the payout provider, recorded before it was sent with a key so it is sent at most once: it shows as sending until the provider answers.
+    payload_schema: ./payloads/payouts.statement.sent.v1.schema.json
+    example: ./examples/payouts.statement.sent.v1.json
+
+  - type: payouts.statement.paid
+    version: 1
+    domain: payouts
+    description: >-
+      A statement was paid: the payout provider processed its transfer, or platform staff marked it paid by hand with the day and the transfer's reference. The ledger posts the payout; the Location's inbox gets "Payout sent" with the amount, the account's last four digits, the reference and the week, and an Agent is pushed the same. It says sent, not arrived.
+    payload_schema: ./payloads/payouts.statement.paid.v1.schema.json
+    example: ./examples/payouts.statement.paid.v1.json
+
+  - type: payouts.statement.unpaid
+    version: 1
+    domain: payouts
+    description: >-
+      A statement could not be paid: the payout provider failed or reversed its transfer, such as "account closed", or platform staff marked it unpaid with why. A paid statement's day and reference are cleared and the ledger reverses its payout. Mission Control is alerted.
+    payload_schema: ./payloads/payouts.statement.unpaid.v1.schema.json
+    example: ./examples/payouts.statement.unpaid.v1.json
+
+  - type: payouts.statement.archived
+    version: 1
+    domain: payouts
+    description: >-
+      A statement was archived: locked with nothing to pay, saying why, or archived by platform staff.
+    payload_schema: ./payloads/payouts.statement.archived.v1.schema.json
+    example: ./examples/payouts.statement.archived.v1.json
+
+  - type: payouts.statement.reopened
+    version: 1
+    domain: payouts
+    description: >-
+      Platform staff put a statement back to due, which clears its paid day and reference or its note; a paid statement's payout is reversed in the ledger.
+    payload_schema: ./payloads/payouts.statement.reopened.v1.schema.json
+    example: ./examples/payouts.statement.reopened.v1.json
+
+  - type: payouts.adjustment.added
+    version: 1
+    domain: payouts
+    description: >-
+      Platform staff added money to a payee's payout or took money off it, with a reason the payee reads; it lands in the first week not locked yet and is settled into the statement that locks it.
+    payload_schema: ./payloads/payouts.adjustment.added.v1.schema.json
+    example: ./examples/payouts.adjustment.added.v1.json
+
+  - type: payouts.adjustment.removed
+    version: 1
+    domain: payouts
+    description: >-
+      Platform staff took an adjustment back before its week was locked.
+    payload_schema: ./payloads/payouts.adjustment.removed.v1.schema.json
+    example: ./examples/payouts.adjustment.removed.v1.json
+
+  - type: payouts.question.asked
+    version: 1
+    domain: payouts
+    description: >-
+      A Location or an Agent asked about a locked week, "Something look wrong?"; Mission Control lists it on the week's statement. The words stay on the platform.
+    payload_schema: ./payloads/payouts.question.asked.v1.schema.json
+    example: ./examples/payouts.question.asked.v1.json
+
+  - type: payouts.question.answered
+    version: 1
+    domain: payouts
+    description: >-
+      Mission Control answered a question about a week, once: the answer appears under the week signed by the platform, and the Location's inbox and devices, or the Agent, are told.
+    payload_schema: ./payloads/payouts.question.answered.v1.schema.json
+    example: ./examples/payouts.question.answered.v1.json
+
+  - type: payouts.account_check.passed
+    version: 1
+    domain: payouts
+    description: >-
+      A payout destination passed its one-rupee check: the payout provider sent ₹1.00, which stays with the holder, and the bank returned the holder's legal name; or platform staff checked it by hand with a reason. A statement held for it is due without the hold at once.
+    payload_schema: ./payloads/payouts.account_check.passed.v1.schema.json
+    example: ./examples/payouts.account_check.passed.v1.json
+
+  - type: payouts.account_check.failed
+    version: 1
+    domain: payouts
+    description: >-
+      A payout destination failed its one-rupee check: the bank returned a different name, "The account is not in your legal name", or the transfer failed. Statements stay held, the Partner or the Agent is told, and Mission Control is alerted.
+    payload_schema: ./payloads/payouts.account_check.failed.v1.schema.json
+    example: ./examples/payouts.account_check.failed.v1.json

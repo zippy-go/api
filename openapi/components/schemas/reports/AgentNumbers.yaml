@@ -1,0 +1,181 @@
+type: object
+description: "One Agent's numbers over a range, as Rock Hero's heroes page measured riders: deliveries, the average minutes from taking a delivery to the door and kilometres, hours on duty and deliveries per hour on duty, the rating, the shares of offers accepted and of deliveries by the promise, failed drops and geofence overrides, tips and earnings. A number with nothing to divide by is `null`, a dash, never a zero. An Agent whose membership ended stays in the numbers for the deliveries they made."
+required:
+  - agent_id
+  - name
+  - partner_id
+  - partner_name
+  - service_id
+  - service_name
+  - team_id
+  - team_name
+  - status
+  - online
+  - deliveries
+  - average_minutes_to_door
+  - average_km
+  - minutes_on_duty
+  - deliveries_per_hour
+  - rating
+  - offers_made
+  - offers_accepted_share
+  - on_time_share
+  - failed_drops
+  - geofence_overrides
+  - tips
+  - earnings
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  partner_id:
+    type: string
+    format: uuid
+    description: Their Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  partner_name:
+    type: string
+    description: Their Partner's name.
+    examples:
+      - ZippyGo Fleet
+  service_id:
+    type: string
+    format: uuid
+    description: Their delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  service_name:
+    type: string
+    description: The service's name.
+    examples:
+      - ZippyGo Fleet delivery
+  team_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Their team.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5601
+  team_name:
+    type:
+      - string
+      - "null"
+    description: The team's name.
+    examples:
+      - Hyderabad
+  status:
+    $ref: ../agents/AgentMembershipStatus.yaml
+    description: Their membership's status.
+  online:
+    type: boolean
+    description: Whether they are online now.
+  deliveries:
+    type: integer
+    description: Deliveries made.
+    examples:
+      - 2
+  average_minutes_to_door:
+    type:
+      - number
+      - "null"
+    description: The average minutes from taking a delivery to the door.
+    examples:
+      - 24.5
+  average_km:
+    type:
+      - number
+      - "null"
+    description: The average kilometres of a delivery, measured.
+    examples:
+      - 3.4
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty in the range.
+    examples:
+      - 180
+  deliveries_per_hour:
+    type:
+      - number
+      - "null"
+    description: Deliveries per hour on duty.
+    examples:
+      - 0.67
+  rating:
+    $ref: ./AgentNumbersRating.yaml
+    description: Their rating over the last 90 days.
+  offers_made:
+    type: integer
+    description: Offers made to them.
+    examples:
+      - 3
+  offers_accepted_share:
+    type:
+      - number
+      - "null"
+    description: The share of offers they accepted.
+    examples:
+      - 0.67
+  on_time_share:
+    type:
+      - number
+      - "null"
+    description: The share of their deliveries at the door by the promise.
+    examples:
+      - 1
+  failed_drops:
+    type: integer
+    description: Drops they failed.
+    examples:
+      - 0
+  geofence_overrides:
+    type: integer
+    description: Arrivals they confirmed outside the geofence, with a reason.
+    examples:
+      - 0
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips, in full.
+  earnings:
+    $ref: ../common/Money.yaml
+    description: What they earned, tips included.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    name: Ravi Kumar
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    partner_name: ZippyGo Fleet
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    service_name: ZippyGo Fleet delivery
+    team_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5601
+    team_name: Hyderabad
+    status: active
+    online: true
+    deliveries: 2
+    average_minutes_to_door: 24.5
+    average_km: 3.4
+    minutes_on_duty: 180
+    deliveries_per_hour: 0.67
+    rating:
+      thumbs_up: 4
+      count: 5
+      share: 0.8
+    offers_made: 3
+    offers_accepted_share: 0.67
+    on_time_share: 1
+    failed_drops: 0
+    geofence_overrides: 0
+    tips:
+      minor_units: 2000
+      currency: INR
+    earnings:
+      minor_units: 12320
+      currency: INR

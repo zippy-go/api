@@ -1,0 +1,198 @@
+type: object
+description: "An Agent's week as the Agent app shows it: the tasks, distance, tips and cash, and what it comes to. For the platform fleet the week in progress is an estimate until its statement is locked; a Partner's own Agent reads every week as reported to the Partner, who pays them, with no payment from the platform."
+required:
+  - agent_id
+  - agent_name
+  - partner_id
+  - partner_name
+  - service_id
+  - week
+  - starts_on
+  - ends_on
+  - time_zone
+  - currency
+  - paid_by
+  - estimate
+  - statement_id
+  - sentence
+  - tasks
+  - deliveries
+  - distance_metres
+  - minutes_on_duty
+  - pay
+  - tips
+  - cash_collected
+  - total
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  agent_name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  partner_id:
+    type: string
+    format: uuid
+    description: The Agent's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  partner_name:
+    type: string
+    description: The Partner's name.
+    examples:
+      - ZippyGo Fleet
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week.
+    examples:
+      - 2026W44
+  starts_on:
+    type: string
+    format: date
+    description: Its Monday.
+    examples:
+      - 2026-10-26
+  ends_on:
+    type: string
+    format: date
+    description: Its Sunday.
+    examples:
+      - 2026-11-01
+  time_zone:
+    type: string
+    description: The clock it is read on.
+    examples:
+      - Asia/Kolkata
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  paid_by:
+    $ref: ./AgentPaidBy.yaml
+    description: Who pays the Agent.
+  estimate:
+    type: boolean
+    description: "`true` while it can still change."
+  statement_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its statement, once locked, for the platform fleet.
+    examples:
+      - null
+  sentence:
+    type: string
+    description: 'What it is: "So far this week", or "Reported to {Partner}, who pays you".'
+    examples:
+      - "So far this week: an estimate while it can still change."
+  tasks:
+    type: array
+    items:
+      $ref: ./AgentStatementTask.yaml
+      description: A task.
+    description: Task by task, oldest first.
+  deliveries:
+    type: integer
+    description: Drop-offs completed.
+    examples:
+      - 1
+  distance_metres:
+    type: integer
+    description: The measured distance of its drop-offs, in metres.
+    examples:
+      - 3600
+  minutes_on_duty:
+    type: integer
+    description: Minutes on duty in the week.
+    examples:
+      - 180
+  pay:
+    $ref: ../common/Money.yaml
+    description: Pay under the service's rule, tips not included.
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips, in full.
+  cash_collected:
+    $ref: ../common/Money.yaml
+    description: Cash collected.
+  total:
+    $ref: ../common/Money.yaml
+    description: Pay and tips; for the platform fleet less the cash kept, as the statement will work it out.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    agent_name: Ravi Kumar
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    partner_name: ZippyGo Fleet
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    week: 2026W44
+    starts_on: 2026-10-26
+    ends_on: 2026-11-01
+    time_zone: Asia/Kolkata
+    currency: INR
+    paid_by: platform
+    estimate: true
+    statement_id: null
+    sentence: "So far this week: an estimate while it can still change."
+    tasks:
+      - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5501
+        delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+        order_number: AB0042
+        kind: drop_off
+        outcome: completed
+        earned_at: 2026-10-22T13:40:00Z
+        rule_version: 1
+        lines:
+          - kind: drop_off
+            label: Drop-off
+            amount:
+              minor_units: 3000
+              currency: INR
+          - kind: distance
+            label: 3.6 km at ₹6.00 per km
+            amount:
+              minor_units: 2160
+              currency: INR
+          - kind: tip
+            label: Tip, in full
+            amount:
+              minor_units: 2000
+              currency: INR
+        pay:
+          minor_units: 5160
+          currency: INR
+        tip:
+          minor_units: 2000
+          currency: INR
+        cash_collected:
+          minor_units: 0
+          currency: INR
+        distance_metres: 3600
+    deliveries: 1
+    distance_metres: 3600
+    minutes_on_duty: 180
+    pay:
+      minor_units: 5160
+      currency: INR
+    tips:
+      minor_units: 2000
+      currency: INR
+    cash_collected:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 7160
+      currency: INR

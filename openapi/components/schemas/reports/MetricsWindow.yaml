@@ -1,0 +1,8 @@
+type: string
+description: "The time the metrics board covers: the last hour, the day so far on the platform's clock, or chosen times of up to 31 days."
+enum:
+  - last_hour
+  - today
+  - custom
+examples:
+  - last_hour

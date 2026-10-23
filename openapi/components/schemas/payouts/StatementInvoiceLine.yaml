@@ -1,0 +1,47 @@
+type: object
+description: One fee line of a GST invoice, with its SAC code, taxable value and GST.
+required:
+  - description
+  - sac
+  - taxable_value
+  - cgst
+  - sgst
+  - igst
+properties:
+  description:
+    type: string
+    description: What the fee is.
+    examples:
+      - Marketplace fee, week 2026W43
+  sac:
+    type: string
+    description: The services accounting code; a placeholder until the founder's accountant confirms it.
+    examples:
+      - "998599"
+  taxable_value:
+    $ref: ../common/Money.yaml
+    description: The fee.
+  cgst:
+    $ref: ../common/Money.yaml
+    description: Central GST, for a Partner registered in the platform's state.
+  sgst:
+    $ref: ../common/Money.yaml
+    description: State GST, for a Partner registered in the platform's state.
+  igst:
+    $ref: ../common/Money.yaml
+    description: Integrated GST, for a Partner elsewhere.
+examples:
+  - description: Marketplace fee, week 2026W43
+    sac: "998599"
+    taxable_value:
+      minor_units: 6000
+      currency: INR
+    cgst:
+      minor_units: 540
+      currency: INR
+    sgst:
+      minor_units: 540
+      currency: INR
+    igst:
+      minor_units: 0
+      currency: INR

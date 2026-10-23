@@ -1,0 +1,7 @@
+type: string
+description: "Who pays an Agent: the platform pays its own fleet's Agents weekly; a Partner's own Agents are reported, not paid, and the Partner pays them."
+enum:
+  - platform
+  - partner
+examples:
+  - platform

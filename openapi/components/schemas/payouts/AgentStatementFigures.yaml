@@ -1,0 +1,93 @@
+type: object
+description: "How a platform fleet Agent's week was worked out: the pay for each task under the pay rule version it was offered under, with its parts; tips in full; bonuses and quest rewards; plus or less adjustments; less the cash collected and kept instead of deposited; less tax deducted at source; plus what was carried in."
+required:
+  - pay
+  - pay_parts
+  - tips
+  - bonuses
+  - adjustments
+  - cash_kept
+  - tax_deducted
+  - carried_in
+  - total
+  - payable
+  - carried_out
+properties:
+  pay:
+    $ref: ../common/Money.yaml
+    description: Pay for the week's tasks, tips not included.
+  pay_parts:
+    type: array
+    items:
+      $ref: ./AgentPayPart.yaml
+      description: A part.
+    description: "The pay by part: base, distance, waiting and call-offs."
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips customers gave on the tasks, in full.
+  bonuses:
+    $ref: ../common/Money.yaml
+    description: Bonuses and quest rewards; nothing until they arrive.
+  adjustments:
+    $ref: ../common/Money.yaml
+    description: "Adjustments settled into the week: positive adds, negative takes off."
+  cash_kept:
+    $ref: ../common/Money.yaml
+    description: Cash collected and not deposited by the lock, which the Agent keeps instead.
+  tax_deducted:
+    $ref: ../common/Money.yaml
+    description: Tax deducted at source; nothing until the rate is settled.
+  carried_in:
+    $ref: ../common/Money.yaml
+    description: "What the week before carried in: a shortfall is negative."
+  total:
+    $ref: ../common/Money.yaml
+    description: The week's total; negative when the cash kept came to more than the earnings.
+  payable:
+    $ref: ../common/Money.yaml
+    description: "What is paid: the total, or nothing when it is below nothing."
+  carried_out:
+    $ref: ../common/Money.yaml
+    description: A shortfall taken off the next statement, as a negative amount; a deposit clears it.
+examples:
+  - pay:
+      minor_units: 318000
+      currency: INR
+    pay_parts:
+      - kind: base
+        label: Base pay
+        amount:
+          minor_units: 210000
+          currency: INR
+      - kind: distance
+        label: Distance pay
+        amount:
+          minor_units: 108000
+          currency: INR
+    tips:
+      minor_units: 31000
+      currency: INR
+    bonuses:
+      minor_units: 0
+      currency: INR
+    adjustments:
+      minor_units: 0
+      currency: INR
+    cash_kept:
+      minor_units: 80000
+      currency: INR
+    tax_deducted:
+      minor_units: 0
+      currency: INR
+    carried_in:
+      minor_units: 0
+      currency: INR
+    total:
+      minor_units: 269000
+      currency: INR
+    payable:
+      minor_units: 269000
+      currency: INR
+    carried_out:
+      minor_units: 0
+      currency: INR

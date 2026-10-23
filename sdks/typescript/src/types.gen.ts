@@ -2637,7 +2637,7 @@ export type PartnerDocumentPage = {
 };
 
 /**
- * The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits.
+ * The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider's one-rupee transfer (`check`): a pass marks it verified and lifts the hold after a change of account, a different name or a failed transfer fails it with the reason.
  */
 export type PayoutAccount = {
     /**
@@ -2689,6 +2689,10 @@ export type PayoutAccount = {
      */
     verified_at?: string | null;
     /**
+     * The one-rupee check of the account as it stands now; since contract 0.19.0.
+     */
+    check: PayoutAccountCheck;
+    /**
      * Who verified it.
      */
     verified_by?: string | null;
@@ -2725,7 +2729,7 @@ export type PayoutAccountUpdate = {
 };
 
 /**
- * Whether platform staff verified the account.
+ * Whether the account is verified, by the payout provider's one-rupee check since contract 0.19.0 or by platform staff by hand.
  */
 export type PayoutAccountState = 'unverified' | 'verified';
 
@@ -15493,9 +15497,9 @@ export type WalletCorrectionRequest = {
 };
 
 /**
- * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), and the memorandum pair `card_holds` and `card_holds_contra`. Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet).
+ * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), the memorandum pair `card_holds` and `card_holds_contra`, and since contract 0.19.0 `agent_pay_expense` (the platform fleet's pay to its Agents), `payout_adjustments` (adjustments to Partners' and Agents' payouts) and `payouts_clearing` (money the payout provider sends to Partners and Agents). Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet), and since 0.19.0 `agent_payable` (owed to a platform fleet Agent).
  */
-export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional';
+export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional' | 'agent_payable' | 'agent_pay_expense' | 'payout_adjustments' | 'payouts_clearing';
 
 /**
  * The account's class: an asset, a liability, revenue, an expense, or a memorandum account that records a promise (a card hold) without moving money.
@@ -15508,9 +15512,9 @@ export type LedgerAccountClass = 'asset' | 'liability' | 'revenue' | 'expense' |
 export type LedgerSide = 'debit' | 'credit';
 
 /**
- * What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected.
+ * What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected; since contract 0.19.0 a week settled when its statement was locked (the GST its invoice bills beyond the orders' own, cancellation fees, fee credits, adjustments, the cash a Location or an Agent kept, an Agent's pay and tips), a payout paid, and a payout reversed when a paid statement came back unpaid.
  */
-export type LedgerEntryKind = 'payment_captured' | 'card_held' | 'card_hold_released' | 'order_split' | 'order_split_reversed' | 'refund_issued' | 'refund_to_wallet' | 'wallet_credit' | 'wallet_correction';
+export type LedgerEntryKind = 'payment_captured' | 'card_held' | 'card_hold_released' | 'order_split' | 'order_split_reversed' | 'refund_issued' | 'refund_to_wallet' | 'wallet_credit' | 'wallet_correction' | 'statement_settled' | 'payout_paid' | 'payout_reversed';
 
 /**
  * A ledger account with what was posted to it. Its balance is the sum of its postings, shown in its normal direction.
@@ -15751,6 +15755,10 @@ export type OrderMoneySplit = {
      * The policy layer the commission rate came from, such as `country India`.
      */
     plan: string | null;
+    /**
+     * Who carries the order's delivery, which decides whose its delivery fee and tip are: the platform fleet, the Location's own Agents, an external carrier, or `none` for a pickup. Since contract 0.19.0.
+     */
+    carrier: 'platform_fleet' | 'own_agents' | 'external_carrier' | 'none';
     /**
      * GST on the commission.
      */
@@ -21646,6 +21654,2798 @@ export type OutboxReplay = {
 };
 
 /**
+ * Whom a statement pays: a Location for what it sold, or a platform fleet Agent for the work they did.
+ */
+export type PayeeKind = 'location' | 'agent';
+
+/**
+ * Where a statement stands: `due` once locked with something to pay; `sending` while the payout provider has the transfer; `paid` with its day and reference; `unpaid` with why; `archived` when there is nothing to pay or platform staff archived it.
+ */
+export type StatementState = 'due' | 'sending' | 'paid' | 'unpaid' | 'archived';
+
+/**
+ * Where the money stands, for the sentence beside it: `so_far` for the week in progress, `locking` for a week over and not yet locked, `due` for its Friday, `held` with what holds it, `sending`, `paid`, `unpaid`, `nothing_to_pay` and `archived`.
+ */
+export type StatementStandingCode = 'so_far' | 'locking' | 'due' | 'held' | 'sending' | 'paid' | 'unpaid' | 'nothing_to_pay' | 'archived';
+
+/**
+ * What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once.
+ */
+export type PayoutHoldCode = 'no_account' | 'account_not_checked' | 'account_check_failed' | 'partner_gone' | 'agent_gone';
+
+/**
+ * A move in a statement's history: `locked`, `sent` to the payout provider, `paid`, `unpaid`, `archived`, or `reopened` (put back to due).
+ */
+export type StatementMoveKind = 'locked' | 'sent' | 'paid' | 'unpaid' | 'archived' | 'reopened';
+
+/**
+ * Who made a move: the statement clock, the payout provider, or platform staff.
+ */
+export type StatementActorKind = 'clock' | 'provider' | 'staff';
+
+/**
+ * A document drawn from a locked week when it is asked for: the statement (PDF), the GST invoice for the platform's fee (PDF) and the order list (CSV).
+ */
+export type StatementDocumentKind = 'statement' | 'invoice' | 'orders';
+
+/**
+ * How an order counts on a statement: `completed` (delivered or collected), or `cancelled_by_partner` after the customer paid, which costs its fee and nothing else.
+ */
+export type StatementOrderOutcome = 'completed' | 'cancelled_by_partner';
+
+/**
+ * Who carried an order: the platform fleet (the delivery fee and the tip are not the Location's), the Location's own Agents (both are), an external carrier, or nobody for a pickup.
+ */
+export type StatementCarrier = 'platform_fleet' | 'own_agents' | 'external_carrier' | 'none';
+
+/**
+ * Whether platform staff answered a question.
+ */
+export type PayoutQuestionState = 'unanswered' | 'answered';
+
+/**
+ * How the money goes: a bank transfer or UPI.
+ */
+export type PayoutDestinationKind = 'bank' | 'upi';
+
+/**
+ * Where the one-rupee check stands: `not_checked` before it is asked, `checking` while the payout provider sends ₹1.00, `passed` when the name the bank returns is the holder's legal name (or staff checked it by hand), `failed` with the reason.
+ */
+export type PayoutAccountCheckState = 'not_checked' | 'checking' | 'passed' | 'failed';
+
+/**
+ * Who decided a check: the payout provider's one-rupee transfer, or platform staff by hand with a reason.
+ */
+export type PayoutAccountCheckBy = 'provider' | 'staff';
+
+/**
+ * Who pays an Agent: the platform pays its own fleet's Agents weekly; a Partner's own Agents are reported, not paid, and the Partner pays them.
+ */
+export type AgentPaidBy = 'platform' | 'partner';
+
+/**
+ * A part of an Agent's pay: the base per stop, the distance, the waiting, or the pay for a task called off after the Agent started.
+ */
+export type AgentPayPartKind = 'base' | 'distance' | 'waiting' | 'call_off';
+
+/**
+ * What holds a due statement, in words.
+ */
+export type PayoutHold = {
+    /**
+     * The hold.
+     */
+    code: PayoutHoldCode;
+    /**
+     * The hold in words: "No bank account yet", "Bank account not checked yet", "Bank account check failed" or "The Partner is gone".
+     */
+    sentence: string;
+};
+
+/**
+ * Where the money stands, in a sentence: so far, locking on Tuesday, due on Friday, on its way, held and why, paid on a day with its reference, could not be paid and why, or nothing to pay and why.
+ */
+export type StatementStanding = {
+    /**
+     * Where it stands.
+     */
+    code: StatementStandingCode;
+    /**
+     * The sentence.
+     */
+    sentence: string;
+};
+
+/**
+ * Who made a move. A Location and an Agent never read the names of the people at the platform who moved their statements.
+ */
+export type StatementActor = {
+    /**
+     * The clock, the provider or staff.
+     */
+    kind: StatementActorKind;
+    /**
+     * The operator's name, in Mission Control only; `null` for the clock, the provider and in every payee's view.
+     */
+    name: string | null;
+};
+
+/**
+ * One move in a statement's history, with who made it and when.
+ */
+export type StatementMove = {
+    /**
+     * The move.
+     */
+    move: StatementMoveKind;
+    /**
+     * The state after it.
+     */
+    state: StatementState;
+    /**
+     * The state before it; `null` for the lock.
+     */
+    previous_state: StatementState | null;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Who.
+     */
+    by: StatementActor;
+    /**
+     * Why, for an unpaid, an archived or a reopened statement: the provider's words or staff's.
+     */
+    reason: string | null;
+    /**
+     * The transfer's reference, for a paid statement.
+     */
+    reference: string | null;
+    /**
+     * The day it was paid, for a paid statement.
+     */
+    paid_on: string | null;
+};
+
+/**
+ * How a Location's week was worked out: its item sales; less what the Partner paid towards its promotions; less the platform's fee on the rest with the GST the invoice bills on it; less the fee and its GST on each order the Partner cancelled after the customer paid; plus delivery charges and tips for the Location's own Agents, and cutlery charges; less the refunds charged to the Partner; less the cash the Location collected itself; less tax deducted at source; plus or less adjustments; plus what was carried in. Every amount but `adjustments`, `carried_in`, `total` and `carried_out` is positive and named for what it is; the order rows, the refunds, the adjustments and the carry add up to `total`.
+ */
+export type StatementFigures = {
+    /**
+     * Item sales of the orders that ended in the week, tax included.
+     */
+    sales: Money;
+    /**
+     * What the Partner paid towards its promotions; nothing until promotions arrive.
+     */
+    promotions: Money;
+    /**
+     * Sales after the Partner's promotions, which the fee is worked out on.
+     */
+    net_sales: Money;
+    /**
+     * The platform's fee on net sales, rounded half up on each order.
+     */
+    fee: Money;
+    /**
+     * GST on the fee as the invoice bills it: worked out on the week's fee, each half rounded half up once.
+     */
+    fee_gst: Money;
+    /**
+     * The fee on each order the Partner cancelled after the customer paid.
+     */
+    cancellation_fees: Money;
+    /**
+     * GST on the cancellation fees, as the invoice bills it.
+     */
+    cancellation_fees_gst: Money;
+    /**
+     * Delivery charges of orders the Location's own Agents carried; the platform takes no fee on them.
+     */
+    delivery_charges: Money;
+    /**
+     * Tips customers gave the Location's own Agents, for the Partner to pass on.
+     */
+    tips: Money;
+    /**
+     * Cutlery charges, which are the Location's.
+     */
+    cutlery_charges: Money;
+    /**
+     * Refunds given in the week and charged to the Partner, whatever week their order ended in.
+     */
+    refunds: Money;
+    /**
+     * Cash the Location collected itself: cash orders its own Agents delivered and bills taken at the counter.
+     */
+    cash_collected: Money;
+    /**
+     * Tax deducted or collected at source; nothing until the rates are settled.
+     */
+    tax_deducted: Money;
+    /**
+     * Adjustments settled into the week: positive adds, negative takes off.
+     */
+    adjustments: Money;
+    /**
+     * What the week before carried in: a shortfall is negative.
+     */
+    carried_in: Money;
+    /**
+     * The week's total; negative when the charges came to more than the sales.
+     */
+    total: Money;
+    /**
+     * What is paid: the total, or nothing when it is below nothing.
+     */
+    payable: Money;
+    /**
+     * A shortfall taken off the next statement, once, as a negative amount; zero otherwise.
+     */
+    carried_out: Money;
+};
+
+/**
+ * One order's part of a week: its sales, promotions, net sales, the rule and rate its fee came from, the fee and its GST, the charges that are the Location's, cash the Location collected, refunds charged on it in the week, and what the Partner got for it.
+ */
+export type StatementOrderRow = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The order's number, as said aloud.
+     */
+    number: string;
+    /**
+     * How it counts.
+     */
+    outcome: StatementOrderOutcome;
+    /**
+     * When it ended: completed, or cancelled.
+     */
+    ended_at: string;
+    /**
+     * Who carried it.
+     */
+    carrier: StatementCarrier;
+    /**
+     * Its item sales; nothing for an order the Partner cancelled.
+     */
+    sales: Money;
+    /**
+     * What the Partner paid towards its promotion.
+     */
+    promotions: Money;
+    /**
+     * Sales after the Partner's promotion.
+     */
+    net_sales: Money;
+    /**
+     * The policy layer the fee's rate came from, as the order was placed under it.
+     */
+    plan: string | null;
+    /**
+     * The fee's rate in basis points: 1200 is 12%.
+     */
+    rate_bp: number;
+    /**
+     * The platform's fee on it, or the cancellation fee for an order the Partner cancelled.
+     */
+    fee: Money;
+    /**
+     * GST on the fee, as the ledger split the order.
+     */
+    fee_gst: Money;
+    /**
+     * Its delivery charge, when the Location's own Agents carried it.
+     */
+    delivery_charge: Money;
+    /**
+     * Its tip, when the Location's own Agents carried it.
+     */
+    tip: Money;
+    /**
+     * Its cutlery charge.
+     */
+    cutlery_charge: Money;
+    /**
+     * Cash the Location collected on it.
+     */
+    cash_collected: Money;
+    /**
+     * Refunds of it given in the same week and charged to the Partner.
+     */
+    refunds: Money;
+    /**
+     * What the Partner got for it: net sales less the fee and its GST, plus its charges, less cash and refunds.
+     */
+    partner_gets: Money;
+};
+
+/**
+ * A refund given in the week and charged to the Partner, whatever week its order ended in.
+ */
+export type StatementRefund = {
+    /**
+     * The refund.
+     */
+    refund_id: string;
+    /**
+     * Its order.
+     */
+    order_id: string;
+    /**
+     * The order's number.
+     */
+    number: string;
+    /**
+     * When it was given.
+     */
+    given_at: string;
+    /**
+     * What the Partner bore of it.
+     */
+    amount: Money;
+    /**
+     * Why, in words.
+     */
+    reason: string | null;
+    /**
+     * The week its order counted in, when that was an earlier week.
+     */
+    order_week: string | null;
+};
+
+/**
+ * One day of a week, on the Location's clock: what its orders, refunds and cash came to.
+ */
+export type StatementDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Orders that ended that day.
+     */
+    orders: number;
+    /**
+     * Their sales.
+     */
+    sales: Money;
+    /**
+     * The fee on them, cancellation fees included.
+     */
+    fee: Money;
+    /**
+     * GST on the fee, as the orders were split.
+     */
+    fee_gst: Money;
+    /**
+     * Delivery charges, tips and cutlery charges that are the Location's.
+     */
+    charges: Money;
+    /**
+     * Refunds charged that day.
+     */
+    refunds: Money;
+    /**
+     * Cash the Location collected that day.
+     */
+    cash_collected: Money;
+    /**
+     * The day's part of the week's total, before adjustments and the carry.
+     */
+    total: Money;
+};
+
+/**
+ * A party on a GST invoice: its legal name, address, GSTIN where recorded, and its state.
+ */
+export type InvoiceParty = {
+    /**
+     * The legal name.
+     */
+    legal_name: string;
+    /**
+     * The address.
+     */
+    address: string | null;
+    /**
+     * The GSTIN, where recorded.
+     */
+    gstin: string | null;
+    /**
+     * The state, for the place of supply.
+     */
+    state: string | null;
+    /**
+     * The GST state code.
+     */
+    state_code: string | null;
+    /**
+     * `true` while the platform's legal identity is a placeholder, until the founder gives it; printed as one.
+     */
+    placeholder: boolean;
+};
+
+/**
+ * One fee line of a GST invoice, with its SAC code, taxable value and GST.
+ */
+export type StatementInvoiceLine = {
+    /**
+     * What the fee is.
+     */
+    description: string;
+    /**
+     * The services accounting code; a placeholder until the founder's accountant confirms it.
+     */
+    sac: string;
+    /**
+     * The fee.
+     */
+    taxable_value: Money;
+    /**
+     * Central GST, for a Partner registered in the platform's state.
+     */
+    cgst: Money;
+    /**
+     * State GST, for a Partner registered in the platform's state.
+     */
+    sgst: Money;
+    /**
+     * Integrated GST, for a Partner elsewhere.
+     */
+    igst: Money;
+};
+
+/**
+ * The tax invoice for the platform's fee in a week, numbered from one counter and taken only by the statement that won the lock: each fee line with its SAC code and taxable value, GST split as CGST and SGST for a Partner registered in the platform's state and as IGST otherwise, rounded half up once on each line, and the total, settled by deduction from the payout.
+ */
+export type StatementInvoice = {
+    /**
+     * The invoice number, `INV-{year}-{nnnnn}`.
+     */
+    number: string;
+    /**
+     * The day it was issued: the lock's.
+     */
+    issued_on: string;
+    /**
+     * The place of supply.
+     */
+    place_of_supply: string;
+    /**
+     * The platform, which bills the fee.
+     */
+    platform: InvoiceParty;
+    /**
+     * The Partner's legal entity, billed.
+     */
+    partner: InvoiceParty;
+    /**
+     * The fee lines.
+     */
+    lines: Array<StatementInvoiceLine>;
+    /**
+     * The fees together.
+     */
+    taxable_value: Money;
+    /**
+     * Central GST together.
+     */
+    cgst: Money;
+    /**
+     * State GST together.
+     */
+    sgst: Money;
+    /**
+     * Integrated GST together.
+     */
+    igst: Money;
+    /**
+     * The fees and their GST: exactly what the statement deducts.
+     */
+    total: Money;
+    /**
+     * That the total was settled by deduction from the payout.
+     */
+    sentence: string;
+};
+
+/**
+ * A credit note putting right a fee found wrong after its invoice, numbered from its own counter on the statement that settles the adjustment; the invoice itself never changes.
+ */
+export type StatementCreditNote = {
+    /**
+     * The credit note's number, `CN-{year}-{nnnnn}`.
+     */
+    number: string;
+    /**
+     * When it was issued.
+     */
+    issued_on: string;
+    /**
+     * The adjustment that credits the fee back.
+     */
+    adjustment_id: string;
+    /**
+     * Why.
+     */
+    reason: string;
+    /**
+     * The fee credited back.
+     */
+    taxable_value: Money;
+    /**
+     * Central GST credited back.
+     */
+    cgst: Money;
+    /**
+     * State GST credited back.
+     */
+    sgst: Money;
+    /**
+     * Integrated GST credited back.
+     */
+    igst: Money;
+    /**
+     * Everything credited back.
+     */
+    total: Money;
+};
+
+/**
+ * A document of a locked week, drawn when it is asked for and never stored; its link never expires.
+ */
+export type StatementDocument = {
+    /**
+     * Which document.
+     */
+    kind: StatementDocumentKind;
+    /**
+     * Its title.
+     */
+    title: string;
+    /**
+     * `application/pdf` or `text/csv`.
+     */
+    media_type: string;
+    /**
+     * Where it is drawn, on the API.
+     */
+    href: string;
+};
+
+/**
+ * Money added to a payee's payout or taken off it, with a reason the payee reads. It lands in the first week not locked yet, is settled into the statement that locks that week, and can be taken back only until then.
+ */
+export type PayoutAdjustment = {
+    /**
+     * The adjustment.
+     */
+    id: string;
+    /**
+     * Whose payout.
+     */
+    payee_kind: PayeeKind;
+    /**
+     * The Location's Partner, or the Agent's.
+     */
+    partner_id: string;
+    /**
+     * The Location, for a Location's payout.
+     */
+    location_id: string | null;
+    /**
+     * The Agent, for an Agent's payout.
+     */
+    agent_id: string | null;
+    /**
+     * The week it landed in.
+     */
+    week: string;
+    /**
+     * Positive adds, negative takes off.
+     */
+    amount: Money;
+    /**
+     * `true` when it credits back a fee found wrong: the statement adds its GST too and carries a credit note for both.
+     */
+    fee_correction: boolean;
+    /**
+     * Why, as the payee reads it.
+     */
+    reason: string;
+    /**
+     * Staff's note, in Mission Control only.
+     */
+    note: string | null;
+    /**
+     * The statement it was settled into, once locked.
+     */
+    statement_id: string | null;
+    /**
+     * Whether its week is locked, after which only another adjustment can undo it.
+     */
+    settled: boolean;
+    /**
+     * When it was added.
+     */
+    added_at: string;
+    /**
+     * Who added it, in Mission Control only.
+     */
+    added_by_name: string | null;
+};
+
+/**
+ * An adjustment to add: at most ₹100,000.00 either way and never nothing, with a reason the payee reads.
+ */
+export type PayoutAdjustmentInput = {
+    /**
+     * The amount in paise: positive adds to the payout, negative takes off it; never zero, at most 10,000,000 either way. A fee correction is positive: the fee credited back, its GST added.
+     */
+    amount_minor: number;
+    /**
+     * Why, as the payee reads it; 1 to 140 characters.
+     */
+    reason: string;
+    /**
+     * Staff's note, never shown to the payee; at most 1,000 characters.
+     */
+    note?: string | null;
+    /**
+     * Whether it credits back a fee found wrong, with a credit note on the statement that settles it; `false` by default.
+     */
+    fee_correction?: boolean;
+};
+
+/**
+ * A page of adjustments, newest first.
+ */
+export type PayoutAdjustmentPage = {
+    /**
+     * The adjustments on this page.
+     */
+    items: Array<PayoutAdjustment>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * "Something look wrong?": a question about a locked week, answered once by Mission Control and signed by the platform; neither can be changed after.
+ */
+export type PayoutQuestion = {
+    /**
+     * The question.
+     */
+    id: string;
+    /**
+     * The statement it is about.
+     */
+    statement_id: string;
+    /**
+     * The statement's reference.
+     */
+    reference: string;
+    /**
+     * A Location's or an Agent's.
+     */
+    payee_kind: PayeeKind;
+    /**
+     * The payee's Partner.
+     */
+    partner_id: string;
+    /**
+     * The Location, for a Location's statement.
+     */
+    location_id: string | null;
+    /**
+     * The Agent, for an Agent's statement.
+     */
+    agent_id: string | null;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * The question, at most 2,000 characters.
+     */
+    text: string;
+    /**
+     * When it was asked.
+     */
+    asked_at: string;
+    /**
+     * Who asked it.
+     */
+    asked_by_name: string | null;
+    /**
+     * Whether it was answered.
+     */
+    state: PayoutQuestionState;
+    /**
+     * The answer, once given.
+     */
+    answer: string | null;
+    /**
+     * When it was answered.
+     */
+    answered_at: string | null;
+    /**
+     * Who signed the answer: the platform, `ZippyGo`, for the payee; the operator's name in Mission Control.
+     */
+    answered_by: string | null;
+};
+
+/**
+ * A question about a week.
+ */
+export type PayoutQuestionInput = {
+    /**
+     * The question, 1 to 2,000 characters.
+     */
+    text: string;
+};
+
+/**
+ * The answer to a question, given once.
+ */
+export type PayoutAnswerInput = {
+    /**
+     * The answer, 1 to 2,000 characters; the payee reads it signed by the platform.
+     */
+    answer: string;
+};
+
+/**
+ * A page of questions, oldest unanswered first.
+ */
+export type PayoutQuestionPage = {
+    /**
+     * The questions on this page.
+     */
+    items: Array<PayoutQuestion>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * The one-rupee check of a payout destination: the payout provider sends ₹1.00, which stays with the holder, and compares the name the bank returns with the holder's legal name. A match checks the destination; a different name or a failed transfer fails it with the reason. Every write of the destination checks it again.
+ */
+export type PayoutAccountCheck = {
+    /**
+     * Where it stands.
+     */
+    state: PayoutAccountCheckState;
+    /**
+     * Why it failed, such as "The account is not in your legal name"; or staff's reason for checking it by hand.
+     */
+    reason: string | null;
+    /**
+     * When it was decided.
+     */
+    checked_at: string | null;
+    /**
+     * Who decided it; `null` until decided.
+     */
+    by: PayoutAccountCheckBy | null;
+    /**
+     * The payout provider's reference for the ₹1.00 transfer.
+     */
+    reference: string | null;
+};
+
+/**
+ * Checking a destination by hand, for the day the payout provider is not there: written to the audit log with the reason.
+ */
+export type PayoutAccountVerification = {
+    /**
+     * Why it is checked by hand, such as the bank letter seen; at most 500 characters.
+     */
+    reason?: string | null;
+};
+
+/**
+ * Where a payee is paid: a bank account by its last four digits, or a UPI ID, and whether it is checked.
+ */
+export type PayoutDestination = {
+    /**
+     * Bank or UPI.
+     */
+    kind: PayoutDestinationKind;
+    /**
+     * The holder's name.
+     */
+    holder_name: string;
+    /**
+     * The bank account's last four digits.
+     */
+    last4: string | null;
+    /**
+     * The UPI ID, when paid by UPI.
+     */
+    upi_id: string | null;
+    /**
+     * Whether it is checked.
+     */
+    check: PayoutAccountCheck;
+};
+
+/**
+ * Where a platform fleet Agent is paid: a UPI ID or a bank account, checked by a one-rupee transfer before the first payout. The account number is masked to its last four digits in every view.
+ */
+export type AgentPayoutAccount = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * UPI or bank.
+     */
+    kind: PayoutDestinationKind;
+    /**
+     * The holder's name, which the bank must return.
+     */
+    holder_name: string;
+    /**
+     * The UPI ID.
+     */
+    upi_id: string | null;
+    /**
+     * The account number, all but the last four digits masked; sending it back unchanged keeps it.
+     */
+    account_number: string | null;
+    /**
+     * The account's last four digits.
+     */
+    last4: string | null;
+    /**
+     * The IFSC.
+     */
+    ifsc: string | null;
+    /**
+     * The one-rupee check.
+     */
+    check: PayoutAccountCheck;
+    /**
+     * When it was last written.
+     */
+    updated_at: string;
+    /**
+     * The version, raised on every write.
+     */
+    version: number;
+};
+
+/**
+ * Where an Agent wants to be paid. Every write is checked again before anything is paid to it.
+ */
+export type AgentPayoutAccountUpdate = {
+    /**
+     * UPI or bank.
+     */
+    kind: PayoutDestinationKind;
+    /**
+     * The holder's name, 1 to 120 characters.
+     */
+    holder_name: string;
+    /**
+     * The UPI ID, for `upi`.
+     */
+    upi_id?: string | null;
+    /**
+     * The account number, nine to eighteen digits, for `bank`; the masked number sent back unchanged keeps it.
+     */
+    account_number?: string | null;
+    /**
+     * The IFSC, for `bank`.
+     */
+    ifsc?: string | null;
+};
+
+/**
+ * A Location's statement for one week, Monday to Sunday on its clock, written when the week is locked and never changed after: how it was worked out order by order, the GST invoice for the platform's fee, the refunds, adjustments and carry, where the money stands and what holds it, the questions asked about it, its history and its documents. Reference `ZG-{ISO week-based year}W{week}`.
+ */
+export type Statement = {
+    /**
+     * The statement.
+     */
+    id: string;
+    /**
+     * Its reference, which the transfer quotes.
+     */
+    reference: string;
+    /**
+     * Always `location` here.
+     */
+    payee_kind: PayeeKind;
+    /**
+     * The Location's Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The Location's name.
+     */
+    location_name: string;
+    /**
+     * The ISO week, `YYYYWww`.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * The Location's clock.
+     */
+    time_zone: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Where it stands.
+     */
+    state: StatementState;
+    /**
+     * Where the money stands, in a sentence.
+     */
+    standing: StatementStanding;
+    /**
+     * What holds it while it is due; empty when nothing does.
+     */
+    holds: Array<PayoutHold>;
+    /**
+     * When the week was locked.
+     */
+    locked_at: string;
+    /**
+     * Who locked it: the clock on the Tuesday after, or platform staff once the week was over.
+     */
+    locked_by: StatementActor;
+    /**
+     * Its payday: the Friday after the lock, at 10:00 on the Location's clock.
+     */
+    pays_on: string;
+    /**
+     * The day it was paid.
+     */
+    paid_on: string | null;
+    /**
+     * The transfer's reference, once paid.
+     */
+    transfer_reference: string | null;
+    /**
+     * How it was worked out.
+     */
+    figures: StatementFigures;
+    /**
+     * What the fee is for, in plain words.
+     */
+    fee_explained: string;
+    /**
+     * "The platform charged no fee this week." when the week had no fee and so no invoice; `null` otherwise.
+     */
+    no_fee_sentence: string | null;
+    /**
+     * The GST invoice for the platform's fee; `null` for a week with no fee.
+     */
+    invoice: StatementInvoice | null;
+    /**
+     * Credit notes settled in this week.
+     */
+    credit_notes: Array<StatementCreditNote>;
+    /**
+     * Every order that ended in the week, oldest first.
+     */
+    rows: Array<StatementOrderRow>;
+    /**
+     * Refunds charged to the Partner in the week, of orders of earlier weeks too.
+     */
+    refunds: Array<StatementRefund>;
+    /**
+     * Adjustments settled into the week.
+     */
+    adjustments: Array<PayoutAdjustment>;
+    /**
+     * Day by day, Monday first.
+     */
+    days: Array<StatementDay>;
+    /**
+     * Questions asked about the week, oldest first.
+     */
+    questions: Array<PayoutQuestion>;
+    /**
+     * How many of them are unanswered.
+     */
+    unanswered_questions: number;
+    /**
+     * Every move, oldest first.
+     */
+    history: Array<StatementMove>;
+    /**
+     * Its documents: the statement, the invoice when there is one, and the order list.
+     */
+    documents: Array<StatementDocument>;
+    /**
+     * The version, raised on every move.
+     */
+    version: number;
+};
+
+/**
+ * A Location's statement as lists show it.
+ */
+export type StatementSummary = {
+    /**
+     * The statement.
+     */
+    id: string;
+    /**
+     * Its reference.
+     */
+    reference: string;
+    /**
+     * Always `location` here.
+     */
+    payee_kind: PayeeKind;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The Location's name.
+     */
+    location_name: string;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * Where it stands.
+     */
+    state: StatementState;
+    /**
+     * Where the money stands.
+     */
+    standing: StatementStanding;
+    /**
+     * What holds it.
+     */
+    holds: Array<PayoutHold>;
+    /**
+     * The week's total.
+     */
+    total: Money;
+    /**
+     * What is paid.
+     */
+    payable: Money;
+    /**
+     * Its payday.
+     */
+    pays_on: string;
+    /**
+     * The day it was paid.
+     */
+    paid_on: string | null;
+    /**
+     * The transfer's reference.
+     */
+    transfer_reference: string | null;
+    /**
+     * Its invoice's number; `null` for a week with no fee.
+     */
+    invoice_number: string | null;
+    /**
+     * Questions not answered yet.
+     */
+    unanswered_questions: number;
+    /**
+     * When it was locked.
+     */
+    locked_at: string;
+};
+
+/**
+ * A page of statements, newest week first.
+ */
+export type StatementPage = {
+    /**
+     * The statements on this page.
+     */
+    items: Array<StatementSummary>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * The next payment: the oldest locked week not paid yet; else the week just ended until it locks; else the week in progress so far, as an estimate while it can still change.
+ */
+export type PayoutWeekSummary = {
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its reference.
+     */
+    reference: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * Its statement, once locked.
+     */
+    statement_id: string | null;
+    /**
+     * `true` while the week is not locked and its figures can still change.
+     */
+    estimate: boolean;
+    /**
+     * Its statement's state; `null` before the lock.
+     */
+    state: StatementState | null;
+    /**
+     * Where the money stands.
+     */
+    standing: StatementStanding;
+    /**
+     * Its total, or the estimate so far.
+     */
+    total: Money;
+    /**
+     * The Tuesday the clock locks it.
+     */
+    locks_on: string;
+    /**
+     * Its payday.
+     */
+    pays_on: string;
+};
+
+/**
+ * Days of a Location not locked yet, or any range of its days up to a year, worked out as a payout would be. An estimate while it can still change.
+ */
+export type PayoutWorking = {
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The last day, included.
+     */
+    until: string;
+    /**
+     * The week, when the range is one week.
+     */
+    week: string | null;
+    /**
+     * `true` while any of its days can still change.
+     */
+    estimate: boolean;
+    /**
+     * What it is, in words.
+     */
+    sentence: string;
+    /**
+     * How it works out; no carry and no invoice GST until the lock, so the fee's GST is the orders' own.
+     */
+    figures: StatementFigures;
+    /**
+     * Its orders.
+     */
+    rows: Array<StatementOrderRow>;
+    /**
+     * Its refunds.
+     */
+    refunds: Array<StatementRefund>;
+    /**
+     * Adjustments waiting for its lock.
+     */
+    adjustments: Array<PayoutAdjustment>;
+    /**
+     * Day by day.
+     */
+    days: Array<StatementDay>;
+};
+
+/**
+ * What a Location will be paid and why: its next payment, the week so far, six months of past statements with their documents, where it is paid and whether that is checked, and what would hold a payout now. Mission Control may also ask for any range of its days, worked out.
+ */
+export type LocationPayouts = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Its clock.
+     */
+    time_zone: string;
+    /**
+     * The day on its clock that payouts work to: today, unless platform staff moved the payouts date on a developer's machine or in the sandbox.
+     */
+    today: string;
+    /**
+     * What the fee is for, in plain words.
+     */
+    fee_explained: string;
+    /**
+     * The next payment; `null` when nothing has happened yet.
+     */
+    next_payment: PayoutWeekSummary | null;
+    /**
+     * The week in progress, as an estimate.
+     */
+    week_so_far: PayoutWorking;
+    /**
+     * Six months of statements, newest first.
+     */
+    statements: Array<StatementSummary>;
+    /**
+     * Where it is paid; `null` when no account is stated.
+     */
+    destination: PayoutDestination | null;
+    /**
+     * What would hold a payout now.
+     */
+    holds: Array<PayoutHold>;
+    /**
+     * The range asked for with `from` and `until`, in Mission Control; `null` otherwise.
+     */
+    range: PayoutWorking | null;
+};
+
+/**
+ * Marking a statement paid outside the payout provider.
+ */
+export type StatementPaidInput = {
+    /**
+     * The day it was paid, not in the future.
+     */
+    paid_on: string;
+    /**
+     * The transfer's reference, 1 to 64 characters.
+     */
+    reference: string;
+};
+
+/**
+ * Marking a statement unpaid, with why.
+ */
+export type StatementUnpaidInput = {
+    /**
+     * Why, 1 to 200 characters, as the payee reads it.
+     */
+    reason: string;
+};
+
+/**
+ * Archiving a statement.
+ */
+export type StatementArchiveInput = {
+    /**
+     * Why, at most 200 characters.
+     */
+    reason?: string | null;
+};
+
+/**
+ * One move of the payouts date.
+ */
+export type PayoutsDateMoveRecord = {
+    /**
+     * When it was moved, in real time.
+     */
+    moved_at: string;
+    /**
+     * The payouts date before.
+     */
+    from: string;
+    /**
+     * The payouts date after.
+     */
+    to: string;
+    /**
+     * Who moved it.
+     */
+    by_name: string | null;
+    /**
+     * Why.
+     */
+    reason: string | null;
+};
+
+/**
+ * The date payouts work to: the real date, unless platform staff moved it forward on a developer's machine or in the sandbox, so a week can be locked and paid without waiting for it to end. Orders, payments and deliveries keep the real time: an order delivered before a move counts in the week it was delivered in, one delivered after it from the moved date on.
+ */
+export type PayoutsDate = {
+    /**
+     * The payouts date now.
+     */
+    now: string;
+    /**
+     * The real time now.
+     */
+    real_now: string;
+    /**
+     * Whether it was ever moved.
+     */
+    moved: boolean;
+    /**
+     * Whether it can be moved here: only on a developer's machine or in the sandbox.
+     */
+    movable: boolean;
+    /**
+     * Every move, oldest first; each is in the audit log too.
+     */
+    moves: Array<PayoutsDateMoveRecord>;
+};
+
+/**
+ * Moving the payouts date forward, never back. The lock clock and then the payday run take the new date at once.
+ */
+export type PayoutsDateMove = {
+    /**
+     * The new payouts date, later than the current one.
+     */
+    to: string;
+    /**
+     * Why, at most 200 characters.
+     */
+    reason?: string | null;
+};
+
+/**
+ * One part of an Agent's pay over a week.
+ */
+export type AgentPayPart = {
+    /**
+     * Which part.
+     */
+    kind: AgentPayPartKind;
+    /**
+     * The part in words.
+     */
+    label: string;
+    /**
+     * What it came to.
+     */
+    amount: Money;
+};
+
+/**
+ * How a platform fleet Agent's week was worked out: the pay for each task under the pay rule version it was offered under, with its parts; tips in full; bonuses and quest rewards; plus or less adjustments; less the cash collected and kept instead of deposited; less tax deducted at source; plus what was carried in.
+ */
+export type AgentStatementFigures = {
+    /**
+     * Pay for the week's tasks, tips not included.
+     */
+    pay: Money;
+    /**
+     * The pay by part: base, distance, waiting and call-offs.
+     */
+    pay_parts: Array<AgentPayPart>;
+    /**
+     * Tips customers gave on the tasks, in full.
+     */
+    tips: Money;
+    /**
+     * Bonuses and quest rewards; nothing until they arrive.
+     */
+    bonuses: Money;
+    /**
+     * Adjustments settled into the week: positive adds, negative takes off.
+     */
+    adjustments: Money;
+    /**
+     * Cash collected and not deposited by the lock, which the Agent keeps instead.
+     */
+    cash_kept: Money;
+    /**
+     * Tax deducted at source; nothing until the rate is settled.
+     */
+    tax_deducted: Money;
+    /**
+     * What the week before carried in: a shortfall is negative.
+     */
+    carried_in: Money;
+    /**
+     * The week's total; negative when the cash kept came to more than the earnings.
+     */
+    total: Money;
+    /**
+     * What is paid: the total, or nothing when it is below nothing.
+     */
+    payable: Money;
+    /**
+     * A shortfall taken off the next statement, as a negative amount; a deposit clears it.
+     */
+    carried_out: Money;
+};
+
+/**
+ * One task of an Agent's week: what it paid under the rule version it was offered under, the tip in full and the cash collected on it.
+ */
+export type AgentStatementTask = {
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The stop.
+     */
+    kind: TaskKind;
+    /**
+     * Why it paid.
+     */
+    outcome: EarningOutcome;
+    /**
+     * When it was earned.
+     */
+    earned_at: string;
+    /**
+     * The pay rule version.
+     */
+    rule_version: number;
+    /**
+     * The breakdown, the tip included.
+     */
+    lines: Array<EarningLine>;
+    /**
+     * Its pay, the tip not included.
+     */
+    pay: Money;
+    /**
+     * Its tip, in full.
+     */
+    tip: Money;
+    /**
+     * Cash collected on it.
+     */
+    cash_collected: Money;
+    /**
+     * The measured distance of a drop-off, in metres.
+     */
+    distance_metres: number | null;
+};
+
+/**
+ * A platform fleet Agent's statement for one week, Monday to Sunday on the fleet's clock, locked the Tuesday after and paid the Friday to their checked UPI ID or bank account: task by task, with the tips in full and the cash kept on a line of its own. Reference `AG-{ISO week-based year}W{week}`.
+ */
+export type AgentStatement = {
+    /**
+     * The statement.
+     */
+    id: string;
+    /**
+     * Its reference.
+     */
+    reference: string;
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    agent_name: string;
+    /**
+     * The platform fleet.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * The fleet's clock.
+     */
+    time_zone: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Where it stands.
+     */
+    state: StatementState;
+    /**
+     * Where the money stands, in a sentence.
+     */
+    standing: StatementStanding;
+    /**
+     * What holds it while it is due.
+     */
+    holds: Array<PayoutHold>;
+    /**
+     * When it was locked.
+     */
+    locked_at: string;
+    /**
+     * Who locked it.
+     */
+    locked_by: StatementActor;
+    /**
+     * Its payday.
+     */
+    pays_on: string;
+    /**
+     * The day it was paid.
+     */
+    paid_on: string | null;
+    /**
+     * The transfer's reference, once paid.
+     */
+    transfer_reference: string | null;
+    /**
+     * Where it is paid; `null` when the Agent has given none.
+     */
+    destination: PayoutDestination | null;
+    /**
+     * How it was worked out.
+     */
+    figures: AgentStatementFigures;
+    /**
+     * Task by task, oldest first.
+     */
+    tasks: Array<AgentStatementTask>;
+    /**
+     * Adjustments settled into the week.
+     */
+    adjustments: Array<PayoutAdjustment>;
+    /**
+     * Questions asked about the week.
+     */
+    questions: Array<PayoutQuestion>;
+    /**
+     * Questions not answered yet.
+     */
+    unanswered_questions: number;
+    /**
+     * Every move, oldest first.
+     */
+    history: Array<StatementMove>;
+    /**
+     * Its PDF.
+     */
+    documents: Array<StatementDocument>;
+    /**
+     * The version, raised on every move.
+     */
+    version: number;
+};
+
+/**
+ * An Agent's statement as lists show it.
+ */
+export type AgentStatementSummary = {
+    /**
+     * The statement.
+     */
+    id: string;
+    /**
+     * Its reference.
+     */
+    reference: string;
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    agent_name: string;
+    /**
+     * The platform fleet.
+     */
+    partner_id: string;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * Where it stands.
+     */
+    state: StatementState;
+    /**
+     * Where the money stands.
+     */
+    standing: StatementStanding;
+    /**
+     * What holds it.
+     */
+    holds: Array<PayoutHold>;
+    /**
+     * The week's total.
+     */
+    total: Money;
+    /**
+     * What is paid.
+     */
+    payable: Money;
+    /**
+     * Its payday.
+     */
+    pays_on: string;
+    /**
+     * The day it was paid.
+     */
+    paid_on: string | null;
+    /**
+     * The transfer's reference.
+     */
+    transfer_reference: string | null;
+    /**
+     * Questions not answered yet.
+     */
+    unanswered_questions: number;
+    /**
+     * When it was locked.
+     */
+    locked_at: string;
+};
+
+/**
+ * A page of Agents' statements, newest week first.
+ */
+export type AgentStatementPage = {
+    /**
+     * The statements on this page.
+     */
+    items: Array<AgentStatementSummary>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An Agent's week as the Agent app shows it: the tasks, distance, tips and cash, and what it comes to. For the platform fleet the week in progress is an estimate until its statement is locked; a Partner's own Agent reads every week as reported to the Partner, who pays them, with no payment from the platform.
+ */
+export type AgentWeek = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    agent_name: string;
+    /**
+     * The Agent's Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * The clock it is read on.
+     */
+    time_zone: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Who pays the Agent.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * `true` while it can still change.
+     */
+    estimate: boolean;
+    /**
+     * Its statement, once locked, for the platform fleet.
+     */
+    statement_id: string | null;
+    /**
+     * What it is: "So far this week", or "Reported to {Partner}, who pays you".
+     */
+    sentence: string;
+    /**
+     * Task by task, oldest first.
+     */
+    tasks: Array<AgentStatementTask>;
+    /**
+     * Drop-offs completed.
+     */
+    deliveries: number;
+    /**
+     * The measured distance of its drop-offs, in metres.
+     */
+    distance_metres: number;
+    /**
+     * Minutes on duty in the week.
+     */
+    minutes_on_duty: number;
+    /**
+     * Pay under the service's rule, tips not included.
+     */
+    pay: Money;
+    /**
+     * Tips, in full.
+     */
+    tips: Money;
+    /**
+     * Cash collected.
+     */
+    cash_collected: Money;
+    /**
+     * Pay and tips; for the platform fleet less the cash kept, as the statement will work it out.
+     */
+    total: Money;
+};
+
+/**
+ * A past week of a Partner's own Agent, reported to the Partner.
+ */
+export type AgentWeekSummary = {
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * Tasks that paid.
+     */
+    tasks: number;
+    /**
+     * Drop-offs completed.
+     */
+    deliveries: number;
+    /**
+     * The measured distance, in metres.
+     */
+    distance_metres: number;
+    /**
+     * Pay under the Partner's rule.
+     */
+    pay: Money;
+    /**
+     * Tips.
+     */
+    tips: Money;
+    /**
+     * Cash collected.
+     */
+    cash_collected: Money;
+};
+
+/**
+ * An Agent's money in the Agent app: the week so far, the next payment and where it stands, past statements with their PDFs, and where they are paid. A Partner's own Agent has no statements: their past weeks are reported to the Partner, who pays them.
+ */
+export type AgentStatementList = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Who pays the Agent.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * How the Agent is paid, in words.
+     */
+    sentence: string;
+    /**
+     * The day payouts work to, on the fleet's clock.
+     */
+    today: string;
+    /**
+     * The week in progress.
+     */
+    week_so_far: AgentWeek;
+    /**
+     * The next payment from the platform; `null` for a Partner's own Agent and before any work.
+     */
+    next_payment: PayoutWeekSummary | null;
+    /**
+     * Six months of statements, newest first; empty for a Partner's own Agent.
+     */
+    statements: Array<AgentStatementSummary>;
+    /**
+     * A Partner's own Agent's past weeks, newest first, eight at most; empty for the platform fleet.
+     */
+    weeks: Array<AgentWeekSummary>;
+    /**
+     * Where the platform pays the Agent; `null` for a Partner's own Agent and before one is given.
+     */
+    destination: PayoutDestination | null;
+};
+
+/**
+ * How the orders report groups its figures: not at all, by store, by how orders ended, by way of ordering, by vertical, by city or by day.
+ */
+export type OrdersReportGrouping = 'none' | 'store' | 'status' | 'fulfilment' | 'vertical' | 'city' | 'day';
+
+/**
+ * What the orders report is compared with: nothing, the period just before of the same length, or the same dates a year before.
+ */
+export type OrdersReportComparison = 'none' | 'previous_period' | 'previous_year';
+
+/**
+ * The time the metrics board covers: the last hour, the day so far on the platform's clock, or chosen times of up to 31 days.
+ */
+export type MetricsWindow = 'last_hour' | 'today' | 'custom';
+
+/**
+ * How a share of orders on time reads: `good` at 90% or more, `warning` from 75% to 90%, `critical` below 75%, `no_orders` when nothing was measured.
+ */
+export type MetricStanding = 'good' | 'warning' | 'critical' | 'no_orders';
+
+/**
+ * What an Agent did, on their activity log.
+ */
+export type AgentActivityKind = 'duty_started' | 'duty_ended' | 'delivery_taken' | 'delivery_collected' | 'delivered' | 'drop_failed';
+
+/**
+ * Money of the orders report in one currency, never added across two.
+ */
+export type OrdersReportMoney = {
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * Completed orders in it.
+     */
+    orders: number;
+    /**
+     * What the completed orders were charged.
+     */
+    sales: Money;
+    /**
+     * Sales over completed orders, rounded half up.
+     */
+    average_order_value: Money;
+    /**
+     * Refunds given on the orders.
+     */
+    refunds: Money;
+};
+
+/**
+ * Orders by way of ordering.
+ */
+export type OrdersReportWays = {
+    /**
+     * Delivered orders.
+     */
+    delivery: number;
+    /**
+     * Orders collected at the store.
+     */
+    pickup: number;
+    /**
+     * Dine-in tabs.
+     */
+    dine_in: number;
+    /**
+     * Orders scheduled for later.
+     */
+    scheduled: number;
+    /**
+     * Orders a subscription made.
+     */
+    subscription: number;
+};
+
+/**
+ * What the orders placed in a range came to: counts by how they ended and by way of ordering, and money per currency.
+ */
+export type OrdersReportFigures = {
+    /**
+     * Orders placed.
+     */
+    placed: number;
+    /**
+     * Delivered or collected.
+     */
+    completed: number;
+    /**
+     * Declined by the store or for want of an answer.
+     */
+    declined: number;
+    /**
+     * Cancelled.
+     */
+    cancelled: number;
+    /**
+     * Never paid for.
+     */
+    expired: number;
+    /**
+     * Still moving.
+     */
+    in_progress: number;
+    /**
+     * By way of ordering.
+     */
+    ways: OrdersReportWays;
+    /**
+     * Sales, average order value and refunds per currency.
+     */
+    money: Array<OrdersReportMoney>;
+};
+
+/**
+ * One group of the orders report.
+ */
+export type OrdersReportGroup = {
+    /**
+     * What the group is: a store's id, a status, a way of ordering, a vertical's code, a city's id or a day.
+     */
+    key: string;
+    /**
+     * The group in words.
+     */
+    label: string;
+    /**
+     * Its figures.
+     */
+    figures: OrdersReportFigures;
+};
+
+/**
+ * Customers over the same range, for the Customers page: who joined and who ordered. Dashes, `null`, when the range is all time, with the sentence saying why.
+ */
+export type OrdersReportCustomers = {
+    /**
+     * Customers who registered in the range.
+     */
+    joined: number | null;
+    /**
+     * Customers who placed an order in the range.
+     */
+    ordered: number | null;
+    /**
+     * Orders placed in the range.
+     */
+    orders: number;
+    /**
+     * Why the figures are dashes, when they are.
+     */
+    sentence: string | null;
+};
+
+/**
+ * The orders report: orders placed in a range of up to a year, by how they ended, by way of ordering, by vertical and by store, with sales, average order value and refunds per currency, computed from the event warehouse and current to the minute it says. Narrowed by status, store, fulfilment, vertical and city; compared with the period before or the year before. Also served as a spreadsheet (`Accept: text/csv`), every export written to the audit log with who, the range and the columns.
+ */
+export type OrdersReport = {
+    /**
+     * The first day, on the report's clock; `null` for all time.
+     */
+    from: string | null;
+    /**
+     * The last day, included.
+     */
+    until: string | null;
+    /**
+     * The clock the days are read on.
+     */
+    time_zone: string;
+    /**
+     * The moment the warehouse's data is current to.
+     */
+    current_to: string;
+    /**
+     * How it is grouped.
+     */
+    group_by: OrdersReportGrouping;
+    /**
+     * What it is compared with.
+     */
+    comparison: OrdersReportComparison;
+    /**
+     * Every order in the range.
+     */
+    totals: OrdersReportFigures;
+    /**
+     * The groups, largest first; empty when not grouped.
+     */
+    groups: Array<OrdersReportGroup>;
+    /**
+     * The figures it is compared with.
+     */
+    previous: OrdersReportFigures | null;
+    /**
+     * The first day compared with.
+     */
+    previous_from: string | null;
+    /**
+     * The last day compared with.
+     */
+    previous_until: string | null;
+    /**
+     * Customers over the range.
+     */
+    customers: OrdersReportCustomers;
+};
+
+/**
+ * One measure of the metrics board: each order measured against its own promise as the customer was last told it.
+ */
+export type MetricFigure = {
+    /**
+     * Orders in the window.
+     */
+    orders: number;
+    /**
+     * Orders measured: those that reached the end of this measure.
+     */
+    measured: number;
+    /**
+     * Measured orders within their promise.
+     */
+    on_time: number;
+    /**
+     * Measured orders after their promise.
+     */
+    late: number;
+    /**
+     * The share on time, from 0 to 1; `null` with nothing measured.
+     */
+    on_time_share: number | null;
+    /**
+     * The average minutes the measure took; `null` with nothing measured.
+     */
+    average_minutes: number | null;
+    /**
+     * How it reads.
+     */
+    standing: MetricStanding;
+};
+
+/**
+ * What is under way now.
+ */
+export type MetricsNow = {
+    /**
+     * Orders accepted and not finished.
+     */
+    in_progress: number;
+    /**
+     * Orders being prepared.
+     */
+    preparing: number;
+    /**
+     * Orders on their way.
+     */
+    out_for_delivery: number;
+    /**
+     * Deliveries waiting for an Agent.
+     */
+    waiting_for_agent: number;
+};
+
+/**
+ * The metrics of one store.
+ */
+export type MetricsByLocation = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * From acceptance to ready, against the time the store gave.
+     */
+    preparation: MetricFigure;
+    /**
+     * From leaving the store to the door, against the promise.
+     */
+    delivery: MetricFigure;
+    /**
+     * From placing to the door or the counter, against the promise.
+     */
+    fulfilment: MetricFigure;
+};
+
+/**
+ * The metrics of one Provider, so a slow Partner fleet and a slow kitchen are told apart.
+ */
+export type MetricsByProvider = {
+    /**
+     * The kind of Provider.
+     */
+    provider_kind: ProviderKind;
+    /**
+     * The Provider's Partner.
+     */
+    provider_partner_id: string | null;
+    /**
+     * The Provider in words.
+     */
+    name: string;
+    /**
+     * From leaving the store to the door.
+     */
+    delivery: MetricFigure;
+    /**
+     * From placing to the door.
+     */
+    fulfilment: MetricFigure;
+};
+
+/**
+ * The metrics board: what is under way now and, for the window, the average preparation, delivery and fulfilment times with how many orders were on time and late, each order against its own promise as the customer was last told: the store's quoted times when placed, the promise when accepted, and the later time once it ran late. Split by store and by Provider. Computed from the event warehouse, current to the moment it says.
+ */
+export type MetricsBoard = {
+    /**
+     * The window.
+     */
+    window: MetricsWindow;
+    /**
+     * Where the window starts.
+     */
+    from: string;
+    /**
+     * Where it ends.
+     */
+    until: string;
+    /**
+     * The moment the warehouse's data is current to.
+     */
+    current_to: string;
+    /**
+     * What is under way now.
+     */
+    now: MetricsNow;
+    /**
+     * From acceptance to ready.
+     */
+    preparation: MetricFigure;
+    /**
+     * From leaving the store to the door.
+     */
+    delivery: MetricFigure;
+    /**
+     * From placing to the door or the counter.
+     */
+    fulfilment: MetricFigure;
+    /**
+     * By store, the most orders first.
+     */
+    by_location: Array<MetricsByLocation>;
+    /**
+     * By Provider.
+     */
+    by_provider: Array<MetricsByProvider>;
+};
+
+/**
+ * An Agent's rating, counted when asked for: the share of thumbs up among the ratings of the deliveries they carried, read "80% (5)", and a dash with no ratings.
+ */
+export type AgentNumbersRating = {
+    /**
+     * Thumbs up.
+     */
+    thumbs_up: number;
+    /**
+     * Ratings counted.
+     */
+    count: number;
+    /**
+     * The share of thumbs up, from 0 to 1; `null` with no ratings.
+     */
+    share: number | null;
+};
+
+/**
+ * One Agent's numbers over a range, as Rock Hero's heroes page measured riders: deliveries, the average minutes from taking a delivery to the door and kilometres, hours on duty and deliveries per hour on duty, the rating, the shares of offers accepted and of deliveries by the promise, failed drops and geofence overrides, tips and earnings. A number with nothing to divide by is `null`, a dash, never a zero. An Agent whose membership ended stays in the numbers for the deliveries they made.
+ */
+export type AgentNumbers = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    name: string;
+    /**
+     * Their Partner.
+     */
+    partner_id: string;
+    /**
+     * Their Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Their delivery service.
+     */
+    service_id: string;
+    /**
+     * The service's name.
+     */
+    service_name: string;
+    /**
+     * Their team.
+     */
+    team_id: string | null;
+    /**
+     * The team's name.
+     */
+    team_name: string | null;
+    /**
+     * Their membership's status.
+     */
+    status: AgentMembershipStatus;
+    /**
+     * Whether they are online now.
+     */
+    online: boolean;
+    /**
+     * Deliveries made.
+     */
+    deliveries: number;
+    /**
+     * The average minutes from taking a delivery to the door.
+     */
+    average_minutes_to_door: number | null;
+    /**
+     * The average kilometres of a delivery, measured.
+     */
+    average_km: number | null;
+    /**
+     * Minutes on duty in the range.
+     */
+    minutes_on_duty: number;
+    /**
+     * Deliveries per hour on duty.
+     */
+    deliveries_per_hour: number | null;
+    /**
+     * Their rating over the last 90 days.
+     */
+    rating: AgentNumbersRating;
+    /**
+     * Offers made to them.
+     */
+    offers_made: number;
+    /**
+     * The share of offers they accepted.
+     */
+    offers_accepted_share: number | null;
+    /**
+     * The share of their deliveries at the door by the promise.
+     */
+    on_time_share: number | null;
+    /**
+     * Drops they failed.
+     */
+    failed_drops: number;
+    /**
+     * Arrivals they confirmed outside the geofence, with a reason.
+     */
+    geofence_overrides: number;
+    /**
+     * Tips, in full.
+     */
+    tips: Money;
+    /**
+     * What they earned, tips included.
+     */
+    earnings: Money;
+};
+
+/**
+ * Everyone's totals over the same range.
+ */
+export type AgentNumbersTotals = {
+    /**
+     * Agents counted.
+     */
+    agents: number;
+    /**
+     * Agents online now.
+     */
+    online: number;
+    /**
+     * Deliveries made.
+     */
+    deliveries: number;
+    /**
+     * The average minutes from taking a delivery to the door.
+     */
+    average_minutes_to_door: number | null;
+    /**
+     * The average kilometres of a delivery.
+     */
+    average_km: number | null;
+    /**
+     * Minutes on duty.
+     */
+    minutes_on_duty: number;
+    /**
+     * Deliveries per hour on duty.
+     */
+    deliveries_per_hour: number | null;
+    /**
+     * Offers made.
+     */
+    offers_made: number;
+    /**
+     * The share of offers accepted.
+     */
+    offers_accepted_share: number | null;
+    /**
+     * The share of deliveries by the promise.
+     */
+    on_time_share: number | null;
+    /**
+     * Failed drops.
+     */
+    failed_drops: number;
+    /**
+     * Geofence overrides.
+     */
+    geofence_overrides: number;
+    /**
+     * Tips.
+     */
+    tips: Money;
+    /**
+     * Earnings, tips included.
+     */
+    earnings: Money;
+};
+
+/**
+ * The Agents numbers over a range of at most 92 days, month to date unless chosen, with everyone's totals and how many are online; searchable by name or mobile number and filterable by team.
+ */
+export type AgentNumbersPage = {
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The last day, included.
+     */
+    until: string;
+    /**
+     * The clock the days are read on.
+     */
+    time_zone: string;
+    /**
+     * The moment the warehouse's data is current to.
+     */
+    current_to: string;
+    /**
+     * Everyone's totals.
+     */
+    totals: AgentNumbersTotals;
+    /**
+     * The Agents on this page, the most deliveries first.
+     */
+    items: Array<AgentNumbers>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A delivery an Agent made, with when they took, collected and delivered it.
+ */
+export type AgentNumbersDelivery = {
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * Its order.
+     */
+    order_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * When the Agent took it.
+     */
+    taken_at: string;
+    /**
+     * When they collected it.
+     */
+    collected_at: string | null;
+    /**
+     * When they delivered it.
+     */
+    delivered_at: string | null;
+    /**
+     * Minutes from taking it to the door.
+     */
+    minutes_to_door: number | null;
+    /**
+     * Kilometres, measured.
+     */
+    km: number | null;
+    /**
+     * Whether it was at the door by the promise; `null` when no promise was known.
+     */
+    on_time: boolean | null;
+};
+
+/**
+ * One day of an Agent on the Location's clock; a night stretch counts on both days it covered.
+ */
+export type AgentNumbersDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Deliveries that day.
+     */
+    deliveries: number;
+    /**
+     * Minutes on duty that day.
+     */
+    minutes_on_duty: number;
+};
+
+/**
+ * A stretch on duty.
+ */
+export type AgentDutyStretch = {
+    /**
+     * When it started.
+     */
+    started_at: string;
+    /**
+     * When it ended; `null` while on duty.
+     */
+    ended_at: string | null;
+    /**
+     * Its minutes within the range.
+     */
+    minutes: number;
+};
+
+/**
+ * One thing an Agent did.
+ */
+export type AgentActivityItem = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * What.
+     */
+    kind: AgentActivityKind;
+    /**
+     * It in words.
+     */
+    text: string;
+    /**
+     * The order, for a delivery.
+     */
+    order_number: string | null;
+};
+
+/**
+ * An Agent's activity on one day, on the Location's clock.
+ */
+export type AgentActivityDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * What they did, in order.
+     */
+    items: Array<AgentActivityItem>;
+};
+
+/**
+ * One Agent on the same range: their numbers, the deliveries they made, their time on duty as stretches, deliveries and hours on duty day by day, and an activity log by day.
+ */
+export type AgentNumbersDetail = {
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The last day, included.
+     */
+    until: string;
+    /**
+     * The clock the days are read on.
+     */
+    time_zone: string;
+    /**
+     * The moment the warehouse's data is current to.
+     */
+    current_to: string;
+    /**
+     * Their numbers.
+     */
+    numbers: AgentNumbers;
+    /**
+     * The deliveries they made, newest first.
+     */
+    deliveries: Array<AgentNumbersDelivery>;
+    /**
+     * Their stretches on duty, newest first.
+     */
+    duty: Array<AgentDutyStretch>;
+    /**
+     * Day by day, newest first.
+     */
+    days: Array<AgentNumbersDay>;
+    /**
+     * Their activity log by day, newest first.
+     */
+    activity: Array<AgentActivityDay>;
+};
+
+/**
+ * One Agent's week in a Partner's own delivery service, reported for the Partner to pay.
+ */
+export type AgentWeeksRow = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    name: string;
+    /**
+     * Their membership's status.
+     */
+    status: AgentMembershipStatus;
+    /**
+     * Tasks completed.
+     */
+    tasks_completed: number;
+    /**
+     * Drop-offs completed.
+     */
+    deliveries: number;
+    /**
+     * The measured distance, in metres.
+     */
+    distance_metres: number;
+    /**
+     * Minutes on duty.
+     */
+    minutes_on_duty: number;
+    /**
+     * Tips customers gave, which the Partner's statement pays it to pass on.
+     */
+    tips: Money;
+    /**
+     * Cash collected.
+     */
+    cash_collected: Money;
+    /**
+     * What the Partner's pay rule gives.
+     */
+    pay: Money;
+};
+
+/**
+ * Every Agent of the report together.
+ */
+export type AgentWeeksTotals = {
+    /**
+     * Agents.
+     */
+    agents: number;
+    /**
+     * Tasks completed.
+     */
+    tasks_completed: number;
+    /**
+     * Drop-offs completed.
+     */
+    deliveries: number;
+    /**
+     * The measured distance, in metres.
+     */
+    distance_metres: number;
+    /**
+     * Minutes on duty.
+     */
+    minutes_on_duty: number;
+    /**
+     * Tips.
+     */
+    tips: Money;
+    /**
+     * Cash collected.
+     */
+    cash_collected: Money;
+    /**
+     * Pay under the Partner's rule.
+     */
+    pay: Money;
+};
+
+/**
+ * The weekly report of a Partner's own Agents in one delivery service: per Agent the tasks completed, distance, hours, tips, cash collected and the pay the Partner's own pay rule gives. No money moves from the platform to them. Also served as a spreadsheet (`Accept: text/csv`).
+ */
+export type AgentWeeksReport = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    service_name: string;
+    /**
+     * The week.
+     */
+    week: string;
+    /**
+     * Its Monday.
+     */
+    starts_on: string;
+    /**
+     * Its Sunday.
+     */
+    ends_on: string;
+    /**
+     * The clock it is read on.
+     */
+    time_zone: string;
+    /**
+     * The currency.
+     */
+    currency: string;
+    /**
+     * The pay rule version in force at the week's end.
+     */
+    rule_version: number | null;
+    /**
+     * That the Partner pays them, in words.
+     */
+    sentence: string;
+    /**
+     * Each Agent who worked or was a member, by name.
+     */
+    items: Array<AgentWeeksRow>;
+    /**
+     * Everyone together.
+     */
+    totals: AgentWeeksTotals;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -26731,7 +29531,7 @@ export type PutPayoutAccountError = PutPayoutAccountErrors[keyof PutPayoutAccoun
 
 export type PutPayoutAccountResponses = {
     /**
-     * The account as saved, masked and unverified.
+     * The account as saved, masked and unverified, its check `checking`.
      */
     200: PayoutAccount;
 };
@@ -26739,7 +29539,10 @@ export type PutPayoutAccountResponses = {
 export type PutPayoutAccountResponse = PutPayoutAccountResponses[keyof PutPayoutAccountResponses];
 
 export type VerifyPayoutAccountData = {
-    body?: never;
+    /**
+     * The reason, optionally.
+     */
+    body?: PayoutAccountVerification;
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
@@ -50186,3 +52989,3112 @@ export type ReplayOutboxResponses = {
 };
 
 export type ReplayOutboxResponse = ReplayOutboxResponses[keyof ReplayOutboxResponses];
+
+export type GetLocationPayoutsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the Partner's; a sister Location's statement answers `404`.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/payouts';
+};
+
+export type GetLocationPayoutsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `payout:read` at the Location (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner or the Location does not exist or is not the caller's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationPayoutsError = GetLocationPayoutsErrors[keyof GetLocationPayoutsErrors];
+
+export type GetLocationPayoutsResponses = {
+    /**
+     * What the Location will be paid.
+     */
+    200: LocationPayouts;
+};
+
+export type GetLocationPayoutsResponse = GetLocationPayoutsResponses[keyof GetLocationPayoutsResponses];
+
+export type GetLocationStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the Partner's; a sister Location's statement answers `404`.
+         */
+        location_id: string;
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}';
+};
+
+export type GetLocationStatementErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `payout:read` at the Location (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner, the Location or the statement does not exist or is not the caller's (`not_found`); a sister Location's statement answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationStatementError = GetLocationStatementErrors[keyof GetLocationStatementErrors];
+
+export type GetLocationStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: Statement;
+};
+
+export type GetLocationStatementResponse = GetLocationStatementResponses[keyof GetLocationStatementResponses];
+
+export type GetLocationStatementDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the Partner's; a sister Location's statement answers `404`.
+         */
+        location_id: string;
+        /**
+         * The statement.
+         */
+        statement_id: string;
+        /**
+         * `statement` (PDF), `invoice` (PDF; `404` for a week with no fee) or `orders` (the order list, CSV).
+         */
+        document: StatementDocumentKind;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}/documents/{document}';
+};
+
+export type GetLocationStatementDocumentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `payout:read` at the Location (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner, the Location or the statement does not exist or is not the caller's, or the week had no fee and so no invoice (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationStatementDocumentError = GetLocationStatementDocumentErrors[keyof GetLocationStatementDocumentErrors];
+
+export type GetLocationStatementDocumentResponses = {
+    /**
+     * The PDF.
+     */
+    200: Blob | File;
+};
+
+export type GetLocationStatementDocumentResponse = GetLocationStatementDocumentResponses[keyof GetLocationStatementDocumentResponses];
+
+export type AskAboutLocationStatementData = {
+    /**
+     * The question.
+     */
+    body: PayoutQuestionInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the Partner's; a sister Location's statement answers `404`.
+         */
+        location_id: string;
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/statements/{statement_id}/questions';
+};
+
+export type AskAboutLocationStatementErrors = {
+    /**
+     * `validation_failed`: an empty question or one over 2,000 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `payout:read` at the Location (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner, the Location or the statement does not exist or is not the caller's (`not_found`); a sister Location's statement answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskAboutLocationStatementError = AskAboutLocationStatementErrors[keyof AskAboutLocationStatementErrors];
+
+export type AskAboutLocationStatementResponses = {
+    /**
+     * The question, unanswered.
+     */
+    201: PayoutQuestion;
+};
+
+export type AskAboutLocationStatementResponse = AskAboutLocationStatementResponses[keyof AskAboutLocationStatementResponses];
+
+export type ListOwnAgentStatementsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/statements';
+};
+
+export type ListOwnAgentStatementsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOwnAgentStatementsError = ListOwnAgentStatementsErrors[keyof ListOwnAgentStatementsErrors];
+
+export type ListOwnAgentStatementsResponses = {
+    /**
+     * The Agent's money.
+     */
+    200: AgentStatementList;
+};
+
+export type ListOwnAgentStatementsResponse = ListOwnAgentStatementsResponses[keyof ListOwnAgentStatementsResponses];
+
+export type GetOwnAgentStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/statements/{statement_id}';
+};
+
+export type GetOwnAgentStatementErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same), or no such statement of it.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnAgentStatementError = GetOwnAgentStatementErrors[keyof GetOwnAgentStatementErrors];
+
+export type GetOwnAgentStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: AgentStatement;
+};
+
+export type GetOwnAgentStatementResponse = GetOwnAgentStatementResponses[keyof GetOwnAgentStatementResponses];
+
+export type GetOwnAgentStatementDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/statements/{statement_id}/document';
+};
+
+export type GetOwnAgentStatementDocumentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same), or no such statement of it.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnAgentStatementDocumentError = GetOwnAgentStatementDocumentErrors[keyof GetOwnAgentStatementDocumentErrors];
+
+export type GetOwnAgentStatementDocumentResponses = {
+    /**
+     * The PDF.
+     */
+    200: Blob | File;
+};
+
+export type GetOwnAgentStatementDocumentResponse = GetOwnAgentStatementDocumentResponses[keyof GetOwnAgentStatementDocumentResponses];
+
+export type AskAboutOwnAgentStatementData = {
+    /**
+     * The question.
+     */
+    body: PayoutQuestionInput;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/statements/{statement_id}/questions';
+};
+
+export type AskAboutOwnAgentStatementErrors = {
+    /**
+     * `validation_failed`: an empty question or one over 2,000 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller (another person's answers the same), or no such statement of it.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskAboutOwnAgentStatementError = AskAboutOwnAgentStatementErrors[keyof AskAboutOwnAgentStatementErrors];
+
+export type AskAboutOwnAgentStatementResponses = {
+    /**
+     * The question, unanswered.
+     */
+    201: PayoutQuestion;
+};
+
+export type AskAboutOwnAgentStatementResponse = AskAboutOwnAgentStatementResponses[keyof AskAboutOwnAgentStatementResponses];
+
+export type GetOwnAgentWeekData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The ISO week, `YYYYWww`, Monday to Sunday on the payee's clock.
+         */
+        week: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/weeks/{week}';
+};
+
+export type GetOwnAgentWeekErrors = {
+    /**
+     * `validation_failed`: a week not written `YYYYWww`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnAgentWeekError = GetOwnAgentWeekErrors[keyof GetOwnAgentWeekErrors];
+
+export type GetOwnAgentWeekResponses = {
+    /**
+     * The week.
+     */
+    200: AgentWeek;
+};
+
+export type GetOwnAgentWeekResponse = GetOwnAgentWeekResponses[keyof GetOwnAgentWeekResponses];
+
+export type GetOwnAgentPayoutAccountData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/payout-account';
+};
+
+export type GetOwnAgentPayoutAccountErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller, or no account given yet.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOwnAgentPayoutAccountError = GetOwnAgentPayoutAccountErrors[keyof GetOwnAgentPayoutAccountErrors];
+
+export type GetOwnAgentPayoutAccountResponses = {
+    /**
+     * Where the Agent is paid.
+     */
+    200: AgentPayoutAccount;
+};
+
+export type GetOwnAgentPayoutAccountResponse = GetOwnAgentPayoutAccountResponses[keyof GetOwnAgentPayoutAccountResponses];
+
+export type PutOwnAgentPayoutAccountData = {
+    /**
+     * Where to be paid.
+     */
+    body: AgentPayoutAccountUpdate;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/payout-account';
+};
+
+export type PutOwnAgentPayoutAccountErrors = {
+    /**
+     * `validation_failed`: `upi_id_invalid`, `ifsc_invalid`, an account number not nine to eighteen digits, or a field missing for the kind.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller.
+     */
+    404: Problem;
+    /**
+     * `paid_by_partner`: the Agent belongs to a Partner's own delivery service, which pays them.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutOwnAgentPayoutAccountError = PutOwnAgentPayoutAccountErrors[keyof PutOwnAgentPayoutAccountErrors];
+
+export type PutOwnAgentPayoutAccountResponses = {
+    /**
+     * The account, masked, its check `checking`.
+     */
+    200: AgentPayoutAccount;
+};
+
+export type PutOwnAgentPayoutAccountResponse = PutOwnAgentPayoutAccountResponses[keyof PutOwnAgentPayoutAccountResponses];
+
+export type ListStatementsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only statements in this state.
+         */
+        state?: StatementState;
+        /**
+         * Only this week, `YYYYWww`.
+         */
+        week?: string;
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * Only this Location's.
+         */
+        location_id?: string;
+        /**
+         * `true` for due statements something holds.
+         */
+        held?: boolean;
+        /**
+         * `true` for statements with unanswered questions.
+         */
+        unanswered?: boolean;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/statements';
+};
+
+export type ListStatementsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStatementsError = ListStatementsErrors[keyof ListStatementsErrors];
+
+export type ListStatementsResponses = {
+    /**
+     * A page of statements.
+     */
+    200: StatementPage;
+};
+
+export type ListStatementsResponse = ListStatementsResponses[keyof ListStatementsResponses];
+
+export type GetStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}';
+};
+
+export type GetStatementErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStatementError = GetStatementErrors[keyof GetStatementErrors];
+
+export type GetStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: Statement;
+};
+
+export type GetStatementResponse = GetStatementResponses[keyof GetStatementResponses];
+
+export type GetStatementDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+        /**
+         * `statement` (PDF), `invoice` (PDF; `404` for a week with no fee) or `orders` (the order list, CSV).
+         */
+        document: StatementDocumentKind;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/documents/{document}';
+};
+
+export type GetStatementDocumentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement, or the week had no fee and so no invoice (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStatementDocumentError = GetStatementDocumentErrors[keyof GetStatementDocumentErrors];
+
+export type GetStatementDocumentResponses = {
+    /**
+     * The PDF.
+     */
+    200: Blob | File;
+};
+
+export type GetStatementDocumentResponse = GetStatementDocumentResponses[keyof GetStatementDocumentResponses];
+
+export type MarkStatementPaidData = {
+    /**
+     * The day and the reference.
+     */
+    body: StatementPaidInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/paid';
+};
+
+export type MarkStatementPaidErrors = {
+    /**
+     * `validation_failed`: `paid_on_in_future`, an empty reference, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkStatementPaidError = MarkStatementPaidErrors[keyof MarkStatementPaidErrors];
+
+export type MarkStatementPaidResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: Statement;
+};
+
+export type MarkStatementPaidResponse = MarkStatementPaidResponses[keyof MarkStatementPaidResponses];
+
+export type MarkStatementUnpaidData = {
+    /**
+     * Why.
+     */
+    body: StatementUnpaidInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/unpaid';
+};
+
+export type MarkStatementUnpaidErrors = {
+    /**
+     * `validation_failed`: an empty reason, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkStatementUnpaidError = MarkStatementUnpaidErrors[keyof MarkStatementUnpaidErrors];
+
+export type MarkStatementUnpaidResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: Statement;
+};
+
+export type MarkStatementUnpaidResponse = MarkStatementUnpaidResponses[keyof MarkStatementUnpaidResponses];
+
+export type ArchiveStatementData = {
+    /**
+     * Why, optionally.
+     */
+    body?: StatementArchiveInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/archive';
+};
+
+export type ArchiveStatementErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ArchiveStatementError = ArchiveStatementErrors[keyof ArchiveStatementErrors];
+
+export type ArchiveStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: Statement;
+};
+
+export type ArchiveStatementResponse = ArchiveStatementResponses[keyof ArchiveStatementResponses];
+
+export type ReopenStatementData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/due';
+};
+
+export type ReopenStatementErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReopenStatementError = ReopenStatementErrors[keyof ReopenStatementErrors];
+
+export type ReopenStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: Statement;
+};
+
+export type ReopenStatementResponse = ReopenStatementResponses[keyof ReopenStatementResponses];
+
+export type SendStatementData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/statements/{statement_id}/send';
+};
+
+export type SendStatementErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendStatementError = SendStatementErrors[keyof SendStatementErrors];
+
+export type SendStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: Statement;
+};
+
+export type SendStatementResponse = SendStatementResponses[keyof SendStatementResponses];
+
+export type LockLocationWeekData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The ISO week, `YYYYWww`, Monday to Sunday on the payee's clock.
+         */
+        week: string;
+    };
+    query?: never;
+    url: '/v1/platform/locations/{location_id}/weeks/{week}/lock';
+};
+
+export type LockLocationWeekErrors = {
+    /**
+     * `validation_failed`: a week not written `YYYYWww`, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `week_not_over` with when it can be locked, `week_locked` naming its statement, `week_carried_on`, or `week_empty`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type LockLocationWeekError = LockLocationWeekErrors[keyof LockLocationWeekErrors];
+
+export type LockLocationWeekResponses = {
+    /**
+     * The statement written.
+     */
+    201: Statement;
+};
+
+export type LockLocationWeekResponse = LockLocationWeekResponses[keyof LockLocationWeekResponses];
+
+export type GetPlatformLocationPayoutsData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The first day of a range to work out, on the Location's clock.
+         */
+        from?: string;
+        /**
+         * The last day of the range, included; a year at most after `from`.
+         */
+        until?: string;
+    };
+    url: '/v1/platform/locations/{location_id}/payouts';
+};
+
+export type GetPlatformLocationPayoutsErrors = {
+    /**
+     * `validation_failed`: `range_too_long`, or `from` after `until`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformLocationPayoutsError = GetPlatformLocationPayoutsErrors[keyof GetPlatformLocationPayoutsErrors];
+
+export type GetPlatformLocationPayoutsResponses = {
+    /**
+     * The Location's payouts.
+     */
+    200: LocationPayouts;
+};
+
+export type GetPlatformLocationPayoutsResponse = GetPlatformLocationPayoutsResponses[keyof GetPlatformLocationPayoutsResponses];
+
+export type ListLocationPayoutAdjustmentsData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/locations/{location_id}/payout-adjustments';
+};
+
+export type ListLocationPayoutAdjustmentsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationPayoutAdjustmentsError = ListLocationPayoutAdjustmentsErrors[keyof ListLocationPayoutAdjustmentsErrors];
+
+export type ListLocationPayoutAdjustmentsResponses = {
+    /**
+     * A page of adjustments.
+     */
+    200: PayoutAdjustmentPage;
+};
+
+export type ListLocationPayoutAdjustmentsResponse = ListLocationPayoutAdjustmentsResponses[keyof ListLocationPayoutAdjustmentsResponses];
+
+export type AddLocationPayoutAdjustmentData = {
+    /**
+     * The amount and the reason.
+     */
+    body: PayoutAdjustmentInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/locations/{location_id}/payout-adjustments';
+};
+
+export type AddLocationPayoutAdjustmentErrors = {
+    /**
+     * `validation_failed`: `adjustment_out_of_range`, an empty reason, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddLocationPayoutAdjustmentError = AddLocationPayoutAdjustmentErrors[keyof AddLocationPayoutAdjustmentErrors];
+
+export type AddLocationPayoutAdjustmentResponses = {
+    /**
+     * The adjustment.
+     */
+    201: PayoutAdjustment;
+};
+
+export type AddLocationPayoutAdjustmentResponse = AddLocationPayoutAdjustmentResponses[keyof AddLocationPayoutAdjustmentResponses];
+
+export type RemoveLocationPayoutAdjustmentData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The adjustment.
+         */
+        adjustment_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/locations/{location_id}/payout-adjustments/{adjustment_id}';
+};
+
+export type RemoveLocationPayoutAdjustmentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such adjustment of the payee (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `adjustment_settled`: its week is locked; only another adjustment can undo it now.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveLocationPayoutAdjustmentError = RemoveLocationPayoutAdjustmentErrors[keyof RemoveLocationPayoutAdjustmentErrors];
+
+export type RemoveLocationPayoutAdjustmentResponses = {
+    /**
+     * Taken back.
+     */
+    204: void;
+};
+
+export type RemoveLocationPayoutAdjustmentResponse = RemoveLocationPayoutAdjustmentResponses[keyof RemoveLocationPayoutAdjustmentResponses];
+
+export type ListPayoutQuestionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only questions in this state.
+         */
+        state?: PayoutQuestionState;
+        /**
+         * Only this statement's.
+         */
+        statement_id?: string;
+        /**
+         * Only this Location's.
+         */
+        location_id?: string;
+        /**
+         * Only this Agent's.
+         */
+        agent_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/payout-questions';
+};
+
+export type ListPayoutQuestionsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPayoutQuestionsError = ListPayoutQuestionsErrors[keyof ListPayoutQuestionsErrors];
+
+export type ListPayoutQuestionsResponses = {
+    /**
+     * A page of questions.
+     */
+    200: PayoutQuestionPage;
+};
+
+export type ListPayoutQuestionsResponse = ListPayoutQuestionsResponses[keyof ListPayoutQuestionsResponses];
+
+export type AnswerPayoutQuestionData = {
+    /**
+     * The answer.
+     */
+    body: PayoutAnswerInput;
+    path: {
+        /**
+         * The question.
+         */
+        question_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/payout-questions/{question_id}/answer';
+};
+
+export type AnswerPayoutQuestionErrors = {
+    /**
+     * `validation_failed`: an empty answer or one over 2,000 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such question (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `question_answered`: it was answered already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AnswerPayoutQuestionError = AnswerPayoutQuestionErrors[keyof AnswerPayoutQuestionErrors];
+
+export type AnswerPayoutQuestionResponses = {
+    /**
+     * The question, answered.
+     */
+    200: PayoutQuestion;
+};
+
+export type AnswerPayoutQuestionResponse = AnswerPayoutQuestionResponses[keyof AnswerPayoutQuestionResponses];
+
+export type GetPayoutsDateData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/payouts/date';
+};
+
+export type GetPayoutsDateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPayoutsDateError = GetPayoutsDateErrors[keyof GetPayoutsDateErrors];
+
+export type GetPayoutsDateResponses = {
+    /**
+     * The payouts date.
+     */
+    200: PayoutsDate;
+};
+
+export type GetPayoutsDateResponse = GetPayoutsDateResponses[keyof GetPayoutsDateResponses];
+
+export type MovePayoutsDateData = {
+    /**
+     * The new date.
+     */
+    body: PayoutsDateMove;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/payouts/date';
+};
+
+export type MovePayoutsDateErrors = {
+    /**
+     * `validation_failed`: `payouts_date_backwards`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `payouts_date_fixed`: anywhere but a developer's machine or the sandbox the date cannot move.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MovePayoutsDateError = MovePayoutsDateErrors[keyof MovePayoutsDateErrors];
+
+export type MovePayoutsDateResponses = {
+    /**
+     * The payouts date after the move.
+     */
+    200: PayoutsDate;
+};
+
+export type MovePayoutsDateResponse = MovePayoutsDateResponses[keyof MovePayoutsDateResponses];
+
+export type ListAgentStatementsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Agent's.
+         */
+        agent_id?: string;
+        /**
+         * Only statements in this state.
+         */
+        state?: StatementState;
+        /**
+         * Only this week, `YYYYWww`.
+         */
+        week?: string;
+        /**
+         * `true` for due statements something holds.
+         */
+        held?: boolean;
+        /**
+         * `true` for statements with unanswered questions.
+         */
+        unanswered?: boolean;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agent-statements';
+};
+
+export type ListAgentStatementsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentStatementsError = ListAgentStatementsErrors[keyof ListAgentStatementsErrors];
+
+export type ListAgentStatementsResponses = {
+    /**
+     * A page of statements.
+     */
+    200: AgentStatementPage;
+};
+
+export type ListAgentStatementsResponse = ListAgentStatementsResponses[keyof ListAgentStatementsResponses];
+
+export type GetAgentStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}';
+};
+
+export type GetAgentStatementErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentStatementError = GetAgentStatementErrors[keyof GetAgentStatementErrors];
+
+export type GetAgentStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: AgentStatement;
+};
+
+export type GetAgentStatementResponse = GetAgentStatementResponses[keyof GetAgentStatementResponses];
+
+export type GetAgentStatementDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/document';
+};
+
+export type GetAgentStatementDocumentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentStatementDocumentError = GetAgentStatementDocumentErrors[keyof GetAgentStatementDocumentErrors];
+
+export type GetAgentStatementDocumentResponses = {
+    /**
+     * The PDF.
+     */
+    200: Blob | File;
+};
+
+export type GetAgentStatementDocumentResponse = GetAgentStatementDocumentResponses[keyof GetAgentStatementDocumentResponses];
+
+export type MarkAgentStatementPaidData = {
+    /**
+     * The day and the reference.
+     */
+    body: StatementPaidInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/paid';
+};
+
+export type MarkAgentStatementPaidErrors = {
+    /**
+     * `validation_failed`: `paid_on_in_future`, an empty reference, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkAgentStatementPaidError = MarkAgentStatementPaidErrors[keyof MarkAgentStatementPaidErrors];
+
+export type MarkAgentStatementPaidResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: AgentStatement;
+};
+
+export type MarkAgentStatementPaidResponse = MarkAgentStatementPaidResponses[keyof MarkAgentStatementPaidResponses];
+
+export type MarkAgentStatementUnpaidData = {
+    /**
+     * Why.
+     */
+    body: StatementUnpaidInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/unpaid';
+};
+
+export type MarkAgentStatementUnpaidErrors = {
+    /**
+     * `validation_failed`: an empty reason, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkAgentStatementUnpaidError = MarkAgentStatementUnpaidErrors[keyof MarkAgentStatementUnpaidErrors];
+
+export type MarkAgentStatementUnpaidResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: AgentStatement;
+};
+
+export type MarkAgentStatementUnpaidResponse = MarkAgentStatementUnpaidResponses[keyof MarkAgentStatementUnpaidResponses];
+
+export type ArchiveAgentStatementData = {
+    /**
+     * Why, optionally.
+     */
+    body?: StatementArchiveInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/archive';
+};
+
+export type ArchiveAgentStatementErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ArchiveAgentStatementError = ArchiveAgentStatementErrors[keyof ArchiveAgentStatementErrors];
+
+export type ArchiveAgentStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: AgentStatement;
+};
+
+export type ArchiveAgentStatementResponse = ArchiveAgentStatementResponses[keyof ArchiveAgentStatementResponses];
+
+export type ReopenAgentStatementData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/due';
+};
+
+export type ReopenAgentStatementErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReopenAgentStatementError = ReopenAgentStatementErrors[keyof ReopenAgentStatementErrors];
+
+export type ReopenAgentStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: AgentStatement;
+};
+
+export type ReopenAgentStatementResponse = ReopenAgentStatementResponses[keyof ReopenAgentStatementResponses];
+
+export type SendAgentStatementData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent's statement.
+         */
+        statement_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-statements/{statement_id}/send';
+};
+
+export type SendAgentStatementErrors = {
+    /**
+     * `validation_failed`: `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such statement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `statement_move_refused`: the move is not allowed from the statement's state, or nothing is there to pay, or its destination is not checked; the detail says why in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendAgentStatementError = SendAgentStatementErrors[keyof SendAgentStatementErrors];
+
+export type SendAgentStatementResponses = {
+    /**
+     * The statement after the move.
+     */
+    200: AgentStatement;
+};
+
+export type SendAgentStatementResponse = SendAgentStatementResponses[keyof SendAgentStatementResponses];
+
+export type LockAgentWeekData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The ISO week, `YYYYWww`, Monday to Sunday on the payee's clock.
+         */
+        week: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/weeks/{week}/lock';
+};
+
+export type LockAgentWeekErrors = {
+    /**
+     * `validation_failed`: a week not written `YYYYWww`, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such platform fleet Agent (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `week_not_over`, `week_locked`, `week_carried_on` or `week_empty`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type LockAgentWeekError = LockAgentWeekErrors[keyof LockAgentWeekErrors];
+
+export type LockAgentWeekResponses = {
+    /**
+     * The statement written.
+     */
+    201: AgentStatement;
+};
+
+export type LockAgentWeekResponse = LockAgentWeekResponses[keyof LockAgentWeekResponses];
+
+export type GetPlatformAgentWeekData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The ISO week, `YYYYWww`, Monday to Sunday on the payee's clock.
+         */
+        week: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/weeks/{week}';
+};
+
+export type GetPlatformAgentWeekErrors = {
+    /**
+     * `validation_failed`: a week not written `YYYYWww`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Agent (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformAgentWeekError = GetPlatformAgentWeekErrors[keyof GetPlatformAgentWeekErrors];
+
+export type GetPlatformAgentWeekResponses = {
+    /**
+     * The week.
+     */
+    200: AgentWeek;
+};
+
+export type GetPlatformAgentWeekResponse = GetPlatformAgentWeekResponses[keyof GetPlatformAgentWeekResponses];
+
+export type ListAgentPayoutAdjustmentsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agents/{agent_id}/payout-adjustments';
+};
+
+export type ListAgentPayoutAdjustmentsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Agent (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentPayoutAdjustmentsError = ListAgentPayoutAdjustmentsErrors[keyof ListAgentPayoutAdjustmentsErrors];
+
+export type ListAgentPayoutAdjustmentsResponses = {
+    /**
+     * A page of adjustments.
+     */
+    200: PayoutAdjustmentPage;
+};
+
+export type ListAgentPayoutAdjustmentsResponse = ListAgentPayoutAdjustmentsResponses[keyof ListAgentPayoutAdjustmentsResponses];
+
+export type AddAgentPayoutAdjustmentData = {
+    /**
+     * The amount and the reason.
+     */
+    body: PayoutAdjustmentInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/payout-adjustments';
+};
+
+export type AddAgentPayoutAdjustmentErrors = {
+    /**
+     * `validation_failed`: `adjustment_out_of_range`, an empty reason, or `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such platform fleet Agent (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddAgentPayoutAdjustmentError = AddAgentPayoutAdjustmentErrors[keyof AddAgentPayoutAdjustmentErrors];
+
+export type AddAgentPayoutAdjustmentResponses = {
+    /**
+     * The adjustment.
+     */
+    201: PayoutAdjustment;
+};
+
+export type AddAgentPayoutAdjustmentResponse = AddAgentPayoutAdjustmentResponses[keyof AddAgentPayoutAdjustmentResponses];
+
+export type RemoveAgentPayoutAdjustmentData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+        /**
+         * The adjustment.
+         */
+        adjustment_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/payout-adjustments/{adjustment_id}';
+};
+
+export type RemoveAgentPayoutAdjustmentErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such adjustment of the payee (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `adjustment_settled`: its week is locked; only another adjustment can undo it now.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveAgentPayoutAdjustmentError = RemoveAgentPayoutAdjustmentErrors[keyof RemoveAgentPayoutAdjustmentErrors];
+
+export type RemoveAgentPayoutAdjustmentResponses = {
+    /**
+     * Taken back.
+     */
+    204: void;
+};
+
+export type RemoveAgentPayoutAdjustmentResponse = RemoveAgentPayoutAdjustmentResponses[keyof RemoveAgentPayoutAdjustmentResponses];
+
+export type GetAgentPayoutAccountData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/payout-account';
+};
+
+export type GetAgentPayoutAccountErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Agent, or no account given yet (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentPayoutAccountError = GetAgentPayoutAccountErrors[keyof GetAgentPayoutAccountErrors];
+
+export type GetAgentPayoutAccountResponses = {
+    /**
+     * Where the Agent is paid.
+     */
+    200: AgentPayoutAccount;
+};
+
+export type GetAgentPayoutAccountResponse = GetAgentPayoutAccountResponses[keyof GetAgentPayoutAccountResponses];
+
+export type VerifyAgentPayoutAccountData = {
+    /**
+     * The reason.
+     */
+    body?: PayoutAccountVerification;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agents/{agent_id}/payout-account/verify';
+};
+
+export type VerifyAgentPayoutAccountErrors = {
+    /**
+     * `validation_failed`: a reason over 500 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `partner:approve` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Agent, or no account given yet (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyAgentPayoutAccountError = VerifyAgentPayoutAccountErrors[keyof VerifyAgentPayoutAccountErrors];
+
+export type VerifyAgentPayoutAccountResponses = {
+    /**
+     * The account, checked.
+     */
+    200: AgentPayoutAccount;
+};
+
+export type VerifyAgentPayoutAccountResponse = VerifyAgentPayoutAccountResponses[keyof VerifyAgentPayoutAccountResponses];
+
+export type GetOrdersReportData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The first day, on the report's clock.
+         */
+        from?: string;
+        /**
+         * The last day, included; a year at most after `from`.
+         */
+        until?: string;
+        /**
+         * How to group; `none` by default.
+         */
+        group_by?: OrdersReportGrouping;
+        /**
+         * What to compare with; `none` by default.
+         */
+        compare?: OrdersReportComparison;
+        /**
+         * Only orders that ended so: `completed`, `declined`, `cancelled`, `expired` or `in_progress`.
+         */
+        status?: 'completed' | 'declined' | 'cancelled' | 'expired' | 'in_progress';
+        /**
+         * Only this store's.
+         */
+        location_id?: string;
+        /**
+         * Only this way of ordering.
+         */
+        fulfilment?: 'delivery' | 'pickup' | 'dine_in' | 'scheduled' | 'subscription';
+        /**
+         * Only this vertical's, by code.
+         */
+        vertical?: string;
+        /**
+         * Only this city's, a service area.
+         */
+        city_id?: string;
+        /**
+         * The clock days are read on, an IANA name; `Asia/Kolkata` by default.
+         */
+        time_zone?: string;
+        /**
+         * For the spreadsheet: the columns, comma separated, of `group`, `placed`, `completed`, `declined`, `cancelled`, `expired`, `in_progress`, `currency`, `sales`, `average_order_value` and `refunds`; all by default.
+         */
+        columns?: string;
+    };
+    url: '/v1/platform/reports/orders';
+};
+
+export type GetOrdersReportErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (a year at most), `from` after `until`, an unknown time zone or column.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetOrdersReportError = GetOrdersReportErrors[keyof GetOrdersReportErrors];
+
+export type GetOrdersReportResponses = {
+    /**
+     * The report, or the spreadsheet.
+     */
+    200: OrdersReport;
+};
+
+export type GetOrdersReportResponse = GetOrdersReportResponses[keyof GetOrdersReportResponses];
+
+export type GetMetricsBoardData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `last_hour` by default, `today`, or `custom` with `from` and `until`.
+         */
+        window?: MetricsWindow;
+        /**
+         * Where a custom window starts.
+         */
+        from?: string;
+        /**
+         * Where it ends; 31 days at most after `from`.
+         */
+        until?: string;
+        /**
+         * Only this store's.
+         */
+        location_id?: string;
+        /**
+         * Only this kind of Provider's deliveries.
+         */
+        provider_kind?: ProviderKind;
+    };
+    url: '/v1/platform/reports/metrics';
+};
+
+export type GetMetricsBoardErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (31 days at most), or a custom window without both ends.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMetricsBoardError = GetMetricsBoardErrors[keyof GetMetricsBoardErrors];
+
+export type GetMetricsBoardResponses = {
+    /**
+     * The board.
+     */
+    200: MetricsBoard;
+};
+
+export type GetMetricsBoardResponse = GetMetricsBoardResponses[keyof GetMetricsBoardResponses];
+
+export type ListAgentNumbersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The first day; the first of this month by default.
+         */
+        from?: string;
+        /**
+         * The last day, included; today by default; 92 days at most after `from`.
+         */
+        until?: string;
+        /**
+         * Find Agents by name, or by the last digits of their mobile number.
+         */
+        q?: string;
+        /**
+         * Only this team's.
+         */
+        team_id?: string;
+        /**
+         * Only this delivery service's.
+         */
+        service_id?: string;
+        /**
+         * Only include items that belong to this partner. Without it, every partner the credential can see is included.
+         */
+        partner_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agent-numbers';
+};
+
+export type ListAgentNumbersErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (92 days at most), or `from` after `until`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `agent:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentNumbersError = ListAgentNumbersErrors[keyof ListAgentNumbersErrors];
+
+export type ListAgentNumbersResponses = {
+    /**
+     * A page of Agents' numbers.
+     */
+    200: AgentNumbersPage;
+};
+
+export type ListAgentNumbersResponse = ListAgentNumbersResponses[keyof ListAgentNumbersResponses];
+
+export type GetAgentNumbersData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * The first day; the first of this month by default.
+         */
+        from?: string;
+        /**
+         * The last day, included; 92 days at most after `from`.
+         */
+        until?: string;
+    };
+    url: '/v1/platform/agents/{agent_id}/numbers';
+};
+
+export type GetAgentNumbersErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (92 days at most).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `agent:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Agent (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentNumbersError = GetAgentNumbersErrors[keyof GetAgentNumbersErrors];
+
+export type GetAgentNumbersResponses = {
+    /**
+     * The Agent's numbers.
+     */
+    200: AgentNumbersDetail;
+};
+
+export type GetAgentNumbersResponse = GetAgentNumbersResponses[keyof GetAgentNumbersResponses];
+
+export type ListPartnerAgentNumbersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * The first day; the first of this month by default.
+         */
+        from?: string;
+        /**
+         * The last day, included; today by default; 92 days at most after `from`.
+         */
+        until?: string;
+        /**
+         * Find Agents by name, or by the last digits of their mobile number.
+         */
+        q?: string;
+        /**
+         * Only this team's.
+         */
+        team_id?: string;
+        /**
+         * Only this delivery service's.
+         */
+        service_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/agent-numbers';
+};
+
+export type ListPartnerAgentNumbersErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (92 days at most), or `from` after `until`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `agent:read` (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner does not exist or is not the caller's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerAgentNumbersError = ListPartnerAgentNumbersErrors[keyof ListPartnerAgentNumbersErrors];
+
+export type ListPartnerAgentNumbersResponses = {
+    /**
+     * A page of Agents' numbers.
+     */
+    200: AgentNumbersPage;
+};
+
+export type ListPartnerAgentNumbersResponse = ListPartnerAgentNumbersResponses[keyof ListPartnerAgentNumbersResponses];
+
+export type GetPartnerAgentNumbersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * The first day; the first of this month by default.
+         */
+        from?: string;
+        /**
+         * The last day, included; 92 days at most after `from`.
+         */
+        until?: string;
+    };
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/numbers';
+};
+
+export type GetPartnerAgentNumbersErrors = {
+    /**
+     * `validation_failed`: `range_too_long` (92 days at most).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `agent:read` (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner or the Agent does not exist or is not the caller's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerAgentNumbersError = GetPartnerAgentNumbersErrors[keyof GetPartnerAgentNumbersErrors];
+
+export type GetPartnerAgentNumbersResponses = {
+    /**
+     * The Agent's numbers.
+     */
+    200: AgentNumbersDetail;
+};
+
+export type GetPartnerAgentNumbersResponse = GetPartnerAgentNumbersResponses[keyof GetPartnerAgentNumbersResponses];
+
+export type GetPartnerAgentWeeksData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service, one of the Partner's.
+         */
+        service_id: string;
+    };
+    query?: {
+        /**
+         * The week, `YYYYWww`; the week just ended by default.
+         */
+        week?: string;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/agent-weeks';
+};
+
+export type GetPartnerAgentWeeksErrors = {
+    /**
+     * `validation_failed`: a week not written `YYYYWww`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A member without `agent:read` (`access_denied`), or a Partner whose envelope lacks it (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * The Partner or the service does not exist or is not the caller's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`: the service has no Agents.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerAgentWeeksError = GetPartnerAgentWeeksErrors[keyof GetPartnerAgentWeeksErrors];
+
+export type GetPartnerAgentWeeksResponses = {
+    /**
+     * The report, or the spreadsheet.
+     */
+    200: AgentWeeksReport;
+};
+
+export type GetPartnerAgentWeeksResponse = GetPartnerAgentWeeksResponses[keyof GetPartnerAgentWeeksResponses];

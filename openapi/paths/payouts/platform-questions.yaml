@@ -1,0 +1,89 @@
+# Path item for /v1/platform/payout-questions. Referenced from openapi.yaml.
+get:
+  operationId: listPayoutQuestions
+  summary: List questions about weeks
+  description: Questions Locations and Agents asked about their weeks, the unanswered ones first and oldest first, by Location or Agent and week. `payout:read`.
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  parameters:
+    - name: state
+      in: query
+      required: false
+      description: Only questions in this state.
+      schema:
+        $ref: ../../components/schemas/payouts/PayoutQuestionState.yaml
+    - name: statement_id
+      in: query
+      required: false
+      description: Only this statement's.
+      schema:
+        type: string
+        format: uuid
+    - name: location_id
+      in: query
+      required: false
+      description: Only this Location's.
+      schema:
+        type: string
+        format: uuid
+    - name: agent_id
+      in: query
+      required: false
+      description: Only this Agent's.
+      schema:
+        type: string
+        format: uuid
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 25 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of questions.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutQuestionPage.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

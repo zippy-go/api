@@ -1,0 +1,49 @@
+type: object
+description: A page of statements, newest week first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./StatementSummary.yaml
+      description: A statement.
+    description: The statements on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
+        reference: ZG-2026W43
+        payee_kind: location
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        partner_name: ZippyGo Dev Partner
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        location_name: Dev Kitchen Gachibowli
+        week: 2026W43
+        starts_on: 2026-10-19
+        ends_on: 2026-10-25
+        state: due
+        standing:
+          code: due
+          sentence: Due on Friday 30 October
+        holds: []
+        total:
+          minor_units: 42920
+          currency: INR
+        payable:
+          minor_units: 42920
+          currency: INR
+        pays_on: 2026-10-30
+        paid_on: null
+        transfer_reference: null
+        invoice_number: INV-2026-00017
+        unanswered_questions: 0
+        locked_at: 2026-10-27T00:15:00Z
+    next_cursor: null

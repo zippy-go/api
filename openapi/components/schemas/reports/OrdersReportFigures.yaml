@@ -1,0 +1,76 @@
+type: object
+description: "What the orders placed in a range came to: counts by how they ended and by way of ordering, and money per currency."
+required:
+  - placed
+  - completed
+  - declined
+  - cancelled
+  - expired
+  - in_progress
+  - ways
+  - money
+properties:
+  placed:
+    type: integer
+    description: Orders placed.
+    examples:
+      - 21
+  completed:
+    type: integer
+    description: Delivered or collected.
+    examples:
+      - 18
+  declined:
+    type: integer
+    description: Declined by the store or for want of an answer.
+    examples:
+      - 1
+  cancelled:
+    type: integer
+    description: Cancelled.
+    examples:
+      - 2
+  expired:
+    type: integer
+    description: Never paid for.
+    examples:
+      - 0
+  in_progress:
+    type: integer
+    description: Still moving.
+    examples:
+      - 0
+  ways:
+    $ref: ./OrdersReportWays.yaml
+    description: By way of ordering.
+  money:
+    type: array
+    items:
+      $ref: ./OrdersReportMoney.yaml
+      description: One currency.
+    description: Sales, average order value and refunds per currency.
+examples:
+  - placed: 21
+    completed: 18
+    declined: 1
+    cancelled: 2
+    expired: 0
+    in_progress: 0
+    ways:
+      delivery: 16
+      pickup: 2
+      dine_in: 0
+      scheduled: 0
+      subscription: 0
+    money:
+      - currency: INR
+        orders: 18
+        sales:
+          minor_units: 1234500
+          currency: INR
+        average_order_value:
+          minor_units: 68583
+          currency: INR
+        refunds:
+          minor_units: 12000
+          currency: INR

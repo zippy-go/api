@@ -1,0 +1,8 @@
+type: string
+description: "A document drawn from a locked week when it is asked for: the statement (PDF), the GST invoice for the platform's fee (PDF) and the order list (CSV)."
+enum:
+  - statement
+  - invoice
+  - orders
+examples:
+  - statement

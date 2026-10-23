@@ -1,0 +1,11 @@
+type: string
+description: "A move in a statement's history: `locked`, `sent` to the payout provider, `paid`, `unpaid`, `archived`, or `reopened` (put back to due)."
+enum:
+  - locked
+  - sent
+  - paid
+  - unpaid
+  - archived
+  - reopened
+examples:
+  - locked

@@ -1,0 +1,65 @@
+type: object
+description: One move in a statement's history, with who made it and when.
+required:
+  - move
+  - state
+  - previous_state
+  - at
+  - by
+  - reason
+  - reference
+  - paid_on
+properties:
+  move:
+    $ref: ./StatementMoveKind.yaml
+    description: The move.
+  state:
+    $ref: ./StatementState.yaml
+    description: The state after it.
+  previous_state:
+    oneOf:
+      - $ref: ./StatementState.yaml
+      - type: "null"
+    description: The state before it; `null` for the lock.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-27T00:15:00Z
+  by:
+    $ref: ./StatementActor.yaml
+    description: Who.
+  reason:
+    type:
+      - string
+      - "null"
+    description: "Why, for an unpaid, an archived or a reopened statement: the provider's words or staff's."
+    examples:
+      - null
+  reference:
+    type:
+      - string
+      - "null"
+    description: The transfer's reference, for a paid statement.
+    examples:
+      - null
+  paid_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The day it was paid, for a paid statement.
+    examples:
+      - null
+examples:
+  - move: locked
+    state: due
+    previous_state: null
+    at: 2026-10-27T00:15:00Z
+    by:
+      kind: clock
+      name: null
+    reason: null
+    reference: null
+    paid_on: null

@@ -1,0 +1,137 @@
+# Path item for /v1/platform/locations/{location_id}/payout-adjustments. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The Location.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: listLocationPayoutAdjustments
+  summary: List a Location's adjustments
+  description: Adjustments to a Location's payout, newest first, with the week each landed in and whether it is settled. `payout:read`.
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many per page. 1 to 100, 25 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    - name: cursor
+      in: query
+      required: false
+      description: The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of adjustments.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutAdjustmentPage.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such Location (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: addLocationPayoutAdjustment
+  summary: Adjust a Location's payout
+  description: "Adds money to a Location's payout or takes money off it, at most ₹100,000.00 either way and never nothing, with a reason the payee reads and an optional note. An adjustment lands in the payee's first week not locked yet: the week just ended until its lock, then the week in progress; it is settled into the statement that locks that week. A fee correction credits back a fee found wrong with its GST, and the statement that settles it carries a credit note. Written to the audit log. `payout:manage`."
+  tags:
+    - Payouts
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The amount and the reason.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payouts/PayoutAdjustmentInput.yaml
+  responses:
+    "201":
+      description: The adjustment.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payouts/PayoutAdjustment.yaml
+    "400":
+      description: "`validation_failed`: `adjustment_out_of_range`, an empty reason, or `idempotency_key_missing`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `payout:manage` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such Location (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

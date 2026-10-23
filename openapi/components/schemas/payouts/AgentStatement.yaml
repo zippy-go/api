@@ -1,0 +1,315 @@
+type: object
+description: "A platform fleet Agent's statement for one week, Monday to Sunday on the fleet's clock, locked the Tuesday after and paid the Friday to their checked UPI ID or bank account: task by task, with the tips in full and the cash kept on a line of its own. Reference `AG-{ISO week-based year}W{week}`."
+required:
+  - id
+  - reference
+  - agent_id
+  - agent_name
+  - partner_id
+  - service_id
+  - week
+  - starts_on
+  - ends_on
+  - time_zone
+  - currency
+  - state
+  - standing
+  - holds
+  - locked_at
+  - locked_by
+  - pays_on
+  - paid_on
+  - transfer_reference
+  - destination
+  - figures
+  - tasks
+  - adjustments
+  - questions
+  - unanswered_questions
+  - history
+  - documents
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The statement.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5201
+  reference:
+    type: string
+    description: Its reference.
+    examples:
+      - AG-2026W43
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  agent_name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Ravi Kumar
+  partner_id:
+    type: string
+    format: uuid
+    description: The platform fleet.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week.
+    examples:
+      - 2026W43
+  starts_on:
+    type: string
+    format: date
+    description: Its Monday.
+    examples:
+      - 2026-10-19
+  ends_on:
+    type: string
+    format: date
+    description: Its Sunday.
+    examples:
+      - 2026-10-25
+  time_zone:
+    type: string
+    description: The fleet's clock.
+    examples:
+      - Asia/Kolkata
+  currency:
+    type: string
+    description: The currency.
+    examples:
+      - INR
+  state:
+    $ref: ./StatementState.yaml
+    description: Where it stands.
+  standing:
+    $ref: ./StatementStanding.yaml
+    description: Where the money stands, in a sentence.
+  holds:
+    type: array
+    items:
+      $ref: ./PayoutHold.yaml
+      description: A hold.
+    description: What holds it while it is due.
+  locked_at:
+    type: string
+    format: date-time
+    description: When it was locked.
+    examples:
+      - 2026-10-27T00:15:00Z
+  locked_by:
+    $ref: ./StatementActor.yaml
+    description: Who locked it.
+  pays_on:
+    type: string
+    format: date
+    description: Its payday.
+    examples:
+      - 2026-10-30
+  paid_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The day it was paid.
+    examples:
+      - null
+  transfer_reference:
+    type:
+      - string
+      - "null"
+    description: The transfer's reference, once paid.
+    examples:
+      - null
+  destination:
+    oneOf:
+      - $ref: ./PayoutDestination.yaml
+      - type: "null"
+    description: Where it is paid; `null` when the Agent has given none.
+  figures:
+    $ref: ./AgentStatementFigures.yaml
+    description: How it was worked out.
+  tasks:
+    type: array
+    items:
+      $ref: ./AgentStatementTask.yaml
+      description: A task.
+    description: Task by task, oldest first.
+  adjustments:
+    type: array
+    items:
+      $ref: ./PayoutAdjustment.yaml
+      description: An adjustment.
+    description: Adjustments settled into the week.
+  questions:
+    type: array
+    items:
+      $ref: ./PayoutQuestion.yaml
+      description: A question.
+    description: Questions asked about the week.
+  unanswered_questions:
+    type: integer
+    description: Questions not answered yet.
+    examples:
+      - 0
+  history:
+    type: array
+    items:
+      $ref: ./StatementMove.yaml
+      description: A move.
+    description: Every move, oldest first.
+  documents:
+    type: array
+    items:
+      $ref: ./StatementDocument.yaml
+      description: A document.
+    description: Its PDF.
+  version:
+    type: integer
+    description: The version, raised on every move.
+    examples:
+      - 1
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5201
+    reference: AG-2026W43
+    agent_id: 01a13a48-9e00-7000-8000-000000000107
+    agent_name: Ravi Kumar
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    week: 2026W43
+    starts_on: 2026-10-19
+    ends_on: 2026-10-25
+    time_zone: Asia/Kolkata
+    currency: INR
+    state: due
+    standing:
+      code: due
+      sentence: Due on Friday 30 October
+    holds: []
+    locked_at: 2026-10-27T00:15:00Z
+    locked_by:
+      kind: clock
+      name: null
+    pays_on: 2026-10-30
+    paid_on: null
+    transfer_reference: null
+    destination:
+      kind: upi
+      holder_name: Ravi Kumar
+      last4: null
+      upi_id: ravi.kumar@okaxis
+      check:
+        state: passed
+        reason: null
+        checked_at: 2026-10-22T06:30:05Z
+        by: provider
+        reference: SIMCHK-7F3A21
+    figures:
+      pay:
+        minor_units: 318000
+        currency: INR
+      pay_parts:
+        - kind: base
+          label: Base pay
+          amount:
+            minor_units: 210000
+            currency: INR
+        - kind: distance
+          label: Distance pay
+          amount:
+            minor_units: 108000
+            currency: INR
+      tips:
+        minor_units: 31000
+        currency: INR
+      bonuses:
+        minor_units: 0
+        currency: INR
+      adjustments:
+        minor_units: 0
+        currency: INR
+      cash_kept:
+        minor_units: 80000
+        currency: INR
+      tax_deducted:
+        minor_units: 0
+        currency: INR
+      carried_in:
+        minor_units: 0
+        currency: INR
+      total:
+        minor_units: 269000
+        currency: INR
+      payable:
+        minor_units: 269000
+        currency: INR
+      carried_out:
+        minor_units: 0
+        currency: INR
+    tasks:
+      - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5501
+        delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+        order_number: AB0042
+        kind: drop_off
+        outcome: completed
+        earned_at: 2026-10-22T13:40:00Z
+        rule_version: 1
+        lines:
+          - kind: drop_off
+            label: Drop-off
+            amount:
+              minor_units: 3000
+              currency: INR
+          - kind: distance
+            label: 3.6 km at ₹6.00 per km
+            amount:
+              minor_units: 2160
+              currency: INR
+          - kind: tip
+            label: Tip, in full
+            amount:
+              minor_units: 2000
+              currency: INR
+        pay:
+          minor_units: 5160
+          currency: INR
+        tip:
+          minor_units: 2000
+          currency: INR
+        cash_collected:
+          minor_units: 0
+          currency: INR
+        distance_metres: 3600
+    adjustments: []
+    questions: []
+    unanswered_questions: 0
+    history:
+      - move: locked
+        state: due
+        previous_state: null
+        at: 2026-10-27T00:15:00Z
+        by:
+          kind: clock
+          name: null
+        reason: null
+        reference: null
+        paid_on: null
+    documents:
+      - kind: statement
+        title: Statement AG-2026W43
+        media_type: application/pdf
+        href: /v1/agent/memberships/01a13a48-9e00-7000-8000-000000000107/statements/0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5201/document
+    version: 1
