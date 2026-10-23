@@ -4,7 +4,7 @@ parameters:
 post:
   operationId: verifyPayoutAccount
   summary: Verify the payout account
-  description: "Marks the payout account verified by hand, for the day the payout provider is not there; platform staff with the approval permission (`partner:approve`). Since contract 0.19.0 it takes an optional reason, written to the audit log with the check, and lifts the hold after a change of account, so a statement held for it is due at once."
+  description: "Marks the payout account verified by hand, for the day the payout provider is not there; platform staff with the approval permission (`partner:approve`). Since contract 0.19.0 it takes an optional reason, written to the audit log with the check; a statement held for the check is due at once, while the hold after a change of an existing account still runs its 48 hours (`account_changed`)."
   requestBody:
     required: false
     description: The reason, optionally.

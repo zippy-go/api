@@ -102,7 +102,8 @@ it merged second; an Agent's rating in the numbers is the one reviews counts
   email or the words of a question.
 - Problem codes `week_not_over`, `week_locked`, `week_carried_on`,
   `week_empty`, `statement_move_refused` (with `statement_state`,
-  `nothing_to_pay`, `destination_not_checked` and `payee_gone`),
+  `nothing_to_pay`, `destination_not_checked`, `destination_held` and
+  `payee_gone`),
   `adjustment_settled`, `question_answered`, `payouts_date_fixed` and
   `paid_by_partner`; field codes `adjustment_out_of_range`, `range_too_long`,
   `payouts_date_backwards`, `paid_on_in_future` and `week_invalid`.
@@ -113,7 +114,10 @@ it merged second; an Agent's rating in the numbers is the one reviews counts
   (`report:read`), in the platform's default roles' edition 6.
 - `PUT /v1/partners/{partner_id}/payout-account` and the verification say
   the account is checked by the payout provider's one-rupee transfer, whose
-  pass verifies it and lifts the hold after a change of account.
+  pass verifies it. A change of an existing account holds payouts for at
+  least 48 hours whatever verifies it, shown on statements as the hold
+  `account_changed` and refused to a send as `destination_held`; a first
+  account is not a change and waits for its check alone.
 
 ## [0.19.0] - 2026-10-22
 

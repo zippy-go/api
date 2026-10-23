@@ -55,7 +55,7 @@ get:
 put:
   operationId: putPayoutAccount
   summary: State the payout account
-  description: "States or changes the payout account: it is unverified again after every write, and the masked number sent back unchanged keeps the account. Since contract 0.19.0 every write is checked by the payout provider: it sends ₹1.00, which stays with the holder, and compares the name the bank returns with the Partner's legal name; a match verifies the account and lifts the hold after a change of account, so a statement held for it is due at once; a different name or a failed transfer fails the check with the reason (\"The account is not in your legal name\"), the Partner is told and its statements stay held. A change of account still holds the next payout until the account is verified. `partner:profile:write`, or platform staff with `partner:write`."
+  description: "States or changes the payout account: it is unverified again after every write, and the masked number sent back unchanged keeps the account. Since contract 0.19.0 every write is checked by the payout provider: it sends ₹1.00, which stays with the holder, and compares the name the bank returns with the Partner's legal name; a match verifies the account, so a statement held for the check is due at once; a different name or a failed transfer fails the check with the reason (\"The account is not in your legal name\"), the Partner is told and its statements stay held. A change of an existing account holds payouts for at least 48 hours whatever verifies it (`payouts_held_until`, the statements' `account_changed` hold), while a first account is not a change and waits for its check alone. `partner:profile:write`, or platform staff with `partner:write`."
   tags:
     - Payout accounts
   security:

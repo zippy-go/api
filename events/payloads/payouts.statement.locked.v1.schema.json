@@ -342,7 +342,7 @@
     },
     "gst_difference": {
       "$ref": "#/$defs/money",
-      "description": "The GST the invoice bills less the GST the orders were split with, which the lock posts; negative when the invoice bills less."
+      "description": "The GST the invoice bills on the fee less the GST the completed orders were split with, which the lock posts between what the Partner is owed and GST payable; a fee on an order the Partner cancelled after payment is posted whole with its GST beside it, that order's split having been reversed. Negative when the invoice bills less."
     }
   },
   "$defs": {

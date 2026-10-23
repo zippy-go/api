@@ -1530,7 +1530,7 @@ export const getPayoutAccount = <ThrowOnError extends boolean = false>(options: 
 /**
  * State the payout account
  *
- * States or changes the payout account: it is unverified again after every write, and the masked number sent back unchanged keeps the account. Since contract 0.19.0 every write is checked by the payout provider: it sends ₹1.00, which stays with the holder, and compares the name the bank returns with the Partner's legal name; a match verifies the account and lifts the hold after a change of account, so a statement held for it is due at once; a different name or a failed transfer fails the check with the reason ("The account is not in your legal name"), the Partner is told and its statements stay held. A change of account still holds the next payout until the account is verified. `partner:profile:write`, or platform staff with `partner:write`.
+ * States or changes the payout account: it is unverified again after every write, and the masked number sent back unchanged keeps the account. Since contract 0.19.0 every write is checked by the payout provider: it sends ₹1.00, which stays with the holder, and compares the name the bank returns with the Partner's legal name; a match verifies the account, so a statement held for the check is due at once; a different name or a failed transfer fails the check with the reason ("The account is not in your legal name"), the Partner is told and its statements stay held. A change of an existing account holds payouts for at least 48 hours whatever verifies it (`payouts_held_until`, the statements' `account_changed` hold), while a first account is not a change and waits for its check alone. `partner:profile:write`, or platform staff with `partner:write`.
  */
 export const putPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<PutPayoutAccountData, ThrowOnError>): RequestResult<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError> => (options.client ?? client).put<PutPayoutAccountResponses, PutPayoutAccountErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1545,7 +1545,7 @@ export const putPayoutAccount = <ThrowOnError extends boolean = false>(options: 
 /**
  * Verify the payout account
  *
- * Marks the payout account verified by hand, for the day the payout provider is not there; platform staff with the approval permission (`partner:approve`). Since contract 0.19.0 it takes an optional reason, written to the audit log with the check, and lifts the hold after a change of account, so a statement held for it is due at once.
+ * Marks the payout account verified by hand, for the day the payout provider is not there; platform staff with the approval permission (`partner:approve`). Since contract 0.19.0 it takes an optional reason, written to the audit log with the check; a statement held for the check is due at once, while the hold after a change of an existing account still runs its 48 hours (`account_changed`).
  */
 export const verifyPayoutAccount = <ThrowOnError extends boolean = false>(options: Options<VerifyPayoutAccountData, ThrowOnError>): RequestResult<VerifyPayoutAccountResponses, VerifyPayoutAccountErrors, ThrowOnError> => (options.client ?? client).post<VerifyPayoutAccountResponses, VerifyPayoutAccountErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

@@ -1,5 +1,5 @@
 type: object
-description: 'The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider''s one-rupee transfer (`check`): a pass marks it verified and lifts the hold after a change of account, a different name or a failed transfer fails it with the reason.'
+description: 'The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider''s one-rupee transfer (`check`): a pass marks it verified, a different name or a failed transfer fails it with the reason. A change of an existing account holds payouts for at least 48 hours whatever verifies it; a first account is not a change.'
 required:
   - holder_name
   - account_type

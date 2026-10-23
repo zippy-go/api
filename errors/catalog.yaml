@@ -1726,6 +1726,9 @@ errors:
       - code: destination_not_checked
         message: The payout destination is not checked yet.
         description: A statement is sent only to a destination whose one-rupee check passed.
+      - code: destination_held
+        message: The payout destination changed less than 48 hours ago.
+        description: A changed bank account holds payouts for at least 48 hours, whatever checks it.
       - code: payee_gone
         message: The payee is gone.
         description: The Partner is archived, or the Agent's membership ended, so nothing is sent.

@@ -2637,7 +2637,7 @@ export type PartnerDocumentPage = {
 };
 
 /**
- * The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider's one-rupee transfer (`check`): a pass marks it verified and lifts the hold after a change of account, a different name or a failed transfer fails it with the reason.
+ * The payout account as every view shows it, the `PayoutAccount` schema: the number masked to its last four digits. Since contract 0.19.0 every write is checked by the payout provider's one-rupee transfer (`check`): a pass marks it verified, a different name or a failed transfer fails it with the reason. A change of an existing account holds payouts for at least 48 hours whatever verifies it; a first account is not a change.
  */
 export type PayoutAccount = {
     /**
@@ -21669,9 +21669,9 @@ export type StatementState = 'due' | 'sending' | 'paid' | 'unpaid' | 'archived';
 export type StatementStandingCode = 'so_far' | 'locking' | 'due' | 'held' | 'sending' | 'paid' | 'unpaid' | 'nothing_to_pay' | 'archived';
 
 /**
- * What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once.
+ * What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once: no account, an account not checked yet or whose check failed, an account changed less than 48 hours ago (`account_changed`, whatever checks it), or a payee gone.
  */
-export type PayoutHoldCode = 'no_account' | 'account_not_checked' | 'account_check_failed' | 'partner_gone' | 'agent_gone';
+export type PayoutHoldCode = 'no_account' | 'account_not_checked' | 'account_check_failed' | 'account_changed' | 'partner_gone' | 'agent_gone';
 
 /**
  * A move in a statement's history: `locked`, `sent` to the payout provider, `paid`, `unpaid`, `archived`, or `reopened` (put back to due).
@@ -22611,7 +22611,7 @@ export type Statement = {
      */
     standing: StatementStanding;
     /**
-     * What holds it while it is due; empty when nothing does.
+     * What holds it while it is due or unpaid, waiting to be sent again; empty when nothing does.
      */
     holds: Array<PayoutHold>;
     /**
@@ -23229,7 +23229,7 @@ export type AgentStatement = {
      */
     standing: StatementStanding;
     /**
-     * What holds it while it is due.
+     * What holds it while it is due or unpaid, waiting to be sent again.
      */
     holds: Array<PayoutHold>;
     /**

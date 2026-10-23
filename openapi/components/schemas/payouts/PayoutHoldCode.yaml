@@ -1,9 +1,10 @@
 type: string
-description: What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once.
+description: "What holds a due statement, read from the payee whenever the statement is shown, so checking the account clears it everywhere at once: no account, an account not checked yet or whose check failed, an account changed less than 48 hours ago (`account_changed`, whatever checks it), or a payee gone."
 enum:
   - no_account
   - account_not_checked
   - account_check_failed
+  - account_changed
   - partner_gone
   - agent_gone
 examples:

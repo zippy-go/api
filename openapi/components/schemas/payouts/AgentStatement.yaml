@@ -103,7 +103,7 @@ properties:
     items:
       $ref: ./PayoutHold.yaml
       description: A hold.
-    description: What holds it while it is due.
+    description: What holds it while it is due or unpaid, waiting to be sent again.
   locked_at:
     type: string
     format: date-time
