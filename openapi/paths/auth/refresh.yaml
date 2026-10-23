@@ -67,6 +67,12 @@ post:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
+    '403':
+      description: '`account_blocked`: a customer whose account support blocked. The detail says how to reach support; the session stays ended. Since 0.19.0.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
     '409':
       description: A customer session whose market does not admit sign-in now (`sign_in_closed`); the session is kept.
       content:

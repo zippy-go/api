@@ -35,6 +35,22 @@ get:
       schema:
         type: string
         maxLength: 100
+    - name: aggregate_type
+      in: query
+      required: false
+      description: "Only events about one aggregate, named by its kind as the payload names its id: `order` reads `order_id`, `delivery` reads `delivery_id`. With `aggregate_id`; one without the other is `validation_failed`."
+      schema:
+        type: string
+        pattern: "^[a-z][a-z_]{0,39}$"
+      example: "order"
+    - name: aggregate_id
+      in: query
+      required: false
+      description: "The aggregate's id, with `aggregate_type`."
+      schema:
+        type: string
+        format: uuid
+      example: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
     - name: limit
       in: query
       required: false

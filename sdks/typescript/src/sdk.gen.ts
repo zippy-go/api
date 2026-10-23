@@ -6753,7 +6753,7 @@ export const writeCustomerNote = <ThrowOnError extends boolean = false>(options:
 /**
  * Block a customer
  *
- * Blocks the account with a reason: every session ends at once (the app and the storefront are signed out at their next request), every refresh and sign-in answers `403` `account_blocked` saying "This account is blocked. Contact support.", and placing an order is refused; an order already placed runs to its end and its refunds stay possible. On the timeline and in the audit log; publishes `customers.customer.blocked`. Mission Control tokens only, with `customer:block`.
+ * Blocks the account with a reason: every session ends at once (the app and the storefront are signed out at their next request), every refresh and sign-in answers `403` `account_blocked` saying "Your account is blocked. If you think this is a mistake, contact ZippyGo support.", and placing an order is refused; an order already placed runs to its end and its refunds stay possible. On the timeline and in the audit log; publishes `customers.customer.blocked`. Mission Control tokens only, with `customer:block`.
  */
 export const blockCustomer = <ThrowOnError extends boolean = false>(options: Options<BlockCustomerData, ThrowOnError>): RequestResult<BlockCustomerResponses, BlockCustomerErrors, ThrowOnError> => (options.client ?? client).post<BlockCustomerResponses, BlockCustomerErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

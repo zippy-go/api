@@ -25000,6 +25000,10 @@ export type RefreshSessionErrors = {
      */
     401: Problem;
     /**
+     * `account_blocked`: a customer whose account support blocked. The detail says how to reach support; the session stays ended. Since 0.19.0.
+     */
+    403: Problem;
+    /**
      * A customer session whose market does not admit sign-in now (`sign_in_closed`); the session is kept.
      */
     409: Problem;
@@ -50085,6 +50089,14 @@ export type ListOutboxData = {
          * Only events with this correlation id.
          */
         correlation_id?: string;
+        /**
+         * Only events about one aggregate, named by its kind as the payload names its id: `order` reads `order_id`, `delivery` reads `delivery_id`. With `aggregate_id`; one without the other is `validation_failed`.
+         */
+        aggregate_type?: string;
+        /**
+         * The aggregate's id, with `aggregate_type`.
+         */
+        aggregate_id?: string;
         /**
          * How many, 1 to 100; 50 by default.
          */

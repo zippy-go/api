@@ -1286,7 +1286,7 @@ errors:
   - code: account_blocked
     status: 403
     title: Account blocked
-    message: This account is blocked. {support}
+    message: Your account is blocked. {support}
     retryable: false
     description: >-
       The customer account behind the number is blocked. The detail says how

@@ -98,14 +98,22 @@ of step 5; renumbered if settlement merges first. Additive only.
   `JobRunOutcome`; `POST .../jobs/{job}/run`; `409` `job_running`,
   `job_not_runnable`), and the outbox's pending and failed rows with replay
   (`GET /v1/platform/operations/outbox`, `OutboxPage`, `OutboxEntry`,
-  `OutboxCounts`, `OutboxTypeCount`, `OutboxRowStatus`;
-  `POST .../outbox/replay`, `OutboxReplayInput`, `OutboxReplay`), with
-  `operations:manage`, a new platform permission.
+  `OutboxCounts`, `OutboxTypeCount`, `OutboxRowStatus`, narrowed by type,
+  Partner, correlation id or aggregate (`aggregate_type` with
+  `aggregate_id`); `POST .../outbox/replay`, `OutboxReplayInput`,
+  `OutboxReplay`), with `operations:manage`, a new platform permission.
+- `POST /v1/auth/refresh` lists the `403` `account_blocked` a blocked
+  customer's refresh answers.
 - Events: `reviews.review.written`, `.hidden`, `.shown` and `.asked`,
   `reviews.reply.published` and `.rejected`, `reviews.task_rating.written`,
   `reviews.flag.decided`, `customers.customer.blocked` and `.unblocked`,
   `customers.note.written`, `operations.alert.opened`, `.acknowledged` and
   `.closed`.
+
+### Changed
+
+- `account_blocked` says "Your account is blocked. If you think this is a
+  mistake, contact ZippyGo support." rather than naming a Help page.
 
 ## [0.18.0] - 2026-10-16
 
