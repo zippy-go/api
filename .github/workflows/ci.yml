@@ -56,7 +56,7 @@ jobs:
           pnpm exec redocly bundle openapi/openapi.yaml --output dist/openapi.yaml
       # Severity overrides come from .oasdiff.yaml at the repository root,
       # which the action reads from the workspace (see VERSIONING.md).
-      - uses: oasdiff/oasdiff-action/breaking@v0.1.18
+      - uses: oasdiff/oasdiff-action/breaking@v0.1.20
         with:
           base: dist/base/openapi.yaml
           revision: dist/openapi.yaml
