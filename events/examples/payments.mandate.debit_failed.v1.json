@@ -1,0 +1,23 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d9308",
+  "type": "payments.mandate.debit_failed",
+  "version": 1,
+  "occurred_at": "2026-11-05T09:30:00Z",
+  "partner_id": null,
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "mandate_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7601",
+    "debit_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7701",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+    "date": "2026-11-06",
+    "amount": {
+      "minor_units": 6400,
+      "currency": "INR"
+    },
+    "attempt": 2,
+    "reason": "The bank refused the debit",
+    "final": true,
+    "at": "2026-11-05T09:30:00Z"
+  }
+}

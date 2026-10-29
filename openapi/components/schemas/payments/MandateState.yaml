@@ -1,0 +1,10 @@
+type: string
+description: "A UPI AutoPay mandate's state: `pending` until the customer approves it on the provider's page, `confirmed` while it debits, `paused` with its subscription, `cancelled` by ZippyGo or declined or left to expire on the page, `revoked` by the customer in their UPI app."
+enum:
+  - pending
+  - confirmed
+  - paused
+  - cancelled
+  - revoked
+examples:
+  - confirmed

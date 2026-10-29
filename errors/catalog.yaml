@@ -2221,3 +2221,31 @@ errors:
     message: "The schedule date moves only on a developer's machine or in the sandbox."
     retryable: false
     description: "A move of the schedule date anywhere but on a developer's machine or in the sandbox."
+
+  - code: subscription_not_mandated
+    status: 409
+    title: Not paid by UPI AutoPay
+    message: "This subscription does not pay by UPI AutoPay"
+    retryable: false
+    description: "The subscription named is not the customer's, or pays from the Wallet: it has no mandate to approve or set up again."
+
+  - code: mandate_over_cap
+    status: 422
+    title: Above the UPI AutoPay limit
+    message: "A delivery of {amount} is more than UPI AutoPay allows; pay this subscription from the Wallet"
+    retryable: false
+    description: "A delivery whose mandate limit, 1.5 times its price rounded up to the next ₹100, would pass the provider's cap of ₹15,000.00."
+
+  - code: review_month_taken
+    status: 409
+    title: Reviewed this month
+    message: "You've reviewed it for {month}; review it again in {next}"
+    retryable: false
+    description: "The subscription was reviewed for the month already: one review a calendar month, counted once in the Location's rating."
+
+  - code: review_not_due
+    status: 409
+    title: Nothing to review yet
+    message: "Review it once a delivery is done this month"
+    retryable: false
+    description: "No delivery of the subscription completed in the month named yet."

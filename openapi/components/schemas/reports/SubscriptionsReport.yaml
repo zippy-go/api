@@ -1,0 +1,57 @@
+type: object
+description: Subscriptions in a calendar month on the platform's clock, by store and plan with a total, computed from the event warehouse and saying the moment its data is current to.
+required:
+  - month
+  - current_to
+  - rows
+  - total
+properties:
+  month:
+    type: string
+    pattern: ^[0-9]{4}-[0-9]{2}$
+    description: The month, `YYYY-MM`.
+    examples:
+      - 2026-10
+  current_to:
+    type: string
+    format: date-time
+    description: The warehouse holds every event up to here.
+    examples:
+      - 2026-11-02T04:30:00Z
+  rows:
+    type: array
+    items:
+      $ref: ./SubscriptionsReportRow.yaml
+    description: One row per store and plan, the most subscriptions at the start first.
+  total:
+    $ref: ./SubscriptionsReportRow.yaml
+    description: Every row together.
+examples:
+  - month: 2026-10
+    current_to: 2026-11-02T04:30:00Z
+    rows: []
+    total:
+      partner_id: null
+      partner_name: null
+      location_id: null
+      location_name: null
+      vertical: null
+      plan_id: null
+      plan_name: null
+      active_at_start: 120
+      started: 6
+      paused: 11
+      resumed: 8
+      cancelled_by_customer: 9
+      cancelled_other: 0
+      ended_by_date: 0
+      plan_ended: 0
+      active_at_end: 117
+      churn_percent: 7.5
+      reasons:
+        - reason: moving
+          count: 4
+        - reason: too_expensive
+          count: 3
+        - reason: none
+          count: 2

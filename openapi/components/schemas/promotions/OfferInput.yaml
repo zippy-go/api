@@ -90,6 +90,13 @@ properties:
     description: Show a code-only offer's code on Location pages.
     examples:
       - false
+  ways:
+    type: array
+    items:
+      $ref: ./OfferWay.yaml
+    uniqueItems: true
+    minItems: 1
+    description: The ways of ordering it applies to; `on_demand` and `scheduled` by default. It applies to subscription occurrences only when `subscription` is among them.
 examples:
   - kind: campaign
     purpose: null

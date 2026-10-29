@@ -1,0 +1,132 @@
+# Path item for /v1/customer/subscriptions/{subscription_id}/review. Referenced from openapi.yaml.
+parameters:
+  - name: subscription_id
+    in: path
+    required: true
+    description: The subscription.
+    schema:
+      type: string
+      format: uuid
+get:
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  operationId: getSubscriptionReview
+  summary: A subscription's review for a month
+  description: "Whether the subscription may be reviewed for a month, with the deliveries completed in it, the review written and the tags offered. A subscription is never reviewed delivery by delivery: once a calendar month on the Location's clock in which a delivery completed, counted once in the Location's rating. Customer tokens only."
+  parameters:
+    - name: month
+      in: query
+      required: false
+      description: The month, `YYYY-MM`; this month on the Location's clock by default.
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-[0-9]{2}$
+  responses:
+    "200":
+      description: The month's review.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reviews/SubscriptionReview.yaml
+    "400":
+      description: A malformed month or identifier (`validation_failed`, `malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No delivery of this subscription was ever completed for the customer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  tags:
+    - Reviews
+  security:
+    - Bearer: []
+  operationId: reviewSubscription
+  summary: Review a subscription for a month
+  description: "The month's review of a subscription, written once: a thumb, tags from the thumb's list and an optional note. It counts once in the Location's rating and the Location may reply as to any review. A second review for the same month is refused until the next. Customer tokens only."
+  requestBody:
+    required: true
+    description: The review.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reviews/SubscriptionReviewInput.yaml
+  responses:
+    "201":
+      description: The month's review, written.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reviews/SubscriptionReview.yaml
+    "400":
+      description: "`validation_failed`: a tag of the other thumb or unknown, a note over 500 characters, a malformed month, or a month in the future."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No delivery of this subscription was ever completed for the customer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`review_month_taken`: the month was reviewed already, until the next; `review_not_due`: no delivery completed in the month yet."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

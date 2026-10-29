@@ -1,0 +1,38 @@
+type: object
+description: "A subscription's review: a thumb, tags from the thumb's list and an optional note, for the month on the Location's clock unless another is named."
+required:
+  - thumb
+properties:
+  month:
+    type:
+      - string
+      - "null"
+    pattern: ^[0-9]{4}-[0-9]{2}$
+    description: The month it reviews, `YYYY-MM`; this month on the Location's clock by default.
+    examples:
+      - null
+  thumb:
+    $ref: ./ReviewThumb.yaml
+    description: Up or down.
+  tags:
+    type: array
+    items:
+      type: string
+    uniqueItems: true
+    maxItems: 4
+    description: Tag codes from the thumb's list, as many as apply.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    description: A note, at most 500 characters.
+    examples:
+      - Never late in November.
+examples:
+  - month: null
+    thumb: up
+    tags:
+      - always_on_time
+      - fresh
+    note: Never late in November.

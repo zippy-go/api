@@ -1,0 +1,8 @@
+type: string
+description: "A way of ordering an offer applies to: an order placed `on_demand`, one `scheduled` into a slot, or a `subscription` occurrence generated at the cutoff. No offer applies to subscription occurrences unless it says so."
+enum:
+  - on_demand
+  - scheduled
+  - subscription
+examples:
+  - on_demand

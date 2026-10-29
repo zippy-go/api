@@ -1,0 +1,21 @@
+type: object
+description: The subscription a review is of, reviewed once for a calendar month on the Location's clock; `null` on a review of an order.
+required:
+  - subscription_id
+  - month
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  month:
+    type: string
+    pattern: ^[0-9]{4}-[0-9]{2}$
+    description: The month it reviews, `YYYY-MM`.
+    examples:
+      - 2026-11
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    month: 2026-11

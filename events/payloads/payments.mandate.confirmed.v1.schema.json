@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.mandate.confirmed.v1.schema.json",
+  "title": "PaymentsMandateConfirmedPayload",
+  "description": "Payload of `payments.mandate.confirmed` version 1. The customer approved the mandate on the provider's page: its subscription may start, and its debits may be asked. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "mandate_id",
+    "customer_id",
+    "subscription_id",
+    "state",
+    "previous_state",
+    "limit",
+    "frequency",
+    "starts_on",
+    "ends_on",
+    "provider",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "mandate_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The mandate.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7601"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer whose mandate it is.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "subscription_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The subscription it pays.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "paused",
+        "cancelled",
+        "revoked"
+      ],
+      "description": "Its state after.",
+      "examples": [
+        "confirmed"
+      ]
+    },
+    "previous_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "pending",
+        "confirmed",
+        "paused",
+        "cancelled",
+        "revoked",
+        null
+      ],
+      "description": "Its state before; `null` when it was created.",
+      "examples": [
+        "pending"
+      ]
+    },
+    "limit": {
+      "$ref": "#/$defs/money",
+      "description": "The most one debit may take."
+    },
+    "frequency": {
+      "type": "string",
+      "description": "How often it debits: the subscription's frequency.",
+      "examples": [
+        "weekdays"
+      ]
+    },
+    "starts_on": {
+      "type": "string",
+      "format": "date",
+      "description": "Its first day.",
+      "examples": [
+        "2026-11-07"
+      ]
+    },
+    "ends_on": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Its last day, once cancelled.",
+      "examples": [
+        null
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "description": "The provider that holds it.",
+      "examples": [
+        "simulated"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "declined",
+        "expired",
+        "cancelled",
+        "revoked",
+        null
+      ],
+      "description": "Why it ended, on `cancelled` and `revoked`; `null` otherwise.",
+      "examples": [
+        null
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-05T16:31:10Z"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

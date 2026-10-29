@@ -1,0 +1,27 @@
+type: object
+description: A reason customers gave when cancelling, with how many gave it.
+required:
+  - reason
+  - count
+properties:
+  reason:
+    type: string
+    enum:
+      - moving
+      - too_expensive
+      - quality
+      - not_needed
+      - other
+      - none
+    description: "`none` when they gave none."
+    examples:
+      - moving
+  count:
+    type: integer
+    minimum: 0
+    description: How many.
+    examples:
+      - 4
+examples:
+  - reason: moving
+    count: 4

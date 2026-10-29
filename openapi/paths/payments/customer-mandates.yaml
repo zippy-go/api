@@ -1,0 +1,125 @@
+# Path item for /v1/customer/mandates. Referenced from openapi.yaml.
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: listCustomerMandates
+  summary: The customer's mandates
+  description: The customer's UPI AutoPay mandates, the newest first, each with its state, its limit and its last fourteen debits. Customer tokens only.
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 20 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+    - name: cursor
+      in: query
+      required: false
+      description: The page after the one that answered it.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The mandates.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/MandatePage.yaml
+    "400":
+      description: A parameter failed validation (`validation_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: createCustomerMandate
+  summary: A subscription's mandate, to approve
+  description: "The mandate of one of the customer's subscriptions paid by UPI AutoPay, with the provider's page to approve it on: the pending one as it stands, the confirmed or paused one as it is, or, after one was declined, expired or revoked, a new one on the same terms, answered `201`. The subscription asks for its first mandate when it is created; this is how the customer reaches its page, or sets it up again. Customer tokens only."
+  requestBody:
+    required: true
+    description: The subscription.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/payments/MandateCreate.yaml
+  responses:
+    "200":
+      description: The subscription's mandate as it stands.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/Mandate.yaml
+    "201":
+      description: A new mandate on the same terms, pending.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/Mandate.yaml
+    "400":
+      description: The body failed validation (`validation_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`subscription_not_mandated`: the subscription is not the customer's, or does not pay by UPI AutoPay."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

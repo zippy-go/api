@@ -50,6 +50,11 @@ properties:
       - $ref: ./PublishedReply.yaml
       - type: "null"
     description: "The store's published reply."
+  subscription:
+    oneOf:
+      - $ref: ./ReviewSubscription.yaml
+      - type: "null"
+    description: The subscription it reviews for a month; `null` on a review of an order.
 examples:
   - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
     first_name: Asha

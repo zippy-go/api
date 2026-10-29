@@ -1,0 +1,81 @@
+type: object
+description: "A subscription's review for one calendar month on the Location's clock: due once a delivery completed in the month, written once and counted once in the Location's rating, refused again until the next month."
+required:
+  - subscription_id
+  - month
+  - state
+  - deliveries_completed
+  - review
+  - tags
+  - next_month
+  - text
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  month:
+    type: string
+    pattern: ^[0-9]{4}-[0-9]{2}$
+    description: The month, `YYYY-MM`.
+    examples:
+      - 2026-11
+  state:
+    $ref: ./SubscriptionReviewState.yaml
+    description: Whether it may be written.
+  deliveries_completed:
+    type: integer
+    minimum: 0
+    description: The deliveries completed in the month so far.
+    examples:
+      - 20
+  review:
+    oneOf:
+      - $ref: ./CustomerReview.yaml
+      - type: "null"
+    description: The review written for the month; `null` before.
+  tags:
+    $ref: ./ReviewTagOffer.yaml
+    description: A subscription's tags under each thumb.
+  next_month:
+    type:
+      - string
+      - "null"
+    pattern: ^[0-9]{4}-[0-9]{2}$
+    description: Once written, the month it may be reviewed again.
+    examples:
+      - null
+  text:
+    type: string
+    description: Where it stands, in words.
+    examples:
+      - "20 deliveries in November: how was it?"
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    month: 2026-11
+    state: due
+    deliveries_completed: 20
+    review: null
+    tags:
+      up:
+        - code: always_on_time
+          label: Always on time
+        - code: fresh
+          label: Fresh
+        - code: good_value
+          label: Good value
+        - code: easy_to_manage
+          label: Easy to manage
+      down:
+        - code: missed_deliveries
+          label: Missed deliveries
+        - code: late_deliveries
+          label: Late deliveries
+        - code: quality_varied
+          label: Quality varied
+        - code: wrong_items
+          label: Wrong items
+    next_month: null
+    text: "20 deliveries in November: how was it?"

@@ -1,0 +1,165 @@
+type: object
+description: "A plan's subscriptions in the month at one store, or the total: those active at its start, started, paused, resumed and ended, the ending split into cancelled by the customer, cancelled by the store or ZippyGo, run to their end date and ended with their plan. Churn is those cancelled by customers over those active at the start."
+required:
+  - partner_id
+  - partner_name
+  - location_id
+  - location_name
+  - vertical
+  - plan_id
+  - plan_name
+  - active_at_start
+  - started
+  - paused
+  - resumed
+  - cancelled_by_customer
+  - cancelled_other
+  - ended_by_date
+  - plan_ended
+  - active_at_end
+  - churn_percent
+  - reasons
+properties:
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner; `null` on the total.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000006
+  partner_name:
+    type:
+      - string
+      - "null"
+    description: The Partner's name.
+    examples:
+      - Gachibowli Dairy
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The store; `null` on the total.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  location_name:
+    type:
+      - string
+      - "null"
+    description: The store's name.
+    examples:
+      - Gachibowli Dairy
+  vertical:
+    type:
+      - string
+      - "null"
+    description: The store's Vertical, by code.
+    examples:
+      - daily_essentials
+  plan_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The plan; `null` on the total.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  plan_name:
+    type:
+      - string
+      - "null"
+    description: The plan's name.
+    examples:
+      - Daily milk
+  active_at_start:
+    type: integer
+    minimum: 0
+    description: Started before the month and not ended by its first day, paused ones included.
+    examples:
+      - 120
+  started:
+    type: integer
+    minimum: 0
+    description: Started in the month.
+    examples:
+      - 6
+  paused:
+    type: integer
+    minimum: 0
+    description: Paused in the month, by the customer or by itself.
+    examples:
+      - 11
+  resumed:
+    type: integer
+    minimum: 0
+    description: Resumed in the month.
+    examples:
+      - 8
+  cancelled_by_customer:
+    type: integer
+    minimum: 0
+    description: Cancelled by the customer in the month.
+    examples:
+      - 9
+  cancelled_other:
+    type: integer
+    minimum: 0
+    description: Cancelled by the store or by ZippyGo in the month.
+    examples:
+      - 0
+  ended_by_date:
+    type: integer
+    minimum: 0
+    description: Run to their end date in the month.
+    examples:
+      - 0
+  plan_ended:
+    type: integer
+    minimum: 0
+    description: Ended in the month because the plan was withdrawn.
+    examples:
+      - 0
+  active_at_end:
+    type: integer
+    minimum: 0
+    description: Not ended by the month's last day.
+    examples:
+      - 117
+  churn_percent:
+    type:
+      - number
+      - "null"
+    description: Cancelled by customers over active at the start, in percent to one place; `null` with none active at the start.
+    examples:
+      - 7.5
+  reasons:
+    type: array
+    items:
+      $ref: ./SubscriptionsReportReason.yaml
+    description: The reasons customers gave when cancelling, the most given first.
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000006
+    partner_name: Gachibowli Dairy
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    location_name: Gachibowli Dairy
+    vertical: daily_essentials
+    plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    plan_name: Daily milk
+    active_at_start: 120
+    started: 6
+    paused: 11
+    resumed: 8
+    cancelled_by_customer: 9
+    cancelled_other: 0
+    ended_by_date: 0
+    plan_ended: 0
+    active_at_end: 117
+    churn_percent: 7.5
+    reasons:
+      - reason: moving
+        count: 4
+      - reason: too_expensive
+        count: 3
+      - reason: none
+        count: 2

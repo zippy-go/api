@@ -1,0 +1,21 @@
+type: object
+description: "Where the customer approves a pending mandate: the provider's page, standing in for their UPI app, until it expires."
+required:
+  - url
+  - expires_at
+properties:
+  url:
+    type: string
+    format: uri
+    description: The provider's page.
+    examples:
+      - http://127.0.0.1:8087/sim/provider/mandate/simmdt_0192b6f49b0a7cde8f3a6d2c1e4c7601
+  expires_at:
+    type: string
+    format: date-time
+    description: When the page stops taking an approval; the mandate is then cancelled as expired.
+    examples:
+      - 2026-11-05T17:00:00Z
+examples:
+  - url: http://127.0.0.1:8087/sim/provider/mandate/simmdt_0192b6f49b0a7cde8f3a6d2c1e4c7601
+    expires_at: 2026-11-05T17:00:00Z

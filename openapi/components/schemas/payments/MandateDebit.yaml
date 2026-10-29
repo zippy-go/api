@@ -1,0 +1,70 @@
+type: object
+description: "One delivery day's debit under a mandate: the pre-debit notice at 08:00 two days before, then the debit asked at 09:00 the day before and once more at 15:00 if the bank refused it. A debit taken lands in the customer's Wallet, from which the day is held at the cutoff."
+required:
+  - date
+  - amount
+  - state
+  - attempts
+  - reason
+  - notified_at
+  - debited_at
+  - text
+properties:
+  date:
+    type: string
+    format: date
+    description: The delivery day it pays for.
+    examples:
+      - 2026-11-06
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it takes, at most the mandate's limit.
+  state:
+    $ref: ./MandateDebitState.yaml
+    description: Where it stands.
+  attempts:
+    type: integer
+    minimum: 0
+    maximum: 2
+    description: How many times it was asked.
+    examples:
+      - 1
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why the bank refused the last try, in the provider's words; `null` otherwise.
+    examples:
+      - null
+  notified_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the pre-debit notice went.
+    examples:
+      - 2026-11-04T02:30:00Z
+  debited_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was taken.
+    examples:
+      - 2026-11-05T03:30:00Z
+  text:
+    type: string
+    description: What it did, in words.
+    examples:
+      - ₹64.00 for Fri 6 Nov, taken on Thu 5 Nov at 09:00 into your Wallet
+examples:
+  - date: 2026-11-06
+    amount:
+      minor_units: 6400
+      currency: INR
+    state: debited
+    attempts: 1
+    reason: null
+    notified_at: 2026-11-04T02:30:00Z
+    debited_at: 2026-11-05T03:30:00Z
+    text: ₹64.00 for Fri 6 Nov, taken on Thu 5 Nov at 09:00 into your Wallet

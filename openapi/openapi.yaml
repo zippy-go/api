@@ -1490,6 +1490,18 @@ paths:
   /v1/platform/bundles/{bundle_id}/stop:
     $ref: ./paths/crosssell/platform-bundle-stop.yaml
 
+  # Step 7 mandates: UPI AutoPay mandates, a subscription's monthly review, the subscriptions report
+  /v1/customer/mandates:
+    $ref: ./paths/payments/customer-mandates.yaml
+  /v1/customer/mandates/{mandate_id}:
+    $ref: ./paths/payments/customer-mandate.yaml
+  /v1/platform/customers/{customer_id}/mandates:
+    $ref: ./paths/payments/platform-customer-mandates.yaml
+  /v1/customer/subscriptions/{subscription_id}/review:
+    $ref: ./paths/reviews/subscription-review.yaml
+  /v1/platform/reports/subscriptions:
+    $ref: ./paths/reports/subscriptions.yaml
+
 components:
   securitySchemes:
     ApiKey:
@@ -4195,3 +4207,36 @@ components:
       $ref: ./components/schemas/crosssell/StoreBundleList.yaml
     BundleTaken:
       $ref: ./components/schemas/crosssell/BundleTaken.yaml
+    # Step 7 mandates
+    MandateState:
+      $ref: ./components/schemas/payments/MandateState.yaml
+    MandateDebitState:
+      $ref: ./components/schemas/payments/MandateDebitState.yaml
+    MandateEndReason:
+      $ref: ./components/schemas/payments/MandateEndReason.yaml
+    MandateApproval:
+      $ref: ./components/schemas/payments/MandateApproval.yaml
+    MandateDebit:
+      $ref: ./components/schemas/payments/MandateDebit.yaml
+    Mandate:
+      $ref: ./components/schemas/payments/Mandate.yaml
+    MandateCreate:
+      $ref: ./components/schemas/payments/MandateCreate.yaml
+    MandatePage:
+      $ref: ./components/schemas/payments/MandatePage.yaml
+    SubscriptionReviewState:
+      $ref: ./components/schemas/reviews/SubscriptionReviewState.yaml
+    ReviewSubscription:
+      $ref: ./components/schemas/reviews/ReviewSubscription.yaml
+    SubscriptionReviewInput:
+      $ref: ./components/schemas/reviews/SubscriptionReviewInput.yaml
+    SubscriptionReview:
+      $ref: ./components/schemas/reviews/SubscriptionReview.yaml
+    SubscriptionsReportReason:
+      $ref: ./components/schemas/reports/SubscriptionsReportReason.yaml
+    SubscriptionsReportRow:
+      $ref: ./components/schemas/reports/SubscriptionsReportRow.yaml
+    SubscriptionsReport:
+      $ref: ./components/schemas/reports/SubscriptionsReport.yaml
+    OfferWay:
+      $ref: ./components/schemas/promotions/OfferWay.yaml

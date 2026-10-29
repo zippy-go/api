@@ -1,0 +1,78 @@
+# Path item for /v1/platform/reports/subscriptions. Referenced from openapi.yaml.
+get:
+  tags:
+    - Reports
+  security:
+    - Bearer: []
+  operationId: getSubscriptionsReport
+  summary: Report on subscriptions
+  description: "Subscriptions in a calendar month, by store and plan with a total: those active at its start, started, paused, resumed and ended, the ending split into cancelled by the customer, by the store or ZippyGo, run to their end date and ended with their plan, with churn as those cancelled by customers over those active at the start, and the reasons customers gave. Computed from the event warehouse and saying the moment its data is current to. With `Accept: text/csv` it is a spreadsheet of the rows and the total, and the export is written to the audit log. `report:read`."
+  parameters:
+    - name: month
+      in: query
+      required: true
+      description: The month, `YYYY-MM`.
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-[0-9]{2}$
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's.
+      schema:
+        type: string
+        format: uuid
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's.
+      schema:
+        type: string
+        format: uuid
+    - name: vertical
+      in: query
+      required: false
+      description: Only this Vertical's, by code.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The report, or the spreadsheet.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reports/SubscriptionsReport.yaml
+        text/csv:
+          schema:
+            type: string
+            description: "The report as a spreadsheet: a header row, one row per store and plan, then the total."
+    "400":
+      description: "`validation_failed`: a malformed or missing month, or a month in the future; or a malformed identifier."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,75 @@
+# Path item for /v1/platform/customers/{customer_id}/mandates. Referenced from openapi.yaml.
+parameters:
+  - name: customer_id
+    in: path
+    required: true
+    description: The customer.
+    schema:
+      type: string
+      format: uuid
+get:
+  tags:
+    - Payments
+  security:
+    - Bearer: []
+  operationId: listPlatformCustomerMandates
+  summary: A customer's mandates
+  description: A customer's UPI AutoPay mandates for their page in Mission Control, the newest first, each with its last fourteen debits. Mission Control tokens only, with `customer:read`.
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 20 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+    - name: cursor
+      in: query
+      required: false
+      description: The page after the one that answered it.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The mandates.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/payments/MandatePage.yaml
+    "400":
+      description: A parameter failed validation (`validation_failed`), or a malformed identifier (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `customer:read`, or `forbidden` (another surface)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such customer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

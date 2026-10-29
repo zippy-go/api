@@ -1,0 +1,8 @@
+type: string
+description: "A subscription's review for a month: `not_due` until a delivery completed in it, `due` then, `written` once reviewed, refused again until the next month."
+enum:
+  - not_due
+  - due
+  - written
+examples:
+  - due

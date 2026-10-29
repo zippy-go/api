@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d9306",
+  "type": "payments.mandate.notified",
+  "version": 1,
+  "occurred_at": "2026-11-04T02:30:00Z",
+  "partner_id": null,
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "mandate_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7601",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+    "date": "2026-11-06",
+    "amount": {
+      "minor_units": 6400,
+      "currency": "INR"
+    },
+    "debit_at": "2026-11-05T03:30:00Z",
+    "at": "2026-11-04T02:30:00Z"
+  }
+}

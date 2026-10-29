@@ -1768,3 +1768,67 @@ events:
       A customer took a bundle from the first store's page: both offers are theirs and the second side is in a basket at its store. The envelope names no Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address.
     payload_schema: ./payloads/crosssell.bundle.taken.v1.schema.json
     example: ./examples/crosssell.bundle.taken.v1.json
+
+
+  - type: payments.mandate.created
+    version: 1
+    domain: payments
+    description: "A UPI AutoPay mandate was asked for a subscription, for at most 1.5 times a delivery's price rounded up to the next ₹100; it waits for the customer's approval on the provider's page. No UPI ID is carried. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.created.v1.schema.json
+    example: ./examples/payments.mandate.created.v1.json
+
+  - type: payments.mandate.confirmed
+    version: 1
+    domain: payments
+    description: "The customer approved the mandate on the provider's page: its subscription may start, and its debits may be asked. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.confirmed.v1.schema.json
+    example: ./examples/payments.mandate.confirmed.v1.json
+
+  - type: payments.mandate.paused
+    version: 1
+    domain: payments
+    description: "The mandate was paused with its subscription: no debit is asked until it resumes. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.paused.v1.schema.json
+    example: ./examples/payments.mandate.paused.v1.json
+
+  - type: payments.mandate.resumed
+    version: 1
+    domain: payments
+    description: "The mandate was resumed with its subscription. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.resumed.v1.schema.json
+    example: ./examples/payments.mandate.resumed.v1.json
+
+  - type: payments.mandate.cancelled
+    version: 1
+    domain: payments
+    description: "The mandate ended on ZippyGo's side: cancelled with its subscription or set up again (`cancelled`), declined on the provider's page (`declined`) or left to expire there (`expired`). The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.cancelled.v1.schema.json
+    example: ./examples/payments.mandate.cancelled.v1.json
+
+  - type: payments.mandate.revoked
+    version: 1
+    domain: payments
+    description: "The customer revoked the mandate in their UPI app: its subscription pauses and tells them they can set it up again or pay from the Wallet. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.revoked.v1.schema.json
+    example: ./examples/payments.mandate.revoked.v1.json
+
+  - type: payments.mandate.notified
+    version: 1
+    domain: payments
+    description: "The pre-debit notice of a delivery day's debit went to the customer, at 08:00 two days before the delivery and at least 24 hours before the debit. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.notified.v1.schema.json
+    example: ./examples/payments.mandate.notified.v1.json
+
+  - type: payments.mandate.debited
+    version: 1
+    domain: payments
+    description: "A delivery day's debit was taken and landed in the customer's Wallet as paid money, from which the day is held at the cutoff; the ledger posts it from the provider's clearing to the Wallet. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.debited.v1.schema.json
+    example: ./examples/payments.mandate.debited.v1.json
+
+  - type: payments.mandate.debit_failed
+    version: 1
+    domain: payments
+    description: "The bank refused a delivery day's debit: tried once more at 15:00 after the first, and after the second the cutoff takes the Wallet or skips the day. The envelope's `partner_id` is `null`."
+    payload_schema: ./payloads/payments.mandate.debit_failed.v1.schema.json
+    example: ./examples/payments.mandate.debit_failed.v1.json

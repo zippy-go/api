@@ -1,0 +1,9 @@
+type: string
+description: "A delivery day's debit: `notified` once the pre-debit notice went, `debited` once taken into the Wallet, `retrying` after the first try was refused, `refused` after the second, when the cutoff takes the Wallet or skips the day."
+enum:
+  - notified
+  - debited
+  - retrying
+  - refused
+examples:
+  - debited

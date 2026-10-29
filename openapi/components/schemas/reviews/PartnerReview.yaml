@@ -83,6 +83,11 @@ properties:
     examples:
       - "A reply was published; a review takes one reply."
     description: "Why not, in words; `null` when a reply may be written."
+  subscription:
+    oneOf:
+      - $ref: ./ReviewSubscription.yaml
+      - type: "null"
+    description: The subscription it reviews for a month; `null` on a review of an order.
 examples:
   - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
     location_id: "01a13a48-9e00-7000-8000-000000000301"

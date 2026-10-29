@@ -6,6 +6,53 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-10-30
+
+Step 7, mandates and the subscription's companions: UPI AutoPay mandates with
+the simulated provider, a subscription reviewed once a month, the subscriptions
+report with churn, offers that say which ways of ordering they apply to, and
+streaks of a subscription's deliveries. Written as 0.24.0 beside the step 7
+subscriptions and routes slices and renumbered 0.26.0 after both merged first.
+Additive only.
+
+### Added
+
+- A customer's UPI AutoPay mandates (`Payments` tag): the list and one
+  mandate with its debits (`GET /v1/customer/mandates`,
+  `GET /v1/customer/mandates/{mandate_id}`, `Mandate`, `MandatePage`,
+  `MandateState`, `MandateEndReason`, `MandateDebit`,
+  `MandateDebitState`), and a subscription's mandate to approve on the
+  provider's page or set up again after one was declined, expired or revoked
+  (`POST /v1/customer/mandates`, `MandateCreate`, `MandateApproval`).
+  Mission Control reads a customer's with `customer:read`
+  (`GET /v1/platform/customers/{customer_id}/mandates`).
+- A subscription's review for a month (`Reviews` tag): whether it is due,
+  with the deliveries completed and the tags offered, and the review written
+  once a month (`GET`, `POST /v1/customer/subscriptions/{subscription_id}/review`,
+  `SubscriptionReview`, `SubscriptionReviewState`,
+  `SubscriptionReviewInput`); `subscription` on `PartnerReview`,
+  `StoreReview` and `PlatformReview` (`ReviewSubscription`).
+- The subscriptions report by month, store and plan, with churn and the
+  reasons customers gave, also as a spreadsheet
+  (`GET /v1/platform/reports/subscriptions`, `SubscriptionsReport`,
+  `SubscriptionsReportRow`, `SubscriptionsReportReason`), `report:read`.
+- `ways` on `OfferInput` and `Offer` (`OfferWay`): `on_demand`,
+  `scheduled` and `subscription`; no offer applies to subscription
+  occurrences unless it names them.
+- A subscription's streaks and quest step (`Engagement` tag): `counts` on
+  `StreakRules`, `StreakRulesInput` and `StreakProgress` (`StreakCounts`:
+  `weeks` or a subscription's `deliveries` in a row), and the quest step
+  `subscription_started` in `QuestStepKind`.
+- Nine events: `payments.mandate.created`, `.confirmed`, `.paused`,
+  `.resumed`, `.cancelled`, `.revoked`, `.notified`, `.debited` and
+  `.debit_failed`; `reviews.review.written` gains `source`,
+  `subscription_id` and `month`, and `reviews.review.asked` the
+  `subscription_id` and `month` a subscription's monthly ask names. The
+  streak events `engagement.streak.advanced`, `.frozen` and `.broken` gain
+  `counts`, `subscription_id` and `date` for a streak of deliveries.
+- Problem codes `subscription_not_mandated`, `mandate_over_cap`,
+  `review_month_taken` and `review_not_due`.
+
 ## [0.25.0] - 2026-10-30
 
 Step 7, the routes: the morning's scheduled and subscription deliveries built into planned

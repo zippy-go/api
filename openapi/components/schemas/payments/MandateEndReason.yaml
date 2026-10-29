@@ -1,0 +1,9 @@
+type: string
+description: "Why a mandate ended: `declined` or `expired` on the provider's page, `cancelled` with its subscription or set up again, `revoked` by the customer in their UPI app."
+enum:
+  - declined
+  - expired
+  - cancelled
+  - revoked
+examples:
+  - revoked
