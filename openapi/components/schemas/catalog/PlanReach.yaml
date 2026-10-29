@@ -1,0 +1,42 @@
+type: object
+description: Whether the store delivers a plan to the customer's address.
+required:
+  - address_id
+  - deliverable
+  - distance_metres
+  - reason
+properties:
+  address_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The address asked about: the one named, else the customer's selected one; `null` without one."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+  deliverable:
+    type:
+      - boolean
+      - "null"
+    description: Whether the store delivers there; `null` without an address.
+    examples:
+      - true
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: The straight-line distance in metres.
+    examples:
+      - 1200
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why not, as a sentence a screen may show; Subscribe is not offered then.
+    examples:
+      - null
+examples:
+  - address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    deliverable: true
+    distance_metres: 1200
+    reason: null

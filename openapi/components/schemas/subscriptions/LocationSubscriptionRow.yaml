@@ -1,0 +1,107 @@
+type: object
+description: A subscription as its store sees it.
+required:
+  - subscription_id
+  - customer_name
+  - plan_id
+  - plan_name
+  - state
+  - items
+  - frequency
+  - window
+  - starts_on
+  - ends_on
+  - next_delivery
+  - locality
+  - created_at
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  customer_name:
+    type: string
+    description: The customer's given name and initial.
+    examples:
+      - Asha R.
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  plan_name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  state:
+    $ref: ./SubscriptionState.yaml
+    description: Where it stands.
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionDayItem.yaml
+    description: Its everyday items.
+  frequency:
+    $ref: ./SubscriptionFrequency.yaml
+    description: How often.
+  window:
+    $ref: ./DeliveryWindow.yaml
+    description: The window.
+  starts_on:
+    type: string
+    format: date
+    description: The first day.
+    examples:
+      - 2026-11-06
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day.
+    examples:
+      - null
+  next_delivery:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The next delivery day.
+    examples:
+      - 2026-11-06
+  locality:
+    type:
+      - string
+      - "null"
+    description: Where it delivers, by locality.
+    examples:
+      - Gachibowli
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-05T16:30:00Z
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    customer_name: Asha R.
+    plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    plan_name: Daily milk
+    state: active
+    items:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk 500 ml
+        quantity: 2
+    frequency: daily
+    window:
+      starts: 06:00
+      ends: 08:00
+    starts_on: 2026-11-06
+    ends_on: null
+    next_delivery: 2026-11-06
+    locality: Gachibowli
+    created_at: 2026-11-05T16:30:00Z

@@ -1,0 +1,175 @@
+type: object
+description: "A plan: a subscription product of the store's catalogue, offered as its own shelf. Pausing, skipping and the orders a subscription generates are the subscriptions'."
+required:
+  - plan_id
+  - location_id
+  - partner_id
+  - name
+  - description
+  - state
+  - items
+  - frequencies
+  - window
+  - min_deliveries
+  - substitutions_allowed
+  - delivery_fee
+  - cutoff
+  - from_price
+  - active_subscriptions
+  - version
+  - created_at
+  - updated_at
+  - withdrawn_at
+  - existing_end_on
+properties:
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  partner_id:
+    type: string
+    format: uuid
+    description: The store's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000006
+  name:
+    type: string
+    description: The plan's name.
+    examples:
+      - Daily milk
+  description:
+    type:
+      - string
+      - "null"
+    description: What it is, as customers read it.
+    examples:
+      - Fresh toned milk at your door every morning.
+  state:
+    $ref: ./SubscriptionPlanState.yaml
+    description: Whether it takes subscriptions.
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionPlanItem.yaml
+    description: Its items.
+  frequencies:
+    type: array
+    items:
+      $ref: ../subscriptions/SubscriptionFrequency.yaml
+    description: The frequencies it allows.
+  window:
+    $ref: ../subscriptions/DeliveryWindow.yaml
+    description: The delivery window, on the store's clock.
+  min_deliveries:
+    type: integer
+    minimum: 1
+    description: "The minimum term, in deliveries: the earliest end date a subscriber may choose."
+    examples:
+      - 7
+  substitutions_allowed:
+    type: boolean
+    description: Whether a similar item may stand in for one that cannot be supplied.
+    examples:
+      - true
+  delivery_fee:
+    $ref: ../common/Money.yaml
+    description: The delivery fee of each delivery; nothing for none.
+  cutoff:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: "The store's cutoff the evening before, HH:MM: changes for a day count only before it."
+    examples:
+      - 20:00
+  from_price:
+    $ref: ../common/Money.yaml
+    description: "The least one delivery costs: every item at its least quantity, with the fee."
+  active_subscriptions:
+    type: integer
+    minimum: 0
+    description: Subscriptions active or paused on it.
+    examples:
+      - 120
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change.
+    examples:
+      - 3
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-30T06:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-11-01T06:00:00Z
+  withdrawn_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was withdrawn.
+    examples:
+      - null
+  existing_end_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last delivery of the subscriptions it has, when the store ended them with notice.
+    examples:
+      - null
+examples:
+  - plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    partner_id: 01a13a48-9e00-7000-8000-000000000006
+    name: Daily milk
+    description: Fresh toned milk at your door every morning.
+    state: live
+    items:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk
+        variant_label: 500 ml
+        food_mark: veg
+        unit_price:
+          minor_units: 3200
+          currency: INR
+        default_quantity: 1
+        min_quantity: 1
+        max_quantity: 6
+        available: true
+    frequencies:
+      - daily
+      - weekdays
+      - alternate_days
+    window:
+      starts: 06:00
+      ends: 08:00
+    min_deliveries: 7
+    substitutions_allowed: true
+    delivery_fee:
+      minor_units: 0
+      currency: INR
+    cutoff: 20:00
+    from_price:
+      minor_units: 3200
+      currency: INR
+    active_subscriptions: 120
+    version: 3
+    created_at: 2026-10-30T06:00:00Z
+    updated_at: 2026-11-01T06:00:00Z
+    withdrawn_at: null
+    existing_end_on: null

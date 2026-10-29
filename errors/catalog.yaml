@@ -106,6 +106,27 @@ errors:
       - code: taxonomy_slug_taken
         message: "The slug {slug} is taken in this Vertical."
         description: A slug another term of the same Vertical holds, active or retired.
+      - code: quantity_out_of_range
+        message: "A quantity is outside the item's range in the plan."
+        description: "A subscription's quantity of an item below its least or above its most, or every item of a day at 0 where a day must deliver something."
+      - code: frequency_not_offered
+        message: "The plan does not deliver that often."
+        description: "A subscription's frequency the plan does not allow, or `weekly` or `custom` without days."
+      - code: start_before_earliest
+        message: "The start is before the earliest the cutoff allows."
+        description: "A subscription starting before tomorrow, or before the day after once the store's cutoff has passed."
+      - code: end_out_of_range
+        message: "The end is before the minimum term or more than 365 days out."
+        description: "A subscription's end date earlier than the plan's minimum term allows, or more than 365 days from its start."
+      - code: vacation_invalid
+        message: "Days away run forwards, for at most 90 days."
+        description: "A vacation whose last day is before its first, or longer than 90 days."
+      - code: subscription_cutoff_invalid
+        message: "The cutoff is from 18:00 to 21:00."
+        description: "A store's subscription cutoff outside 18:00 to 21:00, before the morning's routes are built at 22:00."
+      - code: schedule_date_backwards
+        message: "The schedule date only moves forward."
+        description: "A move of the schedule date to a moment at or before the date it reads now."
       - code: adjustment_out_of_range
         message: An adjustment is at most ₹100,000.00 either way and never nothing.
         description: An adjustment of nothing, or of more than ₹100,000.00 added or taken off; a fee correction must add.
@@ -2100,3 +2121,79 @@ errors:
       - code: not_in_service
         message: You are not active in this service.
         description: The membership is not active in the incentive's service.
+  - code: slot_full
+    status: 409
+    title: Slot full
+    message: "The slot is full; the next open one is {next}."
+    retryable: false
+    description: "The slot filled while the customer checked out: it takes no more orders. The sentence names the next open slot; nothing was charged or held."
+
+  - code: slot_past
+    status: 409
+    title: Slot too soon
+    message: "The slot starts too soon; the next open one is {next}."
+    retryable: false
+    description: "The slot starts sooner than the store's lead time, its preparation plus 15 minutes. The sentence names the next open slot."
+
+  - code: item_pre_order_only
+    status: 409
+    title: Needs notice
+    message: "{item} needs {hours} hours' notice; the earliest slot is {earliest}."
+    retryable: false
+    description: "A pre-order-only item placed for now, or into a slot nearer than its notice of 24, 48 or 72 hours. The sentence names the item and the earliest slot it can go into; `errors` names its line."
+
+  - code: plan_withdrawn
+    status: 409
+    title: Plan withdrawn
+    message: "The plan is no longer offered."
+    retryable: false
+    description: "The plan was withdrawn: it takes no new subscriptions and cannot be changed."
+
+  - code: plan_has_subscriptions
+    status: 409
+    title: Plan has subscriptions
+    message: "The plan has subscriptions; withdraw it instead."
+    retryable: false
+    description: "A plan somebody subscribed to cannot be deleted; withdrawing it stops new subscriptions."
+
+  - code: scheduled_delivery_off
+    status: 409
+    title: Scheduled delivery is off
+    message: "Switch scheduled delivery on before offering a plan."
+    retryable: false
+    description: "A plan needs the store to take scheduled orders and deliver them."
+
+  - code: subscription_ended
+    status: 409
+    title: Subscription ended
+    message: "The subscription was cancelled or has ended."
+    retryable: false
+    description: "A change to a subscription that was cancelled or ended; its calendar stays readable."
+
+  - code: subscription_not_active
+    status: 409
+    title: Subscription not started
+    message: "The subscription has not started yet."
+    retryable: false
+    description: "A pause of a pending subscription, which waits for its payment and schedules nothing."
+
+  - code: subscription_not_paused
+    status: 409
+    title: Subscription not paused
+    message: "The subscription is not paused."
+    retryable: false
+    description: "Resuming a subscription that is not paused."
+
+  - code: subscription_day_invalid
+    status: 409
+    title: Not a delivery day
+    message: "That is not a delivery day of the subscription."
+    retryable: false
+    description: "A day outside the subscription's dates or its days of the week, or one already past."
+
+  - code: schedule_date_fixed
+    status: 409
+    title: Schedule date fixed
+    message: "The schedule date moves only on a developer's machine or in the sandbox."
+    retryable: false
+    description: "A move of the schedule date anywhere but on a developer's machine or in the sandbox."

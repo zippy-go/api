@@ -1,0 +1,28 @@
+type: object
+description: An item's quantity on a day.
+required:
+  - variant_id
+  - name
+  - quantity
+properties:
+  variant_id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+  name:
+    type: string
+    description: The item and its variant.
+    examples:
+      - Toned milk 500 ml
+  quantity:
+    type: integer
+    minimum: 0
+    description: How many.
+    examples:
+      - 2
+examples:
+  - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+    name: Toned milk 500 ml
+    quantity: 2

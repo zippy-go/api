@@ -1,0 +1,11 @@
+type: string
+description: "How often a subscription delivers: `daily`; `weekdays`, Monday to Friday; `weekends`; `alternate_days` from the start date; `weekly` on the chosen days; `custom` days of the week."
+enum:
+  - daily
+  - weekdays
+  - weekends
+  - alternate_days
+  - weekly
+  - custom
+examples:
+  - daily

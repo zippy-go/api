@@ -1,0 +1,7 @@
+type: string
+description: "How a subscription pays: from the `wallet`, or by a UPI AutoPay `mandate` whose debits land in the Wallet before each delivery is held. Never cash."
+enum:
+  - wallet
+  - mandate
+examples:
+  - wallet

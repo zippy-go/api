@@ -1,0 +1,10 @@
+type: string
+description: Why the customer cancelled, which the churn report counts.
+enum:
+  - moving
+  - too_expensive
+  - quality
+  - not_needed
+  - other
+examples:
+  - moving

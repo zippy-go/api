@@ -27,6 +27,12 @@ properties:
       - $ref: ./ScheduledOrdersUpdate.yaml
       - type: 'null'
     description: Scheduled orders; slot settings are refused while scheduled orders are not taken.
+  subscription_cutoff:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    examples:
+      - 19:30
+    description: A new cutoff, 18:00 to 21:00 (`subscription_cutoff_invalid`). Since 0.24.0.
 examples:
   - preparation:
       mode: fixed

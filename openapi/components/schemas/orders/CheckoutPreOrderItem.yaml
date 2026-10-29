@@ -1,0 +1,43 @@
+type: object
+description: A pre-order-only item in the basket, with its notice.
+required:
+  - line_id
+  - item_id
+  - name
+  - notice_hours
+  - earliest_at
+properties:
+  line_id:
+    type: string
+    format: uuid
+    description: The basket line.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12
+  name:
+    type: string
+    description: The item's name.
+    examples:
+      - Eggless Black Forest Cake
+  notice_hours:
+    type: integer
+    description: "The notice it needs: 24, 48 or 72 hours."
+    examples:
+      - 48
+  earliest_at:
+    type: string
+    format: date-time
+    description: The start of the first slot it may go into.
+    examples:
+      - 2026-11-07T03:30:00Z
+examples:
+  - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12
+    name: Eggless Black Forest Cake
+    notice_hours: 48
+    earliest_at: 2026-11-07T03:30:00Z

@@ -1,0 +1,31 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7f01",
+  "type": "ordering.order.released",
+  "version": 1,
+  "occurred_at": "2026-11-06T00:05:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+  "correlation_id": null,
+  "payload": {
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000307",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "status": "placed",
+    "previous_status": "placed",
+    "version": 3,
+    "fulfilment": "delivery",
+    "currency": "INR",
+    "at": "2026-11-06T00:05:00Z",
+    "released_at": "2026-11-06T00:05:00Z",
+    "accept_by": "2026-11-06T00:35:00Z",
+    "slot": {
+      "starts_at": "2026-11-06T00:30:00Z",
+      "ends_at": "2026-11-06T02:30:00Z"
+    },
+    "occurrence": {
+      "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+      "date": "2026-11-06"
+    }
+  }
+}

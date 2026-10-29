@@ -1,0 +1,42 @@
+type: object
+description: A change to a store's subscriptions as it happened.
+required:
+  - at
+  - subscription_id
+  - customer_name
+  - kind
+  - text
+properties:
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-05T16:30:00Z
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  customer_name:
+    type: string
+    description: The customer.
+    examples:
+      - Asha R.
+  kind:
+    type: string
+    description: "`started`, `paused`, `resumed`, `cancelled`, `ended`, `address_changed` or `day_changed`."
+    examples:
+      - started
+  text:
+    type: string
+    description: In words.
+    examples:
+      - Asha R. subscribed to Daily milk from Friday.
+examples:
+  - at: 2026-11-05T16:30:00Z
+    subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    customer_name: Asha R.
+    kind: started
+    text: Asha R. subscribed to Daily milk from Friday.

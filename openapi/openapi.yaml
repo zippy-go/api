@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.23.0
+  version: 0.24.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -273,7 +273,7 @@ tags:
   - name: Events
     description: The events the platform publishes, as a list to poll and as a stream.
   - name: Subscriptions
-    description: Plans and schedules that generate recurring orders.
+    description: "Daily essentials on a schedule: a customer subscribes to a store's plan with the items and quantities they want, how often, in its morning window, from a start date to an optional end, paying from the Wallet or by a UPI AutoPay mandate, and changes, skips, pauses, sets days away or cancels from a calendar until the store's cutoff the evening before. At the cutoff each delivery day becomes an ordinary order held from the Wallet, generated once; a failed delivery is credited back, a price change is announced a week ahead and each month ends with a statement. The store reads its calendar, what to pack and a forecast for two weeks (`subscription:read` at the Location); Mission Control reads every subscription (`subscription:read`) and moves the schedule date on a developer's machine or in the sandbox (`operations:manage`). Every change signals `subscription.changed` on the customer's channel."
   - name: Webhooks
     description: Webhook endpoints and event delivery.
   - name: Reviews
@@ -1403,6 +1403,57 @@ paths:
     $ref: ./paths/incentives/agent-incentives.yaml
   /v1/agent/memberships/{agent_id}/incentives/{incentive_id}/join:
     $ref: ./paths/incentives/agent-incentive-join.yaml
+  # Step 7 subscriptions: scheduled orders, plans, subscriptions and the schedule date
+  /v1/storefront/stores/{location_id}/plans:
+    $ref: ./paths/catalog/store-plans.yaml
+  /v1/storefront/stores/{location_id}/plans/{plan_id}:
+    $ref: ./paths/catalog/store-plan.yaml
+  /v1/customer/subscriptions:
+    $ref: ./paths/subscriptions/subscriptions.yaml
+  /v1/customer/subscriptions/{subscription_id}:
+    $ref: ./paths/subscriptions/subscription.yaml
+  /v1/customer/subscriptions/{subscription_id}/calendar:
+    $ref: ./paths/subscriptions/subscription-calendar.yaml
+  /v1/customer/subscriptions/{subscription_id}/days/{date}:
+    $ref: ./paths/subscriptions/subscription-day.yaml
+  /v1/customer/subscriptions/{subscription_id}/quantities:
+    $ref: ./paths/subscriptions/subscription-quantities.yaml
+  /v1/customer/subscriptions/{subscription_id}/pause:
+    $ref: ./paths/subscriptions/subscription-pause.yaml
+  /v1/customer/subscriptions/{subscription_id}/resume:
+    $ref: ./paths/subscriptions/subscription-resume.yaml
+  /v1/customer/subscriptions/{subscription_id}/vacations:
+    $ref: ./paths/subscriptions/subscription-vacations.yaml
+  /v1/customer/subscriptions/{subscription_id}/vacations/{vacation_id}:
+    $ref: ./paths/subscriptions/subscription-vacation.yaml
+  /v1/customer/subscriptions/{subscription_id}/cancel:
+    $ref: ./paths/subscriptions/subscription-cancel.yaml
+  /v1/customer/subscriptions/{subscription_id}/statements/{month}:
+    $ref: ./paths/subscriptions/subscription-statement.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/scheduled:
+    $ref: ./paths/order-handling/scheduled.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/ready:
+    $ref: ./paths/order-handling/ready-many.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/subscriptions:
+    $ref: ./paths/subscriptions/location-subscriptions.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/subscriptions/calendar:
+    $ref: ./paths/subscriptions/location-subscriptions-calendar.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/subscriptions/forecast:
+    $ref: ./paths/subscriptions/location-subscriptions-forecast.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/plans:
+    $ref: ./paths/catalog/plans.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}:
+    $ref: ./paths/catalog/plan.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}/withdraw:
+    $ref: ./paths/catalog/plan-withdraw.yaml
+  /v1/platform/orders/scheduled:
+    $ref: ./paths/order-handling/platform-scheduled.yaml
+  /v1/platform/subscriptions:
+    $ref: ./paths/subscriptions/platform-subscriptions.yaml
+  /v1/platform/subscriptions/{subscription_id}:
+    $ref: ./paths/subscriptions/platform-subscription.yaml
+  /v1/platform/schedule/date:
+    $ref: ./paths/subscriptions/platform-schedule-date.yaml
 
 components:
   securitySchemes:
@@ -3895,3 +3946,156 @@ components:
       $ref: ./components/schemas/payouts/StatementRewardRow.yaml
     AgentBonusLine:
       $ref: ./components/schemas/payouts/AgentBonusLine.yaml
+    # Step 7 subscriptions
+    OrderSlot:
+      $ref: ./components/schemas/orders/OrderSlot.yaml
+    OrderSlotInput:
+      $ref: ./components/schemas/orders/OrderSlotInput.yaml
+    CheckoutSlotCode:
+      $ref: ./components/schemas/orders/CheckoutSlotCode.yaml
+    CheckoutSlot:
+      $ref: ./components/schemas/orders/CheckoutSlot.yaml
+    CheckoutPreOrderItem:
+      $ref: ./components/schemas/orders/CheckoutPreOrderItem.yaml
+    CheckoutPreOrder:
+      $ref: ./components/schemas/orders/CheckoutPreOrder.yaml
+    OrderOccurrence:
+      $ref: ./components/schemas/orders/OrderOccurrence.yaml
+    ScheduledSlotCount:
+      $ref: ./components/schemas/orders/ScheduledSlotCount.yaml
+    ScheduledOrderPage:
+      $ref: ./components/schemas/orders/ScheduledOrderPage.yaml
+    PlatformScheduledOrderPage:
+      $ref: ./components/schemas/orders/PlatformScheduledOrderPage.yaml
+    OrdersReadyInput:
+      $ref: ./components/schemas/orders/OrdersReadyInput.yaml
+    OrderReadyOutcome:
+      $ref: ./components/schemas/orders/OrderReadyOutcome.yaml
+    OrdersReadyResult:
+      $ref: ./components/schemas/orders/OrdersReadyResult.yaml
+    SubscriptionFrequency:
+      $ref: ./components/schemas/subscriptions/SubscriptionFrequency.yaml
+    DeliveryWindow:
+      $ref: ./components/schemas/subscriptions/DeliveryWindow.yaml
+    SubscriptionPlanState:
+      $ref: ./components/schemas/catalog/SubscriptionPlanState.yaml
+    SubscriptionPlanItem:
+      $ref: ./components/schemas/catalog/SubscriptionPlanItem.yaml
+    SubscriptionPlanItemInput:
+      $ref: ./components/schemas/catalog/SubscriptionPlanItemInput.yaml
+    SubscriptionPlan:
+      $ref: ./components/schemas/catalog/SubscriptionPlan.yaml
+    SubscriptionPlanCreate:
+      $ref: ./components/schemas/catalog/SubscriptionPlanCreate.yaml
+    SubscriptionPlanUpdate:
+      $ref: ./components/schemas/catalog/SubscriptionPlanUpdate.yaml
+    SubscriptionPlanList:
+      $ref: ./components/schemas/catalog/SubscriptionPlanList.yaml
+    SubscriptionPlanWithdrawal:
+      $ref: ./components/schemas/catalog/SubscriptionPlanWithdrawal.yaml
+    PlanReach:
+      $ref: ./components/schemas/catalog/PlanReach.yaml
+    StorefrontPlan:
+      $ref: ./components/schemas/catalog/StorefrontPlan.yaml
+    StorefrontPlanList:
+      $ref: ./components/schemas/catalog/StorefrontPlanList.yaml
+    StorePlanCard:
+      $ref: ./components/schemas/storefront/StorePlanCard.yaml
+    SubscriptionState:
+      $ref: ./components/schemas/subscriptions/SubscriptionState.yaml
+    SubscriptionPayBy:
+      $ref: ./components/schemas/subscriptions/SubscriptionPayBy.yaml
+    SubstitutionPolicy:
+      $ref: ./components/schemas/subscriptions/SubstitutionPolicy.yaml
+    SubscriptionPauseReason:
+      $ref: ./components/schemas/subscriptions/SubscriptionPauseReason.yaml
+    SubscriptionCancelReason:
+      $ref: ./components/schemas/subscriptions/SubscriptionCancelReason.yaml
+    SubscriptionPrice:
+      $ref: ./components/schemas/subscriptions/SubscriptionPrice.yaml
+    SubscriptionItem:
+      $ref: ./components/schemas/subscriptions/SubscriptionItem.yaml
+    SubscriptionItemInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionItemInput.yaml
+    SubscriptionPause:
+      $ref: ./components/schemas/subscriptions/SubscriptionPause.yaml
+    SubscriptionNextDelivery:
+      $ref: ./components/schemas/subscriptions/SubscriptionNextDelivery.yaml
+    SubscriptionAddress:
+      $ref: ./components/schemas/subscriptions/SubscriptionAddress.yaml
+    SubscriptionMandateSummary:
+      $ref: ./components/schemas/subscriptions/SubscriptionMandateSummary.yaml
+    SubscriptionPaymentDue:
+      $ref: ./components/schemas/subscriptions/SubscriptionPaymentDue.yaml
+    SubscriptionActions:
+      $ref: ./components/schemas/subscriptions/SubscriptionActions.yaml
+    SubscriptionVacation:
+      $ref: ./components/schemas/subscriptions/SubscriptionVacation.yaml
+    Subscription:
+      $ref: ./components/schemas/subscriptions/Subscription.yaml
+    SubscriptionPage:
+      $ref: ./components/schemas/subscriptions/SubscriptionPage.yaml
+    SubscriptionInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionInput.yaml
+    SubscriptionUpdate:
+      $ref: ./components/schemas/subscriptions/SubscriptionUpdate.yaml
+    SubscriptionChange:
+      $ref: ./components/schemas/subscriptions/SubscriptionChange.yaml
+    SubscriptionDayInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionDayInput.yaml
+    SubscriptionQuantitiesInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionQuantitiesInput.yaml
+    SubscriptionPauseInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionPauseInput.yaml
+    SubscriptionResumeInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionResumeInput.yaml
+    SubscriptionVacationInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionVacationInput.yaml
+    SubscriptionCancelInput:
+      $ref: ./components/schemas/subscriptions/SubscriptionCancelInput.yaml
+    SubscriptionDayState:
+      $ref: ./components/schemas/subscriptions/SubscriptionDayState.yaml
+    SubscriptionDayItem:
+      $ref: ./components/schemas/subscriptions/SubscriptionDayItem.yaml
+    SubscriptionDay:
+      $ref: ./components/schemas/subscriptions/SubscriptionDay.yaml
+    SubscriptionCalendar:
+      $ref: ./components/schemas/subscriptions/SubscriptionCalendar.yaml
+    SubscriptionStatementDay:
+      $ref: ./components/schemas/subscriptions/SubscriptionStatementDay.yaml
+    SubscriptionStatementMove:
+      $ref: ./components/schemas/subscriptions/SubscriptionStatementMove.yaml
+    SubscriptionStatement:
+      $ref: ./components/schemas/subscriptions/SubscriptionStatement.yaml
+    LocationSubscriptionRow:
+      $ref: ./components/schemas/subscriptions/LocationSubscriptionRow.yaml
+    LocationSubscriptionPage:
+      $ref: ./components/schemas/subscriptions/LocationSubscriptionPage.yaml
+    SubscriptionItemTotal:
+      $ref: ./components/schemas/subscriptions/SubscriptionItemTotal.yaml
+    SubscriptionDaySlot:
+      $ref: ./components/schemas/subscriptions/SubscriptionDaySlot.yaml
+    SubscriptionProgress:
+      $ref: ./components/schemas/subscriptions/SubscriptionProgress.yaml
+    PartnerOccurrence:
+      $ref: ./components/schemas/subscriptions/PartnerOccurrence.yaml
+    SubscriptionChangeNote:
+      $ref: ./components/schemas/subscriptions/SubscriptionChangeNote.yaml
+    PartnerSubscriptionDay:
+      $ref: ./components/schemas/subscriptions/PartnerSubscriptionDay.yaml
+    ForecastDay:
+      $ref: ./components/schemas/subscriptions/ForecastDay.yaml
+    SubscriptionForecast:
+      $ref: ./components/schemas/subscriptions/SubscriptionForecast.yaml
+    PlatformSubscriptionRow:
+      $ref: ./components/schemas/subscriptions/PlatformSubscriptionRow.yaml
+    PlatformSubscriptionPage:
+      $ref: ./components/schemas/subscriptions/PlatformSubscriptionPage.yaml
+    PlatformSubscription:
+      $ref: ./components/schemas/subscriptions/PlatformSubscription.yaml
+    ScheduleDateMoveRecord:
+      $ref: ./components/schemas/subscriptions/ScheduleDateMoveRecord.yaml
+    ScheduleDate:
+      $ref: ./components/schemas/subscriptions/ScheduleDate.yaml
+    ScheduleDateMove:
+      $ref: ./components/schemas/subscriptions/ScheduleDateMove.yaml

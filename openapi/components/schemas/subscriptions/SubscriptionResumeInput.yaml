@@ -1,0 +1,13 @@
+type: object
+description: Resuming a paused subscription.
+properties:
+  from:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first day to deliver again; the next one open to change when absent.
+    examples:
+      - null
+examples:
+  - {}

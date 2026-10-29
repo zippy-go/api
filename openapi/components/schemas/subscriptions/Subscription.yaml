@@ -1,0 +1,269 @@
+type: object
+description: "A subscription: one customer, one store and one plan, with its items, schedule, window, dates, address and way to pay."
+required:
+  - subscription_id
+  - customer_id
+  - partner_id
+  - location_id
+  - store_name
+  - plan_id
+  - plan_name
+  - state
+  - pause
+  - items
+  - frequency
+  - days
+  - window
+  - starts_on
+  - ends_on
+  - first_delivery
+  - next_delivery
+  - address
+  - pay_by
+  - mandate
+  - substitution
+  - price_per_delivery
+  - delivery_fee
+  - cutoff
+  - vacations
+  - payment_due
+  - actions
+  - cancelled_at
+  - cancel_reason
+  - created_at
+  - updated_at
+  - version
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  partner_id:
+    type: string
+    format: uuid
+    description: The store's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000006
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  store_name:
+    type: string
+    description: The store.
+    examples:
+      - Gachibowli Dairy
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  plan_name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  state:
+    $ref: ./SubscriptionState.yaml
+    description: Where it stands.
+  pause:
+    oneOf:
+      - $ref: ./SubscriptionPause.yaml
+      - type: "null"
+    description: The pause in force or set.
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionItem.yaml
+    description: Its items.
+  frequency:
+    $ref: ./SubscriptionFrequency.yaml
+    description: How often.
+  days:
+    type: array
+    items:
+      type: integer
+      minimum: 1
+      maximum: 7
+    description: The days of the week it delivers, 1 for Monday to 7 for Sunday; every day for `alternate_days`, whose days follow the start date.
+  window:
+    $ref: ./DeliveryWindow.yaml
+    description: The delivery window.
+  starts_on:
+    type: string
+    format: date
+    description: The first day it may deliver.
+    examples:
+      - 2026-11-07
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day; `null` while open-ended.
+    examples:
+      - null
+  first_delivery:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first delivery day.
+    examples:
+      - 2026-11-09
+  next_delivery:
+    oneOf:
+      - $ref: ./SubscriptionNextDelivery.yaml
+      - type: "null"
+    description: The next delivery day; `null` when none is due.
+  address:
+    $ref: ./SubscriptionAddress.yaml
+    description: Where it delivers.
+  pay_by:
+    $ref: ./SubscriptionPayBy.yaml
+    description: How it pays.
+  mandate:
+    oneOf:
+      - $ref: ./SubscriptionMandateSummary.yaml
+      - type: "null"
+    description: The mandate, when it pays by one.
+  substitution:
+    $ref: ./SubstitutionPolicy.yaml
+    description: What the store does with an item it cannot supply; `leave_out` where the plan allows no substitution.
+  price_per_delivery:
+    $ref: ../common/Money.yaml
+    description: A delivery at the everyday quantities, the fee included.
+  delivery_fee:
+    $ref: ../common/Money.yaml
+    description: The delivery fee of each delivery.
+  cutoff:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: The store's cutoff the evening before.
+    examples:
+      - 20:00
+  vacations:
+    type: array
+    items:
+      $ref: ./SubscriptionVacation.yaml
+    description: Vacations not yet over.
+  payment_due:
+    oneOf:
+      - $ref: ./SubscriptionPaymentDue.yaml
+      - type: "null"
+    description: What a pending subscription waits for.
+  actions:
+    $ref: ./SubscriptionActions.yaml
+    description: What the customer may do now.
+  cancelled_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was cancelled.
+    examples:
+      - null
+  cancel_reason:
+    oneOf:
+      - $ref: ./SubscriptionCancelReason.yaml
+      - type: "null"
+    description: Why.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-05T16:30:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-11-05T16:30:00Z
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change.
+    examples:
+      - 1
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    partner_id: 01a13a48-9e00-7000-8000-000000000006
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    store_name: Gachibowli Dairy
+    plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    plan_name: Daily milk
+    state: active
+    pause: null
+    items:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk
+        variant_label: 500 ml
+        quantity: 2
+        unit_price:
+          minor_units: 3200
+          currency: INR
+        next_price: null
+    frequency: weekdays
+    days:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+    window:
+      starts: 06:00
+      ends: 08:00
+    starts_on: 2026-11-07
+    ends_on: null
+    first_delivery: 2026-11-09
+    next_delivery:
+      date: 2026-11-06
+      window:
+        starts: 06:00
+        ends: 08:00
+      amount:
+        minor_units: 6400
+        currency: INR
+      locked: false
+      order_id: null
+    address:
+      address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+      label: Home
+      summary: 402, Lake View Residency, Gachibowli
+    pay_by: wallet
+    mandate: null
+    substitution: similar
+    price_per_delivery:
+      minor_units: 6400
+      currency: INR
+    delivery_fee:
+      minor_units: 0
+      currency: INR
+    cutoff: 20:00
+    vacations: []
+    payment_due: null
+    actions:
+      pause: true
+      resume: false
+      skip_next: true
+      change_address: true
+      cancel: true
+    cancelled_at: null
+    cancel_reason: null
+    created_at: 2026-11-05T16:30:00Z
+    updated_at: 2026-11-05T16:30:00Z
+    version: 1

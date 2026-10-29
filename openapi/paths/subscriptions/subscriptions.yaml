@@ -1,0 +1,117 @@
+# Path item for /v1/customer/subscriptions. Referenced from openapi.yaml.
+get:
+  operationId: listCustomerSubscriptions
+  summary: List the customer's subscriptions
+  description: "The account's Subscriptions: active and pending first, then paused, then those cancelled or ended in the last ninety days, each with its plan, schedule, next delivery and what the customer may do now. Read it again on `subscription.changed` on the customer's channel."
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of subscriptions.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/SubscriptionPage.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createSubscription
+  summary: Subscribe to a plan
+  description: "Subscribes the customer to a live plan: its items and quantities within their ranges, a frequency it allows, its window, a start date (tomorrow before the store's cutoff, the day after once it has passed, or later), an end (open-ended, or a date at most 365 days out and no earlier than the plan's minimum term), a saved address the store reaches, and the way to pay, never cash. It starts once the Wallet covers the first delivery, or once the UPI AutoPay mandate is confirmed (`POST /v1/customer/mandates`, the provider's page asks for at most 1.5 times a delivery rounded up to the next ₹100); until then it is `pending`, schedules nothing, and `payment_due` names the least top-up that covers the first week. It starts by itself as soon as a top-up lands. `Idempotency-Key` is required: subscribing again with the same key answers what the first made. `409`: `plan_withdrawn`, `address_outside_area` (the store does not deliver to the address)."
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The plan, the items, the schedule, the dates, the address and the way to pay.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/subscriptions/SubscriptionInput.yaml
+  responses:
+    "201":
+      description: The subscription, active or pending.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/Subscription.yaml
+    "400":
+      description: "`validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`), a quantity out of the item's range (`quantity_out_of_range`), a frequency the plan does not allow (`frequency_not_offered`), a start before the earliest (`start_before_earliest`), an end before the minimum term or over 365 days out (`end_out_of_range`), or another malformed member."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the plan, or the address is not the customer's."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`plan_withdrawn`, `address_outside_area`, or `idempotency_key_reuse`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

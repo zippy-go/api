@@ -1,0 +1,61 @@
+type: object
+description: The live plans of a store, the Subscribe section of its page.
+required:
+  - location_id
+  - items
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  items:
+    type: array
+    items:
+      $ref: ./StorefrontPlan.yaml
+    description: The plans.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000307
+    items:
+      - plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+        location_id: 01a13a48-9e00-7000-8000-000000000307
+        store_name: Gachibowli Dairy
+        name: Daily milk
+        description: Fresh toned milk at your door every morning.
+        items:
+          - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk
+            variant_label: 500 ml
+            food_mark: veg
+            unit_price:
+              minor_units: 3200
+              currency: INR
+            default_quantity: 1
+            min_quantity: 1
+            max_quantity: 6
+            available: true
+        frequencies:
+          - daily
+          - weekdays
+          - alternate_days
+        window:
+          starts: 06:00
+          ends: 08:00
+        min_deliveries: 7
+        substitutions_allowed: true
+        delivery_fee:
+          minor_units: 0
+          currency: INR
+        cutoff: 20:00
+        earliest_start: 2026-11-06
+        from_price:
+          minor_units: 3200
+          currency: INR
+        summary: Milk · from ₹32 per delivery · 06:00 to 08:00 · starts tomorrow
+        reach:
+          address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+          deliverable: true
+          distance_metres: 1200
+          reason: null

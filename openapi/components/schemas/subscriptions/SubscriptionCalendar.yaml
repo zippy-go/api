@@ -1,0 +1,52 @@
+type: object
+description: A month of a subscription, day by day. It moves within seconds of an occurrence moving (`subscription.changed` on the customer's channel).
+required:
+  - subscription_id
+  - month
+  - today
+  - days
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  month:
+    type: string
+    pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    description: The month, YYYY-MM.
+    examples:
+      - 2026-11
+  today:
+    type: string
+    format: date
+    description: Today on the store's clock, as the schedule date reads it.
+    examples:
+      - 2026-11-05
+  days:
+    type: array
+    items:
+      $ref: ./SubscriptionDay.yaml
+    description: Every day of the month.
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    month: 2026-11
+    today: 2026-11-05
+    days:
+      - date: 2026-11-06
+        state: delivered
+        label: Delivered at 06:40
+        locked: true
+        cutoff_at: 2026-11-05T14:30:00Z
+        items:
+          - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk 500 ml
+            quantity: 2
+        amount:
+          minor_units: 6400
+          currency: INR
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        order_number: AB0042
+        delivered_at: 2026-11-06T01:10:00Z
+        proof_url: /v1/customer/orders/0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01/proof-of-delivery

@@ -1,0 +1,32 @@
+type: object
+description: "The pre-order-only items in the basket: the basket goes only into a slot at least as far ahead as the longest notice."
+required:
+  - items
+  - earliest_at
+  - message
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CheckoutPreOrderItem.yaml
+    description: The items, the longest notice first.
+  earliest_at:
+    type: string
+    format: date-time
+    description: The start of the first slot every one of them allows.
+    examples:
+      - 2026-11-07T03:30:00Z
+  message:
+    type: string
+    description: What it means, as a sentence a screen may show.
+    examples:
+      - "Eggless Black Forest Cake needs 48 hours' notice: the first slot is Saturday 09:00 to 09:30."
+examples:
+  - items:
+      - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+        item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b12
+        name: Eggless Black Forest Cake
+        notice_hours: 48
+        earliest_at: 2026-11-07T03:30:00Z
+    earliest_at: 2026-11-07T03:30:00Z
+    message: "Eggless Black Forest Cake needs 48 hours' notice: the first slot is Saturday 09:00 to 09:30."

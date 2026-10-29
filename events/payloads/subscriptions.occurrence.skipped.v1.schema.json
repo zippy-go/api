@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/subscriptions.occurrence.skipped.v1.schema.json",
+  "title": "SubscriptionsOccurrenceSkippedPayload",
+  "description": "Payload of `subscriptions.occurrence.skipped` version 1. A subscription's delivery day was not generated at the cutoff: skipped by the customer, away, paused, the store closed, for want of balance, or its mandate debit refused with no Wallet to fall to. Consumers: notifications (the customer, for want of balance and a closure), engagement (a skip keeps a streak), analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "occurrence_id",
+    "subscription_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "date",
+    "reason",
+    "amount_needed",
+    "at"
+  ],
+  "properties": {
+    "occurrence_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The occurrence: one delivery day of the subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7401"
+      ]
+    },
+    "subscription_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The delivery day.",
+      "examples": [
+        "2026-11-06"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "vacation",
+        "paused",
+        "closed",
+        "balance",
+        "mandate_refused"
+      ],
+      "description": "Why.",
+      "examples": [
+        "balance"
+      ]
+    },
+    "amount_needed": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "minor_units",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor_units": {
+              "type": "integer",
+              "description": "The amount in paise."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "The ISO 4217 code."
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "What the day needed, for want of balance.",
+      "examples": [
+        {
+          "minor_units": 2400,
+          "currency": "INR"
+        }
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-05T14:30:05Z"
+      ]
+    }
+  }
+}

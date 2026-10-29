@@ -1,0 +1,13 @@
+type: object
+description: The slot checkout chose, by its start; `null` in its place orders for now.
+required:
+  - starts_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: The start of one of the slots checkout offers.
+    examples:
+      - 2026-11-06T03:30:00Z
+examples:
+  - starts_at: 2026-11-06T03:30:00Z

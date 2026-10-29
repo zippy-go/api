@@ -1,0 +1,10 @@
+type: object
+description: "Withdrawing a plan: it stops taking subscriptions at once."
+properties:
+  end_existing:
+    type: boolean
+    description: Also end the subscriptions it has, seven days from now; `false` keeps serving them until each ends. Needs `subscription:manage` as well.
+    examples:
+      - false
+examples:
+  - end_existing: false

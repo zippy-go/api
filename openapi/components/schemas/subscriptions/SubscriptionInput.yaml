@@ -1,0 +1,67 @@
+type: object
+description: Subscribing to a plan. It starts once the Wallet covers the first delivery, or once the mandate is confirmed; until then it is `pending` and schedules nothing.
+required:
+  - plan_id
+  - items
+  - frequency
+  - address_id
+  - pay_by
+properties:
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionItemInput.yaml
+    description: The plan's items and quantities chosen, within each item's range; at least one above 0.
+  frequency:
+    $ref: ./SubscriptionFrequency.yaml
+    description: One the plan allows.
+  days:
+    type: array
+    items:
+      type: integer
+      minimum: 1
+      maximum: 7
+    description: "For `weekly` and `custom`: the days of the week, 1 for Monday to 7 for Sunday."
+  starts_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: "The first day; `null` or absent for as soon as possible: tomorrow before the cutoff, the day after once it has passed."
+    examples:
+      - null
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day, at most 365 days out and no earlier than the plan's minimum term; `null` or absent for open-ended.
+    examples:
+      - null
+  address_id:
+    type: string
+    format: uuid
+    description: One of the customer's saved addresses the store delivers to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+  pay_by:
+    $ref: ./SubscriptionPayBy.yaml
+    description: How it pays.
+  substitution:
+    $ref: ./SubstitutionPolicy.yaml
+    description: Where the plan allows substitutions; `similar` by default.
+examples:
+  - plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    items:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        quantity: 2
+    frequency: weekdays
+    starts_on: null
+    address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    pay_by: wallet

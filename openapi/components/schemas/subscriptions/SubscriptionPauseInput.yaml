@@ -1,0 +1,21 @@
+type: object
+description: "Pausing: from a day until resumed or until a day."
+properties:
+  from:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first day without deliveries; the next one open to change when absent.
+    examples:
+      - null
+  until:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day without deliveries; until resumed when absent.
+    examples:
+      - null
+examples:
+  - {}

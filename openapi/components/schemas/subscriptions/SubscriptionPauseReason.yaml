@@ -1,0 +1,9 @@
+type: string
+description: "Why a subscription is paused: by the `customer`; by itself for want of `balance` (three deliveries in a row) or after `failed_deliveries` (three in 14 days); `mandate_revoked` in the customer's UPI app."
+enum:
+  - customer
+  - balance
+  - failed_deliveries
+  - mandate_revoked
+examples:
+  - customer

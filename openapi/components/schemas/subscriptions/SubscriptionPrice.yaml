@@ -1,0 +1,20 @@
+type: object
+description: A price announced for an item, applying from a day.
+required:
+  - unit_price
+  - applies_from
+properties:
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: The new price of one.
+  applies_from:
+    type: string
+    format: date
+    description: "The first delivery day it applies to: seven days after the customer was told."
+    examples:
+      - 2026-11-08
+examples:
+  - unit_price:
+      minor_units: 3400
+      currency: INR
+    applies_from: 2026-11-08

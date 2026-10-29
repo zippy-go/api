@@ -1,0 +1,21 @@
+type: object
+description: "A slot an order is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in. The slot is the order's promise."
+required:
+  - starts_at
+  - ends_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: When the slot starts.
+    examples:
+      - 2026-11-06T03:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-06T04:00:00Z
+examples:
+  - starts_at: 2026-11-06T03:30:00Z
+    ends_at: 2026-11-06T04:00:00Z

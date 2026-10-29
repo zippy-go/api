@@ -1,0 +1,44 @@
+type: object
+description: The next delivery day.
+required:
+  - date
+  - window
+  - amount
+  - locked
+  - order_id
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-11-06
+  window:
+    $ref: ./DeliveryWindow.yaml
+    description: Its window.
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it costs, held from the Wallet at the cutoff.
+  locked:
+    type: boolean
+    description: "Whether the cutoff passed for it: it is generated, and changes go to the day after."
+    examples:
+      - false
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its order once generated.
+    examples:
+      - null
+examples:
+  - date: 2026-11-06
+    window:
+      starts: 06:00
+      ends: 08:00
+    amount:
+      minor_units: 6400
+      currency: INR
+    locked: false
+    order_id: null

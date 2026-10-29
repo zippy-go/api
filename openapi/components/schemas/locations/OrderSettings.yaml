@@ -19,6 +19,12 @@ properties:
   scheduled:
     $ref: ./ScheduledOrders.yaml
     description: Scheduled orders.
+  subscription_cutoff:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    examples:
+      - 20:00
+    description: The cutoff the evening before, HH:MM on the store's clock, 18:00 to 21:00; 20:00 by default. A change to a subscription's day counts only before it, and its deliveries are generated then. Since 0.24.0.
 examples:
   - preparation:
       mode: fixed

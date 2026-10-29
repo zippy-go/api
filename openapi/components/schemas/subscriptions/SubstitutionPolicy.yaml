@@ -1,0 +1,8 @@
+type: string
+description: "What the store does when an item cannot be supplied: `similar` (a similar item at no extra cost with the same veg mark), `leave_out` (credited back) or `skip_day` (the whole day skipped and credited back)."
+enum:
+  - similar
+  - leave_out
+  - skip_day
+examples:
+  - similar

@@ -6,6 +6,15 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-30
+
+Step 7, subscriptions: scheduled orders into a store's slots, the catalogue's
+plans, and subscriptions with their calendar, the cutoff the evening before,
+the deliveries generated then and held from the Wallet, failed deliveries
+credited back, price changes announced a week ahead, the monthly statement,
+the store's calendar and forecast, and the schedule date. Written as 0.24.0,
+after the three platform slices of step 6 (0.21.0 to 0.23.0); the first
+platform slice of step 7 to merge takes 0.24.0 and the others are renumbered.
 ## [0.23.0] - 2026-10-30
 
 Step 6, engagement: reward campaigns and the rewards engine, the customer's
@@ -218,6 +227,96 @@ the first of the three to merge keeps 0.21.0 and the default roles' edition 7.
 Additive only.
 
 ### Added
+
+- Scheduled orders: checkout's `slots` over the store's window of days, each
+  with its places left and why it cannot be chosen (`CheckoutSlot`,
+  `CheckoutSlotCode`), the pre-order-only items in the basket with the
+  earliest slot they allow (`pre_order`, `CheckoutPreOrder`,
+  `CheckoutPreOrderItem`), `scheduled` now true where the store takes them and
+  `now` on `CheckoutFulfilment`; `slot` on `PATCH /v1/baskets/{location_id}`
+  (`OrderSlotInput`) and on the basket's choices (`OrderSlot`); placing
+  refused with `slot_full`, `slot_past` and `item_pre_order_only`, each naming
+  the next open slot or the earliest one; the order's `slot` and the
+  subscription it was generated for (`subscription`, `OrderOccurrence`) on
+  `CustomerOrder`, `CustomerOrderSummary`, `StoreOrder` (with `scheduled` and
+  `released_at`) and `PlatformOrderRow`. The store's Scheduled tab
+  (`GET /v1/partners/{partner_id}/locations/{location_id}/orders/scheduled`,
+  `ScheduledOrderPage`, `ScheduledSlotCount`), several orders marked packed
+  and ready together for a route (`POST .../orders/ready`, `OrdersReadyInput`,
+  `OrdersReadyResult`, `OrderReadyOutcome`) and Mission Control's Scheduled
+  panel (`GET /v1/platform/orders/scheduled`, `PlatformScheduledOrderPage`).
+- The catalogue's plans: a store's subscription products with their items at
+  the plan's own prices, frequencies, window, minimum term, substitutions and
+  fee (`GET`, `POST /v1/partners/{partner_id}/locations/{location_id}/catalog/plans`,
+  `GET`, `PATCH`, `DELETE .../catalog/plans/{plan_id}`, `POST .../withdraw`,
+  `SubscriptionPlan`, `SubscriptionPlanItem`, `SubscriptionPlanCreate`,
+  `SubscriptionPlanUpdate`, `SubscriptionPlanItemInput`,
+  `SubscriptionPlanList`, `SubscriptionPlanWithdrawal`,
+  `SubscriptionPlanState`, `DeliveryWindow`, `SubscriptionFrequency`); the
+  Subscribe section of a store's page with the reach of the customer's
+  address (`GET /v1/storefront/stores/{location_id}/plans`, `.../plans/{plan_id}`,
+  `StorefrontPlan`, `StorefrontPlanList`, `PlanReach`), and `plans` on
+  `StoreCard` (`StorePlanCard`). `subscription_cutoff` on a store's order
+  settings, 18:00 to 21:00.
+- Subscriptions (`Subscriptions` tag): subscribing with `Idempotency-Key`,
+  pending until the Wallet covers the first delivery or the mandate is
+  confirmed (`POST /v1/customer/subscriptions`, `SubscriptionInput`,
+  `SubscriptionItemInput`, `Subscription`, `SubscriptionItem`,
+  `SubscriptionPrice`, `SubscriptionNextDelivery`, `SubscriptionAddress`,
+  `SubscriptionMandateSummary`, `SubscriptionPaymentDue`,
+  `SubscriptionActions`, `SubscriptionState`, `SubscriptionPayBy`,
+  `SubstitutionPolicy`); the account's list and one subscription
+  (`GET /v1/customer/subscriptions`, `SubscriptionPage`, `GET`, `PATCH .../{subscription_id}`,
+  `SubscriptionUpdate`, `SubscriptionChange`); the calendar by month
+  (`GET .../calendar`, `SubscriptionCalendar`, `SubscriptionDay`,
+  `SubscriptionDayItem`, `SubscriptionDayState`); a day skipped or its
+  quantities (`PUT .../days/{date}`, `SubscriptionDayInput`), quantities from
+  a day (`PUT .../quantities`, `SubscriptionQuantitiesInput`), pause and
+  resume (`POST .../pause`, `.../resume`, `SubscriptionPauseInput`,
+  `SubscriptionResumeInput`, `SubscriptionPause`, `SubscriptionPauseReason`),
+  days away (`POST .../vacations`, `DELETE .../vacations/{vacation_id}`,
+  `SubscriptionVacationInput`, `SubscriptionVacation`), cancelling with a
+  reason (`POST .../cancel`, `SubscriptionCancelInput`,
+  `SubscriptionCancelReason`) and the month's statement
+  (`GET .../statements/{month}`, `SubscriptionStatement`,
+  `SubscriptionStatementDay`, `SubscriptionStatementMove`). Every change
+  signals `subscription.changed` on the customer's channel.
+- A store's subscriptions (`GET /v1/partners/{partner_id}/locations/{location_id}/subscriptions`,
+  `LocationSubscriptionPage`, `LocationSubscriptionRow`), a day of its
+  calendar with the occurrences by slot and route, what to pack, the day's
+  progress and the latest changes (`GET .../subscriptions/calendar`,
+  `PartnerSubscriptionDay`, `PartnerOccurrence`, `SubscriptionDaySlot`,
+  `SubscriptionItemTotal`, `SubscriptionProgress`, `SubscriptionChangeNote`),
+  and the demand forecast for 14 days beside the last 28 days, also as CSV
+  (`GET .../subscriptions/forecast`, `SubscriptionForecast`, `ForecastDay`).
+  `subscription:read` at the Location.
+- Mission Control's subscriptions (`GET /v1/platform/subscriptions`,
+  `PlatformSubscriptionPage`, `PlatformSubscriptionRow`,
+  `GET .../{subscription_id}`, `PlatformSubscription`), `subscription:read`;
+  and the schedule date the cutoffs, the route building and the release of
+  scheduled orders read, moved forward on a developer's machine or in the
+  sandbox only (`GET`, `PUT /v1/platform/schedule/date`, `ScheduleDate`,
+  `ScheduleDateMove`, `ScheduleDateMoveRecord`), `operations:manage` to move.
+- Permissions `subscription:read` and `subscription:manage`; the default
+  roles' next edition gives Manager both, Staff and Kitchen
+  `subscription:read`, Mission Control's `support` both and `operations`
+  `subscription:read`.
+- Problem codes `slot_full`, `slot_past`, `item_pre_order_only`,
+  `plan_withdrawn`, `plan_has_subscriptions`, `scheduled_delivery_off`,
+  `subscription_ended`, `subscription_not_active`, `subscription_not_paused`,
+  `subscription_day_invalid` and `schedule_date_fixed`; under
+  `validation_failed` the field codes `quantity_out_of_range`,
+  `frequency_not_offered`, `start_before_earliest`, `end_out_of_range`,
+  `vacation_invalid`, `subscription_cutoff_invalid` and
+  `schedule_date_backwards`.
+- Events `subscriptions.subscription.started`, `.changed`, `.paused`,
+  `.resumed`, `.cancelled` and `.ended`; `subscriptions.day.changed`;
+  `subscriptions.occurrence.generated`, `.skipped`, `.failed` and
+  `.completed`; `subscriptions.price.announced`;
+  `subscriptions.statement.ready`; `catalog.plan.published` and
+  `.withdrawn`; `ordering.order.released`; `ordering.order.placed` gains the
+  `slot` and the subscription's `occurrence`. None carries a name, a phone
+  number, an email or an address.
 
 - The shared taxonomy (`Taxonomy` tag): a Vertical's tree, public, depth first
   with each term's rules and how much maps to it

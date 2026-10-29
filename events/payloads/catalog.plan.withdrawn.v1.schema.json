@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.plan.withdrawn.v1.schema.json",
+  "title": "CatalogPlanWithdrawnPayload",
+  "description": "Payload of `catalog.plan.withdrawn` version 1. A store withdrew a plan: it takes no new subscriptions, and keeps the ones it has unless the store ended them with seven days' notice. Consumers: subscriptions (ending them on the day), the store page, analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "partner_id",
+    "location_id",
+    "version",
+    "end_existing",
+    "existing_end_on",
+    "at"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The plan.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The plan's version.",
+      "examples": [
+        3
+      ]
+    },
+    "end_existing": {
+      "type": "boolean",
+      "description": "Whether its subscriptions end too.",
+      "examples": [
+        false
+      ]
+    },
+    "existing_end_on": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Their last delivery day, when they end.",
+      "examples": [
+        null
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-01T06:00:00Z"
+      ]
+    }
+  }
+}

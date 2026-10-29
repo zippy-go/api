@@ -59,7 +59,7 @@ get:
 patch:
   operationId: updateBasketChoices
   summary: Save checkout's answers
-  description: Saves each of checkout's answers as it is given (delivery or pickup, the address, instructions, the tip, the Wallet, the way to pay, what to do with an unavailable item, cutlery) and answers the basket priced with them. An answer the store would not accept is saved anyway and shows among the basket's refusals with why (a pickup-only store's delivery, a tip on a pickup, cash over the limit); switching to pickup takes the delivery fee and the tip off. The address must be one of the customer's own (`404` otherwise); visitors choose no address and no way to pay. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
+  description: Saves each of checkout's answers as it is given (delivery or pickup, the address, instructions, the tip, the Wallet, the way to pay, what to do with an unavailable item, cutlery, the slot of a scheduled order) and answers the basket priced with them. An answer the store would not accept is saved anyway and shows among the basket's refusals with why (a pickup-only store's delivery, a tip on a pickup, cash over the limit); switching to pickup takes the delivery fee and the tip off. The address must be one of the customer's own (`404` otherwise); visitors choose no address and no way to pay. A signed-in customer's basket with a customer token, or a visitor's with `X-Visitor-Token`; a token of another surface is refused (`403`).
   tags:
     - Baskets
   security:

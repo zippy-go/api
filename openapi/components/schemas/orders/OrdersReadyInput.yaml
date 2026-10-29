@@ -1,0 +1,14 @@
+type: object
+description: Orders marked packed and ready together, such as a route's.
+required:
+  - order_ids
+properties:
+  order_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The orders, 1 to 50; each is accepted first where it was waiting, then marked ready.
+examples:
+  - order_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01

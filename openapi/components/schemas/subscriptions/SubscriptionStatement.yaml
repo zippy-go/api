@@ -1,0 +1,130 @@
+type: object
+description: "A subscription's statement for a month: each day delivered with its amount, the skipped and failed days, the top-ups, the credits back and the balances."
+required:
+  - subscription_id
+  - month
+  - store_name
+  - plan_name
+  - ready_at
+  - days
+  - delivered
+  - delivered_amount
+  - skipped
+  - failed
+  - credited_back
+  - top_ups
+  - credits_back
+  - opening_balance
+  - closing_balance
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  month:
+    type: string
+    pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    description: The month.
+    examples:
+      - 2026-11
+  store_name:
+    type: string
+    description: The store.
+    examples:
+      - Gachibowli Dairy
+  plan_name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  ready_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was issued, on the 1st of the next month; `null` for the month in progress.
+    examples:
+      - 2026-12-01T02:30:00Z
+  days:
+    type: array
+    items:
+      $ref: ./SubscriptionStatementDay.yaml
+    description: The delivery days of the month.
+  delivered:
+    type: integer
+    minimum: 0
+    description: Days delivered.
+    examples:
+      - 26
+  delivered_amount:
+    $ref: ../common/Money.yaml
+    description: What they cost.
+  skipped:
+    type: integer
+    minimum: 0
+    description: Days skipped, paused, away, closed or unpaid.
+    examples:
+      - 4
+  failed:
+    type: integer
+    minimum: 0
+    description: Days that could not be delivered.
+    examples:
+      - 1
+  credited_back:
+    $ref: ../common/Money.yaml
+    description: What failed days gave back.
+  top_ups:
+    type: array
+    items:
+      $ref: ./SubscriptionStatementMove.yaml
+    description: The Wallet's top-ups in the month.
+  credits_back:
+    type: array
+    items:
+      $ref: ./SubscriptionStatementMove.yaml
+    description: What came back to the Wallet in the month.
+  opening_balance:
+    $ref: ../common/Money.yaml
+    description: The Wallet at the start of the month.
+  closing_balance:
+    $ref: ../common/Money.yaml
+    description: The Wallet at its end.
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    month: 2026-11
+    store_name: Gachibowli Dairy
+    plan_name: Daily milk
+    ready_at: 2026-12-01T02:30:00Z
+    days:
+      - date: 2026-11-06
+        state: delivered
+        amount:
+          minor_units: 6400
+          currency: INR
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    delivered: 26
+    delivered_amount:
+      minor_units: 166400
+      currency: INR
+    skipped: 4
+    failed: 1
+    credited_back:
+      minor_units: 6400
+      currency: INR
+    top_ups:
+      - at: 2026-11-03T10:00:00Z
+        kind: top_up
+        amount:
+          minor_units: 50000
+          currency: INR
+        description: Top-up by UPI
+    credits_back: []
+    opening_balance:
+      minor_units: 50000
+      currency: INR
+    closing_balance:
+      minor_units: 23600
+      currency: INR

@@ -1,0 +1,30 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7f01",
+  "type": "catalog.plan.published",
+  "version": 1,
+  "occurred_at": "2026-11-01T06:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+  "correlation_id": null,
+  "payload": {
+    "plan_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+    "location_id": "01a13a48-9e00-7000-8000-000000000307",
+    "version": 2,
+    "change": "updated",
+    "price_changes": [
+      {
+        "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101",
+        "variant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102",
+        "old_price": {
+          "minor_units": 3200,
+          "currency": "INR"
+        },
+        "new_price": {
+          "minor_units": 3400,
+          "currency": "INR"
+        }
+      }
+    ],
+    "at": "2026-11-01T06:00:00Z"
+  }
+}

@@ -1,5 +1,5 @@
 type: object
-description: "The ways the store offers: delivery, with who carries it, and pickup; scheduled orders arrive in a later step."
+description: "The ways the store offers: delivery, with who carries it, pickup, scheduled orders into a slot, and whether the basket may go now."
 required:
   - delivery
   - pickup
@@ -24,8 +24,13 @@ properties:
   scheduled:
     type: boolean
     examples:
-      - false
-    description: Whether it takes scheduled orders now; always `false` until scheduled orders arrive.
+      - true
+    description: "Whether it takes scheduled orders: checkout then offers `slots`."
+  now:
+    type: boolean
+    examples:
+      - true
+    description: "Whether the basket may be placed for now: the store open and no pre-order-only item in it. Since 0.24.0."
 examples:
   - delivery: true
     pickup: true

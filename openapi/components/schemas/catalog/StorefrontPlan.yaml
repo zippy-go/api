@@ -1,0 +1,140 @@
+type: object
+description: A plan as customers read it on the store's page, with whether the store reaches their address.
+required:
+  - plan_id
+  - location_id
+  - store_name
+  - name
+  - description
+  - items
+  - frequencies
+  - window
+  - min_deliveries
+  - substitutions_allowed
+  - delivery_fee
+  - cutoff
+  - earliest_start
+  - from_price
+  - summary
+  - reach
+properties:
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  store_name:
+    type: string
+    description: The store.
+    examples:
+      - Gachibowli Dairy
+  name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  description:
+    type:
+      - string
+      - "null"
+    description: What it is.
+    examples:
+      - Fresh toned milk at your door every morning.
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionPlanItem.yaml
+    description: Its items.
+  frequencies:
+    type: array
+    items:
+      $ref: ../subscriptions/SubscriptionFrequency.yaml
+    description: The frequencies it allows.
+  window:
+    $ref: ../subscriptions/DeliveryWindow.yaml
+    description: The delivery window.
+  min_deliveries:
+    type: integer
+    description: The minimum term in deliveries.
+    examples:
+      - 7
+  substitutions_allowed:
+    type: boolean
+    description: Whether substitutions are allowed.
+    examples:
+      - true
+  delivery_fee:
+    $ref: ../common/Money.yaml
+    description: The delivery fee of each delivery.
+  cutoff:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: The cutoff the evening before.
+    examples:
+      - 20:00
+  earliest_start:
+    type: string
+    format: date
+    description: "The first day a subscription made now can start: tomorrow before the cutoff, the day after once it has passed."
+    examples:
+      - 2026-11-06
+  from_price:
+    $ref: ../common/Money.yaml
+    description: The least one delivery costs.
+  summary:
+    type: string
+    description: The plan on one line, as a card shows it.
+    examples:
+      - Milk · from ₹32 per delivery · 06:00 to 08:00 · starts tomorrow
+  reach:
+    $ref: ./PlanReach.yaml
+    description: Whether the store delivers to the customer's address.
+examples:
+  - plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    store_name: Gachibowli Dairy
+    name: Daily milk
+    description: Fresh toned milk at your door every morning.
+    items:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk
+        variant_label: 500 ml
+        food_mark: veg
+        unit_price:
+          minor_units: 3200
+          currency: INR
+        default_quantity: 1
+        min_quantity: 1
+        max_quantity: 6
+        available: true
+    frequencies:
+      - daily
+      - weekdays
+      - alternate_days
+    window:
+      starts: 06:00
+      ends: 08:00
+    min_deliveries: 7
+    substitutions_allowed: true
+    delivery_fee:
+      minor_units: 0
+      currency: INR
+    cutoff: 20:00
+    earliest_start: 2026-11-06
+    from_price:
+      minor_units: 3200
+      currency: INR
+    summary: Milk · from ₹32 per delivery · 06:00 to 08:00 · starts tomorrow
+    reach:
+      address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+      deliverable: true
+      distance_metres: 1200
+      reason: null

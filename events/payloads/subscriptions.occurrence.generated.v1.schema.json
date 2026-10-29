@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/subscriptions.occurrence.generated.v1.schema.json",
+  "title": "SubscriptionsOccurrenceGeneratedPayload",
+  "description": "Payload of `subscriptions.occurrence.generated` version 1. A subscription's delivery day was generated at the cutoff as an ordinary order into its window, held from the Wallet; generated once whatever the servers. Consumers: the store's calendar, analytics; the order itself announces `ordering.order.placed` with its slot and occurrence, which routes builds from. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "occurrence_id",
+    "subscription_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "date",
+    "slot",
+    "order_id",
+    "number",
+    "amount",
+    "paid_by",
+    "at"
+  ],
+  "properties": {
+    "occurrence_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The occurrence: one delivery day of the subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7401"
+      ]
+    },
+    "subscription_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The delivery day.",
+      "examples": [
+        "2026-11-06"
+      ]
+    },
+    "slot": {
+      "type": "object",
+      "description": "The window the order is placed into.",
+      "required": [
+        "starts_at",
+        "ends_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "starts_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the window starts.",
+          "examples": [
+            "2026-11-06T00:30:00Z"
+          ]
+        },
+        "ends_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When it ends.",
+          "examples": [
+            "2026-11-06T02:30:00Z"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "starts_at": "2026-11-06T00:30:00Z",
+          "ends_at": "2026-11-06T02:30:00Z"
+        }
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What it costs, held from the Wallet.",
+      "examples": [
+        {
+          "minor_units": 6400,
+          "currency": "INR"
+        }
+      ]
+    },
+    "paid_by": {
+      "type": "string",
+      "enum": [
+        "wallet",
+        "mandate"
+      ],
+      "description": "How it was covered: the Wallet, or a mandate debit that landed in it.",
+      "examples": [
+        "wallet"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was generated.",
+      "examples": [
+        "2026-11-05T14:30:05Z"
+      ]
+    }
+  }
+}

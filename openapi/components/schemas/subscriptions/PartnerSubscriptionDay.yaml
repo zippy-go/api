@@ -1,0 +1,117 @@
+type: object
+description: "A store's subscriptions on one day: the occurrences by slot and route, what to pack, how the day stands and the latest changes."
+required:
+  - location_id
+  - date
+  - locked
+  - cutoff_at
+  - occurrences
+  - skips
+  - slots
+  - totals
+  - items
+  - progress
+  - changes
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-11-06
+  locked:
+    type: boolean
+    description: "Whether its cutoff passed: its occurrences are generated."
+    examples:
+      - true
+  cutoff_at:
+    type: string
+    format: date-time
+    description: Its cutoff, the evening before.
+    examples:
+      - 2026-11-05T14:30:00Z
+  occurrences:
+    type: integer
+    minimum: 0
+    description: Deliveries that day.
+    examples:
+      - 111
+  skips:
+    type: integer
+    minimum: 0
+    description: "Subscribers skipping it: skipped, paused, away or unpaid."
+    examples:
+      - 9
+  slots:
+    type: array
+    items:
+      $ref: ./SubscriptionDaySlot.yaml
+    description: The occurrences by window and route.
+  totals:
+    type: array
+    items:
+      $ref: ./SubscriptionItemTotal.yaml
+    description: What to pack, item by item.
+  items:
+    type: array
+    items:
+      $ref: ./PartnerOccurrence.yaml
+    description: Each delivery.
+  progress:
+    $ref: ./SubscriptionProgress.yaml
+    description: How the day stands.
+  changes:
+    type: array
+    items:
+      $ref: ./SubscriptionChangeNote.yaml
+    description: The latest changes, newest first, at most 20.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000307
+    date: 2026-11-06
+    locked: true
+    cutoff_at: 2026-11-05T14:30:00Z
+    occurrences: 111
+    skips: 9
+    slots:
+      - window:
+          starts: 06:00
+          ends: 08:00
+        route_id: null
+        occurrences: 111
+    totals:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk
+        variant_label: 500 ml
+        quantity: 148
+    items:
+      - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+        customer_name: Asha R.
+        state: generated
+        window:
+          starts: 06:00
+          ends: 08:00
+        items:
+          - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk 500 ml
+            quantity: 2
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        order_number: AB0042
+        route_id: null
+        locality: Gachibowli
+    progress:
+      packed: 0
+      collected: 0
+      delivered: 0
+      failed: 0
+    changes:
+      - at: 2026-11-05T16:30:00Z
+        subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+        customer_name: Asha R.
+        kind: started
+        text: Asha R. subscribed to Daily milk from Friday.

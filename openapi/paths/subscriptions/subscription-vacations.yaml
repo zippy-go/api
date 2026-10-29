@@ -1,0 +1,68 @@
+# Path item for /v1/customer/subscriptions/{subscription_id}/vacations. Referenced from openapi.yaml.
+parameters:
+  - name: subscription_id
+    in: path
+    required: true
+    description: The subscription, the customer's own.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+post:
+  operationId: addSubscriptionVacation
+  summary: Set days away
+  description: "Sets a vacation over a range of days, at most 90: nothing is delivered or charged on them. Days whose cutoff passed stand; the answer names the first day it applies to."
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The days away.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/subscriptions/SubscriptionVacationInput.yaml
+  responses:
+    "200":
+      description: The subscription with the vacation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/SubscriptionChange.yaml
+    "400":
+      description: "`validation_failed`: a malformed member, or a range backwards or over 90 days (`vacation_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the subscription is not the customer's."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`subscription_ended`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

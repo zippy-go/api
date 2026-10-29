@@ -86,6 +86,16 @@ properties:
     items:
       $ref: ./AttentionReason.yaml
     description: What needs attention; empty when nothing does.
+  slot:
+    oneOf:
+      - $ref: ./OrderSlot.yaml
+      - type: "null"
+    description: "The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0."
+  scheduled:
+    type: boolean
+    examples:
+      - false
+    description: Whether it waits under Scheduled, not yet sent to its store. Since 0.24.0.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
     number: AB0042

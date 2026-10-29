@@ -1,0 +1,47 @@
+type: object
+description: One move of the schedule date.
+required:
+  - moved_at
+  - from
+  - to
+  - by_name
+  - reason
+properties:
+  moved_at:
+    type: string
+    format: date-time
+    description: When it was moved, in real time.
+    examples:
+      - 2026-11-05T09:00:00Z
+  from:
+    type: string
+    format: date-time
+    description: The schedule date before.
+    examples:
+      - 2026-11-05T09:00:00Z
+  to:
+    type: string
+    format: date-time
+    description: The schedule date after.
+    examples:
+      - 2026-11-05T14:31:00Z
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Who moved it.
+    examples:
+      - Platform Admin
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why.
+    examples:
+      - Tonight's cutoff
+examples:
+  - moved_at: 2026-11-05T09:00:00Z
+    from: 2026-11-05T09:00:00Z
+    to: 2026-11-05T14:31:00Z
+    by_name: Platform Admin
+    reason: Tonight's cutoff

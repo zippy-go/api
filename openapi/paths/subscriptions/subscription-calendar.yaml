@@ -1,0 +1,65 @@
+# Path item for /v1/customer/subscriptions/{subscription_id}/calendar. Referenced from openapi.yaml.
+parameters:
+  - name: subscription_id
+    in: path
+    required: true
+    description: The subscription, the customer's own.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+get:
+  operationId: getSubscriptionCalendar
+  summary: Read a subscription's calendar
+  description: "A month of the subscription day by day: each day's items and quantities, its state (upcoming, generated, delivered with its photo and time, skipped, paused, away, closed, failed and credited back, unpaid), and whether its cutoff passed. A cancelled subscription's calendar stays readable."
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  parameters:
+    - name: month
+      in: query
+      required: false
+      description: The month, YYYY-MM; the current one on the store's clock by default.
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+      example: 2026-11
+  responses:
+    "200":
+      description: The month.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/SubscriptionCalendar.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or month."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the subscription is not the customer's."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

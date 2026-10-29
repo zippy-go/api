@@ -1,0 +1,90 @@
+type: object
+description: "The customer's subscriptions: active and pending first, then paused, then those cancelled or ended in the last ninety days."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Subscription.yaml
+    description: The subscriptions.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+        customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        partner_id: 01a13a48-9e00-7000-8000-000000000006
+        location_id: 01a13a48-9e00-7000-8000-000000000307
+        store_name: Gachibowli Dairy
+        plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+        plan_name: Daily milk
+        state: active
+        pause: null
+        items:
+          - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk
+            variant_label: 500 ml
+            quantity: 2
+            unit_price:
+              minor_units: 3200
+              currency: INR
+            next_price: null
+        frequency: weekdays
+        days:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+        window:
+          starts: 06:00
+          ends: 08:00
+        starts_on: 2026-11-07
+        ends_on: null
+        first_delivery: 2026-11-09
+        next_delivery:
+          date: 2026-11-06
+          window:
+            starts: 06:00
+            ends: 08:00
+          amount:
+            minor_units: 6400
+            currency: INR
+          locked: false
+          order_id: null
+        address:
+          address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+          label: Home
+          summary: 402, Lake View Residency, Gachibowli
+        pay_by: wallet
+        mandate: null
+        substitution: similar
+        price_per_delivery:
+          minor_units: 6400
+          currency: INR
+        delivery_fee:
+          minor_units: 0
+          currency: INR
+        cutoff: 20:00
+        vacations: []
+        payment_due: null
+        actions:
+          pause: true
+          resume: false
+          skip_next: true
+          change_address: true
+          cancel: true
+        cancelled_at: null
+        cancel_reason: null
+        created_at: 2026-11-05T16:30:00Z
+        updated_at: 2026-11-05T16:30:00Z
+        version: 1
+    next_cursor: null

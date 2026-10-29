@@ -30,6 +30,8 @@
     "payment_state": "captured",
     "wallet_amount": 0,
     "method_amount": 79800,
-    "carrier": "platform_fleet"
+    "carrier": "platform_fleet",
+    "slot": null,
+    "occurrence": null
   }
 }

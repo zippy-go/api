@@ -41,6 +41,16 @@ properties:
   basket:
     $ref: ./Basket.yaml
     description: The basket, priced with the answers saved.
+  slots:
+    type: array
+    items:
+      $ref: ./CheckoutSlot.yaml
+    description: "The slots the basket may be scheduled into over the store's window of days, each with its places left and why it cannot be chosen where it cannot: full, too soon for the store's lead time (its preparation plus 15 minutes) or for a pre-order item's notice, or the store shut then. Empty where the store takes no scheduled orders. Since 0.24.0."
+  pre_order:
+    oneOf:
+      - $ref: ./CheckoutPreOrder.yaml
+      - type: "null"
+    description: The pre-order-only items in the basket with the earliest slot they allow; `null` when there are none. Since 0.24.0.
 examples:
   - location_id: 01a13a48-9e00-7000-8000-000000000301
     fulfilment:

@@ -1,0 +1,32 @@
+type: object
+description: One day of the demand forecast, or of the deliveries made.
+required:
+  - date
+  - occurrences
+  - items
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-11-06
+  occurrences:
+    type: integer
+    minimum: 0
+    description: Deliveries.
+    examples:
+      - 111
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionItemTotal.yaml
+    description: Item by item.
+examples:
+  - date: 2026-11-06
+    occurrences: 111
+    items:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk
+        variant_label: 500 ml
+        quantity: 148

@@ -1,0 +1,85 @@
+type: object
+description: A subscription in Mission Control's list.
+required:
+  - subscription_id
+  - customer_id
+  - customer_name
+  - location_id
+  - store_name
+  - plan_name
+  - state
+  - pay_by
+  - price_per_delivery
+  - next_delivery
+  - created_at
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  customer_name:
+    type: string
+    description: The customer's name.
+    examples:
+      - Asha Rao
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  store_name:
+    type: string
+    description: The store.
+    examples:
+      - Gachibowli Dairy
+  plan_name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  state:
+    $ref: ./SubscriptionState.yaml
+    description: Where it stands.
+  pay_by:
+    $ref: ./SubscriptionPayBy.yaml
+    description: How it pays.
+  price_per_delivery:
+    $ref: ../common/Money.yaml
+    description: A delivery at the everyday quantities.
+  next_delivery:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The next delivery day.
+    examples:
+      - 2026-11-06
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-05T16:30:00Z
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    customer_name: Asha Rao
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    store_name: Gachibowli Dairy
+    plan_name: Daily milk
+    state: active
+    pay_by: wallet
+    price_per_delivery:
+      minor_units: 6400
+      currency: INR
+    next_delivery: 2026-11-06
+    created_at: 2026-11-05T16:30:00Z

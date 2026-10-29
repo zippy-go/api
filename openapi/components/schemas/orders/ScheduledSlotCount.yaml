@@ -1,0 +1,47 @@
+type: object
+description: How many scheduled orders wait in one slot.
+required:
+  - starts_at
+  - ends_at
+  - orders
+  - cap
+  - places_left
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: When the slot starts.
+    examples:
+      - 2026-11-06T03:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-06T04:00:00Z
+  orders:
+    type: integer
+    minimum: 0
+    description: Scheduled orders in it that are not yet sent to the store.
+    examples:
+      - 3
+  cap:
+    type:
+      - integer
+      - "null"
+    description: The most it takes; `null` for no cap.
+    examples:
+      - 4
+  places_left:
+    type:
+      - integer
+      - "null"
+    description: Places left; `null` for no cap.
+    examples:
+      - 1
+examples:
+  - starts_at: 2026-11-06T03:30:00Z
+    ends_at: 2026-11-06T04:00:00Z
+    orders: 3
+    cap: 4
+    places_left: 1

@@ -1,0 +1,73 @@
+# Path item for /v1/platform/orders/scheduled. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformScheduledOrders
+  summary: List every scheduled order not yet sent
+  description: "The board's Scheduled panel: every scheduled order and generated occurrence not yet sent to its store, soonest slot first, by store and day. `order:read`."
+  tags:
+    - Order handling
+  security:
+    - Bearer: []
+  parameters:
+    - name: location_id
+      in: query
+      required: false
+      description: One store.
+      schema:
+        type: string
+        format: uuid
+    - name: date
+      in: query
+      required: false
+      description: One day, in India time; every day ahead by default.
+      schema:
+        type: string
+        format: date
+      example: 2026-11-06
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The scheduled orders.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/orders/PlatformScheduledOrderPage.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

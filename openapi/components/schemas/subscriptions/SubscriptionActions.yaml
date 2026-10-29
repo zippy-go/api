@@ -1,0 +1,40 @@
+type: object
+description: What the customer may do now.
+required:
+  - pause
+  - resume
+  - skip_next
+  - change_address
+  - cancel
+properties:
+  pause:
+    type: boolean
+    description: Pause it.
+    examples:
+      - true
+  resume:
+    type: boolean
+    description: Resume it.
+    examples:
+      - false
+  skip_next:
+    type: boolean
+    description: Skip the next delivery.
+    examples:
+      - true
+  change_address:
+    type: boolean
+    description: Move it to another address.
+    examples:
+      - true
+  cancel:
+    type: boolean
+    description: Cancel it.
+    examples:
+      - true
+examples:
+  - pause: true
+    resume: false
+    skip_next: true
+    change_address: true
+    cancel: true

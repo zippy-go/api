@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.released.v1.schema.json",
+  "title": "OrderingOrderReleasedPayload",
+  "description": "Payload of `ordering.order.released` version 1. A scheduled order, or a subscription's occurrence, was sent to its store at the store's lead time before its slot (the preparation time plus 15 minutes): it moves from Scheduled to new orders with the sound, and the not-answered alert and the auto-decline run from now. Consumers: notifications (the store's new order with its sound), Mission Control. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "released_at",
+    "accept_by",
+    "slot",
+    "occurrence"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ],
+      "description": "The status after the change: still `placed`.",
+      "examples": [
+        "placed"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before.",
+      "examples": [
+        "placed"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The order's version after the change.",
+      "examples": [
+        3
+      ]
+    },
+    "fulfilment": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "pickup"
+      ],
+      "description": "Delivery or pickup.",
+      "examples": [
+        "delivery"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "The order's currency.",
+      "examples": [
+        "INR"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-06T00:05:00Z"
+      ]
+    },
+    "released_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was sent to the store.",
+      "examples": [
+        "2026-11-06T00:05:00Z"
+      ]
+    },
+    "accept_by": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it is declined as not answered unless accepted.",
+      "examples": [
+        "2026-11-06T00:35:00Z"
+      ]
+    },
+    "slot": {
+      "type": "object",
+      "description": "The slot it is placed into.",
+      "required": [
+        "starts_at",
+        "ends_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "starts_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the window starts.",
+          "examples": [
+            "2026-11-06T00:30:00Z"
+          ]
+        },
+        "ends_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When it ends.",
+          "examples": [
+            "2026-11-06T02:30:00Z"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "starts_at": "2026-11-06T00:30:00Z",
+          "ends_at": "2026-11-06T02:30:00Z"
+        }
+      ]
+    },
+    "occurrence": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The subscription it was generated for; `null` for a scheduled order.",
+      "required": [
+        "subscription_id",
+        "date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subscription_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The subscription.",
+          "examples": [
+            "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The delivery day.",
+          "examples": [
+            "2026-11-06"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+          "date": "2026-11-06"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,49 @@
+type: object
+description: A plan on a store's card.
+required:
+  - plan_id
+  - name
+  - from_price
+  - window
+  - earliest_start
+  - summary
+properties:
+  plan_id:
+    type: string
+    format: uuid
+    description: The plan.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+  name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  from_price:
+    $ref: ../common/Money.yaml
+    description: The least one delivery costs.
+  window:
+    $ref: ../subscriptions/DeliveryWindow.yaml
+    description: The delivery window.
+  earliest_start:
+    type: string
+    format: date
+    description: The first day a subscription made now can start.
+    examples:
+      - 2026-11-06
+  summary:
+    type: string
+    description: The card's line.
+    examples:
+      - Milk · from ₹32 per delivery · 06:00 to 08:00 · starts tomorrow
+examples:
+  - plan_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+    name: Daily milk
+    from_price:
+      minor_units: 3200
+      currency: INR
+    window:
+      starts: 06:00
+      ends: 08:00
+    earliest_start: 2026-11-06
+    summary: Milk · from ₹32 per delivery · 06:00 to 08:00 · starts tomorrow

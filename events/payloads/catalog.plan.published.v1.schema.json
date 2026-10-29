@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.plan.published.v1.schema.json",
+  "title": "CatalogPlanPublishedPayload",
+  "description": "Payload of `catalog.plan.published` version 1. A store published a plan, made or changed: its terms are what customers read, and a changed price is announced to its subscribers. Consumers: subscriptions (the price announcements), the store page, analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "partner_id",
+    "location_id",
+    "version",
+    "change",
+    "price_changes",
+    "at"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The plan.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The plan's version.",
+      "examples": [
+        2
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "created",
+        "updated"
+      ],
+      "description": "Made or changed.",
+      "examples": [
+        "updated"
+      ]
+    },
+    "price_changes": {
+      "type": "array",
+      "description": "The items whose plan price changed; empty when none did.",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_id",
+          "variant_id",
+          "old_price",
+          "new_price"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The item."
+          },
+          "variant_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The variant."
+          },
+          "old_price": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "minor_units",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor_units": {
+                    "type": "integer",
+                    "description": "The amount in paise."
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "description": "The ISO 4217 code."
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plan's price of one before; `null` for an item new to the plan."
+          },
+          "new_price": {
+            "type": "object",
+            "required": [
+              "minor_units",
+              "currency"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "minor_units": {
+                "type": "integer",
+                "description": "The amount in paise."
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "description": "The ISO 4217 code."
+              }
+            },
+            "description": "The plan's price of one now."
+          }
+        }
+      },
+      "examples": [
+        [
+          {
+            "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101",
+            "variant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102",
+            "old_price": {
+              "minor_units": 3200,
+              "currency": "INR"
+            },
+            "new_price": {
+              "minor_units": 3400,
+              "currency": "INR"
+            }
+          }
+        ]
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-01T06:00:00Z"
+      ]
+    }
+  }
+}

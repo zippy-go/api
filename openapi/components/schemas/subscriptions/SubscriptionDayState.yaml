@@ -1,0 +1,17 @@
+type: string
+description: "One day of a subscription: `none` (not a delivery day), `upcoming`, `generated` (its order made at the cutoff, waiting for its window), `on_its_way`, `delivered`, `skipped`, `paused`, `vacation`, `closed` (the store shut that day), `failed` (could not be delivered, credited back), `unpaid` (skipped at the cutoff for want of balance) or `cancelled` (its order cancelled)."
+enum:
+  - none
+  - upcoming
+  - generated
+  - on_its_way
+  - delivered
+  - skipped
+  - paused
+  - vacation
+  - closed
+  - failed
+  - unpaid
+  - cancelled
+examples:
+  - upcoming

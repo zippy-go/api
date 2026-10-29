@@ -1,0 +1,76 @@
+# Path item for /v1/customer/subscriptions/{subscription_id}/days/{date}. Referenced from openapi.yaml.
+parameters:
+  - name: subscription_id
+    in: path
+    required: true
+    description: The subscription, the customer's own.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  - name: date
+    in: path
+    required: true
+    description: A delivery day of the subscription.
+    schema:
+      type: string
+      format: date
+    example: 2026-11-08
+put:
+  operationId: setSubscriptionDay
+  summary: Skip a day or change its quantities
+  description: Skips one delivery day, or sets its quantities within each item's range (every item at 0 skips it). Before the day's cutoff, the evening before, it applies to that day and nothing is charged for a skipped one; after it the day stands, and the change applies to the next delivery day, which the answer names. A skip is confirmed to the customer once.
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The day.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/subscriptions/SubscriptionDayInput.yaml
+  responses:
+    "200":
+      description: The subscription, the day the change applies to and what to tell the customer.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/SubscriptionChange.yaml
+    "400":
+      description: "`validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the subscription is not the customer's."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`subscription_day_invalid` (not a delivery day of it, or in the past) or `subscription_ended`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,25 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7f01",
+  "type": "subscriptions.occurrence.failed",
+  "version": 1,
+  "occurred_at": "2026-11-06T01:15:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+  "correlation_id": null,
+  "payload": {
+    "occurrence_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7401",
+    "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+    "location_id": "01a13a48-9e00-7000-8000-000000000307",
+    "date": "2026-11-06",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "number": "AB0042",
+    "reason": "could_not_reach_door",
+    "credited": {
+      "minor_units": 6400,
+      "currency": "INR"
+    },
+    "failures_in_14_days": 1,
+    "at": "2026-11-06T01:15:00Z"
+  }
+}

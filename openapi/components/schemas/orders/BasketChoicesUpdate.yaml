@@ -63,6 +63,11 @@ properties:
     description: Picks the free item among its choices; `null` goes back to the cheapest.
     examples:
       - null
+  slot:
+    oneOf:
+      - $ref: ./OrderSlotInput.yaml
+      - type: "null"
+    description: Schedules the basket into one of checkout's slots, by its start; `null` orders for now. A slot that is full, too soon or before a pre-order item's notice is saved anyway and shows among the basket's refusals with why. Since 0.24.0.
 examples:
   - fulfilment: delivery
     address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81

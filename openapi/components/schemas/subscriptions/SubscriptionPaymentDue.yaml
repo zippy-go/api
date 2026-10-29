@@ -1,0 +1,21 @@
+type: object
+description: What a pending subscription waits for.
+required:
+  - top_up
+  - message
+properties:
+  top_up:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least top-up that covers the first week; `null` when it waits for a mandate.
+  message:
+    type: string
+    description: As a screen shows it.
+    examples:
+      - Top up at least ₹398 to cover the first week, or pay by UPI AutoPay.
+examples:
+  - top_up:
+      minor_units: 39800
+      currency: INR
+    message: Top up at least ₹398 to cover the first week, or pay by UPI AutoPay.

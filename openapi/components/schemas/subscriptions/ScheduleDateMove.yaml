@@ -1,0 +1,22 @@
+type: object
+description: Moving the schedule date forward, never back. The cutoffs, the release of scheduled orders and what reads the date take it at once.
+required:
+  - to
+properties:
+  to:
+    type: string
+    format: date-time
+    description: The new schedule date, later than the current one.
+    examples:
+      - 2026-11-05T14:31:00Z
+  reason:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: Why, at most 200 characters.
+    examples:
+      - Tonight's cutoff
+examples:
+  - to: 2026-11-05T14:31:00Z
+    reason: Tonight's cutoff

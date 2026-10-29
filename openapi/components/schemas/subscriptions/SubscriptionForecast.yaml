@@ -1,0 +1,57 @@
+type: object
+description: A store's demand for the next 14 days, committed by active subscriptions net of the skips, pauses and vacations already set, beside the last 28 days' deliveries.
+required:
+  - location_id
+  - from
+  - to
+  - days
+  - actuals
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  from:
+    type: string
+    format: date
+    description: "The first day forecast: tomorrow."
+    examples:
+      - 2026-11-06
+  to:
+    type: string
+    format: date
+    description: The last.
+    examples:
+      - 2026-11-19
+  days:
+    type: array
+    items:
+      $ref: ./ForecastDay.yaml
+    description: The forecast, day by day.
+  actuals:
+    type: array
+    items:
+      $ref: ./ForecastDay.yaml
+    description: The last 28 days' deliveries, day by day.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000307
+    from: 2026-11-06
+    to: 2026-11-19
+    days:
+      - date: 2026-11-06
+        occurrences: 111
+        items:
+          - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk
+            variant_label: 500 ml
+            quantity: 148
+    actuals:
+      - date: 2026-11-06
+        occurrences: 111
+        items:
+          - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+            name: Toned milk
+            variant_label: 500 ml
+            quantity: 148

@@ -1,0 +1,77 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}/withdraw. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000307
+  - name: plan_id
+    in: path
+    required: true
+    description: The plan, of the store in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+post:
+  operationId: withdrawSubscriptionPlan
+  summary: Withdraw a plan
+  description: Stops the plan taking new subscriptions (`catalog.plan.withdrawn`). It keeps serving the subscriptions it has until each ends or is cancelled, unless `end_existing` ends them all seven days from now, each subscriber told. `catalog:write` at the Location, and `subscription:manage` to end them.
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Whether the subscriptions end too.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/catalog/SubscriptionPlanWithdrawal.yaml
+  responses:
+    "200":
+      description: The withdrawn plan.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SubscriptionPlan.yaml
+    "400":
+      description: "`validation_failed`: a malformed member."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location or the plan."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`plan_withdrawn`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

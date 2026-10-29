@@ -1,0 +1,130 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/plans. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000307
+get:
+  operationId: listSubscriptionPlans
+  summary: List a store's plans
+  description: The store's plans, live first, each with its items, terms and how many subscriptions it has. `catalog:read` at the Location.
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The plans.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SubscriptionPlanList.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createSubscriptionPlan
+  summary: Offer a plan
+  description: "Offers a plan: items of the store's catalogue at the plan's own prices with their quantity ranges, the frequencies, the window, the minimum term, substitutions and the fee. It is live at once and published as its own shelf (`catalog.plan.published`). The store must take scheduled orders and deliver (`scheduled_delivery_off`). Written to the audit log. `catalog:write` at the Location."
+  tags:
+    - Catalog
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The plan.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/catalog/SubscriptionPlanCreate.yaml
+  responses:
+    "201":
+      description: The plan.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/SubscriptionPlan.yaml
+    "400":
+      description: "`validation_failed`: a member out of range, an item or variant not of the store, a window shorter than 30 minutes, or no frequency."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`scheduled_delivery_off`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

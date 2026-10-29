@@ -1,0 +1,7 @@
+type: string
+description: "Whether a plan takes subscriptions: `live`, or `withdrawn` (it serves the subscriptions it has until each ends, unless the store ended them with notice)."
+enum:
+  - live
+  - withdrawn
+examples:
+  - live

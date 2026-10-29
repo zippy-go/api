@@ -1,0 +1,80 @@
+type: object
+description: One subscriber's delivery on a day, as the store packs it.
+required:
+  - subscription_id
+  - customer_name
+  - state
+  - window
+  - items
+  - order_id
+  - order_number
+  - route_id
+  - locality
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  customer_name:
+    type: string
+    description: The customer's given name and initial.
+    examples:
+      - Asha R.
+  state:
+    $ref: ./SubscriptionDayState.yaml
+    description: Where it stands.
+  window:
+    $ref: ./DeliveryWindow.yaml
+    description: Its window.
+  items:
+    type: array
+    items:
+      $ref: ./SubscriptionDayItem.yaml
+    description: What to pack.
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its order, once generated.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type:
+      - string
+      - "null"
+    description: Its order's number.
+    examples:
+      - AB0042
+  route_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its route, once built.
+    examples:
+      - null
+  locality:
+    type:
+      - string
+      - "null"
+    description: Where it goes, by locality.
+    examples:
+      - Gachibowli
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    customer_name: Asha R.
+    state: generated
+    window:
+      starts: 06:00
+      ends: 08:00
+    items:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        name: Toned milk 500 ml
+        quantity: 2
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB0042
+    route_id: null
+    locality: Gachibowli

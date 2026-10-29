@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/subscriptions.day.changed.v1.schema.json",
+  "title": "SubscriptionsDayChangedPayload",
+  "description": "Payload of `subscriptions.day.changed` version 1. One day of a subscription changed: skipped, restored, its quantities set, or covered or freed by a vacation. Consumers: the store's calendar and forecast, notifications (a skip confirmed once), engagement (a skip keeps a streak). No payload carries a name, a phone number, an email or an address. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "subscription_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "date",
+    "to",
+    "change",
+    "quantities",
+    "after_cutoff",
+    "at"
+  ],
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The first day changed.",
+      "examples": [
+        "2026-11-08"
+      ]
+    },
+    "to": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "The last day changed, for a vacation; `null` for one day.",
+      "examples": [
+        null
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "skipped",
+        "restored",
+        "quantities",
+        "vacation",
+        "vacation_removed"
+      ],
+      "description": "What changed.",
+      "examples": [
+        "skipped"
+      ]
+    },
+    "quantities": {
+      "type": "array",
+      "description": "The day's quantities after the change; empty for a skip.",
+      "items": {
+        "type": "object",
+        "required": [
+          "variant_id",
+          "quantity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The variant."
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "How many."
+          }
+        }
+      },
+      "examples": [
+        []
+      ]
+    },
+    "after_cutoff": {
+      "type": "boolean",
+      "description": "Whether it was asked after the cutoff of the day asked for, and went to the next delivery day.",
+      "examples": [
+        false
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-07T14:00:00Z"
+      ]
+    }
+  }
+}

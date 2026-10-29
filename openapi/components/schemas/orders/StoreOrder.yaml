@@ -235,6 +235,29 @@ properties:
       - $ref: ./OrderProof.yaml
       - type: "null"
     description: "The proof of delivery, once delivered."
+  slot:
+    oneOf:
+      - $ref: ./OrderSlot.yaml
+      - type: "null"
+    description: "The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0."
+  subscription:
+    oneOf:
+      - $ref: ./OrderOccurrence.yaml
+      - type: "null"
+    description: The subscription it was generated for; `null` for any other order. Since 0.24.0.
+  scheduled:
+    type: boolean
+    examples:
+      - false
+    description: "Whether it waits under Scheduled: placed for a slot and not yet sent to the store, which it is at the store's lead time before the slot. Since 0.24.0."
+  released_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    examples:
+      - null
+    description: When a scheduled order was sent to the store, or accepted early; `null` for an order for now and one still waiting. Since 0.24.0.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
     number: AB0042

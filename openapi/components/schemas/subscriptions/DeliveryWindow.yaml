@@ -1,0 +1,21 @@
+type: object
+description: A delivery window on the store's clock.
+required:
+  - starts
+  - ends
+properties:
+  starts:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: When it starts, HH:MM.
+    examples:
+      - 06:00
+  ends:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: When it ends, HH:MM.
+    examples:
+      - 08:00
+examples:
+  - starts: 06:00
+    ends: 08:00

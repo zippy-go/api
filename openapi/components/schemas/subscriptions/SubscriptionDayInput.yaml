@@ -1,0 +1,17 @@
+type: object
+description: "One day's delivery: skipped, or its quantities. A day whose cutoff passed changes the next delivery day instead, as the answer says."
+properties:
+  skip:
+    type: boolean
+    description: "Skip the day: nothing delivered or charged."
+    examples:
+      - false
+  quantities:
+    type: array
+    items:
+      $ref: ./SubscriptionItemInput.yaml
+    description: The day's quantities; every item at 0 skips it.
+examples:
+  - quantities:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        quantity: 3

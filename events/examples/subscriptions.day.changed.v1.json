@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7f01",
+  "type": "subscriptions.day.changed",
+  "version": 1,
+  "occurred_at": "2026-11-07T14:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+  "correlation_id": null,
+  "payload": {
+    "subscription_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000006",
+    "location_id": "01a13a48-9e00-7000-8000-000000000307",
+    "date": "2026-11-08",
+    "to": null,
+    "change": "skipped",
+    "quantities": [],
+    "after_cutoff": false,
+    "at": "2026-11-07T14:00:00Z"
+  }
+}

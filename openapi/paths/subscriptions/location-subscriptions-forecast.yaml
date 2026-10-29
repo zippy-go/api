@@ -1,0 +1,61 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/subscriptions/forecast. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The store, which must be a Location of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000307
+get:
+  operationId: getSubscriptionForecast
+  summary: Read a store's demand forecast
+  description: "The next 14 days' demand per item per day, committed by active subscriptions net of the skips, pauses and vacations already set, beside the last 28 days' deliveries, recalculated on every read. `Accept: text/csv` answers the same figures as a spreadsheet. `subscription:read` at the Location."
+  tags:
+    - Subscriptions
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The forecast.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/subscriptions/SubscriptionForecast.yaml
+        text/csv:
+          schema:
+            type: string
+            description: "The forecast as CSV: one row per day and item, with `date`, `kind` (`forecast` or `actual`), `item`, `variant` and `quantity`."
+    "400":
+      description: "`validation_failed`: a malformed identifier."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

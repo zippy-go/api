@@ -1,0 +1,69 @@
+type: object
+description: One slot checkout offers, open or not with why.
+required:
+  - starts_at
+  - ends_at
+  - date
+  - label
+  - places_left
+  - open
+  - code
+  - reason
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: When the slot starts.
+    examples:
+      - 2026-11-06T03:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-06T04:00:00Z
+  date:
+    type: string
+    format: date
+    description: The day it falls on, on the store's clock.
+    examples:
+      - 2026-11-06
+  label:
+    type: string
+    description: The slot on the store's clock, as a screen shows it.
+    examples:
+      - 09:00 to 09:30
+  places_left:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    description: How many more orders it takes; `null` where the store caps no slot.
+    examples:
+      - 3
+  open:
+    type: boolean
+    description: Whether it may be chosen.
+    examples:
+      - true
+  code:
+    oneOf:
+      - $ref: ./CheckoutSlotCode.yaml
+      - type: "null"
+    description: Why not.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why not, as a sentence a screen may show.
+    examples:
+      - null
+examples:
+  - starts_at: 2026-11-06T03:30:00Z
+    ends_at: 2026-11-06T04:00:00Z
+    date: 2026-11-06
+    label: 09:00 to 09:30
+    places_left: 3
+    open: true
+    code: null
+    reason: null

@@ -1,0 +1,56 @@
+type: object
+description: What marking one order ready did.
+required:
+  - order_id
+  - number
+  - ready
+  - status
+  - code
+  - message
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  number:
+    type:
+      - string
+      - "null"
+    description: Its number; `null` for an order the store does not have.
+    examples:
+      - AB0042
+  ready:
+    type: boolean
+    description: Whether it is ready now.
+    examples:
+      - true
+  status:
+    type:
+      - string
+      - "null"
+    description: Its status after.
+    examples:
+      - ready
+  code:
+    type:
+      - string
+      - "null"
+    description: Why not, as a catalogued code (`not_found`, `order_moved`).
+    examples:
+      - null
+  message:
+    type:
+      - string
+      - "null"
+    description: Why not, as a sentence.
+    examples:
+      - null
+examples:
+  - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    number: AB0042
+    ready: true
+    status: ready
+    code: null
+    message: null

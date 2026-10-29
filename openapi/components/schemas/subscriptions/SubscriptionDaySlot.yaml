@@ -1,0 +1,30 @@
+type: object
+description: A window's occurrences on a day, by route once routes are built.
+required:
+  - window
+  - route_id
+  - occurrences
+properties:
+  window:
+    $ref: ./DeliveryWindow.yaml
+    description: The window.
+  route_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The route, once the morning's routes are built; `null` before.
+    examples:
+      - null
+  occurrences:
+    type: integer
+    minimum: 0
+    description: How many.
+    examples:
+      - 111
+examples:
+  - window:
+      starts: 06:00
+      ends: 08:00
+    route_id: null
+    occurrences: 111

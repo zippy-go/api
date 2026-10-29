@@ -1,0 +1,47 @@
+type: object
+description: "The date the cutoffs, the route building, the release of scheduled orders and the start of planned trips read: the real time, unless platform staff moved it forward on a developer's machine or in the sandbox. Everything else keeps the real time."
+required:
+  - now
+  - real_now
+  - moved
+  - movable
+  - moves
+properties:
+  now:
+    type: string
+    format: date-time
+    description: The schedule date now.
+    examples:
+      - 2026-11-05T14:31:00Z
+  real_now:
+    type: string
+    format: date-time
+    description: The real time now.
+    examples:
+      - 2026-11-05T09:00:00Z
+  moved:
+    type: boolean
+    description: Whether it was ever moved.
+    examples:
+      - true
+  movable:
+    type: boolean
+    description: "Whether it can be moved here: only on a developer's machine or in the sandbox."
+    examples:
+      - true
+  moves:
+    type: array
+    items:
+      $ref: ./ScheduleDateMoveRecord.yaml
+    description: Every move, oldest first; each is in the audit log too.
+examples:
+  - now: 2026-11-05T14:31:00Z
+    real_now: 2026-11-05T09:00:00Z
+    moved: true
+    movable: true
+    moves:
+      - moved_at: 2026-11-05T09:00:00Z
+        from: 2026-11-05T09:00:00Z
+        to: 2026-11-05T14:31:00Z
+        by_name: Platform Admin
+        reason: Tonight's cutoff

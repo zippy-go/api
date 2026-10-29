@@ -1,0 +1,35 @@
+type: object
+description: A pause in force or set.
+required:
+  - from
+  - until
+  - reason
+  - message
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day without deliveries.
+    examples:
+      - 2026-11-03
+  until:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The last day without them; `null` until resumed.
+    examples:
+      - null
+  reason:
+    $ref: ./SubscriptionPauseReason.yaml
+    description: Why.
+  message:
+    type: string
+    description: What it means, as a screen shows it.
+    examples:
+      - Paused from Tuesday 3 November until you resume it.
+examples:
+  - from: 2026-11-03
+    until: null
+    reason: customer
+    message: Paused from Tuesday 3 November until you resume it.

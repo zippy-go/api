@@ -1,0 +1,51 @@
+type: object
+description: One item of a plan as written.
+required:
+  - item_id
+  - unit_price
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item, of the store's catalogue.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+  variant_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The variant; `null` for an item with one.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: The plan's price of one, GST included.
+  default_quantity:
+    type: integer
+    minimum: 1
+    description: The quantity a subscriber starts from; 1 by default.
+    examples:
+      - 1
+  min_quantity:
+    type: integer
+    minimum: 1
+    description: The least a day may have; 1 by default.
+    examples:
+      - 1
+  max_quantity:
+    type: integer
+    minimum: 1
+    maximum: 20
+    description: The most a day may have, at most 20; 6 by default.
+    examples:
+      - 6
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+    variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+    unit_price:
+      minor_units: 3200
+      currency: INR
+    default_quantity: 1
+    min_quantity: 1
+    max_quantity: 6

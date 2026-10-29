@@ -1,0 +1,10 @@
+type: string
+description: "`pending` (waiting for the Wallet to cover the first delivery or the mandate to be confirmed; nothing is scheduled), `active`, `paused`, `cancelled` or `ended` (its end date passed, or its plan ended it)."
+enum:
+  - pending
+  - active
+  - paused
+  - cancelled
+  - ended
+examples:
+  - active

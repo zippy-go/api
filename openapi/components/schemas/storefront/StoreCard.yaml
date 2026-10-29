@@ -134,6 +134,11 @@ properties:
       - $ref: ../promotions/StoreOfferBadge.yaml
       - type: "null"
     description: The store's best advertised offer open to everyone and how many more it has; `null` when it runs none.
+  plans:
+    type: array
+    items:
+      $ref: ./StorePlanCard.yaml
+    description: Its live plans, as Daily Essentials' cards show them; empty when it offers none. Since 0.24.0.
 examples:
   - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02

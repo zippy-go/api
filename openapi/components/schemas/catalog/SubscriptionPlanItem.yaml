@@ -1,0 +1,82 @@
+type: object
+description: "One item of a plan: a variant of the store's catalogue at the plan's own price per unit, with the quantities a subscriber may choose."
+required:
+  - item_id
+  - variant_id
+  - name
+  - variant_label
+  - food_mark
+  - unit_price
+  - default_quantity
+  - min_quantity
+  - max_quantity
+  - available
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+  variant_id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+  name:
+    type: string
+    description: The item's name.
+    examples:
+      - Toned milk
+  variant_label:
+    type:
+      - string
+      - "null"
+    description: The variant, where the item has several.
+    examples:
+      - 500 ml
+  food_mark:
+    oneOf:
+      - $ref: ./FoodMark.yaml
+      - type: "null"
+    description: The food mark, for food.
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: The plan's price of one, GST included; it may differ from the menu's.
+  default_quantity:
+    type: integer
+    minimum: 1
+    description: The quantity a subscriber starts from.
+    examples:
+      - 1
+  min_quantity:
+    type: integer
+    minimum: 1
+    description: The least a day may have.
+    examples:
+      - 1
+  max_quantity:
+    type: integer
+    minimum: 1
+    description: The most a day may have.
+    examples:
+      - 6
+  available:
+    type: boolean
+    description: Whether it is on the store's published menu now.
+    examples:
+      - true
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7101
+    variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+    name: Toned milk
+    variant_label: 500 ml
+    food_mark: veg
+    unit_price:
+      minor_units: 3200
+      currency: INR
+    default_quantity: 1
+    min_quantity: 1
+    max_quantity: 6
+    available: true

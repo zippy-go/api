@@ -1,0 +1,29 @@
+type: object
+description: The UPI AutoPay mandate of a subscription, as the subscription knows it; the mandate itself is the payments'.
+required:
+  - mandate_id
+  - state
+  - limit
+properties:
+  mandate_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The mandate, once asked for.
+    examples:
+      - null
+  state:
+    type: string
+    description: "`pending` until the customer approves it, `confirmed`, `paused`, `cancelled` or `revoked`."
+    examples:
+      - pending
+  limit:
+    $ref: ../common/Money.yaml
+    description: "The most one debit may take: 1.5 times a delivery, rounded up to the next ₹100."
+examples:
+  - mandate_id: null
+    state: pending
+    limit:
+      minor_units: 10000
+      currency: INR

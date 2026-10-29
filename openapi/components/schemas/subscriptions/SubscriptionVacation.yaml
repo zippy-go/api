@@ -1,0 +1,37 @@
+type: object
+description: "Days away: no delivery and nothing charged."
+required:
+  - vacation_id
+  - from
+  - to
+  - created_at
+properties:
+  vacation_id:
+    type: string
+    format: uuid
+    description: The vacation.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7301
+  from:
+    type: string
+    format: date
+    description: The first day away.
+    examples:
+      - 2026-11-10
+  to:
+    type: string
+    format: date
+    description: The last day away.
+    examples:
+      - 2026-11-16
+  created_at:
+    type: string
+    format: date-time
+    description: When it was set.
+    examples:
+      - 2026-11-08T10:00:00Z
+examples:
+  - vacation_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7301
+    from: 2026-11-10
+    to: 2026-11-16
+    created_at: 2026-11-08T10:00:00Z

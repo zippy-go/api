@@ -1,0 +1,28 @@
+type: object
+description: The subscription an order was generated for, one delivery day of it.
+required:
+  - subscription_id
+  - plan_name
+  - date
+properties:
+  subscription_id:
+    type: string
+    format: uuid
+    description: The subscription.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+  plan_name:
+    type: string
+    description: The plan.
+    examples:
+      - Daily milk
+  date:
+    type: string
+    format: date
+    description: The delivery day.
+    examples:
+      - 2026-11-06
+examples:
+  - subscription_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201
+    plan_name: Daily milk
+    date: 2026-11-06

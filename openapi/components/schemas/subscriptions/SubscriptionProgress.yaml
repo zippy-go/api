@@ -1,0 +1,37 @@
+type: object
+description: How a day's occurrences stand.
+required:
+  - packed
+  - collected
+  - delivered
+  - failed
+properties:
+  packed:
+    type: integer
+    minimum: 0
+    description: Packed and ready.
+    examples:
+      - 0
+  collected:
+    type: integer
+    minimum: 0
+    description: Collected by an Agent.
+    examples:
+      - 0
+  delivered:
+    type: integer
+    minimum: 0
+    description: Delivered.
+    examples:
+      - 0
+  failed:
+    type: integer
+    minimum: 0
+    description: Could not be delivered.
+    examples:
+      - 0
+examples:
+  - packed: 0
+    collected: 0
+    delivered: 0
+    failed: 0

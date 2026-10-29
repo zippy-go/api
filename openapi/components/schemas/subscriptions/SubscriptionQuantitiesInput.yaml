@@ -1,0 +1,22 @@
+type: object
+description: Everyday quantities from a day onward; the days before keep theirs.
+required:
+  - from
+  - quantities
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day.
+    examples:
+      - 2026-11-09
+  quantities:
+    type: array
+    items:
+      $ref: ./SubscriptionItemInput.yaml
+    description: The quantities, each within its range and at least one above 0.
+examples:
+  - from: 2026-11-09
+    quantities:
+      - variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7102
+        quantity: 2

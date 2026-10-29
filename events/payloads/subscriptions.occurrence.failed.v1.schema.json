@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/subscriptions.occurrence.failed.v1.schema.json",
+  "title": "SubscriptionsOccurrenceFailedPayload",
+  "description": "Payload of `subscriptions.occurrence.failed` version 1. A subscription's delivery could not be made and its order was cancelled as could not deliver, its price credited back to the Wallet. Consumers: notifications (the customer, with the photo), the store's calendar, analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "occurrence_id",
+    "subscription_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "date",
+    "order_id",
+    "number",
+    "reason",
+    "credited",
+    "failures_in_14_days",
+    "at"
+  ],
+  "properties": {
+    "occurrence_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The occurrence: one delivery day of the subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7401"
+      ]
+    },
+    "subscription_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The delivery day.",
+      "examples": [
+        "2026-11-06"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why, as the Agent recorded it.",
+      "examples": [
+        "could_not_reach_door"
+      ]
+    },
+    "credited": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What went back to the Wallet.",
+      "examples": [
+        {
+          "minor_units": 6400,
+          "currency": "INR"
+        }
+      ]
+    },
+    "failures_in_14_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Failed deliveries of the subscription in the 14 days to this one; the third pauses it.",
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-06T01:15:00Z"
+      ]
+    }
+  }
+}

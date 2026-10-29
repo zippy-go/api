@@ -1,0 +1,18 @@
+type: object
+description: Cancelling a subscription, with an optional reason the churn report counts.
+properties:
+  reason:
+    oneOf:
+      - $ref: ./SubscriptionCancelReason.yaml
+      - type: "null"
+    description: Why.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    description: More, at most 500 characters.
+    examples:
+      - null
+examples:
+  - reason: moving

@@ -1,0 +1,21 @@
+type: object
+description: Days away, at most 90.
+required:
+  - from
+  - to
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day away.
+    examples:
+      - 2026-11-10
+  to:
+    type: string
+    format: date
+    description: The last day away.
+    examples:
+      - 2026-11-16
+examples:
+  - from: 2026-11-10
+    to: 2026-11-16

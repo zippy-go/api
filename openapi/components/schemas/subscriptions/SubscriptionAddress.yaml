@@ -1,0 +1,27 @@
+type: object
+description: Where a subscription delivers.
+required:
+  - address_id
+  - label
+  - summary
+properties:
+  address_id:
+    type: string
+    format: uuid
+    description: The customer's saved address.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+  label:
+    type: string
+    description: Home, work or another name.
+    examples:
+      - Home
+  summary:
+    type: string
+    description: The address on one line.
+    examples:
+      - 402, Lake View Residency, Gachibowli
+examples:
+  - address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+    label: Home
+    summary: 402, Lake View Residency, Gachibowli

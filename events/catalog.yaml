@@ -1538,3 +1538,130 @@ events:
       A streak's week has no order by Saturday 18:00 on its clock: the customer is told once that week, where they agreed to such messages.
     payload_schema: ./payloads/engagement.streak.at_risk.v1.schema.json
     example: ./examples/engagement.streak.at_risk.v1.json
+  - type: subscriptions.subscription.started
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription started: the Wallet covered its first delivery or its mandate was confirmed, and its days are scheduled. Consumers: notifications (the customer, with the first delivery), the store's calendar, engagement (the "subscription started" quest step), analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.started.v1.schema.json
+    example: ./examples/subscriptions.subscription.started.v1.json
+
+  - type: subscriptions.subscription.changed
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription changed: its address, substitution policy, end date or everyday quantities. Consumers: the store's calendar, analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.changed.v1.schema.json
+    example: ./examples/subscriptions.subscription.changed.v1.json
+
+  - type: subscriptions.subscription.paused
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription paused: by the customer, or by itself for want of balance, after three failed deliveries in 14 days, or because its mandate was revoked. Consumers: notifications (the customer when it paused itself, with how to resume), the store's calendar, analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.paused.v1.schema.json
+    example: ./examples/subscriptions.subscription.paused.v1.json
+
+  - type: subscriptions.subscription.resumed
+    version: 1
+    domain: subscriptions
+    description: >-
+      A paused subscription resumed. Consumers: the store's calendar, analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.resumed.v1.schema.json
+    example: ./examples/subscriptions.subscription.resumed.v1.json
+
+  - type: subscriptions.subscription.cancelled
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription was cancelled, with the reason the customer gave; an order generated before stands unless cancelled on its own. Consumers: notifications (the customer), the store's calendar, analytics (churn). No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.cancelled.v1.schema.json
+    example: ./examples/subscriptions.subscription.cancelled.v1.json
+
+  - type: subscriptions.subscription.ended
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription ended: its end date passed, or its withdrawn plan ended it with notice. Consumers: notifications, the store's calendar, analytics (churn). No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.subscription.ended.v1.schema.json
+    example: ./examples/subscriptions.subscription.ended.v1.json
+
+  - type: subscriptions.day.changed
+    version: 1
+    domain: subscriptions
+    description: >-
+      One day of a subscription changed: skipped, restored, its quantities set, or covered or freed by a vacation. Consumers: the store's calendar and forecast, notifications (a skip confirmed once), engagement (a skip keeps a streak). No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/subscriptions.day.changed.v1.schema.json
+    example: ./examples/subscriptions.day.changed.v1.json
+
+  - type: subscriptions.occurrence.generated
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription's delivery day was generated at the cutoff as an ordinary order into its window, held from the Wallet; generated once whatever the servers. Consumers: the store's calendar, analytics; the order itself announces `ordering.order.placed` with its slot and occurrence, which routes builds from.
+    payload_schema: ./payloads/subscriptions.occurrence.generated.v1.schema.json
+    example: ./examples/subscriptions.occurrence.generated.v1.json
+
+  - type: subscriptions.occurrence.skipped
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription's delivery day was not generated at the cutoff: skipped by the customer, away, paused, the store closed, for want of balance, or its mandate debit refused with no Wallet to fall to. Consumers: notifications (the customer, for want of balance and a closure), engagement (a skip keeps a streak), analytics.
+    payload_schema: ./payloads/subscriptions.occurrence.skipped.v1.schema.json
+    example: ./examples/subscriptions.occurrence.skipped.v1.json
+
+  - type: subscriptions.occurrence.failed
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription's delivery could not be made and its order was cancelled as could not deliver, its price credited back to the Wallet. Consumers: notifications (the customer, with the photo), the store's calendar, analytics.
+    payload_schema: ./payloads/subscriptions.occurrence.failed.v1.schema.json
+    example: ./examples/subscriptions.occurrence.failed.v1.json
+
+  - type: subscriptions.occurrence.completed
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription's delivery was made, with its proof at the door. Consumers: engagement (subscription streaks), reviews (the month's review), analytics.
+    payload_schema: ./payloads/subscriptions.occurrence.completed.v1.schema.json
+    example: ./examples/subscriptions.occurrence.completed.v1.json
+
+  - type: subscriptions.price.announced
+    version: 1
+    domain: subscriptions
+    description: >-
+      A plan item's new price was announced to one subscriber: it applies from seven days after, and deliveries until then keep the old price. Consumers: notifications (the customer, with the old price, the new price and the day).
+    payload_schema: ./payloads/subscriptions.price.announced.v1.schema.json
+    example: ./examples/subscriptions.price.announced.v1.json
+
+  - type: subscriptions.statement.ready
+    version: 1
+    domain: subscriptions
+    description: >-
+      A subscription's statement for a month was issued, on the 1st of the next month at 08:00 on the store's clock. Consumers: notifications (the customer: in the account, and by email where they have one).
+    payload_schema: ./payloads/subscriptions.statement.ready.v1.schema.json
+    example: ./examples/subscriptions.statement.ready.v1.json
+
+  - type: catalog.plan.published
+    version: 1
+    domain: catalog
+    description: >-
+      A store published a plan, made or changed: its terms are what customers read, and a changed price is announced to its subscribers. Consumers: subscriptions (the price announcements), the store page, analytics.
+    payload_schema: ./payloads/catalog.plan.published.v1.schema.json
+    example: ./examples/catalog.plan.published.v1.json
+
+  - type: catalog.plan.withdrawn
+    version: 1
+    domain: catalog
+    description: >-
+      A store withdrew a plan: it takes no new subscriptions, and keeps the ones it has unless the store ended them with seven days' notice. Consumers: subscriptions (ending them on the day), the store page, analytics.
+    payload_schema: ./payloads/catalog.plan.withdrawn.v1.schema.json
+    example: ./examples/catalog.plan.withdrawn.v1.json
+
+  - type: ordering.order.released
+    version: 1
+    domain: ordering
+    description: >-
+      A scheduled order, or a subscription's occurrence, was sent to its store at the store's lead time before its slot (the preparation time plus 15 minutes): it moves from Scheduled to new orders with the sound, and the not-answered alert and the auto-decline run from now. Consumers: notifications (the store's new order with its sound), Mission Control.
+    payload_schema: ./payloads/ordering.order.released.v1.schema.json
+    example: ./examples/ordering.order.released.v1.json

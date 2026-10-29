@@ -1,0 +1,84 @@
+# Path item for /v1/storefront/stores/{location_id}/plans/{plan_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000307
+  - name: plan_id
+    in: path
+    required: true
+    description: The plan, of the store in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7001
+get:
+  operationId: getStorePlan
+  summary: Read a plan
+  description: One live plan of the store with its terms and the reach of the customer's address, as `listStorePlans` has it. A withdrawn plan answers `404`.
+  tags:
+    - Store pages
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: address_id
+      in: query
+      required: false
+      description: One of the customer's saved addresses to check the reach of.
+      schema:
+        type: string
+        format: uuid
+    - name: lat
+      in: query
+      required: false
+      description: A pin's latitude, with `lng`, for a visitor.
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+    - name: lng
+      in: query
+      required: false
+      description: A pin's longitude, with `lat`.
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+  responses:
+    "200":
+      description: The plan.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/catalog/StorefrontPlan.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or coordinate."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the store or the plan, or the address is not the customer's."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,9 @@
+type: string
+description: "Why a slot cannot be chosen: `slot_full` (no place left), `slot_past` (it starts sooner than the store's lead time), `item_pre_order_only` (sooner than a pre-order item's notice), `store_closed` (the store is shut then and takes no scheduled orders for it)."
+enum:
+  - slot_full
+  - slot_past
+  - item_pre_order_only
+  - store_closed
+examples:
+  - slot_full

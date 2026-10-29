@@ -1,0 +1,37 @@
+type: object
+description: One day of a month's statement.
+required:
+  - date
+  - state
+  - amount
+  - order_id
+properties:
+  date:
+    type: string
+    format: date
+    description: The day.
+    examples:
+      - 2026-11-06
+  state:
+    $ref: ./SubscriptionDayState.yaml
+    description: What it was.
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What it cost, or what was credited back.
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+examples:
+  - date: 2026-11-06
+    state: delivered
+    amount:
+      minor_units: 6400
+      currency: INR
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
