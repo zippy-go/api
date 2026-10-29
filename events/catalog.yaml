@@ -1530,3 +1530,11 @@ events:
       An Agent earned from an incentive: reached a quest's tier, or completed a drop-off in a bonus's window. Payouts adds it to the platform fleet Agent's week under "Bonuses and quests", beside the pay for each task, or to a Partner's own Agent's week on the weekly report, for the Partner to pay.
     payload_schema: ./payloads/engagement.incentive.earned.v1.schema.json
     example: ./examples/engagement.incentive.earned.v1.json
+
+  - type: engagement.streak.at_risk
+    version: 1
+    domain: engagement
+    description: >-
+      A streak's week has no order by Saturday 18:00 on its clock: the customer is told once that week, where they agreed to such messages.
+    payload_schema: ./payloads/engagement.streak.at_risk.v1.schema.json
+    example: ./examples/engagement.streak.at_risk.v1.json

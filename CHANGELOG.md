@@ -86,10 +86,10 @@ code may count. Additive only.
   `AgentBonusLine`), filling `AgentStatementFigures.bonuses`; the bonuses
   column of a Partner's own Agents' weekly report (`AgentWeeksRow.bonuses`,
   `AgentWeeksTotals.bonuses`).
-- Twenty-three events: `engagement.campaign.created`, `.published`,
+- Twenty-four events: `engagement.campaign.created`, `.published`,
   `.started`, `.paused`, `.resumed`, `.ended`; `engagement.reward.granted`,
   `.held`, `.released`, `.refused`, `.clawed_back`;
-  `engagement.streak.advanced`, `.frozen`, `.broken`;
+  `engagement.streak.advanced`, `.frozen`, `.broken`, `.at_risk`;
   `engagement.quest.started`, `.completed`, `.expired`;
   `engagement.tier.changed`; `engagement.referral.recorded`, `.rewarded`;
   `engagement.incentive.published`, `.joined`, `.earned`. None carries a
@@ -107,6 +107,10 @@ code may count. Additive only.
 
 ### Changed
 
+- `wallet.entry.recorded` gains the optional `payer_partner_share`: a
+  reward's credit the platform and a Partner pay in shares carries the
+  Partner's share, and a reward taken back is the same credit turned the
+  other way.
 - New permissions `engagement:read`, `engagement:write` and
   `engagement:manage`; edition 9 of the default roles gives
   Manager `engagement:read` and `engagement:write`, Staff

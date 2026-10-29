@@ -113,6 +113,17 @@
       "format": "uuid",
       "description": "The Partner, when a Partner pays for a credit."
     },
+    "payer_partner_share": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The Partner's share of a credit the platform pays the rest of, a reward funded by both, signed as the entry; absent when the payer pays all of it. Since step 6."
+    },
     "wallet_version": {
       "type": "integer",
       "description": "The Wallet's version after it.",

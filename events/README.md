@@ -180,6 +180,7 @@ with the identifiers when it is needed.
 | `engagement.streak.advanced` | 1 | A customer's weekly streak counted a week with a completed order. Payload: `campaign_id`, `customer_id`, `week`, `weeks`, `at`, `previous_weeks`, `milestone`. |
 | `engagement.streak.frozen` | 1 | A week passed without an order and the month's freeze kept the streak; the customer is told their freeze kept it. Payload: `campaign_id`, `customer_id`, `week`, `weeks`, `at`. |
 | `engagement.streak.broken` | 1 | A week passed without an order and no freeze was left: the streak is broken and shown as 0. Payload: `campaign_id`, `customer_id`, `week`, `weeks`, `at`, `previous_weeks`. |
+| `engagement.streak.at_risk` | 1 | A streak's week has no order by Saturday 18:00 on its clock: the customer is told once that week, where they agreed to such messages. Payload: `campaign_id`, `customer_id`, `week`, `weeks`, `at`. |
 | `engagement.quest.started` | 1 | A customer pressed Start on a quest: from now its steps count, until its days run out. Payload: `campaign_id`, `customer_id`, `progress_id`, `rules_version`, `at`, `started_at`, `ends_at`, `started_from`. |
 | `engagement.quest.completed` | 1 | A customer completed a quest's last step; its reward is granted once. Payload: `campaign_id`, `customer_id`, `progress_id`, `rules_version`, `at`, `completed_at`, `order_id`. |
 | `engagement.quest.expired` | 1 | A quest's days ran out before its steps were done. Payload: `campaign_id`, `customer_id`, `progress_id`, `rules_version`, `at`, `done`, `needed`. |

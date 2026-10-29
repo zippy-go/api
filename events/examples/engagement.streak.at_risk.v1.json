@@ -1,0 +1,15 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f6015",
+  "type": "engagement.streak.at_risk",
+  "version": 1,
+  "occurred_at": "2026-11-04T12:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "campaign_id": "01a13a48-9e00-7000-8000-000000006001",
+    "customer_id": "01a13a48-9e00-7000-8000-000000000701",
+    "week": "2026W45",
+    "weeks": 4,
+    "at": "2026-11-04T12:00:00Z"
+  }
+}
