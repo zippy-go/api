@@ -1,0 +1,50 @@
+# Path item for /v1/storefront/stores/{location_id}/bundles. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: listStoreBundles
+  summary: List the live bundles of a store's page
+  description: The live bundles whose first side is this store, for its page and its basket. A bundle pairs an item or category at one store with one at another store of another Partner within 1 km, with a saving on the pair that ZippyGo or the two Partners pay. Each store accepts it as a campaign is accepted; live, it shows on the first store's page and in its basket, and each order carries its share as an offer the promotions engine prices, kept if the other order is declined. Public.
+  tags:
+    - Bundles
+  security: []
+  responses:
+    "200":
+      description: The bundles.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/StoreBundleList.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no live store."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

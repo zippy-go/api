@@ -1,0 +1,11 @@
+type: string
+description: "Where a stop is: `planned` until the store has the order ready, `ready` (a pickup the store marked ready or packed), `collected` (the Agent has the order: a pickup done, a drop on its way), `delivered` (a drop done), `failed` (could not collect or deliver, with the reason on the delivery), `cancelled` (its order left the route)."
+enum:
+  - planned
+  - ready
+  - collected
+  - delivered
+  - failed
+  - cancelled
+examples:
+  - planned

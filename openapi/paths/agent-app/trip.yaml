@@ -1,0 +1,56 @@
+# Path item for /v1/agent/trips/{trip_id}. Referenced from openapi.yaml.
+parameters:
+  - name: trip_id
+    in: path
+    required: true
+    description: The trip.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8201
+get:
+  operationId: getAgentTrip
+  summary: Read one of the agent's trips
+  description: One of the Agent's trips with every stop in order, the next stop first, each pickup saying whether the store has the order ready, and the trip's pay under the rule it was given with. A trip carries one delivery, a drop added on demand, two orders of one customer, or a planned route; the app shows them alike. For the Agent holding it (an Agent token), or the simulator's service token for an Agent without a person.
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The trip.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentTrip.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden` for a token that is not the Agent's."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no trip of the caller's."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

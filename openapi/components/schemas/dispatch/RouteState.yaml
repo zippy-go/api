@@ -1,0 +1,11 @@
+type: string
+description: "Where a planned route is: built and re-optimised while `planned`; `offered` to the Agents on duty in its zone at its lead time; `assigned` to one Agent (by an offer accepted or a dispatcher); `started` once the Agent set out; `completed` once every stop ended; `cancelled` when every order left it before it started."
+enum:
+  - planned
+  - offered
+  - assigned
+  - started
+  - completed
+  - cancelled
+examples:
+  - planned

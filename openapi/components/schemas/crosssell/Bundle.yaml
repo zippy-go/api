@@ -1,0 +1,159 @@
+type: object
+description: "A bundle across two Partners, as Mission Control keeps it: an item or category at one store paired with one at another store within 1 km, a saving on the pair and who pays it. Each store accepts it as a campaign is accepted; live, it shows on the first store's page and in its basket, and each order carries its share as an offer the promotions engine prices, kept if the other order is declined."
+required:
+  - id
+  - name
+  - headline
+  - saving
+  - funded_by
+  - state
+  - distance_metres
+  - starts_at
+  - ends_at
+  - first
+  - second
+  - taken
+  - version
+  - created_at
+  - updated_at
+  - published_at
+  - stopped_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The bundle.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Biryani and a sweet
+  headline:
+    type: string
+    description: What customers read.
+    examples:
+      - Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+  saving:
+    $ref: ../common/Money.yaml
+    description: The saving on the pair.
+  funded_by:
+    $ref: ./BundleFunding.yaml
+    description: Who pays the saving.
+  state:
+    $ref: ./BundleState.yaml
+    description: Where it is.
+  distance_metres:
+    type: integer
+    minimum: 0
+    maximum: 1000
+    description: How far apart the two stores are, at most 1,000 m.
+    examples:
+      - 540
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts; `null` from publishing.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` until stopped.
+    examples:
+      - null
+  first:
+    $ref: ./BundleSide.yaml
+    description: The side shown first, on whose page the bundle appears.
+  second:
+    $ref: ./BundleSide.yaml
+    description: The side added to a basket at its store when a customer takes the bundle.
+  taken:
+    type: integer
+    minimum: 0
+    description: How many times customers took it.
+    examples:
+      - 12
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change; the entity tag.
+    examples:
+      - 3
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-01T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-11-02T10:05:00Z
+  published_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was published.
+    examples:
+      - 2026-11-01T09:30:00Z
+  stopped_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was stopped.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+    name: Biryani and a sweet
+    headline: Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+    saving:
+      minor_units: 6000
+      currency: INR
+    funded_by: platform
+    state: live
+    distance_metres: 540
+    starts_at: null
+    ends_at: null
+    first:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      location_name: Dev Kitchen Gachibowli
+      partner_id: 01a13a48-9e00-7000-8000-000000000001
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+      category_id: null
+      name: Hyderabadi Biryani
+      share:
+        minor_units: 3000
+        currency: INR
+      answer: accepted
+      answered_at: 2026-11-02T10:00:00Z
+      offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8501
+    second:
+      location_id: 01a13a48-9e00-7000-8000-000000000308
+      location_name: Charminar Bakes Gachibowli
+      partner_id: 01a13a48-9e00-7000-8000-000000000003
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+      category_id: null
+      name: Dil Kush
+      share:
+        minor_units: 3000
+        currency: INR
+      answer: accepted
+      answered_at: 2026-11-02T10:05:00Z
+      offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8502
+    taken: 12
+    version: 3
+    created_at: 2026-11-01T09:00:00Z
+    updated_at: 2026-11-02T10:05:00Z
+    published_at: 2026-11-01T09:30:00Z
+    stopped_at: null

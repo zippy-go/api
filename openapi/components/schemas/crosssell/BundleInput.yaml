@@ -1,0 +1,64 @@
+type: object
+description: "A bundle as Mission Control writes it, whole: the two sides at two stores of two Partners within 1 km, the saving, the first side's share of it (half by default) and who pays it. A published bundle changes only its name and end."
+required:
+  - name
+  - first
+  - second
+  - saving
+  - funded_by
+properties:
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Biryani and a sweet
+  first:
+    $ref: ./BundleSideInput.yaml
+    description: The side shown first.
+  second:
+    $ref: ./BundleSideInput.yaml
+    description: The side added to a basket at its store.
+  saving:
+    $ref: ../common/Money.yaml
+    description: The saving on the pair.
+  first_share:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The first side's share; the rest is the second's. Half by default.
+  funded_by:
+    $ref: ./BundleFunding.yaml
+    description: Who pays the saving.
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts; `null` from publishing.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` until stopped.
+    examples:
+      - null
+examples:
+  - name: Biryani and a sweet
+    first:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+      category_id: null
+    second:
+      location_id: 01a13a48-9e00-7000-8000-000000000308
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+      category_id: null
+    saving:
+      minor_units: 6000
+      currency: INR
+    first_share: null
+    funded_by: platform
+    starts_at: null
+    ends_at: null

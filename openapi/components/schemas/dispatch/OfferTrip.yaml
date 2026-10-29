@@ -1,0 +1,51 @@
+type: object
+description: "The trip an offer is for, when it is more than one delivery: a planned route offered whole. The offer's `stops` then list every stop in order, and its `delivery_id` names the route, since a route's orders may not have their deliveries yet."
+required:
+  - route_id
+  - window_starts_at
+  - window_ends_at
+  - pickups
+  - drops
+properties:
+  route_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The planned route.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101
+  window_starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: The route's window.
+    examples:
+      - 2026-11-06T00:30:00Z
+  window_ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: The window's end.
+    examples:
+      - 2026-11-06T02:30:00Z
+  pickups:
+    type: integer
+    minimum: 0
+    description: Its pickups.
+    examples:
+      - 2
+  drops:
+    type: integer
+    minimum: 0
+    description: Its drops.
+    examples:
+      - 14
+examples:
+  - route_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101
+    window_starts_at: 2026-11-06T00:30:00Z
+    window_ends_at: 2026-11-06T02:30:00Z
+    pickups: 2
+    drops: 14

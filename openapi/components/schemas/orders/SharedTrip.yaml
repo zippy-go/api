@@ -1,0 +1,41 @@
+type: object
+description: "This basket's order can share a trip with the customer's recent order from another Partner (placed within 15 minutes, to the same address, from a store within 1 km): its delivery fee is waived up to the other order's fee and paid by ZippyGo, whether or not the trip forms in the end, so the pair pays one fee, the higher. Each order stays its own, with its own payment, status and refund."
+required:
+  - order_id
+  - order_number
+  - store_name
+  - waived
+  - charged
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: The order it rides with.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: That order's number.
+    examples:
+      - AB0042
+  store_name:
+    type: string
+    description: That order's store.
+    examples:
+      - Dev Kitchen Gachibowli
+  waived:
+    $ref: ../common/Money.yaml
+    description: The fee waived, paid by ZippyGo.
+  charged:
+    $ref: ../common/Money.yaml
+    description: What this order pays for delivery after the waiver; 0 reads Free with the fee struck beside it.
+examples:
+  - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB0042
+    store_name: Dev Kitchen Gachibowli
+    waived:
+      minor_units: 4000
+      currency: INR
+    charged:
+      minor_units: 0
+      currency: INR

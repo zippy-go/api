@@ -91,6 +91,12 @@ errors:
       - code: reason_required
         message: "Give a reason the Partner will read."
         description: "A Partner's offer paused by the platform without a reason."
+      - code: bundle_too_far
+        message: "{first} and {second} are {metres} m apart; a bundle's stores are within 1 km."
+        description: A bundle whose two stores are more than the co-delivery distance apart.
+      - code: bundle_same_partner
+        message: Both sides are stores of {partner}; a bundle pairs two Partners.
+        description: A bundle whose two sides are stores of one Partner.
       - code: taxonomy_term_retired
         message: "{term} is {status} and can no longer be chosen; choose {replacement}."
         description: A deprecated or merged term named where an active one is needed, such as a mapping, a parent, a replacement or a city's pair; the detail names the term it gave way to.
@@ -822,6 +828,24 @@ errors:
     description: >-
       A term with terms beneath it is not deleted; deprecating or merging it
       moves them under its replacement instead.
+
+  - code: route_not_assignable
+    status: 409
+    title: Route not assignable
+    message: "{route} cannot be given here: {why}."
+    retryable: false
+    description: >-
+      A planned route that is under way or ended, or a route of another
+      delivery service than the caller's own Agents carry.
+
+  - code: bundle_not_live
+    status: 409
+    title: Bundle not live
+    message: This bundle is not on offer any more.
+    retryable: false
+    description: >-
+      A bundle taken after it was stopped, declined by a store or before
+      both stores accepted it.
 
   - code: prescriptions_not_accepted
     status: 409

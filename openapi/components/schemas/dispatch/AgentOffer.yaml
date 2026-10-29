@@ -108,6 +108,11 @@ properties:
     description: The reason the Agent gave when declining.
     examples:
       - null
+  trip:
+    oneOf:
+      - $ref: ./OfferTrip.yaml
+      - type: "null"
+    description: "The trip, when the offer is a planned route offered whole: its window and counts, its `stops` listing every stop in order; `null` for one delivery. Since 0.25.0."
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd501
     delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401

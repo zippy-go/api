@@ -1,0 +1,21 @@
+type: object
+description: Gives a route to one Agent of its delivery service, before or after it is offered; the Agent's open offers of it go.
+required:
+  - agent_id
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent (the membership).
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  note:
+    type:
+      - string
+      - "null"
+    description: Why, for the log.
+    examples:
+      - Knows these streets
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    note: Knows these streets

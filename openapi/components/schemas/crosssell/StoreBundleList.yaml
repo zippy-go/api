@@ -1,0 +1,37 @@
+type: object
+description: The live bundles of a store's page.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./StoreBundle.yaml
+    description: The bundles.
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+        headline: Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+        saving:
+          minor_units: 6000
+          currency: INR
+        funded_by_platform: true
+        first:
+          location_id: 01a13a48-9e00-7000-8000-000000000301
+          location_name: Dev Kitchen Gachibowli
+          item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+          category_id: null
+          name: Hyderabadi Biryani
+          share:
+            minor_units: 3000
+            currency: INR
+        second:
+          location_id: 01a13a48-9e00-7000-8000-000000000308
+          location_name: Charminar Bakes Gachibowli
+          item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+          category_id: null
+          name: Dil Kush
+          share:
+            minor_units: 3000
+            currency: INR
+        distance_metres: 540

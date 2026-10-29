@@ -1,0 +1,68 @@
+type: object
+description: "A live bundle on a store's page and in its basket: one suggestion naming both stores and the saving. Taking it adds the second side to a basket at its store, and each order carries its share."
+required:
+  - id
+  - headline
+  - saving
+  - funded_by_platform
+  - first
+  - second
+  - distance_metres
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The bundle.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+  headline:
+    type: string
+    description: What customers read.
+    examples:
+      - Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+  saving:
+    $ref: ../common/Money.yaml
+    description: The saving on the pair.
+  funded_by_platform:
+    type: boolean
+    description: Whether ZippyGo pays the saving.
+    examples:
+      - true
+  first:
+    $ref: ./StoreBundleSide.yaml
+    description: This store's side.
+  second:
+    $ref: ./StoreBundleSide.yaml
+    description: The other store's side.
+  distance_metres:
+    type: integer
+    minimum: 0
+    description: How far apart the stores are.
+    examples:
+      - 540
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+    headline: Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+    saving:
+      minor_units: 6000
+      currency: INR
+    funded_by_platform: true
+    first:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      location_name: Dev Kitchen Gachibowli
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+      category_id: null
+      name: Hyderabadi Biryani
+      share:
+        minor_units: 3000
+        currency: INR
+    second:
+      location_id: 01a13a48-9e00-7000-8000-000000000308
+      location_name: Charminar Bakes Gachibowli
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+      category_id: null
+      name: Dil Kush
+      share:
+        minor_units: 3000
+        currency: INR
+    distance_metres: 540

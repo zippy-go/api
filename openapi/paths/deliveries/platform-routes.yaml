@@ -1,0 +1,88 @@
+# Path item for /v1/platform/dispatch/routes. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformRoutes
+  summary: List the planned routes
+  description: "Every planned route of a day, whole, by window: the platform fleet's and every Partner's own. A route is the morning's scheduled and subscription deliveries of one zone and window, built at 22:00 on the stores' clock the evening before into a trip for one Agent: its pickups first, at most 20 drops, every drop inside the window. It is re-optimised as orders join or leave until it is offered, 45 minutes before its window, to the Agents on duty in its zone, unless a dispatcher gave it to an Agent before. Needs the platform's `dispatch:read`."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  parameters:
+    - name: date
+      in: query
+      required: false
+      description: The day the routes run, on their stores' clock; tomorrow by default.
+      schema:
+        type: string
+        format: date
+      example: 2026-11-06
+    - name: service_area_id
+      in: query
+      required: false
+      description: Only routes in this zone, or in the zones of this city.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-00000000a011
+    - name: partner_id
+      in: query
+      required: false
+      description: Only routes carrying this Partner's stops, or carried by its delivery service.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000006
+    - name: state
+      in: query
+      required: false
+      description: Only routes in this state.
+      schema:
+        $ref: ../../components/schemas/dispatch/RouteState.yaml
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of the day's routes.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/RoutePage.yaml
+    "400":
+      description: "`validation_failed` for a malformed date, state, limit or cursor; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without the platform's `dispatch:read`, or `forbidden` for a token that is not Mission Control's."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

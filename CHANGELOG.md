@@ -6,6 +6,49 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-30
+
+Step 7, the routes: the morning's scheduled and subscription deliveries built into planned
+routes, trips of several stops, nearby drops and two Partners' orders for one customer on one
+trip, and bundles across Partners. Written by the platform's `step7/routes` slice as 0.24.0
+beside the subscriptions slice, and renumbered 0.25.0 since subscriptions merged first. Additive
+only.
+
+### Added
+
+- Planned routes (`Deliveries` tag): built at 22:00 on the stores' clock from the morning's
+  orders placed into a slot, one zone and window each, pickups first, at most 20 drops inside the
+  window, re-optimised until offered 45 minutes before the window, or given by a dispatcher. A
+  Partner reads the routes carrying its stops with only its own stops
+  (`GET /v1/partners/{partner_id}/dispatch/routes`, `GET .../routes/{route_id}`) and gives its own
+  Agents' routes (`POST .../routes/{route_id}/assignment`, `dispatch:manage`); Mission Control
+  reads every route whole and gives any (`GET /v1/platform/dispatch/routes`,
+  `GET .../routes/{route_id}`, `POST .../routes/{route_id}/assignment`). `Route`, `RouteSummary`,
+  `RoutePage`, `RouteStop`, `RouteState`, `RouteStopKind`, `RouteStopState`,
+  `RouteAssignmentInput`.
+- Trips of several stops: the Agent's trip whole (`GET /v1/agent/trips/{trip_id}`, `AgentTrip`,
+  `AgentTripStop`); `trip` and `ready` on `AgentTask` (`AgentTaskTrip`); `trip` on `AgentOffer`
+  for a route offered whole (`OfferTrip`); `trip` on the boards' `DeliverySummary` and
+  `DeliveryDetail` (`DeliveryTrip`, `TripReason`: `route`, `nearby`, `co_delivery`).
+- Sharing a trip at checkout: `shared_trip` on `DeliveryFee` (`SharedTrip`): the customer's
+  order from another Partner placed within 15 minutes to the same address from a store within
+  1 km, and the fee waived on this one, paid by ZippyGo. `ordering.order.placed` gains
+  `shared_trip`, beside 0.24.0's `slot` and `occurrence`.
+- Bundles across Partners (`Bundles` tag): a live store's bundles
+  (`GET /v1/storefront/stores/{location_id}/bundles`, `StoreBundleList`, `StoreBundle`,
+  `StoreBundleSide`), taking one (`POST /v1/customer/bundles/{bundle_id}/take`, `BundleTaken`);
+  a Partner's bundles and its stores' answers (`GET /v1/partners/{partner_id}/bundles`,
+  `POST .../locations/{location_id}/bundles/{bundle_id}/accept`, `.../decline`,
+  `PartnerBundle`, `PartnerBundlePage`); Mission Control's bundles (`GET`, `POST
+  /v1/platform/bundles`, `GET`, `PATCH .../bundles/{bundle_id}`, `POST .../publish`,
+  `.../stop`, `Bundle`, `BundlePage`, `BundleInput`, `BundleUpdate`, `BundleSide`,
+  `BundleSideInput`, `BundleState`, `BundleFunding`, `BundleAnswer`).
+- Problem codes `route_not_assignable` and `bundle_not_live`; field codes `bundle_too_far` and
+  `bundle_same_partner`.
+- Events `orchestration.route.built`, `.changed`, `.offered`, `.assigned`, `.started` and
+  `.completed`; `orchestration.delivery.batched`; `crosssell.codelivery.formed`;
+  `crosssell.bundle.published`, `.accepted`, `.declined` and `.taken`.
+
 ## [0.24.0] - 2026-10-30
 
 Step 7, subscriptions: scheduled orders into a store's slots, the catalogue's

@@ -234,6 +234,16 @@ properties:
     description: Raised by one on every change.
     examples:
       - 2
+  trip:
+    $ref: ./AgentTaskTrip.yaml
+    description: Where the task sits in its trip, which may carry several deliveries; the app shows the trip's next stop first. Since 0.25.0.
+  ready:
+    type:
+      - boolean
+      - "null"
+    description: For a pickup, whether the store marked the order ready to collect; `null` for a drop. Since 0.25.0.
+    examples:
+      - true
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
     trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10

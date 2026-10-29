@@ -430,6 +430,42 @@
           "date": "2026-11-06"
         }
       ]
+    },
+    "shared_trip": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The order this one shares a trip with, and the delivery fee waived on this one, paid by ZippyGo (minor units); `null` when it shares none. Since 0.25.0.",
+      "required": [
+        "order_id",
+        "waived"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The order it rides with.",
+          "examples": [
+            "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+          ]
+        },
+        "waived": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The fee waived, in minor units.",
+          "examples": [
+            4000
+          ]
+        }
+      },
+      "examples": [
+        {
+          "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+          "waived": 4000
+        }
+      ]
     }
   }
 }

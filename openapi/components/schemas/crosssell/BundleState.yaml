@@ -1,0 +1,10 @@
+type: string
+description: "Where a bundle is: a `draft` Mission Control edits; `published`, waiting for both stores' answers; `live`, accepted by both and shown; `declined` by a store; `stopped`."
+enum:
+  - draft
+  - published
+  - live
+  - declined
+  - stopped
+examples:
+  - live

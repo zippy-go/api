@@ -1,0 +1,120 @@
+type: object
+description: "One stop of a planned route, in the route's order: every pickup first, then the drops. Drops at one address share a visit, so one Agent hands over every order there at once. A Partner reads its own stops only."
+required:
+  - sequence
+  - visit
+  - kind
+  - state
+  - order_id
+  - order_number
+  - delivery_id
+  - location_id
+  - location_name
+  - partner_id
+  - area
+  - lat
+  - lng
+  - planned_at
+  - finished_at
+properties:
+  sequence:
+    type: integer
+    minimum: 1
+    description: The stop's place in the whole route, from 1.
+    examples:
+      - 1
+  visit:
+    type: integer
+    minimum: 1
+    description: "The visit it belongs to: stops at one place share a number."
+    examples:
+      - 1
+  kind:
+    $ref: ./RouteStopKind.yaml
+    description: Pickup or drop.
+  state:
+    $ref: ./RouteStopState.yaml
+    description: Where it is.
+  order_id:
+    type: string
+    format: uuid
+    description: The order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  order_number:
+    type: string
+    description: The order's number.
+    examples:
+      - AB0042
+  delivery_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order's delivery once the store accepted the order; `null` before.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+  location_id:
+    type: string
+    format: uuid
+    description: The order's store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000307
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Gachibowli Dairy
+  partner_id:
+    type: string
+    format: uuid
+    description: The store's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000006
+  area:
+    type:
+      - string
+      - "null"
+    description: "The area the stop is in: the store's for a pickup, the customer's locality for a drop."
+    examples:
+      - Gachibowli
+  lat:
+    type: number
+    description: Latitude.
+    examples:
+      - 17.4401
+  lng:
+    type: number
+    description: Longitude.
+    examples:
+      - 78.3489
+  planned_at:
+    type: string
+    format: date-time
+    description: When the Agent is planned at the stop.
+    examples:
+      - 2026-11-06T00:35:00Z
+  finished_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the stop ended; `null` while open.
+    examples:
+      - null
+examples:
+  - sequence: 1
+    visit: 1
+    kind: pickup
+    state: ready
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    order_number: AB0042
+    delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
+    location_id: 01a13a48-9e00-7000-8000-000000000307
+    location_name: Gachibowli Dairy
+    partner_id: 01a13a48-9e00-7000-8000-000000000006
+    area: Gachibowli
+    lat: 17.4401
+    lng: 78.3489
+    planned_at: 2026-11-06T00:35:00Z
+    finished_at: null

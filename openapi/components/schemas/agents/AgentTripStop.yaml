@@ -1,0 +1,87 @@
+type: object
+description: One stop of a trip, in order.
+required:
+  - task_id
+  - sequence
+  - kind
+  - status
+  - order_number
+  - name
+  - address
+  - lat
+  - lng
+  - planned_at
+  - ready
+properties:
+  task_id:
+    type: string
+    format: uuid
+    description: The task.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8301
+  sequence:
+    type: integer
+    minimum: 1
+    description: The stop's place in the trip, from 1.
+    examples:
+      - 1
+  kind:
+    $ref: ./TaskKind.yaml
+    description: Pickup or drop-off.
+  status:
+    $ref: ./TaskStatus.yaml
+    description: Where the task is.
+  order_number:
+    type: string
+    description: The order's number, as its label carries it.
+    examples:
+      - AB0042
+  name:
+    type: string
+    description: The store's name for a pickup, the customer's first name for a drop.
+    examples:
+      - Gachibowli Dairy
+  address:
+    type:
+      - string
+      - "null"
+    description: The address in words.
+    examples:
+      - Plot 12, Financial District Road, Gachibowli
+  lat:
+    type: number
+    description: Latitude.
+    examples:
+      - 17.4401
+  lng:
+    type: number
+    description: Longitude.
+    examples:
+      - 78.3489
+  planned_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the Agent is planned there.
+    examples:
+      - 2026-11-06T00:35:00Z
+  ready:
+    type:
+      - boolean
+      - "null"
+    description: For a pickup, whether the store marked the order ready to collect; `null` for a drop.
+    examples:
+      - true
+examples:
+  - task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8301
+    sequence: 1
+    kind: pickup
+    status: accepted
+    order_number: AB0042
+    name: Gachibowli Dairy
+    address: Plot 12, Financial District Road, Gachibowli
+    lat: 17.4401
+    lng: 78.3489
+    planned_at: 2026-11-06T00:35:00Z
+    ready: true

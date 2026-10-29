@@ -1,0 +1,73 @@
+# Path item for /v1/partners/{partner_id}/bundles. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerBundles
+  summary: List the bundles reaching the partner's stores
+  description: The bundles one of this Partner's stores is a side of, those waiting for an answer first. A bundle pairs an item or category at one store with one at another store of another Partner within 1 km, with a saving on the pair that ZippyGo or the two Partners pay. Each store accepts it as a campaign is accepted; live, it shows on the first store's page and in its basket, and each order carries its share as an offer the promotions engine prices, kept if the other order is declined. Members need `promotion:read`.
+  tags:
+    - Bundles
+  security:
+    - Bearer: []
+  parameters:
+    - name: location_id
+      in: query
+      required: false
+      description: Only this store's bundles.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000308
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of bundles.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/PartnerBundlePage.yaml
+    "400":
+      description: "`validation_failed`; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without `promotion:read`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the partner, or a store that is not its."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.24.0
+  version: 0.25.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -231,6 +231,8 @@ tags:
     description: "The shared taxonomy: per Vertical, a tree of categories at most four levels deep that every store's catalogue maps to, with the attributes a product of a category may or must carry (the food Vertical's dietary mark is read from the vegetarian mark items carry). Public to read; Mission Control creates, renames, moves, merges and deprecates terms with `taxonomy:write`, a rename keeping the id so mappings hold, a term in use never deleted, every change versioned and published as `catalog.taxonomy.changed`. A store maps its categories, and items more narrowly, with `catalog:write`; Mission Control on the Partner's behalf with `taxonomy:write`, recorded as such. An item without a term is sold on its store's page and left out of search across stores, recommendations and shelves."
   - name: Recommendations
     description: "Cross-sell, each suggestion with its reason: often ordered with (items completed orders at the same store carried together, at least 5 orders in 90 days), nearby, goes with your order (another Partner's item within 2 km in a category the city pairs with what the order holds) and reorder prompts (a category the customer orders at a steady interval, after three repeats, at most one prompt a day, by push only with consent). Built from the customer's own orders: no Partner learns of a customer through cross-sell until the customer orders from it. Organic only in this version, ranked by relevance, then the store's rating, then distance. A customer turns all of it off with `recommendations` in their notification preferences; Mission Control keeps each city's configuration."
+  - name: Bundles
+    description: "Bundles across Partners: an item or category at one store paired with one at another store of another Partner within 1 km, a saving on the pair that ZippyGo or the two Partners pay. Mission Control makes and publishes them (`promotion:write`); each store accepts or declines as a campaign is accepted (`promotion:write` at the store); live, they show on the first store's page and in its basket, and taking one adds the second side to a basket at its store, each order carrying its share as an offer the promotions engine prices."
   - name: Notifications
     description: |
       How the platform tells people what happened. Every message leaves
@@ -1454,6 +1456,39 @@ paths:
     $ref: ./paths/subscriptions/platform-subscription.yaml
   /v1/platform/schedule/date:
     $ref: ./paths/subscriptions/platform-schedule-date.yaml
+  # Step 7 routes: planned routes, trips of several stops, sharing a trip and bundles
+  /v1/partners/{partner_id}/dispatch/routes:
+    $ref: ./paths/deliveries/partner-routes.yaml
+  /v1/partners/{partner_id}/dispatch/routes/{route_id}:
+    $ref: ./paths/deliveries/partner-route.yaml
+  /v1/partners/{partner_id}/dispatch/routes/{route_id}/assignment:
+    $ref: ./paths/deliveries/partner-route-assignment.yaml
+  /v1/platform/dispatch/routes:
+    $ref: ./paths/deliveries/platform-routes.yaml
+  /v1/platform/dispatch/routes/{route_id}:
+    $ref: ./paths/deliveries/platform-route.yaml
+  /v1/platform/dispatch/routes/{route_id}/assignment:
+    $ref: ./paths/deliveries/platform-route-assignment.yaml
+  /v1/agent/trips/{trip_id}:
+    $ref: ./paths/agent-app/trip.yaml
+  /v1/storefront/stores/{location_id}/bundles:
+    $ref: ./paths/crosssell/store-bundles.yaml
+  /v1/customer/bundles/{bundle_id}/take:
+    $ref: ./paths/crosssell/customer-bundle-take.yaml
+  /v1/partners/{partner_id}/bundles:
+    $ref: ./paths/crosssell/partner-bundles.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bundles/{bundle_id}/accept:
+    $ref: ./paths/crosssell/partner-bundle-accept.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bundles/{bundle_id}/decline:
+    $ref: ./paths/crosssell/partner-bundle-decline.yaml
+  /v1/platform/bundles:
+    $ref: ./paths/crosssell/platform-bundles.yaml
+  /v1/platform/bundles/{bundle_id}:
+    $ref: ./paths/crosssell/platform-bundle.yaml
+  /v1/platform/bundles/{bundle_id}/publish:
+    $ref: ./paths/crosssell/platform-bundle-publish.yaml
+  /v1/platform/bundles/{bundle_id}/stop:
+    $ref: ./paths/crosssell/platform-bundle-stop.yaml
 
 components:
   securitySchemes:
@@ -4099,3 +4134,64 @@ components:
       $ref: ./components/schemas/subscriptions/ScheduleDate.yaml
     ScheduleDateMove:
       $ref: ./components/schemas/subscriptions/ScheduleDateMove.yaml
+    # Step 7 routes
+    RouteState:
+      $ref: ./components/schemas/dispatch/RouteState.yaml
+    RouteStopKind:
+      $ref: ./components/schemas/dispatch/RouteStopKind.yaml
+    RouteStopState:
+      $ref: ./components/schemas/dispatch/RouteStopState.yaml
+    RouteStop:
+      $ref: ./components/schemas/dispatch/RouteStop.yaml
+    RouteSummary:
+      $ref: ./components/schemas/dispatch/RouteSummary.yaml
+    Route:
+      $ref: ./components/schemas/dispatch/Route.yaml
+    RoutePage:
+      $ref: ./components/schemas/dispatch/RoutePage.yaml
+    RouteAssignmentInput:
+      $ref: ./components/schemas/dispatch/RouteAssignmentInput.yaml
+    TripReason:
+      $ref: ./components/schemas/dispatch/TripReason.yaml
+    DeliveryTrip:
+      $ref: ./components/schemas/dispatch/DeliveryTrip.yaml
+    OfferTrip:
+      $ref: ./components/schemas/dispatch/OfferTrip.yaml
+    AgentTaskTrip:
+      $ref: ./components/schemas/agents/AgentTaskTrip.yaml
+    AgentTripStop:
+      $ref: ./components/schemas/agents/AgentTripStop.yaml
+    AgentTrip:
+      $ref: ./components/schemas/agents/AgentTrip.yaml
+    SharedTrip:
+      $ref: ./components/schemas/orders/SharedTrip.yaml
+    BundleState:
+      $ref: ./components/schemas/crosssell/BundleState.yaml
+    BundleFunding:
+      $ref: ./components/schemas/crosssell/BundleFunding.yaml
+    BundleAnswer:
+      $ref: ./components/schemas/crosssell/BundleAnswer.yaml
+    BundleSideInput:
+      $ref: ./components/schemas/crosssell/BundleSideInput.yaml
+    BundleSide:
+      $ref: ./components/schemas/crosssell/BundleSide.yaml
+    Bundle:
+      $ref: ./components/schemas/crosssell/Bundle.yaml
+    BundlePage:
+      $ref: ./components/schemas/crosssell/BundlePage.yaml
+    BundleInput:
+      $ref: ./components/schemas/crosssell/BundleInput.yaml
+    BundleUpdate:
+      $ref: ./components/schemas/crosssell/BundleUpdate.yaml
+    PartnerBundle:
+      $ref: ./components/schemas/crosssell/PartnerBundle.yaml
+    PartnerBundlePage:
+      $ref: ./components/schemas/crosssell/PartnerBundlePage.yaml
+    StoreBundleSide:
+      $ref: ./components/schemas/crosssell/StoreBundleSide.yaml
+    StoreBundle:
+      $ref: ./components/schemas/crosssell/StoreBundle.yaml
+    StoreBundleList:
+      $ref: ./components/schemas/crosssell/StoreBundleList.yaml
+    BundleTaken:
+      $ref: ./components/schemas/crosssell/BundleTaken.yaml

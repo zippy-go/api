@@ -1,0 +1,25 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8f01",
+  "type": "orchestration.delivery.batched",
+  "version": 1,
+  "occurred_at": "2026-11-06T07:12:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+  "correlation_id": null,
+  "payload": {
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02",
+    "number": "AB0043",
+    "location_id": "01a13a48-9e00-7000-8000-000000000308",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+    "attempt": 1,
+    "agent_id": "01a13a48-9e00-7000-8000-000000000107",
+    "trip_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8201",
+    "reason": "co_delivery",
+    "with_order_ids": [
+      "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+    ],
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "drops": 2,
+    "at": "2026-11-06T07:12:00Z"
+  }
+}

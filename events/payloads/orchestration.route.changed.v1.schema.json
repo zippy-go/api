@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/orchestration.route.changed.v1.schema.json",
+  "title": "OrchestrationRouteChangedPayload",
+  "description": "Payload of `orchestration.route.changed` version 1. A planned route changed before it started: an order joined or left, or it was re-optimised. Consumers: the boards, the subscriptions module (each occurrence's route on the store's calendar), analytics. The envelope's partner is the delivery service's Partner, so a store's own feed never lists another Partner's orders. No payload carries a name, a phone number, an email or an address. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "route_id",
+    "date",
+    "window_starts_at",
+    "window_ends_at",
+    "state",
+    "previous_state",
+    "provider_kind",
+    "provider_partner_id",
+    "service_id",
+    "zone_id",
+    "location_ids",
+    "order_ids",
+    "pickups",
+    "drops",
+    "version",
+    "at",
+    "change",
+    "order_id"
+  ],
+  "properties": {
+    "route_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The route.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The day it runs, on its stores' clock.",
+      "examples": [
+        "2026-11-06"
+      ]
+    },
+    "window_starts_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When its window opens.",
+      "examples": [
+        "2026-11-06T00:30:00Z"
+      ]
+    },
+    "window_ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it closes.",
+      "examples": [
+        "2026-11-06T02:30:00Z"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "offered",
+        "assigned",
+        "started",
+        "completed",
+        "cancelled"
+      ],
+      "description": "Its state after the change.",
+      "examples": [
+        "planned"
+      ]
+    },
+    "previous_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "planned",
+        "offered",
+        "assigned",
+        "started",
+        "completed",
+        "cancelled",
+        null
+      ],
+      "description": "Its state before; `null` for a route just built.",
+      "examples": [
+        "planned"
+      ]
+    },
+    "provider_kind": {
+      "type": "string",
+      "enum": [
+        "own_service",
+        "platform_fleet"
+      ],
+      "description": "Who carries it.",
+      "examples": [
+        "platform_fleet"
+      ]
+    },
+    "provider_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000402"
+      ]
+    },
+    "zone_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The zone its stores are in.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000a011"
+      ]
+    },
+    "location_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "The stores it collects from.",
+      "examples": [
+        [
+          "01a13a48-9e00-7000-8000-000000000307",
+          "01a13a48-9e00-7000-8000-000000000308"
+        ]
+      ]
+    },
+    "order_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "Every order it carries, so a store's calendar can name each occurrence's route.",
+      "examples": [
+        [
+          "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+          "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02"
+        ]
+      ]
+    },
+    "pickups": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Its pickups.",
+      "examples": [
+        2
+      ]
+    },
+    "drops": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Its drops.",
+      "examples": [
+        2
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Its version, which only rises.",
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-05T16:30:00Z"
+      ]
+    },
+    "change": {
+      "type": "string",
+      "enum": [
+        "order_added",
+        "order_removed",
+        "resequenced"
+      ],
+      "description": "What changed.",
+      "examples": [
+        "order_added"
+      ]
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order that joined or left; `null` for a re-optimisation.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02"
+      ]
+    }
+  }
+}

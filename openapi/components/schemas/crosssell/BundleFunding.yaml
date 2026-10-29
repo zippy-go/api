@@ -1,0 +1,7 @@
+type: string
+description: "Who pays the saving: `platform` (ZippyGo), or `partners`, each store's Partner paying its own side's share."
+enum:
+  - platform
+  - partners
+examples:
+  - platform

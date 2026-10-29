@@ -1,0 +1,8 @@
+type: string
+description: "Why a delivery shares a trip: a planned `route`, a `nearby` drop added on demand (the same store or within 1.5 km of a stop, every promise still held, at most four drops), or `co_delivery` (two orders of one customer from two Partners, to one address)."
+enum:
+  - route
+  - nearby
+  - co_delivery
+examples:
+  - nearby

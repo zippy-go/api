@@ -1,0 +1,7 @@
+type: string
+description: "Which end of an order a stop is: the pickup at its store or the drop at its customer."
+enum:
+  - pickup
+  - drop
+examples:
+  - pickup

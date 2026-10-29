@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/crosssell.bundle.taken.v1.schema.json",
+  "title": "CrosssellBundleTakenPayload",
+  "description": "Payload of `crosssell.bundle.taken` version 1. A customer took a bundle from the first store's page: both offers are theirs and the second side is in a basket at its store. The envelope names no Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "bundle_id",
+    "state",
+    "location_ids",
+    "partner_ids",
+    "saving",
+    "funded_by",
+    "at",
+    "customer_id"
+  ],
+  "properties": {
+    "bundle_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The bundle.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "live",
+        "declined",
+        "stopped"
+      ],
+      "description": "Its state after the change.",
+      "examples": [
+        "live"
+      ]
+    },
+    "location_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "Its two stores, the first side first.",
+      "examples": [
+        [
+          "01a13a48-9e00-7000-8000-000000000301",
+          "01a13a48-9e00-7000-8000-000000000308"
+        ]
+      ]
+    },
+    "partner_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "Their Partners.",
+      "examples": [
+        [
+          "01a13a48-9e00-7000-8000-000000000001",
+          "01a13a48-9e00-7000-8000-000000000003"
+        ]
+      ]
+    },
+    "saving": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "The saving on the pair.",
+      "examples": [
+        {
+          "minor_units": 6000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "funded_by": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partners"
+      ],
+      "description": "Who pays the saving.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-01T09:30:00Z"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    }
+  }
+}

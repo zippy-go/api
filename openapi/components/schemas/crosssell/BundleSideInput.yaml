@@ -1,0 +1,31 @@
+type: object
+description: "One side of a bundle: an item or a category of one store, exactly one of them."
+required:
+  - location_id
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: An item of the store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+  category_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Or a category of it.
+    examples:
+      - null
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+    category_id: null

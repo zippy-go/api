@@ -1,0 +1,119 @@
+type: object
+description: "A bundle as a store's Partner reads it: its own side, what the other store offers, and the answer it gave. It learns nothing of the other store's customers or orders."
+required:
+  - id
+  - name
+  - headline
+  - saving
+  - funded_by
+  - state
+  - distance_metres
+  - starts_at
+  - ends_at
+  - location_id
+  - side
+  - other_store
+  - other_name
+  - pays
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The bundle.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Biryani and a sweet
+  headline:
+    type: string
+    description: What customers read.
+    examples:
+      - Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+  saving:
+    $ref: ../common/Money.yaml
+    description: The saving on the pair.
+  funded_by:
+    $ref: ./BundleFunding.yaml
+    description: Who pays the saving.
+  state:
+    $ref: ./BundleState.yaml
+    description: Where it is.
+  distance_metres:
+    type: integer
+    minimum: 0
+    maximum: 1000
+    description: How far apart the two stores are, at most 1,000 m.
+    examples:
+      - 540
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts; `null` from publishing.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` until stopped.
+    examples:
+      - null
+  location_id:
+    type: string
+    format: uuid
+    description: The store of this Partner that answers.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000308
+  side:
+    $ref: ./BundleSide.yaml
+    description: This store's side.
+  other_store:
+    type: string
+    description: The other side's store.
+    examples:
+      - Dev Kitchen Gachibowli
+  other_name:
+    type: string
+    description: The other side's item or category.
+    examples:
+      - Hyderabadi Biryani
+  pays:
+    $ref: ../common/Money.yaml
+    description: "What this Partner pays for each pair sold: its side's share when the Partners fund it, else 0."
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+    name: Biryani and a sweet
+    headline: Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+    saving:
+      minor_units: 6000
+      currency: INR
+    funded_by: platform
+    state: live
+    distance_metres: 540
+    starts_at: null
+    ends_at: null
+    location_id: 01a13a48-9e00-7000-8000-000000000308
+    side:
+      location_id: 01a13a48-9e00-7000-8000-000000000308
+      location_name: Charminar Bakes Gachibowli
+      partner_id: 01a13a48-9e00-7000-8000-000000000003
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+      category_id: null
+      name: Dil Kush
+      share:
+        minor_units: 3000
+        currency: INR
+      answer: accepted
+      answered_at: 2026-11-02T10:05:00Z
+      offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8502
+    other_store: Dev Kitchen Gachibowli
+    other_name: Hyderabadi Biryani
+    pays:
+      minor_units: 0
+      currency: INR

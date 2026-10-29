@@ -1,0 +1,57 @@
+type: object
+description: "Where a task sits in its trip: a trip may carry several deliveries, and the app shows the trip's next stop first."
+required:
+  - trip_id
+  - route_id
+  - stops
+  - drops
+  - position
+  - next_task_id
+properties:
+  trip_id:
+    type: string
+    format: uuid
+    description: The trip.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8201
+  route_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The planned route it carries; `null` on demand.
+    examples:
+      - null
+  stops:
+    type: integer
+    minimum: 1
+    description: The trip's stops.
+    examples:
+      - 4
+  drops:
+    type: integer
+    minimum: 1
+    description: The trip's drops.
+    examples:
+      - 2
+  position:
+    type: integer
+    minimum: 1
+    description: This task's place in the trip, from 1.
+    examples:
+      - 1
+  next_task_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The trip's next open stop; `null` once every stop ended.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8301
+examples:
+  - trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8201
+    route_id: null
+    stops: 4
+    drops: 2
+    position: 1
+    next_task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8301

@@ -1,0 +1,38 @@
+type: object
+description: "A bundle taken: both sides' offers are the customer's, and the second side's item is in a basket at its store (a category side leaves the choice to the customer)."
+required:
+  - bundle_id
+  - second_location_id
+  - added_item_id
+  - words
+properties:
+  bundle_id:
+    type: string
+    format: uuid
+    description: The bundle.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+  second_location_id:
+    type: string
+    format: uuid
+    description: The store whose basket holds the second side.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000308
+  added_item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The item added to that basket; `null` for a category side.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+  words:
+    type: string
+    description: What happened, in words.
+    examples:
+      - Dil Kush is in your basket at Charminar Bakes Gachibowli; each order shows its ₹30.00 off.
+examples:
+  - bundle_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+    second_location_id: 01a13a48-9e00-7000-8000-000000000308
+    added_item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+    words: Dil Kush is in your basket at Charminar Bakes Gachibowli; each order shows its ₹30.00 off.

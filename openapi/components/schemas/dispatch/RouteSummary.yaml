@@ -1,0 +1,162 @@
+type: object
+description: "A planned route as a list shows it: its window, Provider, zone and Agent, and how many stops it has. A Partner reads only routes carrying its stops, and counts only its own."
+required:
+  - id
+  - date
+  - window_starts_at
+  - window_ends_at
+  - state
+  - provider
+  - zone_id
+  - zone_name
+  - agent
+  - offer_at
+  - pickups
+  - drops
+  - partners
+  - other_stops
+  - distance_metres
+  - trip_id
+  - version
+  - built_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The route.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101
+  date:
+    type: string
+    format: date
+    description: The day it runs, on its stores' clock.
+    examples:
+      - 2026-11-06
+  window_starts_at:
+    type: string
+    format: date-time
+    description: "When its window opens: the slot its orders were placed into."
+    examples:
+      - 2026-11-06T00:30:00Z
+  window_ends_at:
+    type: string
+    format: date-time
+    description: When its window closes; every drop is planned inside it.
+    examples:
+      - 2026-11-06T02:30:00Z
+  state:
+    $ref: ./RouteState.yaml
+    description: Where it is.
+  provider:
+    $ref: ./DeliveryProvider.yaml
+    description: "The delivery service that carries it: a Partner's own Agents carry only that Partner's stops; the platform fleet gathers several Partners' stops in a zone."
+  zone_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The zone its stores are in.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  zone_name:
+    type:
+      - string
+      - "null"
+    description: The zone in words.
+    examples:
+      - Gachibowli
+  agent:
+    oneOf:
+      - $ref: ./DeliveryCourier.yaml
+      - type: "null"
+    description: The Agent carrying it once assigned; `null` before.
+  offer_at:
+    type: string
+    format: date-time
+    description: "When it is offered to the Agents on duty in its zone: 45 minutes before its window, unless a dispatcher gave it to an Agent before."
+    examples:
+      - 2026-11-05T23:45:00Z
+  pickups:
+    type: integer
+    minimum: 0
+    description: Its pickups, at every store.
+    examples:
+      - 2
+  drops:
+    type: integer
+    minimum: 0
+    maximum: 20
+    description: Its drops, at most 20.
+    examples:
+      - 14
+  partners:
+    type: integer
+    minimum: 0
+    description: How many Partners have stops on it.
+    examples:
+      - 2
+  other_stops:
+    type: integer
+    minimum: 0
+    description: Stops of other Partners a Partner's reading leaves out; 0 for Mission Control.
+    examples:
+      - 0
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    description: The planned distance from the first pickup to the last drop, in metres.
+    examples:
+      - 9400
+  trip_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent's trip once assigned; `null` before.
+    examples:
+      - null
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change; the entity tag.
+    examples:
+      - 1
+  built_at:
+    type: string
+    format: date-time
+    description: "When it was built: 22:00 on its stores' clock the evening before, or when an order joined later."
+    examples:
+      - 2026-11-05T16:30:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-11-05T16:30:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101
+    date: 2026-11-06
+    window_starts_at: 2026-11-06T00:30:00Z
+    window_ends_at: 2026-11-06T02:30:00Z
+    state: planned
+    provider:
+      kind: platform_fleet
+      partner_id: 01a13a48-9e00-7000-8000-000000000002
+      service_id: 01a13a48-9e00-7000-8000-000000000202
+      name: ZippyGo Fleet
+    zone_id: 01a13a48-9e00-7000-8000-00000000a011
+    zone_name: Gachibowli
+    agent: null
+    offer_at: 2026-11-05T23:45:00Z
+    pickups: 2
+    drops: 14
+    partners: 2
+    other_stops: 0
+    distance_metres: 9400
+    trip_id: null
+    version: 1
+    built_at: 2026-11-05T16:30:00Z
+    updated_at: 2026-11-05T16:30:00Z

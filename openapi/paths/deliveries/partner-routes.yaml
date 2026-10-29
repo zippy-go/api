@@ -1,0 +1,87 @@
+# Path item for /v1/partners/{partner_id}/dispatch/routes. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerRoutes
+  summary: List the routes carrying the partner's stops
+  description: "The day's planned routes that carry this Partner's orders, by window: those of its own delivery service, and the platform fleet's routes where its stores' stops ride with other Partners'. A route is the morning's scheduled and subscription deliveries of one zone and window, built at 22:00 on the stores' clock the evening before into a trip for one Agent: its pickups first, at most 20 drops, every drop inside the window. It is re-optimised as orders join or leave until it is offered, 45 minutes before its window, to the Agents on duty in its zone, unless a dispatcher gave it to an Agent before. A Partner reads its own stops only: `stops`, `pickups` and `drops` count its own, and `other_stops` how many it does not see. Members need `dispatch:read` in the partner; platform staff use the same routes with their platform permissions."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  parameters:
+    - name: date
+      in: query
+      required: false
+      description: The day the routes run, on their stores' clock; tomorrow by default.
+      schema:
+        type: string
+        format: date
+      example: 2026-11-06
+    - name: location_id
+      in: query
+      required: false
+      description: Only routes carrying this store's stops.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000307
+    - name: state
+      in: query
+      required: false
+      description: Only routes in this state.
+      schema:
+        $ref: ../../components/schemas/dispatch/RouteState.yaml
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of the day's routes.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/RoutePage.yaml
+    "400":
+      description: "`validation_failed` for a malformed date, state, limit or cursor; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without `dispatch:read`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the partner, or a store that is not its."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

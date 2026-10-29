@@ -162,6 +162,11 @@ properties:
     description: When it last changed.
     examples:
       - 2026-10-16T13:12:30Z
+  trip:
+    oneOf:
+      - $ref: ./DeliveryTrip.yaml
+      - type: "null"
+    description: "The trip it shares with other deliveries: a planned route, a drop added on demand or a co-delivery; `null` when carried alone. Since 0.25.0."
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
     order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01

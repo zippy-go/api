@@ -1,0 +1,124 @@
+# Path item for /v1/platform/bundles. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformBundles
+  summary: List the bundles
+  description: Every bundle, newest first. A bundle pairs an item or category at one store with one at another store of another Partner within 1 km, with a saving on the pair that ZippyGo or the two Partners pay. Each store accepts it as a campaign is accepted; live, it shows on the first store's page and in its basket, and each order carries its share as an offer the promotions engine prices, kept if the other order is declined. Needs the platform's `promotion:read`.
+  tags:
+    - Bundles
+  security:
+    - Bearer: []
+  parameters:
+    - name: state
+      in: query
+      required: false
+      description: Only bundles in this state.
+      schema:
+        $ref: ../../components/schemas/crosssell/BundleState.yaml
+    - name: location_id
+      in: query
+      required: false
+      description: Only bundles with this store as a side.
+      schema:
+        type: string
+        format: uuid
+      example: 01a13a48-9e00-7000-8000-000000000301
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of bundles.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/BundlePage.yaml
+    "400":
+      description: "`validation_failed`; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without the platform's `promotion:read`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createPlatformBundle
+  summary: Make a bundle
+  description: Makes a draft bundle. The two stores must be of two Partners and within 1 km; the saving is shared between the sides, half each unless said. Needs the platform's `promotion:write`. Audited.
+  tags:
+    - Bundles
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The bundle.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/crosssell/BundleInput.yaml
+  responses:
+    "201":
+      description: The draft.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/Bundle.yaml
+    "400":
+      description: "`validation_failed`, with `bundle_too_far` or `bundle_same_partner` on a side; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without the platform's `promotion:write`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: a store, item or category."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

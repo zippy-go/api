@@ -1,0 +1,43 @@
+type: object
+description: "A change to a bundle: the members sent. A draft changes anything; a published or live bundle only its name and end."
+properties:
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Biryani and a sweet
+  first:
+    $ref: ./BundleSideInput.yaml
+    description: The side shown first.
+  second:
+    $ref: ./BundleSideInput.yaml
+    description: The side added to a basket at its store.
+  saving:
+    $ref: ../common/Money.yaml
+    description: The saving on the pair.
+  first_share:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The first side's share.
+  funded_by:
+    $ref: ./BundleFunding.yaml
+    description: Who pays the saving.
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-30T18:30:00Z
+examples:
+  - ends_at: 2026-11-30T18:30:00Z

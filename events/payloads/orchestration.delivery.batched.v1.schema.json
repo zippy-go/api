@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/orchestration.delivery.batched.v1.schema.json",
+  "title": "OrchestrationDeliveryBatchedPayload",
+  "description": "Payload of `orchestration.delivery.batched` version 1. A delivery joined an Agent's trip carrying other deliveries: a drop added on demand (the same store or within 1.5 km of a stop, every promise still held, at most four drops), or the second order of one customer from another Partner to the same address. The envelope's partner is the delivery's store's Partner. Consumers: the boards, the crosssell module (a co-delivery formed), analytics. No payload carries a name, a phone number, an email or an address. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "delivery_id",
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "attempt",
+    "agent_id",
+    "trip_id",
+    "reason",
+    "with_order_ids",
+    "customer_id",
+    "drops",
+    "at"
+  ],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery that joined.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0043"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000308"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000003"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The delivery attempt.",
+      "examples": [
+        1
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "trip_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The trip.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8201"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "nearby",
+        "co_delivery"
+      ],
+      "description": "Why it joined.",
+      "examples": [
+        "co_delivery"
+      ]
+    },
+    "with_order_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "The orders already on the trip.",
+      "examples": [
+        [
+          "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+        ]
+      ]
+    },
+    "customer_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The customer, for a co-delivery; `null` otherwise.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "drops": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "The trip's drops with it.",
+      "examples": [
+        2
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-06T07:12:00Z"
+      ]
+    }
+  }
+}

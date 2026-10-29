@@ -1,0 +1,64 @@
+type: object
+description: A page of bundles, newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Bundle.yaml
+    description: The bundles on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401
+        name: Biryani and a sweet
+        headline: Biryani from Dev Kitchen Gachibowli and a sweet from Charminar Bakes Gachibowli, ₹60 off together
+        saving:
+          minor_units: 6000
+          currency: INR
+        funded_by: platform
+        state: live
+        distance_metres: 540
+        starts_at: null
+        ends_at: null
+        first:
+          location_id: 01a13a48-9e00-7000-8000-000000000301
+          location_name: Dev Kitchen Gachibowli
+          partner_id: 01a13a48-9e00-7000-8000-000000000001
+          item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+          category_id: null
+          name: Hyderabadi Biryani
+          share:
+            minor_units: 3000
+            currency: INR
+          answer: accepted
+          answered_at: 2026-11-02T10:00:00Z
+          offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8501
+        second:
+          location_id: 01a13a48-9e00-7000-8000-000000000308
+          location_name: Charminar Bakes Gachibowli
+          partner_id: 01a13a48-9e00-7000-8000-000000000003
+          item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c21
+          category_id: null
+          name: Dil Kush
+          share:
+            minor_units: 3000
+            currency: INR
+          answer: accepted
+          answered_at: 2026-11-02T10:05:00Z
+          offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8502
+        taken: 12
+        version: 3
+        created_at: 2026-11-01T09:00:00Z
+        updated_at: 2026-11-02T10:05:00Z
+        published_at: 2026-11-01T09:30:00Z
+        stopped_at: null
+    next_cursor: null

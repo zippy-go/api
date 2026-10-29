@@ -36,6 +36,11 @@ properties:
     examples:
       - settings
     description: "Where the ladder comes from: `policy` (the store's service policy) or `settings` (the platform's delivery settings)."
+  shared_trip:
+    oneOf:
+      - $ref: ./SharedTrip.yaml
+      - type: "null"
+    description: The customer's recent order from another Partner this one can share a trip with, and the fee waived on this one, paid by ZippyGo; `null` when it shares none. `fee` stays the full fee. Since 0.25.0.
 examples:
   - fee:
       minor_units: 4000

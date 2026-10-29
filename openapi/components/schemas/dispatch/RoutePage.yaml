@@ -1,0 +1,44 @@
+type: object
+description: A page of planned routes, by window then id.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./RouteSummary.yaml
+    description: The routes on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8101
+        date: 2026-11-06
+        window_starts_at: 2026-11-06T00:30:00Z
+        window_ends_at: 2026-11-06T02:30:00Z
+        state: planned
+        provider:
+          kind: platform_fleet
+          partner_id: 01a13a48-9e00-7000-8000-000000000002
+          service_id: 01a13a48-9e00-7000-8000-000000000202
+          name: ZippyGo Fleet
+        zone_id: 01a13a48-9e00-7000-8000-00000000a011
+        zone_name: Gachibowli
+        agent: null
+        offer_at: 2026-11-05T23:45:00Z
+        pickups: 2
+        drops: 14
+        partners: 2
+        other_stops: 0
+        distance_metres: 9400
+        trip_id: null
+        version: 1
+        built_at: 2026-11-05T16:30:00Z
+        updated_at: 2026-11-05T16:30:00Z
+    next_cursor: null

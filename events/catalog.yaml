@@ -1673,3 +1673,98 @@ events:
       A scheduled order, or a subscription's occurrence, was sent to its store at the store's lead time before its slot (the preparation time plus 15 minutes): it moves from Scheduled to new orders with the sound, and the not-answered alert and the auto-decline run from now. Consumers: notifications (the store's new order with its sound), Mission Control.
     payload_schema: ./payloads/ordering.order.released.v1.schema.json
     example: ./examples/ordering.order.released.v1.json
+  - type: orchestration.route.built
+    version: 1
+    domain: orchestration
+    description: >-
+      A planned route was built: at 22:00 on its stores' clock the evening before, from the morning's scheduled and subscription orders of one zone and window, or later when an order joined and no route had room. Consumers: the boards, the subscriptions module (each occurrence's route on the store's calendar), analytics. The envelope's partner is the delivery service's Partner, so a store's own feed never lists another Partner's orders. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.built.v1.schema.json
+    example: ./examples/orchestration.route.built.v1.json
+
+  - type: orchestration.route.changed
+    version: 1
+    domain: orchestration
+    description: >-
+      A planned route changed before it started: an order joined or left, or it was re-optimised. Consumers: the boards, the subscriptions module (each occurrence's route on the store's calendar), analytics. The envelope's partner is the delivery service's Partner, so a store's own feed never lists another Partner's orders. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.changed.v1.schema.json
+    example: ./examples/orchestration.route.changed.v1.json
+
+  - type: orchestration.route.offered
+    version: 1
+    domain: orchestration
+    description: >-
+      A planned route was offered whole to the Agents on duty in its zone, at its lead time. Consumers: notifications (a push to each Agent's devices), the boards. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.offered.v1.schema.json
+    example: ./examples/orchestration.route.offered.v1.json
+
+  - type: orchestration.route.assigned
+    version: 1
+    domain: orchestration
+    description: >-
+      A planned route went to one Agent: an offer accepted or a dispatcher's choice. Its deliveries ride the Agent's trip. Consumers: the boards, notifications. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.assigned.v1.schema.json
+    example: ./examples/orchestration.route.assigned.v1.json
+
+  - type: orchestration.route.started
+    version: 1
+    domain: orchestration
+    description: >-
+      The Agent set out on a planned route: its first stop started. Consumers: the boards, the subscriptions module (packed and collected). No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.started.v1.schema.json
+    example: ./examples/orchestration.route.started.v1.json
+
+  - type: orchestration.route.completed
+    version: 1
+    domain: orchestration
+    description: >-
+      Every stop of a planned route ended. Consumers: the boards, analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.route.completed.v1.schema.json
+    example: ./examples/orchestration.route.completed.v1.json
+
+  - type: orchestration.delivery.batched
+    version: 1
+    domain: orchestration
+    description: >-
+      A delivery joined an Agent's trip carrying other deliveries: a drop added on demand (the same store or within 1.5 km of a stop, every promise still held, at most four drops), or the second order of one customer from another Partner to the same address. The envelope's partner is the delivery's store's Partner. Consumers: the boards, the crosssell module (a co-delivery formed), analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/orchestration.delivery.batched.v1.schema.json
+    example: ./examples/orchestration.delivery.batched.v1.json
+
+  - type: crosssell.codelivery.formed
+    version: 1
+    domain: crosssell
+    description: >-
+      Two orders of one customer from two Partners travel on one trip: placed within 15 minutes, to one address, from stores within 1 km. Each stays its own order. The envelope names no Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/crosssell.codelivery.formed.v1.schema.json
+    example: ./examples/crosssell.codelivery.formed.v1.json
+
+  - type: crosssell.bundle.published
+    version: 1
+    domain: crosssell
+    description: >-
+      Mission Control published a bundle across two Partners: each side's offer is made for the promotions engine and each store is invited to accept. The envelope names no Partner. Consumers: notifications (each store's invitation), analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/crosssell.bundle.published.v1.schema.json
+    example: ./examples/crosssell.bundle.published.v1.json
+
+  - type: crosssell.bundle.accepted
+    version: 1
+    domain: crosssell
+    description: >-
+      A store accepted a bundle; once both have, it is live. The envelope's partner is the answering store's Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/crosssell.bundle.accepted.v1.schema.json
+    example: ./examples/crosssell.bundle.accepted.v1.json
+
+  - type: crosssell.bundle.declined
+    version: 1
+    domain: crosssell
+    description: >-
+      A store declined a bundle; it is not shown, and orders already placed keep their offers. The envelope's partner is the answering store's Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/crosssell.bundle.declined.v1.schema.json
+    example: ./examples/crosssell.bundle.declined.v1.json
+
+  - type: crosssell.bundle.taken
+    version: 1
+    domain: crosssell
+    description: >-
+      A customer took a bundle from the first store's page: both offers are theirs and the second side is in a basket at its store. The envelope names no Partner. Consumers: analytics. No payload carries a name, a phone number, an email or an address.
+    payload_schema: ./payloads/crosssell.bundle.taken.v1.schema.json
+    example: ./examples/crosssell.bundle.taken.v1.json

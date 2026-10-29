@@ -5833,6 +5833,14 @@ export type AgentTask = {
      * Raised by one on every change.
      */
     version: number;
+    /**
+     * Where the task sits in its trip, which may carry several deliveries; the app shows the trip's next stop first. Since 0.25.0.
+     */
+    trip?: AgentTaskTrip;
+    /**
+     * For a pickup, whether the store marked the order ready to collect; `null` for a drop. Since 0.25.0.
+     */
+    ready?: boolean | null;
 };
 
 /**
@@ -17096,6 +17104,10 @@ export type DeliveryFee = {
      * Where the ladder comes from: `policy` (the store's service policy) or `settings` (the platform's delivery settings).
      */
     rule: string;
+    /**
+     * The customer's recent order from another Partner this one can share a trip with, and the fee waived on this one, paid by ZippyGo; `null` when it shares none. `fee` stays the full fee. Since 0.25.0.
+     */
+    shared_trip?: SharedTrip | null;
 };
 
 /**
@@ -19723,6 +19735,10 @@ export type DeliverySummary = {
      * When it last changed.
      */
     updated_at: string;
+    /**
+     * The trip it shares with other deliveries: a planned route, a drop added on demand or a co-delivery; `null` when carried alone. Since 0.25.0.
+     */
+    trip?: DeliveryTrip | null;
 };
 
 /**
@@ -19929,6 +19945,10 @@ export type DeliveryDetail = {
      * What the reader may do now.
      */
     actions: DeliveryActions;
+    /**
+     * The trip it shares with other deliveries: a planned route, a drop added on demand or a co-delivery; `null` when carried alone. Since 0.25.0.
+     */
+    trip?: DeliveryTrip | null;
 };
 
 /**
@@ -20347,6 +20367,10 @@ export type AgentOffer = {
      * The reason the Agent gave when declining.
      */
     declined_reason: string | null;
+    /**
+     * The trip, when the offer is a planned route offered whole: its window and counts, its `stops` listing every stop in order; `null` for one delivery. Since 0.25.0.
+     */
+    trip?: OfferTrip | null;
 };
 
 /**
@@ -31668,6 +31692,927 @@ export type ScheduleDateMove = {
      * Why, at most 200 characters.
      */
     reason?: string | null;
+};
+
+/**
+ * Where a planned route is: built and re-optimised while `planned`; `offered` to the Agents on duty in its zone at its lead time; `assigned` to one Agent (by an offer accepted or a dispatcher); `started` once the Agent set out; `completed` once every stop ended; `cancelled` when every order left it before it started.
+ */
+export type RouteState = 'planned' | 'offered' | 'assigned' | 'started' | 'completed' | 'cancelled';
+
+/**
+ * Which end of an order a stop is: the pickup at its store or the drop at its customer.
+ */
+export type RouteStopKind = 'pickup' | 'drop';
+
+/**
+ * Where a stop is: `planned` until the store has the order ready, `ready` (a pickup the store marked ready or packed), `collected` (the Agent has the order: a pickup done, a drop on its way), `delivered` (a drop done), `failed` (could not collect or deliver, with the reason on the delivery), `cancelled` (its order left the route).
+ */
+export type RouteStopState = 'planned' | 'ready' | 'collected' | 'delivered' | 'failed' | 'cancelled';
+
+/**
+ * One stop of a planned route, in the route's order: every pickup first, then the drops. Drops at one address share a visit, so one Agent hands over every order there at once. A Partner reads its own stops only.
+ */
+export type RouteStop = {
+    /**
+     * The stop's place in the whole route, from 1.
+     */
+    sequence: number;
+    /**
+     * The visit it belongs to: stops at one place share a number.
+     */
+    visit: number;
+    /**
+     * Pickup or drop.
+     */
+    kind: RouteStopKind;
+    /**
+     * Where it is.
+     */
+    state: RouteStopState;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The order's delivery once the store accepted the order; `null` before.
+     */
+    delivery_id: string | null;
+    /**
+     * The order's store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The area the stop is in: the store's for a pickup, the customer's locality for a drop.
+     */
+    area: string | null;
+    /**
+     * Latitude.
+     */
+    lat: number;
+    /**
+     * Longitude.
+     */
+    lng: number;
+    /**
+     * When the Agent is planned at the stop.
+     */
+    planned_at: string;
+    /**
+     * When the stop ended; `null` while open.
+     */
+    finished_at: string | null;
+};
+
+/**
+ * A planned route as a list shows it: its window, Provider, zone and Agent, and how many stops it has. A Partner reads only routes carrying its stops, and counts only its own.
+ */
+export type RouteSummary = {
+    /**
+     * The route.
+     */
+    id: string;
+    /**
+     * The day it runs, on its stores' clock.
+     */
+    date: string;
+    /**
+     * When its window opens: the slot its orders were placed into.
+     */
+    window_starts_at: string;
+    /**
+     * When its window closes; every drop is planned inside it.
+     */
+    window_ends_at: string;
+    /**
+     * Where it is.
+     */
+    state: RouteState;
+    /**
+     * The delivery service that carries it: a Partner's own Agents carry only that Partner's stops; the platform fleet gathers several Partners' stops in a zone.
+     */
+    provider: DeliveryProvider;
+    /**
+     * The zone its stores are in.
+     */
+    zone_id: string | null;
+    /**
+     * The zone in words.
+     */
+    zone_name: string | null;
+    /**
+     * The Agent carrying it once assigned; `null` before.
+     */
+    agent: DeliveryCourier | null;
+    /**
+     * When it is offered to the Agents on duty in its zone: 45 minutes before its window, unless a dispatcher gave it to an Agent before.
+     */
+    offer_at: string;
+    /**
+     * Its pickups, at every store.
+     */
+    pickups: number;
+    /**
+     * Its drops, at most 20.
+     */
+    drops: number;
+    /**
+     * How many Partners have stops on it.
+     */
+    partners: number;
+    /**
+     * Stops of other Partners a Partner's reading leaves out; 0 for Mission Control.
+     */
+    other_stops: number;
+    /**
+     * The planned distance from the first pickup to the last drop, in metres.
+     */
+    distance_metres: number | null;
+    /**
+     * The Agent's trip once assigned; `null` before.
+     */
+    trip_id: string | null;
+    /**
+     * Raised by every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was built: 22:00 on its stores' clock the evening before, or when an order joined later.
+     */
+    built_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A planned route: the morning's scheduled and subscription deliveries of one zone and window, built at 22:00 on the stores' clock into a trip for one Agent, its pickups first, at most 20 drops, every drop inside the window; re-optimised until it is offered. A Partner reads only its own stops; Mission Control the whole route.
+ */
+export type Route = {
+    /**
+     * The route.
+     */
+    id: string;
+    /**
+     * The day it runs, on its stores' clock.
+     */
+    date: string;
+    /**
+     * When its window opens: the slot its orders were placed into.
+     */
+    window_starts_at: string;
+    /**
+     * When its window closes; every drop is planned inside it.
+     */
+    window_ends_at: string;
+    /**
+     * Where it is.
+     */
+    state: RouteState;
+    /**
+     * The delivery service that carries it: a Partner's own Agents carry only that Partner's stops; the platform fleet gathers several Partners' stops in a zone.
+     */
+    provider: DeliveryProvider;
+    /**
+     * The zone its stores are in.
+     */
+    zone_id: string | null;
+    /**
+     * The zone in words.
+     */
+    zone_name: string | null;
+    /**
+     * The Agent carrying it once assigned; `null` before.
+     */
+    agent: DeliveryCourier | null;
+    /**
+     * When it is offered to the Agents on duty in its zone: 45 minutes before its window, unless a dispatcher gave it to an Agent before.
+     */
+    offer_at: string;
+    /**
+     * Its pickups, at every store.
+     */
+    pickups: number;
+    /**
+     * Its drops, at most 20.
+     */
+    drops: number;
+    /**
+     * How many Partners have stops on it.
+     */
+    partners: number;
+    /**
+     * Stops of other Partners a Partner's reading leaves out; 0 for Mission Control.
+     */
+    other_stops: number;
+    /**
+     * The planned distance from the first pickup to the last drop, in metres.
+     */
+    distance_metres: number | null;
+    /**
+     * The Agent's trip once assigned; `null` before.
+     */
+    trip_id: string | null;
+    /**
+     * Raised by every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was built: 22:00 on its stores' clock the evening before, or when an order joined later.
+     */
+    built_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * The stops in order, pickups first.
+     */
+    stops: Array<RouteStop>;
+    /**
+     * How it was built, in words.
+     */
+    words: string;
+};
+
+/**
+ * A page of planned routes, by window then id.
+ */
+export type RoutePage = {
+    /**
+     * The routes on this page.
+     */
+    items: Array<RouteSummary>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Gives a route to one Agent of its delivery service, before or after it is offered; the Agent's open offers of it go.
+ */
+export type RouteAssignmentInput = {
+    /**
+     * The Agent (the membership).
+     */
+    agent_id: string;
+    /**
+     * Why, for the log.
+     */
+    note?: string | null;
+};
+
+/**
+ * Why a delivery shares a trip: a planned `route`, a `nearby` drop added on demand (the same store or within 1.5 km of a stop, every promise still held, at most four drops), or `co_delivery` (two orders of one customer from two Partners, to one address).
+ */
+export type TripReason = 'route' | 'nearby' | 'co_delivery';
+
+/**
+ * The trip a delivery shares with other deliveries; `null` on a delivery carried alone. Counts only, so a store learns nothing of another Partner's orders.
+ */
+export type DeliveryTrip = {
+    /**
+     * The Agent's trip once one holds it; `null` before.
+     */
+    trip_id: string | null;
+    /**
+     * The planned route, for a route.
+     */
+    route_id: string | null;
+    /**
+     * Why it shares a trip.
+     */
+    reason: TripReason;
+    /**
+     * The deliveries on the trip.
+     */
+    deliveries: number;
+    /**
+     * This delivery's drop among the trip's drops, from 1.
+     */
+    position: number;
+};
+
+/**
+ * The trip an offer is for, when it is more than one delivery: a planned route offered whole. The offer's `stops` then list every stop in order, and its `delivery_id` names the route, since a route's orders may not have their deliveries yet.
+ */
+export type OfferTrip = {
+    /**
+     * The planned route.
+     */
+    route_id: string | null;
+    /**
+     * The route's window.
+     */
+    window_starts_at: string | null;
+    /**
+     * The window's end.
+     */
+    window_ends_at: string | null;
+    /**
+     * Its pickups.
+     */
+    pickups: number;
+    /**
+     * Its drops.
+     */
+    drops: number;
+};
+
+/**
+ * Where a task sits in its trip: a trip may carry several deliveries, and the app shows the trip's next stop first.
+ */
+export type AgentTaskTrip = {
+    /**
+     * The trip.
+     */
+    trip_id: string;
+    /**
+     * The planned route it carries; `null` on demand.
+     */
+    route_id: string | null;
+    /**
+     * The trip's stops.
+     */
+    stops: number;
+    /**
+     * The trip's drops.
+     */
+    drops: number;
+    /**
+     * This task's place in the trip, from 1.
+     */
+    position: number;
+    /**
+     * The trip's next open stop; `null` once every stop ended.
+     */
+    next_task_id: string | null;
+};
+
+/**
+ * One stop of a trip, in order.
+ */
+export type AgentTripStop = {
+    /**
+     * The task.
+     */
+    task_id: string;
+    /**
+     * The stop's place in the trip, from 1.
+     */
+    sequence: number;
+    /**
+     * Pickup or drop-off.
+     */
+    kind: TaskKind;
+    /**
+     * Where the task is.
+     */
+    status: TaskStatus;
+    /**
+     * The order's number, as its label carries it.
+     */
+    order_number: string;
+    /**
+     * The store's name for a pickup, the customer's first name for a drop.
+     */
+    name: string;
+    /**
+     * The address in words.
+     */
+    address: string | null;
+    /**
+     * Latitude.
+     */
+    lat: number;
+    /**
+     * Longitude.
+     */
+    lng: number;
+    /**
+     * When the Agent is planned there.
+     */
+    planned_at: string | null;
+    /**
+     * For a pickup, whether the store marked the order ready to collect; `null` for a drop.
+     */
+    ready: boolean | null;
+};
+
+/**
+ * An Agent's trip: its stops in order, pickups and drops of one or several deliveries, the next stop first, and its pay under the service's rule. The app does not care which mode made it: a planned route, a drop added on demand or one delivery.
+ */
+export type AgentTrip = {
+    /**
+     * The trip.
+     */
+    id: string;
+    /**
+     * The Agent.
+     */
+    agent_id: string;
+    /**
+     * The delivery service's Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * The planned route it carries; `null` on demand.
+     */
+    route_id: string | null;
+    /**
+     * Active while a stop is open.
+     */
+    status: 'active' | 'finished';
+    /**
+     * A route's window; `null` on demand.
+     */
+    window_starts_at: string | null;
+    /**
+     * The window's end.
+     */
+    window_ends_at: string | null;
+    /**
+     * Every stop in order.
+     */
+    stops: Array<AgentTripStop>;
+    /**
+     * The deliveries it carries.
+     */
+    deliveries: number;
+    /**
+     * What the trip pays under the rule it was given with: each stop and the distance.
+     */
+    pay: PayQuote;
+    /**
+     * The next open stop; `null` once every stop ended.
+     */
+    next_task_id: string | null;
+    /**
+     * When the Agent was given it.
+     */
+    created_at: string;
+    /**
+     * When its last stop ended.
+     */
+    finished_at: string | null;
+};
+
+/**
+ * This basket's order can share a trip with the customer's recent order from another Partner (placed within 15 minutes, to the same address, from a store within 1 km): its delivery fee is waived up to the other order's fee and paid by ZippyGo, whether or not the trip forms in the end, so the pair pays one fee, the higher. Each order stays its own, with its own payment, status and refund.
+ */
+export type SharedTrip = {
+    /**
+     * The order it rides with.
+     */
+    order_id: string;
+    /**
+     * That order's number.
+     */
+    order_number: string;
+    /**
+     * That order's store.
+     */
+    store_name: string;
+    /**
+     * The fee waived, paid by ZippyGo.
+     */
+    waived: Money;
+    /**
+     * What this order pays for delivery after the waiver; 0 reads Free with the fee struck beside it.
+     */
+    charged: Money;
+};
+
+/**
+ * Where a bundle is: a `draft` Mission Control edits; `published`, waiting for both stores' answers; `live`, accepted by both and shown; `declined` by a store; `stopped`.
+ */
+export type BundleState = 'draft' | 'published' | 'live' | 'declined' | 'stopped';
+
+/**
+ * Who pays the saving: `platform` (ZippyGo), or `partners`, each store's Partner paying its own side's share.
+ */
+export type BundleFunding = 'platform' | 'partners';
+
+/**
+ * A store's answer to a bundle: `invited` until it answers, `accepted` or `declined`.
+ */
+export type BundleAnswer = 'invited' | 'accepted' | 'declined';
+
+/**
+ * One side of a bundle: an item or a category of one store, exactly one of them.
+ */
+export type BundleSideInput = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * An item of the store.
+     */
+    item_id?: string | null;
+    /**
+     * Or a category of it.
+     */
+    category_id?: string | null;
+};
+
+/**
+ * One side of a bundle: an item or a category of one store, with the share of the saving its order carries and the store's answer.
+ */
+export type BundleSide = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The item, for an item.
+     */
+    item_id: string | null;
+    /**
+     * The category, for a category.
+     */
+    category_id: string | null;
+    /**
+     * The item or category in words.
+     */
+    name: string;
+    /**
+     * The share of the saving this side's order carries.
+     */
+    share: Money;
+    /**
+     * The store's answer.
+     */
+    answer: BundleAnswer;
+    /**
+     * When it answered.
+     */
+    answered_at: string | null;
+    /**
+     * The offer the promotions engine prices this side's order with, once published.
+     */
+    offer_id: string | null;
+};
+
+/**
+ * A bundle across two Partners, as Mission Control keeps it: an item or category at one store paired with one at another store within 1 km, a saving on the pair and who pays it. Each store accepts it as a campaign is accepted; live, it shows on the first store's page and in its basket, and each order carries its share as an offer the promotions engine prices, kept if the other order is declined.
+ */
+export type Bundle = {
+    /**
+     * The bundle.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What customers read.
+     */
+    headline: string;
+    /**
+     * The saving on the pair.
+     */
+    saving: Money;
+    /**
+     * Who pays the saving.
+     */
+    funded_by: BundleFunding;
+    /**
+     * Where it is.
+     */
+    state: BundleState;
+    /**
+     * How far apart the two stores are, at most 1,000 m.
+     */
+    distance_metres: number;
+    /**
+     * When it starts; `null` from publishing.
+     */
+    starts_at: string | null;
+    /**
+     * When it ends; `null` until stopped.
+     */
+    ends_at: string | null;
+    /**
+     * The side shown first, on whose page the bundle appears.
+     */
+    first: BundleSide;
+    /**
+     * The side added to a basket at its store when a customer takes the bundle.
+     */
+    second: BundleSide;
+    /**
+     * How many times customers took it.
+     */
+    taken: number;
+    /**
+     * Raised by every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it was stopped.
+     */
+    stopped_at: string | null;
+};
+
+/**
+ * A page of bundles, newest first.
+ */
+export type BundlePage = {
+    /**
+     * The bundles on this page.
+     */
+    items: Array<Bundle>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A bundle as Mission Control writes it, whole: the two sides at two stores of two Partners within 1 km, the saving, the first side's share of it (half by default) and who pays it. A published bundle changes only its name and end.
+ */
+export type BundleInput = {
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The side shown first.
+     */
+    first: BundleSideInput;
+    /**
+     * The side added to a basket at its store.
+     */
+    second: BundleSideInput;
+    /**
+     * The saving on the pair.
+     */
+    saving: Money;
+    /**
+     * The first side's share; the rest is the second's. Half by default.
+     */
+    first_share?: Money | null;
+    /**
+     * Who pays the saving.
+     */
+    funded_by: BundleFunding;
+    /**
+     * When it starts; `null` from publishing.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends; `null` until stopped.
+     */
+    ends_at?: string | null;
+};
+
+/**
+ * A change to a bundle: the members sent. A draft changes anything; a published or live bundle only its name and end.
+ */
+export type BundleUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string;
+    /**
+     * The side shown first.
+     */
+    first?: BundleSideInput;
+    /**
+     * The side added to a basket at its store.
+     */
+    second?: BundleSideInput;
+    /**
+     * The saving on the pair.
+     */
+    saving?: Money;
+    /**
+     * The first side's share.
+     */
+    first_share?: Money | null;
+    /**
+     * Who pays the saving.
+     */
+    funded_by?: BundleFunding;
+    /**
+     * When it starts.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends.
+     */
+    ends_at?: string | null;
+};
+
+/**
+ * A bundle as a store's Partner reads it: its own side, what the other store offers, and the answer it gave. It learns nothing of the other store's customers or orders.
+ */
+export type PartnerBundle = {
+    /**
+     * The bundle.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What customers read.
+     */
+    headline: string;
+    /**
+     * The saving on the pair.
+     */
+    saving: Money;
+    /**
+     * Who pays the saving.
+     */
+    funded_by: BundleFunding;
+    /**
+     * Where it is.
+     */
+    state: BundleState;
+    /**
+     * How far apart the two stores are, at most 1,000 m.
+     */
+    distance_metres: number;
+    /**
+     * When it starts; `null` from publishing.
+     */
+    starts_at: string | null;
+    /**
+     * When it ends; `null` until stopped.
+     */
+    ends_at: string | null;
+    /**
+     * The store of this Partner that answers.
+     */
+    location_id: string;
+    /**
+     * This store's side.
+     */
+    side: BundleSide;
+    /**
+     * The other side's store.
+     */
+    other_store: string;
+    /**
+     * The other side's item or category.
+     */
+    other_name: string;
+    /**
+     * What this Partner pays for each pair sold: its side's share when the Partners fund it, else 0.
+     */
+    pays: Money;
+};
+
+/**
+ * A page of the bundles reaching a Partner's stores, those waiting for an answer first.
+ */
+export type PartnerBundlePage = {
+    /**
+     * The bundles on this page.
+     */
+    items: Array<PartnerBundle>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One side of a bundle as customers read it.
+ */
+export type StoreBundleSide = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The item, for an item.
+     */
+    item_id: string | null;
+    /**
+     * The category, for a category.
+     */
+    category_id: string | null;
+    /**
+     * The item or category in words.
+     */
+    name: string;
+    /**
+     * What comes off this store's order.
+     */
+    share: Money;
+};
+
+/**
+ * A live bundle on a store's page and in its basket: one suggestion naming both stores and the saving. Taking it adds the second side to a basket at its store, and each order carries its share.
+ */
+export type StoreBundle = {
+    /**
+     * The bundle.
+     */
+    id: string;
+    /**
+     * What customers read.
+     */
+    headline: string;
+    /**
+     * The saving on the pair.
+     */
+    saving: Money;
+    /**
+     * Whether ZippyGo pays the saving.
+     */
+    funded_by_platform: boolean;
+    /**
+     * This store's side.
+     */
+    first: StoreBundleSide;
+    /**
+     * The other store's side.
+     */
+    second: StoreBundleSide;
+    /**
+     * How far apart the stores are.
+     */
+    distance_metres: number;
+};
+
+/**
+ * The live bundles of a store's page.
+ */
+export type StoreBundleList = {
+    /**
+     * The bundles.
+     */
+    items: Array<StoreBundle>;
+};
+
+/**
+ * A bundle taken: both sides' offers are the customer's, and the second side's item is in a basket at its store (a category side leaves the choice to the customer).
+ */
+export type BundleTaken = {
+    /**
+     * The bundle.
+     */
+    bundle_id: string;
+    /**
+     * The store whose basket holds the second side.
+     */
+    second_location_id: string;
+    /**
+     * The item added to that basket; `null` for a category side.
+     */
+    added_item_id: string | null;
+    /**
+     * What happened, in words.
+     */
+    words: string;
 };
 
 /**
@@ -72046,3 +72991,1020 @@ export type MoveScheduleDateResponses = {
 };
 
 export type MoveScheduleDateResponse = MoveScheduleDateResponses[keyof MoveScheduleDateResponses];
+
+export type ListPartnerRoutesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * The day the routes run, on their stores' clock; tomorrow by default.
+         */
+        date?: string;
+        /**
+         * Only routes carrying this store's stops.
+         */
+        location_id?: string;
+        /**
+         * Only routes in this state.
+         */
+        state?: RouteState;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/dispatch/routes';
+};
+
+export type ListPartnerRoutesErrors = {
+    /**
+     * `validation_failed` for a malformed date, state, limit or cursor; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a store that is not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerRoutesError = ListPartnerRoutesErrors[keyof ListPartnerRoutesErrors];
+
+export type ListPartnerRoutesResponses = {
+    /**
+     * A page of the day's routes.
+     */
+    200: RoutePage;
+};
+
+export type ListPartnerRoutesResponse = ListPartnerRoutesResponses[keyof ListPartnerRoutesResponses];
+
+export type GetPartnerRouteData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The route.
+         */
+        route_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/dispatch/routes/{route_id}';
+};
+
+export type GetPartnerRouteErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a route carrying none of its stops.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerRouteError = GetPartnerRouteErrors[keyof GetPartnerRouteErrors];
+
+export type GetPartnerRouteResponses = {
+    /**
+     * The route.
+     */
+    200: Route;
+};
+
+export type GetPartnerRouteResponse = GetPartnerRouteResponses[keyof GetPartnerRouteResponses];
+
+export type AssignPartnerRouteData = {
+    /**
+     * The Agent, and why.
+     */
+    body: RouteAssignmentInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The route.
+         */
+        route_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/dispatch/routes/{route_id}/assignment';
+};
+
+export type AssignPartnerRouteErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, the route or the Agent.
+     */
+    404: Problem;
+    /**
+     * `route_not_assignable` for a route of another delivery service, under way or ended; `assignment_refused` when the Agent cannot take it, naming why.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AssignPartnerRouteError = AssignPartnerRouteErrors[keyof AssignPartnerRouteErrors];
+
+export type AssignPartnerRouteResponses = {
+    /**
+     * The route, assigned.
+     */
+    200: Route;
+};
+
+export type AssignPartnerRouteResponse = AssignPartnerRouteResponses[keyof AssignPartnerRouteResponses];
+
+export type ListPlatformRoutesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The day the routes run, on their stores' clock; tomorrow by default.
+         */
+        date?: string;
+        /**
+         * Only routes in this zone, or in the zones of this city.
+         */
+        service_area_id?: string;
+        /**
+         * Only routes carrying this Partner's stops, or carried by its delivery service.
+         */
+        partner_id?: string;
+        /**
+         * Only routes in this state.
+         */
+        state?: RouteState;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/dispatch/routes';
+};
+
+export type ListPlatformRoutesErrors = {
+    /**
+     * `validation_failed` for a malformed date, state, limit or cursor; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `dispatch:read`, or `forbidden` for a token that is not Mission Control's.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformRoutesError = ListPlatformRoutesErrors[keyof ListPlatformRoutesErrors];
+
+export type ListPlatformRoutesResponses = {
+    /**
+     * A page of the day's routes.
+     */
+    200: RoutePage;
+};
+
+export type ListPlatformRoutesResponse = ListPlatformRoutesResponses[keyof ListPlatformRoutesResponses];
+
+export type GetPlatformRouteData = {
+    body?: never;
+    path: {
+        /**
+         * The route.
+         */
+        route_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/dispatch/routes/{route_id}';
+};
+
+export type GetPlatformRouteErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `dispatch:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformRouteError = GetPlatformRouteErrors[keyof GetPlatformRouteErrors];
+
+export type GetPlatformRouteResponses = {
+    /**
+     * The route.
+     */
+    200: Route;
+};
+
+export type GetPlatformRouteResponse = GetPlatformRouteResponses[keyof GetPlatformRouteResponses];
+
+export type AssignPlatformRouteData = {
+    /**
+     * The Agent, and why.
+     */
+    body: RouteAssignmentInput;
+    path: {
+        /**
+         * The route.
+         */
+        route_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/dispatch/routes/{route_id}/assignment';
+};
+
+export type AssignPlatformRouteErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `dispatch:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the route or the Agent.
+     */
+    404: Problem;
+    /**
+     * `route_not_assignable` for a route under way or ended; `assignment_refused` when the Agent cannot take it, naming why.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AssignPlatformRouteError = AssignPlatformRouteErrors[keyof AssignPlatformRouteErrors];
+
+export type AssignPlatformRouteResponses = {
+    /**
+     * The route, assigned.
+     */
+    200: Route;
+};
+
+export type AssignPlatformRouteResponse = AssignPlatformRouteResponses[keyof AssignPlatformRouteResponses];
+
+export type GetAgentTripData = {
+    body?: never;
+    path: {
+        /**
+         * The trip.
+         */
+        trip_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/trips/{trip_id}';
+};
+
+export type GetAgentTripErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` for a token that is not the Agent's.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no trip of the caller's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentTripError = GetAgentTripErrors[keyof GetAgentTripErrors];
+
+export type GetAgentTripResponses = {
+    /**
+     * The trip.
+     */
+    200: AgentTrip;
+};
+
+export type GetAgentTripResponse = GetAgentTripResponses[keyof GetAgentTripResponses];
+
+export type ListStoreBundlesData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/storefront/stores/{location_id}/bundles';
+};
+
+export type ListStoreBundlesErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no live store.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStoreBundlesError = ListStoreBundlesErrors[keyof ListStoreBundlesErrors];
+
+export type ListStoreBundlesResponses = {
+    /**
+     * The bundles.
+     */
+    200: StoreBundleList;
+};
+
+export type ListStoreBundlesResponse = ListStoreBundlesResponses[keyof ListStoreBundlesResponses];
+
+export type TakeBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bundles/{bundle_id}/take';
+};
+
+export type TakeBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` for a token that is not a customer's.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `bundle_not_live` when it is not live any more.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type TakeBundleError = TakeBundleErrors[keyof TakeBundleErrors];
+
+export type TakeBundleResponses = {
+    /**
+     * The bundle taken.
+     */
+    200: BundleTaken;
+};
+
+export type TakeBundleResponse = TakeBundleResponses[keyof TakeBundleResponses];
+
+export type ListPartnerBundlesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only this store's bundles.
+         */
+        location_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/bundles';
+};
+
+export type ListPartnerBundlesErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `promotion:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, or a store that is not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerBundlesError = ListPartnerBundlesErrors[keyof ListPartnerBundlesErrors];
+
+export type ListPartnerBundlesResponses = {
+    /**
+     * A page of bundles.
+     */
+    200: PartnerBundlePage;
+};
+
+export type ListPartnerBundlesResponse = ListPartnerBundlesResponses[keyof ListPartnerBundlesResponses];
+
+export type AcceptPartnerBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bundles/{bundle_id}/accept';
+};
+
+export type AcceptPartnerBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `promotion:write` at the store.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, the store, or a bundle it is not a side of.
+     */
+    404: Problem;
+    /**
+     * `conflict` when the store answered the other way already, or the bundle was stopped.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptPartnerBundleError = AcceptPartnerBundleErrors[keyof AcceptPartnerBundleErrors];
+
+export type AcceptPartnerBundleResponses = {
+    /**
+     * The bundle with the answer.
+     */
+    200: PartnerBundle;
+};
+
+export type AcceptPartnerBundleResponse = AcceptPartnerBundleResponses[keyof AcceptPartnerBundleResponses];
+
+export type DeclinePartnerBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bundles/{bundle_id}/decline';
+};
+
+export type DeclinePartnerBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `promotion:write` at the store.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner, the store, or a bundle it is not a side of.
+     */
+    404: Problem;
+    /**
+     * `conflict` when the store answered the other way already, or the bundle was stopped.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclinePartnerBundleError = DeclinePartnerBundleErrors[keyof DeclinePartnerBundleErrors];
+
+export type DeclinePartnerBundleResponses = {
+    /**
+     * The bundle with the answer.
+     */
+    200: PartnerBundle;
+};
+
+export type DeclinePartnerBundleResponse = DeclinePartnerBundleResponses[keyof DeclinePartnerBundleResponses];
+
+export type ListPlatformBundlesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only bundles in this state.
+         */
+        state?: BundleState;
+        /**
+         * Only bundles with this store as a side.
+         */
+        location_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/bundles';
+};
+
+export type ListPlatformBundlesErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformBundlesError = ListPlatformBundlesErrors[keyof ListPlatformBundlesErrors];
+
+export type ListPlatformBundlesResponses = {
+    /**
+     * A page of bundles.
+     */
+    200: BundlePage;
+};
+
+export type ListPlatformBundlesResponse = ListPlatformBundlesResponses[keyof ListPlatformBundlesResponses];
+
+export type CreatePlatformBundleData = {
+    /**
+     * The bundle.
+     */
+    body: BundleInput;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/bundles';
+};
+
+export type CreatePlatformBundleErrors = {
+    /**
+     * `validation_failed`, with `bundle_too_far` or `bundle_same_partner` on a side; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:write`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: a store, item or category.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePlatformBundleError = CreatePlatformBundleErrors[keyof CreatePlatformBundleErrors];
+
+export type CreatePlatformBundleResponses = {
+    /**
+     * The draft.
+     */
+    201: Bundle;
+};
+
+export type CreatePlatformBundleResponse = CreatePlatformBundleResponses[keyof CreatePlatformBundleResponses];
+
+export type GetPlatformBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/bundles/{bundle_id}';
+};
+
+export type GetPlatformBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformBundleError = GetPlatformBundleErrors[keyof GetPlatformBundleErrors];
+
+export type GetPlatformBundleResponses = {
+    /**
+     * The bundle.
+     */
+    200: Bundle;
+};
+
+export type GetPlatformBundleResponse = GetPlatformBundleResponses[keyof GetPlatformBundleResponses];
+
+export type UpdatePlatformBundleData = {
+    /**
+     * The members to change.
+     */
+    body: BundleUpdate;
+    path: {
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/bundles/{bundle_id}';
+};
+
+export type UpdatePlatformBundleErrors = {
+    /**
+     * `validation_failed`, with `bundle_too_far` or `bundle_same_partner`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:write`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict` for a change a published bundle does not take, or a stopped bundle.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed` when `If-Match` names an older version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePlatformBundleError = UpdatePlatformBundleErrors[keyof UpdatePlatformBundleErrors];
+
+export type UpdatePlatformBundleResponses = {
+    /**
+     * The bundle.
+     */
+    200: Bundle;
+};
+
+export type UpdatePlatformBundleResponse = UpdatePlatformBundleResponses[keyof UpdatePlatformBundleResponses];
+
+export type PublishPlatformBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/bundles/{bundle_id}/publish';
+};
+
+export type PublishPlatformBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:write`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict` for a stopped or declined bundle.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPlatformBundleError = PublishPlatformBundleErrors[keyof PublishPlatformBundleErrors];
+
+export type PublishPlatformBundleResponses = {
+    /**
+     * The bundle.
+     */
+    200: Bundle;
+};
+
+export type PublishPlatformBundleResponse = PublishPlatformBundleResponses[keyof PublishPlatformBundleResponses];
+
+export type StopPlatformBundleData = {
+    body?: never;
+    path: {
+        /**
+         * The bundle.
+         */
+        bundle_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/bundles/{bundle_id}/stop';
+};
+
+export type StopPlatformBundleErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the platform's `promotion:write`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopPlatformBundleError = StopPlatformBundleErrors[keyof StopPlatformBundleErrors];
+
+export type StopPlatformBundleResponses = {
+    /**
+     * The bundle.
+     */
+    200: Bundle;
+};
+
+export type StopPlatformBundleResponse = StopPlatformBundleResponses[keyof StopPlatformBundleResponses];

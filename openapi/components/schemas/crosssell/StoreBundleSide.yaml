@@ -1,0 +1,54 @@
+type: object
+description: One side of a bundle as customers read it.
+required:
+  - location_id
+  - location_name
+  - item_id
+  - category_id
+  - name
+  - share
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The item, for an item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+  category_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The category, for a category.
+    examples:
+      - null
+  name:
+    type: string
+    description: The item or category in words.
+    examples:
+      - Hyderabadi Biryani
+  share:
+    $ref: ../common/Money.yaml
+    description: What comes off this store's order.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c11
+    category_id: null
+    name: Hyderabadi Biryani
+    share:
+      minor_units: 3000
+      currency: INR

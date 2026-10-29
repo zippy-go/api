@@ -1,0 +1,26 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8f01",
+  "type": "crosssell.bundle.published",
+  "version": 1,
+  "occurred_at": "2026-11-01T09:30:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "bundle_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c8401",
+    "state": "published",
+    "location_ids": [
+      "01a13a48-9e00-7000-8000-000000000301",
+      "01a13a48-9e00-7000-8000-000000000308"
+    ],
+    "partner_ids": [
+      "01a13a48-9e00-7000-8000-000000000001",
+      "01a13a48-9e00-7000-8000-000000000003"
+    ],
+    "saving": {
+      "minor_units": 6000,
+      "currency": "INR"
+    },
+    "funded_by": "platform",
+    "at": "2026-11-01T09:30:00Z"
+  }
+}
