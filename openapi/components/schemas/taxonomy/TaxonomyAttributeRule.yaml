@@ -11,7 +11,11 @@ properties:
     description: The attribute.
   required:
     type: boolean
-    description: Whether a product of the term must carry it; an item without it is a task for its store.
+    description: >-
+      Whether a product of the term must carry it; an item without it is a task
+      for its store. Refused for an attribute no item carries yet
+      (`allergens`, `cuisine`, `pack_size`, `organic`, `cold_chain`), which a
+      term may allow but not require.
 examples:
   - attribute: dietary_mark
     required: true

@@ -13337,7 +13337,7 @@ export type TaxonomyAttributeRule = {
      */
     attribute: TaxonomyAttribute;
     /**
-     * Whether a product of the term must carry it; an item without it is a task for its store.
+     * Whether a product of the term must carry it; an item without it is a task for its store. Refused for an attribute no item carries yet (`allergens`, `cuisine`, `pack_size`, `organic`, `cold_chain`), which a term may allow but not require.
      */
     required: boolean;
 };

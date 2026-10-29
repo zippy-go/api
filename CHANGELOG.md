@@ -27,7 +27,9 @@ Additive only.
   `TaxonomyTermUpdate`, `TaxonomyTermDeprecation`, `TaxonomyTermMerge`), and
   every change kept (`GET /v1/platform/taxonomy/changes`, `TaxonomyChange`,
   `TaxonomyChangeKind`, `TaxonomyChangePage`). `taxonomy:write` to change,
-  `catalog:oversee` to read Mission Control's views.
+  `catalog:oversee` to read Mission Control's views. A term requires only an
+  attribute items carry today: the dietary mark, the brand, and the age and
+  prescription flags; the others may be allowed.
 - A store's catalogue mapped to it: each category with its term or the terms
   suggested from its name, the items mapped more narrowly, unmapped or missing
   an attribute, the tasks and the counts
