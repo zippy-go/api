@@ -22,6 +22,18 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: name_too_long
+        message: "A name is 1 to 80 characters."
+        description: "An offer's name empty or over 80 characters."
+      - code: terms_missing
+        message: "Say what the offer gives."
+        description: "A mechanic without the terms it needs: an amount, a percentage or tiers off the basket, a percentage or an amount off items, a multibuy's buy and get."
+      - code: date_invalid
+        message: "A date is written YYYY-MM-DDTHH:MM."
+        description: "A start or end not written as a wall-clock date and time."
+      - code: limit_invalid
+        message: "A limit is at least 1."
+        description: "Uses per customer or in all set to nothing."
       - code: percent_out_of_range
         message: "A percentage is between 1 and 100."
         description: "A percentage off outside 1 to 100."

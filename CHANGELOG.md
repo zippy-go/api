@@ -86,14 +86,17 @@ finance promotion:read. Additive only.
   `archived`, `restored` and `deleted`; a code's `created`, `retired` and
   `claimed`; a campaign's `participation.invited`, `.accepted` and
   `.declined`; a use's `redemption.reserved`, `.confirmed` and `.released`.
-  `ordering.order.placed` gains `offers` with their split, `discounts` and
-  `delivery_discount`.
+  An offer's and a campaign's events carry its `name` and `line`, the words
+  the Location's notices use. `ordering.order.placed` gains `offers` with
+  their split, `discounts` and `delivery_discount`.
 - Problem codes `offer_transition`, `offer_running_terms`,
   `confirmation_required`, `offer_purpose_taken`, `code_in_use`,
   `campaign_not_open`, `code_not_recognised`, `code_ended`,
   `code_for_new_customers`, `code_already_used`, `code_already_added`,
-  `code_not_for_account` and `code_guesses`; nineteen field codes of
-  `validation_failed` naming the term an offer's terms contradict.
+  `code_not_for_account` and `code_guesses`; twenty-three field codes of
+  `validation_failed` naming the term an offer's terms contradict, a name too
+  long, terms missing, a date not written as a wall-clock date and a limit
+  below one.
 
 ## [0.21.0] - 2026-10-29
 

@@ -6,6 +6,8 @@
   "type": "object",
   "required": [
     "offer_id",
+    "name",
+    "line",
     "partner_id",
     "location_id",
     "status",
@@ -20,6 +22,20 @@
       "description": "The campaign.",
       "examples": [
         "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The offer's name, as its owner wrote it.",
+      "examples": [
+        "Free delivery over ₹199"
+      ]
+    },
+    "line": {
+      "type": "string",
+      "description": "Its line, as the platform wrote it.",
+      "examples": [
+        "Free delivery over ₹199"
       ]
     },
     "partner_id": {
