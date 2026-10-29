@@ -1,0 +1,75 @@
+# Path item for /v1/partners/{partner_id}/offers/{offer_id}/publish. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: offer_id
+    in: path
+    required: true
+    description: The offer.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+post:
+  operationId: publishPartnerOffer
+  summary: Publish a draft
+  description: "Publishes a draft: scheduled until its start, or live at once when its start has come or was left out; an offer whose end has passed is refused. A priced offer asks for the Partner's word, \"My business pays for this offer's discounts, as shown.\", and is refused without it, staying a draft; the words, who gave them and when are kept with the offer. `promotion:write` at each of its Locations."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  requestBody:
+    required: false
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/promotions/OfferPublish.yaml
+  responses:
+    "200":
+      description: The offer, scheduled or live.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/Offer.yaml
+    "400":
+      description: The terms fail validation as saved (`validation_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such offer of the Partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`confirmation_required`: the Partner's word is missing or not the words asked; `offer_transition`: not a draft, or its end has passed."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

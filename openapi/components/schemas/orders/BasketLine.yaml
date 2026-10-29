@@ -95,6 +95,11 @@ properties:
       - $ref: ./LineRefusal.yaml
       - type: "null"
     description: Why the line cannot be ordered now; `null` when it can.
+  promotion:
+    oneOf:
+      - $ref: ../promotions/BasketLinePromotion.yaml
+      - type: "null"
+    description: The item offer the line is under, with what it takes off; `null` when none applies.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
     item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
@@ -131,3 +136,4 @@ examples:
     refusal:
       code: item_unavailable
       message: Hyderabadi Biryani (Full) is sold out today.
+    promotion: null

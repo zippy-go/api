@@ -1,0 +1,7 @@
+type: string
+description: "A platform campaign's purpose, at most one of each per city: the city's first-order offer, or the offer a customer's referral code unlocks."
+enum:
+  - first_order
+  - referral
+examples:
+  - first_order

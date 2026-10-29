@@ -1,0 +1,8 @@
+type: string
+description: "Who acted: the Partner, the platform, or the platform's clock."
+enum:
+  - partner
+  - platform
+  - clock
+examples:
+  - partner

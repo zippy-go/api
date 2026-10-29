@@ -1,0 +1,8 @@
+type: string
+description: "What an offer names: an item, a category or a brand."
+enum:
+  - item
+  - category
+  - brand
+examples:
+  - item

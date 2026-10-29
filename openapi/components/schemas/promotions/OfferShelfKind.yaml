@@ -1,0 +1,9 @@
+type: string
+description: "A Vertical's offer shelf: free delivery, multibuys and deals, money off, or free items."
+enum:
+  - free_delivery
+  - deals
+  - money_off
+  - free_items
+examples:
+  - free_delivery

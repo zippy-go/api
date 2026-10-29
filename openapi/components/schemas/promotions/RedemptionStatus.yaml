@@ -1,0 +1,8 @@
+type: string
+description: "A use of an offer: reserved when the order is placed, confirmed when it completes, released when it is declined, expires or is cancelled."
+enum:
+  - reserved
+  - confirmed
+  - released
+examples:
+  - reserved

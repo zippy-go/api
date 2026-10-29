@@ -1,0 +1,9 @@
+type: string
+description: "What part of a basket an applied offer takes off: items, the basket, the delivery fee, or a free item of its own line."
+enum:
+  - item
+  - basket
+  - delivery
+  - free_item
+examples:
+  - item

@@ -1,0 +1,33 @@
+type: object
+description: A page of an offer's history, newest first, from the draft's creation.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./OfferHistoryEntry.yaml
+    description: The entries on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6401
+        at: 2026-11-06T10:30:00Z
+        action: started
+        actor:
+          kind: clock
+          user_id: null
+          name: null
+        state: live
+        previous_state: scheduled
+        reason: null
+        text: Started by the clock at 16:00
+        changes: []
+    next_cursor: null

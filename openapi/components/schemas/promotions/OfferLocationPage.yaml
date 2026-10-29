@@ -1,0 +1,28 @@
+type: object
+description: A page of Locations with their offers, by name.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./OfferLocation.yaml
+    description: The Locations on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - location_id: 01a13a48-9e00-7000-8000-000000000301
+        name: Dev Kitchen Gachibowli
+        partner_id: 01a13a48-9e00-7000-8000-000000000001
+        partner_name: ZippyGo Dev Partner
+        live: 1
+        scheduled: 1
+        paused: 0
+    next_cursor: null

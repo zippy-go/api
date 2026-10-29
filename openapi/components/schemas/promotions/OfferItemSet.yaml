@@ -1,0 +1,14 @@
+type: object
+description: "One set of a bundle: the customer takes one item from it."
+required:
+  - item_ids
+properties:
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items of the set.
+examples:
+  - item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101

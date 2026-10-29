@@ -11324,6 +11324,10 @@ export type StoreCard = {
      * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
+    /**
+     * The store's best advertised offer open to everyone and how many more it has; `null` when it runs none.
+     */
+    offer?: StoreOfferBadge | null;
 };
 
 /**
@@ -11372,6 +11376,10 @@ export type StoreCardList = {
      * The stores.
      */
     stores: Array<StoreCard>;
+    /**
+     * The Vertical's offer shelves: free delivery, multibuys and deals, money off and free items, each the stores with a live offer of its kind, open ones first; a shelf with none is left out.
+     */
+    shelves?: Array<OfferShelf>;
 };
 
 /**
@@ -14324,6 +14332,10 @@ export type MenuItem = {
      * When and how it may be ordered.
      */
     availability: ItemAvailability;
+    /**
+     * The offer open to everyone the item is under, from the engine: its tag, its price after plain money off, or the deal its sheet opens on; `null` for none.
+     */
+    promotion?: MenuItemPromotion | null;
 };
 
 /**
@@ -14706,6 +14718,10 @@ export type StorePage = {
      * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
+    /**
+     * The store's best advertised offer, as on its card; its page lists them all (`GET /v1/storefront/stores/{location_id}/offers`).
+     */
+    offer?: StoreOfferBadge | null;
 };
 
 /**
@@ -14816,6 +14832,10 @@ export type SearchStore = {
      * The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
      */
     rating?: LocationRating | null;
+    /**
+     * The store's best advertised offer, as on its card.
+     */
+    offer?: StoreOfferBadge | null;
 };
 
 /**
@@ -16850,6 +16870,14 @@ export type BasketChoicesUpdate = {
      * Whether to send disposable cutlery, where the store asks, at its fee.
      */
     cutlery?: boolean;
+    /**
+     * Chooses a basket offer over the best, applied while it qualifies; `null` goes back to the best. Customers only.
+     */
+    basket_offer_id?: string | null;
+    /**
+     * Picks the free item among its choices; `null` goes back to the cheapest.
+     */
+    free_item_variant_id?: string | null;
 };
 
 /**
@@ -16968,6 +16996,10 @@ export type BasketLine = {
      * Why the line cannot be ordered now; `null` when it can.
      */
     refusal: LineRefusal | null;
+    /**
+     * The item offer the line is under, with what it takes off; `null` when none applies.
+     */
+    promotion?: BasketLinePromotion | null;
 };
 
 /**
@@ -17006,6 +17038,14 @@ export type BasketChoices = {
      * Whether disposable cutlery is wanted.
      */
     cutlery: boolean;
+    /**
+     * The basket offer the customer chose over the best, applied while it qualifies; `null` for the best.
+     */
+    basket_offer_id?: string | null;
+    /**
+     * The free item the customer picked among its choices; `null` for the cheapest.
+     */
+    free_item_variant_id?: string | null;
 };
 
 /**
@@ -17108,6 +17148,18 @@ export type BasketPricing = {
      * The chosen method.
      */
     method: PaymentMethod | null;
+    /**
+     * What the platform's offers take off the items and the basket, free items included; `savings` counts them with the variants' own offers.
+     */
+    discounts?: Money;
+    /**
+     * The delivery fee free delivery waives; `null` when it waives nothing. The `delivery` fee stays as worked out.
+     */
+    delivery_discount?: Money | null;
+    /**
+     * The items after every discount: the minimum order, the small-order fee and basket offers' minimum spends are measured on it.
+     */
+    items_after_offers?: Money;
 };
 
 /**
@@ -17202,6 +17254,26 @@ export type Basket = {
      * When it last changed; `null` for an empty basket never changed.
      */
     updated_at: string | null;
+    /**
+     * The offers applied, from the engine: at most one item offer on each unit and one basket offer, money off, a free item or free delivery.
+     */
+    offers?: Array<BasketOffer>;
+    /**
+     * The other basket offers the customer could have instead, with what each would save; choose one with `basket_offer_id`.
+     */
+    alternatives?: Array<BasketAlternative>;
+    /**
+     * Why each advertised or held offer that does not apply does not, in the engine's words.
+     */
+    reasons?: Array<OfferReason>;
+    /**
+     * Minimum spends not met by offers that would beat the one applied: "Spend ₹201.00 more for ₹50 off".
+     */
+    nudges?: Array<OfferNudge>;
+    /**
+     * The free item a basket offer gives, as a line of its own; `null` when none does.
+     */
+    free_item?: BasketFreeItem | null;
 };
 
 /**
@@ -17662,6 +17734,10 @@ export type OrderLine = {
      * How many of it refunds have given back.
      */
     refunded_quantity: number;
+    /**
+     * The item offer the line was sold under, or the free item it is; `null` for none.
+     */
+    promotion?: BasketLinePromotion | null;
 };
 
 /**
@@ -17920,6 +17996,14 @@ export type Receipt = {
      * What refunds gave back in all.
      */
     refunded: Money;
+    /**
+     * What the platform's offers took off the items and the basket.
+     */
+    discounts?: Money;
+    /**
+     * The delivery fee free delivery waived.
+     */
+    delivery_discount?: Money | null;
 };
 
 /**
@@ -18136,6 +18220,10 @@ export type CustomerOrder = {
      * The proof of delivery, once delivered.
      */
     proof?: OrderProof | null;
+    /**
+     * The offers the order was placed with, as they were at placing; ending, pausing or editing an offer afterwards never changes them.
+     */
+    offers?: Array<OrderOffer>;
 };
 
 /**
@@ -18904,6 +18992,10 @@ export type PlatformOrder = {
      * The customer's rating of the delivery; `null` until given or for an order no Agent carried. Since 0.19.0.
      */
     delivery_rating?: DeliveryRating | null;
+    /**
+     * The offers the order was placed with, each with how its cost is split between the Partner and the platform and its use's state.
+     */
+    offers?: Array<OrderOfferSplit>;
 };
 
 /**
@@ -23463,6 +23555,10 @@ export type Statement = {
      * The version, raised on every move.
      */
     version: number;
+    /**
+     * "Promotions you paid for": each promotion that ran in the week with its orders, what it took off for customers and what the Partner and the platform paid.
+     */
+    promotions?: Array<StatementPromotion>;
 };
 
 /**
@@ -25216,6 +25312,2132 @@ export type AgentWeeksReport = {
      * Everyone together.
      */
     totals: AgentWeeksTotals;
+};
+
+/**
+ * Who owns an offer: a Partner, on its own Locations, or the platform.
+ */
+export type OfferOwner = 'partner' | 'platform';
+
+/**
+ * What an offer was made as, kept for its life: a Partner's own offer, the platform's campaign across Locations, or the platform's store promotion at one Location.
+ */
+export type OfferKind = 'partner_offer' | 'campaign' | 'store_promotion';
+
+/**
+ * A platform campaign's purpose, at most one of each per city: the city's first-order offer, or the offer a customer's referral code unlocks.
+ */
+export type OfferPurpose = 'first_order' | 'referral';
+
+/**
+ * Where an offer is in its life: a draft, scheduled to start, live, paused, ended or cancelled.
+ */
+export type OfferState = 'draft' | 'scheduled' | 'live' | 'paused' | 'ended' | 'cancelled';
+
+/**
+ * An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card.
+ */
+export type OfferMechanic = 'basket_off' | 'free_delivery' | 'items_off' | 'multibuy' | 'n_for_price' | 'bundle' | 'free_item' | 'stamp_card';
+
+/**
+ * Whom an offer is for: everyone, customers new to the Location, to the city or to ZippyGo, customers lapsed at the Location, or holders of a code.
+ */
+export type OfferAudience = 'everyone' | 'new_to_location' | 'new_to_city' | 'new_to_platform' | 'lapsed_at_location' | 'code_holders';
+
+/**
+ * A way of ordering an offer may be for. Dine-in and subscriptions come with later steps; no offer is for subscriptions unless it says so.
+ */
+export type OfferFulfilment = 'delivery' | 'pickup' | 'dine_in' | 'subscription';
+
+/**
+ * What the caller may do with an offer now, worked out by the server from its state, who paused it and the caller's permissions.
+ */
+export type OfferAction = 'edit' | 'publish' | 'delete' | 'start' | 'pause' | 'resume' | 'stop' | 'cancel' | 'archive' | 'restore' | 'run_again';
+
+/**
+ * A goal a playbook serves: get more orders, reward regulars, or showcase items.
+ */
+export type OfferGoal = 'get_more_orders' | 'reward_regulars' | 'showcase_items';
+
+/**
+ * What an offer is on: everything the Location sells, chosen categories, brands, or items.
+ */
+export type OfferTarget = 'everything' | 'categories' | 'brands' | 'items';
+
+/**
+ * A stamp card's reward: free delivery, or a free item chosen from a list.
+ */
+export type StampReward = 'free_delivery' | 'free_item';
+
+/**
+ * A day of the week on the Location's clock.
+ */
+export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+/**
+ * A code's kind: open (anyone who has it), single-use (one of a batch), personal (given to one customer), or a customer's referral code.
+ */
+export type OfferCodeKind = 'open' | 'single_use' | 'personal' | 'referral';
+
+/**
+ * A Location's answer to a campaign: invited and not answered, accepted, declined, or included without an invitation because the platform pays for it all.
+ */
+export type ParticipationStatus = 'invited' | 'accepted' | 'declined' | 'included';
+
+/**
+ * A use of an offer: reserved when the order is placed, confirmed when it completes, released when it is declined, expires or is cancelled.
+ */
+export type RedemptionStatus = 'reserved' | 'confirmed' | 'released';
+
+/**
+ * Why an offer does not apply: not started, ended, outside its hours, not for this customer, not for this way of ordering, a minimum spend not met, used up, a stamp card's reward not earned yet, or nothing in the basket for it.
+ */
+export type OfferReasonCode = 'not_started' | 'ended' | 'outside_hours' | 'not_for_you' | 'not_for_fulfilment' | 'min_spend' | 'used_up' | 'stamp_not_earned' | 'nothing_to_apply';
+
+/**
+ * A Vertical's offer shelf: free delivery, multibuys and deals, money off, or free items.
+ */
+export type OfferShelfKind = 'free_delivery' | 'deals' | 'money_off' | 'free_items';
+
+/**
+ * How an offer reached a customer's account: a code they added, a personal code they were given, a referral code, the city's first-order offer, a Location's offer for new customers, or a reward they earned.
+ */
+export type CustomerOfferSource = 'code' | 'personal' | 'referral' | 'first_order' | 'new_customers' | 'reward';
+
+/**
+ * An offer in a customer's account: ready, starting later, used, or ended (listed thirty days after its end).
+ */
+export type CustomerOfferState = 'ready' | 'starts_later' | 'used' | 'ended';
+
+/**
+ * What part of a basket an applied offer takes off: items, the basket, the delivery fee, or a free item of its own line.
+ */
+export type BasketOfferKind = 'item' | 'basket' | 'delivery' | 'free_item';
+
+/**
+ * What a code typed in the basket did: applied here, saved to the customer's offers but not started yet, or saved but not for this basket.
+ */
+export type CodeOutcome = 'applied' | 'saved_not_started' | 'saved_not_applicable';
+
+/**
+ * What happened to an offer.
+ */
+export type OfferHistoryAction = 'created' | 'changed' | 'published' | 'started' | 'paused' | 'resumed' | 'ended' | 'cancelled' | 'archived' | 'restored' | 'code_added' | 'code_retired';
+
+/**
+ * Who acted: the Partner, the platform, or the platform's clock.
+ */
+export type OfferActorKind = 'partner' | 'platform' | 'clock';
+
+/**
+ * What an offer names: an item, a category or a brand.
+ */
+export type OfferNamedKind = 'item' | 'category' | 'brand';
+
+/**
+ * One tier of money off the basket: spend at least this, save that.
+ */
+export type OfferTier = {
+    /**
+     * The least the items come to, after item offers.
+     */
+    min_spend: Money;
+    /**
+     * What comes off.
+     */
+    amount_off: Money;
+};
+
+/**
+ * One set of a bundle: the customer takes one item from it.
+ */
+export type OfferItemSet = {
+    /**
+     * The items of the set.
+     */
+    item_ids: Array<string>;
+};
+
+/**
+ * An offer's mechanic and the terms it uses; the others are `null` or empty. Saved terms that contradict the mechanic or each other are refused with `400`, naming the term.
+ */
+export type OfferTerms = {
+    /**
+     * The mechanic.
+     */
+    mechanic: OfferMechanic;
+    /**
+     * Money off the basket, or off each unit of the items, as an amount.
+     */
+    amount_off?: Money | null;
+    /**
+     * Money off the basket or the items as a percentage, 1 to 100.
+     */
+    percent_off?: number | null;
+    /**
+     * The most a percentage off the basket takes.
+     */
+    percent_cap?: Money | null;
+    /**
+     * Tiers of spend and amount, each asking more and giving more than the one before; they replace a minimum spend.
+     */
+    tiers?: Array<OfferTier>;
+    /**
+     * A multibuy: how many the customer buys.
+     */
+    buy?: number | null;
+    /**
+     * A multibuy: how many more they get, at most as many as they buy.
+     */
+    get?: number | null;
+    /**
+     * A multibuy: what comes off those they get, 100 for free.
+     */
+    get_percent_off?: number | null;
+    /**
+     * A multibuy: whether the units may be mixed from the items it is on, the cheapest given, or must be one item.
+     */
+    mix?: boolean | null;
+    /**
+     * N for a price: how many, at least 2.
+     */
+    count?: number | null;
+    /**
+     * N for a price, or a bundle: the fixed amount.
+     */
+    price?: Money | null;
+    /**
+     * A bundle: two to four sets.
+     */
+    sets?: Array<OfferItemSet>;
+    /**
+     * A free item, or a stamp card rewarding one: the variants that can be had free.
+     */
+    free_variant_ids?: Array<string>;
+    /**
+     * A stamp card: the reward on every nth order, 2 to 100.
+     */
+    every?: number | null;
+    /**
+     * A stamp card: rewards the nth order alone rather than every nth.
+     */
+    once?: boolean | null;
+    /**
+     * A stamp card's reward.
+     */
+    reward?: StampReward | null;
+};
+
+/**
+ * Something an offer names, by its name as the menu has it now; a removed item reads "A removed item".
+ */
+export type OfferNamed = {
+    /**
+     * Its id.
+     */
+    id: string;
+    /**
+     * An item, a category or a brand.
+     */
+    kind: OfferNamedKind;
+    /**
+     * Its name.
+     */
+    name: string;
+};
+
+/**
+ * What an offer is on: the whole Location, categories, brands or chosen items, less what it leaves out.
+ */
+export type OfferOn = {
+    /**
+     * What it is on.
+     */
+    on: OfferTarget;
+    /**
+     * The categories, when on categories.
+     */
+    category_ids?: Array<string>;
+    /**
+     * The brands, when on brands.
+     */
+    brand_ids?: Array<string>;
+    /**
+     * The items, when on chosen items; they belong to one Location.
+     */
+    item_ids?: Array<string>;
+    /**
+     * Items it leaves out.
+     */
+    excluded_item_ids?: Array<string>;
+    /**
+     * Categories it leaves out.
+     */
+    excluded_category_ids?: Array<string>;
+    /**
+     * Read only: everything above by name.
+     */
+    names?: Array<OfferNamed>;
+};
+
+/**
+ * Where an offer runs. A Partner's offer names its Locations. A campaign is aimed by any of the lists, every list given narrowing it (the Food Vertical in Hyderabad), or everywhere; the aim is resolved each time a basket is priced, so a Location that joins a Vertical or opens in a zone joins a running campaign.
+ */
+export type OfferAim = {
+    /**
+     * Locations by name.
+     */
+    location_ids?: Array<string>;
+    /**
+     * Every Location of these Partners.
+     */
+    partner_ids?: Array<string>;
+    /**
+     * Locations trading in these Verticals.
+     */
+    vertical_ids?: Array<string>;
+    /**
+     * Locations in these cities or zones, or beneath them.
+     */
+    service_area_ids?: Array<string>;
+    /**
+     * Locations of these types.
+     */
+    store_type_ids?: Array<string>;
+    /**
+     * Every Location trading, and every one that opens while it runs.
+     */
+    everywhere?: boolean;
+    /**
+     * Read only: where it runs in words, "Food in Hyderabad".
+     */
+    text?: string;
+};
+
+/**
+ * A weekly window on the Location's clock, from its start up to but not including its end; one that ends before it starts runs past midnight.
+ */
+export type OfferWindow = {
+    /**
+     * The days it opens on, at least one.
+     */
+    days: Array<Weekday>;
+    /**
+     * When it opens, `HH:MM`.
+     */
+    start: string;
+    /**
+     * When it closes, `HH:MM`, different from the start.
+     */
+    end: string;
+};
+
+/**
+ * When an offer runs, as the Location's wall clock: its dates, written and read in the Location's time zone, and up to seven weekly windows.
+ */
+export type OfferWhen = {
+    /**
+     * Its start, `YYYY-MM-DDTHH:MM` on the wall clock; `null` for when it is published.
+     */
+    starts_at?: string | null;
+    /**
+     * Its end, `YYYY-MM-DDTHH:MM`; `null` for until it is stopped.
+     */
+    ends_at?: string | null;
+    /**
+     * Weekly windows; none for all day.
+     */
+    windows?: Array<OfferWindow>;
+    /**
+     * Read only: the clock it is written in, the Location's.
+     */
+    time_zone?: string;
+};
+
+/**
+ * A pause: who paused the offer, when and why. Only the platform resumes its own pause.
+ */
+export type OfferPause = {
+    /**
+     * The Partner or the platform.
+     */
+    by: OfferOwner;
+    /**
+     * Why, at most 200 characters; the platform always gives one, and the Partner reads it.
+     */
+    reason: string | null;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * In words, "Paused by ZippyGo".
+     */
+    text: string;
+};
+
+/**
+ * The Partner's word that its business pays for the offer's discounts, as shown: the words, who gave them and when.
+ */
+export type OfferConfirmation = {
+    /**
+     * The words confirmed.
+     */
+    words: string;
+    /**
+     * Who confirmed.
+     */
+    user_id: string;
+    /**
+     * Their name.
+     */
+    name: string | null;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * Another offer competing with this one in the same slot, at a Location they share, over dates and hours that meet; told, never refused. The engine gives a customer the better of the two.
+ */
+export type OfferOverlap = {
+    /**
+     * The other offer.
+     */
+    offer_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Its state.
+     */
+    state: OfferState;
+    /**
+     * Whose it is.
+     */
+    owner: OfferOwner;
+};
+
+/**
+ * How many uses an offer has: reserved by orders placed, and confirmed by orders completed.
+ */
+export type OfferUses = {
+    /**
+     * Reserved and not settled yet.
+     */
+    reserved: number;
+    /**
+     * Confirmed.
+     */
+    confirmed: number;
+};
+
+/**
+ * An offer as its owner and Mission Control read it: one mechanic with its terms, what it is on, whom it is for, where and when it runs, its conditions and limits, who pays, the line and small print the platform wrote from those terms, its state with the moves the caller may make, the Partner's word, its overlaps and its uses. Versioned: reads answer an `ETag`, writes honour `If-Match`.
+ */
+export type Offer = {
+    /**
+     * The offer.
+     */
+    id: string;
+    /**
+     * Raised by one on every change.
+     */
+    version: number;
+    /**
+     * Whose it is.
+     */
+    owner: OfferOwner;
+    /**
+     * The owning Partner; `null` for the platform's.
+     */
+    partner_id: string | null;
+    /**
+     * What it was made as.
+     */
+    kind: OfferKind;
+    /**
+     * A platform campaign's purpose.
+     */
+    purpose: OfferPurpose | null;
+    /**
+     * The owner's own name for it, at most 80 characters; customers read the line.
+     */
+    name: string;
+    /**
+     * The line a customer reads, written by the platform from the terms.
+     */
+    line: string;
+    /**
+     * The rest of the terms in words.
+     */
+    small_print: string;
+    /**
+     * The mechanic and its terms.
+     */
+    terms: OfferTerms;
+    /**
+     * What it is on.
+     */
+    on: OfferOn;
+    /**
+     * Whom it is for.
+     */
+    audience: OfferAudience;
+    /**
+     * Where it runs.
+     */
+    aim: OfferAim;
+    /**
+     * When it runs.
+     */
+    when: OfferWhen;
+    /**
+     * The least the items come to, after item offers; `null` for none.
+     */
+    min_spend: Money | null;
+    /**
+     * The ways of ordering it is for; empty for delivery and pickup.
+     */
+    fulfilments: Array<OfferFulfilment>;
+    /**
+     * Uses per customer; `null` for no limit.
+     */
+    uses_per_customer: number | null;
+    /**
+     * Uses in all; `null` for no limit.
+     */
+    total_uses: number | null;
+    /**
+     * The most its uses may cost; `null` for no budget.
+     */
+    budget: Money | null;
+    /**
+     * The most it takes off one order.
+     */
+    max_off: Money | null;
+    /**
+     * The Partners' share of its cost, 0 to 100; a Partner's own offer is 100.
+     */
+    partner_share_percent: number;
+    /**
+     * Who pays in words, as a Partner reads it: "ZippyGo pays for it", "You pay 50% of it", "You pay for it".
+     */
+    share_text: string;
+    /**
+     * Whether only a code unlocks it.
+     */
+    code_only: boolean;
+    /**
+     * Whether a code-only offer's code is shown on Location pages.
+     */
+    show_code: boolean;
+    /**
+     * Its state.
+     */
+    state: OfferState;
+    /**
+     * Its state in a sentence, a pause and why first.
+     */
+    state_text: string;
+    /**
+     * Its pause, while paused.
+     */
+    pause: OfferPause | null;
+    /**
+     * When it was archived, out of its owner's lists.
+     */
+    archived_at: string | null;
+    /**
+     * The offer it was run again from.
+     */
+    copied_from: string | null;
+    /**
+     * The playbook it started from.
+     */
+    playbook: string | null;
+    /**
+     * The Partner's word, given at publishing.
+     */
+    confirmation: OfferConfirmation | null;
+    /**
+     * Whether publishing asks for the Partner's word: a Partner's own priced offer.
+     */
+    needs_confirmation: boolean;
+    /**
+     * The offers it competes with.
+     */
+    overlaps: Array<OfferOverlap>;
+    /**
+     * The terms a customer has read, locked while it is live or paused: everything but its name, its end, its limits and budget (raised only) and its codes.
+     */
+    locked: Array<string>;
+    /**
+     * Its uses.
+     */
+    uses: OfferUses;
+    /**
+     * What the caller may do now.
+     */
+    actions: Array<OfferAction>;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it went live.
+     */
+    started_at: string | null;
+    /**
+     * When it ended or was cancelled.
+     */
+    ended_at: string | null;
+};
+
+/**
+ * An offer's terms as its owner writes them: every member of a create, the members a change sends. Members left out keep what is saved; `null` clears. A live or paused offer takes only a new name, a later end or none, higher limits and budget or none; anything else is refused with `409` (`offer_running_terms`), the way forward being to stop it and run it again.
+ */
+export type OfferInput = {
+    /**
+     * Mission Control only, at creation: `campaign` or `store_promotion`. A Partner's offer is `partner_offer`.
+     */
+    kind?: OfferKind;
+    /**
+     * Mission Control only: a first-order or referral campaign of a city.
+     */
+    purpose?: OfferPurpose | null;
+    /**
+     * The owner's name for it, at most 80 characters.
+     */
+    name?: string;
+    /**
+     * The playbook it starts from.
+     */
+    playbook?: string | null;
+    /**
+     * The mechanic and its terms.
+     */
+    terms?: OfferTerms;
+    /**
+     * What it is on; the whole Location by default.
+     */
+    on?: OfferOn;
+    /**
+     * Whom it is for; everyone by default.
+     */
+    audience?: OfferAudience;
+    /**
+     * Where it runs.
+     */
+    aim?: OfferAim;
+    /**
+     * When it runs.
+     */
+    when?: OfferWhen;
+    /**
+     * A minimum spend.
+     */
+    min_spend?: Money | null;
+    /**
+     * The ways of ordering it is for.
+     */
+    fulfilments?: Array<OfferFulfilment>;
+    /**
+     * Uses per customer.
+     */
+    uses_per_customer?: number | null;
+    /**
+     * Uses in all.
+     */
+    total_uses?: number | null;
+    /**
+     * A budget.
+     */
+    budget?: Money | null;
+    /**
+     * The most off one order.
+     */
+    max_off?: Money | null;
+    /**
+     * Mission Control only: the Partners' share, 0 to 100; a store promotion's defaults to 100.
+     */
+    partner_share_percent?: number;
+    /**
+     * Only a code unlocks it.
+     */
+    code_only?: boolean;
+    /**
+     * Show a code-only offer's code on Location pages.
+     */
+    show_code?: boolean;
+};
+
+/**
+ * An offer in a list: what a card in the consoles shows.
+ */
+export type OfferSummary = {
+    /**
+     * The offer.
+     */
+    id: string;
+    /**
+     * Whose it is.
+     */
+    owner: OfferOwner;
+    /**
+     * The owning Partner.
+     */
+    partner_id: string | null;
+    /**
+     * The owning Partner's name.
+     */
+    partner_name: string | null;
+    /**
+     * What it was made as.
+     */
+    kind: OfferKind;
+    /**
+     * A campaign's purpose.
+     */
+    purpose: OfferPurpose | null;
+    /**
+     * The owner's name.
+     */
+    name: string;
+    /**
+     * The line a customer reads.
+     */
+    line: string;
+    /**
+     * Its small print.
+     */
+    small_print: string;
+    /**
+     * Its mechanic.
+     */
+    mechanic: OfferMechanic;
+    /**
+     * Its state.
+     */
+    state: OfferState;
+    /**
+     * Its state in a sentence.
+     */
+    state_text: string;
+    /**
+     * Its pause.
+     */
+    pause: OfferPause | null;
+    /**
+     * Where it runs, in words.
+     */
+    aim_text: string;
+    /**
+     * The Locations it names, for an offer on named Locations.
+     */
+    location_ids: Array<string>;
+    /**
+     * When it runs.
+     */
+    when: OfferWhen;
+    /**
+     * The Partners' share.
+     */
+    partner_share_percent: number;
+    /**
+     * Who pays, in words.
+     */
+    share_text: string;
+    /**
+     * When it was archived.
+     */
+    archived_at: string | null;
+    /**
+     * Its uses.
+     */
+    uses: OfferUses;
+    /**
+     * What the caller may do now.
+     */
+    actions: Array<OfferAction>;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * How many offers a list holds in each group, archived ones apart.
+ */
+export type OfferCounts = {
+    /**
+     * Every offer not archived.
+     */
+    all: number;
+    /**
+     * Live now.
+     */
+    live: number;
+    /**
+     * Scheduled.
+     */
+    scheduled: number;
+    /**
+     * Paused.
+     */
+    paused: number;
+    /**
+     * Drafts.
+     */
+    draft: number;
+    /**
+     * Ended or cancelled.
+     */
+    past: number;
+    /**
+     * Archived.
+     */
+    archived: number;
+};
+
+/**
+ * A page of offers, newest first, with the counts of the list it pages.
+ */
+export type OfferPage = {
+    /**
+     * The offers on this page.
+     */
+    items: Array<OfferSummary>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * How many in each group.
+     */
+    counts: OfferCounts;
+};
+
+/**
+ * Publishing: a Partner's own priced offer carries the Partner's word, exactly "My business pays for this offer's discounts, as shown."; the platform's campaigns carry none.
+ */
+export type OfferPublish = {
+    /**
+     * The Partner's word.
+     */
+    confirmation?: string | null;
+};
+
+/**
+ * A pause, with a reason of at most 200 characters, which the platform must give when it pauses a Partner's offer and the Partner reads.
+ */
+export type OfferPauseInput = {
+    /**
+     * Why.
+     */
+    reason?: string | null;
+};
+
+/**
+ * One term changed, before and after, in words.
+ */
+export type OfferChange = {
+    /**
+     * The term.
+     */
+    term: string;
+    /**
+     * Before.
+     */
+    before: string | null;
+    /**
+     * After.
+     */
+    after: string | null;
+};
+
+/**
+ * Who acted on an offer: a person of the Partner or of the platform, or the clock.
+ */
+export type OfferActor = {
+    /**
+     * The Partner, the platform or the clock.
+     */
+    kind: OfferActorKind;
+    /**
+     * The person, when a person acted.
+     */
+    user_id: string | null;
+    /**
+     * Their name.
+     */
+    name: string | null;
+};
+
+/**
+ * One change of an offer: what happened, who did it or that the clock did, its state after and before, the reason where one was given, and the terms changed.
+ */
+export type OfferHistoryEntry = {
+    /**
+     * The entry.
+     */
+    id: string;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * What happened.
+     */
+    action: OfferHistoryAction;
+    /**
+     * Who.
+     */
+    actor: OfferActor;
+    /**
+     * Its state after.
+     */
+    state: OfferState;
+    /**
+     * Its state before.
+     */
+    previous_state: OfferState | null;
+    /**
+     * The reason given.
+     */
+    reason: string | null;
+    /**
+     * The entry in a sentence.
+     */
+    text: string;
+    /**
+     * The terms changed.
+     */
+    changes: Array<OfferChange>;
+};
+
+/**
+ * A page of an offer's history, newest first, from the draft's creation.
+ */
+export type OfferHistoryPage = {
+    /**
+     * The entries on this page.
+     */
+    items: Array<OfferHistoryEntry>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A code that unlocks an offer, counted on its own with its own cap. Letters and digits, matched in any case with spaces and punctuation ignored, unique across the platform while its offer is scheduled, live or paused.
+ */
+export type OfferCode = {
+    /**
+     * The code.
+     */
+    id: string;
+    /**
+     * The offer it unlocks.
+     */
+    offer_id: string;
+    /**
+     * The code, upper case.
+     */
+    code: string;
+    /**
+     * Its kind.
+     */
+    kind: OfferCodeKind;
+    /**
+     * Uses this code allows; `null` for the offer's own limits.
+     */
+    cap: number | null;
+    /**
+     * Uses reserved and confirmed through it.
+     */
+    uses: number;
+    /**
+     * Customers who hold it in their offers.
+     */
+    holders: number;
+    /**
+     * The batch it was made in.
+     */
+    batch_id: string | null;
+    /**
+     * The customer a personal or referral code belongs to.
+     */
+    customer_id: string | null;
+    /**
+     * When it was retired; customers who hold it keep the offer.
+     */
+    retired_at: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+};
+
+/**
+ * A code chosen by the owner: 4 to 16 letters and digits, with an optional cap.
+ */
+export type OfferCodeInput = {
+    /**
+     * The code; spaces and punctuation are dropped and letters made upper case.
+     */
+    code: string;
+    /**
+     * Uses this code allows.
+     */
+    cap?: number | null;
+};
+
+/**
+ * A page of an offer's codes, newest first.
+ */
+export type OfferCodePage = {
+    /**
+     * The codes on this page.
+     */
+    items: Array<OfferCode>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A batch of single-use codes: 1 to 10,000 of them, 10 characters each with no look-alikes, and a label.
+ */
+export type CodeBatchInput = {
+    /**
+     * How many.
+     */
+    count: number;
+    /**
+     * A label; an unlabelled batch is called by its size.
+     */
+    label?: string | null;
+};
+
+/**
+ * A batch of single-use codes, downloadable as a spreadsheet named after it.
+ */
+export type CodeBatch = {
+    /**
+     * The batch.
+     */
+    id: string;
+    /**
+     * Its offer.
+     */
+    offer_id: string;
+    /**
+     * Its label, or its size.
+     */
+    label: string;
+    /**
+     * How many codes.
+     */
+    count: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * Its codes, relative to the API host; `Accept: text/csv` downloads them.
+     */
+    codes_url: string;
+};
+
+/**
+ * A page of an offer's batches, newest first.
+ */
+export type CodeBatchPage = {
+    /**
+     * The batches on this page.
+     */
+    items: Array<CodeBatch>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One of a Partner's Locations a campaign reaches, with its answer and what the caller may do.
+ */
+export type CampaignLocation = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its answer.
+     */
+    status: ParticipationStatus;
+    /**
+     * When it answered.
+     */
+    answered_at: string | null;
+    /**
+     * Who answered.
+     */
+    answered_by: string | null;
+    /**
+     * Whether the caller may accept here now.
+     */
+    can_accept: boolean;
+    /**
+     * Whether the caller may decline here now.
+     */
+    can_decline: boolean;
+};
+
+/**
+ * A platform campaign on a Partner's Locations, read-only to the Partner, with its share in words and each Location's answer.
+ */
+export type PartnerCampaign = {
+    /**
+     * The campaign.
+     */
+    offer: OfferSummary;
+    /**
+     * The Partner's share in words.
+     */
+    share_text: string;
+    /**
+     * Its Locations the campaign reaches.
+     */
+    locations: Array<CampaignLocation>;
+};
+
+/**
+ * A page of the platform's campaigns on a Partner's Locations, live and scheduled first.
+ */
+export type PartnerCampaignPage = {
+    /**
+     * The campaigns on this page.
+     */
+    items: Array<PartnerCampaign>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A Location's answer to a campaign, recorded with who and when.
+ */
+export type CampaignParticipation = {
+    /**
+     * The campaign.
+     */
+    offer_id: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The answer.
+     */
+    status: ParticipationStatus;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Who answered.
+     */
+    by: string | null;
+};
+
+/**
+ * A playbook or a type: its name and example, whether it is built yet, and the answers it opens the editor with.
+ */
+export type OfferPlaybook = {
+    /**
+     * Its stable code.
+     */
+    code: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * An example of it.
+     */
+    example: string;
+    /**
+     * Its mechanic.
+     */
+    mechanic: OfferMechanic;
+    /**
+     * Whether it can be made yet; one not built is shown as coming.
+     */
+    built: boolean;
+    /**
+     * The answers it fills in, every one changeable.
+     */
+    answers: OfferInput;
+};
+
+/**
+ * A goal with its playbooks or types.
+ */
+export type OfferPlaybookGoal = {
+    /**
+     * The goal.
+     */
+    goal: OfferGoal;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it is for.
+     */
+    description: string;
+    /**
+     * Its playbooks.
+     */
+    playbooks: Array<OfferPlaybook>;
+};
+
+/**
+ * The goals and playbooks served by the platform, so the Partner console, Mission Control and later the Partner app open the same answers: a Partner's playbooks, or every type of each goal of a campaign or a store promotion.
+ */
+export type OfferPlaybooks = {
+    /**
+     * Whose playbooks.
+     */
+    kind: OfferKind;
+    /**
+     * The goals.
+     */
+    goals: Array<OfferPlaybookGoal>;
+    /**
+     * The playbooks offered to a business with no offers.
+     */
+    starters: Array<string>;
+};
+
+/**
+ * A Location an offer reaches today, by the rule it is priced with, with its answer to a campaign.
+ */
+export type OfferReachLocation = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Its answer, or `included`.
+     */
+    status: ParticipationStatus;
+};
+
+/**
+ * A page of the Locations an offer reaches today, with how many in all.
+ */
+export type OfferReachPage = {
+    /**
+     * The Locations on this page.
+     */
+    items: Array<OfferReachLocation>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * How many it reaches.
+     */
+    total: number;
+    /**
+     * How many it applies at: included or accepted.
+     */
+    applies: number;
+};
+
+/**
+ * One use of an offer on an order, with what it saved and how its cost is split.
+ */
+export type OfferRedemption = {
+    /**
+     * The use.
+     */
+    id: string;
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * Where.
+     */
+    location_id: string;
+    /**
+     * The Location's name.
+     */
+    location_name: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The code it came through.
+     */
+    code: string | null;
+    /**
+     * Reserved, confirmed or released.
+     */
+    status: RedemptionStatus;
+    /**
+     * What it took off.
+     */
+    saving: Money;
+    /**
+     * The Partner's share.
+     */
+    partner_cost: Money;
+    /**
+     * The platform's share.
+     */
+    platform_cost: Money;
+    /**
+     * When it was reserved.
+     */
+    reserved_at: string;
+    /**
+     * When it was confirmed or released.
+     */
+    settled_at: string | null;
+};
+
+/**
+ * An offer's budget and uses: reserved and confirmed both count, so two orders racing for its last rupee cannot both have it.
+ */
+export type OfferBudget = {
+    /**
+     * The budget; `null` for none.
+     */
+    budget: Money | null;
+    /**
+     * Reserved by orders not settled.
+     */
+    reserved: Money;
+    /**
+     * Confirmed by completed orders.
+     */
+    confirmed: Money;
+    /**
+     * What is left; `null` without a budget.
+     */
+    left: Money | null;
+    /**
+     * Uses reserved.
+     */
+    uses_reserved: number;
+    /**
+     * Uses confirmed.
+     */
+    uses_confirmed: number;
+};
+
+/**
+ * A page of an offer's uses, newest first, with its budget.
+ */
+export type OfferRedemptionPage = {
+    /**
+     * The uses on this page.
+     */
+    items: Array<OfferRedemption>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * The budget and uses.
+     */
+    budget: OfferBudget;
+};
+
+/**
+ * A Location with the live, scheduled and paused offers that reach it, by the rule the engine prices with.
+ */
+export type OfferLocation = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Offers live there.
+     */
+    live: number;
+    /**
+     * Offers scheduled there.
+     */
+    scheduled: number;
+    /**
+     * Offers paused there.
+     */
+    paused: number;
+};
+
+/**
+ * A page of Locations with their offers, by name.
+ */
+export type OfferLocationPage = {
+    /**
+     * The Locations on this page.
+     */
+    items: Array<OfferLocation>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A Location an offer is for, by name.
+ */
+export type OfferPlace = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+};
+
+/**
+ * An offer as a customer's account lists it: its line and terms, where it is for, its code, its state and end, and how it came to them.
+ */
+export type CustomerOffer = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Its terms in words.
+     */
+    small_print: string;
+    /**
+     * How it reached them.
+     */
+    source: CustomerOfferSource;
+    /**
+     * Its code, where a code unlocked it.
+     */
+    code: string | null;
+    /**
+     * Ready, starting later, used or ended.
+     */
+    state: CustomerOfferState;
+    /**
+     * Its state in words: "Starts Friday", "Ends 30 November".
+     */
+    state_text: string;
+    /**
+     * Where it is for: "At Dev Kitchen Gachibowli", or "At stores across ZippyGo" for a campaign wider than a list can say.
+     */
+    where_text: string;
+    /**
+     * The Locations it is for, when a list can say.
+     */
+    locations: Array<OfferPlace>;
+    /**
+     * When it starts.
+     */
+    starts_at: string | null;
+    /**
+     * When it ends; `null` for until stopped.
+     */
+    ends_at: string | null;
+    /**
+     * When it was added to the account.
+     */
+    added_at: string | null;
+    /**
+     * Who pays for a reward, in words.
+     */
+    funded_text: string | null;
+};
+
+/**
+ * The account's offers: those a customer holds (codes added, personal and referral codes, rewards), the city's first-order offer when it is for them, and the live offers for new customers that need no code.
+ */
+export type CustomerOffers = {
+    /**
+     * The offers they hold, ready first, ended ones for thirty days.
+     */
+    held: Array<CustomerOffer>;
+    /**
+     * The city's first-order offer, when they qualify.
+     */
+    first_order: CustomerOffer | null;
+    /**
+     * Live offers for new customers at Locations near them.
+     */
+    for_new_customers: Array<CustomerOffer>;
+};
+
+/**
+ * A code as a customer types it, matched in any case with spaces and punctuation ignored.
+ */
+export type CodeEntry = {
+    /**
+     * The code.
+     */
+    code: string;
+};
+
+/**
+ * A code accepted: the offer it opened, now in the customer's offers, and what it opened in words.
+ */
+export type CodeAdded = {
+    /**
+     * The offer.
+     */
+    offer: CustomerOffer;
+    /**
+     * What it opened.
+     */
+    message: string;
+};
+
+/**
+ * A personal code given to a customer from their page: single-use, theirs alone, in their offers without their typing anything.
+ */
+export type PersonalCodeInput = {
+    /**
+     * A platform offer's id.
+     */
+    offer_id: string;
+    /**
+     * A code to give; one is made when left out.
+     */
+    code?: string | null;
+};
+
+/**
+ * A Location's offer on its card or in search: its best advertised offer open to everyone and how many more it has. A code-only offer heads the card only when nothing open runs, and names its code.
+ */
+export type StoreOfferBadge = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * How many more it has.
+     */
+    more: number;
+    /**
+     * The code, for a code-only offer whose owner shows it.
+     */
+    code: string | null;
+    /**
+     * The shelf it belongs on.
+     */
+    shelf: OfferShelfKind | null;
+};
+
+/**
+ * A Location on a shelf, leading with the offer that put it there.
+ */
+export type OfferShelfStore = {
+    /**
+     * The Location, one of the list's cards.
+     */
+    location_id: string;
+    /**
+     * The offer that put it on the shelf.
+     */
+    offer: StoreOfferBadge;
+};
+
+/**
+ * A Vertical's offer shelf: the Locations with a live offer of its kind, open ones first; a shelf with none is left out. "See all" filters the list with `offer`.
+ */
+export type OfferShelf = {
+    /**
+     * The kind.
+     */
+    kind: OfferShelfKind;
+    /**
+     * Its title.
+     */
+    title: string;
+    /**
+     * The Locations on it.
+     */
+    stores: Array<OfferShelfStore>;
+};
+
+/**
+ * A whole deal an item opens on: how many to add, what it gives in words, and what it costs where that does not depend on the rest of the basket.
+ */
+export type OfferDeal = {
+    /**
+     * How many the sheet opens on.
+     */
+    quantity: number;
+    /**
+     * What the deal gives.
+     */
+    text: string;
+    /**
+     * What the deal costs.
+     */
+    total: Money | null;
+    /**
+     * What it would cost without the offer.
+     */
+    total_before: Money | null;
+};
+
+/**
+ * The offer an item is under on a store's page, its figures from the engine: its tag, its price after plain money off, or the deal its sheet opens on.
+ */
+export type MenuItemPromotion = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * The tag the item carries.
+     */
+    tag: string;
+    /**
+     * Its price after plain money off, beside its price struck through.
+     */
+    price_after: Money | null;
+    /**
+     * The deal a multibuy or a price for several opens on.
+     */
+    deal: OfferDeal | null;
+};
+
+/**
+ * One of a Location's advertised live offers on its page, with its line and terms.
+ */
+export type StoreOffer = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * The Partner's or the platform's.
+     */
+    owner: OfferOwner;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Its terms in words.
+     */
+    small_print: string;
+    /**
+     * Its mechanic.
+     */
+    mechanic: OfferMechanic;
+    /**
+     * Its terms one by one: the minimum spend, until when or its hours, who it is for.
+     */
+    terms: Array<string>;
+    /**
+     * Its code, where the owner shows it, with the way to add it.
+     */
+    code: string | null;
+    /**
+     * The items it is on, for an offer on chosen items.
+     */
+    item_ids: Array<string>;
+    /**
+     * The shelf it belongs on.
+     */
+    shelf: OfferShelfKind | null;
+    /**
+     * When it ends.
+     */
+    ends_at: string | null;
+};
+
+/**
+ * A step of the spend bar towards the next basket offer.
+ */
+export type SpendStep = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * What the items must come to.
+     */
+    min_spend: Money;
+};
+
+/**
+ * A customer's stamp card at a Location: a stamp for each order counted, how many of their orders count towards the next reward and which of their next orders it is.
+ */
+export type StampCard = {
+    /**
+     * The stamp card.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Orders to a reward.
+     */
+    every: number;
+    /**
+     * Orders counted towards the next reward.
+     */
+    counted: number;
+    /**
+     * Which of their next orders is rewarded: 1 for the very next.
+     */
+    next_reward_in: number;
+    /**
+     * The reward in words.
+     */
+    reward_text: string;
+    /**
+     * Whether it rewards the nth order alone.
+     */
+    once: boolean;
+    /**
+     * Whether a one-off card's reward was had.
+     */
+    had: boolean;
+};
+
+/**
+ * A Location's offers on its page: public and cached without a token; with a customer's token the answer is theirs, without what is not for them, with their stamp cards and the offers they hold here. Every figure comes from the engine. Read again on `offers.changed`.
+ */
+export type StoreOffers = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its advertised live offers, open ones before those behind a shown code.
+     */
+    offers: Array<StoreOffer>;
+    /**
+     * The spend bar towards its basket offers, the least first.
+     */
+    spend_bar: Array<SpendStep>;
+    /**
+     * The customer's stamp cards here; signed out, empty.
+     */
+    stamp_cards: Array<StampCard>;
+    /**
+     * The offers the customer holds that apply here.
+     */
+    held: Array<CustomerOffer>;
+    /**
+     * When it was worked out.
+     */
+    as_of: string;
+};
+
+/**
+ * An offer applied to a basket: what it is, what it takes off and from which lines, and the code it came through.
+ */
+export type BasketOffer = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * What it takes off.
+     */
+    kind: BasketOfferKind;
+    /**
+     * What it takes off.
+     */
+    saving: Money;
+    /**
+     * The code it came through.
+     */
+    code: string | null;
+    /**
+     * The lines it takes off, for an item offer.
+     */
+    line_ids: Array<string>;
+    /**
+     * Whether the customer chose it over the best.
+     */
+    chosen: boolean;
+};
+
+/**
+ * Another basket offer the customer could have instead, with what it would save.
+ */
+export type BasketAlternative = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * What it would take off.
+     */
+    kind: BasketOfferKind;
+    /**
+     * What it would save.
+     */
+    saving: Money;
+    /**
+     * In words.
+     */
+    message: string;
+};
+
+/**
+ * Why an advertised or held offer does not apply to the basket, in the engine's words.
+ */
+export type OfferReason = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Why.
+     */
+    code: OfferReasonCode;
+    /**
+     * In words.
+     */
+    message: string;
+};
+
+/**
+ * A minimum spend not met by an offer that would beat the one applied, put to the customer.
+ */
+export type OfferNudge = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * How much more the items must come to.
+     */
+    spend_more: Money;
+    /**
+     * What it would save.
+     */
+    saving: Money;
+    /**
+     * In words.
+     */
+    message: string;
+};
+
+/**
+ * An item a free-item offer can give.
+ */
+export type FreeItemChoice = {
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its variant.
+     */
+    variant_label: string | null;
+    /**
+     * What it is worth.
+     */
+    price: Money;
+    /**
+     * Whether it can be had now.
+     */
+    available: boolean;
+};
+
+/**
+ * A free item the basket's offer gives, as a line of its own at its worth with all of it off: the cheapest until the customer picks another.
+ */
+export type BasketFreeItem = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * The variant given.
+     */
+    variant_id: string;
+    /**
+     * The item's name.
+     */
+    name: string;
+    /**
+     * What it is worth, all of it off.
+     */
+    price: Money;
+    /**
+     * What can be had instead.
+     */
+    choices: Array<FreeItemChoice>;
+};
+
+/**
+ * The item offer a line is under, from the engine: its tag, how many of the line it gives free, what it takes off and the line's price after it.
+ */
+export type BasketLinePromotion = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * The tag.
+     */
+    tag: string;
+    /**
+     * How many of the line go free.
+     */
+    free_quantity: number;
+    /**
+     * What it takes off the line.
+     */
+    saving: Money;
+    /**
+     * The line's price after it.
+     */
+    price_after: Money;
+};
+
+/**
+ * A code typed in the basket: answered as adding it to the account does, its offer joining the customer's offers and chosen for this basket when it applies here, with the basket priced again.
+ */
+export type BasketCodeResult = {
+    /**
+     * The code, as matched.
+     */
+    code: string;
+    /**
+     * What it did.
+     */
+    outcome: CodeOutcome;
+    /**
+     * In words.
+     */
+    message: string;
+    /**
+     * The offer it opened.
+     */
+    offer: CustomerOffer;
+    /**
+     * The basket, priced again.
+     */
+    basket: Basket;
+};
+
+/**
+ * An offer an order was placed with, as it was at placing.
+ */
+export type OrderOffer = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * What it took off.
+     */
+    kind: BasketOfferKind;
+    /**
+     * The code it came through.
+     */
+    code: string | null;
+    /**
+     * What it took off.
+     */
+    saving: Money;
+};
+
+/**
+ * An offer an order was placed with and how its cost is split between the Partner and the platform, as Mission Control reads it.
+ */
+export type OrderOfferSplit = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * What it took off.
+     */
+    kind: BasketOfferKind;
+    /**
+     * Whose offer it is.
+     */
+    owner: OfferOwner;
+    /**
+     * The code it came through.
+     */
+    code: string | null;
+    /**
+     * What it took off.
+     */
+    saving: Money;
+    /**
+     * The Partner's share.
+     */
+    partner_cost: Money;
+    /**
+     * The platform's share.
+     */
+    platform_cost: Money;
+    /**
+     * Its use: reserved, confirmed or released.
+     */
+    status: RedemptionStatus;
+};
+
+/**
+ * A promotion that ran in a Location's week: its orders, what it took off for customers, and what the Partner and the platform paid; the Partner's share comes off sales before the fee.
+ */
+export type StatementPromotion = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its line.
+     */
+    line: string;
+    /**
+     * Whose it is.
+     */
+    owner: OfferOwner;
+    /**
+     * Who paid in words: "Paid by you", "Paid by ZippyGo", "You paid 50%".
+     */
+    paid_by_text: string;
+    /**
+     * Orders that used it.
+     */
+    orders: number;
+    /**
+     * What it took off for customers.
+     */
+    took_off: Money;
+    /**
+     * What the Partner paid.
+     */
+    partner_paid: Money;
+    /**
+     * What the platform paid.
+     */
+    platform_paid: Money;
 };
 
 /**
@@ -42952,6 +45174,10 @@ export type ListVerticalStoresData = {
          * The visitor's country (alpha-2), used when no pin is given.
          */
         country?: string;
+        /**
+         * "See all" of an offer shelf: only stores with a live offer of that kind, each card leading with it.
+         */
+        offer?: 'free_delivery' | 'deals' | 'money_off' | 'free_items';
     };
     url: '/v1/storefront/verticals/{vertical}/stores';
 };
@@ -57861,3 +60087,3196 @@ export type GetPartnerAgentWeeksResponses = {
 };
 
 export type GetPartnerAgentWeeksResponse = GetPartnerAgentWeeksResponses[keyof GetPartnerAgentWeeksResponses];
+
+export type ListOfferPlaybooksData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `partner_offer` (the default), `campaign` or `store_promotion`.
+         */
+        kind?: 'partner_offer' | 'campaign' | 'store_promotion';
+    };
+    url: '/v1/offer-playbooks';
+};
+
+export type ListOfferPlaybooksErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A token of another surface (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOfferPlaybooksError = ListOfferPlaybooksErrors[keyof ListOfferPlaybooksErrors];
+
+export type ListOfferPlaybooksResponses = {
+    /**
+     * The goals and playbooks.
+     */
+    200: OfferPlaybooks;
+};
+
+export type ListOfferPlaybooksResponse = ListOfferPlaybooksResponses[keyof ListOfferPlaybooksResponses];
+
+export type GetCustomerOffersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The zone or city the customer is in, for the first-order offer and the offers near them; the selected address's by default.
+         */
+        service_area_id?: string;
+    };
+    url: '/v1/customer/offers';
+};
+
+export type GetCustomerOffersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A token of another surface (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerOffersError = GetCustomerOffersErrors[keyof GetCustomerOffersErrors];
+
+export type GetCustomerOffersResponses = {
+    /**
+     * The offers.
+     */
+    200: CustomerOffers;
+};
+
+export type GetCustomerOffersResponse = GetCustomerOffersResponses[keyof GetCustomerOffersResponses];
+
+export type AddCustomerOfferCodeData = {
+    /**
+     * The request.
+     */
+    body: CodeEntry;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/offers/codes';
+};
+
+export type AddCustomerOfferCodeErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A token of another surface (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * The code cannot be added, in words: `code_not_recognised` "We don't recognise that code", `code_ended` "That code has ended", `code_for_new_customers` "That code is for new customers", `code_already_used` "That code has already been used", `code_already_added` "You've already added that code", `code_not_for_account` "That code can't be used on this account".
+     */
+    422: Problem;
+    /**
+     * `code_guesses`: ten codes not recognised in ten minutes; `Retry-After` and the sentence say until when.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddCustomerOfferCodeError = AddCustomerOfferCodeErrors[keyof AddCustomerOfferCodeErrors];
+
+export type AddCustomerOfferCodeResponses = {
+    /**
+     * The offer the code opened.
+     */
+    201: CodeAdded;
+};
+
+export type AddCustomerOfferCodeResponse = AddCustomerOfferCodeResponses[keyof AddCustomerOfferCodeResponses];
+
+export type GetStoreOffersData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/storefront/stores/{location_id}/offers';
+};
+
+export type GetStoreOffersErrors = {
+    /**
+     * An access token was sent and refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A token of another surface (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * No such live store (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreOffersError = GetStoreOffersErrors[keyof GetStoreOffersErrors];
+
+export type GetStoreOffersResponses = {
+    /**
+     * The offers.
+     */
+    200: StoreOffers;
+};
+
+export type GetStoreOffersResponse = GetStoreOffersResponses[keyof GetStoreOffersResponses];
+
+export type AddBasketCodeData = {
+    /**
+     * The request.
+     */
+    body: CodeEntry;
+    path: {
+        /**
+         * The store the basket is at: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/codes';
+};
+
+export type AddBasketCodeErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A token of another surface (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * No such live store (`not_found`).
+     */
+    404: Problem;
+    /**
+     * The code cannot be added, in words, as adding a code to the account.
+     */
+    422: Problem;
+    /**
+     * `code_guesses`, as adding a code to the account.
+     */
+    429: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddBasketCodeError = AddBasketCodeErrors[keyof AddBasketCodeErrors];
+
+export type AddBasketCodeResponses = {
+    /**
+     * What the code did, and the basket.
+     */
+    200: BasketCodeResult;
+};
+
+export type AddBasketCodeResponse = AddBasketCodeResponses[keyof AddBasketCodeResponses];
+
+export type ListPartnerOffersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * `live` (live and paused), `scheduled`, `draft`, `past` (ended and cancelled) or `archived`; every offer not archived when left out.
+         */
+        group?: 'live' | 'scheduled' | 'draft' | 'past' | 'archived';
+        /**
+         * Only offers running at this Location.
+         */
+        location_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/offers';
+};
+
+export type ListPartnerOffersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such Partner, or the caller is not its member (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerOffersError = ListPartnerOffersErrors[keyof ListPartnerOffersErrors];
+
+export type ListPartnerOffersResponses = {
+    /**
+     * A page of offers with the counts.
+     */
+    200: OfferPage;
+};
+
+export type ListPartnerOffersResponse = ListPartnerOffersResponses[keyof ListPartnerOffersResponses];
+
+export type CreatePartnerOfferData = {
+    /**
+     * The request.
+     */
+    body: OfferInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers';
+};
+
+export type CreatePartnerOfferErrors = {
+    /**
+     * `validation_failed`, naming the term: `percent_out_of_range`, `multibuy_gives_too_many`, `tiers_not_rising`, `tiers_with_minimum`, `free_delivery_pickup_only`, `stamp_card_code`, `stamp_card_orders`, `n_for_price_count`, `bundle_sets`, `items_missing`, `one_location_only`, `window_invalid`, `windows_too_many`, `ends_before_start`, `aim_missing`; a name over 80 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such Partner, or a Location or item that is not the Partner's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerOfferError = CreatePartnerOfferErrors[keyof CreatePartnerOfferErrors];
+
+export type CreatePartnerOfferResponses = {
+    /**
+     * The draft.
+     */
+    201: Offer;
+};
+
+export type CreatePartnerOfferResponse = CreatePartnerOfferResponses[keyof CreatePartnerOfferResponses];
+
+export type DeletePartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}';
+};
+
+export type DeletePartnerOfferErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not a draft; stop it or cancel it instead.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePartnerOfferError = DeletePartnerOfferErrors[keyof DeletePartnerOfferErrors];
+
+export type DeletePartnerOfferResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeletePartnerOfferResponse = DeletePartnerOfferResponses[keyof DeletePartnerOfferResponses];
+
+export type GetPartnerOfferData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}';
+};
+
+export type GetPartnerOfferErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerOfferError = GetPartnerOfferErrors[keyof GetPartnerOfferErrors];
+
+export type GetPartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type GetPartnerOfferResponse = GetPartnerOfferResponses[keyof GetPartnerOfferResponses];
+
+export type UpdatePartnerOfferData = {
+    /**
+     * The request.
+     */
+    body: OfferInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}';
+};
+
+export type UpdatePartnerOfferErrors = {
+    /**
+     * As making an offer.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_running_terms`: a running offer's terms, a lower limit or an earlier end; `offer_transition`: an ended or cancelled offer.
+     */
+    409: Problem;
+    /**
+     * The offer moved since the `If-Match` version (`precondition_failed`).
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePartnerOfferError = UpdatePartnerOfferErrors[keyof UpdatePartnerOfferErrors];
+
+export type UpdatePartnerOfferResponses = {
+    /**
+     * The offer as changed.
+     */
+    200: Offer;
+};
+
+export type UpdatePartnerOfferResponse = UpdatePartnerOfferResponses[keyof UpdatePartnerOfferResponses];
+
+export type PublishPartnerOfferData = {
+    /**
+     * The request.
+     */
+    body?: OfferPublish;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/publish';
+};
+
+export type PublishPartnerOfferErrors = {
+    /**
+     * The terms fail validation as saved (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `confirmation_required`: the Partner's word is missing or not the words asked; `offer_transition`: not a draft, or its end has passed.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPartnerOfferError = PublishPartnerOfferErrors[keyof PublishPartnerOfferErrors];
+
+export type PublishPartnerOfferResponses = {
+    /**
+     * The offer, scheduled or live.
+     */
+    200: Offer;
+};
+
+export type PublishPartnerOfferResponse = PublishPartnerOfferResponses[keyof PublishPartnerOfferResponses];
+
+export type StartPartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/start';
+};
+
+export type StartPartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartPartnerOfferError = StartPartnerOfferErrors[keyof StartPartnerOfferErrors];
+
+export type StartPartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type StartPartnerOfferResponse = StartPartnerOfferResponses[keyof StartPartnerOfferResponses];
+
+export type PausePartnerOfferData = {
+    /**
+     * The request.
+     */
+    body?: OfferPauseInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/pause';
+};
+
+export type PausePartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not live or scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PausePartnerOfferError = PausePartnerOfferErrors[keyof PausePartnerOfferErrors];
+
+export type PausePartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type PausePartnerOfferResponse = PausePartnerOfferResponses[keyof PausePartnerOfferResponses];
+
+export type ResumePartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/resume';
+};
+
+export type ResumePartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not paused, or the platform paused it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumePartnerOfferError = ResumePartnerOfferErrors[keyof ResumePartnerOfferErrors];
+
+export type ResumePartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type ResumePartnerOfferResponse = ResumePartnerOfferResponses[keyof ResumePartnerOfferResponses];
+
+export type StopPartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/stop';
+};
+
+export type StopPartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not live or paused.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopPartnerOfferError = StopPartnerOfferErrors[keyof StopPartnerOfferErrors];
+
+export type StopPartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type StopPartnerOfferResponse = StopPartnerOfferResponses[keyof StopPartnerOfferResponses];
+
+export type CancelPartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/cancel';
+};
+
+export type CancelPartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelPartnerOfferError = CancelPartnerOfferErrors[keyof CancelPartnerOfferErrors];
+
+export type CancelPartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type CancelPartnerOfferResponse = CancelPartnerOfferResponses[keyof CancelPartnerOfferResponses];
+
+export type ArchivePartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/archive';
+};
+
+export type ArchivePartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is running.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ArchivePartnerOfferError = ArchivePartnerOfferErrors[keyof ArchivePartnerOfferErrors];
+
+export type ArchivePartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type ArchivePartnerOfferResponse = ArchivePartnerOfferResponses[keyof ArchivePartnerOfferResponses];
+
+export type RestorePartnerOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/restore';
+};
+
+export type RestorePartnerOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not archived.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RestorePartnerOfferError = RestorePartnerOfferErrors[keyof RestorePartnerOfferErrors];
+
+export type RestorePartnerOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type RestorePartnerOfferResponse = RestorePartnerOfferResponses[keyof RestorePartnerOfferResponses];
+
+export type RunPartnerOfferAgainData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/run-again';
+};
+
+export type RunPartnerOfferAgainErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RunPartnerOfferAgainError = RunPartnerOfferAgainErrors[keyof RunPartnerOfferAgainErrors];
+
+export type RunPartnerOfferAgainResponses = {
+    /**
+     * The new draft.
+     */
+    201: Offer;
+};
+
+export type RunPartnerOfferAgainResponse = RunPartnerOfferAgainResponses[keyof RunPartnerOfferAgainResponses];
+
+export type ListPartnerOfferHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/history';
+};
+
+export type ListPartnerOfferHistoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerOfferHistoryError = ListPartnerOfferHistoryErrors[keyof ListPartnerOfferHistoryErrors];
+
+export type ListPartnerOfferHistoryResponses = {
+    /**
+     * A page of entries.
+     */
+    200: OfferHistoryPage;
+};
+
+export type ListPartnerOfferHistoryResponse = ListPartnerOfferHistoryResponses[keyof ListPartnerOfferHistoryResponses];
+
+export type ListPartnerOfferCodesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/codes';
+};
+
+export type ListPartnerOfferCodesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerOfferCodesError = ListPartnerOfferCodesErrors[keyof ListPartnerOfferCodesErrors];
+
+export type ListPartnerOfferCodesResponses = {
+    /**
+     * A page of codes.
+     */
+    200: OfferCodePage;
+};
+
+export type ListPartnerOfferCodesResponse = ListPartnerOfferCodesResponses[keyof ListPartnerOfferCodesResponses];
+
+export type AddPartnerOfferCodeData = {
+    /**
+     * The request.
+     */
+    body: OfferCodeInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/codes';
+};
+
+export type AddPartnerOfferCodeErrors = {
+    /**
+     * `validation_failed`: a code outside 4 to 16 characters (`code_length`), or a stamp card (`stamp_card_code`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `code_in_use`: another running offer has it; `offer_transition`: the offer ended or was cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddPartnerOfferCodeError = AddPartnerOfferCodeErrors[keyof AddPartnerOfferCodeErrors];
+
+export type AddPartnerOfferCodeResponses = {
+    /**
+     * The code.
+     */
+    201: OfferCode;
+};
+
+export type AddPartnerOfferCodeResponse = AddPartnerOfferCodeResponses[keyof AddPartnerOfferCodeResponses];
+
+export type RetirePartnerOfferCodeData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+        /**
+         * The code.
+         */
+        code_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/codes/{code_id}';
+};
+
+export type RetirePartnerOfferCodeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such code of the offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RetirePartnerOfferCodeError = RetirePartnerOfferCodeErrors[keyof RetirePartnerOfferCodeErrors];
+
+export type RetirePartnerOfferCodeResponses = {
+    /**
+     * Retired.
+     */
+    204: void;
+};
+
+export type RetirePartnerOfferCodeResponse = RetirePartnerOfferCodeResponses[keyof RetirePartnerOfferCodeResponses];
+
+export type ListPartnerCampaignsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/campaigns';
+};
+
+export type ListPartnerCampaignsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerCampaignsError = ListPartnerCampaignsErrors[keyof ListPartnerCampaignsErrors];
+
+export type ListPartnerCampaignsResponses = {
+    /**
+     * A page of campaigns.
+     */
+    200: PartnerCampaignPage;
+};
+
+export type ListPartnerCampaignsResponse = ListPartnerCampaignsResponses[keyof ListPartnerCampaignsResponses];
+
+export type AcceptCampaignData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/campaigns/{offer_id}/accept';
+};
+
+export type AcceptCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such Location of the Partner, or no campaign reaching it (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `campaign_not_open`: the campaign has ended, or the Location declined it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptCampaignError = AcceptCampaignErrors[keyof AcceptCampaignErrors];
+
+export type AcceptCampaignResponses = {
+    /**
+     * The Location's answer.
+     */
+    200: CampaignParticipation;
+};
+
+export type AcceptCampaignResponse = AcceptCampaignResponses[keyof AcceptCampaignResponses];
+
+export type DeclineCampaignData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/campaigns/{offer_id}/decline';
+};
+
+export type DeclineCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+     */
+    403: Problem;
+    /**
+     * No such Location of the Partner, or no campaign reaching it (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `campaign_not_open`: the campaign has ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineCampaignError = DeclineCampaignErrors[keyof DeclineCampaignErrors];
+
+export type DeclineCampaignResponses = {
+    /**
+     * The Location's answer.
+     */
+    200: CampaignParticipation;
+};
+
+export type DeclineCampaignResponse = DeclineCampaignResponses[keyof DeclineCampaignResponses];
+
+export type ListPlatformOffersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `partner` or `platform`.
+         */
+        owner?: 'partner' | 'platform';
+        /**
+         * `live`, `scheduled`, `paused`, `draft`, `past` or `archived`.
+         */
+        group?: 'live' | 'scheduled' | 'paused' | 'draft' | 'past' | 'archived';
+        /**
+         * `partner_offer`, `campaign` or `store_promotion`.
+         */
+        kind?: 'partner_offer' | 'campaign' | 'store_promotion';
+        /**
+         * One mechanic.
+         */
+        mechanic?: string;
+        /**
+         * One Partner's offers.
+         */
+        partner_id?: string;
+        /**
+         * Words of the name, the line, the owner or a Location.
+         */
+        q?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers';
+};
+
+export type ListPlatformOffersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformOffersError = ListPlatformOffersErrors[keyof ListPlatformOffersErrors];
+
+export type ListPlatformOffersResponses = {
+    /**
+     * A page of offers with the counts.
+     */
+    200: OfferPage;
+};
+
+export type ListPlatformOffersResponse = ListPlatformOffersResponses[keyof ListPlatformOffersResponses];
+
+export type CreatePlatformOfferData = {
+    /**
+     * The request.
+     */
+    body: OfferInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/platform/offers';
+};
+
+export type CreatePlatformOfferErrors = {
+    /**
+     * `validation_failed`, naming the term, as a Partner's offer, and `campaign_on_everything` for a campaign across Locations naming items, `share_out_of_range`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * A Location, Partner, Vertical, service area or item that does not exist (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_purpose_taken`: the city already has a running offer of that purpose.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePlatformOfferError = CreatePlatformOfferErrors[keyof CreatePlatformOfferErrors];
+
+export type CreatePlatformOfferResponses = {
+    /**
+     * The draft.
+     */
+    201: Offer;
+};
+
+export type CreatePlatformOfferResponse = CreatePlatformOfferResponses[keyof CreatePlatformOfferResponses];
+
+export type DeletePlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}';
+};
+
+export type DeletePlatformOfferErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: not a draft.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePlatformOfferError = DeletePlatformOfferErrors[keyof DeletePlatformOfferErrors];
+
+export type DeletePlatformOfferResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeletePlatformOfferResponse = DeletePlatformOfferResponses[keyof DeletePlatformOfferResponses];
+
+export type GetPlatformOfferData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}';
+};
+
+export type GetPlatformOfferErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOfferError = GetPlatformOfferErrors[keyof GetPlatformOfferErrors];
+
+export type GetPlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type GetPlatformOfferResponse = GetPlatformOfferResponses[keyof GetPlatformOfferResponses];
+
+export type UpdatePlatformOfferData = {
+    /**
+     * The request.
+     */
+    body: OfferInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}';
+};
+
+export type UpdatePlatformOfferErrors = {
+    /**
+     * As making one.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_running_terms` or `offer_transition`, as a Partner's change.
+     */
+    409: Problem;
+    /**
+     * The offer moved since the `If-Match` version (`precondition_failed`).
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePlatformOfferError = UpdatePlatformOfferErrors[keyof UpdatePlatformOfferErrors];
+
+export type UpdatePlatformOfferResponses = {
+    /**
+     * The offer as changed.
+     */
+    200: Offer;
+};
+
+export type UpdatePlatformOfferResponse = UpdatePlatformOfferResponses[keyof UpdatePlatformOfferResponses];
+
+export type PublishPlatformOfferData = {
+    /**
+     * The request.
+     */
+    body?: OfferPublish;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/publish';
+};
+
+export type PublishPlatformOfferErrors = {
+    /**
+     * The terms fail validation as saved (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: not a draft, or its end has passed.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPlatformOfferError = PublishPlatformOfferErrors[keyof PublishPlatformOfferErrors];
+
+export type PublishPlatformOfferResponses = {
+    /**
+     * The offer, scheduled or live.
+     */
+    200: Offer;
+};
+
+export type PublishPlatformOfferResponse = PublishPlatformOfferResponses[keyof PublishPlatformOfferResponses];
+
+export type StartPlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/start';
+};
+
+export type StartPlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartPlatformOfferError = StartPlatformOfferErrors[keyof StartPlatformOfferErrors];
+
+export type StartPlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type StartPlatformOfferResponse = StartPlatformOfferResponses[keyof StartPlatformOfferResponses];
+
+export type PausePlatformOfferData = {
+    /**
+     * The request.
+     */
+    body?: OfferPauseInput;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/pause';
+};
+
+export type PausePlatformOfferErrors = {
+    /**
+     * `validation_failed`: a Partner's offer paused without a reason (`reason_required`), or one over 200 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not live or scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PausePlatformOfferError = PausePlatformOfferErrors[keyof PausePlatformOfferErrors];
+
+export type PausePlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type PausePlatformOfferResponse = PausePlatformOfferResponses[keyof PausePlatformOfferResponses];
+
+export type ResumePlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/resume';
+};
+
+export type ResumePlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not paused.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumePlatformOfferError = ResumePlatformOfferErrors[keyof ResumePlatformOfferErrors];
+
+export type ResumePlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type ResumePlatformOfferResponse = ResumePlatformOfferResponses[keyof ResumePlatformOfferResponses];
+
+export type StopPlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/stop';
+};
+
+export type StopPlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not live or paused.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopPlatformOfferError = StopPlatformOfferErrors[keyof StopPlatformOfferErrors];
+
+export type StopPlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type StopPlatformOfferResponse = StopPlatformOfferResponses[keyof StopPlatformOfferResponses];
+
+export type CancelPlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/cancel';
+};
+
+export type CancelPlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not scheduled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelPlatformOfferError = CancelPlatformOfferErrors[keyof CancelPlatformOfferErrors];
+
+export type CancelPlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type CancelPlatformOfferResponse = CancelPlatformOfferResponses[keyof CancelPlatformOfferResponses];
+
+export type ArchivePlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/archive';
+};
+
+export type ArchivePlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is running.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ArchivePlatformOfferError = ArchivePlatformOfferErrors[keyof ArchivePlatformOfferErrors];
+
+export type ArchivePlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type ArchivePlatformOfferResponse = ArchivePlatformOfferResponses[keyof ArchivePlatformOfferResponses];
+
+export type RestorePlatformOfferData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/restore';
+};
+
+export type RestorePlatformOfferErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer is not archived.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RestorePlatformOfferError = RestorePlatformOfferErrors[keyof RestorePlatformOfferErrors];
+
+export type RestorePlatformOfferResponses = {
+    /**
+     * The offer.
+     */
+    200: Offer;
+};
+
+export type RestorePlatformOfferResponse = RestorePlatformOfferResponses[keyof RestorePlatformOfferResponses];
+
+export type RunPlatformOfferAgainData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/run-again';
+};
+
+export type RunPlatformOfferAgainErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RunPlatformOfferAgainError = RunPlatformOfferAgainErrors[keyof RunPlatformOfferAgainErrors];
+
+export type RunPlatformOfferAgainResponses = {
+    /**
+     * The new draft.
+     */
+    201: Offer;
+};
+
+export type RunPlatformOfferAgainResponse = RunPlatformOfferAgainResponses[keyof RunPlatformOfferAgainResponses];
+
+export type ListPlatformOfferHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/history';
+};
+
+export type ListPlatformOfferHistoryErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformOfferHistoryError = ListPlatformOfferHistoryErrors[keyof ListPlatformOfferHistoryErrors];
+
+export type ListPlatformOfferHistoryResponses = {
+    /**
+     * A page of entries.
+     */
+    200: OfferHistoryPage;
+};
+
+export type ListPlatformOfferHistoryResponse = ListPlatformOfferHistoryResponses[keyof ListPlatformOfferHistoryResponses];
+
+export type ListOfferReachData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/reach';
+};
+
+export type ListOfferReachErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOfferReachError = ListOfferReachErrors[keyof ListOfferReachErrors];
+
+export type ListOfferReachResponses = {
+    /**
+     * A page of Locations.
+     */
+    200: OfferReachPage;
+};
+
+export type ListOfferReachResponse = ListOfferReachResponses[keyof ListOfferReachResponses];
+
+export type ListOfferRedemptionsData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * `reserved`, `confirmed` or `released`.
+         */
+        status?: 'reserved' | 'confirmed' | 'released';
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/redemptions';
+};
+
+export type ListOfferRedemptionsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOfferRedemptionsError = ListOfferRedemptionsErrors[keyof ListOfferRedemptionsErrors];
+
+export type ListOfferRedemptionsResponses = {
+    /**
+     * A page of uses with the budget.
+     */
+    200: OfferRedemptionPage;
+};
+
+export type ListOfferRedemptionsResponse = ListOfferRedemptionsResponses[keyof ListOfferRedemptionsResponses];
+
+export type ListPlatformOfferCodesData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/codes';
+};
+
+export type ListPlatformOfferCodesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformOfferCodesError = ListPlatformOfferCodesErrors[keyof ListPlatformOfferCodesErrors];
+
+export type ListPlatformOfferCodesResponses = {
+    /**
+     * A page of codes.
+     */
+    200: OfferCodePage;
+};
+
+export type ListPlatformOfferCodesResponse = ListPlatformOfferCodesResponses[keyof ListPlatformOfferCodesResponses];
+
+export type AddPlatformOfferCodeData = {
+    /**
+     * The request.
+     */
+    body: OfferCodeInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/codes';
+};
+
+export type AddPlatformOfferCodeErrors = {
+    /**
+     * `validation_failed`: `code_length` or `stamp_card_code`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `code_in_use` or `offer_transition`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddPlatformOfferCodeError = AddPlatformOfferCodeErrors[keyof AddPlatformOfferCodeErrors];
+
+export type AddPlatformOfferCodeResponses = {
+    /**
+     * The code.
+     */
+    201: OfferCode;
+};
+
+export type AddPlatformOfferCodeResponse = AddPlatformOfferCodeResponses[keyof AddPlatformOfferCodeResponses];
+
+export type RetirePlatformOfferCodeData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+        /**
+         * The code.
+         */
+        code_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/codes/{code_id}';
+};
+
+export type RetirePlatformOfferCodeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such code of the offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RetirePlatformOfferCodeError = RetirePlatformOfferCodeErrors[keyof RetirePlatformOfferCodeErrors];
+
+export type RetirePlatformOfferCodeResponses = {
+    /**
+     * Retired.
+     */
+    204: void;
+};
+
+export type RetirePlatformOfferCodeResponse = RetirePlatformOfferCodeResponses[keyof RetirePlatformOfferCodeResponses];
+
+export type ListCodeBatchesData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/code-batches';
+};
+
+export type ListCodeBatchesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCodeBatchesError = ListCodeBatchesErrors[keyof ListCodeBatchesErrors];
+
+export type ListCodeBatchesResponses = {
+    /**
+     * A page of batches.
+     */
+    200: CodeBatchPage;
+};
+
+export type ListCodeBatchesResponse = ListCodeBatchesResponses[keyof ListCodeBatchesResponses];
+
+export type CreateCodeBatchData = {
+    /**
+     * The request.
+     */
+    body: CodeBatchInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/offers/{offer_id}/code-batches';
+};
+
+export type CreateCodeBatchErrors = {
+    /**
+     * `validation_failed`: a count outside 1 to 10,000, or a stamp card.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `offer_transition`: the offer ended or was cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCodeBatchError = CreateCodeBatchErrors[keyof CreateCodeBatchErrors];
+
+export type CreateCodeBatchResponses = {
+    /**
+     * The batch.
+     */
+    201: CodeBatch;
+};
+
+export type CreateCodeBatchResponse = CreateCodeBatchResponses[keyof CreateCodeBatchResponses];
+
+export type ListCodeBatchCodesData = {
+    body?: never;
+    path: {
+        /**
+         * The batch.
+         */
+        batch_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/code-batches/{batch_id}/codes';
+};
+
+export type ListCodeBatchCodesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such batch (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCodeBatchCodesError = ListCodeBatchCodesErrors[keyof ListCodeBatchCodesErrors];
+
+export type ListCodeBatchCodesResponses = {
+    /**
+     * A page of codes, or the spreadsheet.
+     */
+    200: OfferCodePage;
+};
+
+export type ListCodeBatchCodesResponse = ListCodeBatchCodesResponses[keyof ListCodeBatchCodesResponses];
+
+export type ListOfferLocationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only Locations trading in this Vertical.
+         */
+        vertical_id?: string;
+        /**
+         * `true` for Locations something runs at, `false` for those with nothing.
+         */
+        running?: boolean;
+        /**
+         * Words of the Location's or its Partner's name.
+         */
+        q?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/offers/locations';
+};
+
+export type ListOfferLocationsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOfferLocationsError = ListOfferLocationsErrors[keyof ListOfferLocationsErrors];
+
+export type ListOfferLocationsResponses = {
+    /**
+     * A page of Locations.
+     */
+    200: OfferLocationPage;
+};
+
+export type ListOfferLocationsResponse = ListOfferLocationsResponses[keyof ListOfferLocationsResponses];
+
+export type ListPlatformLocationOffersData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/locations/{location_id}/offers';
+};
+
+export type ListPlatformLocationOffersErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such Location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformLocationOffersError = ListPlatformLocationOffersErrors[keyof ListPlatformLocationOffersErrors];
+
+export type ListPlatformLocationOffersResponses = {
+    /**
+     * A page of offers.
+     */
+    200: OfferPage;
+};
+
+export type ListPlatformLocationOffersResponse = ListPlatformLocationOffersResponses[keyof ListPlatformLocationOffersResponses];
+
+export type GetPlatformCustomerOffersData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/offers';
+};
+
+export type GetPlatformCustomerOffersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformCustomerOffersError = GetPlatformCustomerOffersErrors[keyof GetPlatformCustomerOffersErrors];
+
+export type GetPlatformCustomerOffersResponses = {
+    /**
+     * The customer's offers.
+     */
+    200: CustomerOffers;
+};
+
+export type GetPlatformCustomerOffersResponse = GetPlatformCustomerOffersResponses[keyof GetPlatformCustomerOffersResponses];
+
+export type GivePersonalCodeData = {
+    /**
+     * The request.
+     */
+    body: PersonalCodeInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/personal-codes';
+};
+
+export type GivePersonalCodeErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * No such customer, or no such offer of the platform (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `code_in_use`, or `offer_transition`: the offer ended or was cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GivePersonalCodeError = GivePersonalCodeErrors[keyof GivePersonalCodeErrors];
+
+export type GivePersonalCodeResponses = {
+    /**
+     * The code.
+     */
+    201: OfferCode;
+};
+
+export type GivePersonalCodeResponse = GivePersonalCodeResponses[keyof GivePersonalCodeResponses];

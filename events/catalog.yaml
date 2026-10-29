@@ -1187,3 +1187,163 @@ events:
       A payout destination failed its one-rupee check: the bank returned a different name, "The account is not in your legal name", or the transfer failed. Statements stay held, the Partner or the Agent is told, and Mission Control is alerted.
     payload_schema: ./payloads/payouts.account_check.failed.v1.schema.json
     example: ./examples/payouts.account_check.failed.v1.json
+
+  - type: promotions.offer.created
+    version: 1
+    domain: promotions
+    description: >-
+      An offer was made as a draft, by its owner or by running an earlier one again.
+    payload_schema: ./payloads/promotions.offer.created.v1.schema.json
+    example: ./examples/promotions.offer.created.v1.json
+
+  - type: promotions.offer.changed
+    version: 1
+    domain: promotions
+    description: >-
+      An offer's terms changed: in full before it started, only its name, a later end and higher limits while it runs.
+    payload_schema: ./payloads/promotions.offer.changed.v1.schema.json
+    example: ./examples/promotions.offer.changed.v1.json
+
+  - type: promotions.offer.published
+    version: 1
+    domain: promotions
+    description: >-
+      A draft was published: scheduled, or live at once. A campaign with a Partner share invites each Partner it reaches.
+    payload_schema: ./payloads/promotions.offer.published.v1.schema.json
+    example: ./examples/promotions.offer.published.v1.json
+
+  - type: promotions.offer.started
+    version: 1
+    domain: promotions
+    description: >-
+      An offer went live: at its start by the platform's clock, once whichever instance reaches it first, or started now by its owner. Open store pages are told.
+    payload_schema: ./payloads/promotions.offer.started.v1.schema.json
+    example: ./examples/promotions.offer.started.v1.json
+
+  - type: promotions.offer.paused
+    version: 1
+    domain: promotions
+    description: >-
+      An offer was paused by its owner, or by the platform with a reason the Partner reads.
+    payload_schema: ./payloads/promotions.offer.paused.v1.schema.json
+    example: ./examples/promotions.offer.paused.v1.json
+
+  - type: promotions.offer.resumed
+    version: 1
+    domain: promotions
+    description: >-
+      A pause was lifted: live again, or scheduled until its start.
+    payload_schema: ./payloads/promotions.offer.resumed.v1.schema.json
+    example: ./examples/promotions.offer.resumed.v1.json
+
+  - type: promotions.offer.ended
+    version: 1
+    domain: promotions
+    description: >-
+      An offer ended: at its end by the clock, or stopped by its owner; its codes are retired. Orders already placed keep it.
+    payload_schema: ./payloads/promotions.offer.ended.v1.schema.json
+    example: ./examples/promotions.offer.ended.v1.json
+
+  - type: promotions.offer.cancelled
+    version: 1
+    domain: promotions
+    description: >-
+      A scheduled offer was cancelled before it started; its codes are retired.
+    payload_schema: ./payloads/promotions.offer.cancelled.v1.schema.json
+    example: ./examples/promotions.offer.cancelled.v1.json
+
+  - type: promotions.offer.archived
+    version: 1
+    domain: promotions
+    description: >-
+      An ended or cancelled offer was moved out of its owner's lists.
+    payload_schema: ./payloads/promotions.offer.archived.v1.schema.json
+    example: ./examples/promotions.offer.archived.v1.json
+
+  - type: promotions.offer.restored
+    version: 1
+    domain: promotions
+    description: >-
+      An archived offer was brought back.
+    payload_schema: ./payloads/promotions.offer.restored.v1.schema.json
+    example: ./examples/promotions.offer.restored.v1.json
+
+  - type: promotions.offer.deleted
+    version: 1
+    domain: promotions
+    description: >-
+      A draft was deleted.
+    payload_schema: ./payloads/promotions.offer.deleted.v1.schema.json
+    example: ./examples/promotions.offer.deleted.v1.json
+
+  - type: promotions.code.created
+    version: 1
+    domain: promotions
+    description: >-
+      A code was added to an offer, or a batch of single-use codes made (announced once with its size), or a personal or referral code given.
+    payload_schema: ./payloads/promotions.code.created.v1.schema.json
+    example: ./examples/promotions.code.created.v1.json
+
+  - type: promotions.code.retired
+    version: 1
+    domain: promotions
+    description: >-
+      A code was retired, by its owner or with its offer; those who hold it keep the offer.
+    payload_schema: ./payloads/promotions.code.retired.v1.schema.json
+    example: ./examples/promotions.code.retired.v1.json
+
+  - type: promotions.code.claimed
+    version: 1
+    domain: promotions
+    description: >-
+      A customer added a code to their offers, typed in the account or the basket. Engagement records a referral from a referral code's claim.
+    payload_schema: ./payloads/promotions.code.claimed.v1.schema.json
+    example: ./examples/promotions.code.claimed.v1.json
+
+  - type: promotions.participation.invited
+    version: 1
+    domain: promotions
+    description: >-
+      A campaign the Partners pay a share of invited a Location; it applies there only once accepted. The Location's notices carry the invitation.
+    payload_schema: ./payloads/promotions.participation.invited.v1.schema.json
+    example: ./examples/promotions.participation.invited.v1.json
+
+  - type: promotions.participation.accepted
+    version: 1
+    domain: promotions
+    description: >-
+      A Location accepted a campaign: it applies there from that moment.
+    payload_schema: ./payloads/promotions.participation.accepted.v1.schema.json
+    example: ./examples/promotions.participation.accepted.v1.json
+
+  - type: promotions.participation.declined
+    version: 1
+    domain: promotions
+    description: >-
+      A Location declined a campaign, an invitation or one the platform pays for in full: it stops applying there at once; orders already placed keep it.
+    payload_schema: ./payloads/promotions.participation.declined.v1.schema.json
+    example: ./examples/promotions.participation.declined.v1.json
+
+  - type: promotions.redemption.reserved
+    version: 1
+    domain: promotions
+    description: >-
+      An order was placed with an offer: one use reserved, counting against the customer's uses, the offer's total uses and its budget, once whatever the retries.
+    payload_schema: ./payloads/promotions.redemption.reserved.v1.schema.json
+    example: ./examples/promotions.redemption.reserved.v1.json
+
+  - type: promotions.redemption.confirmed
+    version: 1
+    domain: promotions
+    description: >-
+      The order completed: its use of the offer confirmed, with the cost split, published once.
+    payload_schema: ./payloads/promotions.redemption.confirmed.v1.schema.json
+    example: ./examples/promotions.redemption.confirmed.v1.json
+
+  - type: promotions.redemption.released
+    version: 1
+    domain: promotions
+    description: >-
+      The order was declined, expired or cancelled: its use given back.
+    payload_schema: ./payloads/promotions.redemption.released.v1.schema.json
+    example: ./examples/promotions.redemption.released.v1.json

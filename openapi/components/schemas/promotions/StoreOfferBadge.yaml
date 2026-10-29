@@ -1,0 +1,44 @@
+type: object
+description: "A Location's offer on its card or in search: its best advertised offer open to everyone and how many more it has. A code-only offer heads the card only when nothing open runs, and names its code."
+required:
+  - offer_id
+  - line
+  - more
+  - code
+  - shelf
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - Buy 1, get 1 free
+  more:
+    type: integer
+    description: How many more it has.
+    examples:
+      - 1
+    minimum: 0
+  code:
+    type:
+      - string
+      - "null"
+    description: The code, for a code-only offer whose owner shows it.
+    examples:
+      - null
+  shelf:
+    oneOf:
+      - $ref: ./OfferShelfKind.yaml
+      - type: "null"
+    description: The shelf it belongs on.
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+    line: Buy 1, get 1 free
+    more: 1
+    code: null
+    shelf: deals

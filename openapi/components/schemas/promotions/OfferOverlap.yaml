@@ -1,0 +1,37 @@
+type: object
+description: Another offer competing with this one in the same slot, at a Location they share, over dates and hours that meet; told, never refused. The engine gives a customer the better of the two.
+required:
+  - offer_id
+  - name
+  - line
+  - state
+  - owner
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The other offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Friday free delivery
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - Free delivery over ₹199
+  state:
+    $ref: ./OfferState.yaml
+    description: Its state.
+  owner:
+    $ref: ./OfferOwner.yaml
+    description: Whose it is.
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    name: Friday free delivery
+    line: Free delivery over ₹199
+    state: live
+    owner: partner

@@ -76,6 +76,14 @@ properties:
   refunded:
     $ref: ../common/Money.yaml
     description: What refunds gave back in all.
+  discounts:
+    $ref: ../common/Money.yaml
+    description: What the platform's offers took off the items and the basket.
+  delivery_discount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The delivery fee free delivery waived.
 examples:
   - subtotal:
       minor_units: 73800
@@ -153,3 +161,7 @@ examples:
     refunded:
       minor_units: 4000
       currency: INR
+    discounts:
+      minor_units: 42900
+      currency: INR
+    delivery_discount: null

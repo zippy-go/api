@@ -1,0 +1,156 @@
+type: object
+description: "An offer's terms as its owner writes them: every member of a create, the members a change sends. Members left out keep what is saved; `null` clears. A live or paused offer takes only a new name, a later end or none, higher limits and budget or none; anything else is refused with `409` (`offer_running_terms`), the way forward being to stop it and run it again."
+properties:
+  kind:
+    $ref: ./OfferKind.yaml
+    description: "Mission Control only, at creation: `campaign` or `store_promotion`. A Partner's offer is `partner_offer`."
+  purpose:
+    oneOf:
+      - $ref: ./OfferPurpose.yaml
+      - type: "null"
+    description: "Mission Control only: a first-order or referral campaign of a city."
+  name:
+    type: string
+    description: The owner's name for it, at most 80 characters.
+    examples:
+      - Biryani BOGO
+    maxLength: 80
+  playbook:
+    type:
+      - string
+      - "null"
+    description: The playbook it starts from.
+    examples:
+      - buy_1_get_1
+  terms:
+    $ref: ./OfferTerms.yaml
+    description: The mechanic and its terms.
+  on:
+    $ref: ./OfferOn.yaml
+    description: What it is on; the whole Location by default.
+  audience:
+    $ref: ./OfferAudience.yaml
+    description: Whom it is for; everyone by default.
+  aim:
+    $ref: ./OfferAim.yaml
+    description: Where it runs.
+  when:
+    $ref: ./OfferWhen.yaml
+    description: When it runs.
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A minimum spend.
+  fulfilments:
+    type: array
+    items:
+      $ref: ./OfferFulfilment.yaml
+    description: The ways of ordering it is for.
+  uses_per_customer:
+    type:
+      - integer
+      - "null"
+    description: Uses per customer.
+    examples:
+      - null
+    minimum: 1
+  total_uses:
+    type:
+      - integer
+      - "null"
+    description: Uses in all.
+    examples:
+      - null
+    minimum: 1
+  budget:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A budget.
+  max_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most off one order.
+  partner_share_percent:
+    type: integer
+    description: "Mission Control only: the Partners' share, 0 to 100; a store promotion's defaults to 100."
+    examples:
+      - 50
+    minimum: 0
+    maximum: 100
+  code_only:
+    type: boolean
+    description: Only a code unlocks it.
+    examples:
+      - false
+  show_code:
+    type: boolean
+    description: Show a code-only offer's code on Location pages.
+    examples:
+      - false
+examples:
+  - kind: campaign
+    purpose: null
+    name: Biryani BOGO
+    playbook: buy_1_get_1
+    terms:
+      mechanic: multibuy
+      amount_off: null
+      percent_off: null
+      percent_cap: null
+      tiers: []
+      buy: 1
+      get: 1
+      get_percent_off: 100
+      mix: false
+      count: null
+      price: null
+      sets: []
+      free_variant_ids: []
+      every: null
+      once: null
+      reward: null
+    on:
+      on: items
+      category_ids: []
+      brand_ids: []
+      item_ids:
+        - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+      excluded_item_ids: []
+      excluded_category_ids: []
+      names:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+          kind: item
+          name: Hyderabadi Biryani
+    audience: everyone
+    aim:
+      location_ids:
+        - 01a13a48-9e00-7000-8000-000000000301
+      partner_ids: []
+      vertical_ids: []
+      service_area_ids: []
+      store_type_ids: []
+      everywhere: false
+      text: Dev Kitchen Gachibowli
+    when:
+      starts_at: 2026-11-06T16:00
+      ends_at: null
+      windows:
+        - days:
+            - friday
+          start: 16:00
+          end: 22:00
+      time_zone: Asia/Kolkata
+    min_spend: null
+    fulfilments:
+      - delivery
+      - pickup
+    uses_per_customer: null
+    total_uses: null
+    budget: null
+    max_off: null
+    partner_share_percent: 50
+    code_only: false
+    show_code: false

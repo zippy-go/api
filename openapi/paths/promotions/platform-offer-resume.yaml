@@ -1,0 +1,67 @@
+# Path item for /v1/platform/offers/{offer_id}/resume. Referenced from openapi.yaml.
+parameters:
+  - name: offer_id
+    in: path
+    required: true
+    description: The offer.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+post:
+  operationId: resumePlatformOffer
+  summary: Resume a paused offer
+  description: "Lifts a pause, the platform's own or one it put on a Partner's offer: live again, or scheduled until its start. Written to the audit log. `promotion:write`."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The offer.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/Offer.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks the permission (`access_denied`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such offer (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`offer_transition`: the offer is not paused."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

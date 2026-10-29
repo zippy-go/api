@@ -274,6 +274,90 @@
       "examples": [
         "platform_fleet"
       ]
+    },
+    "discounts": {
+      "type": "integer",
+      "description": "What the platform's offers took off the items and the basket, in minor units.",
+      "examples": [
+        42900
+      ]
+    },
+    "delivery_discount": {
+      "type": "integer",
+      "description": "The delivery fee free delivery waived, in minor units.",
+      "examples": [
+        0
+      ]
+    },
+    "offers": {
+      "type": "array",
+      "description": "The offers the order was placed with, each with its cost split, in minor units; the ledger posts the platform's share as a promotions expense and takes the Partner's off what it is owed.",
+      "items": {
+        "type": "object",
+        "description": "An offer on the order.",
+        "required": [
+          "offer_id",
+          "redemption_id",
+          "owner",
+          "kind",
+          "saving",
+          "partner_cost",
+          "platform_cost"
+        ],
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The offer."
+          },
+          "redemption_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Its use."
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "partner",
+              "platform"
+            ],
+            "description": "The offer's owner."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "item",
+              "basket",
+              "delivery",
+              "free_item"
+            ],
+            "description": "What it took off."
+          },
+          "code_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The code it came through."
+          },
+          "saving": {
+            "type": "integer",
+            "description": "What it took off."
+          },
+          "partner_cost": {
+            "type": "integer",
+            "description": "The Partner's share."
+          },
+          "platform_cost": {
+            "type": "integer",
+            "description": "The platform's share."
+          }
+        }
+      },
+      "examples": [
+        []
+      ]
     }
   }
 }

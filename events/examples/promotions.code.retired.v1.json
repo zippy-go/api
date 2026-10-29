@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d9012",
+  "type": "promotions.code.retired",
+  "version": 1,
+  "occurred_at": "2026-11-06T10:30:00Z",
+  "partner_id": null,
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "code_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6101",
+    "batch_id": null,
+    "count": 1,
+    "offer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002",
+    "owner": "platform",
+    "partner_id": null,
+    "code_kind": "open",
+    "owner_customer_id": null,
+    "customer_id": null,
+    "at": "2026-11-06T10:30:00Z"
+  }
+}

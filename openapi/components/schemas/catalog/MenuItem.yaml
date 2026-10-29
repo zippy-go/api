@@ -111,6 +111,11 @@ properties:
   availability:
     $ref: ./ItemAvailability.yaml
     description: When and how it may be ordered.
+  promotion:
+    oneOf:
+      - $ref: ../promotions/MenuItemPromotion.yaml
+      - type: "null"
+    description: "The offer open to everyone the item is under, from the engine: its tag, its price after plain money off, or the deal its sheet opens on; `null` for none."
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
     name:
@@ -192,3 +197,4 @@ examples:
       prescription_required: false
       preparation_minutes: 20
       personalisation: false
+    promotion: null

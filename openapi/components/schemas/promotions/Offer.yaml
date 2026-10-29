@@ -1,0 +1,360 @@
+type: object
+description: "An offer as its owner and Mission Control read it: one mechanic with its terms, what it is on, whom it is for, where and when it runs, its conditions and limits, who pays, the line and small print the platform wrote from those terms, its state with the moves the caller may make, the Partner's word, its overlaps and its uses. Versioned: reads answer an `ETag`, writes honour `If-Match`."
+required:
+  - id
+  - version
+  - owner
+  - partner_id
+  - kind
+  - purpose
+  - name
+  - line
+  - small_print
+  - terms
+  - on
+  - audience
+  - aim
+  - when
+  - min_spend
+  - fulfilments
+  - uses_per_customer
+  - total_uses
+  - budget
+  - max_off
+  - partner_share_percent
+  - share_text
+  - code_only
+  - show_code
+  - state
+  - state_text
+  - pause
+  - archived_at
+  - copied_from
+  - playbook
+  - confirmation
+  - needs_confirmation
+  - overlaps
+  - locked
+  - uses
+  - actions
+  - created_at
+  - updated_at
+  - published_at
+  - started_at
+  - ended_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+  version:
+    type: integer
+    description: Raised by one on every change.
+    examples:
+      - 3
+  owner:
+    $ref: ./OfferOwner.yaml
+    description: Whose it is.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The owning Partner; `null` for the platform's.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  kind:
+    $ref: ./OfferKind.yaml
+    description: What it was made as.
+  purpose:
+    oneOf:
+      - $ref: ./OfferPurpose.yaml
+      - type: "null"
+    description: A platform campaign's purpose.
+  name:
+    type: string
+    description: The owner's own name for it, at most 80 characters; customers read the line.
+    examples:
+      - Biryani BOGO
+  line:
+    type: string
+    description: The line a customer reads, written by the platform from the terms.
+    examples:
+      - Buy 1, get 1 free
+  small_print:
+    type: string
+    description: The rest of the terms in words.
+    examples:
+      - On Hyderabadi Biryani · for everyone
+  terms:
+    $ref: ./OfferTerms.yaml
+    description: The mechanic and its terms.
+  on:
+    $ref: ./OfferOn.yaml
+    description: What it is on.
+  audience:
+    $ref: ./OfferAudience.yaml
+    description: Whom it is for.
+  aim:
+    $ref: ./OfferAim.yaml
+    description: Where it runs.
+  when:
+    $ref: ./OfferWhen.yaml
+    description: When it runs.
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least the items come to, after item offers; `null` for none.
+  fulfilments:
+    type: array
+    items:
+      $ref: ./OfferFulfilment.yaml
+    description: The ways of ordering it is for; empty for delivery and pickup.
+  uses_per_customer:
+    type:
+      - integer
+      - "null"
+    description: Uses per customer; `null` for no limit.
+    examples:
+      - null
+    minimum: 1
+  total_uses:
+    type:
+      - integer
+      - "null"
+    description: Uses in all; `null` for no limit.
+    examples:
+      - null
+    minimum: 1
+  budget:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most its uses may cost; `null` for no budget.
+  max_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most it takes off one order.
+  partner_share_percent:
+    type: integer
+    description: The Partners' share of its cost, 0 to 100; a Partner's own offer is 100.
+    examples:
+      - 100
+    minimum: 0
+    maximum: 100
+  share_text:
+    type: string
+    description: 'Who pays in words, as a Partner reads it: "ZippyGo pays for it", "You pay 50% of it", "You pay for it".'
+    examples:
+      - You pay for it
+  code_only:
+    type: boolean
+    description: Whether only a code unlocks it.
+    examples:
+      - false
+  show_code:
+    type: boolean
+    description: Whether a code-only offer's code is shown on Location pages.
+    examples:
+      - false
+  state:
+    $ref: ./OfferState.yaml
+    description: Its state.
+  state_text:
+    type: string
+    description: Its state in a sentence, a pause and why first.
+    examples:
+      - Live, ongoing
+  pause:
+    oneOf:
+      - $ref: ./OfferPause.yaml
+      - type: "null"
+    description: Its pause, while paused.
+  archived_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was archived, out of its owner's lists.
+    examples:
+      - null
+  copied_from:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The offer it was run again from.
+    examples:
+      - null
+  playbook:
+    type:
+      - string
+      - "null"
+    description: The playbook it started from.
+    examples:
+      - buy_1_get_1
+  confirmation:
+    oneOf:
+      - $ref: ./OfferConfirmation.yaml
+      - type: "null"
+    description: The Partner's word, given at publishing.
+  needs_confirmation:
+    type: boolean
+    description: "Whether publishing asks for the Partner's word: a Partner's own priced offer."
+    examples:
+      - true
+  overlaps:
+    type: array
+    items:
+      $ref: ./OfferOverlap.yaml
+    description: The offers it competes with.
+  locked:
+    type: array
+    items:
+      type: string
+    description: "The terms a customer has read, locked while it is live or paused: everything but its name, its end, its limits and budget (raised only) and its codes."
+  uses:
+    $ref: ./OfferUses.yaml
+    description: Its uses.
+  actions:
+    type: array
+    items:
+      $ref: ./OfferAction.yaml
+    description: What the caller may do now.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-02T06:20:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-11-02T06:30:00Z
+  published_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was published.
+    examples:
+      - 2026-11-02T06:30:00Z
+  started_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it went live.
+    examples:
+      - 2026-11-02T06:30:00Z
+  ended_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ended or was cancelled.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+    version: 3
+    owner: partner
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    kind: partner_offer
+    purpose: null
+    name: Biryani BOGO
+    line: Buy 1, get 1 free
+    small_print: On Hyderabadi Biryani · for everyone
+    terms:
+      mechanic: multibuy
+      amount_off: null
+      percent_off: null
+      percent_cap: null
+      tiers: []
+      buy: 1
+      get: 1
+      get_percent_off: 100
+      mix: false
+      count: null
+      price: null
+      sets: []
+      free_variant_ids: []
+      every: null
+      once: null
+      reward: null
+    on:
+      on: items
+      category_ids: []
+      brand_ids: []
+      item_ids:
+        - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+      excluded_item_ids: []
+      excluded_category_ids: []
+      names:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+          kind: item
+          name: Hyderabadi Biryani
+    audience: everyone
+    aim:
+      location_ids:
+        - 01a13a48-9e00-7000-8000-000000000301
+      partner_ids: []
+      vertical_ids: []
+      service_area_ids: []
+      store_type_ids: []
+      everywhere: false
+      text: Dev Kitchen Gachibowli
+    when:
+      starts_at: 2026-11-06T16:00
+      ends_at: null
+      windows:
+        - days:
+            - friday
+          start: 16:00
+          end: 22:00
+      time_zone: Asia/Kolkata
+    min_spend: null
+    fulfilments: []
+    uses_per_customer: null
+    total_uses: null
+    budget: null
+    max_off: null
+    partner_share_percent: 100
+    share_text: You pay for it
+    code_only: false
+    show_code: false
+    state: live
+    state_text: Live, ongoing
+    pause: null
+    archived_at: null
+    copied_from: null
+    playbook: buy_1_get_1
+    confirmation: null
+    needs_confirmation: true
+    overlaps: []
+    locked:
+      - terms
+      - on
+      - audience
+      - aim
+      - min_spend
+      - fulfilments
+      - partner_share_percent
+    uses:
+      reserved: 1
+      confirmed: 11
+    actions:
+      - edit
+      - pause
+      - stop
+    created_at: 2026-11-02T06:20:00Z
+    updated_at: 2026-11-02T06:30:00Z
+    published_at: 2026-11-02T06:30:00Z
+    started_at: 2026-11-02T06:30:00Z
+    ended_at: null

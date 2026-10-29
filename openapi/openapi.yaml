@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.21.0
+  version: 0.22.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -280,6 +280,8 @@ tags:
     description: "What customers say about what they bought, and how Agents are rated: a thumb up or down on one completed order with tags from a short list, a note and photos, asked once by push; the delivery rated apart from the food; a store's rating as the share of thumbs up, counted when asked for; the Partner's reading and its one reply, moderated by the platform; Mission Control's reading, hiding a note and moderating replies; an Agent's rating, one per delivery over 90 days, and the flags an Agent raises on a rating they find unfair. Customers read reviews with no account; Partner staff with `review:read` at the Location and reply with `review:reply`; platform staff read with `review:read` and moderate with `review:manage`."
   - name: Customers
     description: "Mission Control's Customers section: finding a customer by what a caller can say, their page read and never edited, the timeline of what happened on the account drawn from the domain events, support's notes signed and kept for good, and blocking and unblocking with a reason. Reading needs `customer:read`, writing a note `customer:note`, blocking and unblocking `customer:block`. Partner staff never see this section."
+  - name: Promotions
+    description: "Offers and the engine that prices them: a Partner's offers on its own Locations built from playbooks, the platform's campaigns across Locations with the Partners' share and their opt-in, and store promotions; one mechanic per offer with the line and small print the platform writes; a lifecycle with its clock; codes of four kinds in one registry with batches and the guess limit; a customer's offers, held offers and stamp cards; uses reserved, confirmed and released; and what a store's page, a basket and a placed order carry from the one engine. Partner staff read with `promotion:read` and write with `promotion:write` at the Location; platform staff likewise platform-wide; customers read and add codes with a customer token."
   - name: Operations
     description: "Mission Control's Operations section beyond health, events and the audit log: the service level objectives with their attainment, error budget and burn; the alerts they and the jobs, the outbox and the payouts open, acknowledged by name; the registry of jobs with their runs and run now; the outbox's pending and failed rows with replay. Reading needs a Mission Control token; acting needs `operations:manage`."
 
@@ -1231,6 +1233,96 @@ paths:
     $ref: ./paths/reports/partner-agent-numbers-detail.yaml
   /v1/partners/{partner_id}/services/{service_id}/agent-weeks:
     $ref: ./paths/reports/partner-agent-weeks.yaml
+
+  # Step 6 promotions: offers, campaigns, codes, the engine's answers
+  /v1/offer-playbooks:
+    $ref: ./paths/promotions/offer-playbooks.yaml
+  /v1/customer/offers:
+    $ref: ./paths/promotions/customer-offers.yaml
+  /v1/customer/offers/codes:
+    $ref: ./paths/promotions/customer-offer-codes.yaml
+  /v1/storefront/stores/{location_id}/offers:
+    $ref: ./paths/promotions/store-offers.yaml
+  /v1/baskets/{location_id}/codes:
+    $ref: ./paths/promotions/basket-codes.yaml
+  /v1/partners/{partner_id}/offers:
+    $ref: ./paths/promotions/partner-offers.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}:
+    $ref: ./paths/promotions/partner-offer.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/publish:
+    $ref: ./paths/promotions/partner-offer-publish.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/start:
+    $ref: ./paths/promotions/partner-offer-start.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/pause:
+    $ref: ./paths/promotions/partner-offer-pause.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/resume:
+    $ref: ./paths/promotions/partner-offer-resume.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/stop:
+    $ref: ./paths/promotions/partner-offer-stop.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/cancel:
+    $ref: ./paths/promotions/partner-offer-cancel.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/archive:
+    $ref: ./paths/promotions/partner-offer-archive.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/restore:
+    $ref: ./paths/promotions/partner-offer-restore.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/run-again:
+    $ref: ./paths/promotions/partner-offer-run-again.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/history:
+    $ref: ./paths/promotions/partner-offer-history.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/codes:
+    $ref: ./paths/promotions/partner-offer-codes.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/codes/{code_id}:
+    $ref: ./paths/promotions/partner-offer-code.yaml
+  /v1/partners/{partner_id}/campaigns:
+    $ref: ./paths/promotions/partner-campaigns.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/campaigns/{offer_id}/accept:
+    $ref: ./paths/promotions/partner-campaign-accept.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/campaigns/{offer_id}/decline:
+    $ref: ./paths/promotions/partner-campaign-decline.yaml
+  /v1/platform/offers:
+    $ref: ./paths/promotions/platform-offers.yaml
+  /v1/platform/offers/{offer_id}:
+    $ref: ./paths/promotions/platform-offer.yaml
+  /v1/platform/offers/{offer_id}/publish:
+    $ref: ./paths/promotions/platform-offer-publish.yaml
+  /v1/platform/offers/{offer_id}/start:
+    $ref: ./paths/promotions/platform-offer-start.yaml
+  /v1/platform/offers/{offer_id}/pause:
+    $ref: ./paths/promotions/platform-offer-pause.yaml
+  /v1/platform/offers/{offer_id}/resume:
+    $ref: ./paths/promotions/platform-offer-resume.yaml
+  /v1/platform/offers/{offer_id}/stop:
+    $ref: ./paths/promotions/platform-offer-stop.yaml
+  /v1/platform/offers/{offer_id}/cancel:
+    $ref: ./paths/promotions/platform-offer-cancel.yaml
+  /v1/platform/offers/{offer_id}/archive:
+    $ref: ./paths/promotions/platform-offer-archive.yaml
+  /v1/platform/offers/{offer_id}/restore:
+    $ref: ./paths/promotions/platform-offer-restore.yaml
+  /v1/platform/offers/{offer_id}/run-again:
+    $ref: ./paths/promotions/platform-offer-run-again.yaml
+  /v1/platform/offers/{offer_id}/history:
+    $ref: ./paths/promotions/platform-offer-history.yaml
+  /v1/platform/offers/{offer_id}/reach:
+    $ref: ./paths/promotions/platform-offer-reach.yaml
+  /v1/platform/offers/{offer_id}/redemptions:
+    $ref: ./paths/promotions/platform-offer-redemptions.yaml
+  /v1/platform/offers/{offer_id}/codes:
+    $ref: ./paths/promotions/platform-offer-codes.yaml
+  /v1/platform/offers/{offer_id}/codes/{code_id}:
+    $ref: ./paths/promotions/platform-offer-code.yaml
+  /v1/platform/offers/{offer_id}/code-batches:
+    $ref: ./paths/promotions/platform-offer-code-batches.yaml
+  /v1/platform/code-batches/{batch_id}/codes:
+    $ref: ./paths/promotions/platform-code-batch-codes.yaml
+  /v1/platform/offers/locations:
+    $ref: ./paths/promotions/platform-offer-locations.yaml
+  /v1/platform/locations/{location_id}/offers:
+    $ref: ./paths/promotions/platform-location-offers.yaml
+  /v1/platform/customers/{customer_id}/offers:
+    $ref: ./paths/promotions/platform-customer-offers.yaml
+  /v1/platform/customers/{customer_id}/personal-codes:
+    $ref: ./paths/promotions/platform-customer-personal-codes.yaml
 
 components:
   securitySchemes:
@@ -3362,3 +3454,190 @@ components:
       $ref: ./components/schemas/reports/AgentWeeksTotals.yaml
     AgentWeeksReport:
       $ref: ./components/schemas/reports/AgentWeeksReport.yaml
+    # Step 6 promotions
+    OfferOwner:
+      $ref: ./components/schemas/promotions/OfferOwner.yaml
+    OfferKind:
+      $ref: ./components/schemas/promotions/OfferKind.yaml
+    OfferPurpose:
+      $ref: ./components/schemas/promotions/OfferPurpose.yaml
+    OfferState:
+      $ref: ./components/schemas/promotions/OfferState.yaml
+    OfferMechanic:
+      $ref: ./components/schemas/promotions/OfferMechanic.yaml
+    OfferAudience:
+      $ref: ./components/schemas/promotions/OfferAudience.yaml
+    OfferFulfilment:
+      $ref: ./components/schemas/promotions/OfferFulfilment.yaml
+    OfferAction:
+      $ref: ./components/schemas/promotions/OfferAction.yaml
+    OfferGoal:
+      $ref: ./components/schemas/promotions/OfferGoal.yaml
+    OfferTarget:
+      $ref: ./components/schemas/promotions/OfferTarget.yaml
+    StampReward:
+      $ref: ./components/schemas/promotions/StampReward.yaml
+    Weekday:
+      $ref: ./components/schemas/promotions/Weekday.yaml
+    OfferCodeKind:
+      $ref: ./components/schemas/promotions/OfferCodeKind.yaml
+    ParticipationStatus:
+      $ref: ./components/schemas/promotions/ParticipationStatus.yaml
+    RedemptionStatus:
+      $ref: ./components/schemas/promotions/RedemptionStatus.yaml
+    OfferReasonCode:
+      $ref: ./components/schemas/promotions/OfferReasonCode.yaml
+    OfferShelfKind:
+      $ref: ./components/schemas/promotions/OfferShelfKind.yaml
+    CustomerOfferSource:
+      $ref: ./components/schemas/promotions/CustomerOfferSource.yaml
+    CustomerOfferState:
+      $ref: ./components/schemas/promotions/CustomerOfferState.yaml
+    BasketOfferKind:
+      $ref: ./components/schemas/promotions/BasketOfferKind.yaml
+    CodeOutcome:
+      $ref: ./components/schemas/promotions/CodeOutcome.yaml
+    OfferHistoryAction:
+      $ref: ./components/schemas/promotions/OfferHistoryAction.yaml
+    OfferActorKind:
+      $ref: ./components/schemas/promotions/OfferActorKind.yaml
+    OfferNamedKind:
+      $ref: ./components/schemas/promotions/OfferNamedKind.yaml
+    OfferTier:
+      $ref: ./components/schemas/promotions/OfferTier.yaml
+    OfferItemSet:
+      $ref: ./components/schemas/promotions/OfferItemSet.yaml
+    OfferTerms:
+      $ref: ./components/schemas/promotions/OfferTerms.yaml
+    OfferNamed:
+      $ref: ./components/schemas/promotions/OfferNamed.yaml
+    OfferOn:
+      $ref: ./components/schemas/promotions/OfferOn.yaml
+    OfferAim:
+      $ref: ./components/schemas/promotions/OfferAim.yaml
+    OfferWindow:
+      $ref: ./components/schemas/promotions/OfferWindow.yaml
+    OfferWhen:
+      $ref: ./components/schemas/promotions/OfferWhen.yaml
+    OfferPause:
+      $ref: ./components/schemas/promotions/OfferPause.yaml
+    OfferConfirmation:
+      $ref: ./components/schemas/promotions/OfferConfirmation.yaml
+    OfferOverlap:
+      $ref: ./components/schemas/promotions/OfferOverlap.yaml
+    OfferUses:
+      $ref: ./components/schemas/promotions/OfferUses.yaml
+    Offer:
+      $ref: ./components/schemas/promotions/Offer.yaml
+    OfferInput:
+      $ref: ./components/schemas/promotions/OfferInput.yaml
+    OfferSummary:
+      $ref: ./components/schemas/promotions/OfferSummary.yaml
+    OfferCounts:
+      $ref: ./components/schemas/promotions/OfferCounts.yaml
+    OfferPage:
+      $ref: ./components/schemas/promotions/OfferPage.yaml
+    OfferPublish:
+      $ref: ./components/schemas/promotions/OfferPublish.yaml
+    OfferPauseInput:
+      $ref: ./components/schemas/promotions/OfferPauseInput.yaml
+    OfferChange:
+      $ref: ./components/schemas/promotions/OfferChange.yaml
+    OfferActor:
+      $ref: ./components/schemas/promotions/OfferActor.yaml
+    OfferHistoryEntry:
+      $ref: ./components/schemas/promotions/OfferHistoryEntry.yaml
+    OfferHistoryPage:
+      $ref: ./components/schemas/promotions/OfferHistoryPage.yaml
+    OfferCode:
+      $ref: ./components/schemas/promotions/OfferCode.yaml
+    OfferCodeInput:
+      $ref: ./components/schemas/promotions/OfferCodeInput.yaml
+    OfferCodePage:
+      $ref: ./components/schemas/promotions/OfferCodePage.yaml
+    CodeBatchInput:
+      $ref: ./components/schemas/promotions/CodeBatchInput.yaml
+    CodeBatch:
+      $ref: ./components/schemas/promotions/CodeBatch.yaml
+    CodeBatchPage:
+      $ref: ./components/schemas/promotions/CodeBatchPage.yaml
+    CampaignLocation:
+      $ref: ./components/schemas/promotions/CampaignLocation.yaml
+    PartnerCampaign:
+      $ref: ./components/schemas/promotions/PartnerCampaign.yaml
+    PartnerCampaignPage:
+      $ref: ./components/schemas/promotions/PartnerCampaignPage.yaml
+    CampaignParticipation:
+      $ref: ./components/schemas/promotions/CampaignParticipation.yaml
+    OfferPlaybook:
+      $ref: ./components/schemas/promotions/OfferPlaybook.yaml
+    OfferPlaybookGoal:
+      $ref: ./components/schemas/promotions/OfferPlaybookGoal.yaml
+    OfferPlaybooks:
+      $ref: ./components/schemas/promotions/OfferPlaybooks.yaml
+    OfferReachLocation:
+      $ref: ./components/schemas/promotions/OfferReachLocation.yaml
+    OfferReachPage:
+      $ref: ./components/schemas/promotions/OfferReachPage.yaml
+    OfferRedemption:
+      $ref: ./components/schemas/promotions/OfferRedemption.yaml
+    OfferBudget:
+      $ref: ./components/schemas/promotions/OfferBudget.yaml
+    OfferRedemptionPage:
+      $ref: ./components/schemas/promotions/OfferRedemptionPage.yaml
+    OfferLocation:
+      $ref: ./components/schemas/promotions/OfferLocation.yaml
+    OfferLocationPage:
+      $ref: ./components/schemas/promotions/OfferLocationPage.yaml
+    OfferPlace:
+      $ref: ./components/schemas/promotions/OfferPlace.yaml
+    CustomerOffer:
+      $ref: ./components/schemas/promotions/CustomerOffer.yaml
+    CustomerOffers:
+      $ref: ./components/schemas/promotions/CustomerOffers.yaml
+    CodeEntry:
+      $ref: ./components/schemas/promotions/CodeEntry.yaml
+    CodeAdded:
+      $ref: ./components/schemas/promotions/CodeAdded.yaml
+    PersonalCodeInput:
+      $ref: ./components/schemas/promotions/PersonalCodeInput.yaml
+    StoreOfferBadge:
+      $ref: ./components/schemas/promotions/StoreOfferBadge.yaml
+    OfferShelfStore:
+      $ref: ./components/schemas/promotions/OfferShelfStore.yaml
+    OfferShelf:
+      $ref: ./components/schemas/promotions/OfferShelf.yaml
+    OfferDeal:
+      $ref: ./components/schemas/promotions/OfferDeal.yaml
+    MenuItemPromotion:
+      $ref: ./components/schemas/promotions/MenuItemPromotion.yaml
+    StoreOffer:
+      $ref: ./components/schemas/promotions/StoreOffer.yaml
+    SpendStep:
+      $ref: ./components/schemas/promotions/SpendStep.yaml
+    StampCard:
+      $ref: ./components/schemas/promotions/StampCard.yaml
+    StoreOffers:
+      $ref: ./components/schemas/promotions/StoreOffers.yaml
+    BasketOffer:
+      $ref: ./components/schemas/promotions/BasketOffer.yaml
+    BasketAlternative:
+      $ref: ./components/schemas/promotions/BasketAlternative.yaml
+    OfferReason:
+      $ref: ./components/schemas/promotions/OfferReason.yaml
+    OfferNudge:
+      $ref: ./components/schemas/promotions/OfferNudge.yaml
+    FreeItemChoice:
+      $ref: ./components/schemas/promotions/FreeItemChoice.yaml
+    BasketFreeItem:
+      $ref: ./components/schemas/promotions/BasketFreeItem.yaml
+    BasketLinePromotion:
+      $ref: ./components/schemas/promotions/BasketLinePromotion.yaml
+    BasketCodeResult:
+      $ref: ./components/schemas/promotions/BasketCodeResult.yaml
+    OrderOffer:
+      $ref: ./components/schemas/promotions/OrderOffer.yaml
+    OrderOfferSplit:
+      $ref: ./components/schemas/promotions/OrderOfferSplit.yaml
+    StatementPromotion:
+      $ref: ./components/schemas/promotions/StatementPromotion.yaml

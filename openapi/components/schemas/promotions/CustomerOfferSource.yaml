@@ -1,0 +1,11 @@
+type: string
+description: "How an offer reached a customer's account: a code they added, a personal code they were given, a referral code, the city's first-order offer, a Location's offer for new customers, or a reward they earned."
+enum:
+  - code
+  - personal
+  - referral
+  - first_order
+  - new_customers
+  - reward
+examples:
+  - code

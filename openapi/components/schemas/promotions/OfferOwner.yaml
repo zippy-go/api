@@ -1,0 +1,7 @@
+type: string
+description: "Who owns an offer: a Partner, on its own Locations, or the platform."
+enum:
+  - partner
+  - platform
+examples:
+  - partner

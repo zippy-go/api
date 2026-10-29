@@ -1,0 +1,39 @@
+type: object
+description: Another basket offer the customer could have instead, with what it would save.
+required:
+  - offer_id
+  - line
+  - kind
+  - saving
+  - message
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - Free delivery
+  kind:
+    $ref: ./BasketOfferKind.yaml
+    description: What it would take off.
+  saving:
+    $ref: ../common/Money.yaml
+    description: What it would save.
+  message:
+    type: string
+    description: In words.
+    examples:
+      - Free delivery instead saves ₹40.00
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    line: Free delivery
+    kind: delivery
+    saving:
+      minor_units: 4000
+      currency: INR
+    message: Free delivery instead saves ₹40.00

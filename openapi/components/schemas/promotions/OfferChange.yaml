@@ -1,0 +1,30 @@
+type: object
+description: One term changed, before and after, in words.
+required:
+  - term
+  - before
+  - after
+properties:
+  term:
+    type: string
+    description: The term.
+    examples:
+      - ends_at
+  before:
+    type:
+      - string
+      - "null"
+    description: Before.
+    examples:
+      - 2026-11-08T23:59
+  after:
+    type:
+      - string
+      - "null"
+    description: After.
+    examples:
+      - 2026-11-15T23:59
+examples:
+  - term: ends_at
+    before: 2026-11-08T23:59
+    after: 2026-11-15T23:59

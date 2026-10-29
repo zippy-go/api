@@ -1,0 +1,14 @@
+type: object
+description: A code as a customer types it, matched in any case with spaces and punctuation ignored.
+required:
+  - code
+properties:
+  code:
+    type: string
+    description: The code.
+    examples:
+      - feast 150
+    minLength: 1
+    maxLength: 40
+examples:
+  - code: feast 150

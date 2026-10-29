@@ -1,0 +1,11 @@
+type: string
+description: "Where an offer is in its life: a draft, scheduled to start, live, paused, ended or cancelled."
+enum:
+  - draft
+  - scheduled
+  - live
+  - paused
+  - ended
+  - cancelled
+examples:
+  - draft

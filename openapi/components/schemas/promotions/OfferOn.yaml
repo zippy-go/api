@@ -1,0 +1,55 @@
+type: object
+description: "What an offer is on: the whole Location, categories, brands or chosen items, less what it leaves out."
+required:
+  - on
+properties:
+  on:
+    $ref: ./OfferTarget.yaml
+    description: What it is on.
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The categories, when on categories.
+  brand_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The brands, when on brands.
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items, when on chosen items; they belong to one Location.
+  excluded_item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Items it leaves out.
+  excluded_category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Categories it leaves out.
+  names:
+    type: array
+    items:
+      $ref: ./OfferNamed.yaml
+    description: "Read only: everything above by name."
+examples:
+  - on: items
+    category_ids: []
+    brand_ids: []
+    item_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    excluded_item_ids: []
+    excluded_category_ids: []
+    names:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        kind: item
+        name: Hyderabadi Biryani

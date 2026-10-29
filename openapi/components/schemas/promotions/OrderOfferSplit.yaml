@@ -1,0 +1,65 @@
+type: object
+description: An offer an order was placed with and how its cost is split between the Partner and the platform, as Mission Control reads it.
+required:
+  - offer_id
+  - line
+  - kind
+  - owner
+  - code
+  - saving
+  - partner_cost
+  - platform_cost
+  - status
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - Buy 1, get 1 free
+  kind:
+    $ref: ./BasketOfferKind.yaml
+    description: What it took off.
+  owner:
+    $ref: ./OfferOwner.yaml
+    description: Whose offer it is.
+  code:
+    type:
+      - string
+      - "null"
+    description: The code it came through.
+    examples:
+      - null
+  saving:
+    $ref: ../common/Money.yaml
+    description: What it took off.
+  partner_cost:
+    $ref: ../common/Money.yaml
+    description: The Partner's share.
+  platform_cost:
+    $ref: ../common/Money.yaml
+    description: The platform's share.
+  status:
+    $ref: ./RedemptionStatus.yaml
+    description: "Its use: reserved, confirmed or released."
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+    line: Buy 1, get 1 free
+    kind: item
+    owner: partner
+    code: null
+    saving:
+      minor_units: 42900
+      currency: INR
+    partner_cost:
+      minor_units: 42900
+      currency: INR
+    platform_cost:
+      minor_units: 0
+      currency: INR
+    status: confirmed

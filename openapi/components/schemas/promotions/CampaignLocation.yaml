@@ -1,0 +1,58 @@
+type: object
+description: One of a Partner's Locations a campaign reaches, with its answer and what the caller may do.
+required:
+  - location_id
+  - name
+  - status
+  - answered_at
+  - answered_by
+  - can_accept
+  - can_decline
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  status:
+    $ref: ./ParticipationStatus.yaml
+    description: Its answer.
+  answered_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it answered.
+    examples:
+      - 2026-11-02T08:00:00Z
+  answered_by:
+    type:
+      - string
+      - "null"
+    description: Who answered.
+    examples:
+      - Dev Owner
+  can_accept:
+    type: boolean
+    description: Whether the caller may accept here now.
+    examples:
+      - false
+  can_decline:
+    type: boolean
+    description: Whether the caller may decline here now.
+    examples:
+      - true
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
+    status: accepted
+    answered_at: 2026-11-02T08:00:00Z
+    answered_by: Dev Owner
+    can_accept: false
+    can_decline: true

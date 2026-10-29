@@ -64,6 +64,17 @@ properties:
       - $ref: ./PaymentMethod.yaml
       - type: "null"
     description: The chosen method.
+  discounts:
+    $ref: ../common/Money.yaml
+    description: What the platform's offers take off the items and the basket, free items included; `savings` counts them with the variants' own offers.
+  delivery_discount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The delivery fee free delivery waives; `null` when it waives nothing. The `delivery` fee stays as worked out.
+  items_after_offers:
+    $ref: ../common/Money.yaml
+    description: "The items after every discount: the minimum order, the small-order fee and basket offers' minimum spends are measured on it."
 examples:
   - subtotal:
       minor_units: 73800
@@ -114,3 +125,10 @@ examples:
       minor_units: 79800
       currency: INR
     method: upi
+    discounts:
+      minor_units: 42900
+      currency: INR
+    delivery_discount: null
+    items_after_offers:
+      minor_units: 42900
+      currency: INR

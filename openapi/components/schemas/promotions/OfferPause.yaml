@@ -1,0 +1,34 @@
+type: object
+description: "A pause: who paused the offer, when and why. Only the platform resumes its own pause."
+required:
+  - by
+  - reason
+  - at
+  - text
+properties:
+  by:
+    $ref: ./OfferOwner.yaml
+    description: The Partner or the platform.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, at most 200 characters; the platform always gives one, and the Partner reads it.
+    examples:
+      - Price set in error
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-04T09:00:00Z
+  text:
+    type: string
+    description: In words, "Paused by ZippyGo".
+    examples:
+      - Paused by ZippyGo
+examples:
+  - by: platform
+    reason: Price set in error
+    at: 2026-11-04T09:00:00Z
+    text: Paused by ZippyGo

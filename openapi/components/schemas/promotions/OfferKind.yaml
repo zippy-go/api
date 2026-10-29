@@ -1,0 +1,8 @@
+type: string
+description: "What an offer was made as, kept for its life: a Partner's own offer, the platform's campaign across Locations, or the platform's store promotion at one Location."
+enum:
+  - partner_offer
+  - campaign
+  - store_promotion
+examples:
+  - partner_offer

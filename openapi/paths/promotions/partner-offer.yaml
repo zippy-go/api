@@ -1,0 +1,185 @@
+# Path item for /v1/partners/{partner_id}/offers/{offer_id}. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: offer_id
+    in: path
+    required: true
+    description: The offer.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+get:
+  operationId: getPartnerOffer
+  summary: Read a Partner's offer
+  description: "The offer as the server has it now: its state in a sentence, a pause and why first, the line and small print, what it is on by name, where and when, its terms, who pays, the Partner's word, its overlaps, its uses, what is locked while it runs and the moves the caller may make. Answers an `ETag`. `promotion:read` at one of its Locations."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
+  responses:
+    "200":
+      description: The offer.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/Offer.yaml
+    "304":
+      description: Not modified since the `If-None-Match` version.
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such offer of the Partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+patch:
+  operationId: updatePartnerOffer
+  summary: Change a Partner's offer
+  description: "Changes a draft or scheduled offer in full. A live or paused offer takes only a new name, a later end or none, higher limits and budget or none: any other change is refused, saying to stop the offer and run it again. Ended and cancelled offers do not change. Honours `If-Match`. `promotion:write` at each of its Locations."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/promotions/OfferInput.yaml
+  responses:
+    "200":
+      description: The offer as changed.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/Offer.yaml
+    "400":
+      description: As making an offer.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such offer of the Partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`offer_running_terms`: a running offer's terms, a lower limit or an earlier end; `offer_transition`: an ended or cancelled offer."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "412":
+      description: The offer moved since the `If-Match` version (`precondition_failed`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: deletePartnerOffer
+  summary: Delete a draft
+  description: "Deletes a draft. Any other offer is ended or cancelled instead: deleting a live one is refused, offering to stop it. `promotion:write` at each of its Locations."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  responses:
+    "204":
+      description: Deleted.
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: Not a Partner console or Mission Control token (`forbidden`), the member lacks the permission at the Location (`access_denied`), or the Partner's plan does not include promotions (`not_enabled_for_partner`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such offer of the Partner (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`offer_transition`: the offer is not a draft; stop it or cancel it instead."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

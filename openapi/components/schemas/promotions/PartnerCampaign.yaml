@@ -1,0 +1,63 @@
+type: object
+description: A platform campaign on a Partner's Locations, read-only to the Partner, with its share in words and each Location's answer.
+required:
+  - offer
+  - share_text
+  - locations
+properties:
+  offer:
+    $ref: ./OfferSummary.yaml
+    description: The campaign.
+  share_text:
+    type: string
+    description: The Partner's share in words.
+    examples:
+      - You pay 50% of it
+  locations:
+    type: array
+    items:
+      $ref: ./CampaignLocation.yaml
+    description: Its Locations the campaign reaches.
+examples:
+  - offer:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+      owner: partner
+      partner_id: 01a13a48-9e00-7000-8000-000000000001
+      partner_name: ZippyGo Dev Partner
+      kind: partner_offer
+      purpose: null
+      name: Biryani BOGO
+      line: Buy 1, get 1 free
+      small_print: On Hyderabadi Biryani · for everyone
+      mechanic: multibuy
+      state: live
+      state_text: Live, ongoing
+      pause: null
+      aim_text: Dev Kitchen Gachibowli
+      location_ids:
+        - 01a13a48-9e00-7000-8000-000000000301
+      when:
+        starts_at: 2026-11-02T00:00
+        ends_at: null
+        windows: []
+        time_zone: Asia/Kolkata
+      partner_share_percent: 100
+      share_text: You pay for it
+      archived_at: null
+      uses:
+        reserved: 1
+        confirmed: 11
+      actions:
+        - edit
+        - pause
+        - stop
+      updated_at: 2026-11-02T06:30:00Z
+    share_text: You pay 50% of it
+    locations:
+      - location_id: 01a13a48-9e00-7000-8000-000000000301
+        name: Dev Kitchen Gachibowli
+        status: accepted
+        answered_at: 2026-11-02T08:00:00Z
+        answered_by: Dev Owner
+        can_accept: false
+        can_decline: true

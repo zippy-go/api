@@ -1,0 +1,19 @@
+type: object
+description: "One tier of money off the basket: spend at least this, save that."
+required:
+  - min_spend
+  - amount_off
+properties:
+  min_spend:
+    $ref: ../common/Money.yaml
+    description: The least the items come to, after item offers.
+  amount_off:
+    $ref: ../common/Money.yaml
+    description: What comes off.
+examples:
+  - min_spend:
+      minor_units: 30000
+      currency: INR
+    amount_off:
+      minor_units: 5000
+      currency: INR

@@ -1,0 +1,12 @@
+type: string
+description: A day of the week on the Location's clock.
+enum:
+  - monday
+  - tuesday
+  - wednesday
+  - thursday
+  - friday
+  - saturday
+  - sunday
+examples:
+  - monday

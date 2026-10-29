@@ -158,6 +158,11 @@ properties:
       - $ref: ../reviews/LocationRating.yaml
       - type: "null"
     description: "The store's rating, the share of thumbs up with how many reviews (\"72% (18)\"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0."
+  offer:
+    oneOf:
+      - $ref: ../promotions/StoreOfferBadge.yaml
+      - type: "null"
+    description: The store's best advertised offer, as on its card; its page lists them all (`GET /v1/storefront/stores/{location_id}/offers`).
 examples:
   - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -222,3 +227,4 @@ examples:
       percent: 72
       count: 18
       great: false
+    offer: null

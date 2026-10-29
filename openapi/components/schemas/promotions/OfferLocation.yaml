@@ -1,0 +1,56 @@
+type: object
+description: A Location with the live, scheduled and paused offers that reach it, by the rule the engine prices with.
+required:
+  - location_id
+  - name
+  - partner_id
+  - partner_name
+  - live
+  - scheduled
+  - paused
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  partner_name:
+    type: string
+    description: Its Partner's name.
+    examples:
+      - ZippyGo Dev Partner
+  live:
+    type: integer
+    description: Offers live there.
+    examples:
+      - 1
+  scheduled:
+    type: integer
+    description: Offers scheduled there.
+    examples:
+      - 1
+  paused:
+    type: integer
+    description: Offers paused there.
+    examples:
+      - 0
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    partner_name: ZippyGo Dev Partner
+    live: 1
+    scheduled: 1
+    paused: 0

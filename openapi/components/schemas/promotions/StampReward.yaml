@@ -1,0 +1,7 @@
+type: string
+description: "A stamp card's reward: free delivery, or a free item chosen from a list."
+enum:
+  - free_delivery
+  - free_item
+examples:
+  - free_delivery

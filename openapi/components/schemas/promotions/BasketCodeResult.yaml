@@ -1,0 +1,163 @@
+type: object
+description: "A code typed in the basket: answered as adding it to the account does, its offer joining the customer's offers and chosen for this basket when it applies here, with the basket priced again."
+required:
+  - code
+  - outcome
+  - message
+  - offer
+  - basket
+properties:
+  code:
+    type: string
+    description: The code, as matched.
+    examples:
+      - FEAST150
+  outcome:
+    $ref: ./CodeOutcome.yaml
+    description: What it did.
+  message:
+    type: string
+    description: In words.
+    examples:
+      - FEAST150 applied, ₹150 off
+  offer:
+    $ref: ./CustomerOffer.yaml
+    description: The offer it opened.
+  basket:
+    $ref: ../orders/Basket.yaml
+    description: The basket, priced again.
+examples:
+  - code: FEAST150
+    outcome: applied
+    message: FEAST150 applied, ₹150 off
+    offer:
+      offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+      line: ₹150 off · over ₹399
+      small_print: Food stores in Hyderabad · once per customer
+      source: code
+      code: FEAST150
+      state: ready
+      state_text: Ends 30 November
+      where_text: At Food stores in Hyderabad
+      locations: []
+      starts_at: null
+      ends_at: 2026-11-30T18:29:00Z
+      added_at: 2026-11-06T12:50:00Z
+      funded_text: null
+    basket:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      partner_id: 01a13a48-9e00-7000-8000-000000000001
+      store:
+        name: Dev Kitchen Gachibowli
+        live:
+          state: closed
+          reason: closed
+          until: 2026-10-16T05:30:00Z
+      owner: customer
+      version: 3
+      lines:
+        - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+          item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+          variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
+          name: Hyderabadi Chicken Biryani
+          variant_label: Full
+          food_mark: veg
+          answers:
+            - modifier_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+              question: Choose your raita
+              item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
+              name: Boondi raita
+              quantity: 1
+              unit_price:
+                minor_units: 4000
+                currency: INR
+              food_mark: veg
+              answers: []
+          quantity: 2
+          note: Less oil
+          unit_price:
+            minor_units: 34900
+            currency: INR
+          price:
+            minor_units: 69800
+            currency: INR
+          saving:
+            minor_units: 6000
+            currency: INR
+          mrp:
+            minor_units: 39900
+            currency: INR
+          tax_rate_percent: 5
+          refusal:
+            code: item_unavailable
+            message: Hyderabadi Biryani (Full) is sold out today.
+      item_count: 2
+      choices:
+        fulfilment: delivery
+        address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
+        instructions: Ring the bell twice
+        tip:
+          minor_units: 2000
+          currency: INR
+        use_wallet: true
+        payment_method: upi
+        if_unavailable: remove
+        cutlery: false
+      pricing:
+        subtotal:
+          minor_units: 73800
+          currency: INR
+        savings:
+          minor_units: 6000
+          currency: INR
+        delivery:
+          fee:
+            minor_units: 4000
+            currency: INR
+          base:
+            minor_units: 2500
+            currency: INR
+          distance_fee:
+            minor_units: 1500
+            currency: INR
+          distance_metres: 3100
+          band_up_to_metres: 4000
+          rule: settings
+        small_order_fee:
+          minor_units: 1500
+          currency: INR
+        cutlery_fee:
+          minor_units: 500
+          currency: INR
+        tip:
+          minor_units: 2000
+          currency: INR
+        total:
+          minor_units: 79800
+          currency: INR
+        tax_included:
+          - rate_percent: 5
+            taxable:
+              minor_units: 73800
+              currency: INR
+            tax:
+              minor_units: 3514
+              currency: INR
+        tax_total:
+          minor_units: 4124
+          currency: INR
+        wallet:
+          minor_units: 0
+          currency: INR
+        to_pay:
+          minor_units: 79800
+          currency: INR
+        method: upi
+      refusals:
+        - code: store_not_trading
+          message: Dev Kitchen Gachibowli is closed now; it opens at 11:00.
+          line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
+      placeable: true
+      quote: q1-5f0c9d2e7b1a4c3d
+      menu_version: 42
+      updated_at: 2026-10-16T12:58:00Z

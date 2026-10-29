@@ -1,0 +1,29 @@
+type: object
+description: A weekly window on the Location's clock, from its start up to but not including its end; one that ends before it starts runs past midnight.
+required:
+  - days
+  - start
+  - end
+properties:
+  days:
+    type: array
+    items:
+      $ref: ./Weekday.yaml
+    description: The days it opens on, at least one.
+  start:
+    type: string
+    description: When it opens, `HH:MM`.
+    examples:
+      - 16:00
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+  end:
+    type: string
+    description: When it closes, `HH:MM`, different from the start.
+    examples:
+      - 22:00
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+examples:
+  - days:
+      - friday
+    start: 16:00
+    end: 22:00

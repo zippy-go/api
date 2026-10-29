@@ -22,6 +22,63 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: percent_out_of_range
+        message: "A percentage is between 1 and 100."
+        description: "A percentage off outside 1 to 100."
+      - code: multibuy_gives_too_many
+        message: "A multibuy gives at most as many as it asks."
+        description: "A multibuy whose get is more than its buy."
+      - code: tiers_not_rising
+        message: "Each tier must ask more and give more than the one before."
+        description: "Tiers that do not each ask more and give more, or a tier giving as much as it asks."
+      - code: tiers_with_minimum
+        message: "Tiers replace a minimum spend."
+        description: "Tiers saved with a minimum spend."
+      - code: free_delivery_pickup_only
+        message: "Free delivery is for delivery."
+        description: "Free delivery, or a stamp card rewarding it, for pickup only."
+      - code: stamp_card_code
+        message: "A stamp card is open, never behind a code."
+        description: "A stamp card behind a code, or a code added to one."
+      - code: stamp_card_orders
+        message: "A stamp card asks for 2 to 100 orders."
+        description: "A stamp card of fewer than 2 or more than 100 orders."
+      - code: n_for_price_count
+        message: "N for a price asks for at least 2."
+        description: "N for a price with n under 2, or without a price."
+      - code: bundle_sets
+        message: "A bundle has two to four sets, none of them empty."
+        description: "A bundle of fewer than two or more than four sets, or with an empty set."
+      - code: items_missing
+        message: "Say which items it is for."
+        description: "An item offer naming nothing, or a free item with no choices."
+      - code: one_location_only
+        message: "Chosen items, a free item and a bundle run at one store."
+        description: "An offer naming items, giving an item free or making a bundle at more than one Location."
+      - code: window_invalid
+        message: "A window has at least one day and different start and end times."
+        description: "A weekly window with no day, or the same start and end."
+      - code: windows_too_many
+        message: "An offer has at most seven windows."
+        description: "More than seven weekly windows."
+      - code: ends_before_start
+        message: "The end is after the start."
+        description: "An end at or before the start."
+      - code: aim_missing
+        message: "Say where it runs."
+        description: "An offer naming no Location, or a campaign aimed nowhere."
+      - code: campaign_on_everything
+        message: "A campaign across stores is on everything they sell."
+        description: "A campaign across Locations naming items, categories or brands, or making a bundle or a free item."
+      - code: share_out_of_range
+        message: "A Partner's share is between 0 and 100."
+        description: "A Partners' share outside 0 to 100."
+      - code: code_length
+        message: "A code is 4 to 16 letters and digits."
+        description: "A chosen code outside 4 to 16 characters once spaces and punctuation are dropped."
+      - code: reason_required
+        message: "Give a reason the Partner will read."
+        description: "A Partner's offer paused by the platform without a reason."
       - code: taxonomy_term_retired
         message: "{term} is {status} and can no longer be chosen; choose {replacement}."
         description: A deprecated or merged term named where an active one is needed, such as a mapping, a parent, a replacement or a city's pair; the detail names the term it gave way to.
@@ -858,6 +915,13 @@ errors:
       offer, a fee, what the Wallet covers): nothing was placed. Read the
       basket again and show the customer the difference before they
       confirm."
+    details:
+      - code: offer_ended
+        message: The offer has ended.
+        description: An offer the basket showed ended, was paused or stopped applying as the order was placed.
+      - code: offer_used_up
+        message: The offer has been used up.
+        description: An offer the basket showed reached its uses or its budget as the order was placed.
 
   - code: order_moved
     status: 409
@@ -1800,3 +1864,94 @@ errors:
     description: >-
       A Partner's own Agents are reported, not paid: the platform keeps no
       payout account for them.
+
+  - code: offer_transition
+    status: 409
+    title: Offer move not allowed
+    message: "The offer's state does not allow that."
+    retryable: false
+    description: "The move does not fit the offer's state or who paused it: deleting anything but a draft (stop or cancel it instead), cancelling one that started, archiving one that runs, resuming a pause by the platform from the Partner console, changing an ended or cancelled offer, or publishing one whose end has passed."
+
+  - code: offer_running_terms
+    status: 409
+    title: Running offer
+    message: "A running offer's terms cannot change: stop it and run it again with the new terms."
+    retryable: false
+    description: "A live or paused offer takes only a new name, a later end or none, higher limits and budget or none, and codes; anything a customer has read stays as it is. Its limits only go up and its end only moves later."
+
+  - code: confirmation_required
+    status: 409
+    title: Confirmation required
+    message: "Confirm that your business pays for this offer."
+    retryable: false
+    description: "Publishing a Partner's own priced offer without the Partner's word, \"My business pays for this offer's discounts, as shown.\"; it stays a draft."
+
+  - code: offer_purpose_taken
+    status: 409
+    title: Purpose taken
+    message: "The city already has a running offer of that purpose."
+    retryable: false
+    description: "A second first-order or referral campaign for a city while one is scheduled, live or paused."
+
+  - code: code_in_use
+    status: 409
+    title: Code in use
+    message: "That code is in use by another offer."
+    retryable: false
+    description: "A code is unique across the platform while its offer is scheduled, live or paused; once that offer ends or the code is retired, the letters are free."
+
+  - code: campaign_not_open
+    status: 409
+    title: Campaign not open
+    message: "This campaign cannot be answered now."
+    retryable: false
+    description: "Accepting or declining a campaign that ended, or accepting one the Location declined."
+
+  - code: code_not_recognised
+    status: 422
+    title: Code not recognised
+    message: "We don't recognise that code"
+    retryable: false
+    description: "No running offer has that code. The attempt counts towards the limit of ten in ten minutes."
+
+  - code: code_ended
+    status: 422
+    title: Code ended
+    message: "That code has ended"
+    retryable: false
+    description: "The code was retired or its offer ended; customers who hold it keep it."
+
+  - code: code_for_new_customers
+    status: 422
+    title: Code for new customers
+    message: "That code is for new customers"
+    retryable: false
+    description: "The offer is for customers new to the Location, the city or ZippyGo, and this customer is not."
+
+  - code: code_already_used
+    status: 422
+    title: Code already used
+    message: "That code has already been used"
+    retryable: false
+    description: "A single-use or personal code another customer holds, or an offer this customer has used as often as it allows."
+
+  - code: code_already_added
+    status: 422
+    title: Code already added
+    message: "You've already added that code"
+    retryable: false
+    description: "The code is already in the customer's offers."
+
+  - code: code_not_for_account
+    status: 422
+    title: Code not for this account
+    message: "That code can't be used on this account"
+    retryable: false
+    description: "A referral code that cannot count: the customer's own, or from an account on the same mobile number, device or delivery address."
+
+  - code: code_guesses
+    status: 429
+    title: Too many codes
+    message: "Too many codes we did not recognise; try again after {until}."
+    retryable: true
+    description: "Ten codes not recognised within ten minutes; the eleventh is not checked. `Retry-After` and the sentence say until when."

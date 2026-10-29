@@ -1,0 +1,52 @@
+type: object
+description: Where an offer runs. A Partner's offer names its Locations. A campaign is aimed by any of the lists, every list given narrowing it (the Food Vertical in Hyderabad), or everywhere; the aim is resolved each time a basket is priced, so a Location that joins a Vertical or opens in a zone joins a running campaign.
+properties:
+  location_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations by name.
+  partner_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Every Location of these Partners.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations trading in these Verticals.
+  service_area_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations in these cities or zones, or beneath them.
+  store_type_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations of these types.
+  everywhere:
+    type: boolean
+    description: Every Location trading, and every one that opens while it runs.
+    examples:
+      - false
+  text:
+    type: string
+    description: 'Read only: where it runs in words, "Food in Hyderabad".'
+    examples:
+      - Dev Kitchen Gachibowli
+examples:
+  - location_ids:
+      - 01a13a48-9e00-7000-8000-000000000301
+    partner_ids: []
+    vertical_ids: []
+    service_area_ids: []
+    store_type_ids: []
+    everywhere: false
+    text: Dev Kitchen Gachibowli

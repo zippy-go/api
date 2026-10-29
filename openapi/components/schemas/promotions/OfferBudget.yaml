@@ -1,0 +1,51 @@
+type: object
+description: "An offer's budget and uses: reserved and confirmed both count, so two orders racing for its last rupee cannot both have it."
+required:
+  - budget
+  - reserved
+  - confirmed
+  - left
+  - uses_reserved
+  - uses_confirmed
+properties:
+  budget:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The budget; `null` for none.
+  reserved:
+    $ref: ../common/Money.yaml
+    description: Reserved by orders not settled.
+  confirmed:
+    $ref: ../common/Money.yaml
+    description: Confirmed by completed orders.
+  left:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What is left; `null` without a budget.
+  uses_reserved:
+    type: integer
+    description: Uses reserved.
+    examples:
+      - 0
+  uses_confirmed:
+    type: integer
+    description: Uses confirmed.
+    examples:
+      - 1
+examples:
+  - budget:
+      minor_units: 2000000
+      currency: INR
+    reserved:
+      minor_units: 0
+      currency: INR
+    confirmed:
+      minor_units: 15000
+      currency: INR
+    left:
+      minor_units: 1985000
+      currency: INR
+    uses_reserved: 0
+    uses_confirmed: 1

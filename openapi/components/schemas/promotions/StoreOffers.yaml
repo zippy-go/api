@@ -1,0 +1,74 @@
+type: object
+description: "A Location's offers on its page: public and cached without a token; with a customer's token the answer is theirs, without what is not for them, with their stamp cards and the offers they hold here. Every figure comes from the engine. Read again on `offers.changed`."
+required:
+  - location_id
+  - offers
+  - spend_bar
+  - stamp_cards
+  - held
+  - as_of
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  offers:
+    type: array
+    items:
+      $ref: ./StoreOffer.yaml
+    description: Its advertised live offers, open ones before those behind a shown code.
+  spend_bar:
+    type: array
+    items:
+      $ref: ./SpendStep.yaml
+    description: The spend bar towards its basket offers, the least first.
+  stamp_cards:
+    type: array
+    items:
+      $ref: ./StampCard.yaml
+    description: The customer's stamp cards here; signed out, empty.
+  held:
+    type: array
+    items:
+      $ref: ./CustomerOffer.yaml
+    description: The offers the customer holds that apply here.
+  as_of:
+    type: string
+    format: date-time
+    description: When it was worked out.
+    examples:
+      - 2026-11-06T10:29:00Z
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    offers:
+      - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+        owner: partner
+        line: Buy 1, get 1 free
+        small_print: On Hyderabadi Biryani · for everyone
+        mechanic: multibuy
+        terms:
+          - Ongoing
+        code: null
+        item_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+        shelf: deals
+        ends_at: null
+    spend_bar:
+      - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+        line: Free delivery over ₹199
+        min_spend:
+          minor_units: 19900
+          currency: INR
+    stamp_cards:
+      - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+        line: Free delivery on every 5th order
+        every: 5
+        counted: 4
+        next_reward_in: 1
+        reward_text: Your next order has free delivery
+        once: false
+        had: false
+    held: []
+    as_of: 2026-11-06T10:29:00Z

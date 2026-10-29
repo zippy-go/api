@@ -1,0 +1,42 @@
+type: object
+description: "The offer an item is under on a store's page, its figures from the engine: its tag, its price after plain money off, or the deal its sheet opens on."
+required:
+  - offer_id
+  - tag
+  - price_after
+  - deal
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+  tag:
+    type: string
+    description: The tag the item carries.
+    examples:
+      - Buy 1, get 1 free
+  price_after:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its price after plain money off, beside its price struck through.
+  deal:
+    oneOf:
+      - $ref: ./OfferDeal.yaml
+      - type: "null"
+    description: The deal a multibuy or a price for several opens on.
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+    tag: Buy 1, get 1 free
+    price_after: null
+    deal:
+      quantity: 2
+      text: Add 2 and 1 is free
+      total:
+        minor_units: 42900
+        currency: INR
+      total_before:
+        minor_units: 85800
+        currency: INR

@@ -1,0 +1,43 @@
+type: object
+description: A Location's answer to a campaign, recorded with who and when.
+required:
+  - offer_id
+  - location_id
+  - status
+  - at
+  - by
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  status:
+    $ref: ./ParticipationStatus.yaml
+    description: The answer.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-02T08:00:00Z
+  by:
+    type:
+      - string
+      - "null"
+    description: Who answered.
+    examples:
+      - Dev Owner
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    status: accepted
+    at: 2026-11-02T08:00:00Z
+    by: Dev Owner

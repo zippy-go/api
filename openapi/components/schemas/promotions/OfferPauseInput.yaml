@@ -1,0 +1,13 @@
+type: object
+description: A pause, with a reason of at most 200 characters, which the platform must give when it pauses a Partner's offer and the Partner reads.
+properties:
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why.
+    examples:
+      - Price set in error
+    maxLength: 200
+examples:
+  - reason: Price set in error

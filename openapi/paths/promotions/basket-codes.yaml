@@ -1,0 +1,80 @@
+# Path item for /v1/baskets/{location_id}/codes. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store the basket is at: a live store with a published menu."
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+post:
+  operationId: addBasketCode
+  summary: Type a code in the basket
+  description: "Takes a code typed in the basket, answered as adding it to the account is: an accepted code's offer joins the customer's offers and is chosen for this basket when it applies here, \"FEAST150 applied, ₹150 off\"; otherwise it is saved but not on yet, or saved but not for this basket, with the offer's small print. The basket is priced again, and its alternatives say when another offer would save more. Customer tokens only."
+  tags:
+    - Baskets
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The request.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/promotions/CodeEntry.yaml
+  responses:
+    "200":
+      description: What the code did, and the basket.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/BasketCodeResult.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: A token of another surface (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: No such live store (`not_found`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "422":
+      description: The code cannot be added, in words, as adding a code to the account.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "429":
+      description: "`code_guesses`, as adding a code to the account."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

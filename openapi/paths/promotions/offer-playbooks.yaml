@@ -1,0 +1,57 @@
+# Path item for /v1/offer-playbooks. Referenced from openapi.yaml.
+get:
+  operationId: listOfferPlaybooks
+  summary: Read the goals, playbooks and types
+  description: "The goals and the playbooks of each, served by the platform so every console opens the same answers: a Partner's (`partner_offer`), or every type of each goal of a campaign or a store promotion, with its example, the ones not yet built shown as coming. A Partner console or Mission Control token."
+  tags:
+    - Promotions
+  security:
+    - Bearer: []
+  parameters:
+    - name: kind
+      in: query
+      required: false
+      description: "`partner_offer` (the default), `campaign` or `store_promotion`."
+      schema:
+        type: string
+        enum:
+          - partner_offer
+          - campaign
+          - store_promotion
+  responses:
+    "200":
+      description: The goals and playbooks.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/OfferPlaybooks.yaml
+    "400":
+      description: A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: A token of another surface (`forbidden`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

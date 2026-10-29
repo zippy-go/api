@@ -1,0 +1,25 @@
+type: object
+description: Something an offer names, by its name as the menu has it now; a removed item reads "A removed item".
+required:
+  - id
+  - kind
+  - name
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Its id.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+  kind:
+    $ref: ./OfferNamedKind.yaml
+    description: An item, a category or a brand.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Hyderabadi Biryani
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    kind: item
+    name: Hyderabadi Biryani

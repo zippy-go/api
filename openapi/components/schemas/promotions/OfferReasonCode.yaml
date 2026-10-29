@@ -1,0 +1,14 @@
+type: string
+description: "Why an offer does not apply: not started, ended, outside its hours, not for this customer, not for this way of ordering, a minimum spend not met, used up, a stamp card's reward not earned yet, or nothing in the basket for it."
+enum:
+  - not_started
+  - ended
+  - outside_hours
+  - not_for_you
+  - not_for_fulfilment
+  - min_spend
+  - used_up
+  - stamp_not_earned
+  - nothing_to_apply
+examples:
+  - not_started

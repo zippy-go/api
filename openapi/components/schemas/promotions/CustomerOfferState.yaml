@@ -1,0 +1,9 @@
+type: string
+description: "An offer in a customer's account: ready, starting later, used, or ended (listed thirty days after its end)."
+enum:
+  - ready
+  - starts_later
+  - used
+  - ended
+examples:
+  - ready

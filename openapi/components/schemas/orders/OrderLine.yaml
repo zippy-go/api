@@ -95,6 +95,11 @@ properties:
     examples:
       - 0
     description: How many of it refunds have given back.
+  promotion:
+    oneOf:
+      - $ref: ../promotions/BasketLinePromotion.yaml
+      - type: "null"
+    description: The item offer the line was sold under, or the free item it is; `null` for none.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11
     item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
@@ -129,3 +134,4 @@ examples:
       at: 2026-10-16T13:02:00Z
       reason: left_out_at_acceptance
     refunded_quantity: 0
+    promotion: null

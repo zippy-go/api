@@ -53,6 +53,22 @@ properties:
     examples:
       - false
     description: Whether disposable cutlery is wanted.
+  basket_offer_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The basket offer the customer chose over the best, applied while it qualifies; `null` for the best.
+    examples:
+      - null
+  free_item_variant_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The free item the customer picked among its choices; `null` for the cheapest.
+    examples:
+      - null
 examples:
   - fulfilment: delivery
     address_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a81
@@ -64,3 +80,5 @@ examples:
     payment_method: upi
     if_unavailable: remove
     cutlery: false
+    basket_offer_id: null
+    free_item_variant_id: null

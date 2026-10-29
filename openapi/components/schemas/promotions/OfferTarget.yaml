@@ -1,0 +1,9 @@
+type: string
+description: "What an offer is on: everything the Location sells, chosen categories, brands, or items."
+enum:
+  - everything
+  - categories
+  - brands
+  - items
+examples:
+  - everything

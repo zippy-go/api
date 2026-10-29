@@ -1,0 +1,13 @@
+type: string
+description: "An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card."
+enum:
+  - basket_off
+  - free_delivery
+  - items_off
+  - multibuy
+  - n_for_price
+  - bundle
+  - free_item
+  - stamp_card
+examples:
+  - basket_off

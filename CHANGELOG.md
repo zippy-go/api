@@ -6,6 +6,95 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-30
+
+Step 6, promotions: the offers Partners run from playbooks, the platform's
+campaigns across Partners with their share and opt-in, one code registry, and
+the one engine that prices a store's page, the basket and the placed order.
+Written as 0.21.0 beside the taxonomy and engagement slices and renumbered
+0.22.0 when it merged after taxonomy; edition 8 of the default roles gives
+Mission Control's operations promotion:read and promotion:write, support and
+finance promotion:read. Additive only.
+
+### Added
+
+- A Partner's offers (`Promotions` tag): the list with counts by group
+  (`GET /v1/partners/{partner_id}/offers`, `OfferPage`, `OfferSummary`,
+  `OfferCounts`), a draft made and changed (`POST`, `PATCH .../offers/{offer_id}`,
+  `OfferInput`, `Offer`, `OfferTerms`, `OfferTier`, `OfferItemSet`, `OfferOn`,
+  `OfferNamed`, `OfferAim`, `OfferWhen`, `OfferWindow`, `OfferOverlap`,
+  `OfferUses`), read and deleted (`GET`, `DELETE`), published with the
+  Partner's word (`POST .../publish`, `OfferPublish`, `OfferConfirmation`),
+  the moves start, pause, resume, stop, cancel, archive, restore and run again
+  (`OfferPauseInput`, `OfferPause`), its history (`GET .../history`,
+  `OfferHistoryPage`, `OfferHistoryEntry`, `OfferActor`, `OfferChange`) and its
+  codes (`GET`, `POST .../codes`, `DELETE .../codes/{code_id}`, `OfferCode`,
+  `OfferCodeInput`, `OfferCodePage`). `promotion:read` and `promotion:write` at
+  the Location.
+- The platform's campaigns on a Partner's Locations with each Location's
+  answer (`GET /v1/partners/{partner_id}/campaigns`, `PartnerCampaign`,
+  `PartnerCampaignPage`, `CampaignLocation`), accepted and declined at a
+  Location (`POST /v1/partners/{partner_id}/locations/{location_id}/campaigns/{offer_id}/accept`,
+  `.../decline`, `CampaignParticipation`).
+- The goals, playbooks and types served by the platform
+  (`GET /v1/offer-playbooks`, `OfferPlaybooks`, `OfferPlaybookGoal`,
+  `OfferPlaybook`).
+- Mission Control's offers: every offer by owner, group, kind, mechanic and
+  words (`GET /v1/platform/offers`), campaigns and store promotions made,
+  changed, published and moved (`POST /v1/platform/offers`, `GET`, `PATCH`,
+  `DELETE .../{offer_id}` and the moves), a pause with a reason on a Partner's
+  offer, the history, the Locations an offer reaches (`GET .../reach`,
+  `OfferReachPage`, `OfferReachLocation`), its uses with the budget
+  (`GET .../redemptions`, `OfferRedemptionPage`, `OfferRedemption`,
+  `OfferBudget`), codes and batches of single-use codes with their
+  spreadsheet (`GET`, `POST .../code-batches`, `CodeBatch`, `CodeBatchInput`,
+  `CodeBatchPage`, `GET /v1/platform/code-batches/{batch_id}/codes` with
+  `Accept: text/csv`), By store (`GET /v1/platform/offers/locations`,
+  `OfferLocationPage`, `OfferLocation`, `GET /v1/platform/locations/{location_id}/offers`),
+  and a customer's offers with a personal code given from their page
+  (`GET /v1/platform/customers/{customer_id}/offers`,
+  `POST .../personal-codes`, `PersonalCodeInput`).
+- The customer's offers: what they hold, the city's first-order offer and the
+  offers for new customers (`GET /v1/customer/offers`, `CustomerOffers`,
+  `CustomerOffer`, `OfferPlace`), and a code added in words
+  (`POST /v1/customer/offers/codes`, `CodeEntry`, `CodeAdded`).
+- A store's offers on its page with the spend bar and, with a customer's
+  token, their stamp cards and held offers
+  (`GET /v1/storefront/stores/{location_id}/offers`, `StoreOffers`,
+  `StoreOffer`, `SpendStep`, `StampCard`); `offer` on `StoreCard`,
+  `SearchStore` and `StorePage` (`StoreOfferBadge`); the Vertical's offer
+  shelves on `StoreCardList` (`OfferShelf`, `OfferShelfStore`) and the
+  `offer` filter of `GET /v1/storefront/verticals/{vertical}/stores`; each
+  menu item's `promotion` (`MenuItemPromotion`, `OfferDeal`).
+- The basket priced by the engine: `offers`, `alternatives`, `reasons`,
+  `nudges` and `free_item` on `Basket` (`BasketOffer`, `BasketAlternative`,
+  `OfferReason`, `OfferNudge`, `BasketFreeItem`, `FreeItemChoice`), each line's
+  `promotion` (`BasketLinePromotion`), `discounts`, `delivery_discount` and
+  `items_after_offers` on `BasketPricing`, the chosen basket offer and free
+  item (`basket_offer_id`, `free_item_variant_id` on `BasketChoices` and
+  `BasketChoicesUpdate`), and a code typed in the basket
+  (`POST /v1/baskets/{location_id}/codes`, `BasketCodeResult`).
+- The order's offers as placed: `offers` on `CustomerOrder` (`OrderOffer`) and
+  with their split on `PlatformOrder` (`OrderOfferSplit`), each line's
+  `promotion` on `OrderLine`, `discounts` and `delivery_discount` on
+  `Receipt`; placing's `price_changed` names an offer that ended or was used
+  up as the order was placed (`offer_ended`, `offer_used_up`).
+- "Promotions you paid for" on a Location's statement (`promotions` on
+  `Statement`, `StatementPromotion`).
+- Twenty `promotions.*` events: an offer's `created`, `changed`,
+  `published`, `started`, `paused`, `resumed`, `ended`, `cancelled`,
+  `archived`, `restored` and `deleted`; a code's `created`, `retired` and
+  `claimed`; a campaign's `participation.invited`, `.accepted` and
+  `.declined`; a use's `redemption.reserved`, `.confirmed` and `.released`.
+  `ordering.order.placed` gains `offers` with their split, `discounts` and
+  `delivery_discount`.
+- Problem codes `offer_transition`, `offer_running_terms`,
+  `confirmation_required`, `offer_purpose_taken`, `code_in_use`,
+  `campaign_not_open`, `code_not_recognised`, `code_ended`,
+  `code_for_new_customers`, `code_already_used`, `code_already_added`,
+  `code_not_for_account` and `code_guesses`; nineteen field codes of
+  `validation_failed` naming the term an offer's terms contradict.
+
 ## [0.21.0] - 2026-10-29
 
 Step 6, the taxonomy: one tree of categories per Vertical that every store's

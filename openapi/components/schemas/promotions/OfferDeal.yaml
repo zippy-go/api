@@ -1,0 +1,38 @@
+type: object
+description: "A whole deal an item opens on: how many to add, what it gives in words, and what it costs where that does not depend on the rest of the basket."
+required:
+  - quantity
+  - text
+  - total
+  - total_before
+properties:
+  quantity:
+    type: integer
+    description: How many the sheet opens on.
+    examples:
+      - 2
+    minimum: 1
+  text:
+    type: string
+    description: What the deal gives.
+    examples:
+      - Add 2 and 1 is free
+  total:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What the deal costs.
+  total_before:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What it would cost without the offer.
+examples:
+  - quantity: 2
+    text: Add 2 and 1 is free
+    total:
+      minor_units: 42900
+      currency: INR
+    total_before:
+      minor_units: 85800
+      currency: INR

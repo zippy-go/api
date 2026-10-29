@@ -1,0 +1,17 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d9014",
+  "type": "promotions.participation.invited",
+  "version": 1,
+  "occurred_at": "2026-11-06T10:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03",
+  "payload": {
+    "offer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "status": "invited",
+    "partner_share_percent": 50,
+    "by_user_id": null,
+    "at": "2026-11-06T10:30:00Z"
+  }
+}

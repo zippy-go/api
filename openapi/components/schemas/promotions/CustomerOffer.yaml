@@ -1,0 +1,106 @@
+type: object
+description: "An offer as a customer's account lists it: its line and terms, where it is for, its code, its state and end, and how it came to them."
+required:
+  - offer_id
+  - line
+  - small_print
+  - source
+  - code
+  - state
+  - state_text
+  - where_text
+  - locations
+  - starts_at
+  - ends_at
+  - added_at
+  - funded_text
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - ₹150 off · over ₹399
+  small_print:
+    type: string
+    description: Its terms in words.
+    examples:
+      - Food stores in Hyderabad · once per customer
+  source:
+    $ref: ./CustomerOfferSource.yaml
+    description: How it reached them.
+  code:
+    type:
+      - string
+      - "null"
+    description: Its code, where a code unlocked it.
+    examples:
+      - FEAST150
+  state:
+    $ref: ./CustomerOfferState.yaml
+    description: Ready, starting later, used or ended.
+  state_text:
+    type: string
+    description: 'Its state in words: "Starts Friday", "Ends 30 November".'
+    examples:
+      - Ends 30 November
+  where_text:
+    type: string
+    description: 'Where it is for: "At Dev Kitchen Gachibowli", or "At stores across ZippyGo" for a campaign wider than a list can say.'
+    examples:
+      - At Food stores in Hyderabad
+  locations:
+    type: array
+    items:
+      $ref: ./OfferPlace.yaml
+    description: The Locations it is for, when a list can say.
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` for until stopped.
+    examples:
+      - 2026-11-30T18:29:00Z
+  added_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was added to the account.
+    examples:
+      - 2026-11-06T12:50:00Z
+  funded_text:
+    type:
+      - string
+      - "null"
+    description: Who pays for a reward, in words.
+    examples:
+      - null
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    line: ₹150 off · over ₹399
+    small_print: Food stores in Hyderabad · once per customer
+    source: code
+    code: FEAST150
+    state: ready
+    state_text: Ends 30 November
+    where_text: At Food stores in Hyderabad
+    locations: []
+    starts_at: null
+    ends_at: 2026-11-30T18:29:00Z
+    added_at: 2026-11-06T12:50:00Z
+    funded_text: null

@@ -1,0 +1,21 @@
+type: object
+description: "How many uses an offer has: reserved by orders placed, and confirmed by orders completed."
+required:
+  - reserved
+  - confirmed
+properties:
+  reserved:
+    type: integer
+    description: Reserved and not settled yet.
+    examples:
+      - 1
+    minimum: 0
+  confirmed:
+    type: integer
+    description: Confirmed.
+    examples:
+      - 11
+    minimum: 0
+examples:
+  - reserved: 1
+    confirmed: 11

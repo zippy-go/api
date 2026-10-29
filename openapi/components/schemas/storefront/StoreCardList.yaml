@@ -27,6 +27,11 @@ properties:
     items:
       $ref: ./StoreCard.yaml
     description: The stores.
+  shelves:
+    type: array
+    items:
+      $ref: ../promotions/OfferShelf.yaml
+    description: "The Vertical's offer shelves: free delivery, multibuys and deals, money off and free items, each the stores with a live offer of its kind, open ones first; a shelf with none is left out."
 examples:
   - place:
       resolution: inside
@@ -87,3 +92,4 @@ examples:
         minimum_order: null
         delivery_minutes: 30
         catalogue: null
+    shelves: []

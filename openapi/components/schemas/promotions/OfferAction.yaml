@@ -1,0 +1,16 @@
+type: string
+description: What the caller may do with an offer now, worked out by the server from its state, who paused it and the caller's permissions.
+enum:
+  - edit
+  - publish
+  - delete
+  - start
+  - pause
+  - resume
+  - stop
+  - cancel
+  - archive
+  - restore
+  - run_again
+examples:
+  - edit

@@ -1,0 +1,9 @@
+type: string
+description: A way of ordering an offer may be for. Dine-in and subscriptions come with later steps; no offer is for subscriptions unless it says so.
+enum:
+  - delivery
+  - pickup
+  - dine_in
+  - subscription
+examples:
+  - delivery

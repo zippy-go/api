@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/promotions.redemption.released.v1.schema.json",
+  "title": "PromotionsRedemptionReleasedPayload",
+  "description": "Payload of `promotions.redemption.released` version 1. The order was declined, expired or cancelled: its use given back. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "redemption_id",
+    "offer_id",
+    "owner",
+    "offer_partner_id",
+    "code_id",
+    "order_id",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "kind",
+    "saving",
+    "partner_cost",
+    "platform_cost",
+    "status",
+    "at"
+  ],
+  "properties": {
+    "redemption_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The use.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6301"
+      ]
+    },
+    "offer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The offer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "The offer's owner.",
+      "examples": [
+        "partner"
+      ],
+      "enum": [
+        "partner",
+        "platform"
+      ]
+    },
+    "offer_partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The offer's Partner; `null` for the platform's.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "code_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The code it came through.",
+      "examples": [
+        null
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "description": "What it takes off.",
+      "examples": [
+        "item"
+      ],
+      "enum": [
+        "item",
+        "basket",
+        "delivery",
+        "free_item"
+      ]
+    },
+    "saving": {
+      "$ref": "#/$defs/money",
+      "description": "What it took off."
+    },
+    "partner_cost": {
+      "$ref": "#/$defs/money",
+      "description": "The Partner's share."
+    },
+    "platform_cost": {
+      "$ref": "#/$defs/money",
+      "description": "The platform's share."
+    },
+    "status": {
+      "type": "string",
+      "description": "Reserved, confirmed or released.",
+      "examples": [
+        "confirmed"
+      ],
+      "enum": [
+        "reserved",
+        "confirmed",
+        "released"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-06T10:30:00Z"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

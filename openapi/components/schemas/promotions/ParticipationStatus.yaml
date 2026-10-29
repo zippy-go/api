@@ -1,0 +1,9 @@
+type: string
+description: "A Location's answer to a campaign: invited and not answered, accepted, declined, or included without an invitation because the platform pays for it all."
+enum:
+  - invited
+  - accepted
+  - declined
+  - included
+examples:
+  - invited

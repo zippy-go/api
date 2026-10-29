@@ -1,0 +1,11 @@
+type: string
+description: "Whom an offer is for: everyone, customers new to the Location, to the city or to ZippyGo, customers lapsed at the Location, or holders of a code."
+enum:
+  - everyone
+  - new_to_location
+  - new_to_city
+  - new_to_platform
+  - lapsed_at_location
+  - code_holders
+examples:
+  - everyone

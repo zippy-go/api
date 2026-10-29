@@ -1,0 +1,54 @@
+type: object
+description: How many offers a list holds in each group, archived ones apart.
+required:
+  - all
+  - live
+  - scheduled
+  - paused
+  - draft
+  - past
+  - archived
+properties:
+  all:
+    type: integer
+    description: Every offer not archived.
+    examples:
+      - 4
+  live:
+    type: integer
+    description: Live now.
+    examples:
+      - 2
+  scheduled:
+    type: integer
+    description: Scheduled.
+    examples:
+      - 1
+  paused:
+    type: integer
+    description: Paused.
+    examples:
+      - 0
+  draft:
+    type: integer
+    description: Drafts.
+    examples:
+      - 1
+  past:
+    type: integer
+    description: Ended or cancelled.
+    examples:
+      - 0
+  archived:
+    type: integer
+    description: Archived.
+    examples:
+      - 0
+examples:
+  - all: 4
+    live: 2
+    scheduled: 1
+    paused: 0
+    draft: 1
+    past: 0
+    archived: 0

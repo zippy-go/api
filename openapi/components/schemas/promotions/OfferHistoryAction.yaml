@@ -1,0 +1,17 @@
+type: string
+description: What happened to an offer.
+enum:
+  - created
+  - changed
+  - published
+  - started
+  - paused
+  - resumed
+  - ended
+  - cancelled
+  - archived
+  - restored
+  - code_added
+  - code_retired
+examples:
+  - created

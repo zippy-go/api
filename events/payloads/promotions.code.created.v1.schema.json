@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/promotions.code.created.v1.schema.json",
+  "title": "PromotionsCodeCreatedPayload",
+  "description": "Payload of `promotions.code.created` version 1. A code was added to an offer, or a batch of single-use codes made (announced once with its size), or a personal or referral code given. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "code_id",
+    "batch_id",
+    "count",
+    "offer_id",
+    "owner",
+    "partner_id",
+    "code_kind",
+    "owner_customer_id",
+    "customer_id",
+    "at"
+  ],
+  "properties": {
+    "code_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The code; `null` for a batch, announced once.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6101"
+      ]
+    },
+    "batch_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The batch, for single-use codes.",
+      "examples": [
+        null
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many codes: 1, or the size of a batch.",
+      "examples": [
+        1
+      ]
+    },
+    "offer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The offer it unlocks.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "The offer's owner.",
+      "examples": [
+        "platform"
+      ],
+      "enum": [
+        "partner",
+        "platform"
+      ]
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The offer's Partner; `null` for the platform's.",
+      "examples": [
+        null
+      ]
+    },
+    "code_kind": {
+      "type": "string",
+      "description": "Its kind.",
+      "examples": [
+        "open"
+      ],
+      "enum": [
+        "open",
+        "single_use",
+        "personal",
+        "referral"
+      ]
+    },
+    "owner_customer_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The customer a personal or referral code belongs to: for a referral code, the referrer.",
+      "examples": [
+        null
+      ]
+    },
+    "customer_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "For `claimed`, the customer who added it; `null` otherwise.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a01"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-06T10:30:00Z"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

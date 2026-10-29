@@ -1,0 +1,126 @@
+type: object
+description: An offer's mechanic and the terms it uses; the others are `null` or empty. Saved terms that contradict the mechanic or each other are refused with `400`, naming the term.
+required:
+  - mechanic
+properties:
+  mechanic:
+    $ref: ./OfferMechanic.yaml
+    description: The mechanic.
+  amount_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Money off the basket, or off each unit of the items, as an amount.
+  percent_off:
+    type:
+      - integer
+      - "null"
+    description: Money off the basket or the items as a percentage, 1 to 100.
+    examples:
+      - null
+    minimum: 1
+    maximum: 100
+  percent_cap:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most a percentage off the basket takes.
+  tiers:
+    type: array
+    items:
+      $ref: ./OfferTier.yaml
+    description: Tiers of spend and amount, each asking more and giving more than the one before; they replace a minimum spend.
+  buy:
+    type:
+      - integer
+      - "null"
+    description: "A multibuy: how many the customer buys."
+    examples:
+      - 1
+    minimum: 1
+  get:
+    type:
+      - integer
+      - "null"
+    description: "A multibuy: how many more they get, at most as many as they buy."
+    examples:
+      - 1
+    minimum: 1
+  get_percent_off:
+    type:
+      - integer
+      - "null"
+    description: "A multibuy: what comes off those they get, 100 for free."
+    examples:
+      - 100
+    minimum: 1
+    maximum: 100
+  mix:
+    type:
+      - boolean
+      - "null"
+    description: "A multibuy: whether the units may be mixed from the items it is on, the cheapest given, or must be one item."
+    examples:
+      - false
+  count:
+    type:
+      - integer
+      - "null"
+    description: "N for a price: how many, at least 2."
+    examples:
+      - null
+    minimum: 2
+  price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "N for a price, or a bundle: the fixed amount."
+  sets:
+    type: array
+    items:
+      $ref: ./OfferItemSet.yaml
+    description: "A bundle: two to four sets."
+  free_variant_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "A free item, or a stamp card rewarding one: the variants that can be had free."
+  every:
+    type:
+      - integer
+      - "null"
+    description: "A stamp card: the reward on every nth order, 2 to 100."
+    examples:
+      - null
+    minimum: 2
+    maximum: 100
+  once:
+    type:
+      - boolean
+      - "null"
+    description: "A stamp card: rewards the nth order alone rather than every nth."
+    examples:
+      - null
+  reward:
+    oneOf:
+      - $ref: ./StampReward.yaml
+      - type: "null"
+    description: A stamp card's reward.
+examples:
+  - mechanic: multibuy
+    amount_off: null
+    percent_off: null
+    percent_cap: null
+    tiers: []
+    buy: 1
+    get: 1
+    get_percent_off: 100
+    mix: false
+    count: null
+    price: null
+    sets: []
+    free_variant_ids: []
+    every: null
+    once: null
+    reward: null

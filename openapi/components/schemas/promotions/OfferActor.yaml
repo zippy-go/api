@@ -1,0 +1,29 @@
+type: object
+description: "Who acted on an offer: a person of the Partner or of the platform, or the clock."
+required:
+  - kind
+  - user_id
+  - name
+properties:
+  kind:
+    $ref: ./OfferActorKind.yaml
+    description: The Partner, the platform or the clock.
+  user_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The person, when a person acted.
+    examples:
+      - null
+  name:
+    type:
+      - string
+      - "null"
+    description: Their name.
+    examples:
+      - null
+examples:
+  - kind: clock
+    user_id: null
+    name: null

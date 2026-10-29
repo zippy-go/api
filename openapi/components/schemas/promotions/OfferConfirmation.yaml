@@ -1,0 +1,37 @@
+type: object
+description: "The Partner's word that its business pays for the offer's discounts, as shown: the words, who gave them and when."
+required:
+  - words
+  - user_id
+  - name
+  - at
+properties:
+  words:
+    type: string
+    description: The words confirmed.
+    examples:
+      - My business pays for this offer's discounts, as shown.
+  user_id:
+    type: string
+    format: uuid
+    description: Who confirmed.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a05
+  name:
+    type:
+      - string
+      - "null"
+    description: Their name.
+    examples:
+      - Dev Owner
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-02T06:30:00Z
+examples:
+  - words: My business pays for this offer's discounts, as shown.
+    user_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a05
+    name: Dev Owner
+    at: 2026-11-02T06:30:00Z

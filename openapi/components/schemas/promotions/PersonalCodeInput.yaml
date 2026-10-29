@@ -1,0 +1,23 @@
+type: object
+description: "A personal code given to a customer from their page: single-use, theirs alone, in their offers without their typing anything."
+required:
+  - offer_id
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: A platform offer's id.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  code:
+    type:
+      - string
+      - "null"
+    description: A code to give; one is made when left out.
+    examples:
+      - null
+    minLength: 4
+    maxLength: 40
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    code: null

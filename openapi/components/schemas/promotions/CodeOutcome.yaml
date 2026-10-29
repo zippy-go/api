@@ -1,0 +1,8 @@
+type: string
+description: "What a code typed in the basket did: applied here, saved to the customer's offers but not started yet, or saved but not for this basket."
+enum:
+  - applied
+  - saved_not_started
+  - saved_not_applicable
+examples:
+  - applied

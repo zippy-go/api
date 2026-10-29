@@ -1,0 +1,41 @@
+type: object
+description: A minimum spend not met by an offer that would beat the one applied, put to the customer.
+required:
+  - offer_id
+  - line
+  - spend_more
+  - saving
+  - message
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - ₹50 off · over ₹499
+  spend_more:
+    $ref: ../common/Money.yaml
+    description: How much more the items must come to.
+  saving:
+    $ref: ../common/Money.yaml
+    description: What it would save.
+  message:
+    type: string
+    description: In words.
+    examples:
+      - Spend ₹201.00 more for ₹50 off
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    line: ₹50 off · over ₹499
+    spend_more:
+      minor_units: 20100
+      currency: INR
+    saving:
+      minor_units: 5000
+      currency: INR
+    message: Spend ₹201.00 more for ₹50 off

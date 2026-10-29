@@ -1,0 +1,40 @@
+type: object
+description: A Location an offer reaches today, by the rule it is priced with, with its answer to a campaign.
+required:
+  - location_id
+  - name
+  - partner_id
+  - partner_name
+  - status
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  partner_name:
+    type: string
+    description: Its Partner's name.
+    examples:
+      - ZippyGo Dev Partner
+  status:
+    $ref: ./ParticipationStatus.yaml
+    description: Its answer, or `included`.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    partner_name: ZippyGo Dev Partner
+    status: accepted

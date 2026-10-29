@@ -1,0 +1,12 @@
+type: object
+description: "Publishing: a Partner's own priced offer carries the Partner's word, exactly \"My business pays for this offer's discounts, as shown.\"; the platform's campaigns carry none."
+properties:
+  confirmation:
+    type:
+      - string
+      - "null"
+    description: The Partner's word.
+    examples:
+      - My business pays for this offer's discounts, as shown.
+examples:
+  - confirmation: My business pays for this offer's discounts, as shown.

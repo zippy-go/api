@@ -1,0 +1,9 @@
+type: string
+description: "A code's kind: open (anyone who has it), single-use (one of a batch), personal (given to one customer), or a customer's referral code."
+enum:
+  - open
+  - single_use
+  - personal
+  - referral
+examples:
+  - open

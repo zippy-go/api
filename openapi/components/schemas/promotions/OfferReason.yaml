@@ -1,0 +1,32 @@
+type: object
+description: Why an advertised or held offer does not apply to the basket, in the engine's words.
+required:
+  - offer_id
+  - line
+  - code
+  - message
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+  line:
+    type: string
+    description: Its line.
+    examples:
+      - ₹50 off · over ₹499
+  code:
+    $ref: ./OfferReasonCode.yaml
+    description: Why.
+  message:
+    type: string
+    description: In words.
+    examples:
+      - ₹50 off needs ₹201.00 more
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
+    line: ₹50 off · over ₹499
+    code: min_spend
+    message: ₹50 off needs ₹201.00 more

@@ -47,6 +47,17 @@ get:
       description: The visitor's country (alpha-2), used when no pin is given.
       schema:
         type: string
+    - name: offer
+      in: query
+      required: false
+      description: '"See all" of an offer shelf: only stores with a live offer of that kind, each card leading with it.'
+      schema:
+        type: string
+        enum:
+          - free_delivery
+          - deals
+          - money_off
+          - free_items
   responses:
     '200':
       description: The stores as cards.
