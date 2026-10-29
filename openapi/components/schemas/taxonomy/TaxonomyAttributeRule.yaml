@@ -1,0 +1,17 @@
+type: object
+description: >-
+  An attribute a term's products may carry, or must carry when `required`.
+  A product answers the rules of its term and of every term above it.
+required:
+  - attribute
+  - required
+properties:
+  attribute:
+    $ref: ./TaxonomyAttribute.yaml
+    description: The attribute.
+  required:
+    type: boolean
+    description: Whether a product of the term must carry it; an item without it is a task for its store.
+examples:
+  - attribute: dietary_mark
+    required: true

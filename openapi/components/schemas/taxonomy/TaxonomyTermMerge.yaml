@@ -1,0 +1,17 @@
+type: object
+description: >-
+  Folds a term into another, the request of
+  `POST /v1/platform/taxonomy/terms/{term_id}/merge`: its mappings and the
+  terms beneath it move to the other term, and it reads `merged` with the
+  term it was folded into.
+required:
+  - into_id
+properties:
+  into_id:
+    type: string
+    format: uuid
+    description: An active term of the same Vertical, neither the term nor one beneath it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd301
+examples:
+  - into_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd301

@@ -1,0 +1,26 @@
+type: object
+description: >-
+  Who mapped a category or an item: the Partner's staff, or Mission Control
+  on the Partner's behalf.
+required:
+  - kind
+  - name
+properties:
+  kind:
+    type: string
+    enum:
+      - partner
+      - platform
+    description: "`platform` when Mission Control mapped it on the Partner's behalf."
+    examples:
+      - partner
+  name:
+    type:
+      - string
+      - "null"
+    description: Their name; Mission Control's people are not named to the Partner.
+    examples:
+      - Dev Owner
+examples:
+  - kind: partner
+    name: Dev Owner

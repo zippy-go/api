@@ -1,0 +1,17 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc911",
+  "type": "catalog.mapping.changed",
+  "version": 1,
+  "occurred_at": "2026-10-29T09:00:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": null,
+  "payload": {
+    "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40",
+    "category_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001",
+    "item_id": null,
+    "term_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101",
+    "previous_term_id": null,
+    "by": "partner",
+    "changed_at": "2026-10-29T09:00:00Z"
+  }
+}

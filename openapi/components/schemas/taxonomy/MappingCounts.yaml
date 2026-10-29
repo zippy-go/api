@@ -1,0 +1,45 @@
+type: object
+description: How far a store's catalogue is mapped.
+required:
+  - categories
+  - mapped_categories
+  - items
+  - unmapped_items
+  - missing_attributes
+properties:
+  categories:
+    type: integer
+    minimum: 0
+    description: Categories holding items.
+    examples:
+      - 5
+  mapped_categories:
+    type: integer
+    minimum: 0
+    description: Of those, the mapped ones.
+    examples:
+      - 4
+  items:
+    type: integer
+    minimum: 0
+    description: Items.
+    examples:
+      - 18
+  unmapped_items:
+    type: integer
+    minimum: 0
+    description: Items with no term, their own nor through a category.
+    examples:
+      - 4
+  missing_attributes:
+    type: integer
+    minimum: 0
+    description: Items missing an attribute their term requires.
+    examples:
+      - 0
+examples:
+  - categories: 5
+    mapped_categories: 4
+    items: 18
+    unmapped_items: 4
+    missing_attributes: 0

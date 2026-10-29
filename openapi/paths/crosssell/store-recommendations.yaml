@@ -1,0 +1,70 @@
+# Path item for /v1/storefront/stores/{location_id}/recommendations. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+get:
+  operationId: listStoreRecommendations
+  summary: What is often ordered with these items
+  description: |
+    "Often ordered with", for an item sheet or a basket: the store's items that
+    completed orders of the last 90 days carried together with the items named, at
+    least 5 such orders (the city's settings), the most often first, never one of
+    the items named. Public; with a customer's token the customer's own choice
+    applies, and a customer who turned recommendations off is answered nothing.
+    Each answer mints its ids and publishes `crosssell.recommendation.shown`.
+  tags:
+    - Recommendations
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: item_id
+      in: query
+      required: true
+      description: 'The items chosen: the item a sheet shows, or the basket''s; repeat for each, 20 at most.'
+      style: form
+      explode: true
+      schema:
+        type: array
+        minItems: 1
+        maxItems: 20
+        items:
+          type: string
+          format: uuid
+  responses:
+    "200":
+      description: 'The recommendations.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/RecommendationList.yaml
+    "400":
+      description: '`validation_failed`: no `item_id`, or more than 20.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: 'There is no such live store (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: 'Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: 'An unexpected server error, returned as an RFC 9457 problem details document.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

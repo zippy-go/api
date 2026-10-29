@@ -1,0 +1,21 @@
+type: object
+description: >-
+  A complementary pair: after an order holding a product of `from`, the
+  items of `to` at another Partner nearby are suggested as going with it.
+required:
+  - from
+  - to
+properties:
+  from:
+    $ref: ./TaxonomyScope.yaml
+    description: What the order holds.
+  to:
+    $ref: ./TaxonomyScope.yaml
+    description: What goes with it.
+examples:
+  - from:
+      vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+      term_id: null
+    to:
+      vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+      term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200

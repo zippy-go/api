@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.mapping.changed.v1.schema.json",
+  "title": "CatalogMappingChangedPayload",
+  "description": "Payload of `catalog.mapping.changed` version 1: a store's category, or one item more narrowly, was mapped to a term of the shared taxonomy or unmapped. The envelope's `partner_id` is the store's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "category_id",
+    "item_id",
+    "term_id",
+    "previous_term_id",
+    "by",
+    "changed_at"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+      ]
+    },
+    "category_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The category mapped; `null` for an item.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001"
+      ]
+    },
+    "item_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The item mapped more narrowly; `null` for a category.",
+      "examples": [
+        null
+      ]
+    },
+    "term_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The term now; `null` once unmapped, or for an item following its category again.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101"
+      ]
+    },
+    "previous_term_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The term before.",
+      "examples": [
+        null
+      ]
+    },
+    "by": {
+      "type": "string",
+      "enum": [
+        "partner",
+        "platform"
+      ],
+      "description": "`platform` when Mission Control mapped it on the Partner's behalf.",
+      "examples": [
+        "partner"
+      ]
+    },
+    "changed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-29T09:00:00Z"
+      ]
+    }
+  }
+}

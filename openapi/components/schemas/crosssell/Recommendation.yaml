@@ -1,0 +1,88 @@
+type: object
+description: >-
+  Something suggested to a customer, with its reason. Organic: ranked by
+  relevance, then the store's rating, then distance, and never sponsored in
+  this version (`label` stays `null`). Its id is minted as it is shown; a
+  client that adds its item to a basket says so once with
+  `POST /v1/recommendations/{recommendation_id}/accepted`.
+required:
+  - id
+  - kind
+  - reason
+  - label
+  - term_id
+  - store
+  - item
+  - shown_at
+  - expires_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: This showing of it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001
+  kind:
+    $ref: ./RecommendationKind.yaml
+    description: Why it is suggested.
+  reason:
+    type: string
+    description: The reason as shown, such as "Often ordered with" or "Nearby, goes with your order".
+    examples:
+      - Nearby, goes with your order
+  label:
+    type:
+      - string
+      - "null"
+    description: '"Sponsored" or "Partner offer" for a paid placement; `null` for an organic one, as every one is in this version.'
+    examples:
+      - null
+  term_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The item's term; for a reorder prompt, the category "Not for this" turns off.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd201
+  store:
+    $ref: ./RecommendationStore.yaml
+    description: Where it is sold.
+  item:
+    $ref: ./RecommendationItem.yaml
+    description: What is suggested.
+  shown_at:
+    type: string
+    format: date-time
+    description: When it was shown.
+    examples:
+      - 2026-10-29T09:00:00Z
+  expires_at:
+    type: string
+    format: date-time
+    description: Until when its acceptance counts.
+    examples:
+      - 2026-10-30T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001
+    kind: nearby_complement
+    reason: Nearby, goes with your order
+    label: null
+    term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd201
+    store:
+      location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48
+      partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+      name: Charminar Bakes Gachibowli
+      distance_metres: 620
+    item:
+      item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301
+      name:
+        en: Eggless Black Forest Cake
+      price:
+        minor_units: 45000
+        currency: INR
+      picture: null
+      food_mark: veg
+      available: true
+    shown_at: 2026-10-29T09:00:00Z
+    expires_at: 2026-10-30T09:00:00Z

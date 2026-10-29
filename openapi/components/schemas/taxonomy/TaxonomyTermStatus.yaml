@@ -1,0 +1,12 @@
+type: string
+description: >-
+  Where a term stands: `active` can be chosen; `deprecated` was retired in
+  favour of its replacement, its mappings moved there; `merged` was folded
+  into another term with its mappings and the terms beneath it. Neither of
+  the last two can be chosen any more.
+enum:
+  - active
+  - deprecated
+  - merged
+examples:
+  - active

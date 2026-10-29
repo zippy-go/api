@@ -1,0 +1,16 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc913",
+  "type": "crosssell.recommendation.accepted",
+  "version": 1,
+  "occurred_at": "2026-10-29T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "recommendation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001",
+    "kind": "nearby_complement",
+    "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48",
+    "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "accepted_at": "2026-10-29T09:05:00Z"
+  }
+}

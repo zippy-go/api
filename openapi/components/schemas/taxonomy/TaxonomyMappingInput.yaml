@@ -1,0 +1,19 @@
+type: object
+description: >-
+  Maps a store's category or item to a term, the request of the mapping
+  operations. A category takes an active term of one of its Location's
+  Verticals, or `null` to leave it unmapped; an item takes such a term to
+  map more narrowly than its category, or `null` to follow its category.
+required:
+  - term_id
+properties:
+  term_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The term, or `null`.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+examples:
+  - term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101

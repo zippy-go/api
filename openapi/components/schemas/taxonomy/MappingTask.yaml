@@ -1,0 +1,44 @@
+type: object
+description: Something a store should do so its catalogue is found across stores, in words.
+required:
+  - kind
+  - category_id
+  - item_id
+  - attribute
+  - words
+properties:
+  kind:
+    $ref: ./MappingTaskKind.yaml
+    description: What it asks for.
+  category_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The category, for an unmapped category.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc009
+  item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The item, for an unmapped item or a missing attribute.
+    examples:
+      - null
+  attribute:
+    oneOf:
+      - $ref: ./TaxonomyAttribute.yaml
+      - type: "null"
+    description: The attribute missing.
+  words:
+    type: string
+    description: The task in words.
+    examples:
+      - Map "Chef's specials" so its 4 items are found across stores.
+examples:
+  - kind: unmapped_category
+    category_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc009
+    item_id: null
+    attribute: null
+    words: Map "Chef's specials" so its 4 items are found across stores.

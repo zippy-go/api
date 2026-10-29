@@ -1,0 +1,41 @@
+type: object
+description: A term as a mapping names it, with the names from the top of its tree down to it.
+required:
+  - id
+  - vertical_id
+  - name
+  - trail
+  - status
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The term.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+  vertical_id:
+    type: string
+    format: uuid
+    description: Its Vertical.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  trail:
+    type: array
+    items:
+      $ref: ../catalog/LocalizedText.yaml
+    description: The names from the top of the tree down to it, its own last.
+  status:
+    $ref: ./TaxonomyTermStatus.yaml
+    description: Whether it can still be chosen.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+    vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    name:
+      en: Biryani
+    trail:
+      - en: Biryani and rice
+      - en: Biryani
+    status: active

@@ -1,0 +1,89 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/taxonomy. Referenced from openapi.yaml.
+parameters:
+  - name: partner_id
+    in: path
+    required: true
+    description: The partner.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  - name: location_id
+    in: path
+    required: true
+    description: The store.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  - name: item_id
+    in: path
+    required: true
+    description: The item.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+put:
+  operationId: putCatalogItemTaxonomy
+  summary: Map an item more narrowly
+  description: |
+    Maps an item to an active term of one of the Location's Verticals, more
+    narrowly than its category, or with `null` lets it follow its category again.
+    Published as `catalog.mapping.changed` and audited; Mission Control maps on the
+    Partner's behalf with `taxonomy:write`, recorded as such. `catalog:write` at
+    the Location.
+  tags:
+    - Taxonomy
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: 'The term.'
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/taxonomy/TaxonomyMappingInput.yaml
+  responses:
+    "200":
+      description: 'The item''s mapping.'
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/taxonomy/ItemMapping.yaml
+    "400":
+      description: '`validation_failed`, with `taxonomy_term_retired` or `taxonomy_term_elsewhere` on `/term_id`.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: 'No valid access token was sent, or it was refused (`unauthenticated`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: '`access_denied` without `catalog:write` (Mission Control `taxonomy:write`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: 'Unknown partner, location, item or term (`not_found`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: 'Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: 'An unexpected server error, returned as an RFC 9457 problem details document.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

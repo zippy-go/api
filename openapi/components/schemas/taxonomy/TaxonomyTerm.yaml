@@ -1,0 +1,151 @@
+type: object
+description: >-
+  A term of the shared taxonomy, the `TaxonomyTerm` schema: one category of a
+  Vertical's tree, at most four levels deep, that stores' categories and
+  items map to. Its id never changes: a rename, a move or a new slug keeps
+  every mapping. A deprecated term names its replacement and a merged term
+  the term it was merged into; neither can be chosen any more, and their
+  mappings moved there. A term has no picture in this version.
+required:
+  - id
+  - vertical_id
+  - parent_id
+  - level
+  - path
+  - slug
+  - name
+  - attributes
+  - required_attributes
+  - status
+  - replaced_by_id
+  - position
+  - mapped_categories
+  - mapped_items
+  - version
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The term; stable for its life.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+  vertical_id:
+    type: string
+    format: uuid
+    description: The Vertical whose tree it belongs to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The term it sits under; `null` at the top of the tree.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd100
+  level:
+    type: integer
+    minimum: 1
+    maximum: 4
+    description: How deep it sits, 1 at the top.
+    examples:
+      - 2
+  path:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The terms above it, from the top of the tree; empty at the top.
+    examples:
+      - - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd100
+  slug:
+    type: string
+    pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+    maxLength: 80
+    description: Its address word, unique in its Vertical.
+    examples:
+      - biryani
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name, in English and the languages it was given.
+  attributes:
+    type: array
+    items:
+      $ref: ./TaxonomyAttributeRule.yaml
+    description: Its own rules for what its products carry.
+  required_attributes:
+    type: array
+    items:
+      $ref: ./TaxonomyAttribute.yaml
+    description: What its products must carry, by its own rules and those of every term above it.
+  status:
+    $ref: ./TaxonomyTermStatus.yaml
+    description: Whether it can be chosen.
+  replaced_by_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The term a deprecated or merged term gave way to; `null` while active.
+    examples:
+      - null
+  position:
+    type: integer
+    minimum: 0
+    description: Where it stands among the terms beside it, from 0.
+    examples:
+      - 0
+  mapped_categories:
+    type: integer
+    minimum: 0
+    description: How many stores' categories map to it.
+    examples:
+      - 40
+  mapped_items:
+    type: integer
+    minimum: 0
+    description: How many items map to it themselves, more narrowly than their category.
+    examples:
+      - 3
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by one on every change; the entity tag of the term.
+    examples:
+      - 2
+  created_at:
+    type: string
+    format: date-time
+    description: When it was created.
+    examples:
+      - 2026-10-29T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-29T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+    vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    parent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd100
+    level: 2
+    path:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd100
+    slug: biryani
+    name:
+      en: Biryani
+      te: బిర్యానీ
+    attributes: []
+    required_attributes:
+      - dietary_mark
+    status: active
+    replaced_by_id: null
+    position: 0
+    mapped_categories: 40
+    mapped_items: 3
+    version: 2
+    created_at: 2026-10-29T09:00:00Z
+    updated_at: 2026-10-29T09:00:00Z

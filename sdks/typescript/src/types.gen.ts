@@ -6585,19 +6585,27 @@ export type CustomerNotificationPreferences = {
     push_devices: number;
     marketing: MarketingConsent;
     /**
+     * Whether the customer is shown recommendations: often ordered with, nearby complements and reorder prompts, which also need the push marketing consent. On by default; off stops every one of them at once, while messages about an order, and the ask to review it, still come.
+     */
+    recommendations: boolean;
+    /**
      * Raised by one on every change; the entity tag of reads.
      */
     version: number;
 };
 
 /**
- * Changes how the customer is reached, the request of `PUT /v1/customer/notification-preferences`. Marketing consent is its own act (`PUT /v1/customer/consent`).
+ * Changes how the customer is reached, the request of `PUT /v1/customer/notification-preferences`; a member left out stays as it is. Marketing consent is its own act (`PUT /v1/customer/consent`).
  */
 export type CustomerNotificationPreferencesUpdate = {
     /**
      * Opt in to order updates on WhatsApp, or out of them.
      */
-    whatsapp_updates: boolean;
+    whatsapp_updates?: boolean;
+    /**
+     * Turn recommendations and reorder prompts on, or off at once.
+     */
+    recommendations?: boolean;
 };
 
 /**
@@ -13313,6 +13321,771 @@ export type SearchSynonymGroupList = {
      * The groups.
      */
     items: Array<SearchSynonymGroup>;
+};
+
+/**
+ * An attribute a product may or must carry, from the taxonomy's closed set. `dietary_mark` is read from an item's food mark (vegetarian or not), `brand` from its brand, `age_restricted` and `prescription_only` from its availability; `allergens`, `cuisine`, `pack_size`, `organic` and `cold_chain` wait for the catalogue to carry them.
+ */
+export type TaxonomyAttribute = 'dietary_mark' | 'allergens' | 'cuisine' | 'brand' | 'pack_size' | 'organic' | 'cold_chain' | 'age_restricted' | 'prescription_only';
+
+/**
+ * An attribute a term's products may carry, or must carry when `required`. A product answers the rules of its term and of every term above it.
+ */
+export type TaxonomyAttributeRule = {
+    /**
+     * The attribute.
+     */
+    attribute: TaxonomyAttribute;
+    /**
+     * Whether a product of the term must carry it; an item without it is a task for its store.
+     */
+    required: boolean;
+};
+
+/**
+ * Where a term stands: `active` can be chosen; `deprecated` was retired in favour of its replacement, its mappings moved there; `merged` was folded into another term with its mappings and the terms beneath it. Neither of the last two can be chosen any more.
+ */
+export type TaxonomyTermStatus = 'active' | 'deprecated' | 'merged';
+
+/**
+ * A term of the shared taxonomy, the `TaxonomyTerm` schema: one category of a Vertical's tree, at most four levels deep, that stores' categories and items map to. Its id never changes: a rename, a move or a new slug keeps every mapping. A deprecated term names its replacement and a merged term the term it was merged into; neither can be chosen any more, and their mappings moved there. A term has no picture in this version.
+ */
+export type TaxonomyTerm = {
+    /**
+     * The term; stable for its life.
+     */
+    id: string;
+    /**
+     * The Vertical whose tree it belongs to.
+     */
+    vertical_id: string;
+    /**
+     * The term it sits under; `null` at the top of the tree.
+     */
+    parent_id: string | null;
+    /**
+     * How deep it sits, 1 at the top.
+     */
+    level: number;
+    /**
+     * The terms above it, from the top of the tree; empty at the top.
+     */
+    path: Array<string>;
+    /**
+     * Its address word, unique in its Vertical.
+     */
+    slug: string;
+    /**
+     * Its name, in English and the languages it was given.
+     */
+    name: LocalizedText;
+    /**
+     * Its own rules for what its products carry.
+     */
+    attributes: Array<TaxonomyAttributeRule>;
+    /**
+     * What its products must carry, by its own rules and those of every term above it.
+     */
+    required_attributes: Array<TaxonomyAttribute>;
+    /**
+     * Whether it can be chosen.
+     */
+    status: TaxonomyTermStatus;
+    /**
+     * The term a deprecated or merged term gave way to; `null` while active.
+     */
+    replaced_by_id: string | null;
+    /**
+     * Where it stands among the terms beside it, from 0.
+     */
+    position: number;
+    /**
+     * How many stores' categories map to it.
+     */
+    mapped_categories: number;
+    /**
+     * How many items map to it themselves, more narrowly than their category.
+     */
+    mapped_items: number;
+    /**
+     * Raised by one on every change; the entity tag of the term.
+     */
+    version: number;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A Vertical's taxonomy, the `TaxonomyTree` schema: every term, depth first in their order, each top-level term followed by the terms beneath it. Retired terms are left out unless asked for. Its version rises with every change to the Vertical's terms and is the entity tag of the read.
+ */
+export type TaxonomyTree = {
+    /**
+     * The Vertical.
+     */
+    vertical_id: string;
+    /**
+     * The Vertical's taxonomy version, raised by every change to its terms; 0 before any.
+     */
+    version: number;
+    /**
+     * The terms, depth first.
+     */
+    terms: Array<TaxonomyTerm>;
+};
+
+/**
+ * A new term, the request of `POST /v1/platform/taxonomy/terms`.
+ */
+export type TaxonomyTermCreate = {
+    /**
+     * The Vertical whose tree it joins.
+     */
+    vertical_id: string;
+    /**
+     * The active term of the same Vertical it sits under, four levels deep at most; absent or `null` at the top.
+     */
+    parent_id?: string | null;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its address word, unique in the Vertical; made from the English name when absent.
+     */
+    slug?: string;
+    /**
+     * Its rules for what its products carry, one per attribute; none when absent.
+     */
+    attributes?: Array<TaxonomyAttributeRule>;
+    /**
+     * Where it stands among the terms beside it; last when absent.
+     */
+    position?: number;
+};
+
+/**
+ * Changes a term, the request of `PATCH /v1/platform/taxonomy/terms/{term_id}`: a rename, a move under another term of its Vertical, a new slug, its rules or its place. Members left out stay as they are; the id and every mapping stay.
+ */
+export type TaxonomyTermUpdate = {
+    /**
+     * Its new name.
+     */
+    name?: LocalizedText;
+    /**
+     * Its new address word, unique in the Vertical.
+     */
+    slug?: string;
+    /**
+     * Moves it, with the terms beneath it, under another active term of its Vertical, never beneath itself and four levels deep at most; `null` moves it to the top.
+     */
+    parent_id?: string | null;
+    /**
+     * Its rules, replaced whole.
+     */
+    attributes?: Array<TaxonomyAttributeRule>;
+    /**
+     * Its new place among the terms beside it.
+     */
+    position?: number;
+};
+
+/**
+ * Retires a term in favour of another, the request of `POST /v1/platform/taxonomy/terms/{term_id}/deprecate`: every category and item mapped to it is mapped to the replacement, the terms beneath it move under the replacement, and it can no longer be chosen.
+ */
+export type TaxonomyTermDeprecation = {
+    /**
+     * An active term of the same Vertical, neither the term nor one beneath it.
+     */
+    replacement_id: string;
+    /**
+     * Why, kept with the change.
+     */
+    reason?: string;
+};
+
+/**
+ * Folds a term into another, the request of `POST /v1/platform/taxonomy/terms/{term_id}/merge`: its mappings and the terms beneath it move to the other term, and it reads `merged` with the term it was folded into.
+ */
+export type TaxonomyTermMerge = {
+    /**
+     * An active term of the same Vertical, neither the term nor one beneath it.
+     */
+    into_id: string;
+};
+
+/**
+ * What a change to the taxonomy did.
+ */
+export type TaxonomyChangeKind = 'created' | 'renamed' | 'moved' | 'changed' | 'deprecated' | 'merged' | 'deleted';
+
+/**
+ * One change to a Vertical's taxonomy, kept for good: what changed, in words, the version it made, and how many mappings it moved.
+ */
+export type TaxonomyChange = {
+    /**
+     * The change.
+     */
+    id: string;
+    /**
+     * The Vertical.
+     */
+    vertical_id: string;
+    /**
+     * The term changed.
+     */
+    term_id: string;
+    /**
+     * What the change did.
+     */
+    kind: TaxonomyChangeKind;
+    /**
+     * The Vertical's taxonomy version it made.
+     */
+    version: number;
+    /**
+     * The change in words.
+     */
+    words: string;
+    /**
+     * The term a deprecation or a merge moved the mappings to.
+     */
+    replacement_id: string | null;
+    /**
+     * How many categories and items it mapped elsewhere.
+     */
+    moved_mappings: number;
+    /**
+     * Who made it, as Mission Control knows them.
+     */
+    by_name: string | null;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * A page of taxonomy changes, newest first.
+ */
+export type TaxonomyChangePage = {
+    /**
+     * The changes on this page.
+     */
+    items: Array<TaxonomyChange>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A term as a mapping names it, with the names from the top of its tree down to it.
+ */
+export type TaxonomyTermRef = {
+    /**
+     * The term.
+     */
+    id: string;
+    /**
+     * Its Vertical.
+     */
+    vertical_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * The names from the top of the tree down to it, its own last.
+     */
+    trail: Array<LocalizedText>;
+    /**
+     * Whether it can still be chosen.
+     */
+    status: TaxonomyTermStatus;
+};
+
+/**
+ * Maps a store's category or item to a term, the request of the mapping operations. A category takes an active term of one of its Location's Verticals, or `null` to leave it unmapped; an item takes such a term to map more narrowly than its category, or `null` to follow its category.
+ */
+export type TaxonomyMappingInput = {
+    /**
+     * The term, or `null`.
+     */
+    term_id: string | null;
+};
+
+/**
+ * Who mapped a category or an item: the Partner's staff, or Mission Control on the Partner's behalf.
+ */
+export type MappingActor = {
+    /**
+     * `platform` when Mission Control mapped it on the Partner's behalf.
+     */
+    kind: 'partner' | 'platform';
+    /**
+     * Their name; Mission Control's people are not named to the Partner.
+     */
+    name: string | null;
+};
+
+/**
+ * A term suggested for a category from its name, the most alike first.
+ */
+export type TaxonomySuggestion = {
+    /**
+     * The term suggested.
+     */
+    term: TaxonomyTermRef;
+    /**
+     * How alike the names are, 1 the same.
+     */
+    score: number;
+};
+
+/**
+ * A store category and its term. A category with items and no term is a task: its items are sold on the store's page and left out of search across stores, recommendations and shelves.
+ */
+export type CategoryMapping = {
+    /**
+     * The category.
+     */
+    category_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * The category it sits under.
+     */
+    parent_id: string | null;
+    /**
+     * How many items it holds.
+     */
+    item_count: number;
+    /**
+     * Its term; `null` while unmapped.
+     */
+    term: TaxonomyTermRef | null;
+    /**
+     * Terms suggested from its name, while it is unmapped; empty once mapped.
+     */
+    suggestions: Array<TaxonomySuggestion>;
+    /**
+     * Who mapped it.
+     */
+    mapped_by: MappingActor | null;
+    /**
+     * When it was mapped.
+     */
+    mapped_at: string | null;
+};
+
+/**
+ * An item and its term: its own when it maps more narrowly than its category, else its category's. An item without a term is sold on its store's page only; one missing an attribute its term requires is a task.
+ */
+export type ItemMapping = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * The categories it is in.
+     */
+    category_ids: Array<string>;
+    /**
+     * Its own term, more narrowly than its category; `null` when it follows its category.
+     */
+    term: TaxonomyTermRef | null;
+    /**
+     * The term it is found under across stores, its own or its first mapped category's; `null` when there is none.
+     */
+    effective_term: TaxonomyTermRef | null;
+    /**
+     * Whether the effective term is its category's.
+     */
+    inherited: boolean;
+    /**
+     * What its effective term requires that it does not carry.
+     */
+    missing_attributes: Array<TaxonomyAttribute>;
+    /**
+     * Who gave it its own term.
+     */
+    mapped_by: MappingActor | null;
+    /**
+     * When it was given its own term.
+     */
+    mapped_at: string | null;
+};
+
+/**
+ * What a mapping task asks for: `unmapped_category` a category with items and no term, `unmapped_item` an item with no term of its own nor through a category, `missing_attribute` an item without an attribute its term requires.
+ */
+export type MappingTaskKind = 'unmapped_category' | 'unmapped_item' | 'missing_attribute';
+
+/**
+ * Something a store should do so its catalogue is found across stores, in words.
+ */
+export type MappingTask = {
+    /**
+     * What it asks for.
+     */
+    kind: MappingTaskKind;
+    /**
+     * The category, for an unmapped category.
+     */
+    category_id: string | null;
+    /**
+     * The item, for an unmapped item or a missing attribute.
+     */
+    item_id: string | null;
+    /**
+     * The attribute missing.
+     */
+    attribute: TaxonomyAttribute | null;
+    /**
+     * The task in words.
+     */
+    words: string;
+};
+
+/**
+ * How far a store's catalogue is mapped.
+ */
+export type MappingCounts = {
+    /**
+     * Categories holding items.
+     */
+    categories: number;
+    /**
+     * Of those, the mapped ones.
+     */
+    mapped_categories: number;
+    /**
+     * Items.
+     */
+    items: number;
+    /**
+     * Items with no term, their own nor through a category.
+     */
+    unmapped_items: number;
+    /**
+     * Items missing an attribute their term requires.
+     */
+    missing_attributes: number;
+};
+
+/**
+ * A store's catalogue against the taxonomy: each category with its term or the terms suggested for it, the items mapped more narrowly, unmapped or missing an attribute, the tasks and the counts.
+ */
+export type CatalogMapping = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * The Verticals whose terms its catalogue maps to.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Every category, in the store's order.
+     */
+    categories: Array<CategoryMapping>;
+    /**
+     * The items with a term of their own, with no term, or missing an attribute; the rest follow their category.
+     */
+    items: Array<ItemMapping>;
+    /**
+     * What to do, unmapped categories first.
+     */
+    tasks: Array<MappingTask>;
+    /**
+     * How far it is mapped.
+     */
+    counts: MappingCounts;
+};
+
+/**
+ * How far one store's catalogue is mapped, for Mission Control.
+ */
+export type LocationMappingSummary = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    partner_name: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * Its Verticals.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * How far it is mapped.
+     */
+    counts: MappingCounts;
+};
+
+/**
+ * A page of stores and how far each is mapped, by Partner and store name.
+ */
+export type LocationMappingSummaryPage = {
+    /**
+     * The stores on this page.
+     */
+    items: Array<LocationMappingSummary>;
+    /**
+     * An opaque cursor for the next page, or `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A Vertical, or one term of it with every term beneath it.
+ */
+export type TaxonomyScope = {
+    /**
+     * The Vertical.
+     */
+    vertical_id: string;
+    /**
+     * A term of the Vertical and every term beneath it; `null` for the whole Vertical.
+     */
+    term_id: string | null;
+};
+
+/**
+ * A complementary pair: after an order holding a product of `from`, the items of `to` at another Partner nearby are suggested as going with it.
+ */
+export type CrossSellPair = {
+    /**
+     * What the order holds.
+     */
+    from: TaxonomyScope;
+    /**
+     * What goes with it.
+     */
+    to: TaxonomyScope;
+};
+
+/**
+ * A city's cross-sell configuration: whether nearby complements run and which category pairs they follow, how far a complement may be, the support bought together needs, and the reorder prompts. A city that never saved one reads the platform's defaults, `saved` false. Every save is a version and takes effect at the next recommendation.
+ */
+export type CrossSellSettings = {
+    /**
+     * The city.
+     */
+    service_area_id: string;
+    /**
+     * Whether nearby complements are shown in the city.
+     */
+    complements: boolean;
+    /**
+     * The complementary pairs.
+     */
+    pairs: Array<CrossSellPair>;
+    /**
+     * How far a complement's store may be from the store of the order it goes with.
+     */
+    complement_distance_metres: number;
+    /**
+     * How many completed orders must carry two items together before one is suggested with the other.
+     */
+    bought_together_min_orders: number;
+    /**
+     * How many days of completed orders bought together counts.
+     */
+    bought_together_days: number;
+    /**
+     * Whether reorder prompts are sent in the city.
+     */
+    reorder_prompts: boolean;
+    /**
+     * How many orders of a category at a steady interval come before a prompt.
+     */
+    reorder_after_repeats: number;
+    /**
+     * Whether the city saved a configuration of its own; `false` while it reads the platform's defaults.
+     */
+    saved: boolean;
+    /**
+     * Raised by one on every save; 0 for the defaults. The entity tag of the read.
+     */
+    version: number;
+    /**
+     * When it was last saved.
+     */
+    updated_at: string | null;
+    /**
+     * Who saved it last.
+     */
+    updated_by_name: string | null;
+};
+
+/**
+ * A city's cross-sell configuration, replaced whole, the request of `PUT /v1/service-areas/{service_area_id}/cross-sell`.
+ */
+export type CrossSellSettingsInput = {
+    /**
+     * Whether nearby complements are shown.
+     */
+    complements: boolean;
+    /**
+     * The complementary pairs, each term an active one of its Vertical.
+     */
+    pairs: Array<CrossSellPair>;
+    /**
+     * How far a complement's store may be.
+     */
+    complement_distance_metres: number;
+    /**
+     * The support bought together needs.
+     */
+    bought_together_min_orders: number;
+    /**
+     * The days of orders it counts.
+     */
+    bought_together_days: number;
+    /**
+     * Whether reorder prompts are sent.
+     */
+    reorder_prompts: boolean;
+    /**
+     * The repeats before a prompt.
+     */
+    reorder_after_repeats: number;
+};
+
+/**
+ * Why something is suggested: `bought_together` (often ordered with it at the same store), `nearby_complement` (another Partner's item nearby that goes with an order) or `reorder` (a category the customer orders at a steady interval, due again).
+ */
+export type RecommendationKind = 'bought_together' | 'nearby_complement' | 'reorder';
+
+/**
+ * The store a recommended item is sold at.
+ */
+export type RecommendationStore = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * How far it is from the store of the order it goes with, for a nearby complement.
+     */
+    distance_metres: number | null;
+};
+
+/**
+ * A recommended item as its store's published menu has it.
+ */
+export type RecommendationItem = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it costs, its lowest option's price.
+     */
+    price: Money;
+    /**
+     * Its first picture.
+     */
+    picture: CataloguePicture | null;
+    /**
+     * Its vegetarian mark, where it carries one.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * Whether it can be ordered now.
+     */
+    available: boolean;
+};
+
+/**
+ * Something suggested to a customer, with its reason. Organic: ranked by relevance, then the store's rating, then distance, and never sponsored in this version (`label` stays `null`). Its id is minted as it is shown; a client that adds its item to a basket says so once with `POST /v1/recommendations/{recommendation_id}/accepted`.
+ */
+export type Recommendation = {
+    /**
+     * This showing of it.
+     */
+    id: string;
+    /**
+     * Why it is suggested.
+     */
+    kind: RecommendationKind;
+    /**
+     * The reason as shown, such as "Often ordered with" or "Nearby, goes with your order".
+     */
+    reason: string;
+    /**
+     * "Sponsored" or "Partner offer" for a paid placement; `null` for an organic one, as every one is in this version.
+     */
+    label: string | null;
+    /**
+     * The item's term; for a reorder prompt, the category "Not for this" turns off.
+     */
+    term_id: string | null;
+    /**
+     * Where it is sold.
+     */
+    store: RecommendationStore;
+    /**
+     * What is suggested.
+     */
+    item: RecommendationItem;
+    /**
+     * When it was shown.
+     */
+    shown_at: string;
+    /**
+     * Until when its acceptance counts.
+     */
+    expires_at: string;
+};
+
+/**
+ * Recommendations, the most relevant first; empty for a customer who turned recommendations off.
+ */
+export type RecommendationList = {
+    /**
+     * The recommendations.
+     */
+    items: Array<Recommendation>;
 };
 
 /**
@@ -39321,6 +40094,59 @@ export type SetVerticalStatusResponses = {
 
 export type SetVerticalStatusResponse = SetVerticalStatusResponses[keyof SetVerticalStatusResponses];
 
+export type GetVerticalTaxonomyData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The Vertical.
+         */
+        vertical_id: string;
+    };
+    query?: {
+        /**
+         * Also the deprecated and merged terms, each naming the term it gave way to.
+         */
+        include_retired?: boolean;
+    };
+    url: '/v1/verticals/{vertical_id}/taxonomy';
+};
+
+export type GetVerticalTaxonomyErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * There is no such Vertical (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetVerticalTaxonomyError = GetVerticalTaxonomyErrors[keyof GetVerticalTaxonomyErrors];
+
+export type GetVerticalTaxonomyResponses = {
+    /**
+     * The tree.
+     */
+    200: TaxonomyTree;
+};
+
+export type GetVerticalTaxonomyResponse = GetVerticalTaxonomyResponses[keyof GetVerticalTaxonomyResponses];
+
 export type GetLiveConfigData = {
     body?: never;
     path?: never;
@@ -39619,7 +40445,7 @@ export type GetCustomerNotificationPreferencesResponse = GetCustomerNotification
 
 export type PutCustomerNotificationPreferencesData = {
     /**
-     * The WhatsApp opt-in.
+     * The WhatsApp opt-in, the recommendations choice, or both.
      */
     body: CustomerNotificationPreferencesUpdate;
     headers?: {
@@ -39640,7 +40466,7 @@ export type PutCustomerNotificationPreferencesData = {
 
 export type PutCustomerNotificationPreferencesErrors = {
     /**
-     * `validation_failed`: `whatsapp_updates` missing.
+     * `validation_failed`: neither `whatsapp_updates` nor `recommendations`.
      */
     400: Problem;
     /**
@@ -45330,6 +46156,943 @@ export type SuggestNamesResponses = {
 };
 
 export type SuggestNamesResponse = SuggestNamesResponses[keyof SuggestNamesResponses];
+
+export type CreateTaxonomyTermData = {
+    /**
+     * The term.
+     */
+    body: TaxonomyTermCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/taxonomy/terms';
+};
+
+export type CreateTaxonomyTermErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_too_deep`, `taxonomy_term_retired`, `taxonomy_term_elsewhere` or `taxonomy_slug_taken` on the field.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such Vertical or parent term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateTaxonomyTermError = CreateTaxonomyTermErrors[keyof CreateTaxonomyTermErrors];
+
+export type CreateTaxonomyTermResponses = {
+    /**
+     * The term.
+     */
+    201: TaxonomyTerm;
+};
+
+export type CreateTaxonomyTermResponse = CreateTaxonomyTermResponses[keyof CreateTaxonomyTermResponses];
+
+export type DeleteTaxonomyTermData = {
+    body?: never;
+    path: {
+        /**
+         * The term.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/taxonomy/terms/{term_id}';
+};
+
+export type DeleteTaxonomyTermErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `taxonomy_term_in_use`: categories or items map to it; deprecate it with a replacement. `taxonomy_term_has_children`: terms sit beneath it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteTaxonomyTermError = DeleteTaxonomyTermErrors[keyof DeleteTaxonomyTermErrors];
+
+export type DeleteTaxonomyTermResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteTaxonomyTermResponse = DeleteTaxonomyTermResponses[keyof DeleteTaxonomyTermResponses];
+
+export type GetTaxonomyTermData = {
+    body?: never;
+    path: {
+        /**
+         * The term.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/taxonomy/terms/{term_id}';
+};
+
+export type GetTaxonomyTermErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetTaxonomyTermError = GetTaxonomyTermErrors[keyof GetTaxonomyTermErrors];
+
+export type GetTaxonomyTermResponses = {
+    /**
+     * The term.
+     */
+    200: TaxonomyTerm;
+};
+
+export type GetTaxonomyTermResponse = GetTaxonomyTermResponses[keyof GetTaxonomyTermResponses];
+
+export type UpdateTaxonomyTermData = {
+    /**
+     * What changes.
+     */
+    body: TaxonomyTermUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The term.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/taxonomy/terms/{term_id}';
+};
+
+export type UpdateTaxonomyTermErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_too_deep`, `taxonomy_cycle`, `taxonomy_term_retired`, `taxonomy_term_elsewhere` or `taxonomy_slug_taken` on the field.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the term changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateTaxonomyTermError = UpdateTaxonomyTermErrors[keyof UpdateTaxonomyTermErrors];
+
+export type UpdateTaxonomyTermResponses = {
+    /**
+     * The term.
+     */
+    200: TaxonomyTerm;
+};
+
+export type UpdateTaxonomyTermResponse = UpdateTaxonomyTermResponses[keyof UpdateTaxonomyTermResponses];
+
+export type DeprecateTaxonomyTermData = {
+    /**
+     * The replacement.
+     */
+    body: TaxonomyTermDeprecation;
+    path: {
+        /**
+         * The term.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/taxonomy/terms/{term_id}/deprecate';
+};
+
+export type DeprecateTaxonomyTermErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_term_retired`, `taxonomy_term_elsewhere`, `taxonomy_cycle` or `taxonomy_too_deep` on `/replacement_id`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such term or replacement (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the term is already retired.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeprecateTaxonomyTermError = DeprecateTaxonomyTermErrors[keyof DeprecateTaxonomyTermErrors];
+
+export type DeprecateTaxonomyTermResponses = {
+    /**
+     * The term, deprecated.
+     */
+    200: TaxonomyTerm;
+};
+
+export type DeprecateTaxonomyTermResponse = DeprecateTaxonomyTermResponses[keyof DeprecateTaxonomyTermResponses];
+
+export type MergeTaxonomyTermData = {
+    /**
+     * The term to fold it into.
+     */
+    body: TaxonomyTermMerge;
+    path: {
+        /**
+         * The term.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/taxonomy/terms/{term_id}/merge';
+};
+
+export type MergeTaxonomyTermErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_term_retired`, `taxonomy_term_elsewhere`, `taxonomy_cycle` or `taxonomy_too_deep` on `/into_id`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `conflict`: the term is already retired.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MergeTaxonomyTermError = MergeTaxonomyTermErrors[keyof MergeTaxonomyTermErrors];
+
+export type MergeTaxonomyTermResponses = {
+    /**
+     * The term merged into.
+     */
+    200: TaxonomyTerm;
+};
+
+export type MergeTaxonomyTermResponse = MergeTaxonomyTermResponses[keyof MergeTaxonomyTermResponses];
+
+export type ListTaxonomyChangesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Vertical's changes.
+         */
+        vertical_id?: string;
+        /**
+         * Only this term's changes.
+         */
+        term_id?: string;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/taxonomy/changes';
+};
+
+export type ListTaxonomyChangesErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListTaxonomyChangesError = ListTaxonomyChangesErrors[keyof ListTaxonomyChangesErrors];
+
+export type ListTaxonomyChangesResponses = {
+    /**
+     * A page of changes.
+     */
+    200: TaxonomyChangePage;
+};
+
+export type ListTaxonomyChangesResponse = ListTaxonomyChangesResponses[keyof ListTaxonomyChangesResponses];
+
+export type ListCatalogMappingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's stores.
+         */
+        partner_id?: string;
+        /**
+         * Only the stores of this Vertical.
+         */
+        vertical_id?: string;
+        /**
+         * Only the stores with a task left (`true`), or without (`false`).
+         */
+        tasks?: boolean;
+        /**
+         * How many per page. 1 to 100, 25 by default.
+         */
+        limit?: number;
+        /**
+         * The `next_cursor` of the previous page; a cursor from another query or another caller is refused with `cursor_invalid`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/taxonomy/mapping';
+};
+
+export type ListCatalogMappingsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCatalogMappingsError = ListCatalogMappingsErrors[keyof ListCatalogMappingsErrors];
+
+export type ListCatalogMappingsResponses = {
+    /**
+     * A page of stores.
+     */
+    200: LocationMappingSummaryPage;
+};
+
+export type ListCatalogMappingsResponse = ListCatalogMappingsResponses[keyof ListCatalogMappingsResponses];
+
+export type GetCatalogMappingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner.
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/mapping';
+};
+
+export type GetCatalogMappingErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `catalog:read` (Mission Control `catalog:oversee`), or `service_required` for a Location that sells nothing.
+     */
+    403: Problem;
+    /**
+     * Unknown partner or location (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCatalogMappingError = GetCatalogMappingErrors[keyof GetCatalogMappingErrors];
+
+export type GetCatalogMappingResponses = {
+    /**
+     * The mapping.
+     */
+    200: CatalogMapping;
+};
+
+export type GetCatalogMappingResponse = GetCatalogMappingResponses[keyof GetCatalogMappingResponses];
+
+export type PutCatalogCategoryTaxonomyData = {
+    /**
+     * The term.
+     */
+    body: TaxonomyMappingInput;
+    path: {
+        /**
+         * The partner.
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The category.
+         */
+        category_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/taxonomy';
+};
+
+export type PutCatalogCategoryTaxonomyErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_term_retired` or `taxonomy_term_elsewhere` on `/term_id`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `catalog:write` (Mission Control `taxonomy:write`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner, location, category or term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogCategoryTaxonomyError = PutCatalogCategoryTaxonomyErrors[keyof PutCatalogCategoryTaxonomyErrors];
+
+export type PutCatalogCategoryTaxonomyResponses = {
+    /**
+     * The category's mapping.
+     */
+    200: CategoryMapping;
+};
+
+export type PutCatalogCategoryTaxonomyResponse = PutCatalogCategoryTaxonomyResponses[keyof PutCatalogCategoryTaxonomyResponses];
+
+export type PutCatalogItemTaxonomyData = {
+    /**
+     * The term.
+     */
+    body: TaxonomyMappingInput;
+    path: {
+        /**
+         * The partner.
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The item.
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/taxonomy';
+};
+
+export type PutCatalogItemTaxonomyErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_term_retired` or `taxonomy_term_elsewhere` on `/term_id`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `catalog:write` (Mission Control `taxonomy:write`).
+     */
+    403: Problem;
+    /**
+     * Unknown partner, location, item or term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCatalogItemTaxonomyError = PutCatalogItemTaxonomyErrors[keyof PutCatalogItemTaxonomyErrors];
+
+export type PutCatalogItemTaxonomyResponses = {
+    /**
+     * The item's mapping.
+     */
+    200: ItemMapping;
+};
+
+export type PutCatalogItemTaxonomyResponse = PutCatalogItemTaxonomyResponses[keyof PutCatalogItemTaxonomyResponses];
+
+export type ListStoreRecommendationsData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query: {
+        /**
+         * The items chosen: the item a sheet shows, or the basket's; repeat for each, 20 at most.
+         */
+        item_id: Array<string>;
+    };
+    url: '/v1/storefront/stores/{location_id}/recommendations';
+};
+
+export type ListStoreRecommendationsErrors = {
+    /**
+     * `validation_failed`: no `item_id`, or more than 20.
+     */
+    400: Problem;
+    /**
+     * There is no such live store (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStoreRecommendationsError = ListStoreRecommendationsErrors[keyof ListStoreRecommendationsErrors];
+
+export type ListStoreRecommendationsResponses = {
+    /**
+     * The recommendations.
+     */
+    200: RecommendationList;
+};
+
+export type ListStoreRecommendationsResponse = ListStoreRecommendationsResponses[keyof ListStoreRecommendationsResponses];
+
+export type AcceptRecommendationData = {
+    body?: never;
+    path: {
+        /**
+         * The recommendation, as it was shown.
+         */
+        recommendation_id: string;
+    };
+    query?: never;
+    url: '/v1/recommendations/{recommendation_id}/accepted';
+};
+
+export type AcceptRecommendationErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * There is no such recommendation, or its time passed (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AcceptRecommendationError = AcceptRecommendationErrors[keyof AcceptRecommendationErrors];
+
+export type AcceptRecommendationResponses = {
+    /**
+     * Recorded, or recorded already.
+     */
+    204: void;
+};
+
+export type AcceptRecommendationResponse = AcceptRecommendationResponses[keyof AcceptRecommendationResponses];
+
+export type ListCustomerRecommendationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One of the customer's orders.
+         */
+        order_id?: string;
+    };
+    url: '/v1/customer/recommendations';
+};
+
+export type ListCustomerRecommendationsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * There is no such order of the customer's (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerRecommendationsError = ListCustomerRecommendationsErrors[keyof ListCustomerRecommendationsErrors];
+
+export type ListCustomerRecommendationsResponses = {
+    /**
+     * The recommendations.
+     */
+    200: RecommendationList;
+};
+
+export type ListCustomerRecommendationsResponse = ListCustomerRecommendationsResponses[keyof ListCustomerRecommendationsResponses];
+
+export type StopCustomerReorderPromptsData = {
+    body?: never;
+    path: {
+        /**
+         * The category of the prompt, its `term_id`.
+         */
+        term_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/reorder-prompts/{term_id}';
+};
+
+export type StopCustomerReorderPromptsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * There is no such term (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopCustomerReorderPromptsError = StopCustomerReorderPromptsErrors[keyof StopCustomerReorderPromptsErrors];
+
+export type StopCustomerReorderPromptsResponses = {
+    /**
+     * Stopped, or stopped already.
+     */
+    204: void;
+};
+
+export type StopCustomerReorderPromptsResponse = StopCustomerReorderPromptsResponses[keyof StopCustomerReorderPromptsResponses];
+
+export type GetCrossSellSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The city.
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/cross-sell';
+};
+
+export type GetCrossSellSettingsErrors = {
+    /**
+     * A parameter or the body failed validation (`validation_failed`), or an identifier is malformed (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `catalog:oversee` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such city (`not_found`); a zone has no configuration of its own.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCrossSellSettingsError = GetCrossSellSettingsErrors[keyof GetCrossSellSettingsErrors];
+
+export type GetCrossSellSettingsResponses = {
+    /**
+     * The configuration.
+     */
+    200: CrossSellSettings;
+};
+
+export type GetCrossSellSettingsResponse = GetCrossSellSettingsResponses[keyof GetCrossSellSettingsResponses];
+
+export type PutCrossSellSettingsData = {
+    /**
+     * The configuration.
+     */
+    body: CrossSellSettingsInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The city.
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/cross-sell';
+};
+
+export type PutCrossSellSettingsErrors = {
+    /**
+     * `validation_failed`, with `taxonomy_term_retired` or `taxonomy_term_elsewhere` on a pair's term.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `taxonomy:write` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * There is no such city (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the configuration changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutCrossSellSettingsError = PutCrossSellSettingsErrors[keyof PutCrossSellSettingsErrors];
+
+export type PutCrossSellSettingsResponses = {
+    /**
+     * The configuration as saved.
+     */
+    200: CrossSellSettings;
+};
+
+export type PutCrossSellSettingsResponse = PutCrossSellSettingsResponses[keyof PutCrossSellSettingsResponses];
 
 export type GetPaymentOptionsData = {
     body?: never;

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.taxonomy.changed.v1.schema.json",
+  "title": "CatalogTaxonomyChangedPayload",
+  "description": "Payload of `catalog.taxonomy.changed` version 1: a term of the shared taxonomy was created, renamed, moved, changed, deprecated, merged or deleted. The envelope's `partner_id` is `null`: the taxonomy is the platform's. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "vertical_id",
+    "term_id",
+    "kind",
+    "version",
+    "replacement_id",
+    "moved_mappings",
+    "changed_at"
+  ],
+  "properties": {
+    "vertical_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Vertical whose tree changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02"
+      ]
+    },
+    "term_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The term changed.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "created",
+        "renamed",
+        "moved",
+        "changed",
+        "deprecated",
+        "merged",
+        "deleted"
+      ],
+      "description": "What the change did.",
+      "examples": [
+        "renamed"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The Vertical's taxonomy version the change made.",
+      "examples": [
+        13
+      ]
+    },
+    "replacement_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The term a deprecation or a merge moved the mappings to.",
+      "examples": [
+        null
+      ]
+    },
+    "moved_mappings": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many categories and items it mapped elsewhere.",
+      "examples": [
+        0
+      ]
+    },
+    "changed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-29T09:00:00Z"
+      ]
+    }
+  }
+}

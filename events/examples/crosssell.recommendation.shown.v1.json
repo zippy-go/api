@@ -1,0 +1,22 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc912",
+  "type": "crosssell.recommendation.shown",
+  "version": 1,
+  "occurred_at": "2026-10-29T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "recommendation_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001",
+    "kind": "nearby_complement",
+    "reason": "Nearby, goes with your order",
+    "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48",
+    "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301",
+    "term_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd201",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+    "shown_with": {
+      "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01",
+      "location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40"
+    },
+    "shown_at": "2026-10-29T09:00:00Z"
+  }
+}

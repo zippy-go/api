@@ -1,0 +1,17 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc910",
+  "type": "catalog.taxonomy.changed",
+  "version": 1,
+  "occurred_at": "2026-10-29T09:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "vertical_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02",
+    "term_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200",
+    "kind": "renamed",
+    "version": 13,
+    "replacement_id": null,
+    "moved_mappings": 0,
+    "changed_at": "2026-10-29T09:00:00Z"
+  }
+}

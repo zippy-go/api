@@ -1,0 +1,33 @@
+type: object
+description: A page of stores and how far each is mapped, by Partner and store name.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./LocationMappingSummary.yaml
+    description: The stores on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        partner_name: ZippyGo Dev Partner
+        location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        location_name: Dev Kitchen Gachibowli
+        vertical_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        counts:
+          categories: 4
+          mapped_categories: 4
+          items: 14
+          unmapped_items: 0
+          missing_attributes: 0
+    next_cursor: null

@@ -1,0 +1,12 @@
+type: string
+description: What a change to the taxonomy did.
+enum:
+  - created
+  - renamed
+  - moved
+  - changed
+  - deprecated
+  - merged
+  - deleted
+examples:
+  - renamed

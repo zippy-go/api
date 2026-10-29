@@ -6,6 +6,72 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-29
+
+Step 6, the taxonomy: one tree of categories per Vertical that every store's
+catalogue maps to, and the recommendations built on it. Written by the
+platform's `step6/taxonomy` slice beside the promotions and engagement slices;
+the first of the three to merge keeps 0.21.0 and the default roles' edition 7.
+Additive only.
+
+### Added
+
+- The shared taxonomy (`Taxonomy` tag): a Vertical's tree, public, depth first
+  with each term's rules and how much maps to it
+  (`GET /v1/verticals/{vertical_id}/taxonomy`, `TaxonomyTree`, `TaxonomyTerm`,
+  `TaxonomyAttribute`, `TaxonomyAttributeRule`, `TaxonomyTermStatus`); Mission
+  Control's terms, created, read, renamed or moved, deprecated with a
+  replacement, merged and deleted while nothing maps to them
+  (`POST /v1/platform/taxonomy/terms`, `GET`, `PATCH`, `DELETE .../terms/{term_id}`,
+  `POST .../terms/{term_id}/deprecate`, `.../merge`, `TaxonomyTermCreate`,
+  `TaxonomyTermUpdate`, `TaxonomyTermDeprecation`, `TaxonomyTermMerge`), and
+  every change kept (`GET /v1/platform/taxonomy/changes`, `TaxonomyChange`,
+  `TaxonomyChangeKind`, `TaxonomyChangePage`). `taxonomy:write` to change,
+  `catalog:oversee` to read Mission Control's views.
+- A store's catalogue mapped to it: each category with its term or the terms
+  suggested from its name, the items mapped more narrowly, unmapped or missing
+  an attribute, the tasks and the counts
+  (`GET /v1/partners/{partner_id}/locations/{location_id}/catalog/mapping`,
+  `CatalogMapping`, `CategoryMapping`, `ItemMapping`, `TaxonomyTermRef`,
+  `TaxonomySuggestion`, `MappingActor`, `MappingTask`, `MappingTaskKind`,
+  `MappingCounts`); mapping a category, or an item more narrowly
+  (`PUT .../catalog/categories/{category_id}/taxonomy`,
+  `PUT .../catalog/items/{item_id}/taxonomy`, `TaxonomyMappingInput`), with
+  `catalog:write`, or by Mission Control on the Partner's behalf with
+  `taxonomy:write`, recorded as such; and how far every store is mapped
+  (`GET /v1/platform/taxonomy/mapping`, `LocationMappingSummary`,
+  `LocationMappingSummaryPage`). An item without a term is sold on its store's
+  page and left out of search across stores.
+- Recommendations (`Recommendations` tag), each with its reason: often ordered
+  with, for an item sheet or a basket
+  (`GET /v1/storefront/stores/{location_id}/recommendations`); nearby
+  complements for an order, and the home screen's complements and reorder
+  prompts (`GET /v1/customer/recommendations`); a recommendation taken, once
+  (`POST /v1/recommendations/{recommendation_id}/accepted`); "Not for this"
+  (`DELETE /v1/customer/reorder-prompts/{term_id}`); `Recommendation`,
+  `RecommendationKind`, `RecommendationItem`, `RecommendationStore`,
+  `RecommendationList`.
+- A city's cross-sell configuration, versioned
+  (`GET`, `PUT /v1/service-areas/{service_area_id}/cross-sell`,
+  `CrossSellSettings`, `CrossSellSettingsInput`, `CrossSellPair`,
+  `TaxonomyScope`); `taxonomy:write` to change it.
+- `recommendations` on the customer's notification preferences, on by default;
+  `PUT /v1/customer/notification-preferences` takes either member alone.
+- Problem codes `taxonomy_term_in_use` and `taxonomy_term_has_children`; field
+  codes `taxonomy_term_retired`, `taxonomy_term_elsewhere`, `taxonomy_too_deep`,
+  `taxonomy_cycle` and `taxonomy_slug_taken`.
+- Events `catalog.taxonomy.changed`, `catalog.mapping.changed`,
+  `crosssell.recommendation.shown`, `crosssell.recommendation.accepted` and
+  `crosssell.reorder.prompted`, none naming a customer beyond the id, and none
+  readable by a Partner but the mapping's.
+- The permission `taxonomy:write`; edition 7 of the default roles gives Mission
+  Control's Catalog role `taxonomy:write`.
+
+### Changed
+
+- `PUT /v1/customer/notification-preferences` no longer requires
+  `whatsapp_updates`: a member left out stays as it is.
+
 ## [0.20.0] - 2026-10-23
 
 Step 5, settlement: what ZippyGo pays each Location every week for what it

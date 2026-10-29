@@ -51,7 +51,8 @@ put:
   operationId: putCustomerNotificationPreferences
   summary: Change how the customer is reached
   description: |
-    Opts the customer in to order updates on WhatsApp, or out of them. Without
+    Opts the customer in to order updates on WhatsApp, or out of them, and turns
+    recommendations on or off; a member left out stays as it is. Without
     the opt-in WhatsApp is never used: a customer with no device registered for
     pushes is told by SMS. `If-Match` guards against a stale screen.
   tags:
@@ -62,7 +63,7 @@ put:
     - $ref: ../../components/parameters/IfMatchHeader.yaml
   requestBody:
     required: true
-    description: 'The WhatsApp opt-in.'
+    description: 'The WhatsApp opt-in, the recommendations choice, or both.'
     content:
       application/json:
         schema:
@@ -78,7 +79,7 @@ put:
           schema:
             $ref: ../../components/schemas/notifications/CustomerNotificationPreferences.yaml
     '400':
-      description: '`validation_failed`: `whatsapp_updates` missing.'
+      description: '`validation_failed`: neither `whatsapp_updates` nor `recommendations`.'
       content:
         application/problem+json:
           schema:

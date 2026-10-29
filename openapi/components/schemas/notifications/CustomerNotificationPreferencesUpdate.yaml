@@ -1,10 +1,12 @@
 type: object
-description: Changes how the customer is reached, the request of `PUT /v1/customer/notification-preferences`. Marketing consent is its own act (`PUT /v1/customer/consent`).
-required:
-  - whatsapp_updates
+description: Changes how the customer is reached, the request of `PUT /v1/customer/notification-preferences`; a member left out stays as it is. Marketing consent is its own act (`PUT /v1/customer/consent`).
 properties:
   whatsapp_updates:
     type: boolean
     description: Opt in to order updates on WhatsApp, or out of them.
+  recommendations:
+    type: boolean
+    description: Turn recommendations and reorder prompts on, or off at once.
 examples:
   - whatsapp_updates: true
+  - recommendations: false

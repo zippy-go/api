@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/crosssell.recommendation.accepted.v1.schema.json",
+  "title": "CrosssellRecommendationAcceptedPayload",
+  "description": "Payload of `crosssell.recommendation.accepted` version 1: the customer added a recommended item to a basket; published once per recommendation. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "recommendation_id",
+    "kind",
+    "location_id",
+    "item_id",
+    "customer_id",
+    "accepted_at"
+  ],
+  "properties": {
+    "recommendation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The recommendation.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "bought_together",
+        "nearby_complement",
+        "reorder"
+      ],
+      "description": "Why it was suggested.",
+      "examples": [
+        "nearby_complement"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store of the item.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48"
+      ]
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The item.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301"
+      ]
+    },
+    "customer_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The customer, by id alone; `null` for a visitor.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-29T09:00:00Z"
+      ]
+    }
+  }
+}

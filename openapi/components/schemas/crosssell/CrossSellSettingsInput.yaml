@@ -1,0 +1,63 @@
+type: object
+description: A city's cross-sell configuration, replaced whole, the request of `PUT /v1/service-areas/{service_area_id}/cross-sell`.
+required:
+  - complements
+  - pairs
+  - complement_distance_metres
+  - bought_together_min_orders
+  - bought_together_days
+  - reorder_prompts
+  - reorder_after_repeats
+properties:
+  complements:
+    type: boolean
+    description: Whether nearby complements are shown.
+    examples:
+      - false
+  pairs:
+    type: array
+    maxItems: 50
+    items:
+      $ref: ./CrossSellPair.yaml
+    description: The complementary pairs, each term an active one of its Vertical.
+  complement_distance_metres:
+    type: integer
+    minimum: 100
+    maximum: 10000
+    description: How far a complement's store may be.
+    examples:
+      - 2000
+  bought_together_min_orders:
+    type: integer
+    minimum: 2
+    maximum: 100
+    description: The support bought together needs.
+    examples:
+      - 5
+  bought_together_days:
+    type: integer
+    minimum: 7
+    maximum: 365
+    description: The days of orders it counts.
+    examples:
+      - 90
+  reorder_prompts:
+    type: boolean
+    description: Whether reorder prompts are sent.
+    examples:
+      - true
+  reorder_after_repeats:
+    type: integer
+    minimum: 2
+    maximum: 10
+    description: The repeats before a prompt.
+    examples:
+      - 3
+examples:
+  - complements: false
+    pairs: []
+    complement_distance_metres: 2000
+    bought_together_min_orders: 5
+    bought_together_days: 90
+    reorder_prompts: true
+    reorder_after_repeats: 3

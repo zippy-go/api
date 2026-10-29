@@ -1,0 +1,31 @@
+type: object
+description: A page of taxonomy changes, newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./TaxonomyChange.yaml
+    description: The changes on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: An opaque cursor for the next page, or `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4be001
+        vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+        term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200
+        kind: renamed
+        version: 13
+        words: Renamed "Sweets" to "Sweets and mithai".
+        replacement_id: null
+        moved_mappings: 0
+        by_name: Asha Admin
+        at: 2026-10-29T09:00:00Z
+    next_cursor: null

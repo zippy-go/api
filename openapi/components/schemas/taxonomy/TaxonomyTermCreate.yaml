@@ -1,0 +1,50 @@
+type: object
+description: A new term, the request of `POST /v1/platform/taxonomy/terms`.
+required:
+  - vertical_id
+  - name
+properties:
+  vertical_id:
+    type: string
+    format: uuid
+    description: The Vertical whose tree it joins.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The active term of the same Vertical it sits under, four levels deep at most; absent or `null` at the top.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  slug:
+    type: string
+    pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+    maxLength: 80
+    description: Its address word, unique in the Vertical; made from the English name when absent.
+    examples:
+      - sweets
+  attributes:
+    type: array
+    maxItems: 9
+    items:
+      $ref: ./TaxonomyAttributeRule.yaml
+    description: Its rules for what its products carry, one per attribute; none when absent.
+  position:
+    type: integer
+    minimum: 0
+    description: Where it stands among the terms beside it; last when absent.
+    examples:
+      - 0
+examples:
+  - vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+    parent_id: null
+    name:
+      en: Sweets
+    attributes:
+      - attribute: dietary_mark
+        required: true

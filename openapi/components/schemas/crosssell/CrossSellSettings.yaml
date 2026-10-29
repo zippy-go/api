@@ -1,0 +1,116 @@
+type: object
+description: >-
+  A city's cross-sell configuration: whether nearby complements run and
+  which category pairs they follow, how far a complement may be, the support
+  bought together needs, and the reorder prompts. A city that never saved
+  one reads the platform's defaults, `saved` false. Every save is a version
+  and takes effect at the next recommendation.
+required:
+  - service_area_id
+  - complements
+  - pairs
+  - complement_distance_metres
+  - bought_together_min_orders
+  - bought_together_days
+  - reorder_prompts
+  - reorder_after_repeats
+  - saved
+  - version
+  - updated_at
+  - updated_by_name
+properties:
+  service_area_id:
+    type: string
+    format: uuid
+    description: The city.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+  complements:
+    type: boolean
+    description: Whether nearby complements are shown in the city.
+    examples:
+      - true
+  pairs:
+    type: array
+    maxItems: 50
+    items:
+      $ref: ./CrossSellPair.yaml
+    description: The complementary pairs.
+  complement_distance_metres:
+    type: integer
+    minimum: 100
+    maximum: 10000
+    description: How far a complement's store may be from the store of the order it goes with.
+    examples:
+      - 2000
+  bought_together_min_orders:
+    type: integer
+    minimum: 2
+    maximum: 100
+    description: How many completed orders must carry two items together before one is suggested with the other.
+    examples:
+      - 5
+  bought_together_days:
+    type: integer
+    minimum: 7
+    maximum: 365
+    description: How many days of completed orders bought together counts.
+    examples:
+      - 90
+  reorder_prompts:
+    type: boolean
+    description: Whether reorder prompts are sent in the city.
+    examples:
+      - true
+  reorder_after_repeats:
+    type: integer
+    minimum: 2
+    maximum: 10
+    description: How many orders of a category at a steady interval come before a prompt.
+    examples:
+      - 3
+  saved:
+    type: boolean
+    description: Whether the city saved a configuration of its own; `false` while it reads the platform's defaults.
+    examples:
+      - true
+  version:
+    type: integer
+    minimum: 0
+    description: Raised by one on every save; 0 for the defaults. The entity tag of the read.
+    examples:
+      - 1
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was last saved.
+    examples:
+      - 2026-10-29T09:00:00Z
+  updated_by_name:
+    type:
+      - string
+      - "null"
+    description: Who saved it last.
+    examples:
+      - Asha Admin
+examples:
+  - service_area_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a50
+    complements: true
+    pairs:
+      - from:
+          vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+          term_id: null
+        to:
+          vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+          term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200
+    complement_distance_metres: 2000
+    bought_together_min_orders: 5
+    bought_together_days: 90
+    reorder_prompts: true
+    reorder_after_repeats: 3
+    saved: true
+    version: 1
+    updated_at: 2026-10-29T09:00:00Z
+    updated_by_name: Asha Admin

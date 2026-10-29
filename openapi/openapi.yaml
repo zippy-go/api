@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.20.0
+  version: 0.21.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -227,6 +227,10 @@ tags:
     description: "What the storefront draws for one store, signed out: the store page (open or shut, its hours, the reference to its published menu), the published menu with its version as the entity tag, a large category's further pages and an item sheet. Public; no credential."
   - name: Search
     description: "Finding stores and products by typing, across the stores of the customer's city and inside one store, forgiving misspellings and the common spellings of Indian dishes, with names suggested as the customer types. The ranking is published: a store whose name matches exactly what was typed comes first; the rest are ordered open before closed, then nearer the customer's pin before farther, then by how well the words matched; no store is ranked higher for a fee. The searches are public; the synonym groups are Mission Control's."
+  - name: Taxonomy
+    description: "The shared taxonomy: per Vertical, a tree of categories at most four levels deep that every store's catalogue maps to, with the attributes a product of a category may or must carry (the food Vertical's dietary mark is read from the vegetarian mark items carry). Public to read; Mission Control creates, renames, moves, merges and deprecates terms with `taxonomy:write`, a rename keeping the id so mappings hold, a term in use never deleted, every change versioned and published as `catalog.taxonomy.changed`. A store maps its categories, and items more narrowly, with `catalog:write`; Mission Control on the Partner's behalf with `taxonomy:write`, recorded as such. An item without a term is sold on its store's page and left out of search across stores, recommendations and shelves."
+  - name: Recommendations
+    description: "Cross-sell, each suggestion with its reason: often ordered with (items completed orders at the same store carried together, at least 5 orders in 90 days), nearby, goes with your order (another Partner's item within 2 km in a category the city pairs with what the order holds) and reorder prompts (a category the customer orders at a steady interval, after three repeats, at most one prompt a day, by push only with consent). Built from the customer's own orders: no Partner learns of a customer through cross-sell until the customer orders from it. Organic only in this version, ranked by relevance, then the store's rating, then distance. A customer turns all of it off with `recommendations` in their notification preferences; Mission Control keeps each city's configuration."
   - name: Notifications
     description: |
       How the platform tells people what happened. Every message leaves
@@ -688,6 +692,8 @@ paths:
     $ref: ./paths/verticals/reach.yaml
   /v1/verticals/{vertical_id}/status:
     $ref: ./paths/verticals/status.yaml
+  /v1/verticals/{vertical_id}/taxonomy:
+    $ref: ./paths/verticals/taxonomy.yaml
   /v1/live/config:
     $ref: ./paths/live/config.yaml
   /v1/live/stream:
@@ -853,6 +859,35 @@ paths:
     $ref: ./paths/catalog/search.yaml
   /v1/storefront/search/suggestions:
     $ref: ./paths/catalog/search-suggestions.yaml
+  # Step 6 taxonomy: the shared taxonomy, catalogues mapped to it, and cross-sell
+  /v1/platform/taxonomy/terms:
+    $ref: ./paths/taxonomy/terms.yaml
+  /v1/platform/taxonomy/terms/{term_id}:
+    $ref: ./paths/taxonomy/term.yaml
+  /v1/platform/taxonomy/terms/{term_id}/deprecate:
+    $ref: ./paths/taxonomy/term-deprecate.yaml
+  /v1/platform/taxonomy/terms/{term_id}/merge:
+    $ref: ./paths/taxonomy/term-merge.yaml
+  /v1/platform/taxonomy/changes:
+    $ref: ./paths/taxonomy/changes.yaml
+  /v1/platform/taxonomy/mapping:
+    $ref: ./paths/taxonomy/mapping-overview.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/mapping:
+    $ref: ./paths/catalog/mapping.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/categories/{category_id}/taxonomy:
+    $ref: ./paths/catalog/category-taxonomy.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/catalog/items/{item_id}/taxonomy:
+    $ref: ./paths/catalog/item-taxonomy.yaml
+  /v1/storefront/stores/{location_id}/recommendations:
+    $ref: ./paths/crosssell/store-recommendations.yaml
+  /v1/recommendations/{recommendation_id}/accepted:
+    $ref: ./paths/crosssell/recommendation-accepted.yaml
+  /v1/customer/recommendations:
+    $ref: ./paths/crosssell/customer-recommendations.yaml
+  /v1/customer/reorder-prompts/{term_id}:
+    $ref: ./paths/crosssell/reorder-prompt.yaml
+  /v1/service-areas/{service_area_id}/cross-sell:
+    $ref: ./paths/service-areas/cross-sell.yaml
 
   /v1/customer/payment-options:
     $ref: ./paths/payments/payment-options.yaml
@@ -2416,6 +2451,72 @@ components:
       $ref: ./components/schemas/catalog/SearchSynonymGroup.yaml
     SearchSynonymGroupList:
       $ref: ./components/schemas/catalog/SearchSynonymGroupList.yaml
+    TaxonomyAttribute:
+      $ref: ./components/schemas/taxonomy/TaxonomyAttribute.yaml
+    TaxonomyAttributeRule:
+      $ref: ./components/schemas/taxonomy/TaxonomyAttributeRule.yaml
+    TaxonomyTermStatus:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermStatus.yaml
+    TaxonomyTerm:
+      $ref: ./components/schemas/taxonomy/TaxonomyTerm.yaml
+    TaxonomyTree:
+      $ref: ./components/schemas/taxonomy/TaxonomyTree.yaml
+    TaxonomyTermCreate:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermCreate.yaml
+    TaxonomyTermUpdate:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermUpdate.yaml
+    TaxonomyTermDeprecation:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermDeprecation.yaml
+    TaxonomyTermMerge:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermMerge.yaml
+    TaxonomyChangeKind:
+      $ref: ./components/schemas/taxonomy/TaxonomyChangeKind.yaml
+    TaxonomyChange:
+      $ref: ./components/schemas/taxonomy/TaxonomyChange.yaml
+    TaxonomyChangePage:
+      $ref: ./components/schemas/taxonomy/TaxonomyChangePage.yaml
+    TaxonomyTermRef:
+      $ref: ./components/schemas/taxonomy/TaxonomyTermRef.yaml
+    TaxonomyMappingInput:
+      $ref: ./components/schemas/taxonomy/TaxonomyMappingInput.yaml
+    MappingActor:
+      $ref: ./components/schemas/taxonomy/MappingActor.yaml
+    TaxonomySuggestion:
+      $ref: ./components/schemas/taxonomy/TaxonomySuggestion.yaml
+    CategoryMapping:
+      $ref: ./components/schemas/taxonomy/CategoryMapping.yaml
+    ItemMapping:
+      $ref: ./components/schemas/taxonomy/ItemMapping.yaml
+    MappingTaskKind:
+      $ref: ./components/schemas/taxonomy/MappingTaskKind.yaml
+    MappingTask:
+      $ref: ./components/schemas/taxonomy/MappingTask.yaml
+    MappingCounts:
+      $ref: ./components/schemas/taxonomy/MappingCounts.yaml
+    CatalogMapping:
+      $ref: ./components/schemas/taxonomy/CatalogMapping.yaml
+    LocationMappingSummary:
+      $ref: ./components/schemas/taxonomy/LocationMappingSummary.yaml
+    LocationMappingSummaryPage:
+      $ref: ./components/schemas/taxonomy/LocationMappingSummaryPage.yaml
+    TaxonomyScope:
+      $ref: ./components/schemas/crosssell/TaxonomyScope.yaml
+    CrossSellPair:
+      $ref: ./components/schemas/crosssell/CrossSellPair.yaml
+    CrossSellSettings:
+      $ref: ./components/schemas/crosssell/CrossSellSettings.yaml
+    CrossSellSettingsInput:
+      $ref: ./components/schemas/crosssell/CrossSellSettingsInput.yaml
+    RecommendationKind:
+      $ref: ./components/schemas/crosssell/RecommendationKind.yaml
+    RecommendationStore:
+      $ref: ./components/schemas/crosssell/RecommendationStore.yaml
+    RecommendationItem:
+      $ref: ./components/schemas/crosssell/RecommendationItem.yaml
+    Recommendation:
+      $ref: ./components/schemas/crosssell/Recommendation.yaml
+    RecommendationList:
+      $ref: ./components/schemas/crosssell/RecommendationList.yaml
     SearchSynonymGroupCreate:
       $ref: ./components/schemas/catalog/SearchSynonymGroupCreate.yaml
     MenuAsk:

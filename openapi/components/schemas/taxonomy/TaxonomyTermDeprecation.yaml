@@ -1,0 +1,25 @@
+type: object
+description: >-
+  Retires a term in favour of another, the request of
+  `POST /v1/platform/taxonomy/terms/{term_id}/deprecate`: every category and
+  item mapped to it is mapped to the replacement, the terms beneath it move
+  under the replacement, and it can no longer be chosen.
+required:
+  - replacement_id
+properties:
+  replacement_id:
+    type: string
+    format: uuid
+    description: An active term of the same Vertical, neither the term nor one beneath it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd301
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: Why, kept with the change.
+    examples:
+      - Soft drinks are beverages.
+examples:
+  - replacement_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd301
+    reason: Soft drinks are beverages.

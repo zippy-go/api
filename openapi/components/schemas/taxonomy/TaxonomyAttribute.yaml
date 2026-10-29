@@ -1,0 +1,19 @@
+type: string
+description: >-
+  An attribute a product may or must carry, from the taxonomy's closed set.
+  `dietary_mark` is read from an item's food mark (vegetarian or not),
+  `brand` from its brand, `age_restricted` and `prescription_only` from its
+  availability; `allergens`, `cuisine`, `pack_size`, `organic` and
+  `cold_chain` wait for the catalogue to carry them.
+enum:
+  - dietary_mark
+  - allergens
+  - cuisine
+  - brand
+  - pack_size
+  - organic
+  - cold_chain
+  - age_restricted
+  - prescription_only
+examples:
+  - dietary_mark

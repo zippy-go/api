@@ -1,0 +1,78 @@
+type: object
+description: >-
+  A store's catalogue against the taxonomy: each category with its term or
+  the terms suggested for it, the items mapped more narrowly, unmapped or
+  missing an attribute, the tasks and the counts.
+required:
+  - location_id
+  - partner_id
+  - vertical_ids
+  - categories
+  - items
+  - tasks
+  - counts
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The Verticals whose terms its catalogue maps to.
+  categories:
+    type: array
+    items:
+      $ref: ./CategoryMapping.yaml
+    description: Every category, in the store's order.
+  items:
+    type: array
+    items:
+      $ref: ./ItemMapping.yaml
+    description: The items with a term of their own, with no term, or missing an attribute; the rest follow their category.
+  tasks:
+    type: array
+    items:
+      $ref: ./MappingTask.yaml
+    description: What to do, unmapped categories first.
+  counts:
+    $ref: ./MappingCounts.yaml
+    description: How far it is mapped.
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    vertical_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    categories:
+      - category_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc009
+        name:
+          en: Chef's specials
+        parent_id: null
+        item_count: 4
+        term: null
+        suggestions: []
+        mapped_by: null
+        mapped_at: null
+    items: []
+    tasks:
+      - kind: unmapped_category
+        category_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc009
+        item_id: null
+        attribute: null
+        words: Map "Chef's specials" so its 4 items are found across stores.
+    counts:
+      categories: 1
+      mapped_categories: 0
+      items: 4
+      unmapped_items: 4
+      missing_attributes: 0

@@ -1,0 +1,12 @@
+type: string
+description: >-
+  What a mapping task asks for: `unmapped_category` a category with items and
+  no term, `unmapped_item` an item with no term of its own nor through a
+  category, `missing_attribute` an item without an attribute its term
+  requires.
+enum:
+  - unmapped_category
+  - unmapped_item
+  - missing_attribute
+examples:
+  - unmapped_category

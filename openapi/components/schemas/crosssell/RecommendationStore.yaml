@@ -1,0 +1,38 @@
+type: object
+description: The store a recommended item is sold at.
+required:
+  - location_id
+  - partner_id
+  - name
+  - distance_metres
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Charminar Bakes Gachibowli
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    description: How far it is from the store of the order it goes with, for a nearby complement.
+    examples:
+      - 620
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48
+    partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a03
+    name: Charminar Bakes Gachibowli
+    distance_metres: 620

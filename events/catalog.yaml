@@ -590,6 +590,60 @@ events:
     payload_schema: ./payloads/catalog.search.missed.v1.schema.json
     example: ./examples/catalog.search.missed.v1.json
 
+  - type: catalog.taxonomy.changed
+    version: 1
+    domain: catalog
+    description: >-
+      A term of the shared taxonomy was created, renamed, moved,
+      changed, deprecated, merged or deleted; a rename keeps the id,
+      so every mapping holds. The envelope's `partner_id` is `null`.
+    payload_schema: ./payloads/catalog.taxonomy.changed.v1.schema.json
+    example: ./examples/catalog.taxonomy.changed.v1.json
+
+  - type: catalog.mapping.changed
+    version: 1
+    domain: catalog
+    description: >-
+      A store's category, or one item more narrowly, was mapped to a
+      term of the shared taxonomy or unmapped, by its Partner or by
+      Mission Control on its behalf. The envelope's `partner_id` is
+      the store's Partner; search re-indexes the store.
+    payload_schema: ./payloads/catalog.mapping.changed.v1.schema.json
+    example: ./examples/catalog.mapping.changed.v1.json
+
+  - type: crosssell.recommendation.shown
+    version: 1
+    domain: crosssell
+    description: >-
+      A recommendation was shown with its kind and its reason; the
+      customer by id alone, `null` for a visitor. The envelope's
+      `partner_id` is `null`, so no Partner reads who was shown its
+      items.
+    payload_schema: ./payloads/crosssell.recommendation.shown.v1.schema.json
+    example: ./examples/crosssell.recommendation.shown.v1.json
+
+  - type: crosssell.recommendation.accepted
+    version: 1
+    domain: crosssell
+    description: >-
+      A recommended item was added to a basket from the suggestion,
+      published once per recommendation with its kind and the item.
+      The envelope's `partner_id` is `null`.
+    payload_schema: ./payloads/crosssell.recommendation.accepted.v1.schema.json
+    example: ./examples/crosssell.recommendation.accepted.v1.json
+
+  - type: crosssell.reorder.prompted
+    version: 1
+    domain: crosssell
+    description: >-
+      A customer was prompted to reorder from a category they order
+      at a steady interval, once its time came: at most one prompt a
+      day, only with the push marketing consent and recommendations
+      on. The notifications module sends the push. The envelope's
+      `partner_id` is `null`.
+    payload_schema: ./payloads/crosssell.reorder.prompted.v1.schema.json
+    example: ./examples/crosssell.reorder.prompted.v1.json
+
   - type: notifications.notice.sent
     version: 1
     domain: notifications

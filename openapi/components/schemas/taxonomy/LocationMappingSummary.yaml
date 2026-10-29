@@ -1,0 +1,54 @@
+type: object
+description: How far one store's catalogue is mapped, for Mission Control.
+required:
+  - partner_id
+  - partner_name
+  - location_id
+  - location_name
+  - vertical_ids
+  - counts
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  partner_name:
+    type: string
+    description: Its name.
+    examples:
+      - ZippyGo Dev Partner
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+  location_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Its Verticals.
+  counts:
+    $ref: ./MappingCounts.yaml
+    description: How far it is mapped.
+examples:
+  - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    partner_name: ZippyGo Dev Partner
+    location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+    location_name: Dev Kitchen Gachibowli
+    vertical_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    counts:
+      categories: 4
+      mapped_categories: 4
+      items: 14
+      unmapped_items: 0
+      missing_attributes: 0

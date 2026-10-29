@@ -1,0 +1,86 @@
+type: object
+description: >-
+  One change to a Vertical's taxonomy, kept for good: what changed, in words,
+  the version it made, and how many mappings it moved.
+required:
+  - id
+  - vertical_id
+  - term_id
+  - kind
+  - version
+  - words
+  - replacement_id
+  - moved_mappings
+  - by_name
+  - at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The change.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4be001
+  vertical_id:
+    type: string
+    format: uuid
+    description: The Vertical.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+  term_id:
+    type: string
+    format: uuid
+    description: The term changed.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200
+  kind:
+    $ref: ./TaxonomyChangeKind.yaml
+    description: What the change did.
+  version:
+    type: integer
+    minimum: 1
+    description: The Vertical's taxonomy version it made.
+    examples:
+      - 13
+  words:
+    type: string
+    description: The change in words.
+    examples:
+      - Renamed "Sweets" to "Sweets and mithai".
+  replacement_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The term a deprecation or a merge moved the mappings to.
+    examples:
+      - null
+  moved_mappings:
+    type: integer
+    minimum: 0
+    description: How many categories and items it mapped elsewhere.
+    examples:
+      - 0
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Who made it, as Mission Control knows them.
+    examples:
+      - Asha Admin
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-10-29T09:00:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4be001
+    vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b02
+    term_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd200
+    kind: renamed
+    version: 13
+    words: Renamed "Sweets" to "Sweets and mithai".
+    replacement_id: null
+    moved_mappings: 0
+    by_name: Asha Admin
+    at: 2026-10-29T09:00:00Z

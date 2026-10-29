@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/crosssell.reorder.prompted.v1.schema.json",
+  "title": "CrosssellReorderPromptedPayload",
+  "description": "Payload of `crosssell.reorder.prompted` version 1: a customer who orders from a category at a steady interval, consented to marketing pushes and keeps recommendations on, was prompted that its time came; at most one prompt a day. The notifications module sends the push. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "customer_id",
+    "term_id",
+    "item_id",
+    "location_id",
+    "interval_days",
+    "last_ordered_at",
+    "prompted_at"
+  ],
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "term_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The category.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401"
+      ]
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "What the customer last ordered from it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc301"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a48"
+      ]
+    },
+    "interval_days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The customer's usual interval, in days.",
+      "examples": [
+        14
+      ]
+    },
+    "last_ordered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the customer last ordered from it.",
+      "examples": [
+        "2026-10-15T09:00:00Z"
+      ]
+    },
+    "prompted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-10-29T09:00:00Z"
+      ]
+    }
+  }
+}

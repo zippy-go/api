@@ -1,0 +1,84 @@
+type: object
+description: >-
+  An item and its term: its own when it maps more narrowly than its
+  category, else its category's. An item without a term is sold on its
+  store's page only; one missing an attribute its term requires is a task.
+required:
+  - item_id
+  - name
+  - category_ids
+  - term
+  - effective_term
+  - inherited
+  - missing_attributes
+  - mapped_by
+  - mapped_at
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  category_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The categories it is in.
+  term:
+    oneOf:
+      - $ref: ./TaxonomyTermRef.yaml
+      - type: "null"
+    description: Its own term, more narrowly than its category; `null` when it follows its category.
+  effective_term:
+    oneOf:
+      - $ref: ./TaxonomyTermRef.yaml
+      - type: "null"
+    description: The term it is found under across stores, its own or its first mapped category's; `null` when there is none.
+  inherited:
+    type: boolean
+    description: Whether the effective term is its category's.
+    examples:
+      - true
+  missing_attributes:
+    type: array
+    items:
+      $ref: ./TaxonomyAttribute.yaml
+    description: What its effective term requires that it does not carry.
+  mapped_by:
+    oneOf:
+      - $ref: ./MappingActor.yaml
+      - type: "null"
+    description: Who gave it its own term.
+  mapped_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was given its own term.
+    examples:
+      - null
+examples:
+  - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
+    name:
+      en: Hyderabadi Biryani
+    category_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+    term: null
+    effective_term:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+      vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+      name:
+        en: Biryani
+      trail:
+        - en: Biryani and rice
+        - en: Biryani
+      status: active
+    inherited: true
+    missing_attributes: []
+    mapped_by: null
+    mapped_at: null

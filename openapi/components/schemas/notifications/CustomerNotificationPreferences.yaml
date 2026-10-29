@@ -14,6 +14,7 @@ required:
   - email_on_file
   - push_devices
   - marketing
+  - recommendations
   - version
 properties:
   whatsapp_updates:
@@ -43,6 +44,13 @@ properties:
     description: How many of the customer's signed-in devices are registered for pushes.
   marketing:
     $ref: ../customers/MarketingConsent.yaml
+  recommendations:
+    type: boolean
+    description: >-
+      Whether the customer is shown recommendations: often ordered with,
+      nearby complements and reorder prompts, which also need the push
+      marketing consent. On by default; off stops every one of them at once,
+      while messages about an order, and the ask to review it, still come.
   version:
     type: integer
     minimum: 1
@@ -60,4 +68,5 @@ examples:
       sms: false
       whatsapp: false
       agreed_at: 2026-10-15T09:00:00Z
+    recommendations: true
     version: 2

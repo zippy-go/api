@@ -1,0 +1,53 @@
+type: object
+description: >-
+  A Vertical's taxonomy, the `TaxonomyTree` schema: every term, depth first
+  in their order, each top-level term followed by the terms beneath it.
+  Retired terms are left out unless asked for. Its version rises with every
+  change to the Vertical's terms and is the entity tag of the read.
+required:
+  - vertical_id
+  - version
+  - terms
+properties:
+  vertical_id:
+    type: string
+    format: uuid
+    description: The Vertical.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  version:
+    type: integer
+    minimum: 0
+    description: The Vertical's taxonomy version, raised by every change to its terms; 0 before any.
+    examples:
+      - 12
+  terms:
+    type: array
+    items:
+      $ref: ./TaxonomyTerm.yaml
+    description: The terms, depth first.
+examples:
+  - vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    version: 12
+    terms:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd100
+        vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        parent_id: null
+        level: 1
+        path: []
+        slug: biryani-and-rice
+        name:
+          en: Biryani and rice
+        attributes:
+          - attribute: dietary_mark
+            required: true
+        required_attributes:
+          - dietary_mark
+        status: active
+        replaced_by_id: null
+        position: 0
+        mapped_categories: 12
+        mapped_items: 0
+        version: 1
+        created_at: 2026-10-29T09:00:00Z
+        updated_at: 2026-10-29T09:00:00Z

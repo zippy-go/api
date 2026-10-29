@@ -1,0 +1,27 @@
+type: object
+description: A term suggested for a category from its name, the most alike first.
+required:
+  - term
+  - score
+properties:
+  term:
+    $ref: ./TaxonomyTermRef.yaml
+    description: The term suggested.
+  score:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: How alike the names are, 1 the same.
+    examples:
+      - 0.82
+examples:
+  - term:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+      vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+      name:
+        en: Biryani
+      trail:
+        - en: Biryani and rice
+        - en: Biryani
+      status: active
+    score: 0.82

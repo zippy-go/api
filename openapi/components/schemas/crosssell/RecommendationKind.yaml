@@ -1,0 +1,12 @@
+type: string
+description: >-
+  Why something is suggested: `bought_together` (often ordered with it at the
+  same store), `nearby_complement` (another Partner's item nearby that goes
+  with an order) or `reorder` (a category the customer orders at a steady
+  interval, due again).
+enum:
+  - bought_together
+  - nearby_complement
+  - reorder
+examples:
+  - nearby_complement

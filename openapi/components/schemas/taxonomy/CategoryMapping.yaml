@@ -1,0 +1,82 @@
+type: object
+description: >-
+  A store category and its term. A category with items and no term is a task:
+  its items are sold on the store's page and left out of search across
+  stores, recommendations and shelves.
+required:
+  - category_id
+  - name
+  - parent_id
+  - item_count
+  - term
+  - suggestions
+  - mapped_by
+  - mapped_at
+properties:
+  category_id:
+    type: string
+    format: uuid
+    description: The category.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The category it sits under.
+    examples:
+      - null
+  item_count:
+    type: integer
+    minimum: 0
+    description: How many items it holds.
+    examples:
+      - 6
+  term:
+    oneOf:
+      - $ref: ./TaxonomyTermRef.yaml
+      - type: "null"
+    description: Its term; `null` while unmapped.
+  suggestions:
+    type: array
+    maxItems: 3
+    items:
+      $ref: ./TaxonomySuggestion.yaml
+    description: Terms suggested from its name, while it is unmapped; empty once mapped.
+  mapped_by:
+    oneOf:
+      - $ref: ./MappingActor.yaml
+      - type: "null"
+    description: Who mapped it.
+  mapped_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was mapped.
+    examples:
+      - 2026-10-29T09:00:00Z
+examples:
+  - category_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc001
+    name:
+      en: Biryanis
+    parent_id: null
+    item_count: 6
+    term:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd101
+      vertical_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+      name:
+        en: Biryani
+      trail:
+        - en: Biryani and rice
+        - en: Biryani
+      status: active
+    suggestions: []
+    mapped_by:
+      kind: partner
+      name: Dev Owner
+    mapped_at: 2026-10-29T09:00:00Z

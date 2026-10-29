@@ -1,0 +1,41 @@
+type: object
+description: >-
+  Changes a term, the request of `PATCH /v1/platform/taxonomy/terms/{term_id}`:
+  a rename, a move under another term of its Vertical, a new slug, its rules
+  or its place. Members left out stay as they are; the id and every mapping
+  stay.
+minProperties: 1
+properties:
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its new name.
+  slug:
+    type: string
+    pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+    maxLength: 80
+    description: Its new address word, unique in the Vertical.
+    examples:
+      - sweets-and-mithai
+  parent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Moves it, with the terms beneath it, under another active term of its Vertical, never beneath itself and four levels deep at most; `null` moves it to the top.
+    examples:
+      - null
+  attributes:
+    type: array
+    maxItems: 9
+    items:
+      $ref: ./TaxonomyAttributeRule.yaml
+    description: Its rules, replaced whole.
+  position:
+    type: integer
+    minimum: 0
+    description: Its new place among the terms beside it.
+    examples:
+      - 1
+examples:
+  - name:
+      en: Sweets and mithai
