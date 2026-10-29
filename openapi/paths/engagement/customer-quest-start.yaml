@@ -1,0 +1,68 @@
+# Path item for /v1/customer/rewards/quests/{campaign_id}/start. Referenced from openapi.yaml.
+parameters:
+  - name: campaign_id
+    in: path
+    required: true
+    description: The reward campaign.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006002
+post:
+  operationId: startCustomerQuest
+  summary: Start a quest
+  description: "Starts a quest the customer is offered: nothing counts before the customer agrees, it runs its days from now, and the start records where it was pressed. Publishes `engagement.quest.started`. Customer tokens only."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: false
+    description: Where Start was pressed.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/QuestStartInput.yaml
+  responses:
+    "200":
+      description: The quest, started.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/QuestProgress.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such quest is offered to the customer, live and outside their control group."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`quest_not_startable`: started and running (`quest_running`), completed and not repeatable (`quest_completed`), waiting out its days between completions (`quest_waiting`), or its budget spent (`quest_closed`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,35 @@
+type: object
+description: "A reward campaign the Partner paid towards in the week: its grants on the Location's orders and the Partner's share of them, less what was taken back."
+required:
+  - campaign_id
+  - name
+  - grants
+  - amount
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006002
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Try something new
+  grants:
+    type: integer
+    description: Rewards granted on the Location's orders.
+    minimum: 0
+    examples:
+      - 1
+  amount:
+    $ref: ../common/Money.yaml
+    description: The Partner's share.
+examples:
+  - campaign_id: 01a13a48-9e00-7000-8000-000000006002
+    name: Try something new
+    grants: 1
+    amount:
+      minor_units: 10000
+      currency: INR

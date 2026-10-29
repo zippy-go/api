@@ -1,0 +1,103 @@
+type: object
+description: "A change to a campaign. A draft or a scheduled campaign changes freely. A live or paused one changes only where no customer is surprised: its name, a later end, a larger budget and a higher daily cap; its rules change as a new version (Mission Control), and anything else is refused with `reward_campaign_change_refused`, saying to stop it and run another."
+properties:
+  name:
+    type:
+      - string
+      - "null"
+    description: Its name.
+    minLength: 1
+    maxLength: 80
+    examples:
+      - Try something new
+  funder:
+    oneOf:
+      - $ref: ./RewardFunder.yaml
+      - type: "null"
+    description: Who pays.
+  partner_share_percent:
+    type:
+      - integer
+      - "null"
+    description: A split campaign's Partner share.
+    minimum: 0
+    maximum: 100
+    examples:
+      - null
+  funding_partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner paying its share.
+    examples:
+      - null
+  partner_agreed:
+    type:
+      - boolean
+      - "null"
+    description: That the Partner agreed to pay its share.
+    examples:
+      - null
+  budget:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its budget.
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends.
+    examples:
+      - null
+  audience:
+    oneOf:
+      - $ref: ./RewardAudienceInput.yaml
+      - type: "null"
+    description: Where it counts.
+  daily_grant_cap:
+    type:
+      - integer
+      - "null"
+    description: Grants a day at most.
+    minimum: 1
+    maximum: 100000
+    examples:
+      - null
+  control_percent:
+    type:
+      - integer
+      - "null"
+    description: The share held out.
+    minimum: 0
+    maximum: 50
+    examples:
+      - null
+  rules:
+    oneOf:
+      - $ref: ./RewardRulesInput.yaml
+      - type: "null"
+    description: A draft's rules.
+examples:
+  - name: Try something new
+    funder: null
+    partner_share_percent: null
+    funding_partner_id: null
+    partner_agreed: null
+    budget: null
+    starts_at: null
+    ends_at: null
+    audience: null
+    daily_grant_cap: null
+    control_percent: null
+    rules: null

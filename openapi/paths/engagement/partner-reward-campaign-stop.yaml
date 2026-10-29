@@ -1,0 +1,75 @@
+# Path item for /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/stop. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: campaign_id
+    in: path
+    required: true
+    description: The reward campaign.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006002
+post:
+  operationId: stopPartnerRewardCampaign
+  summary: Stop a reward campaign
+  description: "Stops a live or paused campaign for good: it grants nothing from now, and rewards already granted stay. Publishes `engagement.campaign.ended`. `engagement:write` at the campaign's Locations, which managers hold by default."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: false
+    description: A reason, and the Partner's word to publish.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/RewardCampaignMove.yaml
+  responses:
+    "200":
+      description: The campaign, moved.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaign.yaml
+    "400":
+      description: "`validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such campaign."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

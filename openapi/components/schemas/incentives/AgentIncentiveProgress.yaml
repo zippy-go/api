@@ -1,0 +1,78 @@
+type: object
+description: The Agents who joined an incentive in a period, with their progress.
+required:
+  - incentive_id
+  - period
+  - starts_at
+  - ends_at
+  - items
+  - joined
+  - drop_offs
+  - earned
+properties:
+  incentive_id:
+    type: string
+    format: uuid
+    description: The incentive.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006101
+  period:
+    type: string
+    description: "The period: a week such as `2026W45`, or the dates of a one-off."
+    examples:
+      - 2026W45
+  starts_at:
+    type: string
+    format: date-time
+    description: When it starts.
+    examples:
+      - 2026-11-01T18:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-08T18:30:00Z
+  items:
+    type: array
+    items:
+      $ref: ./AgentIncentiveProgressRow.yaml
+    description: The Agents who joined, most drop-offs first.
+  joined:
+    type: integer
+    description: Agents who joined.
+    minimum: 0
+    examples:
+      - 1
+  drop_offs:
+    type: integer
+    description: Drop-offs counted.
+    minimum: 0
+    examples:
+      - 20
+  earned:
+    $ref: ../common/Money.yaml
+    description: Earned.
+examples:
+  - incentive_id: 01a13a48-9e00-7000-8000-000000006101
+    period: 2026W45
+    starts_at: 2026-11-01T18:30:00Z
+    ends_at: 2026-11-08T18:30:00Z
+    items:
+      - agent_id: 01a13a48-9e00-7000-8000-000000000107
+        name: Agent 07
+        joined_at: 2026-11-02T04:00:00Z
+        drop_offs: 20
+        earned:
+          minor_units: 30000
+          currency: INR
+        next_tier:
+          drop_offs: 35
+          amount:
+            minor_units: 60000
+            currency: INR
+    joined: 1
+    drop_offs: 20
+    earned:
+      minor_units: 30000
+      currency: INR

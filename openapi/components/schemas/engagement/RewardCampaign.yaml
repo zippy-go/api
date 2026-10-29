@@ -1,0 +1,269 @@
+type: object
+description: "A reward campaign: what it counts and gives, who pays and from what budget, when and where it runs, whom it holds out, and what the caller may do with it. Its rules are versioned: a live campaign's rules change only as a new version from a moment chosen, progress made under an earlier one keeps counting, and every grant names the version it came from."
+required:
+  - id
+  - owner
+  - partner_id
+  - name
+  - kind
+  - state
+  - line
+  - funder
+  - partner_share_percent
+  - budget
+  - schedule
+  - funding_partner_id
+  - partner_agreed
+  - audience
+  - daily_grant_cap
+  - control_percent
+  - rules_version
+  - rules
+  - versions
+  - confirmed
+  - paused_by_platform
+  - pause_reason
+  - grants
+  - created_at
+  - updated_at
+  - published_at
+  - ended_at
+  - version
+  - actions
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006002
+  owner:
+    $ref: ./RewardCampaignOwner.yaml
+    description: Who runs it.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner whose campaign it is; `null` for the platform's.
+    examples:
+      - null
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Try something new
+  kind:
+    $ref: ./RewardCampaignKind.yaml
+    description: What it counts.
+  state:
+    $ref: ./RewardCampaignState.yaml
+    description: Where it stands.
+  line:
+    type: string
+    description: What a customer reads.
+    examples:
+      - "Order from a second Vertical: ₹150.00 of credit"
+  funder:
+    $ref: ./RewardFunder.yaml
+    description: Who pays for its rewards.
+  partner_share_percent:
+    type: integer
+    description: "The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does."
+    minimum: 0
+    maximum: 100
+    examples:
+      - 0
+  budget:
+    $ref: ./RewardBudget.yaml
+    description: Its budget.
+  schedule:
+    $ref: ./RewardSchedule.yaml
+    description: When it runs.
+  funding_partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner that pays its share of a split campaign; `null` otherwise.
+    examples:
+      - null
+  partner_agreed:
+    type: boolean
+    description: For a split campaign, that the operator confirmed the Partner agreed to pay its share.
+  audience:
+    $ref: ./RewardAudience.yaml
+    description: Where it counts.
+  daily_grant_cap:
+    type: integer
+    description: Grants a day at most; 1,000 by default.
+    minimum: 1
+    examples:
+      - 1000
+  control_percent:
+    type: integer
+    description: The share of the customers it would reach held out as a control group, who see nothing of it and earn nothing; 10 by default, 0 for tiers.
+    minimum: 0
+    maximum: 50
+    examples:
+      - 10
+  rules_version:
+    type: integer
+    description: The version of the rules in force.
+    minimum: 1
+    examples:
+      - 1
+  rules:
+    $ref: ./RewardRules.yaml
+    description: The rules in force.
+  versions:
+    type: integer
+    description: Versions of its rules.
+    minimum: 1
+    examples:
+      - 1
+  confirmed:
+    type: boolean
+    description: For a Partner's campaign, whether the Partner confirmed as it published that its business pays.
+  paused_by_platform:
+    type: boolean
+    description: Whether the platform paused it; a Partner cannot resume it then.
+  pause_reason:
+    type:
+      - string
+      - "null"
+    description: Why it was paused.
+    examples:
+      - null
+  grants:
+    type: integer
+    description: Rewards granted.
+    minimum: 0
+    examples:
+      - 132
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-29T09:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-29T10:00:00Z
+  published_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was published.
+    examples:
+      - 2026-10-29T10:00:00Z
+  ended_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ended.
+    examples:
+      - null
+  version:
+    type: integer
+    description: The version of the campaign, raised on every change; send it in `If-Match` to change it.
+    minimum: 1
+    examples:
+      - 3
+  actions:
+    $ref: ./RewardCampaignActions.yaml
+    description: What the caller may do now.
+examples:
+  - id: 01a13a48-9e00-7000-8000-000000006002
+    owner: platform
+    partner_id: null
+    name: Try something new
+    kind: quest
+    state: live
+    line: "Order from a second Vertical: ₹150.00 of credit"
+    funder: platform
+    partner_share_percent: 0
+    budget:
+      amount:
+        minor_units: 2000000
+        currency: INR
+      granted:
+        minor_units: 1990000
+        currency: INR
+      held:
+        minor_units: 0
+        currency: INR
+      left:
+        minor_units: 10000
+        currency: INR
+      spent: false
+    schedule:
+      starts_at: 2026-10-29T00:00:00Z
+      ends_at: null
+      time_zone: Asia/Kolkata
+    funding_partner_id: null
+    partner_agreed: false
+    audience:
+      everywhere: false
+      service_area_ids:
+        - 01a13a48-9e00-7000-8000-00000000a001
+      vertical_ids: []
+      partner_ids: []
+      location_ids: []
+      words: Everywhere in Hyderabad
+    daily_grant_cap: 1000
+    control_percent: 10
+    rules_version: 1
+    rules:
+      streak: null
+      quest:
+        steps:
+          - kind: second_vertical
+            count: 1
+            partner_id: null
+            location_id: null
+            vertical_id: null
+            label: Order from a second Vertical
+        days: 30
+        repeatable: false
+        wait_days: 7
+        reward:
+          kind: credit
+          paid_as: wallet_credit
+          amount:
+            minor_units: 15000
+            currency: INR
+          worth_up_to: null
+          min_spend: null
+          valid_days: null
+          item_ids: []
+          worth:
+            minor_units: 15000
+            currency: INR
+          line: ₹150.00 of credit
+      tier: null
+      punch_card: null
+    versions: 1
+    confirmed: false
+    paused_by_platform: false
+    pause_reason: null
+    grants: 132
+    created_at: 2026-10-29T09:00:00Z
+    updated_at: 2026-10-29T10:00:00Z
+    published_at: 2026-10-29T10:00:00Z
+    ended_at: null
+    version: 3
+    actions:
+      edit: false
+      publish: false
+      pause: true
+      resume: false
+      stop: true
+      cancel: false
+      delete: false
+      new_version: true

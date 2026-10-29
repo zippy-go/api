@@ -1,0 +1,55 @@
+# Path item for /v1/agent/memberships/{agent_id}/incentives. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: The Agent membership, which must be the caller's.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000107
+get:
+  operationId: listOwnAgentIncentives
+  summary: Read the Agent's incentives
+  description: "The live incentives of the Agent's service this week: what each pays, whether the Agent joined, their drop-offs counted since, what they earned and what the next tier pays, and who pays: the platform on its fleet's weekly statement, or the Partner for its own Agents. Agent app tokens of the person holding the membership; another's answers `404`."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The incentives.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentiveOfferList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

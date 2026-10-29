@@ -1,0 +1,63 @@
+type: object
+description: "A reward as an operator or a Partner sets it. A reward is fixed: a range (`amount_up_to` above `amount`) or a chance is refused with `reward_not_fixed`, since rewards are fixed and shown before a customer acts."
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./RewardKind.yaml
+    description: What it gives.
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The credit, or the money off; required for those.
+  amount_up_to:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: 'Refused when above `amount`: a reward of "₹50 to ₹500 at random" is not fixed.'
+  chance_percent:
+    type:
+      - integer
+      - "null"
+    description: "Refused when set: no reward is given by chance."
+    minimum: 0
+    maximum: 100
+    examples:
+      - null
+  worth_up_to:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most free delivery or a free item takes off an order; ₹60.00 by default for free delivery.
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least an order must come to for money off to apply.
+  valid_days:
+    type:
+      - integer
+      - "null"
+    description: How many days a held offer is held; 14 by default.
+    minimum: 1
+    maximum: 90
+    examples:
+      - null
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items a free item may be chosen from.
+examples:
+  - kind: credit
+    amount:
+      minor_units: 15000
+      currency: INR
+    amount_up_to: null
+    chance_percent: null
+    worth_up_to: null
+    min_spend: null
+    valid_days: null
+    item_ids: []

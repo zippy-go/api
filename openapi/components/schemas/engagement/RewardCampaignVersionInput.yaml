@@ -1,0 +1,23 @@
+type: object
+description: A new version of a live campaign's rules, from a moment chosen, now or later (`effective_from_past` for one before now). Progress made under the earlier version keeps counting.
+required:
+  - rules
+properties:
+  effective_from:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it takes effect; now by default.
+    examples:
+      - 2026-11-01T00:00:00Z
+  rules:
+    $ref: ./RewardRulesInput.yaml
+    description: The rules.
+examples:
+  - effective_from: 2026-11-01T00:00:00Z
+    rules:
+      streak: null
+      quest: null
+      tier: null
+      punch_card: null

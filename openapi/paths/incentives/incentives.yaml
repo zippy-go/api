@@ -1,0 +1,142 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/incentives. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000202
+get:
+  operationId: listAgentIncentives
+  summary: List a service's incentives
+  description: "The delivery service's incentives for its Agents, live ones first: quests of drop-off tiers and bonuses a drop-off. Mission Control runs the platform fleet's through the same operations. `agent:read` at the service."
+  tags:
+    - Incentives
+  security:
+    - Bearer: []
+  parameters:
+    - name: state
+      in: query
+      required: false
+      description: Only incentives in this state.
+      schema:
+        $ref: ../../components/schemas/incentives/IncentiveState.yaml
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: Where the page starts.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of incentives.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentivePage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:read` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such delivery service of the Partner."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createAgentIncentive
+  summary: Make an incentive
+  description: "Makes an incentive kept as a draft: a quest's one to five tiers, more drop-offs paying more, or a bonus's amount a drop-off with its days and hours, weekly or once, with a budget. It never replaces the pay rule. `agent:manage` at the service."
+  tags:
+    - Incentives
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The incentive.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/incentives/AgentIncentiveInput.yaml
+  responses:
+    "201":
+      description: The draft.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentive.yaml
+    "400":
+      description: "`validation_failed`: tiers that do not rise, a bonus without its amount or window, hours that do not end after they start, a last day before the first, or a budget of nothing."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such delivery service of the Partner."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

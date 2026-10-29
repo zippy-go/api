@@ -1,0 +1,79 @@
+type: object
+description: "The customer's Rewards: their streaks, quests, tier and punch cards with their progress and what completes them. A campaign that holds the customer out is not listed."
+required:
+  - streaks
+  - quests
+  - tier
+  - punch_cards
+  - credit_earned
+properties:
+  streaks:
+    type: array
+    items:
+      $ref: ./StreakProgress.yaml
+    description: Weekly streaks.
+  quests:
+    type: array
+    items:
+      $ref: ./QuestProgress.yaml
+    description: Quests offered, started, completed or expired.
+  tier:
+    oneOf:
+      - $ref: ./TierStanding.yaml
+      - type: "null"
+    description: Their tier; `null` when no tier campaign is live.
+  punch_cards:
+    type: array
+    items:
+      $ref: ./PunchCardProgress.yaml
+    description: Punch cards with a punch, or near them.
+  credit_earned:
+    $ref: ../common/Money.yaml
+    description: Promotional credit their rewards gave, all time.
+examples:
+  - streaks:
+      - campaign_id: 01a13a48-9e00-7000-8000-000000006001
+        name: Order every week
+        state: active
+        weeks: 4
+        week: 2026W45
+        this_week_counted: true
+        at_risk: false
+        next_milestone: 8
+        next_reward: Free delivery for 14 days, up to ₹60.00 an order
+        freeze_available: true
+        freeze_used_week: null
+        reward_waiting: Free delivery, from your 4-week streak, funded by ZippyGo, until 22 November
+        sentence: 4 weeks in a row. Next reward at 8 weeks.
+    quests:
+      - campaign_id: 01a13a48-9e00-7000-8000-000000006002
+        name: Try something new
+        state: started
+        steps:
+          - kind: second_vertical
+            label: Order from a second Vertical
+            count: 0
+            needed: 1
+            done: false
+        done: 0
+        needed: 1
+        reward: ₹150.00 of credit
+        can_start: false
+        started_at: 2026-11-01T09:00:00Z
+        ends_at: 2026-12-01T09:00:00Z
+        completed_at: null
+        sentence: 0 of 1 done. Ends 1 December.
+    tier: null
+    punch_cards:
+      - campaign_id: 01a13a48-9e00-7000-8000-000000006004
+        name: Every 5th pickup
+        location_id: 01a13a48-9e00-7000-8000-000000000308
+        location_name: Charminar Bakes Gachibowli
+        punches: 4
+        every: 5
+        next_rewarded: true
+        reward: ₹50.00 off your 5th pickup
+        sentence: 4 of 5. Your next pickup here is rewarded.
+    credit_earned:
+      minor_units: 15000
+      currency: INR

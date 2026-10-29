@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.22.0
+  version: 0.23.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -284,6 +284,11 @@ tags:
     description: "Offers and the engine that prices them: a Partner's offers on its own Locations built from playbooks, the platform's campaigns across Locations with the Partners' share and their opt-in, and store promotions; one mechanic per offer with the line and small print the platform writes; a lifecycle with its clock; codes of four kinds in one registry with batches and the guess limit; a customer's offers, held offers and stamp cards; uses reserved, confirmed and released; and what a store's page, a basket and a placed order carry from the one engine. Partner staff read with `promotion:read` and write with `promotion:write` at the Location; platform staff likewise platform-wide; customers read and add codes with a customer token."
   - name: Operations
     description: "Mission Control's Operations section beyond health, events and the audit log: the service level objectives with their attainment, error budget and burn; the alerts they and the jobs, the outbox and the payouts open, acknowledged by name; the registry of jobs with their runs and run now; the outbox's pending and failed rows with replay. Reading needs a Mission Control token; acting needs `operations:manage`."
+
+  - name: Rewards
+    description: "What brings customers back (step 6, engagement): reward campaigns of kind streak, quest, tier and punch card, run by Mission Control across Partners and by a Partner on its own Locations, each with versioned rules, a funder or a split, a budget, a schedule, an audience, caps and a control group, moved as an offer is; the rewards engine reading the platform's events once each, granting promotional Wallet credit or an offer held for the customer, with claw-backs, caps, the review of held grants and exclusions; the customer's Rewards and its history; and the referral programme, a friend's first order crediting the referrer. Customers read their own; Partner staff read with `engagement:read` and change with `engagement:write` at the Location; platform staff read with `engagement:read`, change with `engagement:write` and decide held grants and exclusions with `engagement:manage`."
+  - name: Incentives
+    description: "The Agents' incentives (step 6): quests of drop-off tiers and bonuses a drop-off on a delivery service, joined by the Agent before anything counts, never replacing the pay rule, each with a budget; paid by the platform on its fleet's weekly statements under \"Bonuses and quests\", and reported to a Partner for its own Agents. Who runs the service configures them with `agent:manage`: Mission Control for the platform fleet, a Partner for its own; the Agent app joins them."
 
 paths:
   /v1/health:
@@ -1323,6 +1328,81 @@ paths:
     $ref: ./paths/promotions/platform-customer-offers.yaml
   /v1/platform/customers/{customer_id}/personal-codes:
     $ref: ./paths/promotions/platform-customer-personal-codes.yaml
+  # Step 6 engagement: reward campaigns, the rewards engine, referrals and the Agents' incentives
+  /v1/customer/rewards:
+    $ref: ./paths/engagement/customer-rewards.yaml
+  /v1/customer/rewards/grants:
+    $ref: ./paths/engagement/customer-reward-grants.yaml
+  /v1/customer/rewards/quests/{campaign_id}/start:
+    $ref: ./paths/engagement/customer-quest-start.yaml
+  /v1/customer/referral:
+    $ref: ./paths/engagement/customer-referral.yaml
+  /v1/customer/referral/code:
+    $ref: ./paths/engagement/customer-referral-code.yaml
+  /v1/partners/{partner_id}/reward-campaigns:
+    $ref: ./paths/engagement/partner-reward-campaigns.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}:
+    $ref: ./paths/engagement/partner-reward-campaign.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/publish:
+    $ref: ./paths/engagement/partner-reward-campaign-publish.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/pause:
+    $ref: ./paths/engagement/partner-reward-campaign-pause.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/resume:
+    $ref: ./paths/engagement/partner-reward-campaign-resume.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/stop:
+    $ref: ./paths/engagement/partner-reward-campaign-stop.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/cancel:
+    $ref: ./paths/engagement/partner-reward-campaign-cancel.yaml
+  /v1/partners/{partner_id}/reward-campaigns/{campaign_id}/results:
+    $ref: ./paths/engagement/partner-reward-campaign-results.yaml
+  /v1/platform/reward-campaigns:
+    $ref: ./paths/engagement/platform-reward-campaigns.yaml
+  /v1/platform/reward-campaigns/{campaign_id}:
+    $ref: ./paths/engagement/platform-reward-campaign.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/publish:
+    $ref: ./paths/engagement/platform-reward-campaign-publish.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/pause:
+    $ref: ./paths/engagement/platform-reward-campaign-pause.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/resume:
+    $ref: ./paths/engagement/platform-reward-campaign-resume.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/stop:
+    $ref: ./paths/engagement/platform-reward-campaign-stop.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/cancel:
+    $ref: ./paths/engagement/platform-reward-campaign-cancel.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/versions:
+    $ref: ./paths/engagement/platform-reward-campaign-versions.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/grants:
+    $ref: ./paths/engagement/platform-reward-campaign-grants.yaml
+  /v1/platform/reward-campaigns/{campaign_id}/results:
+    $ref: ./paths/engagement/platform-reward-campaign-results.yaml
+  /v1/platform/reward-grants:
+    $ref: ./paths/engagement/platform-reward-grants.yaml
+  /v1/platform/reward-grants/{grant_id}/release:
+    $ref: ./paths/engagement/platform-reward-grant-release.yaml
+  /v1/platform/reward-grants/{grant_id}/refuse:
+    $ref: ./paths/engagement/platform-reward-grant-refuse.yaml
+  /v1/service-areas/{service_area_id}/referrals:
+    $ref: ./paths/engagement/service-area-referrals.yaml
+  /v1/platform/referrals:
+    $ref: ./paths/engagement/platform-referrals.yaml
+  /v1/platform/customers/{customer_id}/rewards:
+    $ref: ./paths/engagement/platform-customer-rewards.yaml
+  /v1/platform/customers/{customer_id}/reward-exclusion:
+    $ref: ./paths/engagement/platform-customer-reward-exclusion.yaml
+  /v1/partners/{partner_id}/services/{service_id}/incentives:
+    $ref: ./paths/incentives/incentives.yaml
+  /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}:
+    $ref: ./paths/incentives/incentive.yaml
+  /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/publish:
+    $ref: ./paths/incentives/incentive-publish.yaml
+  /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/stop:
+    $ref: ./paths/incentives/incentive-stop.yaml
+  /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/progress:
+    $ref: ./paths/incentives/incentive-progress.yaml
+  /v1/agent/memberships/{agent_id}/incentives:
+    $ref: ./paths/incentives/agent-incentives.yaml
+  /v1/agent/memberships/{agent_id}/incentives/{incentive_id}/join:
+    $ref: ./paths/incentives/agent-incentive-join.yaml
 
 components:
   securitySchemes:
@@ -3641,3 +3721,177 @@ components:
       $ref: ./components/schemas/promotions/OrderOfferSplit.yaml
     StatementPromotion:
       $ref: ./components/schemas/promotions/StatementPromotion.yaml
+    RewardCampaignKind:
+      $ref: ./components/schemas/engagement/RewardCampaignKind.yaml
+    RewardCampaignState:
+      $ref: ./components/schemas/engagement/RewardCampaignState.yaml
+    RewardCampaignOwner:
+      $ref: ./components/schemas/engagement/RewardCampaignOwner.yaml
+    RewardFunder:
+      $ref: ./components/schemas/engagement/RewardFunder.yaml
+    RewardKind:
+      $ref: ./components/schemas/engagement/RewardKind.yaml
+    RewardSource:
+      $ref: ./components/schemas/engagement/RewardSource.yaml
+    RewardPaidAs:
+      $ref: ./components/schemas/engagement/RewardPaidAs.yaml
+    RewardGrantStatus:
+      $ref: ./components/schemas/engagement/RewardGrantStatus.yaml
+    RewardSignalCode:
+      $ref: ./components/schemas/engagement/RewardSignalCode.yaml
+    QuestStepKind:
+      $ref: ./components/schemas/engagement/QuestStepKind.yaml
+    QuestState:
+      $ref: ./components/schemas/engagement/QuestState.yaml
+    QuestStartedFrom:
+      $ref: ./components/schemas/engagement/QuestStartedFrom.yaml
+    TierLevel:
+      $ref: ./components/schemas/engagement/TierLevel.yaml
+    StreakState:
+      $ref: ./components/schemas/engagement/StreakState.yaml
+    ReferralState:
+      $ref: ./components/schemas/engagement/ReferralState.yaml
+    ClawBackReason:
+      $ref: ./components/schemas/engagement/ClawBackReason.yaml
+    IncentiveKind:
+      $ref: ./components/schemas/incentives/IncentiveKind.yaml
+    IncentiveState:
+      $ref: ./components/schemas/incentives/IncentiveState.yaml
+    IncentiveRecurrence:
+      $ref: ./components/schemas/incentives/IncentiveRecurrence.yaml
+    RewardSpec:
+      $ref: ./components/schemas/engagement/RewardSpec.yaml
+    RewardSpecInput:
+      $ref: ./components/schemas/engagement/RewardSpecInput.yaml
+    StreakMilestone:
+      $ref: ./components/schemas/engagement/StreakMilestone.yaml
+    StreakMilestoneInput:
+      $ref: ./components/schemas/engagement/StreakMilestoneInput.yaml
+    StreakRules:
+      $ref: ./components/schemas/engagement/StreakRules.yaml
+    StreakRulesInput:
+      $ref: ./components/schemas/engagement/StreakRulesInput.yaml
+    QuestStep:
+      $ref: ./components/schemas/engagement/QuestStep.yaml
+    QuestStepInput:
+      $ref: ./components/schemas/engagement/QuestStepInput.yaml
+    QuestRules:
+      $ref: ./components/schemas/engagement/QuestRules.yaml
+    QuestRulesInput:
+      $ref: ./components/schemas/engagement/QuestRulesInput.yaml
+    TierRules:
+      $ref: ./components/schemas/engagement/TierRules.yaml
+    TierRulesInput:
+      $ref: ./components/schemas/engagement/TierRulesInput.yaml
+    PunchCardRules:
+      $ref: ./components/schemas/engagement/PunchCardRules.yaml
+    PunchCardRulesInput:
+      $ref: ./components/schemas/engagement/PunchCardRulesInput.yaml
+    RewardRules:
+      $ref: ./components/schemas/engagement/RewardRules.yaml
+    RewardRulesInput:
+      $ref: ./components/schemas/engagement/RewardRulesInput.yaml
+    RewardAudience:
+      $ref: ./components/schemas/engagement/RewardAudience.yaml
+    RewardAudienceInput:
+      $ref: ./components/schemas/engagement/RewardAudienceInput.yaml
+    RewardBudget:
+      $ref: ./components/schemas/engagement/RewardBudget.yaml
+    RewardSchedule:
+      $ref: ./components/schemas/engagement/RewardSchedule.yaml
+    RewardCampaignActions:
+      $ref: ./components/schemas/engagement/RewardCampaignActions.yaml
+    RewardCampaignCounts:
+      $ref: ./components/schemas/engagement/RewardCampaignCounts.yaml
+    RewardCampaignSummary:
+      $ref: ./components/schemas/engagement/RewardCampaignSummary.yaml
+    RewardCampaign:
+      $ref: ./components/schemas/engagement/RewardCampaign.yaml
+    RewardCampaignPage:
+      $ref: ./components/schemas/engagement/RewardCampaignPage.yaml
+    RewardCampaignInput:
+      $ref: ./components/schemas/engagement/RewardCampaignInput.yaml
+    RewardCampaignUpdate:
+      $ref: ./components/schemas/engagement/RewardCampaignUpdate.yaml
+    RewardCampaignMove:
+      $ref: ./components/schemas/engagement/RewardCampaignMove.yaml
+    RewardCampaignVersion:
+      $ref: ./components/schemas/engagement/RewardCampaignVersion.yaml
+    RewardCampaignVersionList:
+      $ref: ./components/schemas/engagement/RewardCampaignVersionList.yaml
+    RewardCampaignVersionInput:
+      $ref: ./components/schemas/engagement/RewardCampaignVersionInput.yaml
+    RewardResultsGroup:
+      $ref: ./components/schemas/engagement/RewardResultsGroup.yaml
+    RewardCampaignResults:
+      $ref: ./components/schemas/engagement/RewardCampaignResults.yaml
+    RewardSignal:
+      $ref: ./components/schemas/engagement/RewardSignal.yaml
+    RewardClawBack:
+      $ref: ./components/schemas/engagement/RewardClawBack.yaml
+    RewardGrant:
+      $ref: ./components/schemas/engagement/RewardGrant.yaml
+    RewardGrantPage:
+      $ref: ./components/schemas/engagement/RewardGrantPage.yaml
+    RewardGrantDecision:
+      $ref: ./components/schemas/engagement/RewardGrantDecision.yaml
+    StreakProgress:
+      $ref: ./components/schemas/engagement/StreakProgress.yaml
+    QuestStepProgress:
+      $ref: ./components/schemas/engagement/QuestStepProgress.yaml
+    QuestProgress:
+      $ref: ./components/schemas/engagement/QuestProgress.yaml
+    TierStanding:
+      $ref: ./components/schemas/engagement/TierStanding.yaml
+    PunchCardProgress:
+      $ref: ./components/schemas/engagement/PunchCardProgress.yaml
+    CustomerRewards:
+      $ref: ./components/schemas/engagement/CustomerRewards.yaml
+    QuestStartInput:
+      $ref: ./components/schemas/engagement/QuestStartInput.yaml
+    CustomerReferral:
+      $ref: ./components/schemas/engagement/CustomerReferral.yaml
+    ReferralSettings:
+      $ref: ./components/schemas/engagement/ReferralSettings.yaml
+    ReferralSettingsInput:
+      $ref: ./components/schemas/engagement/ReferralSettingsInput.yaml
+    Referral:
+      $ref: ./components/schemas/engagement/Referral.yaml
+    ReferralPage:
+      $ref: ./components/schemas/engagement/ReferralPage.yaml
+    RewardExclusion:
+      $ref: ./components/schemas/engagement/RewardExclusion.yaml
+    RewardExclusionInput:
+      $ref: ./components/schemas/engagement/RewardExclusionInput.yaml
+    PlatformCustomerRewards:
+      $ref: ./components/schemas/engagement/PlatformCustomerRewards.yaml
+    PlatformCustomerRewardActions:
+      $ref: ./components/schemas/engagement/PlatformCustomerRewardActions.yaml
+    IncentiveTier:
+      $ref: ./components/schemas/incentives/IncentiveTier.yaml
+    IncentiveWindow:
+      $ref: ./components/schemas/incentives/IncentiveWindow.yaml
+    IncentiveBudget:
+      $ref: ./components/schemas/incentives/IncentiveBudget.yaml
+    AgentIncentive:
+      $ref: ./components/schemas/incentives/AgentIncentive.yaml
+    AgentIncentivePage:
+      $ref: ./components/schemas/incentives/AgentIncentivePage.yaml
+    AgentIncentiveInput:
+      $ref: ./components/schemas/incentives/AgentIncentiveInput.yaml
+    AgentIncentiveUpdate:
+      $ref: ./components/schemas/incentives/AgentIncentiveUpdate.yaml
+    AgentIncentiveProgressRow:
+      $ref: ./components/schemas/incentives/AgentIncentiveProgressRow.yaml
+    AgentIncentiveProgress:
+      $ref: ./components/schemas/incentives/AgentIncentiveProgress.yaml
+    IncentiveNext:
+      $ref: ./components/schemas/incentives/IncentiveNext.yaml
+    AgentIncentiveOffer:
+      $ref: ./components/schemas/incentives/AgentIncentiveOffer.yaml
+    AgentIncentiveOfferList:
+      $ref: ./components/schemas/incentives/AgentIncentiveOfferList.yaml
+    StatementRewardRow:
+      $ref: ./components/schemas/payouts/StatementRewardRow.yaml
+    AgentBonusLine:
+      $ref: ./components/schemas/payouts/AgentBonusLine.yaml

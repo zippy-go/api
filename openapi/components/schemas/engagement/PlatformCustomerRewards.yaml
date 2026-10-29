@@ -1,0 +1,165 @@
+type: object
+description: "A customer's Rewards tab in Mission Control: what the customer sees, every grant, their referrals, the signals on them and whether they are excluded."
+required:
+  - customer_id
+  - rewards
+  - grants
+  - referrals
+  - signals
+  - excluded
+  - blocked
+  - actions
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000701
+  rewards:
+    $ref: ./CustomerRewards.yaml
+    description: What the customer sees.
+  grants:
+    type: array
+    items:
+      $ref: ./RewardGrant.yaml
+    description: Their latest 50 grants, newest first.
+  referrals:
+    type: array
+    items:
+      $ref: ./Referral.yaml
+    description: Their referrals, as referrer or friend.
+  signals:
+    type: array
+    items:
+      $ref: ./RewardSignal.yaml
+    description: The signals on them now.
+  excluded:
+    oneOf:
+      - $ref: ./RewardExclusion.yaml
+      - type: "null"
+    description: Their exclusion; `null` when they earn.
+  blocked:
+    type: boolean
+    description: Whether support blocked the account, so it earns nothing while blocked.
+  actions:
+    $ref: ./PlatformCustomerRewardActions.yaml
+    description: What the caller may do.
+examples:
+  - customer_id: 01a13a48-9e00-7000-8000-000000000701
+    rewards:
+      streaks:
+        - campaign_id: 01a13a48-9e00-7000-8000-000000006001
+          name: Order every week
+          state: active
+          weeks: 4
+          week: 2026W45
+          this_week_counted: true
+          at_risk: false
+          next_milestone: 8
+          next_reward: Free delivery for 14 days, up to ₹60.00 an order
+          freeze_available: true
+          freeze_used_week: null
+          reward_waiting: Free delivery, from your 4-week streak, funded by ZippyGo, until 22 November
+          sentence: 4 weeks in a row. Next reward at 8 weeks.
+      quests:
+        - campaign_id: 01a13a48-9e00-7000-8000-000000006002
+          name: Try something new
+          state: started
+          steps:
+            - kind: second_vertical
+              label: Order from a second Vertical
+              count: 0
+              needed: 1
+              done: false
+          done: 0
+          needed: 1
+          reward: ₹150.00 of credit
+          can_start: false
+          started_at: 2026-11-01T09:00:00Z
+          ends_at: 2026-12-01T09:00:00Z
+          completed_at: null
+          sentence: 0 of 1 done. Ends 1 December.
+      tier: null
+      punch_cards:
+        - campaign_id: 01a13a48-9e00-7000-8000-000000006004
+          name: Every 5th pickup
+          location_id: 01a13a48-9e00-7000-8000-000000000308
+          location_name: Charminar Bakes Gachibowli
+          punches: 4
+          every: 5
+          next_rewarded: true
+          reward: ₹50.00 off your 5th pickup
+          sentence: 4 of 5. Your next pickup here is rewarded.
+      credit_earned:
+        minor_units: 15000
+        currency: INR
+    grants:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6001
+        source: campaign
+        campaign_id: 01a13a48-9e00-7000-8000-000000006002
+        campaign_name: Try something new
+        campaign_kind: quest
+        rules_version: 1
+        customer_id: 01a13a48-9e00-7000-8000-000000000701
+        status: granted
+        reward:
+          kind: credit
+          paid_as: wallet_credit
+          amount:
+            minor_units: 15000
+            currency: INR
+          worth_up_to: null
+          min_spend: null
+          valid_days: null
+          item_ids: []
+          worth:
+            minor_units: 15000
+            currency: INR
+          line: ₹150.00 of credit
+        amount:
+          minor_units: 15000
+          currency: INR
+        funder: platform
+        platform_share:
+          minor_units: 15000
+          currency: INR
+        partner_share:
+          minor_units: 0
+          currency: INR
+        partner_id: null
+        location_id: 01a13a48-9e00-7000-8000-000000000308
+        location_name: Charminar Bakes Gachibowli
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        explanation: ₹150.00 of credit, from Try something new, funded by ZippyGo
+        signals: []
+        granted_at: 2026-11-01T12:40:00Z
+        expires_at: null
+        deferred_until: null
+        decided_by: null
+        decided_at: null
+        decision_reason: null
+        claw_back: null
+        created_at: 2026-11-01T12:40:00Z
+    referrals:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6101
+        referrer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001
+        referrer_name: Ravi
+        referred_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7002
+        referred_name: Priya
+        code: RAVI7K
+        service_area_id: 01a13a48-9e00-7000-8000-00000000a001
+        state: rewarded
+        recorded_at: 2026-11-02T08:00:00Z
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        rewarded_at: 2026-11-02T09:10:00Z
+        amount:
+          minor_units: 10000
+          currency: INR
+        reason: null
+    signals: []
+    excluded: null
+    blocked: false
+    actions:
+      exclude: true
+      lift: false

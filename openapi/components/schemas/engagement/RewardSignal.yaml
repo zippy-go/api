@@ -1,0 +1,17 @@
+type: object
+description: A signal that held a grant for review, in words.
+required:
+  - code
+  - words
+properties:
+  code:
+    $ref: ./RewardSignalCode.yaml
+    description: The signal.
+  words:
+    type: string
+    description: In words.
+    examples:
+      - 3 accounts on one device
+examples:
+  - code: shared_device
+    words: 3 accounts on one device

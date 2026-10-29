@@ -6,6 +6,113 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-30
+
+Step 6, engagement: reward campaigns and the rewards engine, the customer's
+Rewards, referrals, and the Agents' incentives. Written on branch
+`step6/engagement` beside the taxonomy and promotions slices of step 6; it
+takes 0.23.0 and the default roles' edition 9 after the taxonomy's 0.21.0 and
+promotions' 0.22.0. Promotions holds a reward offer for engagement
+(`source: reward` among the customer's offers) and asks it whether a referral
+code may count. Additive only.
+
+### Added
+
+- Reward campaigns (`Rewards` tag) of kind streak, quest, tier and punch
+  card, each with versioned rules, a funder or a split in percent, a budget,
+  a schedule, an audience, a daily cap and a control group, moved as an
+  offer is: a Partner's on its own Locations, paid by the Partner, published
+  with its word that its business pays
+  (`GET`, `POST /v1/partners/{partner_id}/reward-campaigns`, `GET`, `PATCH`,
+  `DELETE .../{campaign_id}`, `POST .../publish`, `.../pause`, `.../resume`,
+  `.../stop`, `.../cancel`, `GET .../results`), and Mission Control's across
+  Partners, with the rule versions, the grants with the budget, the results
+  against the control group, the held grants released or refused, and a
+  customer's exclusion (`GET`, `POST /v1/platform/reward-campaigns`, `GET`,
+  `PATCH`, `DELETE .../{campaign_id}`, the moves, `GET`, `POST .../versions`,
+  `GET .../grants`, `GET .../results`, `GET /v1/platform/reward-grants`,
+  `POST .../{grant_id}/release`, `.../refuse`,
+  `GET /v1/platform/customers/{customer_id}/rewards`, `PUT`,
+  `DELETE .../reward-exclusion`). Schemas `RewardCampaign`,
+  `RewardCampaignSummary`, `RewardCampaignPage`, `RewardCampaignCounts`,
+  `RewardCampaignInput`, `RewardCampaignUpdate`, `RewardCampaignMove`,
+  `RewardCampaignActions`, `RewardCampaignVersion`,
+  `RewardCampaignVersionList`, `RewardCampaignVersionInput`,
+  `RewardCampaignResults`, `RewardResultsGroup`, `RewardRules`,
+  `RewardRulesInput`, `StreakRules`, `StreakMilestone`, `QuestRules`,
+  `QuestStep`, `TierRules`, `PunchCardRules` with their inputs,
+  `RewardSpec`, `RewardSpecInput`, `RewardAudience`, `RewardAudienceInput`,
+  `RewardBudget`, `RewardSchedule`, `RewardGrant`, `RewardGrantPage`,
+  `RewardGrantDecision`, `RewardSignal`, `RewardClawBack`,
+  `RewardExclusion`, `RewardExclusionInput`, `PlatformCustomerRewards`,
+  `PlatformCustomerRewardActions` and the enumerations
+  `RewardCampaignKind`, `RewardCampaignState`, `RewardCampaignOwner`,
+  `RewardFunder`, `RewardKind`, `RewardPaidAs`, `RewardSource`,
+  `RewardGrantStatus`, `RewardSignalCode`, `ClawBackReason`.
+- The customer's Rewards: weekly streaks, quests offered until Start is
+  pressed, the tier and punch cards with their progress, and every grant
+  with its funder and claw-back (`GET /v1/customer/rewards`,
+  `GET /v1/customer/rewards/grants`,
+  `POST /v1/customer/rewards/quests/{campaign_id}/start`, `CustomerRewards`,
+  `StreakProgress`, `QuestProgress`, `QuestStepProgress`, `TierStanding`,
+  `PunchCardProgress`, `QuestStartInput`, `QuestState`, `QuestStepKind`,
+  `QuestStartedFrom`, `StreakState`, `TierLevel`); the account section
+  `rewards` after Offers and Wallet.
+- Referrals: the customer's referral code with what a friend gets and what
+  the customer earns (`GET /v1/customer/referral`,
+  `POST /v1/customer/referral/code`, `CustomerReferral`), a city's
+  programme (`GET`, `PUT /v1/service-areas/{service_area_id}/referrals`,
+  `ReferralSettings`, `ReferralSettingsInput`) and every referral
+  (`GET /v1/platform/referrals`, `Referral`, `ReferralPage`,
+  `ReferralState`).
+- The Agents' incentives (`Incentives` tag): quests of drop-off tiers and
+  bonuses a drop-off on a delivery service, with a budget, run by Mission
+  Control for the platform fleet and by a Partner for its own
+  (`GET`, `POST /v1/partners/{partner_id}/services/{service_id}/incentives`,
+  `GET`, `PATCH`, `DELETE .../{incentive_id}`, `POST .../publish`,
+  `.../stop`, `GET .../progress`), joined in the Agent app
+  (`GET /v1/agent/memberships/{agent_id}/incentives`,
+  `POST .../incentives/{incentive_id}/join`). Schemas `AgentIncentive`,
+  `AgentIncentivePage`, `AgentIncentiveInput`, `AgentIncentiveUpdate`,
+  `AgentIncentiveProgress`, `AgentIncentiveProgressRow`,
+  `AgentIncentiveOffer`, `AgentIncentiveOfferList`, `IncentiveTier`,
+  `IncentiveWindow`, `IncentiveBudget`, `IncentiveNext`, `IncentiveKind`,
+  `IncentiveState`, `IncentiveRecurrence`.
+- Statements: "Rewards you paid for" on a Location's statement and its
+  working (`Statement.rewards`, `PayoutWorking.rewards`,
+  `StatementFigures.rewards`, `StatementRewardRow`); "Bonuses and quests" on
+  a platform fleet Agent's statement and week (`AgentStatement.bonuses`,
+  `AgentWeek.bonuses`, `AgentWeek.bonus_lines`, `AgentWeekSummary.bonuses`,
+  `AgentBonusLine`), filling `AgentStatementFigures.bonuses`; the bonuses
+  column of a Partner's own Agents' weekly report (`AgentWeeksRow.bonuses`,
+  `AgentWeeksTotals.bonuses`).
+- Twenty-three events: `engagement.campaign.created`, `.published`,
+  `.started`, `.paused`, `.resumed`, `.ended`; `engagement.reward.granted`,
+  `.held`, `.released`, `.refused`, `.clawed_back`;
+  `engagement.streak.advanced`, `.frozen`, `.broken`;
+  `engagement.quest.started`, `.completed`, `.expired`;
+  `engagement.tier.changed`; `engagement.referral.recorded`, `.rewarded`;
+  `engagement.incentive.published`, `.joined`, `.earned`. None carries a
+  phone number, an email, an address or a device.
+- Problem codes `reward_campaign_move_refused` (with `campaign_state` and
+  `paused_by_platform`), `reward_campaign_change_refused`,
+  `quest_not_startable` (with `quest_running`, `quest_completed`,
+  `quest_waiting` and `quest_closed`), `referral_code_recent`,
+  `reward_grant_decided`, `incentive_move_refused` (with
+  `incentive_state`), `incentive_change_refused` and
+  `incentive_not_joinable` (with `already_joined`, `incentive_closed`,
+  `budget_spent` and `not_in_service`); field codes
+  `kind_not_for_partners`, `reward_not_fixed`, `funding_not_confirmed` and
+  `effective_from_past`.
+
+### Changed
+
+- New permissions `engagement:read`, `engagement:write` and
+  `engagement:manage`; edition 9 of the default roles gives
+  Manager `engagement:read` and `engagement:write`, Staff
+  `engagement:read`, `operations` all three, and `support` and `finance`
+  `engagement:read`.
+
 ## [0.22.0] - 2026-10-30
 
 Step 6, promotions: the offers Partners run from playbooks, the platform's

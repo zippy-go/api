@@ -1,0 +1,112 @@
+type: object
+description: A new campaign, kept as a draft. A Partner's campaign is a streak, a quest naming only its own Partner or Locations, or a punch card, on its own Locations and paid by the Partner in full; a tier is the platform's only (`kind_not_for_partners`).
+required:
+  - name
+  - kind
+  - budget
+  - rules
+properties:
+  name:
+    type: string
+    description: Its name, 1 to 80 characters.
+    minLength: 1
+    maxLength: 80
+    examples:
+      - Try something new
+  kind:
+    $ref: ./RewardCampaignKind.yaml
+    description: What it counts.
+  funder:
+    oneOf:
+      - $ref: ./RewardFunder.yaml
+      - type: "null"
+    description: "Who pays: the platform by default for Mission Control's, the Partner always for a Partner's."
+  partner_share_percent:
+    type:
+      - integer
+      - "null"
+    description: A split campaign's Partner share, 1 to 99.
+    minimum: 0
+    maximum: 100
+    examples:
+      - null
+  funding_partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner paying its share of a split campaign.
+    examples:
+      - null
+  partner_agreed:
+    type:
+      - boolean
+      - "null"
+    description: For a split campaign, that the Partner agreed to pay its share; required to publish one.
+    examples:
+      - null
+  budget:
+    $ref: ../common/Money.yaml
+    description: Its budget, more than nothing.
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts; when published by default.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; open by default.
+    examples:
+      - null
+  audience:
+    oneOf:
+      - $ref: ./RewardAudienceInput.yaml
+      - type: "null"
+    description: Where it counts; a Partner's Locations, or everywhere, by default.
+  daily_grant_cap:
+    type:
+      - integer
+      - "null"
+    description: Grants a day at most; 1,000 by default.
+    minimum: 1
+    maximum: 100000
+    examples:
+      - null
+  control_percent:
+    type:
+      - integer
+      - "null"
+    description: The share held out, 0 to 50; 10 by default, 0 for tiers.
+    minimum: 0
+    maximum: 50
+    examples:
+      - null
+  rules:
+    $ref: ./RewardRulesInput.yaml
+    description: "Its rules: the member named by its kind."
+examples:
+  - name: Try something new
+    kind: quest
+    funder: platform
+    partner_share_percent: null
+    funding_partner_id: null
+    partner_agreed: null
+    budget:
+      minor_units: 2000000
+      currency: INR
+    starts_at: null
+    ends_at: null
+    audience: null
+    daily_grant_cap: null
+    control_percent: null
+    rules:
+      streak: null
+      quest: null
+      tier: null
+      punch_card: null

@@ -1,0 +1,7 @@
+type: string
+description: "A customer's streak: `active` while it counts, or `broken` when a week passed without an order and no freeze kept it; a customer in the control group sees no streak."
+enum:
+  - active
+  - broken
+examples:
+  - active

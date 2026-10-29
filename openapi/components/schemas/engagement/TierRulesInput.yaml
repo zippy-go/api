@@ -1,0 +1,34 @@
+type: object
+description: The tiers as set; Silver at 8 and Gold at 20 in 90 days by default.
+properties:
+  silver_orders:
+    type:
+      - integer
+      - "null"
+    description: 8 by default.
+    minimum: 1
+    maximum: 1000
+    examples:
+      - 8
+  gold_orders:
+    type:
+      - integer
+      - "null"
+    description: 20 by default, above Silver.
+    minimum: 2
+    maximum: 1000
+    examples:
+      - 20
+  window_days:
+    type:
+      - integer
+      - "null"
+    description: 90 by default.
+    minimum: 7
+    maximum: 365
+    examples:
+      - 90
+examples:
+  - silver_orders: 8
+    gold_orders: 20
+    window_days: 90

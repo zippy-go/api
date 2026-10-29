@@ -1,0 +1,55 @@
+# Path item for /v1/platform/customers/{customer_id}/rewards. Referenced from openapi.yaml.
+parameters:
+  - name: customer_id
+    in: path
+    required: true
+    description: The customer (a user id).
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000701
+get:
+  operationId: getPlatformCustomerRewards
+  summary: Read a customer's Rewards tab
+  description: What the customer sees in Rewards, every grant of theirs, their referrals, the signals on them now and whether they are excluded or blocked, with what the caller may do. Mission Control tokens only, with `engagement:read`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: Their Rewards tab.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/PlatformCustomerRewards.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such customer."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

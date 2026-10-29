@@ -1,0 +1,102 @@
+type: object
+description: "A quest as the customer sees it: offered with nothing counted until they press Start, then its steps, its end and its reward."
+required:
+  - campaign_id
+  - name
+  - state
+  - steps
+  - done
+  - needed
+  - reward
+  - can_start
+  - started_at
+  - ends_at
+  - completed_at
+  - sentence
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006002
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Try something new
+  state:
+    $ref: ./QuestState.yaml
+    description: Where it stands.
+  steps:
+    type: array
+    items:
+      $ref: ./QuestStepProgress.yaml
+    description: Its steps.
+  done:
+    type: integer
+    description: Steps done.
+    minimum: 0
+    examples:
+      - 0
+  needed:
+    type: integer
+    description: Steps.
+    minimum: 1
+    examples:
+      - 1
+  reward:
+    type: string
+    description: Its reward.
+    examples:
+      - ₹150.00 of credit
+  can_start:
+    type: boolean
+    description: Whether Start is offered now.
+  started_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was started.
+    examples:
+      - 2026-11-01T09:00:00Z
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-12-01T09:00:00Z
+  completed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it completed.
+    examples:
+      - null
+  sentence:
+    type: string
+    description: In words.
+    examples:
+      - 0 of 1 done. Ends 1 December.
+examples:
+  - campaign_id: 01a13a48-9e00-7000-8000-000000006002
+    name: Try something new
+    state: started
+    steps:
+      - kind: second_vertical
+        label: Order from a second Vertical
+        count: 0
+        needed: 1
+        done: false
+    done: 0
+    needed: 1
+    reward: ₹150.00 of credit
+    can_start: false
+    started_at: 2026-11-01T09:00:00Z
+    ends_at: 2026-12-01T09:00:00Z
+    completed_at: null
+    sentence: 0 of 1 done. Ends 1 December.

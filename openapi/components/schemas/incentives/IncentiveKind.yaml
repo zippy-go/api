@@ -1,0 +1,7 @@
+type: string
+description: "An Agent incentive: a `quest`, tiers of drop-offs completed in its period, each paying once; or a `bonus`, an amount for each drop-off completed in its window."
+enum:
+  - quest
+  - bonus
+examples:
+  - quest

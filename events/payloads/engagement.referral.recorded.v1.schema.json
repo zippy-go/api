@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.referral.recorded.v1.schema.json",
+  "title": "EngagementReferralRecordedPayload",
+  "description": "Payload of `engagement.referral.recorded` version 1: a friend added a customer's referral code, recorded from `promotions.code.claimed`. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "properties": {
+    "referral_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The referral.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6101"
+      ]
+    },
+    "referrer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The referrer (a user id).",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001"
+      ]
+    },
+    "referred_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The friend (a user id).",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7002"
+      ]
+    },
+    "code_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The code's id in promotions' registry.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6401"
+      ]
+    },
+    "service_area_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The city.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000a001"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-02T08:00:00Z"
+      ]
+    }
+  }
+}

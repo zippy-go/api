@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.reward.released.v1.schema.json",
+  "title": "EngagementRewardReleasedPayload",
+  "description": "Payload of `engagement.reward.released` version 1: a reward held for review was released by Mission Control and granted; `engagement.reward.granted` follows. The envelope's `partner_id` is the Partner paying a share, `null` when the platform pays it all. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "grant_id",
+    "source",
+    "campaign_id",
+    "campaign_name",
+    "kind",
+    "rules_version",
+    "customer_id",
+    "reward_kind",
+    "paid_as",
+    "amount",
+    "funder",
+    "platform_share",
+    "partner_share",
+    "partner_id",
+    "location_id",
+    "order_id",
+    "explanation",
+    "at",
+    "by_user_id",
+    "reason"
+  ],
+  "properties": {
+    "grant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The grant.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6001"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "campaign",
+        "referral"
+      ],
+      "description": "What granted it: a reward `campaign`, or a city's `referral` programme.",
+      "examples": [
+        "campaign"
+      ]
+    },
+    "campaign_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The reward campaign; `null` for a referral.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006002"
+      ]
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "The campaign's name, or the city's referrals.",
+      "examples": [
+        "Try something new"
+      ]
+    },
+    "kind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "streak",
+        "quest",
+        "tier",
+        "punch_card",
+        null
+      ],
+      "description": "The campaign's kind; `null` for a referral.",
+      "examples": [
+        "quest"
+      ]
+    },
+    "rules_version": {
+      "type": "integer",
+      "description": "The version of the rules it came from.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000701"
+      ]
+    },
+    "reward_kind": {
+      "type": "string",
+      "enum": [
+        "credit",
+        "free_delivery",
+        "money_off",
+        "free_item"
+      ],
+      "description": "What it gives.",
+      "examples": [
+        "credit"
+      ]
+    },
+    "paid_as": {
+      "type": "string",
+      "enum": [
+        "wallet_credit",
+        "held_offer"
+      ],
+      "description": "How it reaches the customer: promotional Wallet credit, or an offer held for them that the basket prices.",
+      "examples": [
+        "wallet_credit"
+      ]
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "The credit, or the most the held offer can take off, which the budget is debited."
+    },
+    "funder": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner",
+        "split"
+      ],
+      "description": "Who pays.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "platform_share": {
+      "$ref": "#/$defs/money",
+      "description": "The platform's share."
+    },
+    "partner_share": {
+      "$ref": "#/$defs/money",
+      "description": "The Partner's share, charged to the Location whose order earned it."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Partner paying a share; the envelope's `partner_id` too.",
+      "examples": [
+        null
+      ]
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Location whose order earned it.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000308"
+      ]
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order that earned it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "explanation": {
+      "type": "string",
+      "description": "What the customer reads.",
+      "examples": [
+        "₹150.00 of credit, from Try something new, funded by ZippyGo"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-01T12:40:00Z"
+      ]
+    },
+    "by_user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who released it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why.",
+      "examples": [
+        "Checked: one household, three phones"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

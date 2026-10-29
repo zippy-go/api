@@ -1,0 +1,32 @@
+type: object
+description: When a campaign runs, on its Locations' clock.
+required:
+  - starts_at
+  - ends_at
+  - time_zone
+properties:
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts; `null` for when it is published.
+    examples:
+      - 2026-10-29T00:00:00Z
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` until stopped.
+    examples:
+      - null
+  time_zone:
+    type: string
+    description: The clock.
+    examples:
+      - Asia/Kolkata
+examples:
+  - starts_at: 2026-10-29T00:00:00Z
+    ends_at: null
+    time_zone: Asia/Kolkata

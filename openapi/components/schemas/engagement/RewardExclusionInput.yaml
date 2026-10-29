@@ -1,0 +1,14 @@
+type: object
+description: Why a customer is excluded from rewards, 1 to 300 characters; in the audit log.
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    description: Why.
+    minLength: 1
+    maxLength: 300
+    examples:
+      - Accounts made to farm referrals
+examples:
+  - reason: Accounts made to farm referrals

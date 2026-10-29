@@ -1,0 +1,34 @@
+type: object
+description: A city's referral programme as set.
+required:
+  - enabled
+  - referrer_reward
+  - budget
+properties:
+  enabled:
+    type: boolean
+    description: Whether referrals earn.
+  referrer_reward:
+    $ref: ../common/Money.yaml
+    description: What the referrer earns, more than nothing.
+  budget:
+    $ref: ../common/Money.yaml
+    description: The budget.
+  monthly_limit:
+    type:
+      - integer
+      - "null"
+    description: 20 by default.
+    minimum: 0
+    maximum: 1000
+    examples:
+      - 20
+examples:
+  - enabled: true
+    referrer_reward:
+      minor_units: 10000
+      currency: INR
+    budget:
+      minor_units: 2500000
+      currency: INR
+    monthly_limit: 20

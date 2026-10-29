@@ -1,0 +1,70 @@
+type: object
+description: "A city's referral programme: whether it runs, what the referrer earns from what budget, the monthly limit and the refund window. The friend's offer is the city's referral offer in promotions."
+required:
+  - service_area_id
+  - service_area_name
+  - enabled
+  - referrer_reward
+  - budget
+  - granted
+  - monthly_limit
+  - refund_window_days
+  - version
+properties:
+  service_area_id:
+    type: string
+    format: uuid
+    description: The city.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a001
+  service_area_name:
+    type: string
+    description: Its name.
+    examples:
+      - Hyderabad
+  enabled:
+    type: boolean
+    description: Whether referrals earn.
+  referrer_reward:
+    $ref: ../common/Money.yaml
+    description: What the referrer earns, promotional credit funded by the platform.
+  budget:
+    $ref: ../common/Money.yaml
+    description: The budget.
+  granted:
+    $ref: ../common/Money.yaml
+    description: Granted so far.
+  monthly_limit:
+    type: integer
+    description: Referrals a referrer may earn for in a month.
+    minimum: 0
+    examples:
+      - 20
+  refund_window_days:
+    type: integer
+    description: Days within which a full refund of the friend's first order takes the reward back.
+    minimum: 0
+    examples:
+      - 7
+  version:
+    type: integer
+    description: Raised on every change.
+    minimum: 1
+    examples:
+      - 1
+examples:
+  - service_area_id: 01a13a48-9e00-7000-8000-00000000a001
+    service_area_name: Hyderabad
+    enabled: true
+    referrer_reward:
+      minor_units: 10000
+      currency: INR
+    budget:
+      minor_units: 2500000
+      currency: INR
+    granted:
+      minor_units: 10000
+      currency: INR
+    monthly_limit: 20
+    refund_window_days: 7
+    version: 1

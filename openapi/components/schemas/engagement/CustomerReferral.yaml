@@ -1,0 +1,74 @@
+type: object
+description: "The customer's referral code and what it does: a friend new to ZippyGo who adds it gets the city's referral offer, and the customer earns promotional credit when the friend's first order completes, at most 20 times a month."
+required:
+  - code
+  - share_text
+  - friend_gets
+  - you_earn
+  - referred
+  - rewarded
+  - earned
+  - monthly_limit
+  - new_code_from
+properties:
+  code:
+    type: string
+    description: The code to share.
+    examples:
+      - RAVI7K
+  share_text:
+    type: string
+    description: A message to share.
+    examples:
+      - Use my code RAVI7K for ₹100 off your first ZippyGo order over ₹299.
+  friend_gets:
+    type: string
+    description: What a friend gets.
+    examples:
+      - ₹100 off a first order over ₹299
+  you_earn:
+    type: string
+    description: What the customer earns.
+    examples:
+      - ₹100.00 of credit for each friend's first order
+  referred:
+    type: integer
+    description: Friends who added the code.
+    minimum: 0
+    examples:
+      - 1
+  rewarded:
+    type: integer
+    description: Friends whose first order earned the customer credit.
+    minimum: 0
+    examples:
+      - 1
+  earned:
+    $ref: ../common/Money.yaml
+    description: Credit earned.
+  monthly_limit:
+    type: integer
+    description: Referrals that may earn in a month.
+    minimum: 0
+    examples:
+      - 20
+  new_code_from:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The first day the customer may ask for a new code; `null` when they may now.
+    examples:
+      - 2026-11-29
+examples:
+  - code: RAVI7K
+    share_text: Use my code RAVI7K for ₹100 off your first ZippyGo order over ₹299.
+    friend_gets: ₹100 off a first order over ₹299
+    you_earn: ₹100.00 of credit for each friend's first order
+    referred: 1
+    rewarded: 1
+    earned:
+      minor_units: 10000
+      currency: INR
+    monthly_limit: 20
+    new_code_from: 2026-11-29

@@ -1,0 +1,149 @@
+# Path item for /v1/platform/reward-campaigns. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformRewardCampaigns
+  summary: List reward campaigns
+  description: Every reward campaign, the platform's and every Partner's, live ones first, then newest, with counts by state, narrowed by owner, state, kind, Partner and words in the name. Mission Control tokens only, with `engagement:read`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  parameters:
+    - name: owner
+      in: query
+      required: false
+      description: Only the platform's or the Partners'.
+      schema:
+        $ref: ../../components/schemas/engagement/RewardCampaignOwner.yaml
+    - name: state
+      in: query
+      required: false
+      description: Only campaigns in this state.
+      schema:
+        $ref: ../../components/schemas/engagement/RewardCampaignState.yaml
+    - name: kind
+      in: query
+      required: false
+      description: Only campaigns of this kind.
+      schema:
+        $ref: ../../components/schemas/engagement/RewardCampaignKind.yaml
+    - name: partner_id
+      in: query
+      required: false
+      description: Only this Partner's.
+      schema:
+        type: string
+        format: uuid
+    - name: q
+      in: query
+      required: false
+      description: Words in the name.
+      schema:
+        type: string
+        maxLength: 80
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: Where the page starts.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of campaigns.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaignPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createPlatformRewardCampaign
+  summary: Make a reward campaign
+  description: "Makes a reward campaign kept as a draft, of any kind, aimed everywhere or at cities, zones, Verticals, Partners and Locations, funded by the platform or split with a Partner who agreed, with a budget, a daily cap and a control group. A reward is fixed: a range or a chance is refused (`reward_not_fixed`). Publishes `engagement.campaign.created`. Mission Control tokens only, with `engagement:write`."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The campaign.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/RewardCampaignInput.yaml
+  responses:
+    "201":
+      description: The draft, with its `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaign.yaml
+    "400":
+      description: "`validation_failed`: `reward_not_fixed`, rules that do not match the kind, a split without its Partner and share, or a value out of range."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

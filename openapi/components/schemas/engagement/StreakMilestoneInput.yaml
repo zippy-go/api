@@ -1,0 +1,24 @@
+type: object
+description: A milestone as set.
+required:
+  - weeks
+  - reward
+properties:
+  weeks:
+    type: integer
+    description: Weeks in a row, 1 to 104.
+    minimum: 1
+    maximum: 104
+    examples:
+      - 4
+  reward:
+    $ref: ./RewardSpecInput.yaml
+    description: Its reward.
+examples:
+  - weeks: 4
+    reward:
+      kind: free_delivery
+      worth_up_to:
+        minor_units: 6000
+        currency: INR
+      valid_days: 14

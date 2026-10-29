@@ -53,6 +53,9 @@ properties:
   cash_collected:
     $ref: ../common/Money.yaml
     description: Cash collected.
+  bonuses:
+    $ref: ../common/Money.yaml
+    description: Bonuses and quests earned in the week. Absent before step 6.
 examples:
   - week: 2026W43
     starts_on: 2026-10-19

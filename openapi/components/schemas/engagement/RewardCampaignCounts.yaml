@@ -1,0 +1,53 @@
+type: object
+description: Campaigns by state.
+required:
+  - draft
+  - scheduled
+  - live
+  - paused
+  - ended
+  - cancelled
+properties:
+  draft:
+    type: integer
+    description: Drafts.
+    minimum: 0
+    examples:
+      - 0
+  scheduled:
+    type: integer
+    description: Scheduled.
+    minimum: 0
+    examples:
+      - 0
+  live:
+    type: integer
+    description: Live.
+    minimum: 0
+    examples:
+      - 3
+  paused:
+    type: integer
+    description: Paused.
+    minimum: 0
+    examples:
+      - 0
+  ended:
+    type: integer
+    description: Ended.
+    minimum: 0
+    examples:
+      - 0
+  cancelled:
+    type: integer
+    description: Cancelled.
+    minimum: 0
+    examples:
+      - 0
+examples:
+  - draft: 0
+    scheduled: 0
+    live: 3
+    paused: 0
+    ended: 0
+    cancelled: 0

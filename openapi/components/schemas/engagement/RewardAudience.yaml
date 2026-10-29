@@ -1,0 +1,50 @@
+type: object
+description: "Where a campaign counts and whom it reaches: everywhere, or the orders at Locations in its cities and zones, Verticals, Partners and Locations, each list narrowing the one before; in words."
+required:
+  - everywhere
+  - service_area_ids
+  - vertical_ids
+  - partner_ids
+  - location_ids
+  - words
+properties:
+  everywhere:
+    type: boolean
+    description: Whether it counts everywhere.
+  service_area_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Cities and zones; empty for any.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Verticals; empty for any.
+  partner_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Partners; empty for any.
+  location_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations; empty for any.
+  words:
+    type: string
+    description: Where, in words.
+    examples:
+      - Everywhere in Hyderabad
+examples:
+  - everywhere: false
+    service_area_ids:
+      - 01a13a48-9e00-7000-8000-00000000a001
+    vertical_ids: []
+    partner_ids: []
+    location_ids: []
+    words: Everywhere in Hyderabad

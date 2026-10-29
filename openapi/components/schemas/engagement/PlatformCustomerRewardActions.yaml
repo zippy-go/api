@@ -1,0 +1,15 @@
+type: object
+description: "What the caller may do on the Rewards tab: exclude and lift with `engagement:manage`."
+required:
+  - exclude
+  - lift
+properties:
+  exclude:
+    type: boolean
+    description: Exclude the customer from rewards.
+  lift:
+    type: boolean
+    description: Lift the exclusion.
+examples:
+  - exclude: true
+    lift: false

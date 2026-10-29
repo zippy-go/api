@@ -1,0 +1,52 @@
+# Path item for /v1/customer/referral/code. Referenced from openapi.yaml.
+post:
+  operationId: renewCustomerReferralCode
+  summary: Ask for a new referral code
+  description: "Gives the customer a new referral code, at most once a month, and retires the old one: friends who added it keep their offer, and nobody can add it any more. Customer tokens only."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The new code.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/CustomerReferral.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the user has no customer profile."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`referral_code_recent`: the code was renewed less than a month ago; the detail names the first day a new one can be had."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,9 @@
+type: string
+description: "Where a referral stands: `recorded` when the friend added the code; `rewarded` once their first order completed and the referrer was credited; `taken_back` when that order was refunded in full within 7 days; `lapsed` when it can no longer earn, the friend having ordered before or the monthly limit being reached."
+enum:
+  - recorded
+  - rewarded
+  - taken_back
+  - lapsed
+examples:
+  - rewarded

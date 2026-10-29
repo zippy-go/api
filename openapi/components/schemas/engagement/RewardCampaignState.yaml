@@ -1,0 +1,11 @@
+type: string
+description: "Where a reward campaign stands: `draft` until published; `scheduled` until its start; `live` while it grants; `paused` by its owner or by the platform; `ended` when stopped, past its end or out of budget; `cancelled` when stopped before it started."
+enum:
+  - draft
+  - scheduled
+  - live
+  - paused
+  - ended
+  - cancelled
+examples:
+  - live

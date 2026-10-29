@@ -1,0 +1,71 @@
+type: object
+description: "A reward as the platform states it: what it gives, how it reaches the customer, the most it can cost and the line the customer reads. Rewards are fixed and shown before a customer acts."
+required:
+  - kind
+  - paid_as
+  - amount
+  - worth_up_to
+  - min_spend
+  - valid_days
+  - item_ids
+  - worth
+  - line
+properties:
+  kind:
+    $ref: ./RewardKind.yaml
+    description: What it gives.
+  paid_as:
+    $ref: ./RewardPaidAs.yaml
+    description: How it reaches the customer.
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The credit, or the money off; `null` for free delivery and a free item.
+  worth_up_to:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The most free delivery or a free item takes off an order; `null` otherwise.
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least an order must come to for money off to apply; `null` without one.
+  valid_days:
+    type:
+      - integer
+      - "null"
+    description: How many days a held offer is held for the customer; `null` for credit.
+    minimum: 1
+    maximum: 90
+    examples:
+      - null
+  item_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The items a free item may be chosen from; empty otherwise.
+  worth:
+    $ref: ../common/Money.yaml
+    description: The most it can cost, which its campaign's budget is debited at grant.
+  line:
+    type: string
+    description: The reward in words.
+    examples:
+      - ₹150.00 of credit
+examples:
+  - kind: credit
+    paid_as: wallet_credit
+    amount:
+      minor_units: 15000
+      currency: INR
+    worth_up_to: null
+    min_spend: null
+    valid_days: null
+    item_ids: []
+    worth:
+      minor_units: 15000
+      currency: INR
+    line: ₹150.00 of credit

@@ -1,0 +1,61 @@
+type: object
+description: Campaigns, live ones first, then newest, with counts by state.
+required:
+  - items
+  - next_cursor
+  - counts
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./RewardCampaignSummary.yaml
+    description: The campaigns.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+    examples:
+      - null
+  counts:
+    $ref: ./RewardCampaignCounts.yaml
+    description: Campaigns by state, whatever the filter on state.
+examples:
+  - items:
+      - id: 01a13a48-9e00-7000-8000-000000006002
+        owner: platform
+        partner_id: null
+        name: Try something new
+        kind: quest
+        state: live
+        line: "Order from a second Vertical: ₹150.00 of credit"
+        funder: platform
+        partner_share_percent: 0
+        budget:
+          amount:
+            minor_units: 2000000
+            currency: INR
+          granted:
+            minor_units: 1990000
+            currency: INR
+          held:
+            minor_units: 0
+            currency: INR
+          left:
+            minor_units: 10000
+            currency: INR
+          spent: false
+        schedule:
+          starts_at: 2026-10-29T00:00:00Z
+          ends_at: null
+          time_zone: Asia/Kolkata
+        grants: 132
+        updated_at: 2026-10-29T10:00:00Z
+    next_cursor: null
+    counts:
+      draft: 0
+      scheduled: 0
+      live: 3
+      paused: 0
+      ended: 0
+      cancelled: 0

@@ -1,0 +1,62 @@
+type: object
+description: "An incentive an Agent earned in a week: what reaching a quest's tier or a bonus's drop-offs paid, beside the pay for each task."
+required:
+  - incentive_id
+  - name
+  - kind
+  - period
+  - drop_offs
+  - amount
+  - earned_at
+  - words
+properties:
+  incentive_id:
+    type: string
+    format: uuid
+    description: The incentive.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006101
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Weekly 20
+  kind:
+    $ref: ../incentives/IncentiveKind.yaml
+    description: Quest or bonus.
+  period:
+    type: string
+    description: The period it was earned in.
+    examples:
+      - 2026W45
+  drop_offs:
+    type: integer
+    description: Drop-offs counted when it was earned.
+    minimum: 0
+    examples:
+      - 20
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it paid.
+  earned_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-06T12:00:00Z
+  words:
+    type: string
+    description: In words.
+    examples:
+      - "Weekly 20: 20 drop-offs"
+examples:
+  - incentive_id: 01a13a48-9e00-7000-8000-000000006101
+    name: Weekly 20
+    kind: quest
+    period: 2026W45
+    drop_offs: 20
+    amount:
+      minor_units: 30000
+      currency: INR
+    earned_at: 2026-11-06T12:00:00Z
+    words: "Weekly 20: 20 drop-offs"

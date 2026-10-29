@@ -1,0 +1,64 @@
+type: object
+description: A change to an incentive. A draft changes freely; a live one changes only its name, a later last day and a larger budget (`incentive_change_refused` otherwise).
+properties:
+  name:
+    type:
+      - string
+      - "null"
+    description: Its name.
+    minLength: 1
+    maxLength: 60
+    examples:
+      - null
+  recurrence:
+    oneOf:
+      - $ref: ./IncentiveRecurrence.yaml
+      - type: "null"
+    description: How often.
+  starts_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its first day.
+    examples:
+      - null
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its last day.
+    examples:
+      - null
+  tiers:
+    type:
+      - array
+      - "null"
+    items:
+      $ref: ./IncentiveTier.yaml
+    description: A quest's tiers.
+  amount_per_drop_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A bonus's amount.
+  window:
+    oneOf:
+      - $ref: ./IncentiveWindow.yaml
+      - type: "null"
+    description: A bonus's window.
+  budget:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its budget.
+examples:
+  - name: null
+    recurrence: null
+    starts_on: null
+    ends_on: null
+    tiers: null
+    amount_per_drop_off: null
+    window: null
+    budget: null

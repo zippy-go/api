@@ -1,0 +1,70 @@
+type: object
+description: "A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded."
+required:
+  - campaign_id
+  - name
+  - location_id
+  - location_name
+  - punches
+  - every
+  - next_rewarded
+  - reward
+  - sentence
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006004
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Every 5th pickup
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000308
+  location_name:
+    type: string
+    description: Its name.
+    examples:
+      - Charminar Bakes Gachibowli
+  punches:
+    type: integer
+    description: Pickups counted towards the next reward.
+    minimum: 0
+    examples:
+      - 4
+  every:
+    type: integer
+    description: Every this many.
+    minimum: 2
+    examples:
+      - 5
+  next_rewarded:
+    type: boolean
+    description: Whether the next pickup is rewarded.
+  reward:
+    type: string
+    description: Its reward.
+    examples:
+      - ₹50.00 off your 5th pickup
+  sentence:
+    type: string
+    description: In words.
+    examples:
+      - 4 of 5. Your next pickup here is rewarded.
+examples:
+  - campaign_id: 01a13a48-9e00-7000-8000-000000006004
+    name: Every 5th pickup
+    location_id: 01a13a48-9e00-7000-8000-000000000308
+    location_name: Charminar Bakes Gachibowli
+    punches: 4
+    every: 5
+    next_rewarded: true
+    reward: ₹50.00 off your 5th pickup
+    sentence: 4 of 5. Your next pickup here is rewarded.

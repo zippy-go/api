@@ -1,0 +1,10 @@
+type: string
+description: "Where a grant stands: `granted`; `deferred` until a cap allows it the next day; `held` for review in Mission Control, which the customer sees as being checked; `refused` after review; `clawed_back` after its order was refunded in full or cancelled."
+enum:
+  - granted
+  - deferred
+  - held
+  - refused
+  - clawed_back
+examples:
+  - granted

@@ -1,0 +1,39 @@
+type: object
+description: "A punch card's rules: every nth pickup collected at its Locations, with at least its minimum spend, earns the reward on that nth pickup; one punch per Location a day."
+required:
+  - every
+  - min_spend
+  - reward
+properties:
+  every:
+    type: integer
+    description: Every this many pickups.
+    minimum: 2
+    maximum: 100
+    examples:
+      - 5
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least a pickup's items must come to; `null` without one.
+  reward:
+    $ref: ./RewardSpec.yaml
+    description: Its reward, priced on the nth pickup.
+examples:
+  - every: 5
+    min_spend: null
+    reward:
+      kind: money_off
+      paid_as: held_offer
+      amount:
+        minor_units: 5000
+        currency: INR
+      worth_up_to: null
+      min_spend: null
+      valid_days: 30
+      item_ids: []
+      worth:
+        minor_units: 5000
+        currency: INR
+      line: ₹50.00 off your 5th pickup

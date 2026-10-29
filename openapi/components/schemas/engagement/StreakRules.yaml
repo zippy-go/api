@@ -1,0 +1,49 @@
+type: object
+description: "A weekly streak's rules: weeks Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; milestones with their rewards, repeated every few weeks past the last; freezes a month, each keeping a streak through one missed week; and the push when a streak is at risk, no order by Saturday 18:00."
+required:
+  - milestones
+  - repeat_every_weeks
+  - freezes_per_month
+  - at_risk_push
+properties:
+  milestones:
+    type: array
+    items:
+      $ref: ./StreakMilestone.yaml
+    description: The milestones, fewest weeks first.
+  repeat_every_weeks:
+    type: integer
+    description: Past the last milestone, its reward again every this many weeks.
+    minimum: 1
+    examples:
+      - 4
+  freezes_per_month:
+    type: integer
+    description: Freezes a customer has each month, used on their own.
+    minimum: 0
+    maximum: 4
+    examples:
+      - 1
+  at_risk_push:
+    type: boolean
+    description: Whether a customer with no order by Saturday 18:00 is told once, where they consented.
+examples:
+  - milestones:
+      - weeks: 4
+        reward:
+          kind: free_delivery
+          paid_as: held_offer
+          amount: null
+          worth_up_to:
+            minor_units: 6000
+            currency: INR
+          min_spend: null
+          valid_days: 14
+          item_ids: []
+          worth:
+            minor_units: 6000
+            currency: INR
+          line: Free delivery for 14 days, up to ₹60.00 an order
+    repeat_every_weeks: 4
+    freezes_per_month: 1
+    at_risk_push: true

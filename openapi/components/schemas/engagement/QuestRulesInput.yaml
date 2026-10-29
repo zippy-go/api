@@ -1,0 +1,56 @@
+type: object
+description: A quest as set.
+required:
+  - steps
+  - reward
+properties:
+  steps:
+    type: array
+    items:
+      $ref: ./QuestStepInput.yaml
+    description: One to five steps.
+    minItems: 1
+    maxItems: 5
+  days:
+    type:
+      - integer
+      - "null"
+    description: 30 by default.
+    minimum: 1
+    maximum: 365
+    examples:
+      - 30
+  repeatable:
+    type:
+      - boolean
+      - "null"
+    description: "`false` by default."
+    examples:
+      - false
+  wait_days:
+    type:
+      - integer
+      - "null"
+    description: 7 by default, never fewer.
+    minimum: 7
+    maximum: 365
+    examples:
+      - 7
+  reward:
+    $ref: ./RewardSpecInput.yaml
+    description: Its reward.
+examples:
+  - steps:
+      - kind: second_vertical
+        count: 1
+        partner_id: null
+        location_id: null
+        vertical_id: null
+    days: 30
+    repeatable: false
+    wait_days: 7
+    reward:
+      kind: credit
+      amount:
+        minor_units: 15000
+        currency: INR

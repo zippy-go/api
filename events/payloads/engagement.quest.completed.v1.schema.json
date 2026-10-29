@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.quest.completed.v1.schema.json",
+  "title": "EngagementQuestCompletedPayload",
+  "description": "Payload of `engagement.quest.completed` version 1: a customer completed a quest's last step; its reward is granted once. The envelope's `partner_id` is the campaign's Partner, `null` for the platform's. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "campaign_id",
+    "customer_id",
+    "progress_id",
+    "rules_version",
+    "at",
+    "completed_at",
+    "order_id"
+  ],
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The quest campaign.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006002"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id).",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000701"
+      ]
+    },
+    "progress_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "This start of the quest.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6201"
+      ]
+    },
+    "rules_version": {
+      "type": "integer",
+      "description": "The version of its rules when it was started.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-01T09:00:00Z"
+      ]
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-01T12:40:00Z"
+      ]
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order that completed it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    }
+  }
+}

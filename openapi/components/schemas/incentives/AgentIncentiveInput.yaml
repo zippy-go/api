@@ -1,0 +1,77 @@
+type: object
+description: "A new incentive, kept as a draft: a quest's tiers, or a bonus's amount and window."
+required:
+  - name
+  - kind
+  - budget
+properties:
+  name:
+    type: string
+    description: Its name, 1 to 60 characters.
+    minLength: 1
+    maxLength: 60
+    examples:
+      - Weekly 20
+  kind:
+    $ref: ./IncentiveKind.yaml
+    description: Quest or bonus.
+  recurrence:
+    oneOf:
+      - $ref: ./IncentiveRecurrence.yaml
+      - type: "null"
+    description: "`weekly` by default."
+  starts_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its first day; today by default.
+    examples:
+      - 2026-11-02
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its last day.
+    examples:
+      - null
+  tiers:
+    type: array
+    items:
+      $ref: ./IncentiveTier.yaml
+    description: A quest's one to five tiers, more drop-offs paying more.
+    maxItems: 5
+  amount_per_drop_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A bonus's amount for each drop-off.
+  window:
+    oneOf:
+      - $ref: ./IncentiveWindow.yaml
+      - type: "null"
+    description: A bonus's window.
+  budget:
+    $ref: ../common/Money.yaml
+    description: Its budget, more than nothing.
+examples:
+  - name: Weekly 20
+    kind: quest
+    recurrence: null
+    starts_on: 2026-11-02
+    ends_on: null
+    tiers:
+      - drop_offs: 20
+        amount:
+          minor_units: 30000
+          currency: INR
+      - drop_offs: 35
+        amount:
+          minor_units: 60000
+          currency: INR
+    amount_per_drop_off: null
+    window: null
+    budget:
+      minor_units: 5000000
+      currency: INR

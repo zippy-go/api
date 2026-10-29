@@ -1,0 +1,233 @@
+type: object
+description: "A reward granted, deferred, held, refused or clawed back: its campaign and rule version, what it gives and who pays, the Location whose order earned it, and the words the customer reads."
+required:
+  - id
+  - source
+  - campaign_id
+  - campaign_name
+  - campaign_kind
+  - rules_version
+  - customer_id
+  - status
+  - reward
+  - amount
+  - funder
+  - platform_share
+  - partner_share
+  - partner_id
+  - location_id
+  - location_name
+  - order_id
+  - explanation
+  - signals
+  - granted_at
+  - expires_at
+  - deferred_until
+  - decided_by
+  - decided_at
+  - decision_reason
+  - claw_back
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The grant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6001
+  source:
+    $ref: ./RewardSource.yaml
+    description: What granted it.
+  campaign_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its campaign; `null` for a referral.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006002
+  campaign_name:
+    type: string
+    description: Its campaign's name, or the city's referrals.
+    examples:
+      - Try something new
+  campaign_kind:
+    oneOf:
+      - $ref: ./RewardCampaignKind.yaml
+      - type: "null"
+    description: Its campaign's kind; `null` for a referral.
+  rules_version:
+    type: integer
+    description: "The version of the rules it came from: the campaign's, or the city's referral programme's."
+    minimum: 1
+    examples:
+      - 1
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer (a user id).
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000701
+  status:
+    $ref: ./RewardGrantStatus.yaml
+    description: Where it stands.
+  reward:
+    $ref: ./RewardSpec.yaml
+    description: What it gives.
+  amount:
+    $ref: ../common/Money.yaml
+    description: The credit, or the most the offer can take off.
+  funder:
+    $ref: ./RewardFunder.yaml
+    description: Who pays.
+  platform_share:
+    $ref: ../common/Money.yaml
+    description: The platform's share.
+  partner_share:
+    $ref: ../common/Money.yaml
+    description: The Partner's share.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner paying a share.
+    examples:
+      - null
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Location whose order earned it, which a Partner's share is charged to.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000308
+  location_name:
+    type:
+      - string
+      - "null"
+    description: Its name.
+    examples:
+      - Charminar Bakes Gachibowli
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order that earned it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+  explanation:
+    type: string
+    description: What the customer reads.
+    examples:
+      - ₹150.00 of credit, from Try something new, funded by ZippyGo
+  signals:
+    type: array
+    items:
+      $ref: ./RewardSignal.yaml
+    description: What held it; empty unless held.
+  granted_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was granted.
+    examples:
+      - 2026-11-01T12:40:00Z
+  expires_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When a held offer ends; `null` for credit, which does not expire.
+    examples:
+      - null
+  deferred_until:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The day a deferred grant is given, when a cap allows.
+    examples:
+      - null
+  decided_by:
+    type:
+      - string
+      - "null"
+    description: Who released or refused it.
+    examples:
+      - null
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When.
+    examples:
+      - null
+  decision_reason:
+    type:
+      - string
+      - "null"
+    description: Why.
+    examples:
+      - null
+  claw_back:
+    oneOf:
+      - $ref: ./RewardClawBack.yaml
+      - type: "null"
+    description: What was taken back.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was earned.
+    examples:
+      - 2026-11-01T12:40:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6001
+    source: campaign
+    campaign_id: 01a13a48-9e00-7000-8000-000000006002
+    campaign_name: Try something new
+    campaign_kind: quest
+    rules_version: 1
+    customer_id: 01a13a48-9e00-7000-8000-000000000701
+    status: granted
+    reward:
+      kind: credit
+      paid_as: wallet_credit
+      amount:
+        minor_units: 15000
+        currency: INR
+      worth_up_to: null
+      min_spend: null
+      valid_days: null
+      item_ids: []
+      worth:
+        minor_units: 15000
+        currency: INR
+      line: ₹150.00 of credit
+    amount:
+      minor_units: 15000
+      currency: INR
+    funder: platform
+    platform_share:
+      minor_units: 15000
+      currency: INR
+    partner_share:
+      minor_units: 0
+      currency: INR
+    partner_id: null
+    location_id: 01a13a48-9e00-7000-8000-000000000308
+    location_name: Charminar Bakes Gachibowli
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+    explanation: ₹150.00 of credit, from Try something new, funded by ZippyGo
+    signals: []
+    granted_at: 2026-11-01T12:40:00Z
+    expires_at: null
+    deferred_until: null
+    decided_by: null
+    decided_at: null
+    decision_reason: null
+    claw_back: null
+    created_at: 2026-11-01T12:40:00Z

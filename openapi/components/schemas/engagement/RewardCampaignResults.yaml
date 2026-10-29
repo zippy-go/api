@@ -1,0 +1,75 @@
+type: object
+description: A campaign's results against its control group, worked out when asked for from completed orders.
+required:
+  - campaign_id
+  - from
+  - until
+  - control_percent
+  - treated
+  - control
+  - sentence
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006001
+  from:
+    type: string
+    format: date-time
+    description: Since when.
+    examples:
+      - 2026-10-01T00:00:00Z
+  until:
+    type: string
+    format: date-time
+    description: Until when.
+    examples:
+      - 2026-10-29T10:00:00Z
+  control_percent:
+    type: integer
+    description: The share held out.
+    minimum: 0
+    maximum: 50
+    examples:
+      - 10
+  treated:
+    $ref: ./RewardResultsGroup.yaml
+    description: The customers it reached.
+  control:
+    $ref: ./RewardResultsGroup.yaml
+    description: The customers held out.
+  sentence:
+    type: string
+    description: What it shows, in words.
+    examples:
+      - Customers it reached completed 2.61 orders each against 2.2 held out.
+examples:
+  - campaign_id: 01a13a48-9e00-7000-8000-000000006001
+    from: 2026-10-01T00:00:00Z
+    until: 2026-10-29T10:00:00Z
+    control_percent: 10
+    treated:
+      customers: 900
+      orders: 2350
+      sales:
+        minor_units: 98700000
+        currency: INR
+      orders_per_customer: 2.61
+      retained_30_days_percent: 46.2
+      reward_cost:
+        minor_units: 1350000
+        currency: INR
+    control:
+      customers: 100
+      orders: 220
+      sales:
+        minor_units: 9100000
+        currency: INR
+      orders_per_customer: 2.2
+      retained_30_days_percent: 38
+      reward_cost:
+        minor_units: 0
+        currency: INR
+    sentence: Customers it reached completed 2.61 orders each against 2.2 held out.

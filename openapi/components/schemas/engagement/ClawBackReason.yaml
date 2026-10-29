@@ -1,0 +1,8 @@
+type: string
+description: "Why a reward was taken back: its order was `order_refunded` in full or `order_cancelled`, or a referral's first order was refunded in full within 7 days (`referral_refunded`)."
+enum:
+  - order_refunded
+  - order_cancelled
+  - referral_refunded
+examples:
+  - order_refunded

@@ -1,0 +1,21 @@
+type: object
+description: "A move's words: the reason for a pause or a stop, which a Partner reads when the platform paused its campaign; and, to publish a Partner's campaign, the Partner's word, exactly \"My business pays for this campaign's rewards, as shown.\" (`funding_not_confirmed` without it)."
+properties:
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, at most 200 characters; required when the platform pauses a Partner's campaign.
+    maxLength: 200
+    examples:
+      - Budget set in error
+  confirmation:
+    type:
+      - string
+      - "null"
+    description: The Partner's word.
+    examples:
+      - null
+examples:
+  - reason: Budget set in error
+    confirmation: null

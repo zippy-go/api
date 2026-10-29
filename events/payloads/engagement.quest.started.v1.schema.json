@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.quest.started.v1.schema.json",
+  "title": "EngagementQuestStartedPayload",
+  "description": "Payload of `engagement.quest.started` version 1: a customer pressed Start on a quest: from now its steps count, until its days run out. The envelope's `partner_id` is the campaign's Partner, `null` for the platform's. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "campaign_id",
+    "customer_id",
+    "progress_id",
+    "rules_version",
+    "at",
+    "started_at",
+    "ends_at",
+    "started_from"
+  ],
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The quest campaign.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006002"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id).",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000701"
+      ]
+    },
+    "progress_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "This start of the quest.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6201"
+      ]
+    },
+    "rules_version": {
+      "type": "integer",
+      "description": "The version of its rules when it was started.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-01T09:00:00Z"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-01T09:00:00Z"
+      ]
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it ends.",
+      "examples": [
+        "2026-12-01T09:00:00Z"
+      ]
+    },
+    "started_from": {
+      "type": "string",
+      "enum": [
+        "rewards",
+        "store",
+        "home"
+      ],
+      "description": "Where Start was pressed.",
+      "examples": [
+        "rewards"
+      ]
+    }
+  }
+}

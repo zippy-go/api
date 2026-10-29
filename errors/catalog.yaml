@@ -371,6 +371,26 @@ errors:
           orders report or a Location's worked-out payouts over more than a
           year, the metrics board over 31 days, the Agents numbers over 92.
           The message says the limit that applies.
+      - code: kind_not_for_partners
+        message: Tiers are the platform's; a Partner runs streaks, quests and punch cards.
+        description: >-
+          A Partner configured a reward campaign of a kind only the platform
+          runs: tiers (and, later, badges).
+      - code: reward_not_fixed
+        message: Rewards are fixed and shown before a customer acts.
+        description: >-
+          A reward with a range of amounts or a chance, such as "₹50 to ₹500
+          at random": no reward is given by chance.
+      - code: funding_not_confirmed
+        message: "Confirm \"My business pays for this campaign's rewards, as shown.\" to publish."
+        description: >-
+          A Partner's reward campaign published without the Partner's word
+          that its business pays, in `confirmation`.
+      - code: effective_from_past
+        message: A new version of the rules takes effect now or later, never before.
+        description: >-
+          A new version of a campaign's rules given an effective moment in the
+          past.
   - code: channel_unknown
     status: 400
     title: Unknown channel
@@ -1967,3 +1987,116 @@ errors:
     message: "Too many codes we did not recognise; try again after {until}."
     retryable: true
     description: "Ten codes not recognised within ten minutes; the eleventh is not checked. `Retry-After` and the sentence say until when."
+  - code: reward_campaign_move_refused
+    status: 409
+    title: Reward campaign move refused
+    message: "The campaign is {state}: it cannot be {move}."
+    retryable: false
+    description: >-
+      A reward campaign moves between draft, scheduled, live, paused, ended
+      and cancelled only as allowed: published from draft, paused from live,
+      resumed from paused, stopped from live or paused, cancelled from
+      scheduled, deleted while a draft, a new version of its rules while
+      scheduled, live or paused. A Partner cannot resume what the platform
+      paused. `errors[].code` names the reason.
+    details:
+      - code: campaign_state
+        message: The campaign's state does not allow the move.
+        description: The move is not allowed from the campaign's state.
+      - code: paused_by_platform
+        message: ZippyGo paused this campaign; only ZippyGo resumes it.
+        description: A Partner resumes a campaign the platform paused.
+
+  - code: reward_campaign_change_refused
+    status: 409
+    title: Reward campaign change refused
+    message: "A live campaign changes only where no customer is surprised; stop it and run another."
+    retryable: false
+    description: >-
+      A live or paused reward campaign takes only a new name, a later end, a
+      larger budget and a higher daily cap; its rules change as a new version
+      from Mission Control. The detail names what may not change.
+
+  - code: quest_not_startable
+    status: 409
+    title: Quest not startable
+    message: "{reason}"
+    retryable: false
+    description: >-
+      Start was pressed on a quest the customer cannot start now.
+      `errors[].code` names why.
+    details:
+      - code: quest_running
+        message: You started this quest already.
+        description: The quest is started and running.
+      - code: quest_completed
+        message: You completed this quest.
+        description: The quest is completed and does not repeat.
+      - code: quest_waiting
+        message: You can start this quest again after a few days.
+        description: A repeatable quest waits out its days between completions; the detail names the day.
+      - code: quest_closed
+        message: This quest is not taking new starts.
+        description: Its budget is spent, so no customer who had not started is offered it.
+
+  - code: referral_code_recent
+    status: 409
+    title: Referral code renewed recently
+    message: "You can ask for a new code from {date}."
+    retryable: false
+    description: >-
+      A customer asks for a new referral code at most once a month; the
+      detail names the first day they may.
+
+  - code: reward_grant_decided
+    status: 409
+    title: Reward decided
+    message: The reward is not held for review.
+    retryable: false
+    description: >-
+      A release or a refusal of a grant that is not held: it was granted,
+      released or refused already.
+
+  - code: incentive_move_refused
+    status: 409
+    title: Incentive move refused
+    message: "The incentive is {state}: it cannot be {move}."
+    retryable: false
+    description: >-
+      An incentive is published from draft, stopped while live, and deleted
+      while a draft. `errors[].code` names the reason.
+    details:
+      - code: incentive_state
+        message: The incentive's state does not allow the move.
+        description: The move is not allowed from the incentive's state.
+
+  - code: incentive_change_refused
+    status: 409
+    title: Incentive change refused
+    message: A live incentive changes only its name, a later last day and a larger budget.
+    retryable: false
+    description: >-
+      A change a live or ended incentive may not take: its kind, tiers,
+      amount, window or first day once Agents may have joined it.
+
+  - code: incentive_not_joinable
+    status: 409
+    title: Incentive not joinable
+    message: "{reason}"
+    retryable: false
+    description: >-
+      An Agent joins an incentive they cannot join now. `errors[].code`
+      names why.
+    details:
+      - code: already_joined
+        message: You joined this incentive already.
+        description: The Agent joined it for this period.
+      - code: incentive_closed
+        message: This incentive has ended.
+        description: The incentive or its period is over.
+      - code: budget_spent
+        message: This incentive's budget is spent.
+        description: Its budget is spent, so no Agent may join.
+      - code: not_in_service
+        message: You are not active in this service.
+        description: The membership is not active in the incentive's service.

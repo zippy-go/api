@@ -1,0 +1,39 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f6009",
+  "type": "engagement.reward.released",
+  "version": 1,
+  "occurred_at": "2026-11-01T12:40:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "grant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6001",
+    "source": "campaign",
+    "campaign_id": "01a13a48-9e00-7000-8000-000000006002",
+    "campaign_name": "Try something new",
+    "kind": "quest",
+    "rules_version": 1,
+    "customer_id": "01a13a48-9e00-7000-8000-000000000701",
+    "reward_kind": "credit",
+    "paid_as": "wallet_credit",
+    "amount": {
+      "minor_units": 15000,
+      "currency": "INR"
+    },
+    "funder": "platform",
+    "platform_share": {
+      "minor_units": 15000,
+      "currency": "INR"
+    },
+    "partner_share": {
+      "minor_units": 0,
+      "currency": "INR"
+    },
+    "partner_id": null,
+    "location_id": "01a13a48-9e00-7000-8000-000000000308",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01",
+    "explanation": "₹150.00 of credit, from Try something new, funded by ZippyGo",
+    "at": "2026-11-01T12:40:00Z",
+    "by_user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90",
+    "reason": "Checked: one household, three phones"
+  }
+}

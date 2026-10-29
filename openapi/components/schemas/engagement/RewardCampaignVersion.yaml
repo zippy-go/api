@@ -1,0 +1,76 @@
+type: object
+description: A version of a campaign's rules.
+required:
+  - version
+  - effective_from
+  - rules
+  - created_at
+  - created_by
+  - in_force
+properties:
+  version:
+    type: integer
+    description: Its number, from 1.
+    minimum: 1
+    examples:
+      - 2
+  effective_from:
+    type: string
+    format: date-time
+    description: When it took or takes effect.
+    examples:
+      - 2026-11-01T00:00:00Z
+  rules:
+    $ref: ./RewardRules.yaml
+    description: Its rules.
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-30T09:00:00Z
+  created_by:
+    type:
+      - string
+      - "null"
+    description: Who made it.
+    examples:
+      - Asha Platform
+  in_force:
+    type: boolean
+    description: Whether it is the version in force now.
+examples:
+  - version: 2
+    effective_from: 2026-11-01T00:00:00Z
+    rules:
+      streak: null
+      quest:
+        steps:
+          - kind: second_vertical
+            count: 1
+            partner_id: null
+            location_id: null
+            vertical_id: null
+            label: Order from a second Vertical
+        days: 30
+        repeatable: false
+        wait_days: 7
+        reward:
+          kind: credit
+          paid_as: wallet_credit
+          amount:
+            minor_units: 15000
+            currency: INR
+          worth_up_to: null
+          min_spend: null
+          valid_days: null
+          item_ids: []
+          worth:
+            minor_units: 15000
+            currency: INR
+          line: ₹150.00 of credit
+      tier: null
+      punch_card: null
+    created_at: 2026-10-30T09:00:00Z
+    created_by: Asha Platform
+    in_force: false

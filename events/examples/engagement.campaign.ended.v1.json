@@ -1,0 +1,28 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f6006",
+  "type": "engagement.campaign.ended",
+  "version": 1,
+  "occurred_at": "2026-10-29T10:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "campaign_id": "01a13a48-9e00-7000-8000-000000006002",
+    "name": "Try something new",
+    "kind": "quest",
+    "owner": "platform",
+    "partner_id": null,
+    "state": "ended",
+    "previous_state": "live",
+    "rules_version": 1,
+    "funder": "platform",
+    "partner_share_percent": 0,
+    "budget": {
+      "minor_units": 2000000,
+      "currency": "INR"
+    },
+    "by": "platform",
+    "by_user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90",
+    "at": "2026-10-29T10:00:00Z",
+    "why": "stopped"
+  }
+}

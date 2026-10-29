@@ -1,0 +1,127 @@
+# Path item for /v1/service-areas/{service_area_id}/referrals. Referenced from openapi.yaml.
+parameters:
+  - name: service_area_id
+    in: path
+    required: true
+    description: The city.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-00000000a001
+get:
+  operationId: getReferralSettings
+  summary: Read a city's referral programme
+  description: Whether referrals earn in the city, what the referrer earns from what budget, the monthly limit and the refund window, with its `ETag`. A city never set reads as off. Mission Control tokens only, with `engagement:read`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The programme, with its `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/ReferralSettings.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such city."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: setReferralSettings
+  summary: Set a city's referral programme
+  description: "Sets the city's referral programme: whether it earns, the referrer's credit and its budget, and the monthly limit. The friend's offer is the city's referral offer in promotions. In the audit log; `If-Match` guards against a stale edit. Mission Control tokens only, with `engagement:write`."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The programme.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/ReferralSettingsInput.yaml
+  responses:
+    "200":
+      description: The programme, with its new `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/ReferralSettings.yaml
+    "400":
+      description: "`validation_failed`: a reward or a budget of nothing, or a limit out of range."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such city."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "412":
+      description: "`precondition_failed`: it changed since the version in `If-Match`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

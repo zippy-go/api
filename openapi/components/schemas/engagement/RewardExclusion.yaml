@@ -1,0 +1,37 @@
+type: object
+description: "A customer excluded from rewards: they earn nothing from any campaign until the exclusion is lifted."
+required:
+  - customer_id
+  - reason
+  - by
+  - at
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000701
+  reason:
+    type: string
+    description: Why.
+    examples:
+      - Accounts made to farm referrals
+  by:
+    type:
+      - string
+      - "null"
+    description: Who excluded them.
+    examples:
+      - Mission Control operator
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-03T10:00:00Z
+examples:
+  - customer_id: 01a13a48-9e00-7000-8000-000000000701
+    reason: Accounts made to farm referrals
+    by: Mission Control operator
+    at: 2026-11-03T10:00:00Z

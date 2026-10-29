@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.campaign.resumed.v1.schema.json",
+  "title": "EngagementCampaignResumedPayload",
+  "description": "Payload of `engagement.campaign.resumed` version 1: a paused reward campaign was resumed. The envelope's `partner_id` is the campaign's Partner, `null` for the platform's. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "campaign_id",
+    "name",
+    "kind",
+    "owner",
+    "partner_id",
+    "state",
+    "previous_state",
+    "rules_version",
+    "funder",
+    "partner_share_percent",
+    "budget",
+    "by",
+    "by_user_id",
+    "at"
+  ],
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The reward campaign.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006002"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The campaign's name.",
+      "examples": [
+        "Try something new"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "streak",
+        "quest",
+        "tier",
+        "punch_card"
+      ],
+      "description": "What it counts.",
+      "examples": [
+        "quest"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner"
+      ],
+      "description": "Who runs it.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Partner whose campaign it is; `null` for the platform's, the envelope's `partner_id` too.",
+      "examples": [
+        null
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scheduled",
+        "live",
+        "paused",
+        "ended",
+        "cancelled"
+      ],
+      "description": "Its state after the change.",
+      "examples": [
+        "live"
+      ]
+    },
+    "previous_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "draft",
+        "scheduled",
+        "live",
+        "paused",
+        "ended",
+        "cancelled",
+        null
+      ],
+      "description": "Its state before; `null` when it was made.",
+      "examples": [
+        "draft"
+      ]
+    },
+    "rules_version": {
+      "type": "integer",
+      "description": "The version of its rules in force.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "funder": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner",
+        "split"
+      ],
+      "description": "Who pays for its rewards.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "partner_share_percent": {
+      "type": "integer",
+      "description": "The Partner's share of each reward, in percent.",
+      "minimum": 0,
+      "maximum": 100,
+      "examples": [
+        0
+      ]
+    },
+    "budget": {
+      "$ref": "#/$defs/money",
+      "description": "Its budget."
+    },
+    "by": {
+      "type": "string",
+      "enum": [
+        "partner",
+        "platform",
+        "clock"
+      ],
+      "description": "Who moved it: a member of the `partner`, the `platform`, or the `clock`.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "by_user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person who moved it; `null` for the clock.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a90"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-29T10:00:00Z"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

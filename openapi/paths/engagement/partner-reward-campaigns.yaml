@@ -1,0 +1,138 @@
+# Path item for /v1/partners/{partner_id}/reward-campaigns. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listPartnerRewardCampaigns
+  summary: List the Partner's reward campaigns
+  description: "The Partner's reward campaigns, live ones first, then newest, with counts by state: streaks, quests and punch cards on its own Locations, paid by the Partner. `engagement:read` at the Partner, or at the Locations whose campaigns are listed."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  parameters:
+    - name: state
+      in: query
+      required: false
+      description: Only campaigns in this state.
+      schema:
+        $ref: ../../components/schemas/engagement/RewardCampaignState.yaml
+    - name: kind
+      in: query
+      required: false
+      description: Only campaigns of this kind.
+      schema:
+        $ref: ../../components/schemas/engagement/RewardCampaignKind.yaml
+    - name: location_id
+      in: query
+      required: false
+      description: Only campaigns counting at this Location.
+      schema:
+        type: string
+        format: uuid
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: Where the page starts.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of campaigns.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaignPage.yaml
+    "400":
+      description: "`validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `engagement:read` at the Partner or the Location, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createPartnerRewardCampaign
+  summary: Make a reward campaign
+  description: "Makes a reward campaign kept as a draft: a weekly streak, a quest naming only the Partner's own Partner or Locations, or a punch card for pickups, on its Locations and paid by the Partner in full. A tier is the platform's (`kind_not_for_partners`), and a reward is fixed (`reward_not_fixed`). Publishes `engagement.campaign.created`. `engagement:write` at the Partner or at every Location it names."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The campaign.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/RewardCampaignInput.yaml
+  responses:
+    "201":
+      description: The draft, with its `ETag`.
+      headers:
+        ETag:
+          $ref: ../../components/headers/ETag.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaign.yaml
+    "400":
+      description: "`validation_failed`: `kind_not_for_partners` for a tier, `reward_not_fixed` for a range or a chance, a Location or Partner not its own, rules that do not match the kind, or a value out of range."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

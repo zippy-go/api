@@ -1,0 +1,57 @@
+type: object
+description: "A quest's rules: its steps, the days it runs from Start, whether it repeats and after what wait, and its reward, granted once on completion."
+required:
+  - steps
+  - days
+  - repeatable
+  - wait_days
+  - reward
+properties:
+  steps:
+    type: array
+    items:
+      $ref: ./QuestStep.yaml
+    description: One to five steps.
+  days:
+    type: integer
+    description: Days from Start.
+    minimum: 1
+    examples:
+      - 30
+  repeatable:
+    type: boolean
+    description: Whether it can be started again once completed.
+  wait_days:
+    type: integer
+    description: Days between completions of a repeatable quest; at least 7.
+    minimum: 7
+    examples:
+      - 7
+  reward:
+    $ref: ./RewardSpec.yaml
+    description: Its reward.
+examples:
+  - steps:
+      - kind: second_vertical
+        count: 1
+        partner_id: null
+        location_id: null
+        vertical_id: null
+        label: Order from a second Vertical
+    days: 30
+    repeatable: false
+    wait_days: 7
+    reward:
+      kind: credit
+      paid_as: wallet_credit
+      amount:
+        minor_units: 15000
+        currency: INR
+      worth_up_to: null
+      min_spend: null
+      valid_days: null
+      item_ids: []
+      worth:
+        minor_units: 15000
+        currency: INR
+      line: ₹150.00 of credit

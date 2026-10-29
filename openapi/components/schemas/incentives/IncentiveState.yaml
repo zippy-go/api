@@ -1,0 +1,8 @@
+type: string
+description: "Where an incentive stands: `draft` until published, `live` while Agents join and earn, `ended` when stopped or past its end."
+enum:
+  - draft
+  - live
+  - ended
+examples:
+  - live

@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.incentive.earned.v1.schema.json",
+  "title": "EngagementIncentiveEarnedPayload",
+  "description": "Payload of `engagement.incentive.earned` version 1: an Agent earned from an incentive. The envelope's `partner_id` is the service's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "properties": {
+    "incentive_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The incentive.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006101"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Weekly 20"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "quest",
+        "bonus"
+      ],
+      "description": "A `quest` of drop-off tiers or a `bonus` a drop-off.",
+      "examples": [
+        "quest"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000202"
+      ]
+    },
+    "paid_by": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner"
+      ],
+      "description": "Who pays it: the `platform` for its fleet, else the `partner`.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-06T12:00:00Z"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person holding it; `null` for an Agent without a person.",
+      "examples": [
+        null
+      ]
+    },
+    "period": {
+      "type": "string",
+      "description": "The period.",
+      "examples": [
+        "2026W45"
+      ]
+    },
+    "drop_offs": {
+      "type": "integer",
+      "description": "Drop-offs counted when it was earned.",
+      "minimum": 0,
+      "examples": [
+        20
+      ]
+    },
+    "amount": {
+      "$ref": "#/$defs/money",
+      "description": "What it paid: the difference a tier adds, or the bonus."
+    },
+    "tier": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The quest's tier reached, in drop-offs; `null` for a bonus.",
+      "examples": [
+        20
+      ]
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The drop-off that earned it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6301"
+      ]
+    },
+    "earning_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "This earning, once per tier or drop-off.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6501"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

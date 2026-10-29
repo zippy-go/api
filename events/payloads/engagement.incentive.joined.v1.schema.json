@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.incentive.joined.v1.schema.json",
+  "title": "EngagementIncentiveJoinedPayload",
+  "description": "Payload of `engagement.incentive.joined` version 1: an Agent joined an incentive for its current period. The envelope's `partner_id` is the service's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "properties": {
+    "incentive_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The incentive.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006101"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Weekly 20"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "quest",
+        "bonus"
+      ],
+      "description": "A `quest` of drop-off tiers or a `bonus` a drop-off.",
+      "examples": [
+        "quest"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000202"
+      ]
+    },
+    "paid_by": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner"
+      ],
+      "description": "Who pays it: the `platform` for its fleet, else the `partner`.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-06T12:00:00Z"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000107"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person holding it; `null` for an Agent without a person.",
+      "examples": [
+        null
+      ]
+    },
+    "period": {
+      "type": "string",
+      "description": "The period: a week such as `2026W45`, or the dates of a one-off.",
+      "examples": [
+        "2026W45"
+      ]
+    }
+  }
+}

@@ -44,6 +44,9 @@ properties:
   pay:
     $ref: ../common/Money.yaml
     description: Pay under the Partner's rule.
+  bonuses:
+    $ref: ../common/Money.yaml
+    description: Bonuses and quests of every Agent. Absent before step 6.
 examples:
   - agents: 1
     tasks_completed: 4

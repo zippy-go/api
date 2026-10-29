@@ -1,0 +1,45 @@
+type: object
+description: What the caller may do with the campaign now.
+required:
+  - edit
+  - publish
+  - pause
+  - resume
+  - stop
+  - cancel
+  - delete
+  - new_version
+properties:
+  edit:
+    type: boolean
+    description: Change it.
+  publish:
+    type: boolean
+    description: Publish it.
+  pause:
+    type: boolean
+    description: Pause it.
+  resume:
+    type: boolean
+    description: Resume it.
+  stop:
+    type: boolean
+    description: Stop it.
+  cancel:
+    type: boolean
+    description: Cancel it before it starts.
+  delete:
+    type: boolean
+    description: Delete the draft.
+  new_version:
+    type: boolean
+    description: Change its rules from a moment chosen, as a new version (Mission Control only).
+examples:
+  - edit: false
+    publish: false
+    pause: true
+    resume: false
+    stop: true
+    cancel: false
+    delete: false
+    new_version: true

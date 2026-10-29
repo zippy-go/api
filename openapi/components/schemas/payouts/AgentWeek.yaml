@@ -132,6 +132,15 @@ properties:
   total:
     $ref: ../common/Money.yaml
     description: Pay and tips; for the platform fleet less the cash kept, as the statement will work it out.
+  bonuses:
+    $ref: ../common/Money.yaml
+    description: "Bonuses and quests earned in the week: paid by ZippyGo for its fleet, reported to the Partner for its own Agents. Absent before step 6."
+  bonus_lines:
+    type: array
+    items:
+      $ref: ./AgentBonusLine.yaml
+      description: An incentive earned.
+    description: Each incentive earned in the week.
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-000000000107
     agent_name: Ravi Kumar

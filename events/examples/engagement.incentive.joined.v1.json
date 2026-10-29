@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f6022",
+  "type": "engagement.incentive.joined",
+  "version": 1,
+  "occurred_at": "2026-11-02T04:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+  "correlation_id": null,
+  "payload": {
+    "incentive_id": "01a13a48-9e00-7000-8000-000000006101",
+    "name": "Weekly 20",
+    "kind": "quest",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000002",
+    "service_id": "01a13a48-9e00-7000-8000-000000000202",
+    "paid_by": "platform",
+    "at": "2026-11-02T04:00:00Z",
+    "agent_id": "01a13a48-9e00-7000-8000-000000000107",
+    "user_id": null,
+    "period": "2026W45"
+  }
+}

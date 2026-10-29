@@ -1,0 +1,10 @@
+type: object
+description: Where Start was pressed.
+properties:
+  from:
+    oneOf:
+      - $ref: ./QuestStartedFrom.yaml
+      - type: "null"
+    description: Where; `rewards` by default.
+examples:
+  - from: rewards

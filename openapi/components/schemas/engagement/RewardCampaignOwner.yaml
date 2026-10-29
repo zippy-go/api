@@ -1,0 +1,7 @@
+type: string
+description: "Who runs a reward campaign: the `platform` from Mission Control, or a `partner` from the Partner console on its own Locations."
+enum:
+  - platform
+  - partner
+examples:
+  - platform

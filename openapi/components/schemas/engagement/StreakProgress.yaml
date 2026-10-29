@@ -1,0 +1,100 @@
+type: object
+description: "A customer's weekly streak: its weeks in a row, whether this week counted, the next milestone and its reward, the freeze, and what waits."
+required:
+  - campaign_id
+  - name
+  - state
+  - weeks
+  - week
+  - this_week_counted
+  - at_risk
+  - next_milestone
+  - next_reward
+  - freeze_available
+  - freeze_used_week
+  - reward_waiting
+  - sentence
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006001
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Order every week
+  state:
+    $ref: ./StreakState.yaml
+    description: Whether it counts.
+  weeks:
+    type: integer
+    description: Weeks in a row.
+    minimum: 0
+    examples:
+      - 4
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: This week.
+    examples:
+      - 2026W45
+  this_week_counted:
+    type: boolean
+    description: Whether this week has a completed order.
+  at_risk:
+    type: boolean
+    description: Whether this week has no order yet past Saturday 18:00.
+  next_milestone:
+    type:
+      - integer
+      - "null"
+    description: The weeks of the next milestone.
+    examples:
+      - 8
+  next_reward:
+    type:
+      - string
+      - "null"
+    description: Its reward.
+    examples:
+      - Free delivery for 14 days, up to ₹60.00 an order
+  freeze_available:
+    type: boolean
+    description: Whether this month's freeze is unused.
+  freeze_used_week:
+    type:
+      - string
+      - "null"
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: The week a freeze kept the streak this month.
+    examples:
+      - null
+  reward_waiting:
+    type:
+      - string
+      - "null"
+    description: A reward from it the customer holds.
+    examples:
+      - Free delivery, from your 4-week streak, funded by ZippyGo, until 22 November
+  sentence:
+    type: string
+    description: In words.
+    examples:
+      - 4 weeks in a row. Next reward at 8 weeks.
+examples:
+  - campaign_id: 01a13a48-9e00-7000-8000-000000006001
+    name: Order every week
+    state: active
+    weeks: 4
+    week: 2026W45
+    this_week_counted: true
+    at_risk: false
+    next_milestone: 8
+    next_reward: Free delivery for 14 days, up to ₹60.00 an order
+    freeze_available: true
+    freeze_used_week: null
+    reward_waiting: Free delivery, from your 4-week streak, funded by ZippyGo, until 22 November
+    sentence: 4 weeks in a row. Next reward at 8 weeks.

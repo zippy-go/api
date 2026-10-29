@@ -1,0 +1,31 @@
+type: object
+description: "A milestone of a weekly streak: the weeks in a row that reach it and the reward it gives."
+required:
+  - weeks
+  - reward
+properties:
+  weeks:
+    type: integer
+    description: Weeks in a row.
+    minimum: 1
+    examples:
+      - 4
+  reward:
+    $ref: ./RewardSpec.yaml
+    description: Its reward.
+examples:
+  - weeks: 4
+    reward:
+      kind: free_delivery
+      paid_as: held_offer
+      amount: null
+      worth_up_to:
+        minor_units: 6000
+        currency: INR
+      min_spend: null
+      valid_days: 14
+      item_ids: []
+      worth:
+        minor_units: 6000
+        currency: INR
+      line: Free delivery for 14 days, up to ₹60.00 an order

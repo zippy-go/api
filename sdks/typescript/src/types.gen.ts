@@ -10885,7 +10885,7 @@ export type AccountSection = {
 /**
  * A section of the account, by key, the `AccountSectionKey` schema.
  */
-export type AccountSectionKey = 'my_details' | 'addresses' | 'orders' | 'subscriptions' | 'bookings' | 'favourites' | 'payment_methods' | 'offers_and_wallet' | 'notifications' | 'language' | 'security' | 'download_my_data' | 'support' | 'about' | 'delete_account' | 'sign_out';
+export type AccountSectionKey = 'my_details' | 'addresses' | 'orders' | 'subscriptions' | 'bookings' | 'favourites' | 'payment_methods' | 'offers_and_wallet' | 'rewards' | 'notifications' | 'language' | 'security' | 'download_my_data' | 'support' | 'about' | 'delete_account' | 'sign_out';
 
 /**
  * The account's sections and its summary, the `AccountSectionList` schema.
@@ -22749,6 +22749,10 @@ export type StatementFigures = {
      * A shortfall taken off the next statement, once, as a negative amount; zero otherwise.
      */
     carried_out: Money;
+    /**
+     * What the Partner paid towards reward campaigns: its share of the rewards granted on the Location's orders, less what was taken back. Absent before step 6; nothing when there were none.
+     */
+    rewards?: Money;
 };
 
 /**
@@ -23559,6 +23563,10 @@ export type Statement = {
      * "Promotions you paid for": each promotion that ran in the week with its orders, what it took off for customers and what the Partner and the platform paid.
      */
     promotions?: Array<StatementPromotion>;
+    /**
+     * "Rewards you paid for": each reward campaign the Partner paid towards in the week, with its grants on the Location's orders and the Partner's share; they add up to `figures.rewards`, which the total takes off.
+     */
+    rewards?: Array<StatementRewardRow>;
 };
 
 /**
@@ -23759,6 +23767,10 @@ export type PayoutWorking = {
      * Day by day.
      */
     days: Array<StatementDay>;
+    /**
+     * "Rewards you paid for" in the days worked out, as a statement shows them.
+     */
+    rewards?: Array<StatementRewardRow>;
 };
 
 /**
@@ -24157,6 +24169,10 @@ export type AgentStatement = {
      * The version, raised on every move.
      */
     version: number;
+    /**
+     * "Bonuses and quests": each incentive earned in the week, beside the pay for each task and never in its place; they add up to `figures.bonuses`.
+     */
+    bonuses?: Array<AgentBonusLine>;
 };
 
 /**
@@ -24343,6 +24359,14 @@ export type AgentWeek = {
      * Pay and tips; for the platform fleet less the cash kept, as the statement will work it out.
      */
     total: Money;
+    /**
+     * Bonuses and quests earned in the week: paid by ZippyGo for its fleet, reported to the Partner for its own Agents. Absent before step 6.
+     */
+    bonuses?: Money;
+    /**
+     * Each incentive earned in the week.
+     */
+    bonus_lines?: Array<AgentBonusLine>;
 };
 
 /**
@@ -24385,6 +24409,10 @@ export type AgentWeekSummary = {
      * Cash collected.
      */
     cash_collected: Money;
+    /**
+     * Bonuses and quests earned in the week. Absent before step 6.
+     */
+    bonuses?: Money;
 };
 
 /**
@@ -25220,6 +25248,10 @@ export type AgentWeeksRow = {
      * What the Partner's pay rule gives.
      */
     pay: Money;
+    /**
+     * Bonuses and quests the Agent earned from the service's incentives in the week, for the Partner to pay. Absent before step 6.
+     */
+    bonuses?: Money;
 };
 
 /**
@@ -25258,6 +25290,10 @@ export type AgentWeeksTotals = {
      * Pay under the Partner's rule.
      */
     pay: Money;
+    /**
+     * Bonuses and quests of every Agent. Absent before step 6.
+     */
+    bonuses?: Money;
 };
 
 /**
@@ -27438,6 +27474,2273 @@ export type StatementPromotion = {
      * What the platform paid.
      */
     platform_paid: Money;
+};
+
+/**
+ * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth pickup collected at a Location.
+ */
+export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card';
+
+/**
+ * Where a reward campaign stands: `draft` until published; `scheduled` until its start; `live` while it grants; `paused` by its owner or by the platform; `ended` when stopped, past its end or out of budget; `cancelled` when stopped before it started.
+ */
+export type RewardCampaignState = 'draft' | 'scheduled' | 'live' | 'paused' | 'ended' | 'cancelled';
+
+/**
+ * Who runs a reward campaign: the `platform` from Mission Control, or a `partner` from the Partner console on its own Locations.
+ */
+export type RewardCampaignOwner = 'platform' | 'partner';
+
+/**
+ * Who pays for a campaign's rewards: the `platform`, the `partner`, or a `split` in percent.
+ */
+export type RewardFunder = 'platform' | 'partner' | 'split';
+
+/**
+ * What a reward gives: `credit`, promotional Wallet credit; or an offer held for the customer that the basket prices: `free_delivery`, `money_off` or `free_item`.
+ */
+export type RewardKind = 'credit' | 'free_delivery' | 'money_off' | 'free_item';
+
+/**
+ * What granted a reward: a reward `campaign`, or a city's `referral` programme, crediting the referrer on a friend's first order.
+ */
+export type RewardSource = 'campaign' | 'referral';
+
+/**
+ * How a reward reaches the customer: `wallet_credit` to the promotional balance, or a `held_offer` the engine prices in the basket.
+ */
+export type RewardPaidAs = 'wallet_credit' | 'held_offer';
+
+/**
+ * Where a grant stands: `granted`; `deferred` until a cap allows it the next day; `held` for review in Mission Control, which the customer sees as being checked; `refused` after review; `clawed_back` after its order was refunded in full or cancelled.
+ */
+export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'clawed_back';
+
+/**
+ * What raised a grant for review: `shared_device`, several accounts on one device; `shared_address`, several accounts delivering to one point within 20 m; `cancellations`, orders cancelled or refunded in full after a reward; `review_burst`, five or more reviews in a day.
+ */
+export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
+
+/**
+ * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written.
+ */
+export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review';
+
+/**
+ * Where a quest stands for the customer: `offered`, not started; `started`, counting; `completed`; `expired`, its days ran out; `being_checked`, its reward is held for review.
+ */
+export type QuestState = 'offered' | 'started' | 'completed' | 'expired' | 'being_checked';
+
+/**
+ * Where the customer pressed Start: in `rewards`, on a `store` page or on the `home` screen.
+ */
+export type QuestStartedFrom = 'rewards' | 'store' | 'home';
+
+/**
+ * A customer's tier: `member`, `silver` or `gold`.
+ */
+export type TierLevel = 'member' | 'silver' | 'gold';
+
+/**
+ * A customer's streak: `active` while it counts, or `broken` when a week passed without an order and no freeze kept it; a customer in the control group sees no streak.
+ */
+export type StreakState = 'active' | 'broken';
+
+/**
+ * Where a referral stands: `recorded` when the friend added the code; `rewarded` once their first order completed and the referrer was credited; `taken_back` when that order was refunded in full within 7 days; `lapsed` when it can no longer earn, the friend having ordered before or the monthly limit being reached.
+ */
+export type ReferralState = 'recorded' | 'rewarded' | 'taken_back' | 'lapsed';
+
+/**
+ * Why a reward was taken back: its order was `order_refunded` in full or `order_cancelled`, or a referral's first order was refunded in full within 7 days (`referral_refunded`).
+ */
+export type ClawBackReason = 'order_refunded' | 'order_cancelled' | 'referral_refunded';
+
+/**
+ * An Agent incentive: a `quest`, tiers of drop-offs completed in its period, each paying once; or a `bonus`, an amount for each drop-off completed in its window.
+ */
+export type IncentiveKind = 'quest' | 'bonus';
+
+/**
+ * Where an incentive stands: `draft` until published, `live` while Agents join and earn, `ended` when stopped or past its end.
+ */
+export type IncentiveState = 'draft' | 'live' | 'ended';
+
+/**
+ * How often an incentive runs: `once`, from its first day to its last; or `weekly`, Monday to Sunday on the service's clock, every week from its first day.
+ */
+export type IncentiveRecurrence = 'once' | 'weekly';
+
+/**
+ * A reward as the platform states it: what it gives, how it reaches the customer, the most it can cost and the line the customer reads. Rewards are fixed and shown before a customer acts.
+ */
+export type RewardSpec = {
+    /**
+     * What it gives.
+     */
+    kind: RewardKind;
+    /**
+     * How it reaches the customer.
+     */
+    paid_as: RewardPaidAs;
+    /**
+     * The credit, or the money off; `null` for free delivery and a free item.
+     */
+    amount: Money | null;
+    /**
+     * The most free delivery or a free item takes off an order; `null` otherwise.
+     */
+    worth_up_to: Money | null;
+    /**
+     * The least an order must come to for money off to apply; `null` without one.
+     */
+    min_spend: Money | null;
+    /**
+     * How many days a held offer is held for the customer; `null` for credit.
+     */
+    valid_days: number | null;
+    /**
+     * The items a free item may be chosen from; empty otherwise.
+     */
+    item_ids: Array<string>;
+    /**
+     * The most it can cost, which its campaign's budget is debited at grant.
+     */
+    worth: Money;
+    /**
+     * The reward in words.
+     */
+    line: string;
+};
+
+/**
+ * A reward as an operator or a Partner sets it. A reward is fixed: a range (`amount_up_to` above `amount`) or a chance is refused with `reward_not_fixed`, since rewards are fixed and shown before a customer acts.
+ */
+export type RewardSpecInput = {
+    /**
+     * What it gives.
+     */
+    kind: RewardKind;
+    /**
+     * The credit, or the money off; required for those.
+     */
+    amount?: Money | null;
+    /**
+     * Refused when above `amount`: a reward of "₹50 to ₹500 at random" is not fixed.
+     */
+    amount_up_to?: Money | null;
+    /**
+     * Refused when set: no reward is given by chance.
+     */
+    chance_percent?: number | null;
+    /**
+     * The most free delivery or a free item takes off an order; ₹60.00 by default for free delivery.
+     */
+    worth_up_to?: Money | null;
+    /**
+     * The least an order must come to for money off to apply.
+     */
+    min_spend?: Money | null;
+    /**
+     * How many days a held offer is held; 14 by default.
+     */
+    valid_days?: number | null;
+    /**
+     * The items a free item may be chosen from.
+     */
+    item_ids?: Array<string>;
+};
+
+/**
+ * A milestone of a weekly streak: the weeks in a row that reach it and the reward it gives.
+ */
+export type StreakMilestone = {
+    /**
+     * Weeks in a row.
+     */
+    weeks: number;
+    /**
+     * Its reward.
+     */
+    reward: RewardSpec;
+};
+
+/**
+ * A milestone as set.
+ */
+export type StreakMilestoneInput = {
+    /**
+     * Weeks in a row, 1 to 104.
+     */
+    weeks: number;
+    /**
+     * Its reward.
+     */
+    reward: RewardSpecInput;
+};
+
+/**
+ * A weekly streak's rules: weeks Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; milestones with their rewards, repeated every few weeks past the last; freezes a month, each keeping a streak through one missed week; and the push when a streak is at risk, no order by Saturday 18:00.
+ */
+export type StreakRules = {
+    /**
+     * The milestones, fewest weeks first.
+     */
+    milestones: Array<StreakMilestone>;
+    /**
+     * Past the last milestone, its reward again every this many weeks.
+     */
+    repeat_every_weeks: number;
+    /**
+     * Freezes a customer has each month, used on their own.
+     */
+    freezes_per_month: number;
+    /**
+     * Whether a customer with no order by Saturday 18:00 is told once, where they consented.
+     */
+    at_risk_push: boolean;
+};
+
+/**
+ * A weekly streak as set; milestones at 4, 8 and 12 weeks with free delivery by default.
+ */
+export type StreakRulesInput = {
+    /**
+     * One to six milestones.
+     */
+    milestones: Array<StreakMilestoneInput>;
+    /**
+     * 4 by default.
+     */
+    repeat_every_weeks?: number | null;
+    /**
+     * 1 by default.
+     */
+    freezes_per_month?: number | null;
+    /**
+     * `true` by default.
+     */
+    at_risk_push?: boolean | null;
+};
+
+/**
+ * A step of a quest, in words.
+ */
+export type QuestStep = {
+    /**
+     * What counts.
+     */
+    kind: QuestStepKind;
+    /**
+     * How many make the step: pickups, reviews or orders.
+     */
+    count: number;
+    /**
+     * The named Partner, for an order at it.
+     */
+    partner_id: string | null;
+    /**
+     * The named Location, for an order at it.
+     */
+    location_id: string | null;
+    /**
+     * The Vertical an order must be in, for an order at a Vertical named.
+     */
+    vertical_id: string | null;
+    /**
+     * The step in words.
+     */
+    label: string;
+};
+
+/**
+ * A step as set.
+ */
+export type QuestStepInput = {
+    /**
+     * What counts.
+     */
+    kind: QuestStepKind;
+    /**
+     * How many; 1 by default.
+     */
+    count?: number | null;
+    /**
+     * The named Partner: for a Partner's quest, its own.
+     */
+    partner_id?: string | null;
+    /**
+     * The named Location: for a Partner's quest, one of its own.
+     */
+    location_id?: string | null;
+    /**
+     * A Vertical an order must be in.
+     */
+    vertical_id?: string | null;
+};
+
+/**
+ * A quest's rules: its steps, the days it runs from Start, whether it repeats and after what wait, and its reward, granted once on completion.
+ */
+export type QuestRules = {
+    /**
+     * One to five steps.
+     */
+    steps: Array<QuestStep>;
+    /**
+     * Days from Start.
+     */
+    days: number;
+    /**
+     * Whether it can be started again once completed.
+     */
+    repeatable: boolean;
+    /**
+     * Days between completions of a repeatable quest; at least 7.
+     */
+    wait_days: number;
+    /**
+     * Its reward.
+     */
+    reward: RewardSpec;
+};
+
+/**
+ * A quest as set.
+ */
+export type QuestRulesInput = {
+    /**
+     * One to five steps.
+     */
+    steps: Array<QuestStepInput>;
+    /**
+     * 30 by default.
+     */
+    days?: number | null;
+    /**
+     * `false` by default.
+     */
+    repeatable?: boolean | null;
+    /**
+     * 7 by default, never fewer.
+     */
+    wait_days?: number | null;
+    /**
+     * Its reward.
+     */
+    reward: RewardSpecInput;
+};
+
+/**
+ * The tiers' rules: Silver and Gold by completed orders across the platform in the last days counted, looked at on the first day of each month at 00:00 India time and at once on crossing, kept for the month and dropped one tier at a time.
+ */
+export type TierRules = {
+    /**
+     * Completed orders for Silver.
+     */
+    silver_orders: number;
+    /**
+     * Completed orders for Gold.
+     */
+    gold_orders: number;
+    /**
+     * The days counted.
+     */
+    window_days: number;
+};
+
+/**
+ * The tiers as set; Silver at 8 and Gold at 20 in 90 days by default.
+ */
+export type TierRulesInput = {
+    /**
+     * 8 by default.
+     */
+    silver_orders?: number | null;
+    /**
+     * 20 by default, above Silver.
+     */
+    gold_orders?: number | null;
+    /**
+     * 90 by default.
+     */
+    window_days?: number | null;
+};
+
+/**
+ * A punch card's rules: every nth pickup collected at its Locations, with at least its minimum spend, earns the reward on that nth pickup; one punch per Location a day.
+ */
+export type PunchCardRules = {
+    /**
+     * Every this many pickups.
+     */
+    every: number;
+    /**
+     * The least a pickup's items must come to; `null` without one.
+     */
+    min_spend: Money | null;
+    /**
+     * Its reward, priced on the nth pickup.
+     */
+    reward: RewardSpec;
+};
+
+/**
+ * A punch card as set.
+ */
+export type PunchCardRulesInput = {
+    /**
+     * 2 to 100.
+     */
+    every: number;
+    /**
+     * The least a pickup's items must come to.
+     */
+    min_spend?: Money | null;
+    /**
+     * Its reward: money off or a free item, held for the nth pickup.
+     */
+    reward: RewardSpecInput;
+};
+
+/**
+ * A version of a campaign's rules: the member named by its kind.
+ */
+export type RewardRules = {
+    /**
+     * A streak's rules.
+     */
+    streak: StreakRules | null;
+    /**
+     * A quest's rules.
+     */
+    quest: QuestRules | null;
+    /**
+     * The tiers' rules.
+     */
+    tier: TierRules | null;
+    /**
+     * A punch card's rules.
+     */
+    punch_card: PunchCardRules | null;
+};
+
+/**
+ * Rules as set: the member named by the campaign's kind, the others left out.
+ */
+export type RewardRulesInput = {
+    /**
+     * A streak's rules.
+     */
+    streak?: StreakRulesInput | null;
+    /**
+     * A quest's rules.
+     */
+    quest?: QuestRulesInput | null;
+    /**
+     * The tiers' rules.
+     */
+    tier?: TierRulesInput | null;
+    /**
+     * A punch card's rules.
+     */
+    punch_card?: PunchCardRulesInput | null;
+};
+
+/**
+ * Where a campaign counts and whom it reaches: everywhere, or the orders at Locations in its cities and zones, Verticals, Partners and Locations, each list narrowing the one before; in words.
+ */
+export type RewardAudience = {
+    /**
+     * Whether it counts everywhere.
+     */
+    everywhere: boolean;
+    /**
+     * Cities and zones; empty for any.
+     */
+    service_area_ids: Array<string>;
+    /**
+     * Verticals; empty for any.
+     */
+    vertical_ids: Array<string>;
+    /**
+     * Partners; empty for any.
+     */
+    partner_ids: Array<string>;
+    /**
+     * Locations; empty for any.
+     */
+    location_ids: Array<string>;
+    /**
+     * Where, in words.
+     */
+    words: string;
+};
+
+/**
+ * Where a campaign counts, as set. A Partner's campaign counts at its own Locations: all of them, or those named.
+ */
+export type RewardAudienceInput = {
+    /**
+     * `true` to count everywhere; the lists are then empty.
+     */
+    everywhere?: boolean | null;
+    /**
+     * Cities and zones.
+     */
+    service_area_ids?: Array<string>;
+    /**
+     * Verticals.
+     */
+    vertical_ids?: Array<string>;
+    /**
+     * Partners.
+     */
+    partner_ids?: Array<string>;
+    /**
+     * Locations.
+     */
+    location_ids?: Array<string>;
+};
+
+/**
+ * A campaign's budget: what it may grant, what it granted, what is held for review, and what is left. A customer already shown their progress still receives the reward they were shown when it is spent, and the budget may go over by that much.
+ */
+export type RewardBudget = {
+    /**
+     * The budget.
+     */
+    amount: Money;
+    /**
+     * Granted so far.
+     */
+    granted: Money;
+    /**
+     * Held for review.
+     */
+    held: Money;
+    /**
+     * Left; negative when a promised reward took it over.
+     */
+    left: Money;
+    /**
+     * Whether nothing is left: no customer who had not started is offered it any more.
+     */
+    spent: boolean;
+};
+
+/**
+ * When a campaign runs, on its Locations' clock.
+ */
+export type RewardSchedule = {
+    /**
+     * When it starts; `null` for when it is published.
+     */
+    starts_at: string | null;
+    /**
+     * When it ends; `null` until stopped.
+     */
+    ends_at: string | null;
+    /**
+     * The clock.
+     */
+    time_zone: string;
+};
+
+/**
+ * What the caller may do with the campaign now.
+ */
+export type RewardCampaignActions = {
+    /**
+     * Change it.
+     */
+    edit: boolean;
+    /**
+     * Publish it.
+     */
+    publish: boolean;
+    /**
+     * Pause it.
+     */
+    pause: boolean;
+    /**
+     * Resume it.
+     */
+    resume: boolean;
+    /**
+     * Stop it.
+     */
+    stop: boolean;
+    /**
+     * Cancel it before it starts.
+     */
+    cancel: boolean;
+    /**
+     * Delete the draft.
+     */
+    delete: boolean;
+    /**
+     * Change its rules from a moment chosen, as a new version (Mission Control only).
+     */
+    new_version: boolean;
+};
+
+/**
+ * Campaigns by state.
+ */
+export type RewardCampaignCounts = {
+    /**
+     * Drafts.
+     */
+    draft: number;
+    /**
+     * Scheduled.
+     */
+    scheduled: number;
+    /**
+     * Live.
+     */
+    live: number;
+    /**
+     * Paused.
+     */
+    paused: number;
+    /**
+     * Ended.
+     */
+    ended: number;
+    /**
+     * Cancelled.
+     */
+    cancelled: number;
+};
+
+/**
+ * A campaign in a list.
+ */
+export type RewardCampaignSummary = {
+    /**
+     * The campaign.
+     */
+    id: string;
+    /**
+     * Who runs it.
+     */
+    owner: RewardCampaignOwner;
+    /**
+     * The Partner whose campaign it is; `null` for the platform's.
+     */
+    partner_id: string | null;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Where it stands.
+     */
+    state: RewardCampaignState;
+    /**
+     * What a customer reads.
+     */
+    line: string;
+    /**
+     * Who pays for its rewards.
+     */
+    funder: RewardFunder;
+    /**
+     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
+     */
+    partner_share_percent: number;
+    /**
+     * Its budget.
+     */
+    budget: RewardBudget;
+    /**
+     * When it runs.
+     */
+    schedule: RewardSchedule;
+    /**
+     * Rewards granted.
+     */
+    grants: number;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A reward campaign: what it counts and gives, who pays and from what budget, when and where it runs, whom it holds out, and what the caller may do with it. Its rules are versioned: a live campaign's rules change only as a new version from a moment chosen, progress made under an earlier one keeps counting, and every grant names the version it came from.
+ */
+export type RewardCampaign = {
+    /**
+     * The campaign.
+     */
+    id: string;
+    /**
+     * Who runs it.
+     */
+    owner: RewardCampaignOwner;
+    /**
+     * The Partner whose campaign it is; `null` for the platform's.
+     */
+    partner_id: string | null;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Where it stands.
+     */
+    state: RewardCampaignState;
+    /**
+     * What a customer reads.
+     */
+    line: string;
+    /**
+     * Who pays for its rewards.
+     */
+    funder: RewardFunder;
+    /**
+     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
+     */
+    partner_share_percent: number;
+    /**
+     * Its budget.
+     */
+    budget: RewardBudget;
+    /**
+     * When it runs.
+     */
+    schedule: RewardSchedule;
+    /**
+     * The Partner that pays its share of a split campaign; `null` otherwise.
+     */
+    funding_partner_id: string | null;
+    /**
+     * For a split campaign, that the operator confirmed the Partner agreed to pay its share.
+     */
+    partner_agreed: boolean;
+    /**
+     * Where it counts.
+     */
+    audience: RewardAudience;
+    /**
+     * Grants a day at most; 1,000 by default.
+     */
+    daily_grant_cap: number;
+    /**
+     * The share of the customers it would reach held out as a control group, who see nothing of it and earn nothing; 10 by default, 0 for tiers.
+     */
+    control_percent: number;
+    /**
+     * The version of the rules in force.
+     */
+    rules_version: number;
+    /**
+     * The rules in force.
+     */
+    rules: RewardRules;
+    /**
+     * Versions of its rules.
+     */
+    versions: number;
+    /**
+     * For a Partner's campaign, whether the Partner confirmed as it published that its business pays.
+     */
+    confirmed: boolean;
+    /**
+     * Whether the platform paused it; a Partner cannot resume it then.
+     */
+    paused_by_platform: boolean;
+    /**
+     * Why it was paused.
+     */
+    pause_reason: string | null;
+    /**
+     * Rewards granted.
+     */
+    grants: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it ended.
+     */
+    ended_at: string | null;
+    /**
+     * The version of the campaign, raised on every change; send it in `If-Match` to change it.
+     */
+    version: number;
+    /**
+     * What the caller may do now.
+     */
+    actions: RewardCampaignActions;
+};
+
+/**
+ * Campaigns, live ones first, then newest, with counts by state.
+ */
+export type RewardCampaignPage = {
+    /**
+     * The campaigns.
+     */
+    items: Array<RewardCampaignSummary>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * Campaigns by state, whatever the filter on state.
+     */
+    counts: RewardCampaignCounts;
+};
+
+/**
+ * A new campaign, kept as a draft. A Partner's campaign is a streak, a quest naming only its own Partner or Locations, or a punch card, on its own Locations and paid by the Partner in full; a tier is the platform's only (`kind_not_for_partners`).
+ */
+export type RewardCampaignInput = {
+    /**
+     * Its name, 1 to 80 characters.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Who pays: the platform by default for Mission Control's, the Partner always for a Partner's.
+     */
+    funder?: RewardFunder | null;
+    /**
+     * A split campaign's Partner share, 1 to 99.
+     */
+    partner_share_percent?: number | null;
+    /**
+     * The Partner paying its share of a split campaign.
+     */
+    funding_partner_id?: string | null;
+    /**
+     * For a split campaign, that the Partner agreed to pay its share; required to publish one.
+     */
+    partner_agreed?: boolean | null;
+    /**
+     * Its budget, more than nothing.
+     */
+    budget: Money;
+    /**
+     * When it starts; when published by default.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends; open by default.
+     */
+    ends_at?: string | null;
+    /**
+     * Where it counts; a Partner's Locations, or everywhere, by default.
+     */
+    audience?: RewardAudienceInput | null;
+    /**
+     * Grants a day at most; 1,000 by default.
+     */
+    daily_grant_cap?: number | null;
+    /**
+     * The share held out, 0 to 50; 10 by default, 0 for tiers.
+     */
+    control_percent?: number | null;
+    /**
+     * Its rules: the member named by its kind.
+     */
+    rules: RewardRulesInput;
+};
+
+/**
+ * A change to a campaign. A draft or a scheduled campaign changes freely. A live or paused one changes only where no customer is surprised: its name, a later end, a larger budget and a higher daily cap; its rules change as a new version (Mission Control), and anything else is refused with `reward_campaign_change_refused`, saying to stop it and run another.
+ */
+export type RewardCampaignUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string | null;
+    /**
+     * Who pays.
+     */
+    funder?: RewardFunder | null;
+    /**
+     * A split campaign's Partner share.
+     */
+    partner_share_percent?: number | null;
+    /**
+     * The Partner paying its share.
+     */
+    funding_partner_id?: string | null;
+    /**
+     * That the Partner agreed to pay its share.
+     */
+    partner_agreed?: boolean | null;
+    /**
+     * Its budget.
+     */
+    budget?: Money | null;
+    /**
+     * When it starts.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends.
+     */
+    ends_at?: string | null;
+    /**
+     * Where it counts.
+     */
+    audience?: RewardAudienceInput | null;
+    /**
+     * Grants a day at most.
+     */
+    daily_grant_cap?: number | null;
+    /**
+     * The share held out.
+     */
+    control_percent?: number | null;
+    /**
+     * A draft's rules.
+     */
+    rules?: RewardRulesInput | null;
+};
+
+/**
+ * A move's words: the reason for a pause or a stop, which a Partner reads when the platform paused its campaign; and, to publish a Partner's campaign, the Partner's word, exactly "My business pays for this campaign's rewards, as shown." (`funding_not_confirmed` without it).
+ */
+export type RewardCampaignMove = {
+    /**
+     * Why, at most 200 characters; required when the platform pauses a Partner's campaign.
+     */
+    reason?: string | null;
+    /**
+     * The Partner's word.
+     */
+    confirmation?: string | null;
+};
+
+/**
+ * A version of a campaign's rules.
+ */
+export type RewardCampaignVersion = {
+    /**
+     * Its number, from 1.
+     */
+    version: number;
+    /**
+     * When it took or takes effect.
+     */
+    effective_from: string;
+    /**
+     * Its rules.
+     */
+    rules: RewardRules;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * Who made it.
+     */
+    created_by: string | null;
+    /**
+     * Whether it is the version in force now.
+     */
+    in_force: boolean;
+};
+
+/**
+ * Every version of a campaign's rules, oldest first.
+ */
+export type RewardCampaignVersionList = {
+    /**
+     * The versions.
+     */
+    items: Array<RewardCampaignVersion>;
+};
+
+/**
+ * A new version of a live campaign's rules, from a moment chosen, now or later (`effective_from_past` for one before now). Progress made under the earlier version keeps counting.
+ */
+export type RewardCampaignVersionInput = {
+    /**
+     * When it takes effect; now by default.
+     */
+    effective_from?: string | null;
+    /**
+     * The rules.
+     */
+    rules: RewardRulesInput;
+};
+
+/**
+ * One side of a campaign's results: the customers treated or held out, their completed orders and sales in the campaign's scope since it started, the share with a second order within 30 days of their first, and what their rewards cost.
+ */
+export type RewardResultsGroup = {
+    /**
+     * Customers.
+     */
+    customers: number;
+    /**
+     * Completed orders.
+     */
+    orders: number;
+    /**
+     * Their sales.
+     */
+    sales: Money;
+    /**
+     * Orders per customer.
+     */
+    orders_per_customer: number;
+    /**
+     * The share, in percent, with another completed order within 30 days of their first; `null` without customers.
+     */
+    retained_30_days_percent: number | null;
+    /**
+     * What their rewards cost.
+     */
+    reward_cost: Money;
+};
+
+/**
+ * A campaign's results against its control group, worked out when asked for from completed orders.
+ */
+export type RewardCampaignResults = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Since when.
+     */
+    from: string;
+    /**
+     * Until when.
+     */
+    until: string;
+    /**
+     * The share held out.
+     */
+    control_percent: number;
+    /**
+     * The customers it reached.
+     */
+    treated: RewardResultsGroup;
+    /**
+     * The customers held out.
+     */
+    control: RewardResultsGroup;
+    /**
+     * What it shows, in words.
+     */
+    sentence: string;
+};
+
+/**
+ * A signal that held a grant for review, in words.
+ */
+export type RewardSignal = {
+    /**
+     * The signal.
+     */
+    code: RewardSignalCode;
+    /**
+     * In words.
+     */
+    words: string;
+};
+
+/**
+ * A reward taken back after its order was refunded in full or cancelled: what was taken back, and what had been spent already.
+ */
+export type RewardClawBack = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Why.
+     */
+    reason: ClawBackReason;
+    /**
+     * Why, in words.
+     */
+    words: string;
+    /**
+     * Taken back from what was not spent.
+     */
+    taken_back: Money;
+    /**
+     * Spent already, and so marked clawed back.
+     */
+    unrecovered: Money;
+};
+
+/**
+ * A reward granted, deferred, held, refused or clawed back: its campaign and rule version, what it gives and who pays, the Location whose order earned it, and the words the customer reads.
+ */
+export type RewardGrant = {
+    /**
+     * The grant.
+     */
+    id: string;
+    /**
+     * What granted it.
+     */
+    source: RewardSource;
+    /**
+     * Its campaign; `null` for a referral.
+     */
+    campaign_id: string | null;
+    /**
+     * Its campaign's name, or the city's referrals.
+     */
+    campaign_name: string;
+    /**
+     * Its campaign's kind; `null` for a referral.
+     */
+    campaign_kind: RewardCampaignKind | null;
+    /**
+     * The version of the rules it came from: the campaign's, or the city's referral programme's.
+     */
+    rules_version: number;
+    /**
+     * The customer (a user id).
+     */
+    customer_id: string;
+    /**
+     * Where it stands.
+     */
+    status: RewardGrantStatus;
+    /**
+     * What it gives.
+     */
+    reward: RewardSpec;
+    /**
+     * The credit, or the most the offer can take off.
+     */
+    amount: Money;
+    /**
+     * Who pays.
+     */
+    funder: RewardFunder;
+    /**
+     * The platform's share.
+     */
+    platform_share: Money;
+    /**
+     * The Partner's share.
+     */
+    partner_share: Money;
+    /**
+     * The Partner paying a share.
+     */
+    partner_id: string | null;
+    /**
+     * The Location whose order earned it, which a Partner's share is charged to.
+     */
+    location_id: string | null;
+    /**
+     * Its name.
+     */
+    location_name: string | null;
+    /**
+     * The order that earned it.
+     */
+    order_id: string | null;
+    /**
+     * What the customer reads.
+     */
+    explanation: string;
+    /**
+     * What held it; empty unless held.
+     */
+    signals: Array<RewardSignal>;
+    /**
+     * When it was granted.
+     */
+    granted_at: string | null;
+    /**
+     * When a held offer ends; `null` for credit, which does not expire.
+     */
+    expires_at: string | null;
+    /**
+     * The day a deferred grant is given, when a cap allows.
+     */
+    deferred_until: string | null;
+    /**
+     * Who released or refused it.
+     */
+    decided_by: string | null;
+    /**
+     * When.
+     */
+    decided_at: string | null;
+    /**
+     * Why.
+     */
+    decision_reason: string | null;
+    /**
+     * What was taken back.
+     */
+    claw_back: RewardClawBack | null;
+    /**
+     * When it was earned.
+     */
+    created_at: string;
+};
+
+/**
+ * Grants, newest first, with the budget they draw on when they are one campaign's.
+ */
+export type RewardGrantPage = {
+    /**
+     * The grants.
+     */
+    items: Array<RewardGrant>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * The campaign's budget, for a campaign's grants; `null` otherwise.
+     */
+    budget: RewardBudget | null;
+};
+
+/**
+ * Why a held grant is released or refused, 1 to 300 characters; in the audit log.
+ */
+export type RewardGrantDecision = {
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * A customer's weekly streak: its weeks in a row, whether this week counted, the next milestone and its reward, the freeze, and what waits.
+ */
+export type StreakProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether it counts.
+     */
+    state: StreakState;
+    /**
+     * Weeks in a row.
+     */
+    weeks: number;
+    /**
+     * This week.
+     */
+    week: string;
+    /**
+     * Whether this week has a completed order.
+     */
+    this_week_counted: boolean;
+    /**
+     * Whether this week has no order yet past Saturday 18:00.
+     */
+    at_risk: boolean;
+    /**
+     * The weeks of the next milestone.
+     */
+    next_milestone: number | null;
+    /**
+     * Its reward.
+     */
+    next_reward: string | null;
+    /**
+     * Whether this month's freeze is unused.
+     */
+    freeze_available: boolean;
+    /**
+     * The week a freeze kept the streak this month.
+     */
+    freeze_used_week: string | null;
+    /**
+     * A reward from it the customer holds.
+     */
+    reward_waiting: string | null;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * A step of a quest the customer started.
+ */
+export type QuestStepProgress = {
+    /**
+     * What counts.
+     */
+    kind: QuestStepKind;
+    /**
+     * In words.
+     */
+    label: string;
+    /**
+     * Counted.
+     */
+    count: number;
+    /**
+     * Needed.
+     */
+    needed: number;
+    /**
+     * Whether it is done.
+     */
+    done: boolean;
+};
+
+/**
+ * A quest as the customer sees it: offered with nothing counted until they press Start, then its steps, its end and its reward.
+ */
+export type QuestProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Where it stands.
+     */
+    state: QuestState;
+    /**
+     * Its steps.
+     */
+    steps: Array<QuestStepProgress>;
+    /**
+     * Steps done.
+     */
+    done: number;
+    /**
+     * Steps.
+     */
+    needed: number;
+    /**
+     * Its reward.
+     */
+    reward: string;
+    /**
+     * Whether Start is offered now.
+     */
+    can_start: boolean;
+    /**
+     * When it was started.
+     */
+    started_at: string | null;
+    /**
+     * When it ends.
+     */
+    ends_at: string | null;
+    /**
+     * When it completed.
+     */
+    completed_at: string | null;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * A customer's tier, how it was earned, what keeps it and when it is next looked at.
+ */
+export type TierStanding = {
+    /**
+     * The tier.
+     */
+    level: TierLevel;
+    /**
+     * Since when.
+     */
+    since: string;
+    /**
+     * Completed orders in the days counted.
+     */
+    orders_in_window: number;
+    /**
+     * The days counted.
+     */
+    window_days: number;
+    /**
+     * How it was earned.
+     */
+    how_earned: string;
+    /**
+     * What keeps it.
+     */
+    keeps: string;
+    /**
+     * When it is next looked at.
+     */
+    next_look_on: string;
+    /**
+     * The tier above; `null` at Gold.
+     */
+    next_level: TierLevel | null;
+    /**
+     * Completed orders more for the tier above.
+     */
+    orders_to_next: number | null;
+    /**
+     * Its perks, and when they arrive.
+     */
+    perks: Array<string>;
+};
+
+/**
+ * A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded.
+ */
+export type PunchCardProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * Pickups counted towards the next reward.
+     */
+    punches: number;
+    /**
+     * Every this many.
+     */
+    every: number;
+    /**
+     * Whether the next pickup is rewarded.
+     */
+    next_rewarded: boolean;
+    /**
+     * Its reward.
+     */
+    reward: string;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * The customer's Rewards: their streaks, quests, tier and punch cards with their progress and what completes them. A campaign that holds the customer out is not listed.
+ */
+export type CustomerRewards = {
+    /**
+     * Weekly streaks.
+     */
+    streaks: Array<StreakProgress>;
+    /**
+     * Quests offered, started, completed or expired.
+     */
+    quests: Array<QuestProgress>;
+    /**
+     * Their tier; `null` when no tier campaign is live.
+     */
+    tier: TierStanding | null;
+    /**
+     * Punch cards with a punch, or near them.
+     */
+    punch_cards: Array<PunchCardProgress>;
+    /**
+     * Promotional credit their rewards gave, all time.
+     */
+    credit_earned: Money;
+};
+
+/**
+ * Where Start was pressed.
+ */
+export type QuestStartInput = {
+    /**
+     * Where; `rewards` by default.
+     */
+    from?: QuestStartedFrom | null;
+};
+
+/**
+ * The customer's referral code and what it does: a friend new to ZippyGo who adds it gets the city's referral offer, and the customer earns promotional credit when the friend's first order completes, at most 20 times a month.
+ */
+export type CustomerReferral = {
+    /**
+     * The code to share.
+     */
+    code: string;
+    /**
+     * A message to share.
+     */
+    share_text: string;
+    /**
+     * What a friend gets.
+     */
+    friend_gets: string;
+    /**
+     * What the customer earns.
+     */
+    you_earn: string;
+    /**
+     * Friends who added the code.
+     */
+    referred: number;
+    /**
+     * Friends whose first order earned the customer credit.
+     */
+    rewarded: number;
+    /**
+     * Credit earned.
+     */
+    earned: Money;
+    /**
+     * Referrals that may earn in a month.
+     */
+    monthly_limit: number;
+    /**
+     * The first day the customer may ask for a new code; `null` when they may now.
+     */
+    new_code_from: string | null;
+};
+
+/**
+ * A city's referral programme: whether it runs, what the referrer earns from what budget, the monthly limit and the refund window. The friend's offer is the city's referral offer in promotions.
+ */
+export type ReferralSettings = {
+    /**
+     * The city.
+     */
+    service_area_id: string;
+    /**
+     * Its name.
+     */
+    service_area_name: string;
+    /**
+     * Whether referrals earn.
+     */
+    enabled: boolean;
+    /**
+     * What the referrer earns, promotional credit funded by the platform.
+     */
+    referrer_reward: Money;
+    /**
+     * The budget.
+     */
+    budget: Money;
+    /**
+     * Granted so far.
+     */
+    granted: Money;
+    /**
+     * Referrals a referrer may earn for in a month.
+     */
+    monthly_limit: number;
+    /**
+     * Days within which a full refund of the friend's first order takes the reward back.
+     */
+    refund_window_days: number;
+    /**
+     * Raised on every change.
+     */
+    version: number;
+};
+
+/**
+ * A city's referral programme as set.
+ */
+export type ReferralSettingsInput = {
+    /**
+     * Whether referrals earn.
+     */
+    enabled: boolean;
+    /**
+     * What the referrer earns, more than nothing.
+     */
+    referrer_reward: Money;
+    /**
+     * The budget.
+     */
+    budget: Money;
+    /**
+     * 20 by default.
+     */
+    monthly_limit?: number | null;
+};
+
+/**
+ * A referral: who referred whom with which code, and what it earned.
+ */
+export type Referral = {
+    /**
+     * The referral.
+     */
+    id: string;
+    /**
+     * The referrer (a user id).
+     */
+    referrer_id: string;
+    /**
+     * The referrer's first name.
+     */
+    referrer_name: string | null;
+    /**
+     * The friend (a user id).
+     */
+    referred_id: string;
+    /**
+     * The friend's first name.
+     */
+    referred_name: string | null;
+    /**
+     * The code.
+     */
+    code: string;
+    /**
+     * The city.
+     */
+    service_area_id: string | null;
+    /**
+     * Where it stands.
+     */
+    state: ReferralState;
+    /**
+     * When the friend added the code.
+     */
+    recorded_at: string;
+    /**
+     * The friend's first order.
+     */
+    order_id: string | null;
+    /**
+     * When the referrer was credited.
+     */
+    rewarded_at: string | null;
+    /**
+     * What the referrer earned.
+     */
+    amount: Money | null;
+    /**
+     * Why it lapsed or was taken back.
+     */
+    reason: string | null;
+};
+
+/**
+ * Referrals, newest first.
+ */
+export type ReferralPage = {
+    /**
+     * The referrals.
+     */
+    items: Array<Referral>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A customer excluded from rewards: they earn nothing from any campaign until the exclusion is lifted.
+ */
+export type RewardExclusion = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * Why.
+     */
+    reason: string;
+    /**
+     * Who excluded them.
+     */
+    by: string | null;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * Why a customer is excluded from rewards, 1 to 300 characters; in the audit log.
+ */
+export type RewardExclusionInput = {
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * A customer's Rewards tab in Mission Control: what the customer sees, every grant, their referrals, the signals on them and whether they are excluded.
+ */
+export type PlatformCustomerRewards = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * What the customer sees.
+     */
+    rewards: CustomerRewards;
+    /**
+     * Their latest 50 grants, newest first.
+     */
+    grants: Array<RewardGrant>;
+    /**
+     * Their referrals, as referrer or friend.
+     */
+    referrals: Array<Referral>;
+    /**
+     * The signals on them now.
+     */
+    signals: Array<RewardSignal>;
+    /**
+     * Their exclusion; `null` when they earn.
+     */
+    excluded: RewardExclusion | null;
+    /**
+     * Whether support blocked the account, so it earns nothing while blocked.
+     */
+    blocked: boolean;
+    /**
+     * What the caller may do.
+     */
+    actions: PlatformCustomerRewardActions;
+};
+
+/**
+ * What the caller may do on the Rewards tab: exclude and lift with `engagement:manage`.
+ */
+export type PlatformCustomerRewardActions = {
+    /**
+     * Exclude the customer from rewards.
+     */
+    exclude: boolean;
+    /**
+     * Lift the exclusion.
+     */
+    lift: boolean;
+};
+
+/**
+ * A tier of a quest: the drop-offs that reach it and what it pays in all, the tiers below included.
+ */
+export type IncentiveTier = {
+    /**
+     * Drop-offs completed.
+     */
+    drop_offs: number;
+    /**
+     * What reaching it pays in all.
+     */
+    amount: Money;
+};
+
+/**
+ * A bonus's window: its days of the week and its hours on the service's clock.
+ */
+export type IncentiveWindow = {
+    /**
+     * The days; every day when empty.
+     */
+    days: Array<Day>;
+    /**
+     * From, `HH:MM`.
+     */
+    from: string;
+    /**
+     * Until, `HH:MM`, after `from`.
+     */
+    to: string;
+};
+
+/**
+ * An incentive's budget and what its Agents earned from it.
+ */
+export type IncentiveBudget = {
+    /**
+     * The budget.
+     */
+    amount: Money;
+    /**
+     * Earned so far.
+     */
+    earned: Money;
+    /**
+     * Left.
+     */
+    left: Money;
+    /**
+     * Whether it is spent: no Agent may join any more.
+     */
+    spent: boolean;
+};
+
+/**
+ * An Agent incentive on a delivery service: a quest of drop-off tiers or a bonus a drop-off, joined by the Agent before anything counts, never replacing the pay rule, with a budget; paid by the platform on its fleet's statements, reported to a Partner for its own Agents.
+ */
+export type AgentIncentive = {
+    /**
+     * The incentive.
+     */
+    id: string;
+    /**
+     * The service's Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * Where it stands.
+     */
+    state: IncentiveState;
+    /**
+     * How often it runs.
+     */
+    recurrence: IncentiveRecurrence;
+    /**
+     * Its first day.
+     */
+    starts_on: string;
+    /**
+     * Its last day; `null` until stopped.
+     */
+    ends_on: string | null;
+    /**
+     * A quest's tiers, fewest drop-offs first; empty for a bonus.
+     */
+    tiers: Array<IncentiveTier>;
+    /**
+     * A bonus's amount for each drop-off; `null` for a quest.
+     */
+    amount_per_drop_off: Money | null;
+    /**
+     * A bonus's window; `null` for a quest.
+     */
+    window: IncentiveWindow | null;
+    /**
+     * Its budget.
+     */
+    budget: IncentiveBudget;
+    /**
+     * The service's clock.
+     */
+    time_zone: string;
+    /**
+     * What an Agent reads.
+     */
+    line: string;
+    /**
+     * Who pays it: the platform for its fleet, else the Partner.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * Agents who joined in the current period.
+     */
+    joined: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it ended.
+     */
+    ended_at: string | null;
+    /**
+     * Raised on every change.
+     */
+    version: number;
+};
+
+/**
+ * A service's incentives, live ones first.
+ */
+export type AgentIncentivePage = {
+    /**
+     * The incentives.
+     */
+    items: Array<AgentIncentive>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A new incentive, kept as a draft: a quest's tiers, or a bonus's amount and window.
+ */
+export type AgentIncentiveInput = {
+    /**
+     * Its name, 1 to 60 characters.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * `weekly` by default.
+     */
+    recurrence?: IncentiveRecurrence | null;
+    /**
+     * Its first day; today by default.
+     */
+    starts_on?: string | null;
+    /**
+     * Its last day.
+     */
+    ends_on?: string | null;
+    /**
+     * A quest's one to five tiers, more drop-offs paying more.
+     */
+    tiers?: Array<IncentiveTier>;
+    /**
+     * A bonus's amount for each drop-off.
+     */
+    amount_per_drop_off?: Money | null;
+    /**
+     * A bonus's window.
+     */
+    window?: IncentiveWindow | null;
+    /**
+     * Its budget, more than nothing.
+     */
+    budget: Money;
+};
+
+/**
+ * A change to an incentive. A draft changes freely; a live one changes only its name, a later last day and a larger budget (`incentive_change_refused` otherwise).
+ */
+export type AgentIncentiveUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string | null;
+    /**
+     * How often.
+     */
+    recurrence?: IncentiveRecurrence | null;
+    /**
+     * Its first day.
+     */
+    starts_on?: string | null;
+    /**
+     * Its last day.
+     */
+    ends_on?: string | null;
+    /**
+     * A quest's tiers.
+     */
+    tiers?: Array<IncentiveTier> | null;
+    /**
+     * A bonus's amount.
+     */
+    amount_per_drop_off?: Money | null;
+    /**
+     * A bonus's window.
+     */
+    window?: IncentiveWindow | null;
+    /**
+     * Its budget.
+     */
+    budget?: Money | null;
+};
+
+/**
+ * An Agent's progress on an incentive in a period.
+ */
+export type AgentIncentiveProgressRow = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    name: string;
+    /**
+     * When they joined.
+     */
+    joined_at: string;
+    /**
+     * Drop-offs counted.
+     */
+    drop_offs: number;
+    /**
+     * Earned.
+     */
+    earned: Money;
+    /**
+     * A quest's next tier; `null` past the last, or for a bonus.
+     */
+    next_tier: IncentiveTier | null;
+};
+
+/**
+ * The Agents who joined an incentive in a period, with their progress.
+ */
+export type AgentIncentiveProgress = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * The period: a week such as `2026W45`, or the dates of a one-off.
+     */
+    period: string;
+    /**
+     * When it starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * The Agents who joined, most drop-offs first.
+     */
+    items: Array<AgentIncentiveProgressRow>;
+    /**
+     * Agents who joined.
+     */
+    joined: number;
+    /**
+     * Drop-offs counted.
+     */
+    drop_offs: number;
+    /**
+     * Earned.
+     */
+    earned: Money;
+};
+
+/**
+ * What an Agent's next tier pays.
+ */
+export type IncentiveNext = {
+    /**
+     * Drop-offs more.
+     */
+    drop_offs_more: number;
+    /**
+     * What reaching it pays in all.
+     */
+    amount: Money;
+    /**
+     * In words.
+     */
+    words: string;
+};
+
+/**
+ * An incentive as the Agent app shows it: what it pays, the period, whether the Agent joined, their drop-offs counted and what they earned, and who pays.
+ */
+export type AgentIncentiveOffer = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * What it pays.
+     */
+    line: string;
+    /**
+     * The period.
+     */
+    period: string;
+    /**
+     * When the period starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * A bonus's window in words.
+     */
+    window: string | null;
+    /**
+     * Whether the Agent joined: nothing counts before.
+     */
+    joined: boolean;
+    /**
+     * When.
+     */
+    joined_at: string | null;
+    /**
+     * Whether Join is offered now.
+     */
+    can_join: boolean;
+    /**
+     * Drop-offs counted since joining.
+     */
+    drop_offs: number;
+    /**
+     * Earned in the period.
+     */
+    earned: Money;
+    /**
+     * A quest's next tier; `null` past the last, or for a bonus.
+     */
+    next: IncentiveNext | null;
+    /**
+     * Who pays it.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * Who pays and where it shows.
+     */
+    sentence: string;
+    /**
+     * Progress in words.
+     */
+    progress: string;
+};
+
+/**
+ * The incentives of the Agent's service this week.
+ */
+export type AgentIncentiveOfferList = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * This week.
+     */
+    week: string;
+    /**
+     * Live incentives, joined ones first.
+     */
+    items: Array<AgentIncentiveOffer>;
+    /**
+     * Earned from incentives this week.
+     */
+    earned: Money;
+};
+
+/**
+ * A reward campaign the Partner paid towards in the week: its grants on the Location's orders and the Partner's share of them, less what was taken back.
+ */
+export type StatementRewardRow = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Rewards granted on the Location's orders.
+     */
+    grants: number;
+    /**
+     * The Partner's share.
+     */
+    amount: Money;
+};
+
+/**
+ * An incentive an Agent earned in a week: what reaching a quest's tier or a bonus's drop-offs paid, beside the pay for each task.
+ */
+export type AgentBonusLine = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * The period it was earned in.
+     */
+    period: string;
+    /**
+     * Drop-offs counted when it was earned.
+     */
+    drop_offs: number;
+    /**
+     * What it paid.
+     */
+    amount: Money;
+    /**
+     * When.
+     */
+    earned_at: string;
+    /**
+     * In words.
+     */
+    words: string;
 };
 
 /**
@@ -63280,3 +65583,2740 @@ export type GivePersonalCodeResponses = {
 };
 
 export type GivePersonalCodeResponse = GivePersonalCodeResponses[keyof GivePersonalCodeResponses];
+
+export type GetCustomerRewardsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/rewards';
+};
+
+export type GetCustomerRewardsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerRewardsError = GetCustomerRewardsErrors[keyof GetCustomerRewardsErrors];
+
+export type GetCustomerRewardsResponses = {
+    /**
+     * Their Rewards.
+     */
+    200: CustomerRewards;
+};
+
+export type GetCustomerRewardsResponse = GetCustomerRewardsResponses[keyof GetCustomerRewardsResponses];
+
+export type ListCustomerRewardGrantsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/rewards/grants';
+};
+
+export type ListCustomerRewardGrantsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerRewardGrantsError = ListCustomerRewardGrantsErrors[keyof ListCustomerRewardGrantsErrors];
+
+export type ListCustomerRewardGrantsResponses = {
+    /**
+     * A page of grants.
+     */
+    200: RewardGrantPage;
+};
+
+export type ListCustomerRewardGrantsResponse = ListCustomerRewardGrantsResponses[keyof ListCustomerRewardGrantsResponses];
+
+export type StartCustomerQuestData = {
+    /**
+     * Where Start was pressed.
+     */
+    body?: QuestStartInput;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/rewards/quests/{campaign_id}/start';
+};
+
+export type StartCustomerQuestErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such quest is offered to the customer, live and outside their control group.
+     */
+    404: Problem;
+    /**
+     * `quest_not_startable`: started and running (`quest_running`), completed and not repeatable (`quest_completed`), waiting out its days between completions (`quest_waiting`), or its budget spent (`quest_closed`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartCustomerQuestError = StartCustomerQuestErrors[keyof StartCustomerQuestErrors];
+
+export type StartCustomerQuestResponses = {
+    /**
+     * The quest, started.
+     */
+    200: QuestProgress;
+};
+
+export type StartCustomerQuestResponse = StartCustomerQuestResponses[keyof StartCustomerQuestResponses];
+
+export type GetCustomerReferralData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/referral';
+};
+
+export type GetCustomerReferralErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerReferralError = GetCustomerReferralErrors[keyof GetCustomerReferralErrors];
+
+export type GetCustomerReferralResponses = {
+    /**
+     * Their referral code.
+     */
+    200: CustomerReferral;
+};
+
+export type GetCustomerReferralResponse = GetCustomerReferralResponses[keyof GetCustomerReferralResponses];
+
+export type RenewCustomerReferralCodeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/referral/code';
+};
+
+export type RenewCustomerReferralCodeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the user has no customer profile.
+     */
+    404: Problem;
+    /**
+     * `referral_code_recent`: the code was renewed less than a month ago; the detail names the first day a new one can be had.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RenewCustomerReferralCodeError = RenewCustomerReferralCodeErrors[keyof RenewCustomerReferralCodeErrors];
+
+export type RenewCustomerReferralCodeResponses = {
+    /**
+     * The new code.
+     */
+    200: CustomerReferral;
+};
+
+export type RenewCustomerReferralCodeResponse = RenewCustomerReferralCodeResponses[keyof RenewCustomerReferralCodeResponses];
+
+export type ListPartnerRewardCampaignsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only campaigns in this state.
+         */
+        state?: RewardCampaignState;
+        /**
+         * Only campaigns of this kind.
+         */
+        kind?: RewardCampaignKind;
+        /**
+         * Only campaigns counting at this Location.
+         */
+        location_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/reward-campaigns';
+};
+
+export type ListPartnerRewardCampaignsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:read` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerRewardCampaignsError = ListPartnerRewardCampaignsErrors[keyof ListPartnerRewardCampaignsErrors];
+
+export type ListPartnerRewardCampaignsResponses = {
+    /**
+     * A page of campaigns.
+     */
+    200: RewardCampaignPage;
+};
+
+export type ListPartnerRewardCampaignsResponse = ListPartnerRewardCampaignsResponses[keyof ListPartnerRewardCampaignsResponses];
+
+export type CreatePartnerRewardCampaignData = {
+    /**
+     * The campaign.
+     */
+    body: RewardCampaignInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns';
+};
+
+export type CreatePartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: `kind_not_for_partners` for a tier, `reward_not_fixed` for a range or a chance, a Location or Partner not its own, rules that do not match the kind, or a value out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePartnerRewardCampaignError = CreatePartnerRewardCampaignErrors[keyof CreatePartnerRewardCampaignErrors];
+
+export type CreatePartnerRewardCampaignResponses = {
+    /**
+     * The draft, with its `ETag`.
+     */
+    201: RewardCampaign;
+};
+
+export type CreatePartnerRewardCampaignResponse = CreatePartnerRewardCampaignResponses[keyof CreatePartnerRewardCampaignResponses];
+
+export type DeletePartnerRewardCampaignData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}';
+};
+
+export type DeletePartnerRewardCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign of the Partner.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: only a draft is deleted (`campaign_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePartnerRewardCampaignError = DeletePartnerRewardCampaignErrors[keyof DeletePartnerRewardCampaignErrors];
+
+export type DeletePartnerRewardCampaignResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeletePartnerRewardCampaignResponse = DeletePartnerRewardCampaignResponses[keyof DeletePartnerRewardCampaignResponses];
+
+export type GetPartnerRewardCampaignData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}';
+};
+
+export type GetPartnerRewardCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:read` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign of the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerRewardCampaignError = GetPartnerRewardCampaignErrors[keyof GetPartnerRewardCampaignErrors];
+
+export type GetPartnerRewardCampaignResponses = {
+    /**
+     * The campaign, with its `ETag`.
+     */
+    200: RewardCampaign;
+};
+
+export type GetPartnerRewardCampaignResponse = GetPartnerRewardCampaignResponses[keyof GetPartnerRewardCampaignResponses];
+
+export type UpdatePartnerRewardCampaignData = {
+    /**
+     * What changes.
+     */
+    body: RewardCampaignUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}';
+};
+
+export type UpdatePartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: as when it was made.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign of the Partner.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_change_refused`: a change a live campaign may not take.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`: it changed since the version in `If-Match`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePartnerRewardCampaignError = UpdatePartnerRewardCampaignErrors[keyof UpdatePartnerRewardCampaignErrors];
+
+export type UpdatePartnerRewardCampaignResponses = {
+    /**
+     * The campaign, with its new `ETag`.
+     */
+    200: RewardCampaign;
+};
+
+export type UpdatePartnerRewardCampaignResponse = UpdatePartnerRewardCampaignResponses[keyof UpdatePartnerRewardCampaignResponses];
+
+export type PublishPartnerRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/publish';
+};
+
+export type PublishPartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: `funding_not_confirmed` without the Partner's word, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPartnerRewardCampaignError = PublishPartnerRewardCampaignErrors[keyof PublishPartnerRewardCampaignErrors];
+
+export type PublishPartnerRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type PublishPartnerRewardCampaignResponse = PublishPartnerRewardCampaignResponses[keyof PublishPartnerRewardCampaignResponses];
+
+export type PausePartnerRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/pause';
+};
+
+export type PausePartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PausePartnerRewardCampaignError = PausePartnerRewardCampaignErrors[keyof PausePartnerRewardCampaignErrors];
+
+export type PausePartnerRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type PausePartnerRewardCampaignResponse = PausePartnerRewardCampaignResponses[keyof PausePartnerRewardCampaignResponses];
+
+export type ResumePartnerRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/resume';
+};
+
+export type ResumePartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumePartnerRewardCampaignError = ResumePartnerRewardCampaignErrors[keyof ResumePartnerRewardCampaignErrors];
+
+export type ResumePartnerRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type ResumePartnerRewardCampaignResponse = ResumePartnerRewardCampaignResponses[keyof ResumePartnerRewardCampaignResponses];
+
+export type StopPartnerRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/stop';
+};
+
+export type StopPartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopPartnerRewardCampaignError = StopPartnerRewardCampaignErrors[keyof StopPartnerRewardCampaignErrors];
+
+export type StopPartnerRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type StopPartnerRewardCampaignResponse = StopPartnerRewardCampaignResponses[keyof StopPartnerRewardCampaignResponses];
+
+export type CancelPartnerRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/cancel';
+};
+
+export type CancelPartnerRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelPartnerRewardCampaignError = CancelPartnerRewardCampaignErrors[keyof CancelPartnerRewardCampaignErrors];
+
+export type CancelPartnerRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type CancelPartnerRewardCampaignResponse = CancelPartnerRewardCampaignResponses[keyof CancelPartnerRewardCampaignResponses];
+
+export type GetPartnerRewardCampaignResultsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/reward-campaigns/{campaign_id}/results';
+};
+
+export type GetPartnerRewardCampaignResultsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:read` at the Partner or the Location, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign of the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerRewardCampaignResultsError = GetPartnerRewardCampaignResultsErrors[keyof GetPartnerRewardCampaignResultsErrors];
+
+export type GetPartnerRewardCampaignResultsResponses = {
+    /**
+     * Its results.
+     */
+    200: RewardCampaignResults;
+};
+
+export type GetPartnerRewardCampaignResultsResponse = GetPartnerRewardCampaignResultsResponses[keyof GetPartnerRewardCampaignResultsResponses];
+
+export type ListPlatformRewardCampaignsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only the platform's or the Partners'.
+         */
+        owner?: RewardCampaignOwner;
+        /**
+         * Only campaigns in this state.
+         */
+        state?: RewardCampaignState;
+        /**
+         * Only campaigns of this kind.
+         */
+        kind?: RewardCampaignKind;
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * Words in the name.
+         */
+        q?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/reward-campaigns';
+};
+
+export type ListPlatformRewardCampaignsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformRewardCampaignsError = ListPlatformRewardCampaignsErrors[keyof ListPlatformRewardCampaignsErrors];
+
+export type ListPlatformRewardCampaignsResponses = {
+    /**
+     * A page of campaigns.
+     */
+    200: RewardCampaignPage;
+};
+
+export type ListPlatformRewardCampaignsResponse = ListPlatformRewardCampaignsResponses[keyof ListPlatformRewardCampaignsResponses];
+
+export type CreatePlatformRewardCampaignData = {
+    /**
+     * The campaign.
+     */
+    body: RewardCampaignInput;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/reward-campaigns';
+};
+
+export type CreatePlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: `reward_not_fixed`, rules that do not match the kind, a split without its Partner and share, or a value out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreatePlatformRewardCampaignError = CreatePlatformRewardCampaignErrors[keyof CreatePlatformRewardCampaignErrors];
+
+export type CreatePlatformRewardCampaignResponses = {
+    /**
+     * The draft, with its `ETag`.
+     */
+    201: RewardCampaign;
+};
+
+export type CreatePlatformRewardCampaignResponse = CreatePlatformRewardCampaignResponses[keyof CreatePlatformRewardCampaignResponses];
+
+export type DeletePlatformRewardCampaignData = {
+    body?: never;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}';
+};
+
+export type DeletePlatformRewardCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: only a draft is deleted (`campaign_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePlatformRewardCampaignError = DeletePlatformRewardCampaignErrors[keyof DeletePlatformRewardCampaignErrors];
+
+export type DeletePlatformRewardCampaignResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeletePlatformRewardCampaignResponse = DeletePlatformRewardCampaignResponses[keyof DeletePlatformRewardCampaignResponses];
+
+export type GetPlatformRewardCampaignData = {
+    body?: never;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}';
+};
+
+export type GetPlatformRewardCampaignErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformRewardCampaignError = GetPlatformRewardCampaignErrors[keyof GetPlatformRewardCampaignErrors];
+
+export type GetPlatformRewardCampaignResponses = {
+    /**
+     * The campaign, with its `ETag`.
+     */
+    200: RewardCampaign;
+};
+
+export type GetPlatformRewardCampaignResponse = GetPlatformRewardCampaignResponses[keyof GetPlatformRewardCampaignResponses];
+
+export type UpdatePlatformRewardCampaignData = {
+    /**
+     * What changes.
+     */
+    body: RewardCampaignUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}';
+};
+
+export type UpdatePlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: as when it was made.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_change_refused`: a change a live campaign may not take.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`: it changed since the version in `If-Match`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdatePlatformRewardCampaignError = UpdatePlatformRewardCampaignErrors[keyof UpdatePlatformRewardCampaignErrors];
+
+export type UpdatePlatformRewardCampaignResponses = {
+    /**
+     * The campaign, with its new `ETag`.
+     */
+    200: RewardCampaign;
+};
+
+export type UpdatePlatformRewardCampaignResponse = UpdatePlatformRewardCampaignResponses[keyof UpdatePlatformRewardCampaignResponses];
+
+export type PublishPlatformRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/publish';
+};
+
+export type PublishPlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishPlatformRewardCampaignError = PublishPlatformRewardCampaignErrors[keyof PublishPlatformRewardCampaignErrors];
+
+export type PublishPlatformRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type PublishPlatformRewardCampaignResponse = PublishPlatformRewardCampaignResponses[keyof PublishPlatformRewardCampaignResponses];
+
+export type PausePlatformRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/pause';
+};
+
+export type PausePlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PausePlatformRewardCampaignError = PausePlatformRewardCampaignErrors[keyof PausePlatformRewardCampaignErrors];
+
+export type PausePlatformRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type PausePlatformRewardCampaignResponse = PausePlatformRewardCampaignResponses[keyof PausePlatformRewardCampaignResponses];
+
+export type ResumePlatformRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/resume';
+};
+
+export type ResumePlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumePlatformRewardCampaignError = ResumePlatformRewardCampaignErrors[keyof ResumePlatformRewardCampaignErrors];
+
+export type ResumePlatformRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type ResumePlatformRewardCampaignResponse = ResumePlatformRewardCampaignResponses[keyof ResumePlatformRewardCampaignResponses];
+
+export type StopPlatformRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/stop';
+};
+
+export type StopPlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopPlatformRewardCampaignError = StopPlatformRewardCampaignErrors[keyof StopPlatformRewardCampaignErrors];
+
+export type StopPlatformRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type StopPlatformRewardCampaignResponse = StopPlatformRewardCampaignResponses[keyof StopPlatformRewardCampaignResponses];
+
+export type CancelPlatformRewardCampaignData = {
+    /**
+     * A reason, and the Partner's word to publish.
+     */
+    body?: RewardCampaignMove;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/cancel';
+};
+
+export type CancelPlatformRewardCampaignErrors = {
+    /**
+     * `validation_failed`: a reason over 200 characters, a pause of a Partner's campaign without one, or a malformed body.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: its state does not allow the move (`campaign_state`), or a Partner resumes what the platform paused (`paused_by_platform`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelPlatformRewardCampaignError = CancelPlatformRewardCampaignErrors[keyof CancelPlatformRewardCampaignErrors];
+
+export type CancelPlatformRewardCampaignResponses = {
+    /**
+     * The campaign, moved.
+     */
+    200: RewardCampaign;
+};
+
+export type CancelPlatformRewardCampaignResponse = CancelPlatformRewardCampaignResponses[keyof CancelPlatformRewardCampaignResponses];
+
+export type ListRewardCampaignVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/versions';
+};
+
+export type ListRewardCampaignVersionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListRewardCampaignVersionsError = ListRewardCampaignVersionsErrors[keyof ListRewardCampaignVersionsErrors];
+
+export type ListRewardCampaignVersionsResponses = {
+    /**
+     * The versions.
+     */
+    200: RewardCampaignVersionList;
+};
+
+export type ListRewardCampaignVersionsResponse = ListRewardCampaignVersionsResponses[keyof ListRewardCampaignVersionsResponses];
+
+export type CreateRewardCampaignVersionData = {
+    /**
+     * The rules and when.
+     */
+    body: RewardCampaignVersionInput;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/versions';
+};
+
+export type CreateRewardCampaignVersionErrors = {
+    /**
+     * `validation_failed`: `effective_from_past`, `reward_not_fixed`, or rules that do not match the kind.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * `reward_campaign_move_refused`: a draft changes its rules directly, an ended campaign not at all (`campaign_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateRewardCampaignVersionError = CreateRewardCampaignVersionErrors[keyof CreateRewardCampaignVersionErrors];
+
+export type CreateRewardCampaignVersionResponses = {
+    /**
+     * The version.
+     */
+    201: RewardCampaignVersion;
+};
+
+export type CreateRewardCampaignVersionResponse = CreateRewardCampaignVersionResponses[keyof CreateRewardCampaignVersionResponses];
+
+export type ListRewardCampaignGrantsData = {
+    body?: never;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: {
+        /**
+         * Only grants in this state.
+         */
+        status?: RewardGrantStatus;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/reward-campaigns/{campaign_id}/grants';
+};
+
+export type ListRewardCampaignGrantsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListRewardCampaignGrantsError = ListRewardCampaignGrantsErrors[keyof ListRewardCampaignGrantsErrors];
+
+export type ListRewardCampaignGrantsResponses = {
+    /**
+     * A page of grants with the budget.
+     */
+    200: RewardGrantPage;
+};
+
+export type ListRewardCampaignGrantsResponse = ListRewardCampaignGrantsResponses[keyof ListRewardCampaignGrantsResponses];
+
+export type GetPlatformRewardCampaignResultsData = {
+    body?: never;
+    path: {
+        /**
+         * The reward campaign.
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-campaigns/{campaign_id}/results';
+};
+
+export type GetPlatformRewardCampaignResultsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such campaign.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformRewardCampaignResultsError = GetPlatformRewardCampaignResultsErrors[keyof GetPlatformRewardCampaignResultsErrors];
+
+export type GetPlatformRewardCampaignResultsResponses = {
+    /**
+     * Its results.
+     */
+    200: RewardCampaignResults;
+};
+
+export type GetPlatformRewardCampaignResultsResponse = GetPlatformRewardCampaignResultsResponses[keyof GetPlatformRewardCampaignResultsResponses];
+
+export type ListPlatformRewardGrantsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only grants in this state.
+         */
+        status?: RewardGrantStatus;
+        /**
+         * Only this campaign's.
+         */
+        campaign_id?: string;
+        /**
+         * Only this customer's.
+         */
+        customer_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/reward-grants';
+};
+
+export type ListPlatformRewardGrantsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformRewardGrantsError = ListPlatformRewardGrantsErrors[keyof ListPlatformRewardGrantsErrors];
+
+export type ListPlatformRewardGrantsResponses = {
+    /**
+     * A page of grants.
+     */
+    200: RewardGrantPage;
+};
+
+export type ListPlatformRewardGrantsResponse = ListPlatformRewardGrantsResponses[keyof ListPlatformRewardGrantsResponses];
+
+export type ReleaseRewardGrantData = {
+    /**
+     * Why.
+     */
+    body: RewardGrantDecision;
+    path: {
+        /**
+         * The grant.
+         */
+        grant_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-grants/{grant_id}/release';
+};
+
+export type ReleaseRewardGrantErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such grant.
+     */
+    404: Problem;
+    /**
+     * `reward_grant_decided`: it is not held, released or refused already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReleaseRewardGrantError = ReleaseRewardGrantErrors[keyof ReleaseRewardGrantErrors];
+
+export type ReleaseRewardGrantResponses = {
+    /**
+     * The grant, granted.
+     */
+    200: RewardGrant;
+};
+
+export type ReleaseRewardGrantResponse = ReleaseRewardGrantResponses[keyof ReleaseRewardGrantResponses];
+
+export type RefuseRewardGrantData = {
+    /**
+     * Why.
+     */
+    body: RewardGrantDecision;
+    path: {
+        /**
+         * The grant.
+         */
+        grant_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/reward-grants/{grant_id}/refuse';
+};
+
+export type RefuseRewardGrantErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such grant.
+     */
+    404: Problem;
+    /**
+     * `reward_grant_decided`: it is not held, released or refused already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RefuseRewardGrantError = RefuseRewardGrantErrors[keyof RefuseRewardGrantErrors];
+
+export type RefuseRewardGrantResponses = {
+    /**
+     * The grant, refused.
+     */
+    200: RewardGrant;
+};
+
+export type RefuseRewardGrantResponse = RefuseRewardGrantResponses[keyof RefuseRewardGrantResponses];
+
+export type GetReferralSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The city.
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/referrals';
+};
+
+export type GetReferralSettingsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such city.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetReferralSettingsError = GetReferralSettingsErrors[keyof GetReferralSettingsErrors];
+
+export type GetReferralSettingsResponses = {
+    /**
+     * The programme, with its `ETag`.
+     */
+    200: ReferralSettings;
+};
+
+export type GetReferralSettingsResponse = GetReferralSettingsResponses[keyof GetReferralSettingsResponses];
+
+export type SetReferralSettingsData = {
+    /**
+     * The programme.
+     */
+    body: ReferralSettingsInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The city.
+         */
+        service_area_id: string;
+    };
+    query?: never;
+    url: '/v1/service-areas/{service_area_id}/referrals';
+};
+
+export type SetReferralSettingsErrors = {
+    /**
+     * `validation_failed`: a reward or a budget of nothing, or a limit out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such city.
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: it changed since the version in `If-Match`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetReferralSettingsError = SetReferralSettingsErrors[keyof SetReferralSettingsErrors];
+
+export type SetReferralSettingsResponses = {
+    /**
+     * The programme, with its new `ETag`.
+     */
+    200: ReferralSettings;
+};
+
+export type SetReferralSettingsResponse = SetReferralSettingsResponses[keyof SetReferralSettingsResponses];
+
+export type ListPlatformReferralsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only referrals in this state.
+         */
+        state?: ReferralState;
+        /**
+         * Only this customer's, as referrer or friend.
+         */
+        customer_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/referrals';
+};
+
+export type ListPlatformReferralsErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformReferralsError = ListPlatformReferralsErrors[keyof ListPlatformReferralsErrors];
+
+export type ListPlatformReferralsResponses = {
+    /**
+     * A page of referrals.
+     */
+    200: ReferralPage;
+};
+
+export type ListPlatformReferralsResponse = ListPlatformReferralsResponses[keyof ListPlatformReferralsResponses];
+
+export type GetPlatformCustomerRewardsData = {
+    body?: never;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/rewards';
+};
+
+export type GetPlatformCustomerRewardsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformCustomerRewardsError = GetPlatformCustomerRewardsErrors[keyof GetPlatformCustomerRewardsErrors];
+
+export type GetPlatformCustomerRewardsResponses = {
+    /**
+     * Their Rewards tab.
+     */
+    200: PlatformCustomerRewards;
+};
+
+export type GetPlatformCustomerRewardsResponse = GetPlatformCustomerRewardsResponses[keyof GetPlatformCustomerRewardsResponses];
+
+export type LiftCustomerRewardExclusionData = {
+    body?: never;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/reward-exclusion';
+};
+
+export type LiftCustomerRewardExclusionErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type LiftCustomerRewardExclusionError = LiftCustomerRewardExclusionErrors[keyof LiftCustomerRewardExclusionErrors];
+
+export type LiftCustomerRewardExclusionResponses = {
+    /**
+     * Lifted, or there was none.
+     */
+    204: void;
+};
+
+export type LiftCustomerRewardExclusionResponse = LiftCustomerRewardExclusionResponses[keyof LiftCustomerRewardExclusionResponses];
+
+export type ExcludeCustomerFromRewardsData = {
+    /**
+     * Why.
+     */
+    body: RewardExclusionInput;
+    path: {
+        /**
+         * The customer (a user id).
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/reward-exclusion';
+};
+
+export type ExcludeCustomerFromRewardsErrors = {
+    /**
+     * `validation_failed`: an empty reason or one over 300 characters.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ExcludeCustomerFromRewardsError = ExcludeCustomerFromRewardsErrors[keyof ExcludeCustomerFromRewardsErrors];
+
+export type ExcludeCustomerFromRewardsResponses = {
+    /**
+     * The exclusion.
+     */
+    200: RewardExclusion;
+};
+
+export type ExcludeCustomerFromRewardsResponse = ExcludeCustomerFromRewardsResponses[keyof ExcludeCustomerFromRewardsResponses];
+
+export type ListAgentIncentivesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+    };
+    query?: {
+        /**
+         * Only incentives in this state.
+         */
+        state?: IncentiveState;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives';
+};
+
+export type ListAgentIncentivesErrors = {
+    /**
+     * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such delivery service of the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentIncentivesError = ListAgentIncentivesErrors[keyof ListAgentIncentivesErrors];
+
+export type ListAgentIncentivesResponses = {
+    /**
+     * A page of incentives.
+     */
+    200: AgentIncentivePage;
+};
+
+export type ListAgentIncentivesResponse = ListAgentIncentivesResponses[keyof ListAgentIncentivesResponses];
+
+export type CreateAgentIncentiveData = {
+    /**
+     * The incentive.
+     */
+    body: AgentIncentiveInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives';
+};
+
+export type CreateAgentIncentiveErrors = {
+    /**
+     * `validation_failed`: tiers that do not rise, a bonus without its amount or window, hours that do not end after they start, a last day before the first, or a budget of nothing.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such delivery service of the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateAgentIncentiveError = CreateAgentIncentiveErrors[keyof CreateAgentIncentiveErrors];
+
+export type CreateAgentIncentiveResponses = {
+    /**
+     * The draft.
+     */
+    201: AgentIncentive;
+};
+
+export type CreateAgentIncentiveResponse = CreateAgentIncentiveResponses[keyof CreateAgentIncentiveResponses];
+
+export type DeleteAgentIncentiveData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}';
+};
+
+export type DeleteAgentIncentiveErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * `incentive_move_refused`: only a draft is deleted (`incentive_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteAgentIncentiveError = DeleteAgentIncentiveErrors[keyof DeleteAgentIncentiveErrors];
+
+export type DeleteAgentIncentiveResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteAgentIncentiveResponse = DeleteAgentIncentiveResponses[keyof DeleteAgentIncentiveResponses];
+
+export type GetAgentIncentiveData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}';
+};
+
+export type GetAgentIncentiveErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentIncentiveError = GetAgentIncentiveErrors[keyof GetAgentIncentiveErrors];
+
+export type GetAgentIncentiveResponses = {
+    /**
+     * The incentive.
+     */
+    200: AgentIncentive;
+};
+
+export type GetAgentIncentiveResponse = GetAgentIncentiveResponses[keyof GetAgentIncentiveResponses];
+
+export type UpdateAgentIncentiveData = {
+    /**
+     * What changes.
+     */
+    body: AgentIncentiveUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}';
+};
+
+export type UpdateAgentIncentiveErrors = {
+    /**
+     * `validation_failed`: as when it was made.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * `incentive_change_refused`: a change a live incentive may not take, or an ended one.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateAgentIncentiveError = UpdateAgentIncentiveErrors[keyof UpdateAgentIncentiveErrors];
+
+export type UpdateAgentIncentiveResponses = {
+    /**
+     * The incentive.
+     */
+    200: AgentIncentive;
+};
+
+export type UpdateAgentIncentiveResponse = UpdateAgentIncentiveResponses[keyof UpdateAgentIncentiveResponses];
+
+export type PublishAgentIncentiveData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/publish';
+};
+
+export type PublishAgentIncentiveErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * `incentive_move_refused`: its state does not allow the move (`incentive_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishAgentIncentiveError = PublishAgentIncentiveErrors[keyof PublishAgentIncentiveErrors];
+
+export type PublishAgentIncentiveResponses = {
+    /**
+     * The incentive, moved.
+     */
+    200: AgentIncentive;
+};
+
+export type PublishAgentIncentiveResponse = PublishAgentIncentiveResponses[keyof PublishAgentIncentiveResponses];
+
+export type StopAgentIncentiveData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/stop';
+};
+
+export type StopAgentIncentiveErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * `incentive_move_refused`: its state does not allow the move (`incentive_state`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StopAgentIncentiveError = StopAgentIncentiveErrors[keyof StopAgentIncentiveErrors];
+
+export type StopAgentIncentiveResponses = {
+    /**
+     * The incentive, moved.
+     */
+    200: AgentIncentive;
+};
+
+export type StopAgentIncentiveResponse = StopAgentIncentiveResponses[keyof StopAgentIncentiveResponses];
+
+export type GetAgentIncentiveProgressData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery service.
+         */
+        service_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: {
+        /**
+         * The week, `YYYYWww`; this week by default. A one-off incentive has one period.
+         */
+        week?: string;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/progress';
+};
+
+export type GetAgentIncentiveProgressErrors = {
+    /**
+     * `validation_failed`: `week_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such incentive of the service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentIncentiveProgressError = GetAgentIncentiveProgressErrors[keyof GetAgentIncentiveProgressErrors];
+
+export type GetAgentIncentiveProgressResponses = {
+    /**
+     * Its progress.
+     */
+    200: AgentIncentiveProgress;
+};
+
+export type GetAgentIncentiveProgressResponse = GetAgentIncentiveProgressResponses[keyof GetAgentIncentiveProgressResponses];
+
+export type ListOwnAgentIncentivesData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent membership, which must be the caller's.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/incentives';
+};
+
+export type ListOwnAgentIncentivesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListOwnAgentIncentivesError = ListOwnAgentIncentivesErrors[keyof ListOwnAgentIncentivesErrors];
+
+export type ListOwnAgentIncentivesResponses = {
+    /**
+     * The incentives.
+     */
+    200: AgentIncentiveOfferList;
+};
+
+export type ListOwnAgentIncentivesResponse = ListOwnAgentIncentivesResponses[keyof ListOwnAgentIncentivesResponses];
+
+export type JoinAgentIncentiveData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent membership, which must be the caller's.
+         */
+        agent_id: string;
+        /**
+         * The incentive.
+         */
+        incentive_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/incentives/{incentive_id}/join';
+};
+
+export type JoinAgentIncentiveErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller, or no such live incentive of its service.
+     */
+    404: Problem;
+    /**
+     * `incentive_not_joinable`: joined already (`already_joined`), its period or the incentive is over (`incentive_closed`), its budget is spent (`budget_spent`), or the membership is not active (`not_in_service`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type JoinAgentIncentiveError = JoinAgentIncentiveErrors[keyof JoinAgentIncentiveErrors];
+
+export type JoinAgentIncentiveResponses = {
+    /**
+     * The incentive, joined.
+     */
+    200: AgentIncentiveOffer;
+};
+
+export type JoinAgentIncentiveResponse = JoinAgentIncentiveResponses[keyof JoinAgentIncentiveResponses];

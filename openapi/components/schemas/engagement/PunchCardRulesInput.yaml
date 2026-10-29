@@ -1,0 +1,29 @@
+type: object
+description: A punch card as set.
+required:
+  - every
+  - reward
+properties:
+  every:
+    type: integer
+    description: 2 to 100.
+    minimum: 2
+    maximum: 100
+    examples:
+      - 5
+  min_spend:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The least a pickup's items must come to.
+  reward:
+    $ref: ./RewardSpecInput.yaml
+    description: "Its reward: money off or a free item, held for the nth pickup."
+examples:
+  - every: 5
+    min_spend: null
+    reward:
+      kind: money_off
+      amount:
+        minor_units: 5000
+        currency: INR

@@ -1,0 +1,31 @@
+type: object
+description: An incentive's budget and what its Agents earned from it.
+required:
+  - amount
+  - earned
+  - left
+  - spent
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The budget.
+  earned:
+    $ref: ../common/Money.yaml
+    description: Earned so far.
+  left:
+    $ref: ../common/Money.yaml
+    description: Left.
+  spent:
+    type: boolean
+    description: "Whether it is spent: no Agent may join any more."
+examples:
+  - amount:
+      minor_units: 5000000
+      currency: INR
+    earned:
+      minor_units: 30000
+      currency: INR
+    left:
+      minor_units: 4970000
+      currency: INR
+    spent: false

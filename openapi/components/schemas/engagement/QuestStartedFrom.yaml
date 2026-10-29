@@ -1,0 +1,8 @@
+type: string
+description: "Where the customer pressed Start: in `rewards`, on a `store` page or on the `home` screen."
+enum:
+  - rewards
+  - store
+  - home
+examples:
+  - rewards

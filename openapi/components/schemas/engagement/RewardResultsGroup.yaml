@@ -1,0 +1,51 @@
+type: object
+description: "One side of a campaign's results: the customers treated or held out, their completed orders and sales in the campaign's scope since it started, the share with a second order within 30 days of their first, and what their rewards cost."
+required:
+  - customers
+  - orders
+  - sales
+  - orders_per_customer
+  - retained_30_days_percent
+  - reward_cost
+properties:
+  customers:
+    type: integer
+    description: Customers.
+    minimum: 0
+    examples:
+      - 900
+  orders:
+    type: integer
+    description: Completed orders.
+    minimum: 0
+    examples:
+      - 2350
+  sales:
+    $ref: ../common/Money.yaml
+    description: Their sales.
+  orders_per_customer:
+    type: number
+    description: Orders per customer.
+    examples:
+      - 2.61
+  retained_30_days_percent:
+    type:
+      - number
+      - "null"
+    description: The share, in percent, with another completed order within 30 days of their first; `null` without customers.
+    examples:
+      - 46.2
+  reward_cost:
+    $ref: ../common/Money.yaml
+    description: What their rewards cost.
+examples:
+  - customers: 900
+    orders: 2350
+    sales:
+      minor_units: 98700000
+      currency: INR
+    orders_per_customer: 2.61
+    retained_30_days_percent: 46.2
+    reward_cost:
+      minor_units: 1350000
+      currency: INR

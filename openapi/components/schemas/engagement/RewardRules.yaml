@@ -1,0 +1,57 @@
+type: object
+description: "A version of a campaign's rules: the member named by its kind."
+required:
+  - streak
+  - quest
+  - tier
+  - punch_card
+properties:
+  streak:
+    oneOf:
+      - $ref: ./StreakRules.yaml
+      - type: "null"
+    description: A streak's rules.
+  quest:
+    oneOf:
+      - $ref: ./QuestRules.yaml
+      - type: "null"
+    description: A quest's rules.
+  tier:
+    oneOf:
+      - $ref: ./TierRules.yaml
+      - type: "null"
+    description: The tiers' rules.
+  punch_card:
+    oneOf:
+      - $ref: ./PunchCardRules.yaml
+      - type: "null"
+    description: A punch card's rules.
+examples:
+  - streak: null
+    quest:
+      steps:
+        - kind: second_vertical
+          count: 1
+          partner_id: null
+          location_id: null
+          vertical_id: null
+          label: Order from a second Vertical
+      days: 30
+      repeatable: false
+      wait_days: 7
+      reward:
+        kind: credit
+        paid_as: wallet_credit
+        amount:
+          minor_units: 15000
+          currency: INR
+        worth_up_to: null
+        min_spend: null
+        valid_days: null
+        item_ids: []
+        worth:
+          minor_units: 15000
+          currency: INR
+        line: ₹150.00 of credit
+    tier: null
+    punch_card: null

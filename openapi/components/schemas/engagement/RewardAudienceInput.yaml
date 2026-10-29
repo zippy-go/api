@@ -1,0 +1,41 @@
+type: object
+description: "Where a campaign counts, as set. A Partner's campaign counts at its own Locations: all of them, or those named."
+properties:
+  everywhere:
+    type:
+      - boolean
+      - "null"
+    description: "`true` to count everywhere; the lists are then empty."
+    examples:
+      - false
+  service_area_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Cities and zones.
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Verticals.
+  partner_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Partners.
+  location_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: Locations.
+examples:
+  - everywhere: false
+    service_area_ids:
+      - 01a13a48-9e00-7000-8000-00000000a001
+    vertical_ids: []
+    partner_ids: []
+    location_ids: []

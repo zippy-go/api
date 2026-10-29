@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.incentive.published.v1.schema.json",
+  "title": "EngagementIncentivePublishedPayload",
+  "description": "Payload of `engagement.incentive.published` version 1: an incentive for a delivery service's Agents was published. The envelope's `partner_id` is the service's Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "properties": {
+    "incentive_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The incentive.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006101"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Weekly 20"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "quest",
+        "bonus"
+      ],
+      "description": "A `quest` of drop-off tiers or a `bonus` a drop-off.",
+      "examples": [
+        "quest"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000002"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000202"
+      ]
+    },
+    "paid_by": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "partner"
+      ],
+      "description": "Who pays it: the `platform` for its fleet, else the `partner`.",
+      "examples": [
+        "platform"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-06T12:00:00Z"
+      ]
+    },
+    "recurrence": {
+      "type": "string",
+      "enum": [
+        "once",
+        "weekly"
+      ],
+      "description": "How often it runs.",
+      "examples": [
+        "weekly"
+      ]
+    },
+    "starts_on": {
+      "type": "string",
+      "format": "date",
+      "description": "Its first day.",
+      "examples": [
+        "2026-11-02"
+      ]
+    },
+    "ends_on": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Its last day.",
+      "examples": [
+        null
+      ]
+    },
+    "tiers": {
+      "type": "array",
+      "description": "A quest's tiers; empty for a bonus.",
+      "items": {
+        "type": "object",
+        "description": "A tier: the drop-offs that reach it and what it pays in all.",
+        "required": [
+          "drop_offs",
+          "amount"
+        ],
+        "properties": {
+          "drop_offs": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Drop-offs."
+          },
+          "amount": {
+            "$ref": "#/$defs/money",
+            "description": "What it pays in all."
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "drop_offs": 20,
+            "amount": {
+              "minor_units": 30000,
+              "currency": "INR"
+            }
+          }
+        ]
+      ]
+    },
+    "amount_per_drop_off": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "A bonus's amount a drop-off; `null` for a quest."
+    },
+    "window": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "A bonus's days and hours.",
+          "required": [
+            "days",
+            "from",
+            "to"
+          ],
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday"
+                ]
+              },
+              "description": "The days; every day when empty."
+            },
+            "from": {
+              "type": "string",
+              "description": "From, `HH:MM`."
+            },
+            "to": {
+              "type": "string",
+              "description": "Until, `HH:MM`."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "A bonus's window; `null` for a quest."
+    },
+    "budget": {
+      "$ref": "#/$defs/money",
+      "description": "Its budget."
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "description": "An amount in minor units with its ISO 4217 currency.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in the currency's minor unit."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The currency, upper case."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

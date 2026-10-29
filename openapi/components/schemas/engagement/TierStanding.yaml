@@ -1,0 +1,80 @@
+type: object
+description: A customer's tier, how it was earned, what keeps it and when it is next looked at.
+required:
+  - level
+  - since
+  - orders_in_window
+  - window_days
+  - how_earned
+  - keeps
+  - next_look_on
+  - next_level
+  - orders_to_next
+  - perks
+properties:
+  level:
+    $ref: ./TierLevel.yaml
+    description: The tier.
+  since:
+    type: string
+    format: date
+    description: Since when.
+    examples:
+      - 2026-11-06
+  orders_in_window:
+    type: integer
+    description: Completed orders in the days counted.
+    minimum: 0
+    examples:
+      - 8
+  window_days:
+    type: integer
+    description: The days counted.
+    minimum: 1
+    examples:
+      - 90
+  how_earned:
+    type: string
+    description: How it was earned.
+    examples:
+      - Silver for 8 completed orders in the last 90 days.
+  keeps:
+    type: string
+    description: What keeps it.
+    examples:
+      - Keep 8 completed orders in 90 days to stay Silver.
+  next_look_on:
+    type: string
+    format: date
+    description: When it is next looked at.
+    examples:
+      - 2026-12-01
+  next_level:
+    oneOf:
+      - $ref: ./TierLevel.yaml
+      - type: "null"
+    description: The tier above; `null` at Gold.
+  orders_to_next:
+    type:
+      - integer
+      - "null"
+    description: Completed orders more for the tier above.
+    examples:
+      - 12
+  perks:
+    type: array
+    items:
+      type: string
+    description: Its perks, and when they arrive.
+examples:
+  - level: silver
+    since: 2026-11-06
+    orders_in_window: 8
+    window_days: 90
+    how_earned: Silver for 8 completed orders in the last 90 days.
+    keeps: Keep 8 completed orders in 90 days to stay Silver.
+    next_look_on: 2026-12-01
+    next_level: gold
+    orders_to_next: 12
+    perks:
+      - Priority support and early access arrive in a later step.

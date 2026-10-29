@@ -1,0 +1,20 @@
+type: object
+description: "A tier of a quest: the drop-offs that reach it and what it pays in all, the tiers below included."
+required:
+  - drop_offs
+  - amount
+properties:
+  drop_offs:
+    type: integer
+    description: Drop-offs completed.
+    minimum: 1
+    examples:
+      - 20
+  amount:
+    $ref: ../common/Money.yaml
+    description: What reaching it pays in all.
+examples:
+  - drop_offs: 20
+    amount:
+      minor_units: 30000
+      currency: INR

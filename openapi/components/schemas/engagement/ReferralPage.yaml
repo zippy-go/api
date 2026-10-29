@@ -1,0 +1,36 @@
+type: object
+description: Referrals, newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Referral.yaml
+    description: The referrals.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6101
+        referrer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001
+        referrer_name: Ravi
+        referred_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7002
+        referred_name: Priya
+        code: RAVI7K
+        service_area_id: 01a13a48-9e00-7000-8000-00000000a001
+        state: rewarded
+        recorded_at: 2026-11-02T08:00:00Z
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
+        rewarded_at: 2026-11-02T09:10:00Z
+        amount:
+          minor_units: 10000
+          currency: INR
+        reason: null
+    next_cursor: null

@@ -1,0 +1,54 @@
+type: object
+description: The incentives of the Agent's service this week.
+required:
+  - agent_id
+  - week
+  - items
+  - earned
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  week:
+    type: string
+    pattern: ^[0-9]{4}W[0-9]{2}$
+    description: This week.
+    examples:
+      - 2026W45
+  items:
+    type: array
+    items:
+      $ref: ./AgentIncentiveOffer.yaml
+    description: Live incentives, joined ones first.
+  earned:
+    $ref: ../common/Money.yaml
+    description: Earned from incentives this week.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    week: 2026W45
+    items:
+      - incentive_id: 01a13a48-9e00-7000-8000-000000006101
+        name: Weekly 20
+        kind: quest
+        line: 20 drop-offs for ₹300.00, 35 for ₹600.00
+        period: 2026W45
+        starts_at: 2026-11-01T18:30:00Z
+        ends_at: 2026-11-08T18:30:00Z
+        window: null
+        joined: true
+        joined_at: 2026-11-02T04:00:00Z
+        can_join: false
+        drop_offs: 20
+        earned:
+          minor_units: 30000
+          currency: INR
+        next: null
+        paid_by: platform
+        sentence: Paid by ZippyGo on your weekly statement, under Bonuses and quests.
+        progress: ₹300.00 earned. 15 more for ₹600.00.
+    earned:
+      minor_units: 30000
+      currency: INR

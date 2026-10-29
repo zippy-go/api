@@ -1,0 +1,16 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f6019",
+  "type": "engagement.referral.recorded",
+  "version": 1,
+  "occurred_at": "2026-11-02T08:00:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "referral_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6101",
+    "referrer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001",
+    "referred_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7002",
+    "code_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e6401",
+    "service_area_id": "01a13a48-9e00-7000-8000-00000000a001",
+    "at": "2026-11-02T08:00:00Z"
+  }
+}

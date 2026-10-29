@@ -1,0 +1,108 @@
+type: object
+description: A campaign in a list.
+required:
+  - id
+  - owner
+  - partner_id
+  - name
+  - kind
+  - state
+  - line
+  - funder
+  - partner_share_percent
+  - budget
+  - schedule
+  - grants
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The campaign.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006002
+  owner:
+    $ref: ./RewardCampaignOwner.yaml
+    description: Who runs it.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner whose campaign it is; `null` for the platform's.
+    examples:
+      - null
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Try something new
+  kind:
+    $ref: ./RewardCampaignKind.yaml
+    description: What it counts.
+  state:
+    $ref: ./RewardCampaignState.yaml
+    description: Where it stands.
+  line:
+    type: string
+    description: What a customer reads.
+    examples:
+      - "Order from a second Vertical: ₹150.00 of credit"
+  funder:
+    $ref: ./RewardFunder.yaml
+    description: Who pays for its rewards.
+  partner_share_percent:
+    type: integer
+    description: "The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does."
+    minimum: 0
+    maximum: 100
+    examples:
+      - 0
+  budget:
+    $ref: ./RewardBudget.yaml
+    description: Its budget.
+  schedule:
+    $ref: ./RewardSchedule.yaml
+    description: When it runs.
+  grants:
+    type: integer
+    description: Rewards granted.
+    minimum: 0
+    examples:
+      - 132
+  updated_at:
+    type: string
+    format: date-time
+    description: When it last changed.
+    examples:
+      - 2026-10-29T10:00:00Z
+examples:
+  - id: 01a13a48-9e00-7000-8000-000000006002
+    owner: platform
+    partner_id: null
+    name: Try something new
+    kind: quest
+    state: live
+    line: "Order from a second Vertical: ₹150.00 of credit"
+    funder: platform
+    partner_share_percent: 0
+    budget:
+      amount:
+        minor_units: 2000000
+        currency: INR
+      granted:
+        minor_units: 1990000
+        currency: INR
+      held:
+        minor_units: 0
+        currency: INR
+      left:
+        minor_units: 10000
+        currency: INR
+      spent: false
+    schedule:
+      starts_at: 2026-10-29T00:00:00Z
+      ends_at: null
+      time_zone: Asia/Kolkata
+    grants: 132
+    updated_at: 2026-10-29T10:00:00Z

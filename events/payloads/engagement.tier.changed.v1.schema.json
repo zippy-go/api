@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.tier.changed.v1.schema.json",
+  "title": "EngagementTierChangedPayload",
+  "description": "Payload of `engagement.tier.changed` version 1: a customer's tier changed, at once on crossing a threshold or at the month's look. The envelope's `partner_id` is `null`. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tier campaign.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000006003"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id).",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000701"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "member",
+        "silver",
+        "gold"
+      ],
+      "description": "The tier now.",
+      "examples": [
+        "silver"
+      ]
+    },
+    "previous_tier": {
+      "type": "string",
+      "enum": [
+        "member",
+        "silver",
+        "gold"
+      ],
+      "description": "The tier before.",
+      "examples": [
+        "member"
+      ]
+    },
+    "orders_in_window": {
+      "type": "integer",
+      "description": "Completed orders in the days counted.",
+      "minimum": 0,
+      "examples": [
+        8
+      ]
+    },
+    "why": {
+      "type": "string",
+      "enum": [
+        "crossed",
+        "monthly"
+      ],
+      "description": "`crossed` mid-month, or the `monthly` look.",
+      "examples": [
+        "crossed"
+      ]
+    },
+    "next_look_on": {
+      "type": "string",
+      "format": "date",
+      "description": "When it is next looked at.",
+      "examples": [
+        "2026-12-01"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-06T12:00:00Z"
+      ]
+    }
+  }
+}

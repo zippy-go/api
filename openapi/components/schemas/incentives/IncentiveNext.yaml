@@ -1,0 +1,27 @@
+type: object
+description: What an Agent's next tier pays.
+required:
+  - drop_offs_more
+  - amount
+  - words
+properties:
+  drop_offs_more:
+    type: integer
+    description: Drop-offs more.
+    minimum: 1
+    examples:
+      - 15
+  amount:
+    $ref: ../common/Money.yaml
+    description: What reaching it pays in all.
+  words:
+    type: string
+    description: In words.
+    examples:
+      - 15 more for ₹600.00
+examples:
+  - drop_offs_more: 15
+    amount:
+      minor_units: 60000
+      currency: INR
+    words: 15 more for ₹600.00

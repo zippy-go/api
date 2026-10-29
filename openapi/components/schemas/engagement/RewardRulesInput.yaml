@@ -1,0 +1,28 @@
+type: object
+description: "Rules as set: the member named by the campaign's kind, the others left out."
+properties:
+  streak:
+    oneOf:
+      - $ref: ./StreakRulesInput.yaml
+      - type: "null"
+    description: A streak's rules.
+  quest:
+    oneOf:
+      - $ref: ./QuestRulesInput.yaml
+      - type: "null"
+    description: A quest's rules.
+  tier:
+    oneOf:
+      - $ref: ./TierRulesInput.yaml
+      - type: "null"
+    description: The tiers' rules.
+  punch_card:
+    oneOf:
+      - $ref: ./PunchCardRulesInput.yaml
+      - type: "null"
+    description: A punch card's rules.
+examples:
+  - streak: null
+    quest: null
+    tier: null
+    punch_card: null

@@ -1,0 +1,176 @@
+type: object
+description: "An Agent incentive on a delivery service: a quest of drop-off tiers or a bonus a drop-off, joined by the Agent before anything counts, never replacing the pay rule, with a budget; paid by the platform on its fleet's statements, reported to a Partner for its own Agents."
+required:
+  - id
+  - partner_id
+  - service_id
+  - name
+  - kind
+  - state
+  - recurrence
+  - starts_on
+  - ends_on
+  - tiers
+  - amount_per_drop_off
+  - window
+  - budget
+  - time_zone
+  - line
+  - paid_by
+  - joined
+  - created_at
+  - published_at
+  - ended_at
+  - version
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The incentive.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006101
+  partner_id:
+    type: string
+    format: uuid
+    description: The service's Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000002
+  service_id:
+    type: string
+    format: uuid
+    description: The delivery service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Weekly 20
+  kind:
+    $ref: ./IncentiveKind.yaml
+    description: Quest or bonus.
+  state:
+    $ref: ./IncentiveState.yaml
+    description: Where it stands.
+  recurrence:
+    $ref: ./IncentiveRecurrence.yaml
+    description: How often it runs.
+  starts_on:
+    type: string
+    format: date
+    description: Its first day.
+    examples:
+      - 2026-11-02
+  ends_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: Its last day; `null` until stopped.
+    examples:
+      - null
+  tiers:
+    type: array
+    items:
+      $ref: ./IncentiveTier.yaml
+    description: A quest's tiers, fewest drop-offs first; empty for a bonus.
+  amount_per_drop_off:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A bonus's amount for each drop-off; `null` for a quest.
+  window:
+    oneOf:
+      - $ref: ./IncentiveWindow.yaml
+      - type: "null"
+    description: A bonus's window; `null` for a quest.
+  budget:
+    $ref: ./IncentiveBudget.yaml
+    description: Its budget.
+  time_zone:
+    type: string
+    description: The service's clock.
+    examples:
+      - Asia/Kolkata
+  line:
+    type: string
+    description: What an Agent reads.
+    examples:
+      - 20 drop-offs for ₹300.00, 35 for ₹600.00, every week
+  paid_by:
+    $ref: ../payouts/AgentPaidBy.yaml
+    description: "Who pays it: the platform for its fleet, else the Partner."
+  joined:
+    type: integer
+    description: Agents who joined in the current period.
+    minimum: 0
+    examples:
+      - 12
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-29T09:00:00Z
+  published_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was published.
+    examples:
+      - 2026-10-29T09:30:00Z
+  ended_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ended.
+    examples:
+      - null
+  version:
+    type: integer
+    description: Raised on every change.
+    minimum: 1
+    examples:
+      - 2
+examples:
+  - id: 01a13a48-9e00-7000-8000-000000006101
+    partner_id: 01a13a48-9e00-7000-8000-000000000002
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    name: Weekly 20
+    kind: quest
+    state: live
+    recurrence: weekly
+    starts_on: 2026-11-02
+    ends_on: null
+    tiers:
+      - drop_offs: 20
+        amount:
+          minor_units: 30000
+          currency: INR
+      - drop_offs: 35
+        amount:
+          minor_units: 60000
+          currency: INR
+    amount_per_drop_off: null
+    window: null
+    budget:
+      amount:
+        minor_units: 5000000
+        currency: INR
+      earned:
+        minor_units: 30000
+        currency: INR
+      left:
+        minor_units: 4970000
+        currency: INR
+      spent: false
+    time_zone: Asia/Kolkata
+    line: 20 drop-offs for ₹300.00, 35 for ₹600.00, every week
+    paid_by: platform
+    joined: 12
+    created_at: 2026-10-29T09:00:00Z
+    published_at: 2026-10-29T09:30:00Z
+    ended_at: null
+    version: 2

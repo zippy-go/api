@@ -1,0 +1,125 @@
+type: object
+description: "An incentive as the Agent app shows it: what it pays, the period, whether the Agent joined, their drop-offs counted and what they earned, and who pays."
+required:
+  - incentive_id
+  - name
+  - kind
+  - line
+  - period
+  - starts_at
+  - ends_at
+  - window
+  - joined
+  - joined_at
+  - can_join
+  - drop_offs
+  - earned
+  - next
+  - paid_by
+  - sentence
+  - progress
+properties:
+  incentive_id:
+    type: string
+    format: uuid
+    description: The incentive.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000006101
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Weekly 20
+  kind:
+    $ref: ./IncentiveKind.yaml
+    description: Quest or bonus.
+  line:
+    type: string
+    description: What it pays.
+    examples:
+      - 20 drop-offs for ₹300.00, 35 for ₹600.00
+  period:
+    type: string
+    description: The period.
+    examples:
+      - 2026W45
+  starts_at:
+    type: string
+    format: date-time
+    description: When the period starts.
+    examples:
+      - 2026-11-01T18:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-08T18:30:00Z
+  window:
+    type:
+      - string
+      - "null"
+    description: A bonus's window in words.
+    examples:
+      - null
+  joined:
+    type: boolean
+    description: "Whether the Agent joined: nothing counts before."
+  joined_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-02T04:00:00Z
+  can_join:
+    type: boolean
+    description: Whether Join is offered now.
+  drop_offs:
+    type: integer
+    description: Drop-offs counted since joining.
+    minimum: 0
+    examples:
+      - 20
+  earned:
+    $ref: ../common/Money.yaml
+    description: Earned in the period.
+  next:
+    oneOf:
+      - $ref: ./IncentiveNext.yaml
+      - type: "null"
+    description: A quest's next tier; `null` past the last, or for a bonus.
+  paid_by:
+    $ref: ../payouts/AgentPaidBy.yaml
+    description: Who pays it.
+  sentence:
+    type: string
+    description: Who pays and where it shows.
+    examples:
+      - Paid by ZippyGo on your weekly statement, under Bonuses and quests.
+  progress:
+    type: string
+    description: Progress in words.
+    examples:
+      - ₹300.00 earned. 15 more for ₹600.00.
+examples:
+  - incentive_id: 01a13a48-9e00-7000-8000-000000006101
+    name: Weekly 20
+    kind: quest
+    line: 20 drop-offs for ₹300.00, 35 for ₹600.00
+    period: 2026W45
+    starts_at: 2026-11-01T18:30:00Z
+    ends_at: 2026-11-08T18:30:00Z
+    window: null
+    joined: true
+    joined_at: 2026-11-02T04:00:00Z
+    can_join: false
+    drop_offs: 20
+    earned:
+      minor_units: 30000
+      currency: INR
+    next: null
+    paid_by: platform
+    sentence: Paid by ZippyGo on your weekly statement, under Bonuses and quests.
+    progress: ₹300.00 earned. 15 more for ₹600.00.

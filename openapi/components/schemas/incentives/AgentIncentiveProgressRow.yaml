@@ -1,0 +1,54 @@
+type: object
+description: An Agent's progress on an incentive in a period.
+required:
+  - agent_id
+  - name
+  - joined_at
+  - drop_offs
+  - earned
+  - next_tier
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000107
+  name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Agent 07
+  joined_at:
+    type: string
+    format: date-time
+    description: When they joined.
+    examples:
+      - 2026-11-02T04:00:00Z
+  drop_offs:
+    type: integer
+    description: Drop-offs counted.
+    minimum: 0
+    examples:
+      - 20
+  earned:
+    $ref: ../common/Money.yaml
+    description: Earned.
+  next_tier:
+    oneOf:
+      - $ref: ./IncentiveTier.yaml
+      - type: "null"
+    description: A quest's next tier; `null` past the last, or for a bonus.
+examples:
+  - agent_id: 01a13a48-9e00-7000-8000-000000000107
+    name: Agent 07
+    joined_at: 2026-11-02T04:00:00Z
+    drop_offs: 20
+    earned:
+      minor_units: 30000
+      currency: INR
+    next_tier:
+      drop_offs: 35
+      amount:
+        minor_units: 60000
+        currency: INR

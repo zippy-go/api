@@ -55,6 +55,9 @@ properties:
   pay:
     $ref: ../common/Money.yaml
     description: What the Partner's pay rule gives.
+  bonuses:
+    $ref: ../common/Money.yaml
+    description: "Bonuses and quests the Agent earned from the service's incentives in the week, for the Partner to pay. Absent before step 6."
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-000000000107
     name: Ravi Kumar

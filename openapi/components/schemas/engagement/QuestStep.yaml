@@ -1,0 +1,55 @@
+type: object
+description: A step of a quest, in words.
+required:
+  - kind
+  - count
+  - partner_id
+  - location_id
+  - vertical_id
+  - label
+properties:
+  kind:
+    $ref: ./QuestStepKind.yaml
+    description: What counts.
+  count:
+    type: integer
+    description: "How many make the step: pickups, reviews or orders."
+    minimum: 1
+    examples:
+      - 1
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The named Partner, for an order at it.
+    examples:
+      - null
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The named Location, for an order at it.
+    examples:
+      - null
+  vertical_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Vertical an order must be in, for an order at a Vertical named.
+    examples:
+      - null
+  label:
+    type: string
+    description: The step in words.
+    examples:
+      - Order from a second Vertical
+examples:
+  - kind: second_vertical
+    count: 1
+    partner_id: null
+    location_id: null
+    vertical_id: null
+    label: Order from a second Vertical

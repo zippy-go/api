@@ -1,0 +1,46 @@
+# Path item for /v1/customer/rewards. Referenced from openapi.yaml.
+get:
+  operationId: getCustomerRewards
+  summary: Read the customer's Rewards
+  description: "The customer's Rewards: their weekly streaks, quests, tier and punch cards, each with its progress and what completes it, and the credit their rewards gave. A quest is offered with nothing counted until the customer presses Start. A campaign holding the customer out in its control group is not listed, and a campaign whose budget is spent is not offered to a customer who had not started it. Customer tokens only."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: Their Rewards.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/CustomerRewards.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the user has no customer profile."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

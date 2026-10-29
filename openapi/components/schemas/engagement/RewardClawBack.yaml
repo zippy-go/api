@@ -1,0 +1,39 @@
+type: object
+description: "A reward taken back after its order was refunded in full or cancelled: what was taken back, and what had been spent already."
+required:
+  - at
+  - reason
+  - words
+  - taken_back
+  - unrecovered
+properties:
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-02T09:00:00Z
+  reason:
+    $ref: ./ClawBackReason.yaml
+    description: Why.
+  words:
+    type: string
+    description: Why, in words.
+    examples:
+      - Your order AB0042 was refunded in full.
+  taken_back:
+    $ref: ../common/Money.yaml
+    description: Taken back from what was not spent.
+  unrecovered:
+    $ref: ../common/Money.yaml
+    description: Spent already, and so marked clawed back.
+examples:
+  - at: 2026-11-02T09:00:00Z
+    reason: order_refunded
+    words: Your order AB0042 was refunded in full.
+    taken_back:
+      minor_units: 10000
+      currency: INR
+    unrecovered:
+      minor_units: 5000
+      currency: INR

@@ -1,0 +1,60 @@
+type: object
+description: A service's incentives, live ones first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentIncentive.yaml
+    description: The incentives.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 01a13a48-9e00-7000-8000-000000006101
+        partner_id: 01a13a48-9e00-7000-8000-000000000002
+        service_id: 01a13a48-9e00-7000-8000-000000000202
+        name: Weekly 20
+        kind: quest
+        state: live
+        recurrence: weekly
+        starts_on: 2026-11-02
+        ends_on: null
+        tiers:
+          - drop_offs: 20
+            amount:
+              minor_units: 30000
+              currency: INR
+          - drop_offs: 35
+            amount:
+              minor_units: 60000
+              currency: INR
+        amount_per_drop_off: null
+        window: null
+        budget:
+          amount:
+            minor_units: 5000000
+            currency: INR
+          earned:
+            minor_units: 30000
+            currency: INR
+          left:
+            minor_units: 4970000
+            currency: INR
+          spent: false
+        time_zone: Asia/Kolkata
+        line: 20 drop-offs for ₹300.00, 35 for ₹600.00, every week
+        paid_by: platform
+        joined: 12
+        created_at: 2026-10-29T09:00:00Z
+        published_at: 2026-10-29T09:30:00Z
+        ended_at: null
+        version: 2
+    next_cursor: null

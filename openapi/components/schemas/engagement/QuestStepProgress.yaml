@@ -1,0 +1,38 @@
+type: object
+description: A step of a quest the customer started.
+required:
+  - kind
+  - label
+  - count
+  - needed
+  - done
+properties:
+  kind:
+    $ref: ./QuestStepKind.yaml
+    description: What counts.
+  label:
+    type: string
+    description: In words.
+    examples:
+      - Order from a second Vertical
+  count:
+    type: integer
+    description: Counted.
+    minimum: 0
+    examples:
+      - 0
+  needed:
+    type: integer
+    description: Needed.
+    minimum: 1
+    examples:
+      - 1
+  done:
+    type: boolean
+    description: Whether it is done.
+examples:
+  - kind: second_vertical
+    label: Order from a second Vertical
+    count: 0
+    needed: 1
+    done: false

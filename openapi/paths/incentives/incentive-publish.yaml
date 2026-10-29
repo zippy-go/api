@@ -1,0 +1,70 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/publish. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000202
+  - name: incentive_id
+    in: path
+    required: true
+    description: The incentive.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006101
+post:
+  operationId: publishAgentIncentive
+  summary: Publish an incentive
+  description: "Publishes a draft: the service's Agents see it in the Agent app and join it before anything counts. Publishes `engagement.incentive.published`. `agent:manage` at the service."
+  tags:
+    - Incentives
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The incentive, moved.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentive.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such incentive of the service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`incentive_move_refused`: its state does not allow the move (`incentive_state`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

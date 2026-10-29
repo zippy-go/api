@@ -1,0 +1,9 @@
+type: string
+description: "What a reward gives: `credit`, promotional Wallet credit; or an offer held for the customer that the basket prices: `free_delivery`, `money_off` or `free_item`."
+enum:
+  - credit
+  - free_delivery
+  - money_off
+  - free_item
+examples:
+  - credit

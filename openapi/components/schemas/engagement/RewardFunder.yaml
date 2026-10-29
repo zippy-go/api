@@ -1,0 +1,8 @@
+type: string
+description: "Who pays for a campaign's rewards: the `platform`, the `partner`, or a `split` in percent."
+enum:
+  - platform
+  - partner
+  - split
+examples:
+  - platform

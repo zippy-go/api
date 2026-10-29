@@ -67,6 +67,12 @@ properties:
       $ref: ./StatementDay.yaml
       description: A day.
     description: Day by day.
+  rewards:
+    type: array
+    items:
+      $ref: ./StatementRewardRow.yaml
+      description: A campaign.
+    description: "\"Rewards you paid for\" in the days worked out, as a statement shows them."
 examples:
   - from: 2026-10-26
     until: 2026-11-01

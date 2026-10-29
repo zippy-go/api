@@ -1,0 +1,29 @@
+type: object
+description: "A bonus's window: its days of the week and its hours on the service's clock."
+required:
+  - days
+  - from
+  - to
+properties:
+  days:
+    type: array
+    items:
+      $ref: ../reference/Day.yaml
+    description: The days; every day when empty.
+  from:
+    type: string
+    description: From, `HH:MM`.
+    pattern: ^[0-2][0-9]:[0-5][0-9]$
+    examples:
+      - 19:00
+  to:
+    type: string
+    description: Until, `HH:MM`, after `from`.
+    pattern: ^[0-2][0-9]:[0-5][0-9]$
+    examples:
+      - 23:00
+examples:
+  - days:
+      - friday
+    from: 19:00
+    to: 23:00

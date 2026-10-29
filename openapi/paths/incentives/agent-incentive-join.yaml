@@ -1,0 +1,69 @@
+# Path item for /v1/agent/memberships/{agent_id}/incentives/{incentive_id}/join. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: The Agent membership, which must be the caller's.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000107
+  - name: incentive_id
+    in: path
+    required: true
+    description: The incentive.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006101
+post:
+  operationId: joinAgentIncentive
+  summary: Join an incentive
+  description: "Joins the incentive for its current period: drop-offs completed from now count, and those before do not. Publishes `engagement.incentive.joined`. Agent app tokens of the person holding the membership."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The incentive, joined.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentiveOffer.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller, or no such live incentive of its service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`incentive_not_joinable`: joined already (`already_joined`), its period or the incentive is over (`incentive_closed`), its budget is spent (`budget_spent`), or the membership is not active (`not_in_service`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

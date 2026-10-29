@@ -1,0 +1,38 @@
+type: object
+description: "A campaign's budget: what it may grant, what it granted, what is held for review, and what is left. A customer already shown their progress still receives the reward they were shown when it is spent, and the budget may go over by that much."
+required:
+  - amount
+  - granted
+  - held
+  - left
+  - spent
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The budget.
+  granted:
+    $ref: ../common/Money.yaml
+    description: Granted so far.
+  held:
+    $ref: ../common/Money.yaml
+    description: Held for review.
+  left:
+    $ref: ../common/Money.yaml
+    description: Left; negative when a promised reward took it over.
+  spent:
+    type: boolean
+    description: "Whether nothing is left: no customer who had not started is offered it any more."
+examples:
+  - amount:
+      minor_units: 2000000
+      currency: INR
+    granted:
+      minor_units: 1990000
+      currency: INR
+    held:
+      minor_units: 0
+      currency: INR
+    left:
+      minor_units: 10000
+      currency: INR
+    spent: false

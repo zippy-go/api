@@ -1347,3 +1347,186 @@ events:
       The order was declined, expired or cancelled: its use given back.
     payload_schema: ./payloads/promotions.redemption.released.v1.schema.json
     example: ./examples/promotions.redemption.released.v1.json
+  - type: engagement.campaign.created
+    version: 1
+    domain: engagement
+    description: >-
+      A reward campaign was made, kept as a draft, in Mission Control or by a Partner on its own Locations.
+    payload_schema: ./payloads/engagement.campaign.created.v1.schema.json
+    example: ./examples/engagement.campaign.created.v1.json
+
+  - type: engagement.campaign.published
+    version: 1
+    domain: engagement
+    description: >-
+      A reward campaign was published: live at once, or scheduled until its start. A Partner's carries its word that its business pays.
+    payload_schema: ./payloads/engagement.campaign.published.v1.schema.json
+    example: ./examples/engagement.campaign.published.v1.json
+
+  - type: engagement.campaign.started
+    version: 1
+    domain: engagement
+    description: >-
+      A reward campaign went live, when published or when its start came on the clock.
+    payload_schema: ./payloads/engagement.campaign.started.v1.schema.json
+    example: ./examples/engagement.campaign.started.v1.json
+
+  - type: engagement.campaign.paused
+    version: 1
+    domain: engagement
+    description: >-
+      A reward campaign was paused by its owner or by the platform; it grants nothing while paused, and progress made stays.
+    payload_schema: ./payloads/engagement.campaign.paused.v1.schema.json
+    example: ./examples/engagement.campaign.paused.v1.json
+
+  - type: engagement.campaign.resumed
+    version: 1
+    domain: engagement
+    description: >-
+      A paused reward campaign was resumed.
+    payload_schema: ./payloads/engagement.campaign.resumed.v1.schema.json
+    example: ./examples/engagement.campaign.resumed.v1.json
+
+  - type: engagement.campaign.ended
+    version: 1
+    domain: engagement
+    description: >-
+      A reward campaign ended: stopped, cancelled before it started, past its end, or out of budget. Rewards granted stay.
+    payload_schema: ./payloads/engagement.campaign.ended.v1.schema.json
+    example: ./examples/engagement.campaign.ended.v1.json
+
+  - type: engagement.reward.granted
+    version: 1
+    domain: engagement
+    description: >-
+      A reward was granted once for what the customer did, from its campaign's budget: promotional Wallet credit with its funder as payer, or an offer held for the customer that the basket prices. Payouts charges a Partner's share of credit to the Location whose order earned it, under "Rewards you paid for"; the customer is told once by push where they consented.
+    payload_schema: ./payloads/engagement.reward.granted.v1.schema.json
+    example: ./examples/engagement.reward.granted.v1.json
+
+  - type: engagement.reward.held
+    version: 1
+    domain: engagement
+    description: >-
+      A reward was held for review instead of granted: a signal on the customer raised it. Mission Control releases or refuses it, and the customer sees it as being checked.
+    payload_schema: ./payloads/engagement.reward.held.v1.schema.json
+    example: ./examples/engagement.reward.held.v1.json
+
+  - type: engagement.reward.released
+    version: 1
+    domain: engagement
+    description: >-
+      A reward held for review was released by Mission Control and granted; `engagement.reward.granted` follows.
+    payload_schema: ./payloads/engagement.reward.released.v1.schema.json
+    example: ./examples/engagement.reward.released.v1.json
+
+  - type: engagement.reward.refused
+    version: 1
+    domain: engagement
+    description: >-
+      A reward held for review was refused by Mission Control: the customer receives nothing from it, and its budget is freed.
+    payload_schema: ./payloads/engagement.reward.refused.v1.schema.json
+    example: ./examples/engagement.reward.refused.v1.json
+
+  - type: engagement.reward.clawed_back
+    version: 1
+    domain: engagement
+    description: >-
+      A reward was taken back after the order that earned it was refunded in full or cancelled: credit taken back where it was not spent and marked clawed back where it was, a held offer withdrawn. Payouts gives a Partner back its share of what was taken back.
+    payload_schema: ./payloads/engagement.reward.clawed_back.v1.schema.json
+    example: ./examples/engagement.reward.clawed_back.v1.json
+
+  - type: engagement.streak.advanced
+    version: 1
+    domain: engagement
+    description: >-
+      A customer's weekly streak counted a week with a completed order.
+    payload_schema: ./payloads/engagement.streak.advanced.v1.schema.json
+    example: ./examples/engagement.streak.advanced.v1.json
+
+  - type: engagement.streak.frozen
+    version: 1
+    domain: engagement
+    description: >-
+      A week passed without an order and the month's freeze kept the streak; the customer is told their freeze kept it.
+    payload_schema: ./payloads/engagement.streak.frozen.v1.schema.json
+    example: ./examples/engagement.streak.frozen.v1.json
+
+  - type: engagement.streak.broken
+    version: 1
+    domain: engagement
+    description: >-
+      A week passed without an order and no freeze was left: the streak is broken and shown as 0.
+    payload_schema: ./payloads/engagement.streak.broken.v1.schema.json
+    example: ./examples/engagement.streak.broken.v1.json
+
+  - type: engagement.quest.started
+    version: 1
+    domain: engagement
+    description: >-
+      A customer pressed Start on a quest: from now its steps count, until its days run out.
+    payload_schema: ./payloads/engagement.quest.started.v1.schema.json
+    example: ./examples/engagement.quest.started.v1.json
+
+  - type: engagement.quest.completed
+    version: 1
+    domain: engagement
+    description: >-
+      A customer completed a quest's last step; its reward is granted once.
+    payload_schema: ./payloads/engagement.quest.completed.v1.schema.json
+    example: ./examples/engagement.quest.completed.v1.json
+
+  - type: engagement.quest.expired
+    version: 1
+    domain: engagement
+    description: >-
+      A quest's days ran out before its steps were done.
+    payload_schema: ./payloads/engagement.quest.expired.v1.schema.json
+    example: ./examples/engagement.quest.expired.v1.json
+
+  - type: engagement.tier.changed
+    version: 1
+    domain: engagement
+    description: >-
+      A customer's tier changed: at once on crossing a threshold, or at the month's look, dropping one tier at a time. The customer is told once.
+    payload_schema: ./payloads/engagement.tier.changed.v1.schema.json
+    example: ./examples/engagement.tier.changed.v1.json
+
+  - type: engagement.referral.recorded
+    version: 1
+    domain: engagement
+    description: >-
+      A friend added a customer's referral code and the referral was recorded; the referrer earns once the friend's first order completes.
+    payload_schema: ./payloads/engagement.referral.recorded.v1.schema.json
+    example: ./examples/engagement.referral.recorded.v1.json
+
+  - type: engagement.referral.rewarded
+    version: 1
+    domain: engagement
+    description: >-
+      A referred friend's first order completed and the referrer was credited, "Your friend's first order with ZippyGo".
+    payload_schema: ./payloads/engagement.referral.rewarded.v1.schema.json
+    example: ./examples/engagement.referral.rewarded.v1.json
+
+  - type: engagement.incentive.published
+    version: 1
+    domain: engagement
+    description: >-
+      An incentive for a delivery service's Agents was published: they see it in the Agent app and join it before anything counts.
+    payload_schema: ./payloads/engagement.incentive.published.v1.schema.json
+    example: ./examples/engagement.incentive.published.v1.json
+
+  - type: engagement.incentive.joined
+    version: 1
+    domain: engagement
+    description: >-
+      An Agent joined an incentive for its current period; drop-offs completed from now count.
+    payload_schema: ./payloads/engagement.incentive.joined.v1.schema.json
+    example: ./examples/engagement.incentive.joined.v1.json
+
+  - type: engagement.incentive.earned
+    version: 1
+    domain: engagement
+    description: >-
+      An Agent earned from an incentive: reached a quest's tier, or completed a drop-off in a bonus's window. Payouts adds it to the platform fleet Agent's week under "Bonuses and quests", beside the pay for each task, or to a Partner's own Agent's week on the weekly report, for the Partner to pay.
+    payload_schema: ./payloads/engagement.incentive.earned.v1.schema.json
+    example: ./examples/engagement.incentive.earned.v1.json

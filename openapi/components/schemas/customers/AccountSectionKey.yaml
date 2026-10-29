@@ -9,6 +9,7 @@ enum:
   - favourites
   - payment_methods
   - offers_and_wallet
+  - rewards
   - notifications
   - language
   - security

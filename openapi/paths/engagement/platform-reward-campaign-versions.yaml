@@ -1,0 +1,119 @@
+# Path item for /v1/platform/reward-campaigns/{campaign_id}/versions. Referenced from openapi.yaml.
+parameters:
+  - name: campaign_id
+    in: path
+    required: true
+    description: The reward campaign.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006002
+get:
+  operationId: listRewardCampaignVersions
+  summary: List a campaign's rule versions
+  description: Every version of the campaign's rules, oldest first, with the one in force. Mission Control tokens only, with `engagement:read`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The versions.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaignVersionList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such campaign."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: createRewardCampaignVersion
+  summary: Change a live campaign's rules
+  description: Makes a new version of a live, paused or scheduled campaign's rules, in force from a moment chosen, now or later. Progress made under the earlier version keeps counting, and a grant made from then on names the new version. In the audit log. Mission Control tokens only, with `engagement:write`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The rules and when.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/RewardCampaignVersionInput.yaml
+  responses:
+    "201":
+      description: The version.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardCampaignVersion.yaml
+    "400":
+      description: "`validation_failed`: `effective_from_past`, `reward_not_fixed`, or rules that do not match the kind."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such campaign."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`reward_campaign_move_refused`: a draft changes its rules directly, an ended campaign not at all (`campaign_state`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

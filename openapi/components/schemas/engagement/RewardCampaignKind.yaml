@@ -1,0 +1,9 @@
+type: string
+description: "What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth pickup collected at a Location."
+enum:
+  - streak
+  - quest
+  - tier
+  - punch_card
+examples:
+  - streak

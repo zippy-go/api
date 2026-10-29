@@ -1,0 +1,7 @@
+type: string
+description: "What granted a reward: a reward `campaign`, or a city's `referral` programme, crediting the referrer on a friend's first order."
+enum:
+  - campaign
+  - referral
+examples:
+  - campaign

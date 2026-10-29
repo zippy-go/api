@@ -225,6 +225,12 @@ properties:
     items:
       $ref: ../promotions/StatementPromotion.yaml
     description: '"Promotions you paid for": each promotion that ran in the week with its orders, what it took off for customers and what the Partner and the platform paid.'
+  rewards:
+    type: array
+    items:
+      $ref: ./StatementRewardRow.yaml
+      description: A campaign.
+    description: "\"Rewards you paid for\": each reward campaign the Partner paid towards in the week, with its grants on the Location's orders and the Partner's share; they add up to `figures.rewards`, which the total takes off."
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
     reference: ZG-2026W43

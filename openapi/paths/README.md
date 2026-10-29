@@ -58,6 +58,16 @@ paths/
   reports/orders.yaml           GET /v1/platform/reports/orders (+ metrics.yaml, GET /v1/platform/reports/metrics)
   reports/*agent-numbers*.yaml  GET /v1/platform/agent-numbers, /v1/platform/agents/{agent_id}/numbers and the Partner's
   reports/partner-agent-weeks.yaml GET /v1/partners/{partner_id}/services/{service_id}/agent-weeks
+  engagement/customer-*.yaml    /v1/customer/rewards (+ grants, quests/{campaign_id}/start), /v1/customer/referral (+ code)
+  engagement/partner-reward-campaign*.yaml /v1/partners/{partner_id}/reward-campaigns (+ {campaign_id}, publish, pause,
+                                resume, stop, cancel, results)
+  engagement/platform-*.yaml    /v1/platform/reward-campaigns (+ {campaign_id}, the moves, versions, grants, results),
+                                /v1/platform/reward-grants (+ release, refuse), /v1/platform/referrals,
+                                /v1/platform/customers/{customer_id}/rewards and reward-exclusion
+  engagement/service-area-referrals.yaml GET, PUT /v1/service-areas/{service_area_id}/referrals
+  incentives/incentive*.yaml    /v1/partners/{partner_id}/services/{service_id}/incentives (+ {incentive_id}, publish,
+                                stop, progress)
+  incentives/agent-*.yaml       /v1/agent/memberships/{agent_id}/incentives (+ {incentive_id}/join)
   plans/plan.yaml               GET, PUT /v1/partners/{partner_id}/plan (+ plan-impact.yaml)
   locations/locations.yaml      POST, GET /v1/partners/{partner_id}/locations
   locations/location.yaml       GET, PATCH, DELETE /v1/partners/{partner_id}/locations/{location_id}

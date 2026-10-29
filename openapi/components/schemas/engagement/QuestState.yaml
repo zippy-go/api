@@ -1,0 +1,10 @@
+type: string
+description: "Where a quest stands for the customer: `offered`, not started; `started`, counting; `completed`; `expired`, its days ran out; `being_checked`, its reward is held for review."
+enum:
+  - offered
+  - started
+  - completed
+  - expired
+  - being_checked
+examples:
+  - started

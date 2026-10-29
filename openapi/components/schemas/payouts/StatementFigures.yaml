@@ -74,6 +74,9 @@ properties:
   carried_out:
     $ref: ../common/Money.yaml
     description: A shortfall taken off the next statement, once, as a negative amount; zero otherwise.
+  rewards:
+    $ref: ../common/Money.yaml
+    description: "What the Partner paid towards reward campaigns: its share of the rewards granted on the Location's orders, less what was taken back. Absent before step 6; nothing when there were none."
 examples:
   - sales:
       minor_units: 50000

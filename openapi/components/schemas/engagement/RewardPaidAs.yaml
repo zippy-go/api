@@ -1,0 +1,7 @@
+type: string
+description: "How a reward reaches the customer: `wallet_credit` to the promotional balance, or a `held_offer` the engine prices in the basket."
+enum:
+  - wallet_credit
+  - held_offer
+examples:
+  - wallet_credit

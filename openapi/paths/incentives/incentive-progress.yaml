@@ -1,0 +1,78 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/incentives/{incentive_id}/progress. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The delivery service.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000202
+  - name: incentive_id
+    in: path
+    required: true
+    description: The incentive.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000006101
+get:
+  operationId: getAgentIncentiveProgress
+  summary: Read an incentive's progress
+  description: The Agents who joined the incentive in a period with their drop-offs counted, what they earned and their next tier. `agent:read` at the service.
+  tags:
+    - Incentives
+  security:
+    - Bearer: []
+  parameters:
+    - name: week
+      in: query
+      required: false
+      description: The week, `YYYYWww`; this week by default. A one-off incentive has one period.
+      schema:
+        type: string
+        pattern: ^[0-9]{4}W[0-9]{2}$
+  responses:
+    "200":
+      description: Its progress.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/incentives/AgentIncentiveProgress.yaml
+    "400":
+      description: "`validation_failed`: `week_invalid`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:read` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such incentive of the service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

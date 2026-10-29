@@ -1,0 +1,14 @@
+type: object
+description: Why a held grant is released or refused, 1 to 300 characters; in the audit log.
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    description: Why.
+    minLength: 1
+    maxLength: 300
+    examples:
+      - "Checked: one household, three phones"
+examples:
+  - reason: "Checked: one household, three phones"

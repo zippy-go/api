@@ -1,0 +1,47 @@
+type: object
+description: A step as set.
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./QuestStepKind.yaml
+    description: What counts.
+  count:
+    type:
+      - integer
+      - "null"
+    description: How many; 1 by default.
+    minimum: 1
+    maximum: 50
+    examples:
+      - 1
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The named Partner: for a Partner's quest, its own."
+    examples:
+      - null
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The named Location: for a Partner's quest, one of its own."
+    examples:
+      - null
+  vertical_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A Vertical an order must be in.
+    examples:
+      - null
+examples:
+  - kind: second_vertical
+    count: 1
+    partner_id: null
+    location_id: null
+    vertical_id: null

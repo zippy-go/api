@@ -1,0 +1,29 @@
+type: object
+description: "The tiers' rules: Silver and Gold by completed orders across the platform in the last days counted, looked at on the first day of each month at 00:00 India time and at once on crossing, kept for the month and dropped one tier at a time."
+required:
+  - silver_orders
+  - gold_orders
+  - window_days
+properties:
+  silver_orders:
+    type: integer
+    description: Completed orders for Silver.
+    minimum: 1
+    examples:
+      - 8
+  gold_orders:
+    type: integer
+    description: Completed orders for Gold.
+    minimum: 1
+    examples:
+      - 20
+  window_days:
+    type: integer
+    description: The days counted.
+    minimum: 1
+    examples:
+      - 90
+examples:
+  - silver_orders: 8
+    gold_orders: 20
+    window_days: 90

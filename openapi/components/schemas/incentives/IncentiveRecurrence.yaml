@@ -1,0 +1,7 @@
+type: string
+description: "How often an incentive runs: `once`, from its first day to its last; or `weekly`, Monday to Sunday on the service's clock, every week from its first day."
+enum:
+  - once
+  - weekly
+examples:
+  - weekly

@@ -1,0 +1,109 @@
+# Path item for /v1/platform/customers/{customer_id}/reward-exclusion. Referenced from openapi.yaml.
+parameters:
+  - name: customer_id
+    in: path
+    required: true
+    description: The customer (a user id).
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000701
+put:
+  operationId: excludeCustomerFromRewards
+  summary: Exclude a customer from rewards
+  description: "Excludes the customer from rewards with a reason: they earn nothing from any campaign until it is lifted, and what they hold stays theirs. In the audit log. Mission Control tokens only, with `engagement:manage`."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/RewardExclusionInput.yaml
+  responses:
+    "200":
+      description: The exclusion.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/RewardExclusion.yaml
+    "400":
+      description: "`validation_failed`: an empty reason or one over 300 characters."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such customer."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: liftCustomerRewardExclusion
+  summary: Lift an exclusion from rewards
+  description: Lets the customer earn again from now; nothing missed while excluded is granted. In the audit log. Mission Control tokens only, with `engagement:manage`.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "204":
+      description: Lifted, or there was none.
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:manage`)."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such customer."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

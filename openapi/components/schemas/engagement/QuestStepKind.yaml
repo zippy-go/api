@@ -1,0 +1,9 @@
+type: string
+description: "A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written."
+enum:
+  - second_vertical
+  - order_at
+  - pickups
+  - review
+examples:
+  - second_vertical

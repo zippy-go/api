@@ -1,0 +1,9 @@
+type: string
+description: "What raised a grant for review: `shared_device`, several accounts on one device; `shared_address`, several accounts delivering to one point within 20 m; `cancellations`, orders cancelled or refunded in full after a reward; `review_burst`, five or more reviews in a day."
+enum:
+  - shared_device
+  - shared_address
+  - cancellations
+  - review_burst
+examples:
+  - shared_device
