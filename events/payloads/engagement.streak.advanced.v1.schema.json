@@ -33,14 +33,14 @@
     "week": {
       "type": "string",
       "pattern": "^[0-9]{4}W[0-9]{2}$",
-      "description": "The week, Monday to Sunday on the clock of its Locations.",
+      "description": "The week, Monday to Sunday on the clock of its Locations; for a streak of deliveries, the week of the delivery's day.",
       "examples": [
         "2026W45"
       ]
     },
     "weeks": {
       "type": "integer",
-      "description": "Weeks in a row after it.",
+      "description": "Weeks in a row after it; deliveries in a row for a streak of deliveries.",
       "minimum": 0,
       "examples": [
         4
@@ -56,7 +56,7 @@
     },
     "previous_weeks": {
       "type": "integer",
-      "description": "Weeks in a row before it.",
+      "description": "Weeks in a row before it; deliveries for a streak of deliveries.",
       "minimum": 0,
       "examples": [
         3
@@ -67,9 +67,42 @@
         "integer",
         "null"
       ],
-      "description": "The milestone it reached, in weeks; `null` when none.",
+      "description": "The milestone it reached, in weeks, or deliveries for a streak of deliveries; `null` when none.",
       "examples": [
         4
+      ]
+    },
+    "counts": {
+      "type": "string",
+      "enum": [
+        "weeks",
+        "deliveries"
+      ],
+      "description": "What the streak counts (since 0.24.0): weeks with an order, or a subscription's deliveries in a row; absent for weeks.",
+      "examples": [
+        "deliveries"
+      ]
+    },
+    "subscription_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "For a streak of deliveries, the subscription whose delivery moved it (since 0.24.0).",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000007001"
+      ]
+    },
+    "date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "For a streak of deliveries, the delivery's day (since 0.24.0).",
+      "examples": [
+        "2026-12-04"
       ]
     }
   }

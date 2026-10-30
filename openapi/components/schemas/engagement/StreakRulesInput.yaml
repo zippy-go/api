@@ -35,6 +35,11 @@ properties:
     description: "`true` by default."
     examples:
       - true
+  counts:
+    oneOf:
+      - $ref: ./StreakCounts.yaml
+      - type: "null"
+    description: "`weeks` by default; `deliveries` counts a subscription's deliveries in a row, its milestones and repeat in deliveries."
 examples:
   - milestones:
       - weeks: 4

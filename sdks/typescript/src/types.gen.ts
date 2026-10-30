@@ -27614,9 +27614,9 @@ export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'c
 export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
 
 /**
- * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written.
+ * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.24.0).
  */
-export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review';
+export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review' | 'subscription_started';
 
 /**
  * Where a quest stands for the customer: `offered`, not started; `started`, counting; `completed`; `expired`, its days ran out; `being_checked`, its reward is held for review.
@@ -27637,6 +27637,11 @@ export type TierLevel = 'member' | 'silver' | 'gold';
  * A customer's streak: `active` while it counts, or `broken` when a week passed without an order and no freeze kept it; a customer in the control group sees no streak.
  */
 export type StreakState = 'active' | 'broken';
+
+/**
+ * What a streak counts (since 0.24.0): `weeks`, Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; or `deliveries`, a subscription's deliveries completed in a row at the campaign's Locations, where a skip the customer asked for, a vacation, a pause or the store's closure keeps the streak, and a failed delivery or a skip for want of money breaks it unless the month's freeze is left. A streak of deliveries reads its milestones, its repeat and `weeks` in deliveries.
+ */
+export type StreakCounts = 'weeks' | 'deliveries';
 
 /**
  * Where a referral stands: `recorded` when the friend added the code; `rewarded` once their first order completed and the referrer was credited; `taken_back` when that order was refunded in full within 7 days; `lapsed` when it can no longer earn, the friend having ordered before or the monthly limit being reached.
@@ -27791,6 +27796,10 @@ export type StreakRules = {
      * Whether a customer with no order by Saturday 18:00 is told once, where they consented.
      */
     at_risk_push: boolean;
+    /**
+     * What it counts; a streak of deliveries counts its milestones and repeat in deliveries.
+     */
+    counts: StreakCounts;
 };
 
 /**
@@ -27813,6 +27822,10 @@ export type StreakRulesInput = {
      * `true` by default.
      */
     at_risk_push?: boolean | null;
+    /**
+     * `weeks` by default; `deliveries` counts a subscription's deliveries in a row, its milestones and repeat in deliveries.
+     */
+    counts?: StreakCounts | null;
 };
 
 /**
@@ -28887,6 +28900,10 @@ export type StreakProgress = {
      * In words.
      */
     sentence: string;
+    /**
+     * What it counts; for `deliveries`, `weeks` and `next_milestone` are deliveries in a row, `this_week_counted` and `at_risk` stay `false`, and `freeze_used_week` is the week of the delivery the freeze kept.
+     */
+    counts: StreakCounts;
 };
 
 /**

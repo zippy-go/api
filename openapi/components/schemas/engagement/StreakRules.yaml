@@ -5,6 +5,7 @@ required:
   - repeat_every_weeks
   - freezes_per_month
   - at_risk_push
+  - counts
 properties:
   milestones:
     type: array
@@ -27,6 +28,9 @@ properties:
   at_risk_push:
     type: boolean
     description: Whether a customer with no order by Saturday 18:00 is told once, where they consented.
+  counts:
+    $ref: ./StreakCounts.yaml
+    description: What it counts; a streak of deliveries counts its milestones and repeat in deliveries.
 examples:
   - milestones:
       - weeks: 4
@@ -47,3 +51,4 @@ examples:
     repeat_every_weeks: 4
     freezes_per_month: 1
     at_risk_push: true
+    counts: weeks

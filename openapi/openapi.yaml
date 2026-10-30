@@ -3847,6 +3847,8 @@ components:
       $ref: ./components/schemas/engagement/TierLevel.yaml
     StreakState:
       $ref: ./components/schemas/engagement/StreakState.yaml
+    StreakCounts:
+      $ref: ./components/schemas/engagement/StreakCounts.yaml
     ReferralState:
       $ref: ./components/schemas/engagement/ReferralState.yaml
     ClawBackReason:
