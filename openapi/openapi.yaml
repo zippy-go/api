@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.27.0
+  version: 0.28.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -233,6 +233,8 @@ tags:
     description: "Cross-sell, each suggestion with its reason: often ordered with (items completed orders at the same store carried together, at least 5 orders in 90 days), nearby, goes with your order (another Partner's item within 2 km in a category the city pairs with what the order holds) and reorder prompts (a category the customer orders at a steady interval, after three repeats, at most one prompt a day, by push only with consent). Built from the customer's own orders: no Partner learns of a customer through cross-sell until the customer orders from it. Organic only in this version, ranked by relevance, then the store's rating, then distance. A customer turns all of it off with `recommendations` in their notification preferences; Mission Control keeps each city's configuration."
   - name: Bundles
     description: "Bundles across Partners: an item or category at one store paired with one at another store of another Partner within 1 km, a saving on the pair that ZippyGo or the two Partners pay. Mission Control makes and publishes them (`promotion:write`); each store accepts or declines as a campaign is accepted (`promotion:write` at the store); live, they show on the first store's page and in its basket, and taking one adds the second side to a basket at its store, each order carrying its share as an offer the promotions engine prices."
+  - name: Reservations
+    description: "Table reservations: a store opens slots every 30 minutes over its own hours for a party up to its largest, and a signed-in customer reserves one under the account's name and mobile number, answered with a six-character code, reminded at 18:00 the day before and two hours before, cancelling until two hours before. Staff read the day's list (`reservation:read` at the Location), seat a party at a table, which binds the table's tab to the reservation, and mark a no-show 15 minutes after its time (`reservation:manage`); a Location's settings take `location:write`. The account's Bookings lists them."
   - name: Notifications
     description: |
       How the platform tells people what happened. Every message leaves
@@ -1504,6 +1506,23 @@ paths:
     $ref: ./paths/reviews/subscription-review.yaml
   /v1/platform/reports/subscriptions:
     $ref: ./paths/reports/subscriptions.yaml
+  # Step 8 reservations: reservations and the tab's companions
+  /v1/storefront/stores/{location_id}/reservation-slots:
+    $ref: ./paths/reservations/store-reservation-slots.yaml
+  /v1/customer/reservations:
+    $ref: ./paths/reservations/customer-reservations.yaml
+  /v1/customer/reservations/{reservation_id}:
+    $ref: ./paths/reservations/customer-reservation.yaml
+  /v1/customer/reservations/{reservation_id}/cancel:
+    $ref: ./paths/reservations/customer-reservation-cancel.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reservations:
+    $ref: ./paths/reservations/location-reservations.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reservations/{reservation_id}/seat:
+    $ref: ./paths/reservations/location-reservation-seat.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reservations/{reservation_id}/no-show:
+    $ref: ./paths/reservations/location-reservation-no-show.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/reservation-settings:
+    $ref: ./paths/reservations/location-reservation-settings.yaml
 
   # Step 8 kitchen: the kitchen display, its tickets, marks and changes
   /v1/partners/{partner_id}/locations/{location_id}/kitchen:
@@ -4299,3 +4318,28 @@ components:
       $ref: ./components/schemas/kitchen/KitchenMarkResult.yaml
     KitchenMarkResults:
       $ref: ./components/schemas/kitchen/KitchenMarkResults.yaml
+    # Step 8 reservations
+    ReservationState:
+      $ref: ./components/schemas/reservations/ReservationState.yaml
+    ReservationSettings:
+      $ref: ./components/schemas/reservations/ReservationSettings.yaml
+    ReservationSettingsInput:
+      $ref: ./components/schemas/reservations/ReservationSettingsInput.yaml
+    ReservationSlot:
+      $ref: ./components/schemas/reservations/ReservationSlot.yaml
+    ReservationSlotList:
+      $ref: ./components/schemas/reservations/ReservationSlotList.yaml
+    ReservationStore:
+      $ref: ./components/schemas/reservations/ReservationStore.yaml
+    CustomerReservation:
+      $ref: ./components/schemas/reservations/CustomerReservation.yaml
+    CustomerReservationPage:
+      $ref: ./components/schemas/reservations/CustomerReservationPage.yaml
+    ReservationInput:
+      $ref: ./components/schemas/reservations/ReservationInput.yaml
+    LocationReservation:
+      $ref: ./components/schemas/reservations/LocationReservation.yaml
+    LocationReservationList:
+      $ref: ./components/schemas/reservations/LocationReservationList.yaml
+    ReservationSeatInput:
+      $ref: ./components/schemas/reservations/ReservationSeatInput.yaml

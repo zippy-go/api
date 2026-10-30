@@ -1,0 +1,39 @@
+type: object
+description: A table for a party at a store, at one of its slots. The name and mobile number are the account's.
+required:
+  - location_id
+  - starts_at
+  - party_size
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  starts_at:
+    type: string
+    format: date-time
+    description: The slot it is for, as the slots list it.
+    examples:
+      - 2026-11-07T14:30:00Z
+  party_size:
+    type: integer
+    minimum: 1
+    maximum: 50
+    description: How many, 1 to the store's largest party.
+    examples:
+      - 4
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: Anything to ask for, at most 200 characters.
+    examples:
+      - A high chair, please
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    starts_at: 2026-11-07T14:30:00Z
+    party_size: 4
+    note: A high chair, please

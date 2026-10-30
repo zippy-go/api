@@ -1,0 +1,68 @@
+# Path item for /v1/storefront/stores/{location_id}/reservation-slots. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The store.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: listReservationSlots
+  summary: List a store's reservation slots on a day
+  description: "The slots a party may reserve on a day, every 30 minutes from the store's first slot to its last on its own clock, each with whether it can be had for the party and why not: past or less than an hour away, full, beyond the days the store opens, or the party larger than the store takes. A store that takes no reservations answers its reason and no slots. Public."
+  tags:
+    - Reservations
+  security: []
+  parameters:
+    - name: date
+      in: query
+      required: false
+      description: The day, on the store's clock; today by default.
+      schema:
+        type: string
+        format: date
+      example: 2026-11-07
+    - name: party_size
+      in: query
+      required: false
+      description: How many; 2 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+      example: 4
+  responses:
+    "200":
+      description: The day's slots.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reservations/ReservationSlotList.yaml
+    "400":
+      description: "`validation_failed`: a malformed date or party size; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no live store."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

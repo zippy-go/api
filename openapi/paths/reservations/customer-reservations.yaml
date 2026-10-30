@@ -1,0 +1,116 @@
+# Path item for /v1/customer/reservations. Referenced from openapi.yaml.
+get:
+  operationId: listCustomerReservations
+  summary: List the customer's reservations
+  description: "The account's Bookings: reservations to come first, the soonest first, then those past, cancelled or missed, the latest first."
+  tags: &a2
+    - Reservations
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of reservations.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reservations/CustomerReservationPage.yaml
+    "400":
+      description: "`validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createReservation
+  summary: Reserve a table
+  description: Reserves a table for a party at one of the store's slots, under the account's name and mobile number, answered with a six-character code. The customer is reminded at 18:00 the day before and two hours before, and may cancel until two hours before. Staff see it in the day's list. Honours `Idempotency-Key`.
+  tags: *a2
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The store, the slot and the party.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reservations/ReservationInput.yaml
+  responses:
+    "201":
+      description: The reservation with its code.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reservations/CustomerReservation.yaml
+    "400":
+      description: "`validation_failed`: a malformed member, a party larger than the store takes (`party_too_large`), a note too long."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no live store."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`reservation_unavailable`: the store takes no reservations, or the slot is not one of its slots, is past or less than an hour away, beyond the days it opens or full, each said in words."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

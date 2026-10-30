@@ -1,0 +1,115 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/reservation-settings. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, one of the Partner's.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getReservationSettings
+  summary: Read a Location's reservation settings
+  description: Whether the Location takes reservations, its first and last slots, the largest party, how many days ahead and how many parties a slot takes. A Location never set takes none. Answers `ETag`. Members need `reservation:read` at the Location.
+  tags: &a2
+    - Reservations
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The settings.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reservations/ReservationSettings.yaml
+    "400":
+      description: "`malformed_identifier`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without `reservation:read` at the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Partner, or a Location that is not its."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+put:
+  operationId: putReservationSettings
+  summary: Set a Location's reservation settings
+  description: Replaces the settings. Reservations already made stand. Honours `If-Match`. Members need `location:write` at the Location. Audited.
+  tags: *a2
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The settings.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/reservations/ReservationSettingsInput.yaml
+  responses:
+    "200":
+      description: The settings as saved.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/reservations/ReservationSettings.yaml
+    "400":
+      description: "`validation_failed`: a time not HH:MM, the last slot before the first, a number out of range."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` without `location:write` at the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Partner, or a Location that is not its."
+      content:
+        application/problem+json:
+          schema: *a1
+    "412":
+      description: "`precondition_failed` when `If-Match` names an older version."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

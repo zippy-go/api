@@ -1,0 +1,39 @@
+type: object
+description: "The customer's reservations: those to come first, the soonest first, then the rest, the latest first."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CustomerReservation.yaml
+    description: The reservations on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The next page's cursor; `null` on the last page.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+        code: K7R2MX
+        store:
+          location_id: 01a13a48-9e00-7000-8000-000000000301
+          name: Dev Kitchen Gachibowli
+          address: Plot 7, Gachibowli, Hyderabad 500032
+        starts_at: 2026-11-07T14:30:00Z
+        date: 2026-11-07
+        time: 20:00
+        party_size: 4
+        name: Asha
+        note: A high chair, please
+        state: booked
+        cancellable: true
+        cancellable_until: 2026-11-07T12:30:00Z
+        table_name: null
+        created_at: 2026-11-02T10:15:00Z
+        cancelled_at: null
+    next_cursor: null

@@ -1,8 +1,9 @@
 type: string
-description: "How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered) or `collected`."
+description: "How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered), `collected`, or, since 0.28.0, `dine_in` for a settled tab (the tab's id is its order id)."
 enum:
   - delivered
   - delivered_by_own_agent
   - collected
+  - dine_in
 examples:
   - delivered

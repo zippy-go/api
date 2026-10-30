@@ -111,9 +111,10 @@
       "enum": [
         "delivered",
         "delivered_by_own_agent",
-        "collected"
+        "collected",
+        "dine_in"
       ],
-      "description": "How the order reached the customer.",
+      "description": "How the order reached the customer: `delivered`, `delivered_by_own_agent`, `collected`, or, since 0.28.0, `dine_in` for a settled tab's review (the tab's id is `order_id`).",
       "examples": [
         "delivered"
       ]

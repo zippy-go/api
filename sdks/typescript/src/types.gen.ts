@@ -20521,7 +20521,7 @@ export type ReviewTagOption = {
 };
 
 /**
- * The tags offered under each thumb. A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note.
+ * The tags offered under each thumb. An order's: up "Tasted great", "Great value", "Accurate order", "Well packed"; down "Late delivery" (on a delivery only), "Missing item(s)", "Wrong item(s)", "Cold/damaged". Since 0.28.0 a settled tab's: up "Great food" (`great_food`), "Friendly service" (`friendly_service`), "Quick service" (`quick_service`), "Good value" (`good_value`); down "Slow service" (`slow_service`), "Wrong order" (`wrong_order`), "Billing issue" (`billing_issue`), "Cleanliness" (`cleanliness`). A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note.
  */
 export type ReviewTagOffer = {
     /**
@@ -20567,9 +20567,9 @@ export type RatingShare = {
 };
 
 /**
- * How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered) or `collected`.
+ * How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered), `collected`, or, since 0.28.0, `dine_in` for a settled tab (the tab's id is its order id).
  */
-export type ReviewFulfilment = 'delivered' | 'delivered_by_own_agent' | 'collected';
+export type ReviewFulfilment = 'delivered' | 'delivered_by_own_agent' | 'collected' | 'dine_in';
 
 /**
  * A photo of a review: never shown to customers.
@@ -33508,6 +33508,389 @@ export type KitchenMarkResults = {
      * The changes cursor after the marks.
      */
     cursor: string;
+};
+
+/**
+ * Where a reservation is: `booked` until the party is seated, cancelled by the customer or staff, or marked a no-show 15 minutes after its time.
+ */
+export type ReservationState = 'booked' | 'seated' | 'cancelled' | 'no_show';
+
+/**
+ * A Location's reservations: whether it takes them, the slots it opens every 30 minutes on its own clock from the first to the last, the largest party, how many days ahead and how many parties a slot takes. A Location never set takes none.
+ */
+export type ReservationSettings = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Whether it takes reservations.
+     */
+    enabled: boolean;
+    /**
+     * The first slot's time on the Location's clock.
+     */
+    first_slot: string;
+    /**
+     * The last slot's time, at or after the first.
+     */
+    last_slot: string;
+    /**
+     * The largest party, 1 to 50.
+     */
+    max_party: number;
+    /**
+     * How many days ahead a reservation may be made, 1 to 90.
+     */
+    days_ahead: number;
+    /**
+     * How many parties a slot takes; `null` for no limit, staff fitting them in.
+     */
+    parties_per_slot: number | null;
+    /**
+     * The Location's clock.
+     */
+    time_zone: string;
+    /**
+     * Raised by every change; the entity tag.
+     */
+    version: number;
+};
+
+/**
+ * A Location's reservations as staff set them.
+ */
+export type ReservationSettingsInput = {
+    /**
+     * Whether it takes reservations.
+     */
+    enabled: boolean;
+    /**
+     * The first slot's time on the Location's clock.
+     */
+    first_slot: string;
+    /**
+     * The last slot's time, at or after the first.
+     */
+    last_slot: string;
+    /**
+     * The largest party, 1 to 50.
+     */
+    max_party: number;
+    /**
+     * How many days ahead a reservation may be made, 1 to 90.
+     */
+    days_ahead: number;
+    /**
+     * How many parties a slot takes; `null` or left out for no limit.
+     */
+    parties_per_slot?: number | null;
+};
+
+/**
+ * A time a party may reserve, with whether it can be had and why not.
+ */
+export type ReservationSlot = {
+    /**
+     * When it starts.
+     */
+    starts_at: string;
+    /**
+     * Its time on the Location's clock.
+     */
+    time: string;
+    /**
+     * Whether it can be reserved now for the party asked about.
+     */
+    available: boolean;
+    /**
+     * How many more parties it takes; `null` when the Location sets no limit.
+     */
+    places_left: number | null;
+    /**
+     * Why it cannot be had, in words; `null` when it can.
+     */
+    reason: string | null;
+};
+
+/**
+ * A store's slots on a day for a party, on the store's clock, or why it takes no reservations.
+ */
+export type ReservationSlotList = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    location_name: string;
+    /**
+     * The day, on the store's clock.
+     */
+    date: string;
+    /**
+     * The store's clock.
+     */
+    time_zone: string;
+    /**
+     * Whether it takes reservations.
+     */
+    enabled: boolean;
+    /**
+     * Why nothing can be reserved on the day, in words; `null` when something can.
+     */
+    reason: string | null;
+    /**
+     * The largest party it takes.
+     */
+    max_party: number;
+    /**
+     * The last day a reservation may be made for.
+     */
+    last_day: string;
+    /**
+     * Its slots in order, every 30 minutes from the first to the last.
+     */
+    slots: Array<ReservationSlot>;
+};
+
+/**
+ * The store a reservation is at.
+ */
+export type ReservationStore = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's name.
+     */
+    name: string;
+    /**
+     * The store's address in one line.
+     */
+    address: string;
+};
+
+/**
+ * A reservation as its customer reads it in the account's Bookings: the code to give at the door, the store, the time and party, and whether it can still be cancelled.
+ */
+export type CustomerReservation = {
+    /**
+     * The reservation.
+     */
+    id: string;
+    /**
+     * The code to give at the door: six letters and digits without look-alikes.
+     */
+    code: string;
+    /**
+     * The store.
+     */
+    store: ReservationStore;
+    /**
+     * When it is for.
+     */
+    starts_at: string;
+    /**
+     * The day, on the store's clock.
+     */
+    date: string;
+    /**
+     * The time, on the store's clock.
+     */
+    time: string;
+    /**
+     * How many.
+     */
+    party_size: number;
+    /**
+     * The name it is under: the account's.
+     */
+    name: string;
+    /**
+     * What the customer asked for.
+     */
+    note: string | null;
+    /**
+     * Where it is.
+     */
+    state: ReservationState;
+    /**
+     * Whether it can still be cancelled: booked and more than two hours away.
+     */
+    cancellable: boolean;
+    /**
+     * Until when it can be cancelled: two hours before.
+     */
+    cancellable_until: string;
+    /**
+     * The table the party was seated at; `null` until seated.
+     */
+    table_name: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it was cancelled.
+     */
+    cancelled_at: string | null;
+};
+
+/**
+ * The customer's reservations: those to come first, the soonest first, then the rest, the latest first.
+ */
+export type CustomerReservationPage = {
+    /**
+     * The reservations on this page.
+     */
+    items: Array<CustomerReservation>;
+    /**
+     * The next page's cursor; `null` on the last page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A table for a party at a store, at one of its slots. The name and mobile number are the account's.
+ */
+export type ReservationInput = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The slot it is for, as the slots list it.
+     */
+    starts_at: string;
+    /**
+     * How many, 1 to the store's largest party.
+     */
+    party_size: number;
+    /**
+     * Anything to ask for, at most 200 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * A reservation as staff read it on the day's list: the party's name and mobile number, the code they give, and what can be done with it.
+ */
+export type LocationReservation = {
+    /**
+     * The reservation.
+     */
+    id: string;
+    /**
+     * The code the party gives.
+     */
+    code: string;
+    /**
+     * When it is for.
+     */
+    starts_at: string;
+    /**
+     * Its time on the Location's clock.
+     */
+    time: string;
+    /**
+     * How many.
+     */
+    party_size: number;
+    /**
+     * The name it is under.
+     */
+    name: string;
+    /**
+     * The number to call.
+     */
+    mobile: string | null;
+    /**
+     * What the customer asked for.
+     */
+    note: string | null;
+    /**
+     * Where it is.
+     */
+    state: ReservationState;
+    /**
+     * The table the party was seated at.
+     */
+    table_id: string | null;
+    /**
+     * That table's name.
+     */
+    table_name: string | null;
+    /**
+     * When the party was seated.
+     */
+    seated_at: string | null;
+    /**
+     * From when it may be marked a no-show: 15 minutes after its time.
+     */
+    no_show_from: string;
+    /**
+     * When it was marked a no-show.
+     */
+    no_show_at: string | null;
+    /**
+     * When it was cancelled.
+     */
+    cancelled_at: string | null;
+    /**
+     * Who cancelled it: `customer` or `staff`.
+     */
+    cancelled_by: 'customer' | 'staff' | null;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+};
+
+/**
+ * A Location's reservations on a day, in time order, with how many parties and covers are still to come or seated.
+ */
+export type LocationReservationList = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The day, on the Location's clock.
+     */
+    date: string;
+    /**
+     * The Location's clock.
+     */
+    time_zone: string;
+    /**
+     * Parties booked or seated.
+     */
+    parties: number;
+    /**
+     * Their people.
+     */
+    covers: number;
+    /**
+     * The reservations, every state, in time order.
+     */
+    items: Array<LocationReservation>;
+};
+
+/**
+ * The table the party sits at; its tab is bound to the reservation.
+ */
+export type ReservationSeatInput = {
+    /**
+     * The table, one of the Location's.
+     */
+    table_id: string;
 };
 
 /**
@@ -75284,6 +75667,596 @@ export type GetSubscriptionsReportResponses = {
 };
 
 export type GetSubscriptionsReportResponse = GetSubscriptionsReportResponses[keyof GetSubscriptionsReportResponses];
+
+export type ListReservationSlotsData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The day, on the store's clock; today by default.
+         */
+        date?: string;
+        /**
+         * How many; 2 by default.
+         */
+        party_size?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/reservation-slots';
+};
+
+export type ListReservationSlotsErrors = {
+    /**
+     * `validation_failed`: a malformed date or party size; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no live store.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListReservationSlotsError = ListReservationSlotsErrors[keyof ListReservationSlotsErrors];
+
+export type ListReservationSlotsResponses = {
+    /**
+     * The day's slots.
+     */
+    200: ReservationSlotList;
+};
+
+export type ListReservationSlotsResponse = ListReservationSlotsResponses[keyof ListReservationSlotsResponses];
+
+export type ListCustomerReservationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/reservations';
+};
+
+export type ListCustomerReservationsErrors = {
+    /**
+     * `validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerReservationsError = ListCustomerReservationsErrors[keyof ListCustomerReservationsErrors];
+
+export type ListCustomerReservationsResponses = {
+    /**
+     * A page of reservations.
+     */
+    200: CustomerReservationPage;
+};
+
+export type ListCustomerReservationsResponse = ListCustomerReservationsResponses[keyof ListCustomerReservationsResponses];
+
+export type CreateReservationData = {
+    /**
+     * The store, the slot and the party.
+     */
+    body: ReservationInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/reservations';
+};
+
+export type CreateReservationErrors = {
+    /**
+     * `validation_failed`: a malformed member, a party larger than the store takes (`party_too_large`), a note too long.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no live store.
+     */
+    404: Problem;
+    /**
+     * `reservation_unavailable`: the store takes no reservations, or the slot is not one of its slots, is past or less than an hour away, beyond the days it opens or full, each said in words.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateReservationError = CreateReservationErrors[keyof CreateReservationErrors];
+
+export type CreateReservationResponses = {
+    /**
+     * The reservation with its code.
+     */
+    201: CustomerReservation;
+};
+
+export type CreateReservationResponse = CreateReservationResponses[keyof CreateReservationResponses];
+
+export type GetCustomerReservationData = {
+    body?: never;
+    path: {
+        /**
+         * The reservation.
+         */
+        reservation_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/reservations/{reservation_id}';
+};
+
+export type GetCustomerReservationErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerReservationError = GetCustomerReservationErrors[keyof GetCustomerReservationErrors];
+
+export type GetCustomerReservationResponses = {
+    /**
+     * The reservation.
+     */
+    200: CustomerReservation;
+};
+
+export type GetCustomerReservationResponse = GetCustomerReservationResponses[keyof GetCustomerReservationResponses];
+
+export type CancelCustomerReservationData = {
+    body?: never;
+    path: {
+        /**
+         * The reservation.
+         */
+        reservation_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/reservations/{reservation_id}/cancel';
+};
+
+export type CancelCustomerReservationErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not the customer's.
+     */
+    404: Problem;
+    /**
+     * `reservation_not_cancellable`: less than two hours before, or the party was seated or marked a no-show.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelCustomerReservationError = CancelCustomerReservationErrors[keyof CancelCustomerReservationErrors];
+
+export type CancelCustomerReservationResponses = {
+    /**
+     * The reservation, cancelled.
+     */
+    200: CustomerReservation;
+};
+
+export type CancelCustomerReservationResponse = CancelCustomerReservationResponses[keyof CancelCustomerReservationResponses];
+
+export type ListLocationReservationsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The day, on the Location's clock; today by default.
+         */
+        date?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reservations';
+};
+
+export type ListLocationReservationsErrors = {
+    /**
+     * `validation_failed`: a malformed date; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `reservation:read` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, or a Location that is not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationReservationsError = ListLocationReservationsErrors[keyof ListLocationReservationsErrors];
+
+export type ListLocationReservationsResponses = {
+    /**
+     * The day's reservations.
+     */
+    200: LocationReservationList;
+};
+
+export type ListLocationReservationsResponse = ListLocationReservationsResponses[keyof ListLocationReservationsResponses];
+
+export type SeatReservationData = {
+    /**
+     * The table.
+     */
+    body: ReservationSeatInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's.
+         */
+        location_id: string;
+        /**
+         * The reservation.
+         */
+        reservation_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reservations/{reservation_id}/seat';
+};
+
+export type SeatReservationErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `reservation:manage` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Location, the reservation, or a table that is not the Location's.
+     */
+    404: Problem;
+    /**
+     * `conflict`: cancelled, marked a no-show, or seated at another table.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SeatReservationError = SeatReservationErrors[keyof SeatReservationErrors];
+
+export type SeatReservationResponses = {
+    /**
+     * The reservation, seated.
+     */
+    200: LocationReservation;
+};
+
+export type SeatReservationResponse = SeatReservationResponses[keyof SeatReservationResponses];
+
+export type MarkReservationNoShowData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's.
+         */
+        location_id: string;
+        /**
+         * The reservation.
+         */
+        reservation_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reservations/{reservation_id}/no-show';
+};
+
+export type MarkReservationNoShowErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `reservation:manage` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the Location or the reservation.
+     */
+    404: Problem;
+    /**
+     * `no_show_too_early` before 15 minutes after its time; `conflict` when the party was seated or the reservation cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkReservationNoShowError = MarkReservationNoShowErrors[keyof MarkReservationNoShowErrors];
+
+export type MarkReservationNoShowResponses = {
+    /**
+     * The reservation, a no-show.
+     */
+    200: LocationReservation;
+};
+
+export type MarkReservationNoShowResponse = MarkReservationNoShowResponses[keyof MarkReservationNoShowResponses];
+
+export type GetReservationSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reservation-settings';
+};
+
+export type GetReservationSettingsErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `reservation:read` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, or a Location that is not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetReservationSettingsError = GetReservationSettingsErrors[keyof GetReservationSettingsErrors];
+
+export type GetReservationSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: ReservationSettings;
+};
+
+export type GetReservationSettingsResponse = GetReservationSettingsResponses[keyof GetReservationSettingsResponses];
+
+export type PutReservationSettingsData = {
+    /**
+     * The settings.
+     */
+    body: ReservationSettingsInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/reservation-settings';
+};
+
+export type PutReservationSettingsErrors = {
+    /**
+     * `validation_failed`: a time not HH:MM, the last slot before the first, a number out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `location:write` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, or a Location that is not its.
+     */
+    404: Problem;
+    /**
+     * `precondition_failed` when `If-Match` names an older version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutReservationSettingsError = PutReservationSettingsErrors[keyof PutReservationSettingsErrors];
+
+export type PutReservationSettingsResponses = {
+    /**
+     * The settings as saved.
+     */
+    200: ReservationSettings;
+};
+
+export type PutReservationSettingsResponse = PutReservationSettingsResponses[keyof PutReservationSettingsResponses];
 
 export type GetLocationKitchenData = {
     body?: never;

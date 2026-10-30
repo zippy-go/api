@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reservations.reservation.reminded.v1.schema.json",
+  "title": "ReservationsReservationRemindedPayload",
+  "description": "Payload of `reservations.reservation.reminded` version 1. A reservation's reminder is due: at 18:00 the day before on the Location's clock, or two hours before; each is told once, and one whose moment passed before the reservation was made is not told. Consumers: notifications (a push, else an SMS). No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "reservation_id",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "party_size",
+    "starts_at",
+    "date",
+    "state",
+    "at",
+    "which"
+  ],
+  "properties": {
+    "reservation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The reservation.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer who made it (a user id).",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "party_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many.",
+      "examples": [
+        4
+      ]
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it is for.",
+      "examples": [
+        "2026-11-07T14:30:00Z"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Its day on the Location's clock.",
+      "examples": [
+        "2026-11-07"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "booked",
+        "seated",
+        "cancelled",
+        "no_show"
+      ],
+      "description": "Its state after the change.",
+      "examples": [
+        "booked"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "which": {
+      "type": "string",
+      "enum": [
+        "day_before",
+        "two_hours"
+      ],
+      "description": "Which reminder.",
+      "examples": [
+        "day_before"
+      ]
+    }
+  }
+}

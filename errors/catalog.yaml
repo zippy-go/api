@@ -91,6 +91,9 @@ errors:
       - code: reason_required
         message: "Give a reason the Partner will read."
         description: "A Partner's offer paused by the platform without a reason."
+      - code: party_too_large
+        message: "{store} takes parties of at most {max}."
+        description: A reservation for more people than the store takes.
       - code: bundle_too_far
         message: "{first} and {second} are {metres} m apart; a bundle's stores are within 1 km."
         description: A bundle whose two stores are more than the co-delivery distance apart.
@@ -856,6 +859,33 @@ errors:
     description: >-
       A bundle taken after it was stopped, declined by a store or before
       both stores accepted it.
+
+  - code: reservation_unavailable
+    status: 409
+    title: Reservation unavailable
+    message: "{why}"
+    retryable: false
+    description: >-
+      The store takes no reservations, or the slot is not one of its
+      slots, is past or less than an hour away, beyond the days the store
+      opens, or full.
+
+  - code: reservation_not_cancellable
+    status: 409
+    title: Reservation not cancellable
+    message: "{why}"
+    retryable: false
+    description: >-
+      A reservation cancelled less than two hours before its time, or
+      after the party was seated or marked a no-show.
+
+  - code: no_show_too_early
+    status: 409
+    title: No-show too early
+    message: A party may be marked a no-show from {from}.
+    retryable: false
+    description: >-
+      A no-show marked before 15 minutes after the reservation's time.
 
   - code: prescriptions_not_accepted
     status: 409

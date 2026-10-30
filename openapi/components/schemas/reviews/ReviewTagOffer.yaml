@@ -1,5 +1,5 @@
 type: object
-description: "The tags offered under each thumb. A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note."
+description: "The tags offered under each thumb. An order's: up \"Tasted great\", \"Great value\", \"Accurate order\", \"Well packed\"; down \"Late delivery\" (on a delivery only), \"Missing item(s)\", \"Wrong item(s)\", \"Cold/damaged\". Since 0.28.0 a settled tab's: up \"Great food\" (`great_food`), \"Friendly service\" (`friendly_service`), \"Quick service\" (`quick_service`), \"Good value\" (`good_value`); down \"Slow service\" (`slow_service`), \"Wrong order\" (`wrong_order`), \"Billing issue\" (`billing_issue`), \"Cleanliness\" (`cleanliness`). A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note."
 required:
   - up
   - down

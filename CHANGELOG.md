@@ -6,6 +6,39 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-10-30
+
+Step 8, reservations and the tab's companions: table reservations at a store's slots, the day's
+list, seating and no-shows, and a settled tab's review. Written by the platform's
+`step8/reservations` slice as the next minor after api main (0.27.0, kitchen), beside the step 8
+tabs slice; renumbered by merge order among step 8's 0.27.0 to
+0.29.0. Additive only.
+
+### Added
+
+- Reservations (`Reservations` tag): a store's slots on a day for a party, every 30 minutes over
+  its own hours (`GET /v1/storefront/stores/{location_id}/reservation-slots`,
+  `ReservationSlotList`, `ReservationSlot`); reserving under the account's name and mobile number
+  with a six-character code, the account's Bookings, one reservation and cancelling until two
+  hours before (`POST`, `GET /v1/customer/reservations`, `GET .../reservations/{reservation_id}`,
+  `POST .../cancel`, `ReservationInput`, `CustomerReservation`, `CustomerReservationPage`,
+  `ReservationStore`, `ReservationState`); a Location's day of reservations, seating a party at a
+  table and marking a no-show 15 minutes after its time
+  (`GET /v1/partners/{partner_id}/locations/{location_id}/reservations`,
+  `POST .../reservations/{reservation_id}/seat`, `.../no-show`, `LocationReservationList`,
+  `LocationReservation`, `ReservationSeatInput`); a Location's reservation settings
+  (`GET`, `PUT .../reservation-settings`, `ReservationSettings`, `ReservationSettingsInput`).
+- A settled tab's review on `GET`, `POST /v1/customer/orders/{order_id}/review` with the tab's
+  id: `dine_in` in `ReviewFulfilment`, and the tab's tags (`great_food`, `friendly_service`,
+  `quick_service`, `good_value`; `slow_service`, `wrong_order`, `billing_issue`, `cleanliness`).
+  The account's Bookings section is built.
+- Permissions `reservation:read` and `reservation:manage`; the next edition of the default roles
+  (11 as written, after subscriptions' 10) gives Manager and Staff both.
+- Problem codes `reservation_unavailable`, `reservation_not_cancellable` and
+  `no_show_too_early`; field code `party_too_large`.
+- Events `reservations.reservation.made`, `.cancelled`, `.reminded`, `.seated` and `.no_show`;
+  `reviews.review.written` gains the fulfilment `dine_in`.
+
 ## [0.27.0] - 2026-10-30
 
 Step 8, the kitchen: the kitchen display a Location runs, with courses from the

@@ -1,0 +1,9 @@
+type: string
+description: "Where a reservation is: `booked` until the party is seated, cancelled by the customer or staff, or marked a no-show 15 minutes after its time."
+enum:
+  - booked
+  - seated
+  - cancelled
+  - no_show
+examples:
+  - booked

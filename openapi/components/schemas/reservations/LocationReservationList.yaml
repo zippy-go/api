@@ -1,0 +1,67 @@
+type: object
+description: A Location's reservations on a day, in time order, with how many parties and covers are still to come or seated.
+required:
+  - location_id
+  - date
+  - time_zone
+  - parties
+  - covers
+  - items
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  date:
+    type: string
+    format: date
+    description: The day, on the Location's clock.
+    examples:
+      - 2026-11-07
+  time_zone:
+    type: string
+    description: The Location's clock.
+    examples:
+      - Asia/Kolkata
+  parties:
+    type: integer
+    description: Parties booked or seated.
+    examples:
+      - 6
+  covers:
+    type: integer
+    description: Their people.
+    examples:
+      - 22
+  items:
+    type: array
+    items:
+      $ref: ./LocationReservation.yaml
+    description: The reservations, every state, in time order.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    date: 2026-11-07
+    time_zone: Asia/Kolkata
+    parties: 6
+    covers: 22
+    items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+        code: K7R2MX
+        starts_at: 2026-11-07T14:30:00Z
+        time: 20:00
+        party_size: 4
+        name: Asha Rao
+        mobile: "+919876543210"
+        note: A high chair, please
+        state: booked
+        table_id: null
+        table_name: null
+        seated_at: null
+        no_show_from: 2026-11-07T14:45:00Z
+        no_show_at: null
+        cancelled_at: null
+        cancelled_by: null
+        version: 1
+        created_at: 2026-11-02T10:15:00Z

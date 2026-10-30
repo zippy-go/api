@@ -1,0 +1,46 @@
+type: object
+description: A time a party may reserve, with whether it can be had and why not.
+required:
+  - starts_at
+  - time
+  - available
+  - places_left
+  - reason
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: When it starts.
+    examples:
+      - 2026-11-07T14:30:00Z
+  time:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: Its time on the Location's clock.
+    examples:
+      - 20:00
+  available:
+    type: boolean
+    description: Whether it can be reserved now for the party asked about.
+    examples:
+      - true
+  places_left:
+    type:
+      - integer
+      - "null"
+    description: How many more parties it takes; `null` when the Location sets no limit.
+    examples:
+      - null
+  reason:
+    type:
+      - string
+      - "null"
+    examples:
+      - null
+    description: Why it cannot be had, in words; `null` when it can.
+examples:
+  - starts_at: 2026-11-07T14:30:00Z
+    time: 20:00
+    available: true
+    places_left: null
+    reason: null

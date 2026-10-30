@@ -1,0 +1,78 @@
+type: object
+description: A store's slots on a day for a party, on the store's clock, or why it takes no reservations.
+required:
+  - location_id
+  - location_name
+  - date
+  - time_zone
+  - enabled
+  - reason
+  - max_party
+  - last_day
+  - slots
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: The store's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  date:
+    type: string
+    format: date
+    description: The day, on the store's clock.
+    examples:
+      - 2026-11-07
+  time_zone:
+    type: string
+    description: The store's clock.
+    examples:
+      - Asia/Kolkata
+  enabled:
+    type: boolean
+    description: Whether it takes reservations.
+    examples:
+      - true
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why nothing can be reserved on the day, in words; `null` when something can.
+    examples:
+      - null
+  max_party:
+    type: integer
+    description: The largest party it takes.
+    examples:
+      - 8
+  last_day:
+    type: string
+    format: date
+    description: The last day a reservation may be made for.
+    examples:
+      - 2026-12-07
+  slots:
+    type: array
+    items:
+      $ref: ./ReservationSlot.yaml
+    description: Its slots in order, every 30 minutes from the first to the last.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    date: 2026-11-07
+    time_zone: Asia/Kolkata
+    enabled: true
+    reason: null
+    max_party: 8
+    last_day: 2026-12-07
+    slots:
+      - starts_at: 2026-11-07T14:30:00Z
+        time: 20:00
+        available: true
+        places_left: null
+        reason: null

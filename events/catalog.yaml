@@ -1888,3 +1888,43 @@ events:
       The kitchen declined a line not fired yet, as sold out. Consumers: ordering (the table told at once, the line off the bill), notifications.
     payload_schema: ./payloads/kitchen.line.declined.v1.schema.json
     example: ./examples/kitchen.line.declined.v1.json
+
+  - type: reservations.reservation.made
+    version: 1
+    domain: reservations
+    description: >-
+      A customer reserved a table for a party at one of a Location's slots. Consumers: notifications (the customer's confirmation with the code), analytics. No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
+    payload_schema: ./payloads/reservations.reservation.made.v1.schema.json
+    example: ./examples/reservations.reservation.made.v1.json
+
+  - type: reservations.reservation.cancelled
+    version: 1
+    domain: reservations
+    description: >-
+      A reservation was cancelled, by its customer until two hours before or by staff. Consumers: notifications, analytics. No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
+    payload_schema: ./payloads/reservations.reservation.cancelled.v1.schema.json
+    example: ./examples/reservations.reservation.cancelled.v1.json
+
+  - type: reservations.reservation.reminded
+    version: 1
+    domain: reservations
+    description: >-
+      A reservation's reminder is due: at 18:00 the day before on the Location's clock, or two hours before; each is told once, and one whose moment passed before the reservation was made is not told. Consumers: notifications (a push, else an SMS). No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
+    payload_schema: ./payloads/reservations.reservation.reminded.v1.schema.json
+    example: ./examples/reservations.reservation.reminded.v1.json
+
+  - type: reservations.reservation.seated
+    version: 1
+    domain: reservations
+    description: >-
+      Staff seated the party at a table. Consumers: ordering (the table's open tab, or the next opened there within an hour, bound to the reservation, with the party's name read from the reservations module), analytics. No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
+    payload_schema: ./payloads/reservations.reservation.seated.v1.schema.json
+    example: ./examples/reservations.reservation.seated.v1.json
+
+  - type: reservations.reservation.no_show
+    version: 1
+    domain: reservations
+    description: >-
+      Staff marked a booked party that did not come, from 15 minutes after its time. Consumers: analytics. No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
+    payload_schema: ./payloads/reservations.reservation.no_show.v1.schema.json
+    example: ./examples/reservations.reservation.no_show.v1.json

@@ -1,0 +1,159 @@
+type: object
+description: "A reservation as staff read it on the day's list: the party's name and mobile number, the code they give, and what can be done with it."
+required:
+  - id
+  - code
+  - starts_at
+  - time
+  - party_size
+  - name
+  - mobile
+  - note
+  - state
+  - table_id
+  - table_name
+  - seated_at
+  - no_show_from
+  - no_show_at
+  - cancelled_at
+  - cancelled_by
+  - version
+  - created_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The reservation.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+  code:
+    type: string
+    description: The code the party gives.
+    examples:
+      - K7R2MX
+  starts_at:
+    type: string
+    format: date-time
+    description: When it is for.
+    examples:
+      - 2026-11-07T14:30:00Z
+  time:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: Its time on the Location's clock.
+    examples:
+      - 20:00
+  party_size:
+    type: integer
+    description: How many.
+    examples:
+      - 4
+  name:
+    type: string
+    description: The name it is under.
+    examples:
+      - Asha Rao
+  mobile:
+    type:
+      - string
+      - "null"
+    description: The number to call.
+    examples:
+      - "+919876543210"
+  note:
+    type:
+      - string
+      - "null"
+    description: What the customer asked for.
+    examples:
+      - A high chair, please
+  state:
+    $ref: ./ReservationState.yaml
+    description: Where it is.
+  table_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The table the party was seated at.
+    examples:
+      - null
+  table_name:
+    type:
+      - string
+      - "null"
+    description: That table's name.
+    examples:
+      - null
+  seated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the party was seated.
+    examples:
+      - null
+  no_show_from:
+    type: string
+    format: date-time
+    description: "From when it may be marked a no-show: 15 minutes after its time."
+    examples:
+      - 2026-11-07T14:45:00Z
+  no_show_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was marked a no-show.
+    examples:
+      - null
+  cancelled_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was cancelled.
+    examples:
+      - null
+  cancelled_by:
+    type:
+      - string
+      - "null"
+    enum:
+      - customer
+      - staff
+      - null
+    description: "Who cancelled it: `customer` or `staff`."
+    examples:
+      - null
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change.
+    examples:
+      - 1
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-02T10:15:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+    code: K7R2MX
+    starts_at: 2026-11-07T14:30:00Z
+    time: 20:00
+    party_size: 4
+    name: Asha Rao
+    mobile: "+919876543210"
+    note: A high chair, please
+    state: booked
+    table_id: null
+    table_name: null
+    seated_at: null
+    no_show_from: 2026-11-07T14:45:00Z
+    no_show_at: null
+    cancelled_at: null
+    cancelled_by: null
+    version: 1
+    created_at: 2026-11-02T10:15:00Z

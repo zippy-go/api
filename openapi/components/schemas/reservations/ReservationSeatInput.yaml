@@ -1,0 +1,13 @@
+type: object
+description: The table the party sits at; its tab is bound to the reservation.
+required:
+  - table_id
+properties:
+  table_id:
+    type: string
+    format: uuid
+    description: The table, one of the Location's.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0909
+examples:
+  - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0909

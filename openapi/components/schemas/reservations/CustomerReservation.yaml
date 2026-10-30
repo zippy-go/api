@@ -1,0 +1,124 @@
+type: object
+description: "A reservation as its customer reads it in the account's Bookings: the code to give at the door, the store, the time and party, and whether it can still be cancelled."
+required:
+  - id
+  - code
+  - store
+  - starts_at
+  - date
+  - time
+  - party_size
+  - name
+  - note
+  - state
+  - cancellable
+  - cancellable_until
+  - table_name
+  - created_at
+  - cancelled_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The reservation.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+  code:
+    type: string
+    pattern: ^[A-HJ-NP-Z2-9]{6}$
+    description: "The code to give at the door: six letters and digits without look-alikes."
+    examples:
+      - K7R2MX
+  store:
+    $ref: ./ReservationStore.yaml
+    description: The store.
+  starts_at:
+    type: string
+    format: date-time
+    description: When it is for.
+    examples:
+      - 2026-11-07T14:30:00Z
+  date:
+    type: string
+    format: date
+    description: The day, on the store's clock.
+    examples:
+      - 2026-11-07
+  time:
+    type: string
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: The time, on the store's clock.
+    examples:
+      - 20:00
+  party_size:
+    type: integer
+    minimum: 1
+    description: How many.
+    examples:
+      - 4
+  name:
+    type: string
+    description: "The name it is under: the account's."
+    examples:
+      - Asha
+  note:
+    type:
+      - string
+      - "null"
+    description: What the customer asked for.
+    examples:
+      - A high chair, please
+  state:
+    $ref: ./ReservationState.yaml
+    description: Where it is.
+  cancellable:
+    type: boolean
+    description: "Whether it can still be cancelled: booked and more than two hours away."
+    examples:
+      - true
+  cancellable_until:
+    type: string
+    format: date-time
+    description: "Until when it can be cancelled: two hours before."
+    examples:
+      - 2026-11-07T12:30:00Z
+  table_name:
+    type:
+      - string
+      - "null"
+    description: The table the party was seated at; `null` until seated.
+    examples:
+      - null
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-11-02T10:15:00Z
+  cancelled_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was cancelled.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1101
+    code: K7R2MX
+    store:
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      name: Dev Kitchen Gachibowli
+      address: Plot 7, Gachibowli, Hyderabad 500032
+    starts_at: 2026-11-07T14:30:00Z
+    date: 2026-11-07
+    time: 20:00
+    party_size: 4
+    name: Asha
+    note: A high chair, please
+    state: booked
+    cancellable: true
+    cancellable_until: 2026-11-07T12:30:00Z
+    table_name: null
+    created_at: 2026-11-02T10:15:00Z
+    cancelled_at: null
