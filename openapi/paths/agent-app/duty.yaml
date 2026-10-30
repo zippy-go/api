@@ -100,7 +100,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "409":
-      description: "`duty_refused` with the blockers in `errors` (`duty_not_active`, `duty_document_expired`, `duty_elsewhere`, and since 0.27.0 `duty_no_shift`), or `tasks_under_way` going off duty with a delivery under way."
+      description: "`duty_refused` with the blockers in `errors` (`duty_not_active`, `duty_document_expired`, `duty_elsewhere`, and since 0.28.0 `duty_no_shift`), or `tasks_under_way` going off duty with a delivery under way."
       content:
         application/problem+json:
           schema:
