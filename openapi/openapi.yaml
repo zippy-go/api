@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.29.0
+  version: 0.30.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -386,6 +386,20 @@ paths:
     $ref: ./paths/agents/partner-order-proof.yaml
   /v1/partners/{partner_id}/services/{service_id}/teams:
     $ref: ./paths/agents/service-teams.yaml
+  /v1/partners/{partner_id}/services/{service_id}/shifts:
+    $ref: ./paths/agents/service-shifts.yaml
+  /v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}:
+    $ref: ./paths/agents/service-shift.yaml
+  /v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments:
+    $ref: ./paths/agents/service-shift-assignments.yaml
+  /v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments/{agent_id}:
+    $ref: ./paths/agents/service-shift-assignment.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/qualifications:
+    $ref: ./paths/agents/partner-agent-qualifications.yaml
+  /v1/agent/memberships/{agent_id}/shifts:
+    $ref: ./paths/agent-app/shifts.yaml
+  /v1/agent/memberships/{agent_id}/shifts/{shift_id}/pick:
+    $ref: ./paths/agent-app/shift-pick.yaml
   /v1/partners/{partner_id}/services/{service_id}/agent-settings:
     $ref: ./paths/agents/service-agent-settings.yaml
   /v1/partners/{partner_id}/services/{service_id}/pay-rules:
@@ -2234,6 +2248,38 @@ components:
       $ref: ./components/schemas/agents/WorkflowTemplateStep.yaml
     WorkflowTemplate:
       $ref: ./components/schemas/agents/WorkflowTemplate.yaml
+    ShiftState:
+      $ref: ./components/schemas/agents/ShiftState.yaml
+    ShiftAgentHow:
+      $ref: ./components/schemas/agents/ShiftAgentHow.yaml
+    ShiftAgent:
+      $ref: ./components/schemas/agents/ShiftAgent.yaml
+    Shift:
+      $ref: ./components/schemas/agents/Shift.yaml
+    ShiftCreate:
+      $ref: ./components/schemas/agents/ShiftCreate.yaml
+    ShiftUpdate:
+      $ref: ./components/schemas/agents/ShiftUpdate.yaml
+    ShiftList:
+      $ref: ./components/schemas/agents/ShiftList.yaml
+    ShiftPage:
+      $ref: ./components/schemas/agents/ShiftPage.yaml
+    ShiftAssignmentInput:
+      $ref: ./components/schemas/agents/ShiftAssignmentInput.yaml
+    AgentShift:
+      $ref: ./components/schemas/agents/AgentShift.yaml
+    AgentShiftPage:
+      $ref: ./components/schemas/agents/AgentShiftPage.yaml
+    AgentQualification:
+      $ref: ./components/schemas/agents/AgentQualification.yaml
+    AgentQualifications:
+      $ref: ./components/schemas/agents/AgentQualifications.yaml
+    AgentQualificationsInput:
+      $ref: ./components/schemas/agents/AgentQualificationsInput.yaml
+    TaskWindow:
+      $ref: ./components/schemas/agents/TaskWindow.yaml
+    TaskJob:
+      $ref: ./components/schemas/agents/TaskJob.yaml
     AgentServiceSettings:
       $ref: ./components/schemas/agents/AgentServiceSettings.yaml
     AgentServiceSettingsUpdate:

@@ -81,7 +81,7 @@
     "delivery_id": {
       "type": "string",
       "format": "uuid",
-      "description": "The delivery.",
+      "description": "The delivery; for a booked job, the booking it serves (as `booking_id`).",
       "examples": [
         "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01"
       ]
@@ -123,9 +123,11 @@
       "type": "string",
       "enum": [
         "pickup",
-        "drop_off"
+        "drop_off",
+        "appointment",
+        "on_site_job"
       ],
-      "description": "The stop's kind.",
+      "description": "The stop's kind; since 0.28.0 also `appointment` and `on_site_job` for a booked job.",
       "examples": [
         "pickup"
       ]
@@ -151,7 +153,9 @@
         "failed",
         "called_off",
         "handed_back",
-        "returned"
+        "returned",
+        "started",
+        "disputed"
       ],
       "description": "The task's status after the change.",
       "examples": [
@@ -172,6 +176,8 @@
         "called_off",
         "handed_back",
         "returned",
+        "started",
+        "disputed",
         null
       ],
       "description": "Its status before; `null` when assigned.",
@@ -214,6 +220,17 @@
       "description": "Whether the Agent had arrived: a drop failed after arriving pays its base and the distance.",
       "examples": [
         true
+      ]
+    },
+    "booking_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The booking, for a booked job or a laundry leg (since 0.28.0); `null` for a delivery.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9201"
       ]
     }
   }

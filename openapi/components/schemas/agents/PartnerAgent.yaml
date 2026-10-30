@@ -1,5 +1,5 @@
 type: object
-description: "An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand."
+description: "An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.28.0, the qualifications the Partner approved for the Agent."
 required:
   - id
   - partner_id
@@ -32,6 +32,7 @@ required:
   - created_at
   - updated_at
   - version
+  - qualifications
 properties:
   id:
     type: string
@@ -232,6 +233,14 @@ properties:
     description: Raised by one on every change.
     examples:
       - 3
+  qualifications:
+    type: array
+    items:
+      type: string
+    description: The qualifications the Partner approved, by name; a field service's jobs needing them are offered only to their holders.
+    examples:
+      - - AC technician
+        - Electrician
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
@@ -306,3 +315,4 @@ examples:
     created_at: 2026-10-16T09:00:00Z
     updated_at: 2026-10-16T09:00:00Z
     version: 3
+    qualifications: []

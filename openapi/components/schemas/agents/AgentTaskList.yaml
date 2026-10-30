@@ -79,6 +79,9 @@ properties:
           arrive_override_reason: null
           measured_distance_m: 0
           version: 2
+          window: null
+          job: null
+          item_count: null
   next_task_id:
     type:
       - string
@@ -158,4 +161,7 @@ examples:
         arrive_override_reason: null
         measured_distance_m: 0
         version: 2
+        window: null
+        job: null
+        item_count: null
     next_task_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01

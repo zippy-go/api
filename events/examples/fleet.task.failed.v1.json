@@ -25,6 +25,7 @@
     "at": "2026-10-16T09:00:00Z",
     "recorded_at": "2026-10-16T09:00:00Z",
     "reason": "Customer not reachable",
-    "arrived": true
+    "arrived": true,
+    "booking_id": null
   }
 }

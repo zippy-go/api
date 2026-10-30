@@ -1,7 +1,9 @@
 type: string
-description: "The kind of stop a task is: `pickup` at the store, `drop_off` at the customer. Returns, appointments and on-site jobs come with later steps; clients must tolerate values they do not know."
+description: "The kind of stop a task is: `pickup` at the store, or at the customer's door for a laundry leg; `drop_off` at the customer, or at the store for a laundry leg; `appointment`, a visit at a booked time; `on_site_job`, work done at the customer's place (since 0.28.0). Returns come with later steps; clients must tolerate values they do not know."
 enum:
   - pickup
   - drop_off
+  - appointment
+  - on_site_job
 examples:
   - pickup

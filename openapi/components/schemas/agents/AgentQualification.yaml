@@ -1,0 +1,38 @@
+type: object
+description: "A qualification the Partner approved for an Agent, such as Electrician: a field service's job requiring it is offered only to Agents holding it."
+required:
+  - name
+  - key
+  - approved_at
+  - approved_by
+properties:
+  name:
+    type: string
+    minLength: 2
+    maxLength: 60
+    description: As the Partner wrote it.
+    examples:
+      - Electrician
+  key:
+    type: string
+    description: "Lower case with single spaces: what a service requiring it is matched on."
+    examples:
+      - electrician
+  approved_at:
+    type: string
+    format: date-time
+    description: When it was approved.
+    examples:
+      - 2026-11-05T10:00:00Z
+  approved_by:
+    type:
+      - string
+      - "null"
+    description: Who approved it; `null` for the seed.
+    examples:
+      - Ravi Kumar
+examples:
+  - name: Electrician
+    key: electrician
+    approved_at: 2026-11-05T10:00:00Z
+    approved_by: Ravi Kumar

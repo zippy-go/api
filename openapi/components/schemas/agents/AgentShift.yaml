@@ -1,0 +1,104 @@
+type: object
+description: "A shift as the Agent app shows it: whether it is theirs, and the room left."
+required:
+  - id
+  - service_id
+  - zone_id
+  - zone_name
+  - starts_at
+  - ends_at
+  - needed
+  - taken
+  - room
+  - state
+  - mine
+  - how
+  - note
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The shift.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101
+  service_id:
+    type: string
+    format: uuid
+    description: The service it staffs.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  zone_id:
+    type: string
+    format: uuid
+    description: The zone its Agents work.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  zone_name:
+    type: string
+    description: The zone's name.
+    examples:
+      - Madhapur
+  starts_at:
+    type: string
+    format: date-time
+    description: When it starts.
+    examples:
+      - 2026-11-07T03:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-07T12:30:00Z
+  needed:
+    type: integer
+    format: int32
+    description: How many Agents it needs.
+    examples:
+      - 2
+  taken:
+    type: integer
+    format: int32
+    description: How many have it.
+    examples:
+      - 1
+  room:
+    type: integer
+    format: int32
+    description: How many more may pick it.
+    examples:
+      - 1
+  state:
+    $ref: ./ShiftState.yaml
+    description: Where it stands.
+  mine:
+    type: boolean
+    description: Whether this Agent has it.
+    examples:
+      - false
+  how:
+    description: How the Agent has it; `null` when it is not theirs.
+    oneOf:
+      - $ref: ./ShiftAgentHow.yaml
+      - type: "null"
+  note:
+    type:
+      - string
+      - "null"
+    description: What the Partner says about it.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101
+    service_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+    zone_id: 01a13a48-9e00-7000-8000-00000000a011
+    zone_name: Madhapur
+    starts_at: 2026-11-07T03:30:00Z
+    ends_at: 2026-11-07T12:30:00Z
+    needed: 2
+    taken: 1
+    room: 1
+    state: open
+    mine: false
+    how: null
+    note: null

@@ -1,5 +1,5 @@
 type: string
-description: "A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`."
+description: "A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop: en route), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`. Since 0.28.0: `start` (an on-site job's work begins, once any estimate is approved), `count` (a laundry pickup's items counted, with a photo), and two that end an on-site job, `not_available` (fifteen minutes after arriving and two calls, with a photo) and `dispute` (the customer refuses to sign, with their words)."
 enum:
   - navigate
   - arrive
@@ -11,5 +11,9 @@ enum:
   - notes
   - complete
   - fail
+  - start
+  - count
+  - not_available
+  - dispute
 examples:
   - arrive

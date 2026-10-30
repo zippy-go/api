@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.shift.assigned.v1.schema.json",
+  "title": "FleetShiftAssignedPayload",
+  "description": "Payload of `fleet.shift.assigned` version 1. A dispatcher gave a shift to an Agent: the Agent is told. The envelope's `partner_id` is the Agent's Partner. No payload carries a phone number, an email address or a document number. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "shift_id",
+    "partner_id",
+    "service_id",
+    "zone_id",
+    "starts_at",
+    "ends_at",
+    "needed",
+    "taken",
+    "state",
+    "at",
+    "agent_id",
+    "user_id",
+    "by"
+  ],
+  "properties": {
+    "shift_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The shift.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The service it staffs.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45"
+      ]
+    },
+    "zone_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The zone its Agents work.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000a011"
+      ]
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it starts.",
+      "examples": [
+        "2026-11-07T03:30:00Z"
+      ]
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it ends.",
+      "examples": [
+        "2026-11-07T12:30:00Z"
+      ]
+    },
+    "needed": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many Agents it needs.",
+      "examples": [
+        2
+      ]
+    },
+    "taken": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many have it after.",
+      "examples": [
+        1
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "full",
+        "under_way",
+        "ended",
+        "cancelled"
+      ],
+      "description": "Where it stands after.",
+      "examples": [
+        "open"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-06T09:12:00Z"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent's person; `null` for the simulator's Agents.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who did it: a member of the Partner or Mission Control; `null` for the platform.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71"
+      ]
+    }
+  }
+}

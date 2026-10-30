@@ -87,3 +87,6 @@ examples:
       arrive_override_reason: null
       measured_distance_m: 0
       version: 2
+      window: null
+      job: null
+      item_count: null

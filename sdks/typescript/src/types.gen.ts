@@ -4592,14 +4592,14 @@ export type AgentDocumentStatus = 'uploaded' | 'under_review' | 'approved' | 're
 export type AgentDocumentDecision = 'approve' | 'reject';
 
 /**
- * The kind of stop a task is: `pickup` at the store, `drop_off` at the customer. Returns, appointments and on-site jobs come with later steps; clients must tolerate values they do not know.
+ * The kind of stop a task is: `pickup` at the store, or at the customer's door for a laundry leg; `drop_off` at the customer, or at the store for a laundry leg; `appointment`, a visit at a booked time; `on_site_job`, work done at the customer's place (since 0.27.0). Returns come with later steps; clients must tolerate values they do not know.
  */
-export type TaskKind = 'pickup' | 'drop_off';
+export type TaskKind = 'pickup' | 'drop_off' | 'appointment' | 'on_site_job';
 
 /**
- * Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way).
+ * Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way). Since 0.27.0, an on-site job is `started` once its work begins, and `disputed` when the customer refuses to sign.
  */
-export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | 'failed' | 'called_off' | 'handed_back' | 'returned';
+export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | 'failed' | 'called_off' | 'handed_back' | 'returned' | 'started' | 'disputed';
 
 /**
  * How the task reached the Agent: an `offer` the Agent accepted, or a `direct` assignment, which lands with a sound and may be handed back with a reason within 60 seconds of the app receiving it.
@@ -4607,9 +4607,9 @@ export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | '
 export type TaskAssignment = 'offer' | 'direct';
 
 /**
- * A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`.
+ * A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop: en route), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`. Since 0.27.0: `start` (an on-site job's work begins, once any estimate is approved), `count` (a laundry pickup's items counted, with a photo), and two that end an on-site job, `not_available` (fifteen minutes after arriving and two calls, with a photo) and `dispute` (the customer refuses to sign, with their words).
  */
-export type TaskStepKind = 'navigate' | 'arrive' | 'scan' | 'photo' | 'signature' | 'code' | 'cash' | 'notes' | 'complete' | 'fail';
+export type TaskStepKind = 'navigate' | 'arrive' | 'scan' | 'photo' | 'signature' | 'code' | 'cash' | 'notes' | 'complete' | 'fail' | 'start' | 'count' | 'not_available' | 'dispute';
 
 /**
  * A line of an Agent's pay: the base for a `pickup` or a `drop_off`, the `distance` at the rule's amount per kilometre, `waiting` beyond the free minutes at a pickup, the amount for a task `call_off` after the Agent started towards it, and the `tip` in full.
@@ -4632,9 +4632,9 @@ export type ProofKind = 'photo' | 'signature' | 'scan' | 'code';
 export type TeamAreaSource = 'service_zones' | 'location_zones' | 'none';
 
 /**
- * Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Clients must tolerate values they do not know.
+ * Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Since 0.27.0, `no_shift`: the service requires a shift and the Agent has none under way or starting within 30 minutes. Clients must tolerate values they do not know.
  */
-export type AgentBlockerCode = 'not_active' | 'suspended' | 'offboarded' | 'document_missing' | 'document_pending' | 'document_rejected' | 'document_expired' | 'on_duty_elsewhere';
+export type AgentBlockerCode = 'not_active' | 'suspended' | 'offboarded' | 'document_missing' | 'document_pending' | 'document_rejected' | 'document_expired' | 'on_duty_elsewhere' | 'no_shift';
 
 /**
  * Why a duty stretch ended: the Agent `switched_off`; nothing was heard from the app for 30 minutes (`silent`, closed at the last report); the membership was `suspended` or `offboarded`.
@@ -5114,7 +5114,7 @@ export type AgentCounts = {
 };
 
 /**
- * An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand.
+ * An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.27.0, the qualifications the Partner approved for the Agent.
  */
 export type PartnerAgent = {
     /**
@@ -5245,6 +5245,10 @@ export type PartnerAgent = {
      * Raised by one on every change.
      */
     version: number;
+    /**
+     * The qualifications the Partner approved, by name; a field service's jobs needing them are offered only to their holders.
+     */
+    qualifications: Array<string>;
 };
 
 /**
@@ -5284,7 +5288,7 @@ export type DutyClosure = {
 };
 
 /**
- * An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled.
+ * An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled. Since 0.27.0, the shift the stretch works.
  */
 export type AgentDuty = {
     /**
@@ -5312,7 +5316,7 @@ export type AgentDuty = {
      */
     last_heard_at: string | null;
     /**
-     * Whether the stretch is outside any shift; always, until shifts arrive.
+     * Whether the stretch is outside any shift the Agent has.
      */
     unscheduled: boolean;
     /**
@@ -5327,6 +5331,10 @@ export type AgentDuty = {
      * A stretch the platform closed for silence and has not told the Agent of yet; reading it here tells them.
      */
     closed_for_silence: DutyClosure | null;
+    /**
+     * The shift the stretch works; `null` when unscheduled or off duty.
+     */
+    shift_id: string | null;
 };
 
 /**
@@ -5438,7 +5446,7 @@ export type AgentPositionsAccepted = {
 };
 
 /**
- * One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force.
+ * One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force. Since 0.27.0, the qualifications the Partner approved for the Agent.
  */
 export type AgentMembership = {
     /**
@@ -5513,6 +5521,10 @@ export type AgentMembership = {
      * The version of the service's pay rule in force.
      */
     pay_rule_version: number;
+    /**
+     * The qualifications the Partner approved, by name; a field service's jobs needing them are offered only to their holders.
+     */
+    qualifications: Array<string>;
 };
 
 /**
@@ -5694,7 +5706,7 @@ export type PayQuote = {
 };
 
 /**
- * A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first.
+ * A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.27.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted.
  */
 export type AgentTask = {
     /**
@@ -5841,6 +5853,18 @@ export type AgentTask = {
      * For a pickup, whether the store marked the order ready to collect; `null` for a drop. Since 0.25.0.
      */
     ready?: boolean | null;
+    /**
+     * When a booked job is due, or a laundry leg is to be collected or returned; `null` otherwise.
+     */
+    window: TaskWindow | null;
+    /**
+     * An on-site job or appointment: its booking, service and what its steps wait for; `null` for a delivery.
+     */
+    job: TaskJob | null;
+    /**
+     * The items counted at a laundry pickup; `null` otherwise.
+     */
+    item_count: number | null;
 };
 
 /**
@@ -5872,7 +5896,7 @@ export type AgentTaskPage = {
 };
 
 /**
- * A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence.
+ * A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence. Since 0.27.0: the `count` of items for a count, with its photo's `asset_id`; for not available, the photo's `asset_id` and the `calls` the app made; for dispute, the customer's words as the `note`.
  */
 export type TaskStepRecord = {
     /**
@@ -5915,6 +5939,14 @@ export type TaskStepRecord = {
      * For arrive from outside the geofence, why.
      */
     override_reason?: string | null;
+    /**
+     * For a count, the items counted.
+     */
+    count?: number | null;
+    /**
+     * For not available, the calls the app made to the customer; two at least.
+     */
+    calls?: number | null;
 };
 
 /**
@@ -6398,7 +6430,365 @@ export type WorkflowTemplate = {
 };
 
 /**
- * How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates.
+ * Where a shift stands: `open` with room for more Agents, `full` once as many as it needs have it, `under_way` between its start and its end, `ended`, or `cancelled` by the Partner. Clients must tolerate values they do not know.
+ */
+export type ShiftState = 'open' | 'full' | 'under_way' | 'ended' | 'cancelled';
+
+/**
+ * How an Agent has a shift: `picked` it in the Agent app, or `assigned` by a dispatcher.
+ */
+export type ShiftAgentHow = 'picked' | 'assigned';
+
+/**
+ * An Agent working a shift.
+ */
+export type ShiftAgent = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    display_name: string;
+    /**
+     * Picked or assigned.
+     */
+    how: ShiftAgentHow;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * A shift a Partner published for one of its services: a start and an end on the Location's clock, a zone and how many Agents it needs, with the Agents who picked it or were given it. An Agent working a shift is offered work in its zone, and the bookings' slots come from the hours of the shifts Agents have, less their booked jobs.
+ */
+export type Shift = {
+    /**
+     * The shift.
+     */
+    id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The service it staffs.
+     */
+    service_id: string;
+    /**
+     * The zone its Agents work.
+     */
+    zone_id: string;
+    /**
+     * The zone's name.
+     */
+    zone_name: string;
+    /**
+     * When it starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends, after its start, at most 16 hours later.
+     */
+    ends_at: string;
+    /**
+     * How many Agents it needs.
+     */
+    needed: number;
+    /**
+     * How many have it.
+     */
+    taken: number;
+    /**
+     * Where it stands.
+     */
+    state: ShiftState;
+    /**
+     * Who has it, first come first.
+     */
+    agents: Array<ShiftAgent>;
+    /**
+     * What the Partner says about it.
+     */
+    note: string | null;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * When it was published.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * Shifts to publish: a start and an end, a zone of the service's area and how many Agents it needs, once or the same hours for up to 14 days in a row.
+ */
+export type ShiftCreate = {
+    /**
+     * The zone its Agents work.
+     */
+    zone_id: string;
+    /**
+     * When the first starts; not in the past.
+     */
+    starts_at: string;
+    /**
+     * When the first ends: after its start, at most 16 hours later.
+     */
+    ends_at: string;
+    /**
+     * How many Agents each needs.
+     */
+    needed: number;
+    /**
+     * What the Partner says about it.
+     */
+    note?: string | null;
+    /**
+     * How many days in a row, the same hours each day; 1 by default.
+     */
+    repeat_days?: number | null;
+};
+
+/**
+ * A shift changed before it starts: its hours, its zone, how many it needs or its note. Fewer than already have it is refused; Agents who have it are told.
+ */
+export type ShiftUpdate = {
+    /**
+     * Another zone.
+     */
+    zone_id?: string | null;
+    /**
+     * Another start.
+     */
+    starts_at?: string | null;
+    /**
+     * Another end.
+     */
+    ends_at?: string | null;
+    /**
+     * Another count.
+     */
+    needed?: number | null;
+    /**
+     * Another note; an empty string clears it.
+     */
+    note?: string | null;
+};
+
+/**
+ * The shifts published, in order.
+ */
+export type ShiftList = {
+    /**
+     * The shifts.
+     */
+    items: Array<Shift>;
+};
+
+/**
+ * A page of a service's shifts, soonest first.
+ */
+export type ShiftPage = {
+    /**
+     * The shifts.
+     */
+    items: Array<Shift>;
+    /**
+     * The next page; `null` at the end.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An Agent of the service a dispatcher gives the shift to.
+ */
+export type ShiftAssignmentInput = {
+    /**
+     * The Agent membership, active, in the shift's service.
+     */
+    agent_id: string;
+};
+
+/**
+ * A shift as the Agent app shows it: whether it is theirs, and the room left.
+ */
+export type AgentShift = {
+    /**
+     * The shift.
+     */
+    id: string;
+    /**
+     * The service it staffs.
+     */
+    service_id: string;
+    /**
+     * The zone its Agents work.
+     */
+    zone_id: string;
+    /**
+     * The zone's name.
+     */
+    zone_name: string;
+    /**
+     * When it starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * How many Agents it needs.
+     */
+    needed: number;
+    /**
+     * How many have it.
+     */
+    taken: number;
+    /**
+     * How many more may pick it.
+     */
+    room: number;
+    /**
+     * Where it stands.
+     */
+    state: ShiftState;
+    /**
+     * Whether this Agent has it.
+     */
+    mine: boolean;
+    /**
+     * How the Agent has it; `null` when it is not theirs.
+     */
+    how: ShiftAgentHow | null;
+    /**
+     * What the Partner says about it.
+     */
+    note: string | null;
+};
+
+/**
+ * A page of the shifts of the Agent's service, soonest first.
+ */
+export type AgentShiftPage = {
+    /**
+     * The shifts.
+     */
+    items: Array<AgentShift>;
+    /**
+     * The next page; `null` at the end.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A qualification the Partner approved for an Agent, such as Electrician: a field service's job requiring it is offered only to Agents holding it.
+ */
+export type AgentQualification = {
+    /**
+     * As the Partner wrote it.
+     */
+    name: string;
+    /**
+     * Lower case with single spaces: what a service requiring it is matched on.
+     */
+    key: string;
+    /**
+     * When it was approved.
+     */
+    approved_at: string;
+    /**
+     * Who approved it; `null` for the seed.
+     */
+    approved_by: string | null;
+};
+
+/**
+ * An Agent's qualifications.
+ */
+export type AgentQualifications = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The service.
+     */
+    service_id: string;
+    /**
+     * The qualifications held, by name.
+     */
+    qualifications: Array<AgentQualification>;
+};
+
+/**
+ * The qualifications an Agent holds, in full: each named is approved, each left out withdrawn. Names compare without case or extra spaces.
+ */
+export type AgentQualificationsInput = {
+    /**
+     * At most 20 names, each 2 to 60 characters.
+     */
+    qualifications: Array<string>;
+};
+
+/**
+ * When a job is booked, or a leg is to be collected or returned.
+ */
+export type TaskWindow = {
+    /**
+     * Its start.
+     */
+    starts_at: string;
+    /**
+     * Its end.
+     */
+    ends_at: string;
+};
+
+/**
+ * What an on-site job carries beyond the stop: its booking and service, whether the work waits for the customer's approval of an estimate, and when the customer may be marked not available.
+ */
+export type TaskJob = {
+    /**
+     * The booking.
+     */
+    booking_id: string;
+    /**
+     * The service booked.
+     */
+    service_name: string;
+    /**
+     * Whether the work starts only once the customer approves an estimate.
+     */
+    estimate_needed: boolean;
+    /**
+     * Whether `start` is accepted now: no estimate is needed, or the customer approved it.
+     */
+    start_allowed: boolean;
+    /**
+     * From when the customer may be marked not available: fifteen minutes after arriving; `null` before arriving.
+     */
+    not_available_from: string | null;
+    /**
+     * The customer's instructions.
+     */
+    instructions: string | null;
+};
+
+/**
+ * How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates. Since 0.27.0, whether a shift is required to go on duty.
  */
 export type AgentServiceSettings = {
     /**
@@ -6449,10 +6839,14 @@ export type AgentServiceSettings = {
      * Who last changed it.
      */
     updated_by: string | null;
+    /**
+     * Whether an Agent goes on duty only with a shift under way or starting within 30 minutes; `false` by default, the platform fleet's included until its Agents pick shifts.
+     */
+    shifts_required: boolean;
 };
 
 /**
- * Changes a service's settings; absent members are kept.
+ * Changes a service's settings; absent members are kept. Since 0.27.0, `shifts_required`.
  */
 export type AgentServiceSettingsUpdate = {
     /**
@@ -6479,6 +6873,10 @@ export type AgentServiceSettingsUpdate = {
      * The reasons a drop may fail with, 1 to 12 of 1 to 80 characters.
      */
     failure_reasons?: Array<string> | null;
+    /**
+     * Whether a shift is required to go on duty.
+     */
+    shifts_required?: boolean | null;
 };
 
 /**
@@ -37784,6 +38182,744 @@ export type ListAgentTeamsResponses = {
 };
 
 export type ListAgentTeamsResponse = ListAgentTeamsResponses[keyof ListAgentTeamsResponses];
+
+export type ListServiceShiftsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+    };
+    query?: {
+        /**
+         * Shifts ending after this; now by default.
+         */
+        from?: string;
+        /**
+         * Shifts starting before this.
+         */
+        to?: string;
+        /**
+         * Only this zone.
+         */
+        zone_id?: string;
+        /**
+         * Only the shifts this Agent has.
+         */
+        agent_id?: string;
+        /**
+         * Only shifts in this state.
+         */
+        state?: ShiftState;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts, from `next_cursor`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts';
+};
+
+export type ListServiceShiftsErrors = {
+    /**
+     * `validation_failed`: a filter is malformed.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`: the service does not send people out.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceShiftsError = ListServiceShiftsErrors[keyof ListServiceShiftsErrors];
+
+export type ListServiceShiftsResponses = {
+    /**
+     * The shifts.
+     */
+    200: ShiftPage;
+};
+
+export type ListServiceShiftsResponse = ListServiceShiftsResponses[keyof ListServiceShiftsResponses];
+
+export type PublishServiceShiftsData = {
+    /**
+     * The shifts.
+     */
+    body: ShiftCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts';
+};
+
+export type PublishServiceShiftsErrors = {
+    /**
+     * `validation_failed`: the hours, the zone or the count are out of bounds, each named.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `service_not_agent_based`: the service does not send people out.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PublishServiceShiftsError = PublishServiceShiftsErrors[keyof PublishServiceShiftsErrors];
+
+export type PublishServiceShiftsResponses = {
+    /**
+     * The shifts published, in order.
+     */
+    201: ShiftList;
+};
+
+export type PublishServiceShiftsResponse = PublishServiceShiftsResponses[keyof PublishServiceShiftsResponses];
+
+export type CancelServiceShiftData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}';
+};
+
+export type CancelServiceShiftErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `shift_closed`: the shift ended or was cancelled already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelServiceShiftError = CancelServiceShiftErrors[keyof CancelServiceShiftErrors];
+
+export type CancelServiceShiftResponses = {
+    /**
+     * The shift, cancelled.
+     */
+    200: Shift;
+};
+
+export type CancelServiceShiftResponse = CancelServiceShiftResponses[keyof CancelServiceShiftResponses];
+
+export type GetServiceShiftData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}';
+};
+
+export type GetServiceShiftErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:read` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetServiceShiftError = GetServiceShiftErrors[keyof GetServiceShiftErrors];
+
+export type GetServiceShiftResponses = {
+    /**
+     * The shift.
+     */
+    200: Shift;
+};
+
+export type GetServiceShiftResponse = GetServiceShiftResponses[keyof GetServiceShiftResponses];
+
+export type ChangeServiceShiftData = {
+    /**
+     * What changes.
+     */
+    body: ShiftUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}';
+};
+
+export type ChangeServiceShiftErrors = {
+    /**
+     * `validation_failed`: a member is out of bounds, named.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `shift_closed`: the shift has started, ended or was cancelled; `shift_full` when the count would fall below the Agents who have it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ChangeServiceShiftError = ChangeServiceShiftErrors[keyof ChangeServiceShiftErrors];
+
+export type ChangeServiceShiftResponses = {
+    /**
+     * The shift after.
+     */
+    200: Shift;
+};
+
+export type ChangeServiceShiftResponse = ChangeServiceShiftResponses[keyof ChangeServiceShiftResponses];
+
+export type AssignServiceShiftData = {
+    /**
+     * The Agent.
+     */
+    body: ShiftAssignmentInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments';
+};
+
+export type AssignServiceShiftErrors = {
+    /**
+     * `validation_failed`: the Agent is missing or malformed.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AssignServiceShiftError = AssignServiceShiftErrors[keyof AssignServiceShiftErrors];
+
+export type AssignServiceShiftResponses = {
+    /**
+     * The shift after.
+     */
+    200: Shift;
+};
+
+export type AssignServiceShiftResponse = AssignServiceShiftResponses[keyof AssignServiceShiftResponses];
+
+export type RemoveServiceShiftAgentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The service, one of the Partner's that sends Agents out.
+         */
+        service_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments/{agent_id}';
+};
+
+export type RemoveServiceShiftAgentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * `shift_closed`: the shift ended or was cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveServiceShiftAgentError = RemoveServiceShiftAgentErrors[keyof RemoveServiceShiftAgentErrors];
+
+export type RemoveServiceShiftAgentResponses = {
+    /**
+     * The shift after.
+     */
+    200: Shift;
+};
+
+export type RemoveServiceShiftAgentResponse = RemoveServiceShiftAgentResponses[keyof RemoveServiceShiftAgentResponses];
+
+export type GetAgentQualificationsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/qualifications';
+};
+
+export type GetAgentQualificationsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:read` at the service, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAgentQualificationsError = GetAgentQualificationsErrors[keyof GetAgentQualificationsErrors];
+
+export type GetAgentQualificationsResponses = {
+    /**
+     * The qualifications.
+     */
+    200: AgentQualifications;
+};
+
+export type GetAgentQualificationsResponse = GetAgentQualificationsResponses[keyof GetAgentQualificationsResponses];
+
+export type SetAgentQualificationsData = {
+    /**
+     * The qualifications.
+     */
+    body: AgentQualificationsInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/qualifications';
+};
+
+export type SetAgentQualificationsErrors = {
+    /**
+     * `validation_failed`: more than 20, or a name out of bounds, named.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetAgentQualificationsError = SetAgentQualificationsErrors[keyof SetAgentQualificationsErrors];
+
+export type SetAgentQualificationsResponses = {
+    /**
+     * The qualifications after.
+     */
+    200: AgentQualifications;
+};
+
+export type SetAgentQualificationsResponse = SetAgentQualificationsResponses[keyof SetAgentQualificationsResponses];
+
+export type ListAgentShiftsData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+    };
+    query?: {
+        /**
+         * Only the Agent's own.
+         */
+        mine?: boolean;
+        /**
+         * Shifts ending after this; now by default.
+         */
+        from?: string;
+        /**
+         * Shifts starting before this.
+         */
+        to?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts, from `next_cursor`.
+         */
+        cursor?: string;
+    };
+    url: '/v1/agent/memberships/{agent_id}/shifts';
+};
+
+export type ListAgentShiftsErrors = {
+    /**
+     * `validation_failed`: a filter is malformed.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller's, or no such shift of its service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAgentShiftsError = ListAgentShiftsErrors[keyof ListAgentShiftsErrors];
+
+export type ListAgentShiftsResponses = {
+    /**
+     * The shifts.
+     */
+    200: AgentShiftPage;
+};
+
+export type ListAgentShiftsResponse = ListAgentShiftsResponses[keyof ListAgentShiftsResponses];
+
+export type DropAgentShiftData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/shifts/{shift_id}/pick';
+};
+
+export type DropAgentShiftErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller's, or no such shift of its service.
+     */
+    404: Problem;
+    /**
+     * `shift_closed`: the shift has started, ended or was cancelled, or a dispatcher gave it.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DropAgentShiftError = DropAgentShiftErrors[keyof DropAgentShiftErrors];
+
+export type DropAgentShiftResponses = {
+    /**
+     * The shift, no longer the Agent's.
+     */
+    200: AgentShift;
+};
+
+export type DropAgentShiftResponse = DropAgentShiftResponses[keyof DropAgentShiftResponses];
+
+export type PickAgentShiftData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's services.
+         */
+        agent_id: string;
+        /**
+         * The shift.
+         */
+        shift_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/shifts/{shift_id}/pick';
+};
+
+export type PickAgentShiftErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a service token acting for an Agent it may not act for.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such membership of the caller's, or no such shift of its service.
+     */
+    404: Problem;
+    /**
+     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PickAgentShiftError = PickAgentShiftErrors[keyof PickAgentShiftErrors];
+
+export type PickAgentShiftResponses = {
+    /**
+     * The shift, now the Agent's.
+     */
+    200: AgentShift;
+};
+
+export type PickAgentShiftResponse = PickAgentShiftResponses[keyof PickAgentShiftResponses];
 
 export type GetAgentServiceSettingsData = {
     body?: never;

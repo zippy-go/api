@@ -1,5 +1,5 @@
 type: object
-description: "A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first."
+description: "A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.28.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted."
 required:
   - id
   - trip_id
@@ -35,6 +35,9 @@ required:
   - arrive_override_reason
   - measured_distance_m
   - version
+  - window
+  - job
+  - item_count
 properties:
   id:
     type: string
@@ -244,6 +247,24 @@ properties:
     description: For a pickup, whether the store marked the order ready to collect; `null` for a drop. Since 0.25.0.
     examples:
       - true
+  window:
+    oneOf:
+      - $ref: ./TaskWindow.yaml
+      - type: "null"
+    description: When a booked job is due, or a laundry leg is to be collected or returned; `null` otherwise.
+  job:
+    oneOf:
+      - $ref: ./TaskJob.yaml
+      - type: "null"
+    description: "An on-site job or appointment: its booking, service and what its steps wait for; `null` for a delivery."
+  item_count:
+    type:
+      - integer
+      - "null"
+    format: int32
+    description: The items counted at a laundry pickup; `null` otherwise.
+    examples:
+      - null
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01
     trip_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10
@@ -314,3 +335,6 @@ examples:
     arrive_override_reason: null
     measured_distance_m: 0
     version: 2
+    window: null
+    job: null
+    item_count: null

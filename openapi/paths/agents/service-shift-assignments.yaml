@@ -1,0 +1,83 @@
+# Path item for /v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: service_id
+    in: path
+    required: true
+    description: The service, one of the Partner's that sends Agents out.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45
+  - name: shift_id
+    in: path
+    required: true
+    description: The shift.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101
+post:
+  operationId: assignServiceShift
+  summary: Give a shift to an Agent
+  description: A dispatcher gives the shift to an active Agent of its service, while it has room and the Agent has no other shift at those hours. Giving it again to an Agent who has it answers the shift unchanged. Publishes `fleet.shift.assigned`; the Agent is told. `dispatch:manage` at the service.
+  tags:
+    - Agents
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The Agent.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/ShiftAssignmentInput.yaml
+  responses:
+    "200":
+      description: The shift after.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/Shift.yaml
+    "400":
+      description: "`validation_failed`: the Agent is missing or malformed."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `dispatch:manage` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

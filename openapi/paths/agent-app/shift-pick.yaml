@@ -1,0 +1,120 @@
+# Path item for /v1/agent/memberships/{agent_id}/shifts/{shift_id}/pick. Referenced from openapi.yaml.
+parameters:
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  - name: shift_id
+    in: path
+    required: true
+    description: The shift.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101
+post:
+  operationId: pickAgentShift
+  summary: Pick a shift
+  description: "Picks a shift with room, first come first served: two Agents racing for its last place, one has it and the other is told it is full, with the next shift with room. Picking a shift the Agent has answers it unchanged. Refused while the membership is not active, once the shift has started, or when the Agent has another shift at those hours. Its hours make slots for the Agent's qualifications. Publishes `fleet.shift.picked`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The shift, now the Agent's.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentShift.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller's, or no such shift of its service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+delete:
+  operationId: dropAgentShift
+  summary: Give a shift up
+  description: Gives up a shift the Agent picked, before it starts; one a dispatcher gave is given up through the dispatcher. Giving up a shift the Agent does not have answers it unchanged. Publishes `fleet.shift.removed`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one.
+  tags:
+    - Agent app
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The shift, no longer the Agent's.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentShift.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface, or a service token acting for an Agent it may not act for."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such membership of the caller's, or no such shift of its service."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`shift_closed`: the shift has started, ended or was cancelled, or a dispatcher gave it."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

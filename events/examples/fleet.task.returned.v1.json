@@ -24,6 +24,7 @@
     "version": 1,
     "at": "2026-10-16T09:00:00Z",
     "cause": "suspended",
-    "reason": "Customer complaint under review"
+    "reason": "Customer complaint under review",
+    "booking_id": null
   }
 }

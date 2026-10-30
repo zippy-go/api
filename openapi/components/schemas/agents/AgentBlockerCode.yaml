@@ -1,5 +1,5 @@
 type: string
-description: "Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Clients must tolerate values they do not know."
+description: "Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Since 0.28.0, `no_shift`: the service requires a shift and the Agent has none under way or starting within 30 minutes. Clients must tolerate values they do not know."
 enum:
   - not_active
   - suspended
@@ -9,5 +9,6 @@ enum:
   - document_rejected
   - document_expired
   - on_duty_elsewhere
+  - no_shift
 examples:
   - document_missing

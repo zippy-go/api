@@ -1,0 +1,7 @@
+type: string
+description: "How an Agent has a shift: `picked` it in the Agent app, or `assigned` by a dispatcher."
+enum:
+  - picked
+  - assigned
+examples:
+  - picked

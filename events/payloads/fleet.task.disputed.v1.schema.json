@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.task.disputed.v1.schema.json",
+  "title": "FleetTaskDisputedPayload",
+  "description": "Payload of `fleet.task.disputed` version 1. The customer refused to sign off an on-site job, in their words: the job ends disputed, for the Partner and Mission Control to settle. The envelope's `partner_id` is the Agent's Partner. No payload carries a phone number, an email address or a document number. Consumers must ignore fields they do not know; new optional fields are an additive change. Read the task at `GET /v1/agent/tasks/{task_id}` as its Agent.",
+  "type": "object",
+  "required": [
+    "task_id",
+    "trip_id",
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "user_id",
+    "delivery_id",
+    "attempt",
+    "order_id",
+    "order_number",
+    "location_id",
+    "kind",
+    "assignment",
+    "status",
+    "previous_status",
+    "version",
+    "at",
+    "recorded_at",
+    "reason"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The task.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "trip_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The trip.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c10"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership holding it; the courier.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery service.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent's person; `null` for the simulator's Agents.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "delivery_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery; for a booked job, the booking it serves (as `booking_id`).",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "description": "The delivery's attempt the trip was assigned under.",
+      "examples": [
+        1
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
+      ]
+    },
+    "order_number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB1234"
+      ]
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "drop_off",
+        "appointment",
+        "on_site_job"
+      ],
+      "description": "The stop's kind; since 0.28.0 also `appointment` and `on_site_job` for a booked job.",
+      "examples": [
+        "pickup"
+      ]
+    },
+    "assignment": {
+      "type": "string",
+      "enum": [
+        "offer",
+        "direct"
+      ],
+      "description": "How the trip reached the Agent: an accepted `offer` or a `direct` assignment.",
+      "examples": [
+        "direct"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "on_the_way",
+        "arrived",
+        "completed",
+        "failed",
+        "called_off",
+        "handed_back",
+        "returned",
+        "started",
+        "disputed"
+      ],
+      "description": "The task's status after the change.",
+      "examples": [
+        "accepted"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "accepted",
+        "on_the_way",
+        "arrived",
+        "completed",
+        "failed",
+        "called_off",
+        "handed_back",
+        "returned",
+        "started",
+        "disputed",
+        null
+      ],
+      "description": "Its status before; `null` when assigned.",
+      "examples": [
+        null
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "The task's version, which only rises.",
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-10-16T09:00:00Z"
+      ]
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was recorded on the device.",
+      "examples": [
+        "2026-10-16T09:00:00Z"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "The customer's words.",
+      "examples": [
+        "The unit still leaks"
+      ]
+    },
+    "booking_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The booking, for a booked job or a laundry leg (since 0.28.0); `null` for a delivery.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9201"
+      ]
+    }
+  }
+}

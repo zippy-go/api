@@ -24,6 +24,7 @@
     "version": 1,
     "at": "2026-10-16T09:00:00Z",
     "help_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a99",
-    "message": "Store refused to hand over the order"
+    "message": "Store refused to hand over the order",
+    "booking_id": null
   }
 }

@@ -1,0 +1,33 @@
+type: object
+description: An Agent working a shift.
+required:
+  - agent_id
+  - display_name
+  - how
+  - at
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent membership.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+  display_name:
+    type: string
+    description: The Agent's name.
+    examples:
+      - Meena
+  how:
+    $ref: ./ShiftAgentHow.yaml
+    description: Picked or assigned.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-06T09:12:00Z
+examples:
+  - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+    display_name: Meena
+    how: picked
+    at: 2026-11-06T09:12:00Z

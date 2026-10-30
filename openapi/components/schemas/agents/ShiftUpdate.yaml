@@ -1,0 +1,47 @@
+type: object
+description: "A shift changed before it starts: its hours, its zone, how many it needs or its note. Fewer than already have it is refused; Agents who have it are told."
+properties:
+  zone_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Another zone.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: Another start.
+    examples:
+      - 2026-11-07T04:30:00Z
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: Another end.
+    examples:
+      - 2026-11-07T12:30:00Z
+  needed:
+    type:
+      - integer
+      - "null"
+    format: int32
+    minimum: 1
+    maximum: 50
+    description: Another count.
+    examples:
+      - 3
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: Another note; an empty string clears it.
+    examples:
+      - Bring the ladder
+examples:
+  - needed: 3

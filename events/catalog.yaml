@@ -2072,3 +2072,65 @@ events:
       A table was removed; its code stops opening tabs. Consumers: the floor.
     payload_schema: ./payloads/dining.table.removed.v1.schema.json
     example: ./examples/dining.table.removed.v1.json
+  - type: fleet.shift.published
+    version: 1
+    domain: fleet
+    description: "A Partner published a shift for one of its services: its Agents may pick it in the Agent app. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.shift.published.v1.schema.json
+    example: ./examples/fleet.shift.published.v1.json
+
+  - type: fleet.shift.changed
+    version: 1
+    domain: fleet
+    description: "A shift's hours, zone, count or note changed before it started, or it was cancelled (`state` `cancelled`): the Agents who had it are told. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.shift.changed.v1.schema.json
+    example: ./examples/fleet.shift.changed.v1.json
+
+  - type: fleet.shift.picked
+    version: 1
+    domain: fleet
+    description: "An Agent picked a shift in the Agent app, first come first served. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.shift.picked.v1.schema.json
+    example: ./examples/fleet.shift.picked.v1.json
+
+  - type: fleet.shift.assigned
+    version: 1
+    domain: fleet
+    description: "A dispatcher gave a shift to an Agent: the Agent is told. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.shift.assigned.v1.schema.json
+    example: ./examples/fleet.shift.assigned.v1.json
+
+  - type: fleet.shift.removed
+    version: 1
+    domain: fleet
+    description: "An Agent no longer has a shift: they gave it up (`reason` `dropped`), a dispatcher took it (`removed`), or the shift was cancelled (`cancelled`). No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.shift.removed.v1.schema.json
+    example: ./examples/fleet.shift.removed.v1.json
+
+  - type: fleet.qualification.approved
+    version: 1
+    domain: fleet
+    description: "The Partner approved a qualification for an Agent: jobs needing it may be given to them, and their shifts make slots for it. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.qualification.approved.v1.schema.json
+    example: ./examples/fleet.qualification.approved.v1.json
+
+  - type: fleet.qualification.withdrawn
+    version: 1
+    domain: fleet
+    description: "The Partner withdrew a qualification from an Agent: jobs needing it are no longer given to them. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.qualification.withdrawn.v1.schema.json
+    example: ./examples/fleet.qualification.withdrawn.v1.json
+
+  - type: fleet.task.working
+    version: 1
+    domain: fleet
+    description: "An on-site job's work started at the customer's place: no estimate was needed, or the customer approved it. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.working.v1.schema.json
+    example: ./examples/fleet.task.working.v1.json
+
+  - type: fleet.task.disputed
+    version: 1
+    domain: fleet
+    description: "The customer refused to sign off an on-site job, in their words: the job ends disputed, for the Partner and Mission Control to settle. No payload carries a phone number, an email address or a document number."
+    payload_schema: ./payloads/fleet.task.disputed.v1.schema.json
+    example: ./examples/fleet.task.disputed.v1.json

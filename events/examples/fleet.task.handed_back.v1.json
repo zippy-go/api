@@ -23,6 +23,7 @@
     "previous_status": "accepted",
     "version": 1,
     "at": "2026-10-16T09:00:00Z",
-    "reason": "Puncture"
+    "reason": "Puncture",
+    "booking_id": null
   }
 }

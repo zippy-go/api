@@ -1,0 +1,59 @@
+type: object
+description: "Shifts to publish: a start and an end, a zone of the service's area and how many Agents it needs, once or the same hours for up to 14 days in a row."
+required:
+  - zone_id
+  - starts_at
+  - ends_at
+  - needed
+properties:
+  zone_id:
+    type: string
+    format: uuid
+    description: The zone its Agents work.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a011
+  starts_at:
+    type: string
+    format: date-time
+    description: When the first starts; not in the past.
+    examples:
+      - 2026-11-07T03:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: "When the first ends: after its start, at most 16 hours later."
+    examples:
+      - 2026-11-07T12:30:00Z
+  needed:
+    type: integer
+    format: int32
+    minimum: 1
+    maximum: 50
+    description: How many Agents each needs.
+    examples:
+      - 2
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 200
+    description: What the Partner says about it.
+    examples:
+      - null
+  repeat_days:
+    type:
+      - integer
+      - "null"
+    format: int32
+    minimum: 1
+    maximum: 14
+    description: How many days in a row, the same hours each day; 1 by default.
+    examples:
+      - 14
+examples:
+  - zone_id: 01a13a48-9e00-7000-8000-00000000a011
+    starts_at: 2026-11-07T03:30:00Z
+    ends_at: 2026-11-07T12:30:00Z
+    needed: 2
+    note: null
+    repeat_days: 14

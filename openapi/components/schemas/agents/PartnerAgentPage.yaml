@@ -84,6 +84,7 @@ properties:
           created_at: 2026-10-16T09:00:00Z
           updated_at: 2026-10-16T09:00:00Z
           version: 3
+          qualifications: []
   next_cursor:
     type:
       - string
@@ -167,6 +168,7 @@ examples:
         created_at: 2026-10-16T09:00:00Z
         updated_at: 2026-10-16T09:00:00Z
         version: 3
+        qualifications: []
     next_cursor: null
     counts:
       invited: 1

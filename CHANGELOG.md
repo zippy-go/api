@@ -6,6 +6,48 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-10-30
+
+Step 9, field work: qualifications the Partner approves per Agent, shifts
+published, picked and given, the shift a service may require to go on duty,
+the on-site job's steps on the task, and a laundry pickup's count of items.
+Written as the next minor after 0.27.0, beside step 8's other slices and
+step 9's bookings slice; renumbered by merge order. Additive only.
+
+### Added
+
+- Shifts (`Agents` tag): a service's shifts listed, published once or for up
+  to 14 days in a row, read, changed, cancelled, given to an Agent and taken
+  back (`GET`, `POST /v1/partners/{partner_id}/services/{service_id}/shifts`,
+  `GET`, `PATCH`, `DELETE .../shifts/{shift_id}`,
+  `POST .../shifts/{shift_id}/assignments`,
+  `DELETE .../assignments/{agent_id}`; `Shift`, `ShiftState`, `ShiftAgent`,
+  `ShiftAgentHow`, `ShiftCreate`, `ShiftUpdate`, `ShiftList`, `ShiftPage`,
+  `ShiftAssignmentInput`), with `dispatch:read` and `dispatch:manage`.
+- The Agent app's shifts: listed, picked first come first served and given up
+  (`GET /v1/agent/memberships/{agent_id}/shifts`,
+  `POST`, `DELETE .../shifts/{shift_id}/pick`; `AgentShift`,
+  `AgentShiftPage`).
+- An Agent's qualifications, read and set in full with `agent:manage`
+  (`GET`, `PUT /v1/partners/{partner_id}/agents/{agent_id}/qualifications`;
+  `AgentQualification`, `AgentQualifications`, `AgentQualificationsInput`),
+  and `qualifications` on `PartnerAgent` and `AgentMembership`.
+- `shifts_required` on `AgentServiceSettings` and its update; going on duty
+  refused with the blocker `no_shift`; `shift_id` on `AgentDuty`.
+- The on-site job on the task: `appointment` and `on_site_job` in
+  `TaskKind`; `started` and `disputed` in `TaskStatus`; `start`, `count`,
+  `not_available` and `dispute` in `TaskStepKind`; `count` and `calls` on
+  `TaskStepRecord`; `window` (`TaskWindow`), `job` (`TaskJob`) and
+  `item_count` on `AgentTask`.
+- Problem codes `shift_full`, `shift_overlaps`, `shift_closed`,
+  `shift_refused`, `estimate_not_approved`, `wait_not_over` and
+  `qualification_missing`.
+- Events `fleet.shift.published`, `.changed`, `.picked`, `.assigned` and
+  `.removed`; `fleet.qualification.approved` and `.withdrawn`;
+  `fleet.task.working` and `fleet.task.disputed`. Every `fleet.task.*`
+  payload gains `booking_id` and the new kinds and statuses, and
+  `fleet.task.completed` the pickup's `item_count`.
+
 ## [0.29.0] - 2026-10-30
 
 Step 8, tabs: dine-in at a Location's tables. Tables with their codes and

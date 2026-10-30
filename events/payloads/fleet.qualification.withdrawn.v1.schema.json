@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.qualification.withdrawn.v1.schema.json",
+  "title": "FleetQualificationWithdrawnPayload",
+  "description": "Payload of `fleet.qualification.withdrawn` version 1. The Partner withdrew a qualification from an Agent: jobs needing it are no longer given to them. The envelope's `partner_id` is the Agent's Partner. No payload carries a phone number, an email address or a document number. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "user_id",
+    "name",
+    "key",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent's service.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a45"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Agent's person; `null` for the simulator's Agents.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The qualification, as the Partner wrote it.",
+      "examples": [
+        "Electrician"
+      ]
+    },
+    "key": {
+      "type": "string",
+      "description": "Lower case with single spaces: what jobs are matched on.",
+      "examples": [
+        "electrician"
+      ]
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who did it: a member of the Partner or Mission Control; `null` for the platform.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a71"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the platform recorded it.",
+      "examples": [
+        "2026-11-05T10:00:00Z"
+      ]
+    }
+  }
+}

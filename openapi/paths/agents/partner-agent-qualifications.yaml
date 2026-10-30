@@ -1,0 +1,114 @@
+# Path item for /v1/partners/{partner_id}/agents/{agent_id}/qualifications. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: agent_id
+    in: path
+    required: true
+    description: "The Agent: one membership of a person in one of a Partner's services."
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+get:
+  operationId: getAgentQualifications
+  summary: Read an Agent's qualifications
+  description: The qualifications the Partner approved for the Agent, with who approved each and when. `agent:read` at the service; Mission Control uses the same route with its platform permissions.
+  tags:
+    - Agents
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The qualifications.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentQualifications.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:read` at the service, or `forbidden`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+put:
+  operationId: setAgentQualifications
+  summary: Set an Agent's qualifications
+  description: "Sets the qualifications the Agent holds, in full: each new name approved, each left out withdrawn, names compared without case or extra spaces. A field service's jobs requiring a qualification are offered only to Agents holding it, and its slots come only from their shifts. Publishes `fleet.qualification.approved` and `fleet.qualification.withdrawn` for each change. `agent:manage` at the service."
+  tags:
+    - Agents
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The qualifications.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/agents/AgentQualificationsInput.yaml
+  responses:
+    "200":
+      description: The qualifications after.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/AgentQualifications.yaml
+    "400":
+      description: "`validation_failed`: more than 20, or a name out of bounds, named."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `agent:manage` at the service, or `not_enabled_for_partner`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the Partner, the service, the shift or the Agent is not one the caller can see; another Partner's answers the same."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

@@ -1,0 +1,54 @@
+type: object
+description: "What an on-site job carries beyond the stop: its booking and service, whether the work waits for the customer's approval of an estimate, and when the customer may be marked not available."
+required:
+  - booking_id
+  - service_name
+  - estimate_needed
+  - start_allowed
+  - not_available_from
+  - instructions
+properties:
+  booking_id:
+    type: string
+    format: uuid
+    description: The booking.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9201
+  service_name:
+    type: string
+    description: The service booked.
+    examples:
+      - AC service, split unit
+  estimate_needed:
+    type: boolean
+    description: Whether the work starts only once the customer approves an estimate.
+    examples:
+      - false
+  start_allowed:
+    type: boolean
+    description: "Whether `start` is accepted now: no estimate is needed, or the customer approved it."
+    examples:
+      - true
+  not_available_from:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "From when the customer may be marked not available: fifteen minutes after arriving; `null` before arriving."
+    examples:
+      - null
+  instructions:
+    type:
+      - string
+      - "null"
+    maxLength: 500
+    description: The customer's instructions.
+    examples:
+      - Gate code 4421
+examples:
+  - booking_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9201
+    service_name: AC service, split unit
+    estimate_needed: false
+    start_allowed: true
+    not_available_from: null
+    instructions: Gate code 4421

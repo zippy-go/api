@@ -48,6 +48,7 @@ properties:
               zone:
                 id: 01a13a48-9e00-7000-8000-00000000a011
                 name: Gachibowli
+            shift_id: null
           tasks_under_way: 0
           cash_in_hand:
             minor_units: 0
@@ -56,6 +57,7 @@ properties:
             minor_units: 500000
             currency: INR
           pay_rule_version: 1
+          qualifications: []
   working_agent_id:
     type:
       - string
@@ -104,6 +106,7 @@ examples:
             zone:
               id: 01a13a48-9e00-7000-8000-00000000a011
               name: Gachibowli
+          shift_id: null
         tasks_under_way: 0
         cash_in_hand:
           minor_units: 0
@@ -112,4 +115,5 @@ examples:
           minor_units: 500000
           currency: INR
         pay_rule_version: 1
+        qualifications: []
     working_agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10

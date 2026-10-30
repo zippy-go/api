@@ -1,0 +1,10 @@
+type: string
+description: "Where a shift stands: `open` with room for more Agents, `full` once as many as it needs have it, `under_way` between its start and its end, `ended`, or `cancelled` by the Partner. Clients must tolerate values they do not know."
+enum:
+  - open
+  - full
+  - under_way
+  - ended
+  - cancelled
+examples:
+  - open

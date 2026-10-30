@@ -1,5 +1,5 @@
 type: object
-description: Changes a service's settings; absent members are kept.
+description: Changes a service's settings; absent members are kept. Since 0.28.0, `shifts_required`.
 properties:
   geofence_metres:
     type:
@@ -42,6 +42,13 @@ properties:
     minItems: 1
     maxItems: 12
     description: The reasons a drop may fail with, 1 to 12 of 1 to 80 characters.
+  shifts_required:
+    type:
+      - boolean
+      - "null"
+    description: Whether a shift is required to go on duty.
+    examples:
+      - true
 examples:
   - geofence_metres: 150
     drop_code_required: true

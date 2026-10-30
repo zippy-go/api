@@ -2394,3 +2394,51 @@ errors:
     message: "The store asks for no card hold."
     retryable: false
     description: "A card hold at a Location that asks for none."
+  - code: shift_full
+    status: 409
+    title: Shift full
+    message: "The shift has the {needed} Agents it needs"
+    retryable: false
+    description: "Every place of the shift is taken; the problem's `next_shift_id` names the next shift of the service with room, when there is one."
+
+  - code: shift_overlaps
+    status: 409
+    title: Another shift at those hours
+    message: "You have another shift from {starts} to {ends}"
+    retryable: false
+    description: "The Agent has another shift at some of the same hours; the problem's `shift_id` names it."
+
+  - code: shift_closed
+    status: 409
+    title: Shift closed
+    message: "The shift {why}"
+    retryable: false
+    description: "The shift has started, ended or was cancelled, or a dispatcher gave it and only a dispatcher takes it back."
+
+  - code: shift_refused
+    status: 409
+    title: Cannot take shifts
+    message: "This Agent cannot take shifts: {reason}"
+    retryable: false
+    description: "The membership is not active: invited, pending, suspended or offboarded."
+
+  - code: estimate_not_approved
+    status: 409
+    title: Waiting for the estimate
+    message: "The work starts once the customer approves the estimate"
+    retryable: false
+    description: "The on-site job waits for the customer's approval of its estimate before `start`."
+
+  - code: wait_not_over
+    status: 409
+    title: Wait a little longer
+    message: "You can mark the customer not available from {from}, after two calls"
+    retryable: false
+    description: "Not available needs fifteen minutes at the stop since arriving and two calls to the customer."
+
+  - code: qualification_missing
+    status: 409
+    title: Qualification missing
+    message: "{agent} does not hold {qualification}"
+    retryable: false
+    description: "The job needs a qualification the Agent does not hold; only Agents holding every qualification a job needs may be given it."

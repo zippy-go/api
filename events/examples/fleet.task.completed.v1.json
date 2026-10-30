@@ -40,6 +40,8 @@
     "earned": {
       "minor_units": 7160,
       "currency": "INR"
-    }
+    },
+    "booking_id": null,
+    "item_count": null
   }
 }

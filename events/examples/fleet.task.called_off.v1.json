@@ -24,6 +24,7 @@
     "version": 1,
     "at": "2026-10-16T09:00:00Z",
     "reason": "Order cancelled by the customer",
-    "started": true
+    "started": true,
+    "booking_id": null
   }
 }

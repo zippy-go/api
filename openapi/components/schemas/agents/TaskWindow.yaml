@@ -1,0 +1,21 @@
+type: object
+description: When a job is booked, or a leg is to be collected or returned.
+required:
+  - starts_at
+  - ends_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: Its start.
+    examples:
+      - 2026-11-07T04:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: Its end.
+    examples:
+      - 2026-11-07T05:30:00Z
+examples:
+  - starts_at: 2026-11-07T04:30:00Z
+    ends_at: 2026-11-07T05:30:00Z
