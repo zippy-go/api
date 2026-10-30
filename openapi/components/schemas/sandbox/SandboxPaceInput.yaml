@@ -1,0 +1,48 @@
+type: object
+description: A sandbox key's pace, replaced whole.
+required:
+  - accept_after_seconds
+  - assign_after_seconds
+  - collect_after_seconds
+  - deliver_after_seconds
+  - by_hand
+properties:
+  accept_after_seconds:
+    type: integer
+    minimum: 1
+    maximum: 3600
+    description: Seconds from placing to accepting.
+    examples:
+      - 5
+  assign_after_seconds:
+    type: integer
+    minimum: 1
+    maximum: 3600
+    description: Seconds from acceptance to assignment.
+    examples:
+      - 5
+  collect_after_seconds:
+    type: integer
+    minimum: 1
+    maximum: 3600
+    description: Seconds from assignment to collection.
+    examples:
+      - 10
+  deliver_after_seconds:
+    type: integer
+    minimum: 1
+    maximum: 3600
+    description: Seconds from collection to delivery.
+    examples:
+      - 10
+  by_hand:
+    type: boolean
+    description: Whether only the developer moves orders and deliveries.
+    examples:
+      - false
+examples:
+  - accept_after_seconds: 5
+    assign_after_seconds: 5
+    collect_after_seconds: 10
+    deliver_after_seconds: 10
+    by_hand: false

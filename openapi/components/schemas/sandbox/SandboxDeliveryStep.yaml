@@ -1,0 +1,8 @@
+type: string
+description: "Where to step a sandbox delivery: `assigned` (to the sandbox's Agent), `collected` (picked up at the store) or `delivered` (at the door, with a stock proof). Stepping further passes the states between."
+enum:
+  - assigned
+  - collected
+  - delivered
+examples:
+  - collected

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.29.0
+  version: 0.35.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -235,6 +235,8 @@ tags:
     description: "Bundles across Partners: an item or category at one store paired with one at another store of another Partner within 1 km, a saving on the pair that ZippyGo or the two Partners pay. Mission Control makes and publishes them (`promotion:write`); each store accepts or declines as a campaign is accepted (`promotion:write` at the store); live, they show on the first store's page and in its basket, and taking one adds the second side to a basket at its store, each order carrying its share as an offer the promotions engine prices."
   - name: Reservations
     description: "Table reservations: a store opens slots every 30 minutes over its own hours for a party up to its largest, and a signed-in customer reserves one under the account's name and mobile number, answered with a six-character code, reminded at 18:00 the day before and two hours before, cancelling until two hours before. Staff read the day's list (`reservation:read` at the Location), seat a party at a table, which binds the table's tab to the reservation, and mark a no-show 15 minutes after its time (`reservation:manage`); a Location's settings take `location:write`. The account's Bookings lists them."
+  - name: Sandbox
+    description: "A Partner's sandbox, where its developers integrate: a twin of the Partner made at its first sandbox key from its Locations, services and published menus, which a sandbox key (`zg_test_`) acts on with its scopes. It is never listed on the storefront, never paid out and never messages anyone: its messages land in the sandbox inbox. Its orders are accepted and its deliveries assigned to a sandbox Agent, collected and delivered on a pace each key sets, or stepped by hand; it pays only through the simulated provider with the documented test instruments, and its customers sign in with the fixed code 123456. A reset makes the twin again; a twin untouched for 90 days is purged. Members read it with `developer:read` and reset it with `developer:manage`."
   - name: Notifications
     description: |
       How the platform tells people what happened. Every message leaves
@@ -1612,6 +1614,17 @@ paths:
   /v1/platform/tabs/{tab_id}:
     $ref: ./paths/tabs/platform-tab.yaml
 
+  # Step 10 sandbox: a Partner's twin, its pace, its deliveries stepped and its inbox
+  /v1/partners/{partner_id}/sandbox:
+    $ref: ./paths/sandbox/partner-sandbox.yaml
+  /v1/partners/{partner_id}/sandbox/reset:
+    $ref: ./paths/sandbox/partner-sandbox-reset.yaml
+  /v1/sandbox/pace:
+    $ref: ./paths/sandbox/sandbox-pace.yaml
+  /v1/sandbox/deliveries/{delivery_id}/step:
+    $ref: ./paths/sandbox/sandbox-delivery-step.yaml
+  /v1/sandbox/inbox:
+    $ref: ./paths/sandbox/sandbox-inbox.yaml
 components:
   securitySchemes:
     ApiKey:

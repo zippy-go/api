@@ -6,6 +6,28 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.35.0] - 2026-10-31
+
+Step 10, the sandbox: a Partner's twin where its developers integrate, the pace a sandbox key
+sets, a delivery stepped by hand and the sandbox inbox. Written by the platform's
+`step10/sandbox` slice as a placeholder minor above api main's 0.29.0; the coordinator renumbers
+by merge order among step 10's 0.33.0 to 0.35.0. Additive only.
+
+### Added
+
+- The Partner's sandbox in the Partner console (`Sandbox` tag): its twin, Locations, pace,
+  test instruments, fixed one-time code and inbox count
+  (`GET /v1/partners/{partner_id}/sandbox`, `PartnerSandbox`, `SandboxState`,
+  `SandboxLocation`, `SandboxInstrument`, `SandboxInstrumentOutcome`), and a reset
+  (`POST .../sandbox/reset`); `developer:read` and `developer:manage`.
+- The sandbox's own operations, for a sandbox key only: the key's pace (`GET`,
+  `PUT /v1/sandbox/pace`, `SandboxPace`, `SandboxPaceInput`), a delivery stepped by hand
+  (`POST /v1/sandbox/deliveries/{delivery_id}/step`, `SandboxStepInput`,
+  `SandboxDeliveryStep`, `SandboxDelivery`) and the inbox (`GET /v1/sandbox/inbox`,
+  `SandboxInboxPage`, `SandboxMessage`, `SandboxMessageChannel`).
+- Problem codes `sandbox_key_required` and `delivery_step_passed`.
+- Events `sandbox.partner.made`, `.reset` and `.purged`.
+
 ## [0.29.0] - 2026-10-30
 
 Step 8, tabs: dine-in at a Location's tables. Tables with their codes and

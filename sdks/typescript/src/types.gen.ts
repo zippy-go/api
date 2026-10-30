@@ -35251,6 +35251,242 @@ export type PlatformTabPage = {
 };
 
 /**
+ * Whether the Partner has a sandbox: `none` until its first sandbox key, or a reset, makes its twin; `ready` once made. A twin purged after 90 days untouched is `none` again.
+ */
+export type SandboxState = 'none' | 'ready';
+
+/**
+ * A Location of the sandbox's twin, made from one of the Partner's. A sandbox key places orders at these ids.
+ */
+export type SandboxLocation = {
+    /**
+     * The twin's Location, which a sandbox key addresses.
+     */
+    location_id: string;
+    /**
+     * The Partner's Location it was made from.
+     */
+    made_from_location_id: string;
+    /**
+     * Its name, as the Partner's Location's.
+     */
+    name: string;
+};
+
+/**
+ * How a sandbox key's orders and deliveries move by themselves: an order is accepted `accept_after_seconds` after it is placed unless the developer accepts or declines it first, its delivery is assigned to the sandbox's Agent `assign_after_seconds` after acceptance, collected `collect_after_seconds` after that, and delivered with a stock proof `deliver_after_seconds` after that. With `by_hand`, nothing moves by itself: the developer accepts through the API and steps each delivery. An order placed without a key moves at the defaults.
+ */
+export type SandboxPace = {
+    /**
+     * The sandbox key; `null` for the defaults.
+     */
+    key_id: string | null;
+    /**
+     * Seconds from placing to accepting. 20 by default.
+     */
+    accept_after_seconds: number;
+    /**
+     * Seconds from acceptance to a sandbox Agent assigned. 30 by default.
+     */
+    assign_after_seconds: number;
+    /**
+     * Seconds from assignment to collected. 120 by default.
+     */
+    collect_after_seconds: number;
+    /**
+     * Seconds from collection to delivered. 300 by default.
+     */
+    deliver_after_seconds: number;
+    /**
+     * Whether only the developer moves orders and deliveries.
+     */
+    by_hand: boolean;
+    /**
+     * When the key last set it; `null` for the defaults.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * What a test instrument does: `succeeds`, `fails` (with the code and words the real gateway's adapter gives), `times_out` (never answered, expired after the payment's window), `declined` (the bank declines a card) or `not_held` (a card charged at once that cannot be held).
+ */
+export type SandboxInstrumentOutcome = 'succeeds' | 'fails' | 'times_out' | 'declined' | 'not_held';
+
+/**
+ * A documented test instrument the sandbox's simulated payment provider answers by.
+ */
+export type SandboxInstrument = {
+    /**
+     * A UPI ID or a card number.
+     */
+    kind: 'upi_id' | 'card';
+    /**
+     * The UPI ID, or the card number (any future expiry, any CVV).
+     */
+    value: string;
+    outcome: SandboxInstrumentOutcome;
+};
+
+/**
+ * A Partner's sandbox, as its owner reads it in the Partner console. Its twin is made from the Partner's Locations, services and published menus at the first sandbox key, and again on reset; it is never listed on the storefront, never paid out, and never messages anyone.
+ */
+export type PartnerSandbox = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    state: SandboxState;
+    /**
+     * When the twin was first made.
+     */
+    made_at: string | null;
+    /**
+     * When it was last reset.
+     */
+    reset_at: string | null;
+    /**
+     * When a sandbox key last acted on it.
+     */
+    touched_at: string | null;
+    /**
+     * When it is purged unless a sandbox key acts on it first, 90 days after it was last touched.
+     */
+    purges_at: string | null;
+    /**
+     * The twin's Locations, in name order.
+     */
+    locations: Array<SandboxLocation>;
+    default_pace: SandboxPace;
+    /**
+     * The documented test instruments.
+     */
+    instruments: Array<SandboxInstrument>;
+    /**
+     * The sandbox's fixed one-time code, which signs its customers in.
+     */
+    one_time_code: string;
+    /**
+     * How many messages its inbox holds.
+     */
+    messages: number;
+};
+
+/**
+ * A sandbox key's pace, replaced whole.
+ */
+export type SandboxPaceInput = {
+    /**
+     * Seconds from placing to accepting.
+     */
+    accept_after_seconds: number;
+    /**
+     * Seconds from acceptance to assignment.
+     */
+    assign_after_seconds: number;
+    /**
+     * Seconds from assignment to collection.
+     */
+    collect_after_seconds: number;
+    /**
+     * Seconds from collection to delivery.
+     */
+    deliver_after_seconds: number;
+    /**
+     * Whether only the developer moves orders and deliveries.
+     */
+    by_hand: boolean;
+};
+
+/**
+ * Where to step a sandbox delivery: `assigned` (to the sandbox's Agent), `collected` (picked up at the store) or `delivered` (at the door, with a stock proof). Stepping further passes the states between.
+ */
+export type SandboxDeliveryStep = 'assigned' | 'collected' | 'delivered';
+
+/**
+ * Where to step a sandbox delivery; its next state when `to` is left out.
+ */
+export type SandboxStepInput = {
+    to?: SandboxDeliveryStep;
+};
+
+/**
+ * A sandbox delivery after a step. The webhook for each state it passed follows.
+ */
+export type SandboxDelivery = {
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * Its order.
+     */
+    order_id: string;
+    state: DeliveryState;
+    /**
+     * The sandbox's Agent, once assigned.
+     */
+    agent_id: string | null;
+    /**
+     * When it was stepped.
+     */
+    stepped_at: string;
+};
+
+/**
+ * The channel the message would have gone by.
+ */
+export type SandboxMessageChannel = 'sms' | 'whatsapp' | 'email' | 'push';
+
+/**
+ * A message the sandbox would have sent, kept in its inbox instead; no carrier is ever involved.
+ */
+export type SandboxMessage = {
+    /**
+     * The message.
+     */
+    message_id: string;
+    channel: SandboxMessageChannel;
+    /**
+     * Who it was for, as the sandbox's customer or staff gave it.
+     */
+    to: string;
+    /**
+     * Its subject or title, for an email or a push.
+     */
+    subject: string | null;
+    /**
+     * Its words.
+     */
+    body: string;
+    /**
+     * The order it is about.
+     */
+    order_id: string | null;
+    /**
+     * What it is, as notifications names it.
+     */
+    kind: string;
+    /**
+     * When it would have been sent.
+     */
+    at: string;
+};
+
+/**
+ * A page of the sandbox inbox, the latest first.
+ */
+export type SandboxInboxPage = {
+    /**
+     * The messages on this page.
+     */
+    items: Array<SandboxMessage>;
+    /**
+     * The next page's cursor; `null` on the last page.
+     */
+    next_cursor: string | null;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -80364,3 +80600,321 @@ export type GetPlatformTabResponses = {
 };
 
 export type GetPlatformTabResponse = GetPlatformTabResponses[keyof GetPlatformTabResponses];
+
+export type GetPartnerSandboxData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/sandbox';
+};
+
+export type GetPartnerSandboxErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerSandboxError = GetPartnerSandboxErrors[keyof GetPartnerSandboxErrors];
+
+export type GetPartnerSandboxResponses = {
+    /**
+     * The sandbox.
+     */
+    200: PartnerSandbox;
+};
+
+export type GetPartnerSandboxResponse = GetPartnerSandboxResponses[keyof GetPartnerSandboxResponses];
+
+export type ResetPartnerSandboxData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/sandbox/reset';
+};
+
+export type ResetPartnerSandboxErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResetPartnerSandboxError = ResetPartnerSandboxErrors[keyof ResetPartnerSandboxErrors];
+
+export type ResetPartnerSandboxResponses = {
+    /**
+     * The sandbox, made again.
+     */
+    200: PartnerSandbox;
+};
+
+export type ResetPartnerSandboxResponse = ResetPartnerSandboxResponses[keyof ResetPartnerSandboxResponses];
+
+export type GetSandboxPaceData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/sandbox/pace';
+};
+
+export type GetSandboxPaceErrors = {
+    /**
+     * No sandbox key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `sandbox_key_required`: a production key, or a token; the sandbox's operations take a sandbox key (`zg_test_`) only.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSandboxPaceError = GetSandboxPaceErrors[keyof GetSandboxPaceErrors];
+
+export type GetSandboxPaceResponses = {
+    /**
+     * The pace.
+     */
+    200: SandboxPace;
+};
+
+export type GetSandboxPaceResponse = GetSandboxPaceResponses[keyof GetSandboxPaceResponses];
+
+export type SetSandboxPaceData = {
+    /**
+     * The pace.
+     */
+    body: SandboxPaceInput;
+    path?: never;
+    query?: never;
+    url: '/v1/sandbox/pace';
+};
+
+export type SetSandboxPaceErrors = {
+    /**
+     * `validation_failed`: a number of seconds out of range.
+     */
+    400: Problem;
+    /**
+     * No sandbox key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `sandbox_key_required`: a production key, or a token; the sandbox's operations take a sandbox key (`zg_test_`) only.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetSandboxPaceError = SetSandboxPaceErrors[keyof SetSandboxPaceErrors];
+
+export type SetSandboxPaceResponses = {
+    /**
+     * The pace, set.
+     */
+    200: SandboxPace;
+};
+
+export type SetSandboxPaceResponse = SetSandboxPaceResponses[keyof SetSandboxPaceResponses];
+
+export type StepSandboxDeliveryData = {
+    /**
+     * Where to step it.
+     */
+    body?: SandboxStepInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * A delivery of the sandbox's.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/sandbox/deliveries/{delivery_id}/step';
+};
+
+export type StepSandboxDeliveryErrors = {
+    /**
+     * `validation_failed`: `to` is not a step; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No sandbox key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `sandbox_key_required`: a production key, or a token; the sandbox's operations take a sandbox key (`zg_test_`) only.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no delivery of the key's sandbox.
+     */
+    404: Problem;
+    /**
+     * `delivery_step_passed`: the delivery is at that state or past it, or it ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StepSandboxDeliveryError = StepSandboxDeliveryErrors[keyof StepSandboxDeliveryErrors];
+
+export type StepSandboxDeliveryResponses = {
+    /**
+     * The delivery, stepped.
+     */
+    200: SandboxDelivery;
+};
+
+export type StepSandboxDeliveryResponse = StepSandboxDeliveryResponses[keyof StepSandboxDeliveryResponses];
+
+export type ListSandboxInboxData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only the messages about this order.
+         */
+        order_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/sandbox/inbox';
+};
+
+export type ListSandboxInboxErrors = {
+    /**
+     * `validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No sandbox key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `sandbox_key_required`: a production key, or a token; the sandbox's operations take a sandbox key (`zg_test_`) only.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSandboxInboxError = ListSandboxInboxErrors[keyof ListSandboxInboxErrors];
+
+export type ListSandboxInboxResponses = {
+    /**
+     * A page of messages.
+     */
+    200: SandboxInboxPage;
+};
+
+export type ListSandboxInboxResponse = ListSandboxInboxResponses[keyof ListSandboxInboxResponses];

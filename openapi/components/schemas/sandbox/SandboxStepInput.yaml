@@ -1,0 +1,7 @@
+type: object
+description: Where to step a sandbox delivery; its next state when `to` is left out.
+properties:
+  to:
+    $ref: ./SandboxDeliveryStep.yaml
+examples:
+  - to: collected

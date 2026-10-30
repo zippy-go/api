@@ -1,0 +1,44 @@
+# Path item for /v1/partners/{partner_id}/sandbox. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPartnerSandbox
+  summary: Read the Partner's sandbox
+  description: "The Partner's sandbox: whether its twin is made, its Locations a sandbox key places orders at, when it was touched and is purged, the default pace, the documented test instruments, the fixed one-time code and how many messages its inbox holds. Members need `developer:read`."
+  tags:
+    - Sandbox
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The sandbox.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/sandbox/PartnerSandbox.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `developer:read`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Partner."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,21 @@
+type: object
+description: A page of the sandbox inbox, the latest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./SandboxMessage.yaml
+    description: The messages on this page.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The next page's cursor; `null` on the last page.
+    examples:
+      - null
+examples:
+  - items: []
+    next_cursor: null

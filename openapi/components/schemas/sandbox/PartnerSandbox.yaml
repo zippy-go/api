@@ -1,0 +1,119 @@
+type: object
+description: A Partner's sandbox, as its owner reads it in the Partner console. Its twin is made from the Partner's Locations, services and published menus at the first sandbox key, and again on reset; it is never listed on the storefront, never paid out, and never messages anyone.
+required:
+  - partner_id
+  - state
+  - made_at
+  - reset_at
+  - touched_at
+  - purges_at
+  - locations
+  - default_pace
+  - instruments
+  - one_time_code
+  - messages
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+  state:
+    $ref: ./SandboxState.yaml
+  made_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the twin was first made.
+    examples:
+      - "2026-11-02T10:15:00Z"
+  reset_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was last reset.
+    examples:
+      - null
+  touched_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When a sandbox key last acted on it.
+    examples:
+      - "2026-11-02T10:15:00Z"
+  purges_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it is purged unless a sandbox key acts on it first, 90 days after it was last touched.
+    examples:
+      - "2027-01-31T10:15:00Z"
+  locations:
+    type: array
+    items:
+      $ref: ./SandboxLocation.yaml
+    description: The twin's Locations, in name order.
+  default_pace:
+    $ref: ./SandboxPace.yaml
+  instruments:
+    type: array
+    items:
+      $ref: ./SandboxInstrument.yaml
+    description: The documented test instruments.
+  one_time_code:
+    type: string
+    pattern: "^[0-9]{6}$"
+    description: The sandbox's fixed one-time code, which signs its customers in.
+    examples:
+      - "123456"
+  messages:
+    type: integer
+    minimum: 0
+    description: How many messages its inbox holds.
+    examples:
+      - 3
+examples:
+  - partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+    state: ready
+    made_at: "2026-11-02T10:15:00Z"
+    reset_at: null
+    touched_at: "2026-11-02T10:15:00Z"
+    purges_at: "2027-01-31T10:15:00Z"
+    locations:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5b01
+        made_from_location_id: 01a13a48-9e00-7000-8000-000000000301
+        name: Dev Kitchen Gachibowli
+    default_pace:
+      key_id: null
+      accept_after_seconds: 20
+      assign_after_seconds: 30
+      collect_after_seconds: 120
+      deliver_after_seconds: 300
+      by_hand: false
+      updated_at: null
+    instruments:
+      - kind: upi_id
+        value: success@zgsandbox
+        outcome: succeeds
+      - kind: upi_id
+        value: failure@zgsandbox
+        outcome: fails
+      - kind: upi_id
+        value: timeout@zgsandbox
+        outcome: times_out
+      - kind: card
+        value: "4242424242424242"
+        outcome: succeeds
+      - kind: card
+        value: "4000000000000002"
+        outcome: declined
+      - kind: card
+        value: "4000000000000077"
+        outcome: not_held
+    one_time_code: "123456"
+    messages: 3

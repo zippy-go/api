@@ -2072,3 +2072,27 @@ events:
       A table was removed; its code stops opening tabs. Consumers: the floor.
     payload_schema: ./payloads/dining.table.removed.v1.schema.json
     example: ./examples/dining.table.removed.v1.json
+
+  - type: sandbox.partner.made
+    version: 1
+    domain: sandbox
+    description: >-
+      A Partner's sandbox twin was made, at its first sandbox key or its owner's first reset, from its Locations, services and published menus. Consumers: the Partner console's checklist, analytics. The twin is never listed, paid out or messaged.
+    payload_schema: ./payloads/sandbox.partner.made.v1.schema.json
+    example: ./examples/sandbox.partner.made.v1.json
+
+  - type: sandbox.partner.reset
+    version: 1
+    domain: sandbox
+    description: >-
+      A Partner's sandbox was made again from the Partner as it is now: the twin's orders, deliveries and inbox let go. Consumers: analytics.
+    payload_schema: ./payloads/sandbox.partner.reset.v1.schema.json
+    example: ./examples/sandbox.partner.reset.v1.json
+
+  - type: sandbox.partner.purged
+    version: 1
+    domain: sandbox
+    description: >-
+      A Partner's sandbox untouched for 90 days was purged: its twin and everything placed in it are gone, and its next sandbox key makes it again. Consumers: analytics.
+    payload_schema: ./payloads/sandbox.partner.purged.v1.schema.json
+    example: ./examples/sandbox.partner.purged.v1.json

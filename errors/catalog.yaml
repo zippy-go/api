@@ -2394,3 +2394,17 @@ errors:
     message: "The store asks for no card hold."
     retryable: false
     description: "A card hold at a Location that asks for none."
+
+  - code: sandbox_key_required
+    status: 403
+    title: Sandbox key required
+    message: "Use a sandbox key (zg_test_) for the sandbox's operations."
+    retryable: false
+    description: "A production key, or a token, called one of the sandbox's operations (`/v1/sandbox/...`)."
+
+  - code: delivery_step_passed
+    status: 409
+    title: Delivery past that step
+    message: "The delivery is {state} already."
+    retryable: false
+    description: "Stepping a sandbox delivery to a state it is at or past, or a delivery that ended; the sentence says where it is."

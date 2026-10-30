@@ -1,0 +1,15 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b6100",
+  "type": "sandbox.partner.made",
+  "version": 1,
+  "occurred_at": "2026-11-02T10:15:00Z",
+  "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+  "correlation_id": null,
+  "payload": {
+    "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+    "twin_partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5a02",
+    "key_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5c01",
+    "locations": 1,
+    "at": "2026-11-02T10:15:00Z"
+  }
+}

@@ -1,0 +1,7 @@
+type: string
+description: "Whether the Partner has a sandbox: `none` until its first sandbox key, or a reset, makes its twin; `ready` once made. A twin purged after 90 days untouched is `none` again."
+enum:
+  - none
+  - ready
+examples:
+  - ready

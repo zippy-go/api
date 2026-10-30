@@ -1,0 +1,65 @@
+type: object
+description: A message the sandbox would have sent, kept in its inbox instead; no carrier is ever involved.
+required:
+  - message_id
+  - channel
+  - to
+  - subject
+  - body
+  - order_id
+  - kind
+  - at
+properties:
+  message_id:
+    type: string
+    format: uuid
+    description: The message.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b6001
+  channel:
+    $ref: ./SandboxMessageChannel.yaml
+  to:
+    type: string
+    description: Who it was for, as the sandbox's customer or staff gave it.
+    examples:
+      - "+919000000001"
+  subject:
+    type:
+      - string
+      - "null"
+    description: Its subject or title, for an email or a push.
+    examples:
+      - null
+  body:
+    type: string
+    description: Its words.
+    examples:
+      - "Dev Kitchen Gachibowli has your order AB0042: it is being prepared."
+  order_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The order it is about.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01
+  kind:
+    type: string
+    description: What it is, as notifications names it.
+    examples:
+      - order_accepted
+  at:
+    type: string
+    format: date-time
+    description: When it would have been sent.
+    examples:
+      - "2026-11-02T10:15:00Z"
+examples:
+  - message_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b6001
+    channel: sms
+    to: "+919000000001"
+    subject: null
+    body: "Dev Kitchen Gachibowli has your order AB0042: it is being prepared."
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01
+    kind: order_accepted
+    at: "2026-11-02T10:15:00Z"

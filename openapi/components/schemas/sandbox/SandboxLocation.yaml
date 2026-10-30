@@ -1,0 +1,28 @@
+type: object
+description: A Location of the sandbox's twin, made from one of the Partner's. A sandbox key places orders at these ids.
+required:
+  - location_id
+  - made_from_location_id
+  - name
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The twin's Location, which a sandbox key addresses.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5b01
+  made_from_location_id:
+    type: string
+    format: uuid
+    description: The Partner's Location it was made from.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  name:
+    type: string
+    description: Its name, as the Partner's Location's.
+    examples:
+      - Dev Kitchen Gachibowli
+examples:
+  - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5b01
+    made_from_location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
