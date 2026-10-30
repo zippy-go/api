@@ -1513,7 +1513,7 @@ export type Location = {
      */
     pause?: Pause | null;
     /**
-     * A store when a product-sales Service is on there, else a branch; on reads.
+     * A store when a product-sales Service or a field Service is on there, else a branch; on reads.
      */
     reads_as?: ReadsAs | null;
     /**
@@ -3037,7 +3037,7 @@ export type LocationLive = {
 export type LocationLiveState = 'online' | 'closed' | 'offline' | 'not_live';
 
 /**
- * What a Location is, by what it runs: a store sells (a product-sales Service is on there), a branch only operates (a delivery depot, a field Service's base). Never chosen by hand.
+ * What a Location is, by what it runs: a store sells (a product-sales Service is on there) or takes bookings (a field Service is on there, since step 9), a branch only operates (a delivery depot). Never chosen by hand.
  */
 export type ReadsAs = 'store' | 'branch';
 
@@ -22748,6 +22748,11 @@ export type StatementOrderOutcome = 'completed' | 'cancelled_by_partner';
 export type StatementCarrier = 'platform_fleet' | 'own_agents' | 'external_carrier' | 'none';
 
 /**
+ * How the order of a statement row was fulfilled: `delivery`, `pickup`, `dine_in` for a dine-in tab, or `on_site` for a booking's job at the customer's place. Rows kept before step 9 carry the fulfilment the order was placed with.
+ */
+export type StatementFulfilment = 'delivery' | 'pickup' | 'dine_in' | 'on_site';
+
+/**
  * Whether platform staff answered a question.
  */
 export type PayoutQuestionState = 'unanswered' | 'answered';
@@ -22963,6 +22968,10 @@ export type StatementOrderRow = {
      * Who carried it.
      */
     carrier: StatementCarrier;
+    /**
+     * How it was fulfilled, so a tab's row and a booking's stand apart from a pickup's.
+     */
+    fulfilment: StatementFulfilment;
     /**
      * Its item sales; nothing for an order the Partner cancelled.
      */
@@ -33651,7 +33660,7 @@ export type BookableFacts = {
      */
     price_kind: BookingPriceKind;
     /**
-     * The qualifications an Agent needs, codes of the field Service's list.
+     * The qualifications an Agent needs, named as the field Service names them and compared without case.
      */
     qualifications: Array<string>;
     /**

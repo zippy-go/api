@@ -6,6 +6,7 @@ required:
   - outcome
   - ended_at
   - carrier
+  - fulfilment
   - sales
   - promotions
   - net_sales
@@ -43,6 +44,9 @@ properties:
   carrier:
     $ref: ./StatementCarrier.yaml
     description: Who carried it.
+  fulfilment:
+    $ref: ./StatementFulfilment.yaml
+    description: How it was fulfilled, so a tab's row and a booking's stand apart from a pickup's.
   sales:
     $ref: ../common/Money.yaml
     description: Its item sales; nothing for an order the Partner cancelled.
@@ -94,6 +98,7 @@ examples:
     outcome: completed
     ended_at: 2026-10-22T13:40:00Z
     carrier: platform_fleet
+    fulfilment: delivery
     sales:
       minor_units: 50000
       currency: INR

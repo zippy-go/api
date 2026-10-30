@@ -108,7 +108,7 @@ examples:
     pickup_return: false
     turnaround_hours: null
     qualifications:
-      - ac_technician
+      - AC technician
     included:
       - Filter and coil cleaning
     excluded:

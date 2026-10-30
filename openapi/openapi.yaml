@@ -3548,6 +3548,8 @@ components:
       $ref: ./components/schemas/payouts/StatementOrderOutcome.yaml
     StatementCarrier:
       $ref: ./components/schemas/payouts/StatementCarrier.yaml
+    StatementFulfilment:
+      $ref: ./components/schemas/payouts/StatementFulfilment.yaml
     PayoutQuestionState:
       $ref: ./components/schemas/payouts/PayoutQuestionState.yaml
     PayoutDestinationKind:

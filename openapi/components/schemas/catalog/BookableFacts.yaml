@@ -25,7 +25,7 @@ properties:
     type: array
     items:
       type: string
-    description: The qualifications an Agent needs, codes of the field Service's list.
+    description: The qualifications an Agent needs, named as the field Service names them and compared without case.
   included:
     type: array
     items:
@@ -76,7 +76,7 @@ examples:
   - duration_minutes: 60
     price_kind: fixed
     qualifications:
-      - ac_technician
+      - AC technician
     included:
       - Filter and coil cleaning
     excluded:

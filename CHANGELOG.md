@@ -63,10 +63,13 @@ order, and this slice is renumbered then. Additive only.
 - `services` on `StoreCard` (`StoreServices`, `StoreServiceItem`); `booking`
   on `StoreOrder` (`StoreOrderBooking`); `booking_id` on `CustomerOrder`;
   `on_site` in `OrderFulfilment` and in ordering's events.
+- `fulfilment` on `StatementOrderRow` (`StatementFulfilment`: `delivery`,
+  `pickup`, `dine_in` or `on_site`), so the Partner's statement tells a tab's
+  row and a booking's from a pickup's; rows kept before carry the fulfilment
+  their order was placed with.
 - Problem types `slot_taken`, `slot_unavailable`, `outside_area`,
   `hold_expired`, `booking_moved`, `reschedule_window_passed`,
-  `approval_answered`, `nothing_to_pay`, `estimate_not_approved` and
-  `not_bookable`.
+  `approval_answered`, `estimate_not_approved` and `not_bookable`.
 - Events: `bookings.booking.placed`, `.confirmed`, `.declined`, `.assigned`,
   `.rescheduled`, `.cancelled`, `.completed`, `.disputed`, `.not_available`
   and `.reminded`; `bookings.estimate.recorded`, `.approved` and `.declined`;
@@ -74,6 +77,13 @@ order, and this slice is renumbered then. Additive only.
   `bookings.leg.requested`; `catalog.services.published`; and ordering's
   `ordering.order.settled` and `ordering.order.completed` for an order on
   site.
+
+### Changed
+
+- A Location where a field Service is on reads as a `store`: it takes
+  bookings and is listed in its Vertical, needing no way to fulfil since its
+  work goes to the customer. The descriptions of `ReadsAs` and
+  `Location.reads_as` say so; a delivery depot stays a `branch`.
 
 ## [0.27.0] - 2026-10-30
 
