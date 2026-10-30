@@ -1,0 +1,10 @@
+type: string
+description: "A line of the monthly invoice: the `plan` for the month, a `plan_change` prorated, an `add_on`, the `sms` and `whatsapp` pass-through."
+enum:
+  - plan
+  - plan_change
+  - add_on
+  - sms
+  - whatsapp
+examples:
+  - plan

@@ -1,0 +1,42 @@
+type: object
+description: "How a flag is targeted, the `FlagTargeting` schema: the off list wins, then the on list, then the percentage, from a stable hash of the flag's name and the subject's id, so a growing percentage never turns a subject off."
+required:
+  - subject
+  - percentage
+  - on
+  - off
+  - staff_only
+properties:
+  subject:
+    $ref: ./FlagSubject.yaml
+    description: What the percentage and lists count.
+  percentage:
+    type: integer
+    minimum: 0
+    maximum: 100
+    description: The share of subjects on, 0 to 100.
+    examples:
+      - 100
+  on:
+    type: array
+    items:
+      $ref: ./FlagTarget.yaml
+    description: Always on.
+  off:
+    type: array
+    items:
+      $ref: ./FlagTarget.yaml
+    description: Always off.
+  staff_only:
+    type: boolean
+    description: On only for platform staff.
+    examples:
+      - false
+examples:
+  - subject: customer
+    percentage: 100
+    on: []
+    off:
+      - id: 019a3d10-2b00-7d00-8a00-00000000a501
+        label: Asha Rao
+    staff_only: false

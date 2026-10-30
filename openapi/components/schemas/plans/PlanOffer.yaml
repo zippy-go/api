@@ -1,11 +1,16 @@
 type: object
-description: One of the plans as offered, the `PlanOffer` schema.
+description: "One of the plans as offered, the `PlanOffer` schema: its price in force, its modules and limits, and for a plan the Partner is not on, the day a change to it would take effect and what the rest of the month costs."
 required:
   - plan
   - label
   - monthly_fee
   - kinds
   - platform_fleet
+  - price
+  - modules
+  - limits
+  - takes_effect_on
+  - prorated
 properties:
   plan:
     $ref: ./Plan.yaml
@@ -28,6 +33,30 @@ properties:
   platform_fleet:
     type: boolean
     description: Whether its stores may use the platform fleet.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its monthly price in force, before GST; `monthly_fee` in paise says the same.
+  modules:
+    type: array
+    items:
+      $ref: ../configuration/ModuleCode.yaml
+    description: The modules it includes.
+  limits:
+    $ref: ../configuration/PlanLimits.yaml
+    description: What it allows.
+  takes_effect_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: "For a plan the Partner is not on, the day a change to it takes effect: today for an upgrade, the 1st of next month for a downgrade; `null` for the plan in force."
+    examples:
+      - 2026-12-01
+  prorated:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: For an upgrade, what the rest of this month costs on it before GST; `null` otherwise.
 examples:
   - plan: standard
     label: Standard
@@ -37,3 +66,22 @@ examples:
       - field_service
       - delivery
     platform_fleet: true
+    price:
+      minor_units: 199900
+      currency: INR
+    modules:
+      - delivery
+      - pickup
+      - promotions
+      - loyalty
+      - subscriptions
+      - inventory
+      - own_fleet
+    limits:
+      locations: 5
+      staff: 20
+      agents: 50
+      api_keys: 5
+      webhook_endpoints: 5
+    takes_effect_on: 2026-12-01
+    prorated: null

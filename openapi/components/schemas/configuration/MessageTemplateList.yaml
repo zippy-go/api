@@ -1,0 +1,45 @@
+type: object
+description: A page of message templates by name, the `MessageTemplateList` schema.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./MessageTemplate.yaml
+    description: The templates.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page; `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 019a3d10-2b00-7d00-8a00-00000000ba01
+        name: order.accepted
+        event_type: ordering.order.accepted
+        channel: push
+        locale: en-IN
+        title: Your order is accepted
+        body: "{store} accepted order {number}; it will be ready by {ready_time}."
+        placeholders:
+          - store
+          - number
+          - ready_time
+        variables:
+          - store
+          - number
+          - ready_time
+          - total
+          - link
+        enabled: true
+        version: 2
+        registration: not_needed
+        dlt_template_id: null
+        created_at: 2026-10-30T00:00:00Z
+        updated_at: 2026-11-20T06:30:00Z
+        updated_by: 019a3d10-2b00-7d00-8a00-00000000a601
+    next_cursor: null

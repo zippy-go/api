@@ -1,0 +1,20 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea011",
+  "type": "configuration.flag.changed",
+  "version": 1,
+  "occurred_at": "2026-11-20T06:30:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "flag": "storefront.recommendations",
+    "version": 4,
+    "subject": "customer",
+    "percentage": 100,
+    "on_count": 0,
+    "off_count": 1,
+    "staff_only": false,
+    "user_id": "019a3d10-2b00-7d00-8a00-00000000a601",
+    "approval_id": null,
+    "at": "2026-11-20T06:30:00Z"
+  }
+}

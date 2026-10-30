@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.partner.restored.v1.schema.json",
+  "title": "ConfigurationPartnerRestoredPayload",
+  "description": "Payload of `configuration.partner.restored` version 1. A Partner's modules were restored. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "modules",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "delivery",
+          "pickup",
+          "dine_in",
+          "subscriptions",
+          "field_services",
+          "promotions",
+          "loyalty",
+          "inventory",
+          "own_fleet",
+          "developer"
+        ]
+      },
+      "description": "The modules restored."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

@@ -1,40 +1,39 @@
-# Path item for /v1/partners/{partner_id}/plan. Referenced from openapi.yaml.
 parameters:
   - $ref: ../../components/parameters/PartnerIdPath.yaml
 get:
   operationId: getPartnerPlan
   summary: Get the partner's plan
-  description: "The Partner's plan: what it includes, the Pro trial, a change waiting, and the plans on offer. Members and platform staff."
+  description: "The Partner's plan: what it includes, the Pro trial, a change waiting, and the plans on offer. Members and platform staff. Since step 10 each plan carries its price, modules and limits, the day a change to it takes effect and what an upgrade's rest of the month costs, and `price_change` names a price announced for the Partner's plan."
   tags:
     - Plans
   security:
     - Bearer: []
   responses:
-    '200':
+    "200":
       description: The plan.
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/plans/PartnerPlan.yaml
-    '401':
+    "401":
       description: No valid access token was sent, or it was refused (`unauthenticated`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: 'Platform staff without `partner:read` (`access_denied`).'
+    "403":
+      description: Platform staff without `partner:read` (`access_denied`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store the operation needs is unavailable (`unavailable`); retry shortly.
       content:
         application/problem+json:
@@ -68,43 +67,43 @@ put:
         schema:
           $ref: ../../components/schemas/plans/PartnerPlanUpdate.yaml
   responses:
-    '200':
+    "200":
       description: The plan as changed.
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/plans/PartnerPlan.yaml
-    '400':
+    "400":
       description: Malformed body, or a move without a reason.
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '401':
+    "401":
       description: No valid access token was sent, or it was refused (`unauthenticated`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: 'The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).'
+    "403":
+      description: The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: The partner, or the resource named in the path, does not exist or is not visible to the caller (`not_found`).
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '409':
-      description: '`partner_archived`.'
+    "409":
+      description: "`partner_archived`."
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store or mail delivery is unavailable.
       content:
         application/problem+json:

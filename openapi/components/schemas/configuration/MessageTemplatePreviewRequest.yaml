@@ -1,0 +1,13 @@
+type: object
+description: "A template previewed, the `MessageTemplatePreviewRequest` schema: with sample data for its event unless values are given."
+properties:
+  values:
+    type: object
+    additionalProperties:
+      type: string
+    description: A value per placeholder; the event's sample data fills the rest.
+    examples:
+      - store: Dev Kitchen Gachibowli
+examples:
+  - values:
+      store: Dev Kitchen Gachibowli

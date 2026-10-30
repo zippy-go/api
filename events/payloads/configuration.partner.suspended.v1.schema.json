@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.partner.suspended.v1.schema.json",
+  "title": "ConfigurationPartnerSuspendedPayload",
+  "description": "Payload of `configuration.partner.suspended` version 1. A Partner's paid modules were suspended. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "invoice_id",
+    "modules",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "invoice_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The invoice unpaid."
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "delivery",
+          "pickup",
+          "dine_in",
+          "subscriptions",
+          "field_services",
+          "promotions",
+          "loyalty",
+          "inventory",
+          "own_fleet",
+          "developer"
+        ]
+      },
+      "description": "The modules suspended."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

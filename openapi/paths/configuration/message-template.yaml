@@ -1,0 +1,97 @@
+# Path item for /v1/platform/message-templates/{template_id}. Referenced from openapi.yaml.
+parameters:
+  - name: template_id
+    in: path
+    required: true
+    description: The template.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000ba01
+get:
+  operationId: getMessageTemplate
+  summary: Get a message template
+  description: A template as it stands, its last version. `setting:read`.
+  tags: &a2
+    - Configuration
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The template.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/MessageTemplate.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: No such template (`not_found`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+patch:
+  operationId: patchMessageTemplate
+  summary: Edit a message template
+  description: Edits a template as a new version, the old ones kept, with no second approval; a notice already sent keeps its own words. Placeholders are checked against the event's variables (`placeholder_unknown`); `notifications.template.versioned`. `configuration:write`.
+  tags: *a2
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: What changes.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/configuration/MessageTemplateUpdate.yaml
+  responses:
+    "200":
+      description: The template, its new version.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/MessageTemplate.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: No such template (`not_found`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

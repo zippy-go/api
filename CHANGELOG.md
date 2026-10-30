@@ -6,6 +6,64 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-10-30
+
+Step 10, configuration: a Partner's edition and the platform's configuration. Written as
+0.33.0, a placeholder: step 10's platform slices take
+0.33.0 to 0.35.0 in merge order, and this slice is renumbered then. Additive only.
+
+### Added
+
+- A Partner's edition (`Configuration` tag): the catalogue of modules (`ModuleCode`:
+  delivery, pickup, dine-in, subscriptions, field services, promotions, loyalty, inventory,
+  own fleet and developer) with the Service each needs, the lowest plan that includes it and its
+  add-on price (`GET /v1/platform/modules`, `PUT .../modules/{module}`, `ModuleCatalogue`,
+  `ModuleDefinition`); a Partner's modules with their state and who switched them on
+  (`GET /v1/partners/{partner_id}/modules`, `PUT .../modules/{module}`, `PartnerModules`,
+  `PartnerModule`, `ModuleState`), staff switching one off through a proposal.
+- Usage, plans and billing (`Billing` tag): a month's usage counted once per event with what each
+  unit costs (`GET /v1/partners/{partner_id}/usage`, `PartnerUsage`, `UsageLine`, `UsageKind`);
+  the plans with their versioned prices, modules, limits and add-ons (`GET /v1/platform/plans`,
+  `PUT .../plans/{plan}/price` through a proposal, `PlanCatalogue`, `PlanDefinition`,
+  `PlanPriceVersion`, `PlanLimits`, `PlanAddOn`); the monthly invoice with GST apart, its
+  credit notes and its payment (`GET /v1/partners/{partner_id}/invoices`, `GET .../{invoice_id}`,
+  its PDF at `.../document`, `POST .../payments`, `GET`, `PUT .../billing`,
+  `GET /v1/platform/invoices`, `POST .../invoices/{invoice_id}/credit-notes`, `Invoice`,
+  `InvoiceSummary`, `InvoiceList`, `InvoiceLine`, `InvoiceOrderFee`, `InvoiceCreditNote`,
+  `InvoicePaymentRequest`, `InvoicePaymentStarted`, `BillingSettings`, `BillingMethod`).
+- `price`, `modules`, `limits`, `takes_effect_on` and `prorated` on `PlanOffer`, and
+  `price_change` on `PartnerPlan`.
+- Feature flags: the caller's flags evaluated for them, signed in or with a visitor token
+  (`GET /v1/me/flags`, `EvaluatedFlags`); Mission Control's flags and their targeting
+  (`GET /v1/platform/flags`, `GET`, `PATCH .../flags/{flag}`, `Flag`, `FlagTargeting`,
+  `FlagUpdate`, `FlagSubject`), a flag gating payments, payouts or dispatch at 100% through a
+  proposal; `flags.changed` on `broadcast`.
+- Message templates in versions with their registration, placeholders checked against the
+  event's variables, previewed and test-sent (`GET`, `POST /v1/platform/message-templates`,
+  `GET`, `PATCH .../{template_id}`, `GET .../versions`, `POST .../preview`,
+  `POST .../test-send`, `PUT .../enabled`, `MessageTemplate` and its parts).
+- The fee rule in the policy layers: `fee_rule` on `ServicePolicy` and `EffectivePolicy`
+  (`FeeRule`, `FlatFees`), changed through a proposal (202 on `PUT /v1/countries/{alpha2}/policy`).
+- Settings say their `group`, `needs_second_person`, `pending_approval_id` and `ignored`; a
+  retention period changes through a proposal (202 on `PUT /v1/settings/{key}`).
+- The second person's new acts on `POST /v1/platform/approvals`: `change_partner_plan`,
+  `set_plan_price`, `set_fee_rule`, `set_setting`, `switch_module_off`, `set_flag`,
+  `mark_statement_paid`, `create_payout_adjustment` and `credit_wallet`, with their
+  `parameters`, `partner_id`, `subject` (`ApprovalSubject`), `before` and `after`; they expire
+  after 7 days.
+- `bill_deductions` on the payout `Statement` (`StatementBillDeduction`) and on
+  `StatementFigures`: a monthly invoice settled by deduction, a line of its own.
+- Permissions `billing:read`, which the next edition of the default roles gives Owner, and
+  `configuration:write` and `flag:write`, which it gives Mission Control's engineering and admin.
+- Problem types `module_not_enabled`, `module_needs_service`, `invoice_not_payable`,
+  `template_name_taken` and `template_not_registered`; the field code `placeholder_unknown`.
+- Events `configuration.module.switched_on` and `.switched_off`; `configuration.plan.changed`
+  and `.price_announced`; `configuration.invoice.issued`, `.paid`, `.overdue` and `.credited`;
+  `configuration.partner.suspended` and `.restored`; `configuration.flag.changed`;
+  `notifications.template.versioned`; `reference.fee_rule.versioned`; and
+  `access.approval.proposed`, `.approved`, `.refused` and `.expired`, which never leave the
+  platform.
+
 ## [0.29.0] - 2026-10-30
 
 Step 8, tabs: dine-in at a Location's tables. Tables with their codes and

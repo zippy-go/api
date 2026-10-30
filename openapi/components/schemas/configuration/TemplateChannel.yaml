@@ -1,0 +1,10 @@
+type: string
+description: "The channel a template is written for: `push`, `sms`, `whatsapp`, `email` or an in-app `notice`."
+enum:
+  - push
+  - sms
+  - whatsapp
+  - email
+  - notice
+examples:
+  - push

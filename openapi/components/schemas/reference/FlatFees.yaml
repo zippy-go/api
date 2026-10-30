@@ -1,0 +1,40 @@
+type: object
+description: The flat fee per order of the flat fee rule, the `FlatFees` schema, in paise before GST.
+required:
+  - delivery
+  - pickup
+  - tab
+  - occurrence
+  - booking
+properties:
+  delivery:
+    type: integer
+    description: A delivery.
+    examples:
+      - 1500
+  pickup:
+    type: integer
+    description: A pickup.
+    examples:
+      - 500
+  tab:
+    type: integer
+    description: A dine-in tab.
+    examples:
+      - 300
+  occurrence:
+    type: integer
+    description: A subscription occurrence.
+    examples:
+      - 500
+  booking:
+    type: integer
+    description: A booking.
+    examples:
+      - 1000
+examples:
+  - delivery: 1500
+    pickup: 500
+    tab: 300
+    occurrence: 500
+    booking: 1000

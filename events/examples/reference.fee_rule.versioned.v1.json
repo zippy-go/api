@@ -1,0 +1,15 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea013",
+  "type": "reference.fee_rule.versioned",
+  "version": 1,
+  "occurred_at": "2026-11-20T06:30:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "country": "IN",
+    "version": 5,
+    "fee_model": "flat",
+    "approval_id": "019a3d10-2b00-7d00-8a00-00000000ab01",
+    "at": "2026-11-20T06:30:00Z"
+  }
+}

@@ -1,0 +1,23 @@
+type: object
+description: An invoice paid now, the `InvoicePaymentRequest` schema.
+required:
+  - method
+properties:
+  method:
+    type: string
+    enum:
+      - upi
+      - card
+    description: "How: `upi` or `card`, on the simulated provider's page locally."
+    examples:
+      - upi
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the payment page sends the browser back.
+    examples:
+      - null
+examples:
+  - method: upi
+    return_url: null

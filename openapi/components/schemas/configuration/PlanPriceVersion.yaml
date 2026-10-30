@@ -1,0 +1,43 @@
+type: object
+description: "A plan's price as announced, the `PlanPriceVersion` schema: it applies to months starting 30 days or more after its announcement."
+required:
+  - plan
+  - price
+  - applies_from
+  - announced_at
+  - announced_by
+properties:
+  plan:
+    $ref: ../plans/Plan.yaml
+    description: The plan.
+  price:
+    $ref: ../common/Money.yaml
+    description: The monthly price, before GST.
+  applies_from:
+    type: string
+    format: date
+    description: The first month it applies to, its first day.
+    examples:
+      - 2027-01-01
+  announced_at:
+    type: string
+    format: date-time
+    description: When it was announced.
+    examples:
+      - 2026-11-20T06:30:00Z
+  announced_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who announced it, once approved.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a601
+examples:
+  - plan: standard
+    price:
+      minor_units: 249900
+      currency: INR
+    applies_from: 2027-01-01
+    announced_at: 2026-11-20T06:30:00Z
+    announced_by: 019a3d10-2b00-7d00-8a00-00000000a601

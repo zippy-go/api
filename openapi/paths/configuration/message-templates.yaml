@@ -1,0 +1,125 @@
+# Path item for /v1/platform/message-templates. Referenced from openapi.yaml.
+get:
+  operationId: listMessageTemplates
+  summary: List the message templates
+  description: "Every message template by name: per event, channel and locale, with its version and registration. `setting:read`."
+  tags: &a2
+    - Configuration
+  security:
+    - Bearer: []
+  parameters:
+    - name: channel
+      in: query
+      required: false
+      description: Only this channel's.
+      schema:
+        $ref: ../../components/schemas/configuration/TemplateChannel.yaml
+    - name: event_type
+      in: query
+      required: false
+      description: Only this event's.
+      schema:
+        type: string
+      example: ordering.order.accepted
+    - name: enabled
+      in: query
+      required: false
+      description: Only enabled ones, or only withdrawn ones.
+      schema:
+        type: boolean
+    - name: q
+      in: query
+      required: false
+      description: Words in the name or the body.
+      schema:
+        type: string
+        maxLength: 80
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of templates.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/MessageTemplateList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createMessageTemplate
+  summary: Make a message template
+  description: Makes a template, disabled until enabled; a name taken without regard to case answers `template_name_taken`, a placeholder its event does not provide `validation_failed` with the field code `placeholder_unknown` naming the variables available. `configuration:write`.
+  tags: *a2
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The template.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/configuration/MessageTemplateCreate.yaml
+  responses:
+    "201":
+      description: The template.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/MessageTemplate.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`template_name_taken`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

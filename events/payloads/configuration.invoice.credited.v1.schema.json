@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.invoice.credited.v1.schema.json",
+  "title": "ConfigurationInvoiceCreditedPayload",
+  "description": "Payload of `configuration.invoice.credited` version 1. A credit note was issued. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "invoice_id",
+    "number",
+    "partner_id",
+    "month",
+    "currency",
+    "at",
+    "credit_note_id",
+    "credit_note_number",
+    "amount",
+    "gst"
+  ],
+  "properties": {
+    "invoice_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The invoice."
+    },
+    "number": {
+      "type": "string",
+      "description": "Its number."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "month": {
+      "type": "string",
+      "description": "The month it bills, `YYYY-MM`.",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of every amount.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "credit_note_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The credit note."
+    },
+    "credit_note_number": {
+      "type": "string",
+      "description": "Its number."
+    },
+    "amount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What it credits, before GST, in paise."
+    },
+    "gst": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The GST it credits, in paise."
+    }
+  }
+}

@@ -1,0 +1,78 @@
+type: object
+description: An invoice in a list, the `InvoiceSummary` schema.
+required:
+  - id
+  - number
+  - partner_id
+  - partner_name
+  - month
+  - state
+  - total
+  - outstanding
+  - due_on
+  - issued_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The invoice.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000c901
+  number:
+    type: string
+    description: Its number.
+    examples:
+      - PB-2026-00007
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  partner_name:
+    type: string
+    description: The Partner's name.
+    examples:
+      - ZippyGo Dev Partner
+  month:
+    type: string
+    pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    description: The month it bills.
+    examples:
+      - 2026-11
+  state:
+    $ref: ./InvoiceState.yaml
+    description: Where it stands.
+  total:
+    $ref: ../common/Money.yaml
+    description: What it comes to.
+  outstanding:
+    $ref: ../common/Money.yaml
+    description: What remains.
+  due_on:
+    type: string
+    format: date
+    description: When it is due.
+    examples:
+      - 2026-12-16
+  issued_at:
+    type: string
+    format: date-time
+    description: When it was issued.
+    examples:
+      - 2026-12-01T00:30:00Z
+examples:
+  - id: 019a3d10-2b00-7d00-8a00-00000000c901
+    number: PB-2026-00007
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    partner_name: ZippyGo Dev Partner
+    month: 2026-11
+    state: issued
+    total:
+      minor_units: 589882
+      currency: INR
+    outstanding:
+      minor_units: 589882
+      currency: INR
+    due_on: 2026-12-16
+    issued_at: 2026-12-01T00:30:00Z

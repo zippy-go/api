@@ -1,0 +1,18 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea012",
+  "type": "notifications.template.versioned",
+  "version": 1,
+  "occurred_at": "2026-11-20T06:30:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "template_id": "019a3d10-2b00-7d00-8a00-00000000ba01",
+    "name": "order.accepted",
+    "channel": "push",
+    "locale": "en-IN",
+    "event_type": "ordering.order.accepted",
+    "version": 2,
+    "user_id": "019a3d10-2b00-7d00-8a00-00000000a601",
+    "at": "2026-11-20T06:30:00Z"
+  }
+}

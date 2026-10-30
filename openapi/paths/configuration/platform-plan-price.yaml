@@ -1,0 +1,52 @@
+# Path item for /v1/platform/plans/{plan}/price. Referenced from openapi.yaml.
+parameters:
+  - name: plan
+    in: path
+    required: true
+    description: The plan.
+    schema:
+      $ref: ../../components/schemas/plans/Plan.yaml
+    example: standard
+put:
+  operationId: proposePlanPrice
+  summary: Propose a plan's price
+  description: Proposes a plan's new monthly price. Once a different platform member approves it, it is announced (`configuration.plan.price_announced`) and applies to months starting 30 days or more after; every Partner on the plan is told on its plan page and by email. `configuration:write`.
+  tags:
+    - Billing
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The price and why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/configuration/PlanPriceUpdate.yaml
+  responses:
+    "202":
+      description: "The price waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

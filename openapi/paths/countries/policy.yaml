@@ -1,4 +1,3 @@
-# Path item for /v1/countries/{alpha2}/policy. Referenced from openapi.yaml.
 parameters:
   - name: alpha2
     in: path
@@ -16,31 +15,31 @@ get:
   security:
     - Bearer: []
   responses:
-    '200':
+    "200":
       description: The layer; version 0 when never set
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/reference/PolicyLayer.yaml
-    '401':
+    "401":
       description: No valid token
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: '`access_denied`: a Mission Control token without `city:read`'
+    "403":
+      description: "`access_denied`: a Mission Control token without `city:read`"
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: Unknown country
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store is unavailable
       content:
         application/problem+json:
@@ -61,7 +60,7 @@ get:
 put:
   operationId: putCountryPolicy
   summary: Saves a new version of the country's service policy layer
-  description: Saves a new version of the country's service policy layer; platform staff.
+  description: "Saves a new version of the country's service policy layer; platform staff. A change of its `fee_rule` waits for a second person: it is proposed (`set_fee_rule`) and answers 202 with the proposal, the rest of the layer unchanged."
   tags:
     - Countries
   security:
@@ -74,37 +73,43 @@ put:
         schema:
           $ref: ../../components/schemas/reference/ServicePolicy.yaml
   responses:
-    '200':
+    "200":
       description: The layer as saved
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/reference/PolicyLayer.yaml
-    '400':
+    "202":
+      description: "A fee rule waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
+    "400":
       description: Malformed body or invalid fields
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '401':
+    "401":
       description: No valid token
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: 'Not platform staff, or `access_denied` without `city:write`'
+    "403":
+      description: Not platform staff, or `access_denied` without `city:write`
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: Unknown country
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store is unavailable
       content:
         application/problem+json:

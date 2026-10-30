@@ -1,0 +1,15 @@
+type: string
+description: "A unit a module produces, counted per Partner and calendar month on its clock, once per event: `delivery_orders`, `pickup_orders`, `dine_in_tabs`, `subscription_occurrences`, `bookings`, `active_agents` (Agents with a duty stretch), `api_calls`, `webhook_deliveries`, `sms_messages` and `whatsapp_messages`. Clients must tolerate values they do not know."
+enum:
+  - delivery_orders
+  - pickup_orders
+  - dine_in_tabs
+  - subscription_occurrences
+  - bookings
+  - active_agents
+  - api_calls
+  - webhook_deliveries
+  - sms_messages
+  - whatsapp_messages
+examples:
+  - delivery_orders

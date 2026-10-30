@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/notifications.template.versioned.v1.schema.json",
+  "title": "NotificationsTemplateVersionedPayload",
+  "description": "Payload of `notifications.template.versioned` version 1. A message template has a new version. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "template_id",
+    "name",
+    "channel",
+    "locale",
+    "event_type",
+    "version",
+    "user_id",
+    "at"
+  ],
+  "properties": {
+    "template_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The template."
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name."
+    },
+    "channel": {
+      "type": "string",
+      "description": "Its channel.",
+      "enum": [
+        "push",
+        "sms",
+        "whatsapp",
+        "email",
+        "notice"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "description": "Its locale."
+    },
+    "event_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The event it tells."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The new version."
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who made it; `null` for the seed."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

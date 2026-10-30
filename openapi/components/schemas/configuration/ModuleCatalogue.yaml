@@ -1,0 +1,20 @@
+type: object
+description: The catalogue of modules, the `ModuleCatalogue` schema, in the console's order.
+required:
+  - modules
+properties:
+  modules:
+    type: array
+    items:
+      $ref: ./ModuleDefinition.yaml
+    description: The modules.
+examples:
+  - modules:
+      - module: subscriptions
+        name: Subscriptions
+        description: Daily and weekly plans customers subscribe to, generated each day at the cutoff.
+        needs: product_sales
+        included_from: standard
+        add_on_price: null
+        offered: true
+        flag: null

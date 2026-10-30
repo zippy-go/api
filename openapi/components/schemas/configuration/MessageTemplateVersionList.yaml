@@ -1,0 +1,18 @@
+type: object
+description: A template's versions, newest first, the `MessageTemplateVersionList` schema.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./MessageTemplateVersion.yaml
+    description: The versions.
+examples:
+  - items:
+      - version: 1
+        title: Your order is accepted
+        body: "{store} accepted order {number}; it will be ready by {ready_time}."
+        created_at: 2026-10-30T00:00:00Z
+        created_by: null
+        used: true

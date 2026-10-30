@@ -1,5 +1,5 @@
 type: object
-description: 'A four-eyes proposal: an act on a platform membership that a different platform member must approve before it runs. It expires undecided after seventy-two hours and is voided when what it names changes first.'
+description: "A four-eyes proposal: an act that a different platform member holding `approval:decide` must approve before it runs, shown with what it changes before and after. An act on a platform membership expires undecided after seventy-two hours, an act of step 10 after seven days; a proposal is voided when what it names changes first."
 required:
   - id
   - action
@@ -10,6 +10,10 @@ required:
   - expires_at
   - status
   - sole_decider
+  - subject
+  - partner_id
+  - before
+  - after
 properties:
   id:
     type: string
@@ -21,7 +25,7 @@ properties:
   membership_id:
     type: string
     format: uuid
-    description: The platform membership the act is about.
+    description: The platform membership the act is about; for an act of step 10, which is about a Partner, a price, a rule, a setting, a flag, a statement or a Wallet, the proposer's own.
   parameters:
     description: "The act's parameters, frozen when proposed: `role_id` for a grant, `grant_id` for a revocation, nothing else for the other acts."
   proposed_by:
@@ -41,29 +45,52 @@ properties:
     description: Where the proposal stands.
   sole_decider:
     type: boolean
-    description: '`true` when it ran at once because no other platform member could decide it; the audit log says so.'
+    description: "`true` when it ran at once because no other platform member could decide it; the audit log says so."
   decided_at:
     type:
       - string
-      - 'null'
+      - "null"
     format: date-time
     description: When it was decided; `null` while pending.
   decided_by:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
     description: The platform member who decided it; `null` while pending.
   decision_reason:
     type:
       - string
-      - 'null'
+      - "null"
     description: Why, as the decider said.
   reason:
     type:
       - string
-      - 'null'
+      - "null"
     description: Why, as the proposer said.
+  subject:
+    oneOf:
+      - $ref: ./ApprovalSubject.yaml
+      - type: "null"
+    description: What an act of step 10 is about; `null` for an act on a membership.
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner the act is about, when it is about one.
+  before:
+    type:
+      - object
+      - "null"
+    description: What the act changes, as it stands when proposed; `null` for an act on a membership.
+    additionalProperties: true
+  after:
+    type:
+      - object
+      - "null"
+    description: What it will be once approved.
+    additionalProperties: true
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a80
     action: grant_platform_role
@@ -79,3 +106,7 @@ examples:
     decided_by: null
     decision_reason: null
     reason: Joins the finance team on Monday
+    subject: null
+    partner_id: null
+    before: null
+    after: null

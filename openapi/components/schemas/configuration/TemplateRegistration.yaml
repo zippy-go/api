@@ -1,0 +1,9 @@
+type: string
+description: "Where a template stands with its rail: `not_needed` (push, email, notice), `pending`, `approved` or `rejected` (an SMS template's DLT registration, a stand-in locally until DLT registration exists). A template not approved where approval is needed cannot be enabled."
+enum:
+  - not_needed
+  - pending
+  - approved
+  - rejected
+examples:
+  - not_needed

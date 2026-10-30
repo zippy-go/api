@@ -1,0 +1,45 @@
+type: object
+description: "A fee rule, the `FeeRule` schema: the `commission` the country's policy takes of each order (India's 12% since step 1), or `flat` fees per order with the marketplace fee only on orders the marketplace originated. Changed only with a second person; each order carries the version it was placed under."
+required:
+  - model
+  - flat_fees
+  - marketplace_fee_percent
+  - marketplace_fee_cap
+properties:
+  model:
+    type: string
+    enum:
+      - commission
+      - flat
+    description: The rule.
+    examples:
+      - commission
+  flat_fees:
+    oneOf:
+      - $ref: ./FlatFees.yaml
+      - type: "null"
+    description: The flat fee per order, for the `flat` rule.
+  marketplace_fee_percent:
+    type:
+      - number
+      - "null"
+    description: The marketplace fee, a percentage of a marketplace basket, for the `flat` rule.
+    examples:
+      - 8
+  marketplace_fee_cap:
+    type:
+      - integer
+      - "null"
+    description: The marketplace fee's cap, in paise.
+    examples:
+      - 4000
+examples:
+  - model: commission
+    flat_fees:
+      delivery: 1500
+      pickup: 500
+      tab: 300
+      occurrence: 500
+      booking: 1000
+    marketplace_fee_percent: 8
+    marketplace_fee_cap: 4000

@@ -1,0 +1,8 @@
+type: string
+description: "Who a flag's percentage and lists are about: `partner`, `location` or `customer`."
+enum:
+  - partner
+  - location
+  - customer
+examples:
+  - customer

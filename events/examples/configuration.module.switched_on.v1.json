@@ -1,0 +1,16 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea001",
+  "type": "configuration.module.switched_on",
+  "version": 1,
+  "occurred_at": "2026-11-03T05:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "module": "subscriptions",
+    "by": "owner",
+    "user_id": "019a3d10-2b00-7d00-8a00-00000000a601",
+    "approval_id": null,
+    "at": "2026-11-03T05:30:00Z"
+  }
+}

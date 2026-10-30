@@ -2072,3 +2072,138 @@ events:
       A table was removed; its code stops opening tabs. Consumers: the floor.
     payload_schema: ./payloads/dining.table.removed.v1.schema.json
     example: ./examples/dining.table.removed.v1.json
+  - type: configuration.module.switched_on
+    version: 1
+    domain: configuration
+    description: >-
+      A module was switched on for a Partner: by its owner, by staff on its behalf, by a plan that includes it, or by billing restoring it. Consumers: the consoles and the Partner app (through `modules.changed`), analytics.
+    payload_schema: ./payloads/configuration.module.switched_on.v1.schema.json
+    example: ./examples/configuration.module.switched_on.v1.json
+
+  - type: configuration.module.switched_off
+    version: 1
+    domain: configuration
+    description: >-
+      A module was switched off for a Partner: by its owner, by staff after a second person's approval, by a plan that lacks it, by the trial ending or by billing suspending it. What was already placed in it still completes. Consumers: the consoles and the Partner app (through `modules.changed`), analytics.
+    payload_schema: ./payloads/configuration.module.switched_off.v1.schema.json
+    example: ./examples/configuration.module.switched_off.v1.json
+
+  - type: configuration.plan.changed
+    version: 1
+    domain: configuration
+    description: >-
+      A Partner's plan changed: an upgrade at once with the month prorated, a downgrade at the month's end, a move at once by staff after a second person's approval, or the trial ending. Consumers: the module switches, billing, payouts' limits, analytics.
+    payload_schema: ./payloads/configuration.plan.changed.v1.schema.json
+    example: ./examples/configuration.plan.changed.v1.json
+
+  - type: configuration.plan.price_announced
+    version: 1
+    domain: configuration
+    description: >-
+      A plan's new price was announced once a second person approved it; it applies to months starting 30 days or more after. Names no Partner. Consumers: the plan pages, the emails to the plan's Partners.
+    payload_schema: ./payloads/configuration.plan.price_announced.v1.schema.json
+    example: ./examples/configuration.plan.price_announced.v1.json
+
+  - type: configuration.invoice.issued
+    version: 1
+    domain: configuration
+    description: >-
+      A Partner's monthly invoice was issued, on the 1st at 06:00 India time for the month before. Consumers: payouts (an invoice paid by deduction becomes a line of the next statement), notifications, the ledger.
+    payload_schema: ./payloads/configuration.invoice.issued.v1.schema.json
+    example: ./examples/configuration.invoice.issued.v1.json
+
+  - type: configuration.invoice.paid
+    version: 1
+    domain: configuration
+    description: >-
+      A monthly invoice was paid: by deduction on a payout statement, or by UPI or card from the provider's word. Consumers: billing restoring a suspended Partner, the ledger.
+    payload_schema: ./payloads/configuration.invoice.paid.v1.schema.json
+    example: ./examples/configuration.invoice.paid.v1.json
+
+  - type: configuration.invoice.overdue
+    version: 1
+    domain: configuration
+    description: >-
+      A monthly invoice passed its due day unpaid; its paid modules are suspended on `suspends_on`, after a warning 7 days before. Consumers: notifications.
+    payload_schema: ./payloads/configuration.invoice.overdue.v1.schema.json
+    example: ./examples/configuration.invoice.overdue.v1.json
+
+  - type: configuration.invoice.credited
+    version: 1
+    domain: configuration
+    description: >-
+      A credit note was issued against a monthly invoice, which never changes once issued. Consumers: payouts, the ledger.
+    payload_schema: ./payloads/configuration.invoice.credited.v1.schema.json
+    example: ./examples/configuration.invoice.credited.v1.json
+
+  - type: configuration.partner.suspended
+    version: 1
+    domain: configuration
+    description: >-
+      A Partner's paid modules were suspended for an invoice unpaid 15 days after it was due; orders already placed still complete and Starter keeps working. Consumers: the consoles, notifications.
+    payload_schema: ./payloads/configuration.partner.suspended.v1.schema.json
+    example: ./examples/configuration.partner.suspended.v1.json
+
+  - type: configuration.partner.restored
+    version: 1
+    domain: configuration
+    description: >-
+      A suspended Partner's modules were restored once what it owed was paid. Consumers: the consoles, notifications.
+    payload_schema: ./payloads/configuration.partner.restored.v1.schema.json
+    example: ./examples/configuration.partner.restored.v1.json
+
+  - type: configuration.flag.changed
+    version: 1
+    domain: configuration
+    description: >-
+      A feature flag's targeting changed; every instance applies it within 30 seconds and clients read their flags again on `flags.changed`. Names no Partner. Consumers: every instance's flag cache.
+    payload_schema: ./payloads/configuration.flag.changed.v1.schema.json
+    example: ./examples/configuration.flag.changed.v1.json
+
+  - type: notifications.template.versioned
+    version: 1
+    domain: notifications
+    description: >-
+      A message template was made or edited as a new version; the messages rendered after it record the version. Names no Partner. Consumers: every instance's template cache, analytics.
+    payload_schema: ./payloads/notifications.template.versioned.v1.schema.json
+    example: ./examples/notifications.template.versioned.v1.json
+
+  - type: reference.fee_rule.versioned
+    version: 1
+    domain: reference
+    description: >-
+      A country's fee rule changed once a second person approved it: the commission, or the flat fees per order and the marketplace fee. Orders placed after carry the new version; names no Partner. Consumers: the ledger and payouts, which settle whichever rule an order carries.
+    payload_schema: ./payloads/reference.fee_rule.versioned.v1.schema.json
+    example: ./examples/reference.fee_rule.versioned.v1.json
+
+  - type: access.approval.proposed
+    version: 1
+    domain: access
+    description: >-
+      An act needing a second person was proposed: a platform role, a plan changed at once, a price, a fee rule, a retention period, a module switched off by staff, a flag gating payments, payouts or dispatch at 100%, a statement marked paid by hand, a payout adjustment or a Wallet credit over ₹2,000.00. Never offered to webhooks. Consumers: Mission Control's approvals, notifications to the members who may decide.
+    payload_schema: ./payloads/access.approval.proposed.v1.schema.json
+    example: ./examples/access.approval.proposed.v1.json
+
+  - type: access.approval.approved
+    version: 1
+    domain: access
+    description: >-
+      A proposal was approved by a different platform member and the act ran. Never offered to webhooks. Consumers: the module that runs the act, the audit trail.
+    payload_schema: ./payloads/access.approval.approved.v1.schema.json
+    example: ./examples/access.approval.approved.v1.json
+
+  - type: access.approval.refused
+    version: 1
+    domain: access
+    description: >-
+      A proposal was refused by a different platform member; nothing changed. Never offered to webhooks.
+    payload_schema: ./payloads/access.approval.refused.v1.schema.json
+    example: ./examples/access.approval.refused.v1.json
+
+  - type: access.approval.expired
+    version: 1
+    domain: access
+    description: >-
+      A proposal expired undecided; nothing changed. Never offered to webhooks.
+    payload_schema: ./payloads/access.approval.expired.v1.schema.json
+    example: ./examples/access.approval.expired.v1.json

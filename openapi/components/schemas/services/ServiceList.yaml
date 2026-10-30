@@ -1,5 +1,5 @@
 type: object
-description: 'The registry of a partner, the response of `GET /v1/partners/{partner_id}/services`: its services, where every kind stands for it, and its plan.'
+description: "The registry of a partner, the response of `GET /v1/partners/{partner_id}/services`: its services, where every kind stands for it, and its plan."
 required:
   - items
   - kinds
@@ -14,7 +14,7 @@ properties:
     type: array
     items:
       $ref: ./KindAvailability.yaml
-    description: 'Every kind and where it stands for the Partner: enabled, awaiting documents, disabled, available, or not in the plan with the plan that includes it.'
+    description: "Every kind and where it stands for the Partner: enabled, awaiting documents, disabled, available, or not in the plan with the plan that includes it."
   plan:
     $ref: ../plans/PlanOffer.yaml
     description: The plan in force, with the kinds it includes.
@@ -92,3 +92,25 @@ examples:
         - field_service
         - delivery
       platform_fleet: true
+      price:
+        minor_units: 499900
+        currency: INR
+      modules:
+        - delivery
+        - pickup
+        - promotions
+        - loyalty
+        - subscriptions
+        - inventory
+        - own_fleet
+        - dine_in
+        - field_services
+        - developer
+      limits:
+        locations: 50
+        staff: 200
+        agents: 500
+        api_keys: 20
+        webhook_endpoints: 10
+      takes_effect_on: null
+      prorated: null

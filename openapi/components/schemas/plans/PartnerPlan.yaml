@@ -4,6 +4,7 @@ required:
   - current
   - plan_after_trial
   - plans
+  - price_change
 properties:
   current:
     $ref: ./PlanOffer.yaml
@@ -19,13 +20,18 @@ properties:
   scheduled:
     oneOf:
       - $ref: ./ScheduledPlanChange.yaml
-      - type: 'null'
+      - type: "null"
     description: A change platform staff scheduled.
   trial:
     oneOf:
       - $ref: ./PlanTrial.yaml
-      - type: 'null'
+      - type: "null"
     description: The Pro trial, once the Partner has had one.
+  price_change:
+    oneOf:
+      - $ref: ../configuration/PlanPriceVersion.yaml
+      - type: "null"
+    description: A new price announced for the Partner's plan, with the month it applies from; `null` when none.
 examples:
   - current:
       plan: pro
@@ -36,6 +42,28 @@ examples:
         - field_service
         - delivery
       platform_fleet: true
+      price:
+        minor_units: 499900
+        currency: INR
+      modules: &a1
+        - delivery
+        - pickup
+        - promotions
+        - loyalty
+        - subscriptions
+        - inventory
+        - own_fleet
+        - dine_in
+        - field_services
+        - developer
+      limits: &a2
+        locations: 50
+        staff: 200
+        agents: 500
+        api_keys: 20
+        webhook_endpoints: 10
+      takes_effect_on: null
+      prorated: null
     trial:
       ends_at: 2026-11-14T09:00:00Z
       then: standard
@@ -49,6 +77,20 @@ examples:
         kinds:
           - product_sales
         platform_fleet: false
+        price:
+          minor_units: 0
+          currency: INR
+        modules:
+          - delivery
+          - pickup
+        limits:
+          locations: 1
+          staff: 3
+          agents: 5
+          api_keys: 0
+          webhook_endpoints: 0
+        takes_effect_on: 2026-12-01
+        prorated: null
       - plan: standard
         label: Standard
         monthly_fee: 199900
@@ -57,6 +99,25 @@ examples:
           - field_service
           - delivery
         platform_fleet: true
+        price:
+          minor_units: 199900
+          currency: INR
+        modules:
+          - delivery
+          - pickup
+          - promotions
+          - loyalty
+          - subscriptions
+          - inventory
+          - own_fleet
+        limits:
+          locations: 5
+          staff: 20
+          agents: 50
+          api_keys: 5
+          webhook_endpoints: 5
+        takes_effect_on: 2026-12-01
+        prorated: null
       - plan: pro
         label: Pro
         monthly_fee: 499900
@@ -65,3 +126,11 @@ examples:
           - field_service
           - delivery
         platform_fleet: true
+        price:
+          minor_units: 499900
+          currency: INR
+        modules: *a1
+        limits: *a2
+        takes_effect_on: null
+        prorated: null
+    price_change: null

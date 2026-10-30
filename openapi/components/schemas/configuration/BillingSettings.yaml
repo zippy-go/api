@@ -1,0 +1,30 @@
+type: object
+description: How a Partner pays its monthly invoices, the `BillingSettings` schema.
+required:
+  - method
+  - updated_at
+  - updated_by
+properties:
+  method:
+    $ref: ./BillingMethod.yaml
+    description: How.
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was last chosen; `null` for the default.
+    examples:
+      - null
+  updated_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who chose it.
+    examples:
+      - null
+examples:
+  - method: deduction
+    updated_at: null
+    updated_by: null

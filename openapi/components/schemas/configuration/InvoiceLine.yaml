@@ -1,0 +1,38 @@
+type: object
+description: A line of the monthly invoice, the `InvoiceLine` schema.
+required:
+  - kind
+  - description
+  - quantity
+  - unit_price
+  - amount
+properties:
+  kind:
+    $ref: ./InvoiceLineKind.yaml
+    description: What it is.
+  description:
+    type: string
+    description: What it is, in words.
+    examples:
+      - Pro plan, November 2026
+  quantity:
+    type: integer
+    description: How many.
+    examples:
+      - 1
+  unit_price:
+    $ref: ../common/Money.yaml
+    description: One, before GST.
+  amount:
+    $ref: ../common/Money.yaml
+    description: The line, before GST.
+examples:
+  - kind: plan
+    description: Pro plan, November 2026
+    quantity: 1
+    unit_price:
+      minor_units: 499900
+      currency: INR
+    amount:
+      minor_units: 499900
+      currency: INR

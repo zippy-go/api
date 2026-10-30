@@ -1,0 +1,35 @@
+type: object
+description: "A monthly invoice settled on a payout statement by deduction, the `StatementBillDeduction` schema: a line of its own."
+required:
+  - invoice_id
+  - number
+  - month
+  - amount
+properties:
+  invoice_id:
+    type: string
+    format: uuid
+    description: The invoice.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000c901
+  number:
+    type: string
+    description: Its number.
+    examples:
+      - PB-2026-00007
+  month:
+    type: string
+    pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    description: The month it bills.
+    examples:
+      - 2026-11
+  amount:
+    $ref: ../common/Money.yaml
+    description: What the statement deducts, GST included.
+examples:
+  - invoice_id: 019a3d10-2b00-7d00-8a00-00000000c901
+    number: PB-2026-00007
+    month: 2026-11
+    amount:
+      minor_units: 589882
+      currency: INR

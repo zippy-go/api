@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.29.0
+  version: 0.33.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -298,6 +298,11 @@ tags:
 
   - name: Kitchen
     description: "The kitchen display (step 8): a ticket for every order to prepare, from an accepted delivery or pickup with every course fired and from a dine-in round with its first course fired and the later ones held; courses from the catalogue and the Location's stations; fire, ready, serve, decline and bump, as marks sent alone or queued while offline, applied by the moment each was made so the later stands; the changes after a cursor, so a display keeps working without the network. Read with `order:read`, marked with `order:manage`, set with `location:write` at the Location."
+
+  - name: Configuration
+    description: "A Partner's edition and the platform's configuration (step 10): the catalogue of modules and the modules a Partner's plan includes and its owner switches on, the API refusing a call into a module that is off; feature flags declared in code, targeted by percentage, Partner, Location or customer, evaluated on the server and in force within 30 seconds; every message as a versioned template with its registration, placeholders checked, previewed and test-sent."
+  - name: Billing
+    description: "Plans and the billing of Partners (step 10): the plans with their versioned prices and limits, a month's usage counted once per event, the monthly invoice with GST apart, its credit notes, its payment by deduction from the payout statement, UPI or card, and suspension for non-payment."
 
 paths:
   /v1/health:
@@ -1611,6 +1616,53 @@ paths:
     $ref: ./paths/tabs/platform-tabs.yaml
   /v1/platform/tabs/{tab_id}:
     $ref: ./paths/tabs/platform-tab.yaml
+  # Step 10 configuration: modules, usage, plans, invoices, flags and message templates
+  /v1/partners/{partner_id}/modules:
+    $ref: ./paths/configuration/partner-modules.yaml
+  /v1/partners/{partner_id}/modules/{module}:
+    $ref: ./paths/configuration/partner-module.yaml
+  /v1/partners/{partner_id}/usage:
+    $ref: ./paths/configuration/partner-usage.yaml
+  /v1/partners/{partner_id}/invoices:
+    $ref: ./paths/configuration/partner-invoices.yaml
+  /v1/partners/{partner_id}/invoices/{invoice_id}:
+    $ref: ./paths/configuration/partner-invoice.yaml
+  /v1/partners/{partner_id}/invoices/{invoice_id}/document:
+    $ref: ./paths/configuration/partner-invoice-document.yaml
+  /v1/partners/{partner_id}/invoices/{invoice_id}/payments:
+    $ref: ./paths/configuration/partner-invoice-payments.yaml
+  /v1/partners/{partner_id}/billing:
+    $ref: ./paths/configuration/partner-billing.yaml
+  /v1/me/flags:
+    $ref: ./paths/configuration/me-flags.yaml
+  /v1/platform/modules:
+    $ref: ./paths/configuration/platform-modules.yaml
+  /v1/platform/modules/{module}:
+    $ref: ./paths/configuration/platform-module.yaml
+  /v1/platform/plans:
+    $ref: ./paths/configuration/platform-plans.yaml
+  /v1/platform/plans/{plan}/price:
+    $ref: ./paths/configuration/platform-plan-price.yaml
+  /v1/platform/invoices:
+    $ref: ./paths/configuration/platform-invoices.yaml
+  /v1/platform/invoices/{invoice_id}/credit-notes:
+    $ref: ./paths/configuration/platform-invoice-credit-notes.yaml
+  /v1/platform/flags:
+    $ref: ./paths/configuration/platform-flags.yaml
+  /v1/platform/flags/{flag}:
+    $ref: ./paths/configuration/platform-flag.yaml
+  /v1/platform/message-templates:
+    $ref: ./paths/configuration/message-templates.yaml
+  /v1/platform/message-templates/{template_id}:
+    $ref: ./paths/configuration/message-template.yaml
+  /v1/platform/message-templates/{template_id}/versions:
+    $ref: ./paths/configuration/message-template-versions.yaml
+  /v1/platform/message-templates/{template_id}/preview:
+    $ref: ./paths/configuration/message-template-preview.yaml
+  /v1/platform/message-templates/{template_id}/test-send:
+    $ref: ./paths/configuration/message-template-test-send.yaml
+  /v1/platform/message-templates/{template_id}/enabled:
+    $ref: ./paths/configuration/message-template-enabled.yaml
 
 components:
   securitySchemes:
@@ -4530,3 +4582,113 @@ components:
       $ref: ./components/schemas/tabs/CustomerTabPage.yaml
     PlatformTabPage:
       $ref: ./components/schemas/tabs/PlatformTabPage.yaml
+    ModuleCode:
+      $ref: ./components/schemas/configuration/ModuleCode.yaml
+    ModuleState:
+      $ref: ./components/schemas/configuration/ModuleState.yaml
+    ModuleDefinition:
+      $ref: ./components/schemas/configuration/ModuleDefinition.yaml
+    ModuleCatalogue:
+      $ref: ./components/schemas/configuration/ModuleCatalogue.yaml
+    ModuleDefinitionUpdate:
+      $ref: ./components/schemas/configuration/ModuleDefinitionUpdate.yaml
+    PartnerModule:
+      $ref: ./components/schemas/configuration/PartnerModule.yaml
+    PartnerModules:
+      $ref: ./components/schemas/configuration/PartnerModules.yaml
+    PartnerModuleSwitch:
+      $ref: ./components/schemas/configuration/PartnerModuleSwitch.yaml
+    UsageKind:
+      $ref: ./components/schemas/configuration/UsageKind.yaml
+    UsageLine:
+      $ref: ./components/schemas/configuration/UsageLine.yaml
+    PartnerUsage:
+      $ref: ./components/schemas/configuration/PartnerUsage.yaml
+    PlanLimits:
+      $ref: ./components/schemas/configuration/PlanLimits.yaml
+    PlanPriceVersion:
+      $ref: ./components/schemas/configuration/PlanPriceVersion.yaml
+    PlanAddOn:
+      $ref: ./components/schemas/configuration/PlanAddOn.yaml
+    PlanDefinition:
+      $ref: ./components/schemas/configuration/PlanDefinition.yaml
+    PlanCatalogue:
+      $ref: ./components/schemas/configuration/PlanCatalogue.yaml
+    PlanPriceUpdate:
+      $ref: ./components/schemas/configuration/PlanPriceUpdate.yaml
+    InvoiceState:
+      $ref: ./components/schemas/configuration/InvoiceState.yaml
+    InvoiceLineKind:
+      $ref: ./components/schemas/configuration/InvoiceLineKind.yaml
+    BillingMethod:
+      $ref: ./components/schemas/configuration/BillingMethod.yaml
+    InvoiceLine:
+      $ref: ./components/schemas/configuration/InvoiceLine.yaml
+    InvoiceOrderFee:
+      $ref: ./components/schemas/configuration/InvoiceOrderFee.yaml
+    InvoiceCreditNote:
+      $ref: ./components/schemas/configuration/InvoiceCreditNote.yaml
+    InvoiceCreditNoteCreate:
+      $ref: ./components/schemas/configuration/InvoiceCreditNoteCreate.yaml
+    Invoice:
+      $ref: ./components/schemas/configuration/Invoice.yaml
+    InvoiceSummary:
+      $ref: ./components/schemas/configuration/InvoiceSummary.yaml
+    InvoiceList:
+      $ref: ./components/schemas/configuration/InvoiceList.yaml
+    InvoicePaymentRequest:
+      $ref: ./components/schemas/configuration/InvoicePaymentRequest.yaml
+    InvoicePaymentStarted:
+      $ref: ./components/schemas/configuration/InvoicePaymentStarted.yaml
+    BillingSettings:
+      $ref: ./components/schemas/configuration/BillingSettings.yaml
+    BillingSettingsUpdate:
+      $ref: ./components/schemas/configuration/BillingSettingsUpdate.yaml
+    FlagSubject:
+      $ref: ./components/schemas/configuration/FlagSubject.yaml
+    FlagTarget:
+      $ref: ./components/schemas/configuration/FlagTarget.yaml
+    FlagTargeting:
+      $ref: ./components/schemas/configuration/FlagTargeting.yaml
+    Flag:
+      $ref: ./components/schemas/configuration/Flag.yaml
+    FlagList:
+      $ref: ./components/schemas/configuration/FlagList.yaml
+    FlagUpdate:
+      $ref: ./components/schemas/configuration/FlagUpdate.yaml
+    EvaluatedFlag:
+      $ref: ./components/schemas/configuration/EvaluatedFlag.yaml
+    EvaluatedFlags:
+      $ref: ./components/schemas/configuration/EvaluatedFlags.yaml
+    TemplateChannel:
+      $ref: ./components/schemas/configuration/TemplateChannel.yaml
+    TemplateRegistration:
+      $ref: ./components/schemas/configuration/TemplateRegistration.yaml
+    MessageTemplate:
+      $ref: ./components/schemas/configuration/MessageTemplate.yaml
+    MessageTemplateList:
+      $ref: ./components/schemas/configuration/MessageTemplateList.yaml
+    MessageTemplateCreate:
+      $ref: ./components/schemas/configuration/MessageTemplateCreate.yaml
+    MessageTemplateUpdate:
+      $ref: ./components/schemas/configuration/MessageTemplateUpdate.yaml
+    MessageTemplateVersion:
+      $ref: ./components/schemas/configuration/MessageTemplateVersion.yaml
+    MessageTemplateVersionList:
+      $ref: ./components/schemas/configuration/MessageTemplateVersionList.yaml
+    MessageTemplatePreviewRequest:
+      $ref: ./components/schemas/configuration/MessageTemplatePreviewRequest.yaml
+    MessageTemplatePreview:
+      $ref: ./components/schemas/configuration/MessageTemplatePreview.yaml
+    MessageTemplateTestSent:
+      $ref: ./components/schemas/configuration/MessageTemplateTestSent.yaml
+    MessageTemplateEnabled:
+      $ref: ./components/schemas/configuration/MessageTemplateEnabled.yaml
+    FlatFees:
+      $ref: ./components/schemas/reference/FlatFees.yaml
+    FeeRule:
+      $ref: ./components/schemas/reference/FeeRule.yaml
+    ApprovalSubject:
+      $ref: ./components/schemas/oversight/ApprovalSubject.yaml
+    StatementBillDeduction:
+      $ref: ./components/schemas/payouts/StatementBillDeduction.yaml

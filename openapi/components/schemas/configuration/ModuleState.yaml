@@ -1,0 +1,10 @@
+type: string
+description: "Where a module stands for a Partner: `enabled` (its pages show and its operations answer), `available` (the plan includes it and its service is on: an owner may switch it on), `upgrade_required` (a higher plan, or the add-on, includes it), `not_applicable` (it needs a Service the Partner has not enabled) or `suspended` (switched off for an invoice unpaid)."
+enum:
+  - enabled
+  - available
+  - upgrade_required
+  - not_applicable
+  - suspended
+examples:
+  - enabled

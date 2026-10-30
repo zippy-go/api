@@ -2270,7 +2270,7 @@ export type PictureUpdate = {
 export type Plan = 'starter' | 'standard' | 'pro';
 
 /**
- * One of the plans as offered, the `PlanOffer` schema.
+ * One of the plans as offered, the `PlanOffer` schema: its price in force, its modules and limits, and for a plan the Partner is not on, the day a change to it would take effect and what the rest of the month costs.
  */
 export type PlanOffer = {
     /**
@@ -2293,6 +2293,26 @@ export type PlanOffer = {
      * Whether its stores may use the platform fleet.
      */
     platform_fleet: boolean;
+    /**
+     * Its monthly price in force, before GST; `monthly_fee` in paise says the same.
+     */
+    price: Money;
+    /**
+     * The modules it includes.
+     */
+    modules: Array<ModuleCode>;
+    /**
+     * What it allows.
+     */
+    limits: PlanLimits;
+    /**
+     * For a plan the Partner is not on, the day a change to it takes effect: today for an upgrade, the 1st of next month for a downgrade; `null` for the plan in force.
+     */
+    takes_effect_on: string | null;
+    /**
+     * For an upgrade, what the rest of this month costs on it before GST; `null` otherwise.
+     */
+    prorated: Money | null;
 };
 
 /**
@@ -2319,6 +2339,10 @@ export type PartnerPlan = {
      * The Pro trial, once the Partner has had one.
      */
     trial?: PlanTrial | null;
+    /**
+     * A new price announced for the Partner's plan, with the month it applies from; `null` when none.
+     */
+    price_change: PlanPriceVersion | null;
 };
 
 /**
@@ -4082,7 +4106,7 @@ export type TeamMemberUpdate = {
 };
 
 /**
- * A four-eyes proposal: an act on a platform membership that a different platform member must approve before it runs. It expires undecided after seventy-two hours and is voided when what it names changes first.
+ * A four-eyes proposal: an act that a different platform member holding `approval:decide` must approve before it runs, shown with what it changes before and after. An act on a platform membership expires undecided after seventy-two hours, an act of step 10 after seven days; a proposal is voided when what it names changes first.
  */
 export type Approval = {
     /**
@@ -4094,7 +4118,7 @@ export type Approval = {
      */
     action: ApprovalAction;
     /**
-     * The platform membership the act is about.
+     * The platform membership the act is about; for an act of step 10, which is about a Partner, a price, a rule, a setting, a flag, a statement or a Wallet, the proposer's own.
      */
     membership_id: string;
     /**
@@ -4137,15 +4161,35 @@ export type Approval = {
      * Why, as the proposer said.
      */
     reason?: string | null;
+    /**
+     * What an act of step 10 is about; `null` for an act on a membership.
+     */
+    subject: ApprovalSubject | null;
+    /**
+     * The Partner the act is about, when it is about one.
+     */
+    partner_id: string | null;
+    /**
+     * What the act changes, as it stands when proposed; `null` for an act on a membership.
+     */
+    before: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * What it will be once approved.
+     */
+    after: {
+        [key: string]: unknown;
+    } | null;
 };
 
 /**
- * An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member. Clients must tolerate values they do not know.
+ * An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member; and since step 10 a Partner's plan changed at once (`change_partner_plan`), a plan's price (`set_plan_price`), a country's fee rule (`set_fee_rule`), a retention period (`set_setting`), a module switched off on a Partner's behalf (`switch_module_off`), a flag gating payments, payouts or dispatch taken to 100% (`set_flag`), a statement marked paid by hand (`mark_statement_paid`), a payout adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`). Clients must tolerate values they do not know.
  */
-export type ApprovalAction = 'grant_platform_role' | 'revoke_platform_role' | 'reset_platform_two_step' | 'disable_platform_member';
+export type ApprovalAction = 'grant_platform_role' | 'revoke_platform_role' | 'reset_platform_two_step' | 'disable_platform_member' | 'change_partner_plan' | 'set_plan_price' | 'set_fee_rule' | 'set_setting' | 'switch_module_off' | 'set_flag' | 'mark_statement_paid' | 'create_payout_adjustment' | 'credit_wallet';
 
 /**
- * The request body of `POST /v1/platform/approvals`: the act, the platform membership it is about and its parameters.
+ * The request body of `POST /v1/platform/approvals`: the act, what it is about and its parameters. An act on a platform membership names `membership_id`; the acts of step 10 name their parameters.
  */
 export type ApprovalCreate = {
     /**
@@ -4153,9 +4197,9 @@ export type ApprovalCreate = {
      */
     action: ApprovalAction;
     /**
-     * The platform membership the act is about.
+     * The platform membership the act is about, for the acts on a membership.
      */
-    membership_id: string;
+    membership_id?: string;
     /**
      * For `revoke_platform_role`: the grant to revoke.
      */
@@ -4168,6 +4212,16 @@ export type ApprovalCreate = {
      * For `grant_platform_role`: the platform role to grant.
      */
     role_id?: string | null;
+    /**
+     * The Partner the act is about: `change_partner_plan`, `switch_module_off`, `mark_statement_paid`, `create_payout_adjustment`.
+     */
+    partner_id?: string | null;
+    /**
+     * The parameters of a step 10 act, checked and frozen when proposed: `plan` and `at_once` for `change_partner_plan`; `plan` and `price` for `set_plan_price`; `country` and `fee_rule` for `set_fee_rule`; `key` and `value` for `set_setting`; `module` for `switch_module_off`; `flag` and the flag's update for `set_flag`; `statement_id` and `reference` for `mark_statement_paid`; the adjustment for `create_payout_adjustment`; `customer_id`, `amount` and `reason` for `credit_wallet`.
+     */
+    parameters?: {
+        [key: string]: unknown;
+    };
 };
 
 /**
@@ -8066,6 +8120,10 @@ export type EffectivePolicy = {
      * The small order fee.
      */
     small_order_fee?: SourcedAmount | null;
+    /**
+     * The fee rule in force, with the layer it came from in `chain`; `null` reads as the commission.
+     */
+    fee_rule?: FeeRule | null;
 };
 
 /**
@@ -8746,6 +8804,10 @@ export type ServicePolicy = {
      * Fee charged below the minimum instead of refusal, in minor units.
      */
     small_order_fee?: number | null;
+    /**
+     * The fee rule its orders carry: India's commission until the founder answers the fee model, or flat fees with the marketplace fee. Set only through a proposal a second person approves; absent inherits.
+     */
+    fee_rule?: FeeRule | null;
 };
 
 /**
@@ -9006,6 +9068,22 @@ export type Setting = {
      * The value in force: the override when one is stored and in range, else the default.
      */
     value: number;
+    /**
+     * Its group: `codes`, `ordering`, `preparation`, `retention`, `display` and the groups of earlier steps (`reference`, `notifications`, `dispatch` and the rest).
+     */
+    group: string;
+    /**
+     * Whether a change waits for a second person: the retention periods.
+     */
+    needs_second_person: boolean;
+    /**
+     * A change proposed and waiting for its second person.
+     */
+    pending_approval_id: string | null;
+    /**
+     * Whether the stored value falls outside this build's bounds, so the default is in force and the page shows the stored value as ignored.
+     */
+    ignored: boolean;
 };
 
 /**
@@ -9696,8 +9774,7 @@ export type Signal = {
      * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
      * `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
      * `duty.changed`, `agent.changed`, `delivery.changed` (on the dispatch board channels, subject
-     * `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject
-     * `offer`, its status).
+     * `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject `offer`, its status) and, since step 10, `flags.changed` (on `broadcast`, subject `flag` with its name: read `GET /v1/me/flags` again).
      */
     kind: string;
     /**
@@ -22901,6 +22978,10 @@ export type StatementFigures = {
      * What the Partner paid towards reward campaigns: its share of the rewards granted on the Location's orders, less what was taken back. Absent before step 6; nothing when there were none.
      */
     rewards?: Money;
+    /**
+     * Monthly invoices of the platform settled on this statement by deduction (since step 10).
+     */
+    bill_deductions: Money;
 };
 
 /**
@@ -23715,6 +23796,10 @@ export type Statement = {
      * "Rewards you paid for": each reward campaign the Partner paid towards in the week, with its grants on the Location's orders and the Partner's share; they add up to `figures.rewards`, which the total takes off.
      */
     rewards?: Array<StatementRewardRow>;
+    /**
+     * Monthly invoices of the platform it settles by deduction, a line each (since step 10).
+     */
+    bill_deductions: Array<StatementBillDeduction>;
 };
 
 /**
@@ -35251,6 +35336,1193 @@ export type PlatformTabPage = {
 };
 
 /**
+ * A module of the platform, the unit a Partner's edition is made of: `delivery` and `pickup` (product sales delivered or collected), `dine_in` (tables, tabs, the floor, the kitchen display and reservations), `subscriptions`, `field_services` (bookings), `promotions`, `loyalty` (reward campaigns), `inventory`, `own_fleet` (the Partner's own Agents delivering) and `developer` (API keys and webhooks). Clients must tolerate values they do not know.
+ */
+export type ModuleCode = 'delivery' | 'pickup' | 'dine_in' | 'subscriptions' | 'field_services' | 'promotions' | 'loyalty' | 'inventory' | 'own_fleet' | 'developer';
+
+/**
+ * Where a module stands for a Partner: `enabled` (its pages show and its operations answer), `available` (the plan includes it and its service is on: an owner may switch it on), `upgrade_required` (a higher plan, or the add-on, includes it), `not_applicable` (it needs a Service the Partner has not enabled) or `suspended` (switched off for an invoice unpaid).
+ */
+export type ModuleState = 'enabled' | 'available' | 'upgrade_required' | 'not_applicable' | 'suspended';
+
+/**
+ * A module of the catalogue, the `ModuleDefinition` schema: what it is, the Service it needs, the lowest plan that includes it and its add-on price where it can be bought apart.
+ */
+export type ModuleDefinition = {
+    /**
+     * The module.
+     */
+    module: ModuleCode;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it does, a sentence.
+     */
+    description: string;
+    /**
+     * The kind of Service it needs on; `null` for none.
+     */
+    needs: ServiceKind | null;
+    /**
+     * The lowest plan that includes it.
+     */
+    included_from: Plan;
+    /**
+     * Its monthly price as an add-on to a plan that does not include it, before GST; `null` when it is not sold apart.
+     */
+    add_on_price: Money | null;
+    /**
+     * Whether the platform offers it at all; a module withdrawn is off for every Partner.
+     */
+    offered: boolean;
+    /**
+     * The feature flag it ships behind, when one gates it.
+     */
+    flag: string | null;
+};
+
+/**
+ * The catalogue of modules, the `ModuleCatalogue` schema, in the console's order.
+ */
+export type ModuleCatalogue = {
+    /**
+     * The modules.
+     */
+    modules: Array<ModuleDefinition>;
+};
+
+/**
+ * A module of the catalogue offered or withdrawn, the `ModuleDefinitionUpdate` schema.
+ */
+export type ModuleDefinitionUpdate = {
+    /**
+     * Offered, or withdrawn from every Partner.
+     */
+    offered: boolean;
+    /**
+     * Why, for the audit log.
+     */
+    reason: string;
+};
+
+/**
+ * A module as one Partner has it, the `PartnerModule` schema: its state, why, and who switched it on.
+ */
+export type PartnerModule = {
+    /**
+     * The module.
+     */
+    module: ModuleCode;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Where it stands for the Partner.
+     */
+    state: ModuleState;
+    /**
+     * The lowest plan that includes it.
+     */
+    included_from: Plan;
+    /**
+     * Its monthly price as an add-on, before GST, when the Partner's plan does not include it but it is sold apart.
+     */
+    add_on_price: Money | null;
+    /**
+     * Whether the Partner bought it as an add-on.
+     */
+    add_on: boolean;
+    /**
+     * The kind of Service it needs on; `null` for none.
+     */
+    needs: ServiceKind | null;
+    /**
+     * When it was switched on; `null` while off.
+     */
+    switched_on_at: string | null;
+    /**
+     * Who switched it on: an owner, or platform staff on the Partner's behalf.
+     */
+    switched_on_by: string | null;
+    /**
+     * Its state in a sentence the console shows as it is.
+     */
+    words: string;
+};
+
+/**
+ * A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel.
+ */
+export type PartnerModules = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The plan in force.
+     */
+    plan: Plan;
+    /**
+     * Whether its paid modules are suspended for an invoice unpaid.
+     */
+    suspended: boolean;
+    /**
+     * Every module of the catalogue, in its order.
+     */
+    modules: Array<PartnerModule>;
+};
+
+/**
+ * A module switched on or off, the `PartnerModuleSwitch` schema.
+ */
+export type PartnerModuleSwitch = {
+    /**
+     * On, or off. What was placed in a module switched off still completes.
+     */
+    on: boolean;
+    /**
+     * Why, for the audit log; required of platform staff acting on the Partner's behalf.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A unit a module produces, counted per Partner and calendar month on its clock, once per event: `delivery_orders`, `pickup_orders`, `dine_in_tabs`, `subscription_occurrences`, `bookings`, `active_agents` (Agents with a duty stretch), `api_calls`, `webhook_deliveries`, `sms_messages` and `whatsapp_messages`. Clients must tolerate values they do not know.
+ */
+export type UsageKind = 'delivery_orders' | 'pickup_orders' | 'dine_in_tabs' | 'subscription_occurrences' | 'bookings' | 'active_agents' | 'api_calls' | 'webhook_deliveries' | 'sms_messages' | 'whatsapp_messages';
+
+/**
+ * One kind of unit of a month, the `UsageLine` schema, with what each will cost under the rule in force.
+ */
+export type UsageLine = {
+    /**
+     * The unit.
+     */
+    kind: UsageKind;
+    /**
+     * Its name.
+     */
+    label: string;
+    /**
+     * How many so far.
+     */
+    count: number;
+    /**
+     * What one costs under the rule in force, before GST: an order's fee, a message's pass-through; `null` when it costs nothing.
+     */
+    unit_fee: Money | null;
+    /**
+     * What they cost so far, before GST; `null` when nothing.
+     */
+    amount: Money | null;
+    /**
+     * Where it is paid: `weekly` on the payout statement (an order's fees), `invoice` on the monthly invoice (messages), or `free`.
+     */
+    settled: 'weekly' | 'invoice' | 'free';
+    /**
+     * The line in a sentence.
+     */
+    words: string;
+};
+
+/**
+ * A Partner's usage of a calendar month on its clock, the `PartnerUsage` schema.
+ */
+export type PartnerUsage = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The month, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * The clock the month is counted on.
+     */
+    time_zone: string;
+    /**
+     * The fee rule its orders carry: `commission` (a percentage of each order, as since step 5) or `flat` (a flat fee per order and the marketplace fee).
+     */
+    fee_rule: 'commission' | 'flat';
+    /**
+     * Each unit counted.
+     */
+    lines: Array<UsageLine>;
+    /**
+     * What the month's invoice comes to so far before GST: the plan, the add-ons and the messages.
+     */
+    invoice_estimate: Money;
+    /**
+     * When it was counted up to.
+     */
+    counted_at: string;
+};
+
+/**
+ * What a plan allows, the `PlanLimits` schema.
+ */
+export type PlanLimits = {
+    /**
+     * Locations.
+     */
+    locations: number;
+    /**
+     * Staff members.
+     */
+    staff: number;
+    /**
+     * Agents.
+     */
+    agents: number;
+    /**
+     * API keys per environment.
+     */
+    api_keys: number;
+    /**
+     * Webhook endpoints per environment.
+     */
+    webhook_endpoints: number;
+};
+
+/**
+ * A plan's price as announced, the `PlanPriceVersion` schema: it applies to months starting 30 days or more after its announcement.
+ */
+export type PlanPriceVersion = {
+    /**
+     * The plan.
+     */
+    plan: Plan;
+    /**
+     * The monthly price, before GST.
+     */
+    price: Money;
+    /**
+     * The first month it applies to, its first day.
+     */
+    applies_from: string;
+    /**
+     * When it was announced.
+     */
+    announced_at: string;
+    /**
+     * Who announced it, once approved.
+     */
+    announced_by: string | null;
+};
+
+/**
+ * A module a plan sells apart, the `PlanAddOn` schema.
+ */
+export type PlanAddOn = {
+    /**
+     * The module.
+     */
+    module: ModuleCode;
+    /**
+     * Its monthly price, before GST.
+     */
+    price: Money;
+};
+
+/**
+ * A plan as the platform keeps it, the `PlanDefinition` schema: its price in force and any announced, its modules, its limits and its add-ons.
+ */
+export type PlanDefinition = {
+    /**
+     * The plan.
+     */
+    plan: Plan;
+    /**
+     * Its name.
+     */
+    label: string;
+    /**
+     * The monthly price in force, before GST.
+     */
+    price: Money;
+    /**
+     * A price announced and not yet in force.
+     */
+    next_price: PlanPriceVersion | null;
+    /**
+     * The modules it includes.
+     */
+    modules: Array<ModuleCode>;
+    /**
+     * What it allows.
+     */
+    limits: PlanLimits;
+    /**
+     * The modules it sells apart.
+     */
+    add_ons: Array<PlanAddOn>;
+    /**
+     * How many Partners are on it.
+     */
+    partners: number;
+};
+
+/**
+ * The plans, the `PlanCatalogue` schema, cheapest first.
+ */
+export type PlanCatalogue = {
+    /**
+     * The plans.
+     */
+    plans: Array<PlanDefinition>;
+};
+
+/**
+ * A plan's new price proposed, the `PlanPriceUpdate` schema: a second person approves it, and it applies to months starting 30 days or more after.
+ */
+export type PlanPriceUpdate = {
+    /**
+     * The monthly price, before GST.
+     */
+    price: Money;
+    /**
+     * Why, shown to whoever decides and kept in the audit log.
+     */
+    reason: string;
+};
+
+/**
+ * Where a monthly invoice stands: `issued` (due in 15 days), `paid`, `overdue` (past its due day; the paid modules are suspended 15 days after, after a warning 7 days before) or `credited` (credit notes cover it whole). An invoice never changes once issued; a correction is a credit note.
+ */
+export type InvoiceState = 'issued' | 'paid' | 'overdue' | 'credited';
+
+/**
+ * A line of the monthly invoice: the `plan` for the month, a `plan_change` prorated, an `add_on`, the `sms` and `whatsapp` pass-through.
+ */
+export type InvoiceLineKind = 'plan' | 'plan_change' | 'add_on' | 'sms' | 'whatsapp';
+
+/**
+ * How a Partner pays its monthly invoices: by `deduction` from the next payout statement (the default), or by `upi` or `card` on the payment page.
+ */
+export type BillingMethod = 'deduction' | 'upi' | 'card';
+
+/**
+ * A line of the monthly invoice, the `InvoiceLine` schema.
+ */
+export type InvoiceLine = {
+    /**
+     * What it is.
+     */
+    kind: InvoiceLineKind;
+    /**
+     * What it is, in words.
+     */
+    description: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * One, before GST.
+     */
+    unit_price: Money;
+    /**
+     * The line, before GST.
+     */
+    amount: Money;
+};
+
+/**
+ * An order fee of the month, already settled weekly on the payout statements and listed on the invoice for reference, the `InvoiceOrderFee` schema.
+ */
+export type InvoiceOrderFee = {
+    /**
+     * The unit.
+     */
+    kind: UsageKind;
+    /**
+     * How many.
+     */
+    count: number;
+    /**
+     * What they came to, before GST.
+     */
+    amount: Money;
+};
+
+/**
+ * A credit note against an invoice, the `InvoiceCreditNote` schema, numbered in the invoices' sequence.
+ */
+export type InvoiceCreditNote = {
+    /**
+     * The credit note.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * What it credits, before GST.
+     */
+    amount: Money;
+    /**
+     * The GST it credits.
+     */
+    gst: Money;
+    /**
+     * Why.
+     */
+    reason: string;
+    /**
+     * When.
+     */
+    issued_at: string;
+    /**
+     * Who issued it.
+     */
+    issued_by: string;
+};
+
+/**
+ * A credit note issued against an invoice, the `InvoiceCreditNoteCreate` schema: at most what the invoice still carries.
+ */
+export type InvoiceCreditNoteCreate = {
+    /**
+     * What it credits, before GST.
+     */
+    amount: Money;
+    /**
+     * Why, printed on it.
+     */
+    reason: string;
+};
+
+/**
+ * A Partner's monthly invoice, the `Invoice` schema: its lines with GST at 18% apart, the month's order fees already settled weekly for reference, how it is paid and its credit notes. It never changes once issued.
+ */
+export type Invoice = {
+    /**
+     * The invoice.
+     */
+    id: string;
+    /**
+     * Its number, one counter a calendar year.
+     */
+    number: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's legal name.
+     */
+    partner_name: string;
+    /**
+     * The Partner's GSTIN, where given.
+     */
+    partner_gstin: string | null;
+    /**
+     * The platform's GSTIN.
+     */
+    platform_gstin: string;
+    /**
+     * The month it bills, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * When it was issued: the 1st at 06:00 India time for the month before.
+     */
+    issued_at: string;
+    /**
+     * When it is due, 15 days after.
+     */
+    due_on: string;
+    /**
+     * Where it stands.
+     */
+    state: InvoiceState;
+    /**
+     * Its lines.
+     */
+    lines: Array<InvoiceLine>;
+    /**
+     * The lines, before GST.
+     */
+    subtotal: Money;
+    /**
+     * The GST rate.
+     */
+    gst_rate_percent: number;
+    /**
+     * The GST, apart.
+     */
+    gst: Money;
+    /**
+     * What it comes to.
+     */
+    total: Money;
+    /**
+     * What credit notes took off, GST included.
+     */
+    credited: Money;
+    /**
+     * What was paid.
+     */
+    paid: Money;
+    /**
+     * What remains.
+     */
+    outstanding: Money;
+    /**
+     * How it is paid.
+     */
+    method: BillingMethod;
+    /**
+     * When it was paid.
+     */
+    paid_at: string | null;
+    /**
+     * The payment's reference.
+     */
+    payment_reference: string | null;
+    /**
+     * The payout statement that settled it by deduction.
+     */
+    statement_id: string | null;
+    /**
+     * The month's order fees, already settled weekly, for reference.
+     */
+    order_fees: Array<InvoiceOrderFee>;
+    /**
+     * Its credit notes.
+     */
+    credit_notes: Array<InvoiceCreditNote>;
+    /**
+     * Its PDF.
+     */
+    document_url: string;
+};
+
+/**
+ * An invoice in a list, the `InvoiceSummary` schema.
+ */
+export type InvoiceSummary = {
+    /**
+     * The invoice.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string;
+    /**
+     * The month it bills.
+     */
+    month: string;
+    /**
+     * Where it stands.
+     */
+    state: InvoiceState;
+    /**
+     * What it comes to.
+     */
+    total: Money;
+    /**
+     * What remains.
+     */
+    outstanding: Money;
+    /**
+     * When it is due.
+     */
+    due_on: string;
+    /**
+     * When it was issued.
+     */
+    issued_at: string;
+};
+
+/**
+ * A page of invoices, newest first, the `InvoiceList` schema.
+ */
+export type InvoiceList = {
+    /**
+     * The invoices.
+     */
+    items: Array<InvoiceSummary>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An invoice paid now, the `InvoicePaymentRequest` schema.
+ */
+export type InvoicePaymentRequest = {
+    /**
+     * How: `upi` or `card`, on the simulated provider's page locally.
+     */
+    method: 'upi' | 'card';
+    /**
+     * Where the payment page sends the browser back.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * An invoice's payment started, the `InvoicePaymentStarted` schema: the invoice reads paid from the provider's word, never from the browser coming back.
+ */
+export type InvoicePaymentStarted = {
+    /**
+     * The invoice.
+     */
+    invoice: Invoice;
+    /**
+     * What is being paid.
+     */
+    amount: Money;
+    /**
+     * What the payer does next.
+     */
+    next_action: PaymentNextAction | null;
+};
+
+/**
+ * How a Partner pays its monthly invoices, the `BillingSettings` schema.
+ */
+export type BillingSettings = {
+    /**
+     * How.
+     */
+    method: BillingMethod;
+    /**
+     * When it was last chosen; `null` for the default.
+     */
+    updated_at: string | null;
+    /**
+     * Who chose it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * How a Partner pays its monthly invoices, as chosen, the `BillingSettingsUpdate` schema.
+ */
+export type BillingSettingsUpdate = {
+    /**
+     * How.
+     */
+    method: BillingMethod;
+};
+
+/**
+ * Who a flag's percentage and lists are about: `partner`, `location` or `customer`.
+ */
+export type FlagSubject = 'partner' | 'location' | 'customer';
+
+/**
+ * One Partner, Location or customer on a flag's list, the `FlagTarget` schema.
+ */
+export type FlagTarget = {
+    /**
+     * Its id.
+     */
+    id: string;
+    /**
+     * Its name as staff read it.
+     */
+    label: string;
+};
+
+/**
+ * How a flag is targeted, the `FlagTargeting` schema: the off list wins, then the on list, then the percentage, from a stable hash of the flag's name and the subject's id, so a growing percentage never turns a subject off.
+ */
+export type FlagTargeting = {
+    /**
+     * What the percentage and lists count.
+     */
+    subject: FlagSubject;
+    /**
+     * The share of subjects on, 0 to 100.
+     */
+    percentage: number;
+    /**
+     * Always on.
+     */
+    on: Array<FlagTarget>;
+    /**
+     * Always off.
+     */
+    off: Array<FlagTarget>;
+    /**
+     * On only for platform staff.
+     */
+    staff_only: boolean;
+};
+
+/**
+ * A feature flag, the `Flag` schema: declared in code with its owner, default and expiry, targeted in Mission Control, evaluated on the server and in force on every instance within 30 seconds.
+ */
+export type Flag = {
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it gates.
+     */
+    description: string;
+    /**
+     * The team that owns it.
+     */
+    owner: string;
+    /**
+     * Its value where nothing targets the subject.
+     */
+    default: boolean;
+    /**
+     * When it should be gone from the code.
+     */
+    expires_on: string;
+    /**
+     * Past its expiry and still in the code; the build warns naming it and its owner.
+     */
+    stale: boolean;
+    /**
+     * What it gates, when changing it to 100% needs a second person: `payments`, `payouts` or `dispatch`.
+     */
+    gates: 'payments' | 'payouts' | 'dispatch' | null;
+    /**
+     * How it is targeted.
+     */
+    targeting: FlagTargeting;
+    /**
+     * Raised on every change; the entity tag.
+     */
+    version: number;
+    /**
+     * When it was last changed.
+     */
+    updated_at: string | null;
+    /**
+     * Who changed it.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * The flags, the `FlagList` schema, by name, the stale first.
+ */
+export type FlagList = {
+    /**
+     * The flags.
+     */
+    items: Array<Flag>;
+};
+
+/**
+ * A flag's targeting changed, the `FlagUpdate` schema: absent members are kept. A flag gating payments, payouts or dispatch taken to 100% waits for a second person.
+ */
+export type FlagUpdate = {
+    /**
+     * What the percentage and lists count.
+     */
+    subject?: FlagSubject;
+    /**
+     * The share of subjects on, 0 to 100.
+     */
+    percentage?: number;
+    /**
+     * Always on, replaced as a whole.
+     */
+    on?: Array<string>;
+    /**
+     * Always off, replaced as a whole.
+     */
+    off?: Array<string>;
+    /**
+     * On only for platform staff.
+     */
+    staff_only?: boolean;
+    /**
+     * Why, for the audit log.
+     */
+    reason: string;
+};
+
+/**
+ * One flag as it reads for the caller, the `EvaluatedFlag` schema: the answer only, never the rules.
+ */
+export type EvaluatedFlag = {
+    /**
+     * The flag.
+     */
+    name: string;
+    /**
+     * Whether it is on for the caller.
+     */
+    on: boolean;
+};
+
+/**
+ * The flags as they read for the caller, the `EvaluatedFlags` schema, read again on `flags.changed` on the `broadcast` channel.
+ */
+export type EvaluatedFlags = {
+    /**
+     * Every flag, evaluated for the caller.
+     */
+    flags: Array<EvaluatedFlag>;
+    /**
+     * When.
+     */
+    evaluated_at: string;
+};
+
+/**
+ * The channel a template is written for: `push`, `sms`, `whatsapp`, `email` or an in-app `notice`.
+ */
+export type TemplateChannel = 'push' | 'sms' | 'whatsapp' | 'email' | 'notice';
+
+/**
+ * Where a template stands with its rail: `not_needed` (push, email, notice), `pending`, `approved` or `rejected` (an SMS template's DLT registration, a stand-in locally until DLT registration exists). A template not approved where approval is needed cannot be enabled.
+ */
+export type TemplateRegistration = 'not_needed' | 'pending' | 'approved' | 'rejected';
+
+/**
+ * A message template, the `MessageTemplate` schema: words with placeholders for one event, channel and locale, kept in versions; a message records the version it was rendered from.
+ */
+export type MessageTemplate = {
+    /**
+     * The template.
+     */
+    id: string;
+    /**
+     * Its name, unique without regard to case.
+     */
+    name: string;
+    /**
+     * The event it tells, whose variables its placeholders must come from; `null` for one sent by hand.
+     */
+    event_type: string | null;
+    /**
+     * Its channel.
+     */
+    channel: TemplateChannel;
+    /**
+     * Its locale; `en-IN` is the fallback.
+     */
+    locale: string;
+    /**
+     * Its title, at most 120 characters; the push title or the email subject.
+     */
+    title: string | null;
+    /**
+     * Its body with `{placeholder}`s: at most 240 characters for a push, 320 for an SMS, 500 for a notice and 10,000 for an email.
+     */
+    body: string;
+    /**
+     * The placeholders it uses.
+     */
+    placeholders: Array<string>;
+    /**
+     * The variables its event provides.
+     */
+    variables: Array<string>;
+    /**
+     * Whether it is sent; a template is withdrawn this way, never deleted once used.
+     */
+    enabled: boolean;
+    /**
+     * Its version, raised by every edit.
+     */
+    version: number;
+    /**
+     * Where it stands with its rail.
+     */
+    registration: TemplateRegistration;
+    /**
+     * An SMS template's DLT template id.
+     */
+    dlt_template_id: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When its last version was made.
+     */
+    updated_at: string;
+    /**
+     * Who made its last version; `null` for the seed.
+     */
+    updated_by: string | null;
+};
+
+/**
+ * A page of message templates by name, the `MessageTemplateList` schema.
+ */
+export type MessageTemplateList = {
+    /**
+     * The templates.
+     */
+    items: Array<MessageTemplate>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A message template made, the `MessageTemplateCreate` schema: its placeholders are checked against its event's variables.
+ */
+export type MessageTemplateCreate = {
+    /**
+     * Its name, at most 80 characters.
+     */
+    name: string;
+    /**
+     * The event it tells; `null` for one sent by hand.
+     */
+    event_type?: string | null;
+    /**
+     * Its channel.
+     */
+    channel: TemplateChannel;
+    /**
+     * Its locale.
+     */
+    locale: string;
+    /**
+     * Its title.
+     */
+    title?: string | null;
+    /**
+     * Its body.
+     */
+    body: string;
+    /**
+     * An SMS template's DLT template id.
+     */
+    dlt_template_id?: string | null;
+};
+
+/**
+ * A message template edited, the `MessageTemplateUpdate` schema: a new version, the old ones kept; absent members are kept.
+ */
+export type MessageTemplateUpdate = {
+    /**
+     * Its title.
+     */
+    title?: string | null;
+    /**
+     * Its body.
+     */
+    body?: string;
+    /**
+     * An SMS template's DLT template id.
+     */
+    dlt_template_id?: string | null;
+    /**
+     * Why, for the audit log.
+     */
+    reason?: string | null;
+};
+
+/**
+ * One version of a message template, the `MessageTemplateVersion` schema.
+ */
+export type MessageTemplateVersion = {
+    /**
+     * The version.
+     */
+    version: number;
+    /**
+     * Its title.
+     */
+    title: string | null;
+    /**
+     * Its body.
+     */
+    body: string;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * Who made it; `null` for the seed.
+     */
+    created_by: string | null;
+    /**
+     * Whether a message was rendered from it.
+     */
+    used: boolean;
+};
+
+/**
+ * A template's versions, newest first, the `MessageTemplateVersionList` schema.
+ */
+export type MessageTemplateVersionList = {
+    /**
+     * The versions.
+     */
+    items: Array<MessageTemplateVersion>;
+};
+
+/**
+ * A template previewed, the `MessageTemplatePreviewRequest` schema: with sample data for its event unless values are given.
+ */
+export type MessageTemplatePreviewRequest = {
+    /**
+     * A value per placeholder; the event's sample data fills the rest.
+     */
+    values?: {
+        [key: string]: string;
+    };
+};
+
+/**
+ * A template rendered with sample data, the `MessageTemplatePreview` schema.
+ */
+export type MessageTemplatePreview = {
+    /**
+     * The title.
+     */
+    title: string | null;
+    /**
+     * The body.
+     */
+    body: string;
+    /**
+     * The body's length, against the channel's limit.
+     */
+    characters: number;
+};
+
+/**
+ * A template test-sent to the editor's own number or address, the `MessageTemplateTestSent` schema: locally the message inbox.
+ */
+export type MessageTemplateTestSent = {
+    /**
+     * The channel.
+     */
+    channel: TemplateChannel;
+    /**
+     * Where, masked.
+     */
+    to: string;
+    /**
+     * The message, in the delivery log.
+     */
+    message_id: string;
+};
+
+/**
+ * A template enabled or withdrawn, the `MessageTemplateEnabled` schema: an SMS template needs its DLT approval first.
+ */
+export type MessageTemplateEnabled = {
+    /**
+     * Enabled, or withdrawn.
+     */
+    enabled: boolean;
+};
+
+/**
+ * The flat fee per order of the flat fee rule, the `FlatFees` schema, in paise before GST.
+ */
+export type FlatFees = {
+    /**
+     * A delivery.
+     */
+    delivery: number;
+    /**
+     * A pickup.
+     */
+    pickup: number;
+    /**
+     * A dine-in tab.
+     */
+    tab: number;
+    /**
+     * A subscription occurrence.
+     */
+    occurrence: number;
+    /**
+     * A booking.
+     */
+    booking: number;
+};
+
+/**
+ * A fee rule, the `FeeRule` schema: the `commission` the country's policy takes of each order (India's 12% since step 1), or `flat` fees per order with the marketplace fee only on orders the marketplace originated. Changed only with a second person; each order carries the version it was placed under.
+ */
+export type FeeRule = {
+    /**
+     * The rule.
+     */
+    model: 'commission' | 'flat';
+    /**
+     * The flat fee per order, for the `flat` rule.
+     */
+    flat_fees: FlatFees | null;
+    /**
+     * The marketplace fee, a percentage of a marketplace basket, for the `flat` rule.
+     */
+    marketplace_fee_percent: number | null;
+    /**
+     * The marketplace fee's cap, in paise.
+     */
+    marketplace_fee_cap: number | null;
+};
+
+/**
+ * What a proposal is about, the `ApprovalSubject` schema, for an act that is not about a platform membership.
+ */
+export type ApprovalSubject = {
+    /**
+     * What it is.
+     */
+    kind: 'partner' | 'plan' | 'fee_rule' | 'setting' | 'flag' | 'module' | 'statement' | 'adjustment' | 'wallet';
+    /**
+     * Its id or key.
+     */
+    id: string;
+    /**
+     * Its name as staff read it.
+     */
+    label: string;
+};
+
+/**
+ * A monthly invoice settled on a payout statement by deduction, the `StatementBillDeduction` schema: a line of its own.
+ */
+export type StatementBillDeduction = {
+    /**
+     * The invoice.
+     */
+    invoice_id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * The month it bills.
+     */
+    month: string;
+    /**
+     * What the statement deducts, GST included.
+     */
+    amount: Money;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -46229,6 +47501,10 @@ export type PutCountryPolicyResponses = {
      * The layer as saved
      */
     200: PolicyLayer;
+    /**
+     * A fee rule waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved.
+     */
+    202: Approval;
 };
 
 export type PutCountryPolicyResponse = PutCountryPolicyResponses[keyof PutCountryPolicyResponses];
@@ -49349,6 +50625,10 @@ export type PutSettingResponses = {
      * The setting after the change
      */
     200: Setting;
+    /**
+     * A retention period waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved.
+     */
+    202: Approval;
 };
 
 export type PutSettingResponse = PutSettingResponses[keyof PutSettingResponses];
@@ -80364,3 +81644,1319 @@ export type GetPlatformTabResponses = {
 };
 
 export type GetPlatformTabResponse = GetPlatformTabResponses[keyof GetPlatformTabResponses];
+
+export type GetPartnerModulesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/modules';
+};
+
+export type GetPartnerModulesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerModulesError = GetPartnerModulesErrors[keyof GetPartnerModulesErrors];
+
+export type GetPartnerModulesResponses = {
+    /**
+     * The modules.
+     */
+    200: PartnerModules;
+};
+
+export type GetPartnerModulesResponse = GetPartnerModulesResponses[keyof GetPartnerModulesResponses];
+
+export type SwitchPartnerModuleData = {
+    /**
+     * On or off, and why.
+     */
+    body: PartnerModuleSwitch;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The module.
+         */
+        module: ModuleCode;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/modules/{module}';
+};
+
+export type SwitchPartnerModuleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `not_in_plan`, naming the plan that includes the module.
+     */
+    403: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `module_needs_service`: the module needs a Service the Partner has not enabled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SwitchPartnerModuleError = SwitchPartnerModuleErrors[keyof SwitchPartnerModuleErrors];
+
+export type SwitchPartnerModuleResponses = {
+    /**
+     * The module as it now stands.
+     */
+    200: PartnerModule;
+    /**
+     * Switching a module off on a Partner's behalf waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved.
+     */
+    202: Approval;
+};
+
+export type SwitchPartnerModuleResponse = SwitchPartnerModuleResponses[keyof SwitchPartnerModuleResponses];
+
+export type GetPartnerUsageData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * The calendar month on the Partner's clock, `YYYY-MM`; this month by default.
+         */
+        month?: string;
+    };
+    url: '/v1/partners/{partner_id}/usage';
+};
+
+export type GetPartnerUsageErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerUsageError = GetPartnerUsageErrors[keyof GetPartnerUsageErrors];
+
+export type GetPartnerUsageResponses = {
+    /**
+     * The month's usage.
+     */
+    200: PartnerUsage;
+};
+
+export type GetPartnerUsageResponse = GetPartnerUsageResponses[keyof GetPartnerUsageResponses];
+
+export type ListPartnerInvoicesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/invoices';
+};
+
+export type ListPartnerInvoicesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPartnerInvoicesError = ListPartnerInvoicesErrors[keyof ListPartnerInvoicesErrors];
+
+export type ListPartnerInvoicesResponses = {
+    /**
+     * A page of invoices.
+     */
+    200: InvoiceList;
+};
+
+export type ListPartnerInvoicesResponse = ListPartnerInvoicesResponses[keyof ListPartnerInvoicesResponses];
+
+export type GetPartnerInvoiceData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The invoice, of the Partner in the path.
+         */
+        invoice_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invoices/{invoice_id}';
+};
+
+export type GetPartnerInvoiceErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * No such invoice of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerInvoiceError = GetPartnerInvoiceErrors[keyof GetPartnerInvoiceErrors];
+
+export type GetPartnerInvoiceResponses = {
+    /**
+     * The invoice.
+     */
+    200: Invoice;
+};
+
+export type GetPartnerInvoiceResponse = GetPartnerInvoiceResponses[keyof GetPartnerInvoiceResponses];
+
+export type GetPartnerInvoiceDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The invoice, of the Partner in the path.
+         */
+        invoice_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invoices/{invoice_id}/document';
+};
+
+export type GetPartnerInvoiceDocumentErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * No such invoice of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerInvoiceDocumentError = GetPartnerInvoiceDocumentErrors[keyof GetPartnerInvoiceDocumentErrors];
+
+export type GetPartnerInvoiceDocumentResponses = {
+    /**
+     * The PDF.
+     */
+    200: Blob | File;
+};
+
+export type GetPartnerInvoiceDocumentResponse = GetPartnerInvoiceDocumentResponses[keyof GetPartnerInvoiceDocumentResponses];
+
+export type PayPartnerInvoiceData = {
+    /**
+     * How it is paid.
+     */
+    body: InvoicePaymentRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The invoice, of the Partner in the path.
+         */
+        invoice_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/invoices/{invoice_id}/payments';
+};
+
+export type PayPartnerInvoiceErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * No such invoice of the Partner (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `invoice_not_payable`: paid, credited, or settled by deduction already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PayPartnerInvoiceError = PayPartnerInvoiceErrors[keyof PayPartnerInvoiceErrors];
+
+export type PayPartnerInvoiceResponses = {
+    /**
+     * The payment started.
+     */
+    201: InvoicePaymentStarted;
+};
+
+export type PayPartnerInvoiceResponse = PayPartnerInvoiceResponses[keyof PayPartnerInvoiceResponses];
+
+export type GetPartnerBillingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/billing';
+};
+
+export type GetPartnerBillingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerBillingError = GetPartnerBillingErrors[keyof GetPartnerBillingErrors];
+
+export type GetPartnerBillingResponses = {
+    /**
+     * How invoices are paid.
+     */
+    200: BillingSettings;
+};
+
+export type GetPartnerBillingResponse = GetPartnerBillingResponses[keyof GetPartnerBillingResponses];
+
+export type PutPartnerBillingData = {
+    /**
+     * How.
+     */
+    body: BillingSettingsUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/billing';
+};
+
+export type PutPartnerBillingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerBillingError = PutPartnerBillingErrors[keyof PutPartnerBillingErrors];
+
+export type PutPartnerBillingResponses = {
+    /**
+     * How invoices are paid now.
+     */
+    200: BillingSettings;
+};
+
+export type PutPartnerBillingResponse = PutPartnerBillingResponses[keyof PutPartnerBillingResponses];
+
+export type GetMyFlagsData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/me/flags';
+};
+
+export type GetMyFlagsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMyFlagsError = GetMyFlagsErrors[keyof GetMyFlagsErrors];
+
+export type GetMyFlagsResponses = {
+    /**
+     * The flags.
+     */
+    200: EvaluatedFlags;
+};
+
+export type GetMyFlagsResponse = GetMyFlagsResponses[keyof GetMyFlagsResponses];
+
+export type ListPlatformModulesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/modules';
+};
+
+export type ListPlatformModulesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformModulesError = ListPlatformModulesErrors[keyof ListPlatformModulesErrors];
+
+export type ListPlatformModulesResponses = {
+    /**
+     * The catalogue.
+     */
+    200: ModuleCatalogue;
+};
+
+export type ListPlatformModulesResponse = ListPlatformModulesResponses[keyof ListPlatformModulesResponses];
+
+export type PutPlatformModuleData = {
+    /**
+     * Offered or withdrawn, and why.
+     */
+    body: ModuleDefinitionUpdate;
+    path: {
+        /**
+         * The module.
+         */
+        module: ModuleCode;
+    };
+    query?: never;
+    url: '/v1/platform/modules/{module}';
+};
+
+export type PutPlatformModuleErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPlatformModuleError = PutPlatformModuleErrors[keyof PutPlatformModuleErrors];
+
+export type PutPlatformModuleResponses = {
+    /**
+     * The module as it now stands.
+     */
+    200: ModuleDefinition;
+};
+
+export type PutPlatformModuleResponse = PutPlatformModuleResponses[keyof PutPlatformModuleResponses];
+
+export type ListPlatformPlansData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/plans';
+};
+
+export type ListPlatformPlansErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformPlansError = ListPlatformPlansErrors[keyof ListPlatformPlansErrors];
+
+export type ListPlatformPlansResponses = {
+    /**
+     * The plans.
+     */
+    200: PlanCatalogue;
+};
+
+export type ListPlatformPlansResponse = ListPlatformPlansResponses[keyof ListPlatformPlansResponses];
+
+export type ProposePlanPriceData = {
+    /**
+     * The price and why.
+     */
+    body: PlanPriceUpdate;
+    path: {
+        /**
+         * The plan.
+         */
+        plan: Plan;
+    };
+    query?: never;
+    url: '/v1/platform/plans/{plan}/price';
+};
+
+export type ProposePlanPriceErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ProposePlanPriceError = ProposePlanPriceErrors[keyof ProposePlanPriceErrors];
+
+export type ProposePlanPriceResponses = {
+    /**
+     * The price waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved.
+     */
+    202: Approval;
+};
+
+export type ProposePlanPriceResponse = ProposePlanPriceResponses[keyof ProposePlanPriceResponses];
+
+export type ListPlatformInvoicesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * Only invoices in this state.
+         */
+        state?: InvoiceState;
+        /**
+         * The calendar month on the Partner's clock, `YYYY-MM`; this month by default.
+         */
+        month?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/invoices';
+};
+
+export type ListPlatformInvoicesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformInvoicesError = ListPlatformInvoicesErrors[keyof ListPlatformInvoicesErrors];
+
+export type ListPlatformInvoicesResponses = {
+    /**
+     * A page of invoices.
+     */
+    200: InvoiceList;
+};
+
+export type ListPlatformInvoicesResponse = ListPlatformInvoicesResponses[keyof ListPlatformInvoicesResponses];
+
+export type CreateInvoiceCreditNoteData = {
+    /**
+     * What it credits and why.
+     */
+    body: InvoiceCreditNoteCreate;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The invoice.
+         */
+        invoice_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/invoices/{invoice_id}/credit-notes';
+};
+
+export type CreateInvoiceCreditNoteErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such invoice (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateInvoiceCreditNoteError = CreateInvoiceCreditNoteErrors[keyof CreateInvoiceCreditNoteErrors];
+
+export type CreateInvoiceCreditNoteResponses = {
+    /**
+     * The credit note.
+     */
+    201: InvoiceCreditNote;
+};
+
+export type CreateInvoiceCreditNoteResponse = CreateInvoiceCreditNoteResponses[keyof CreateInvoiceCreditNoteResponses];
+
+export type ListPlatformFlagsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/flags';
+};
+
+export type ListPlatformFlagsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformFlagsError = ListPlatformFlagsErrors[keyof ListPlatformFlagsErrors];
+
+export type ListPlatformFlagsResponses = {
+    /**
+     * The flags.
+     */
+    200: FlagList;
+};
+
+export type ListPlatformFlagsResponse = ListPlatformFlagsResponses[keyof ListPlatformFlagsResponses];
+
+export type GetPlatformFlagData = {
+    body?: never;
+    path: {
+        /**
+         * The flag's name.
+         */
+        flag: string;
+    };
+    query?: never;
+    url: '/v1/platform/flags/{flag}';
+};
+
+export type GetPlatformFlagErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such flag in code (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformFlagError = GetPlatformFlagErrors[keyof GetPlatformFlagErrors];
+
+export type GetPlatformFlagResponses = {
+    /**
+     * The flag.
+     */
+    200: Flag;
+};
+
+export type GetPlatformFlagResponse = GetPlatformFlagResponses[keyof GetPlatformFlagResponses];
+
+export type PatchPlatformFlagData = {
+    /**
+     * The targeting changed, and why.
+     */
+    body: FlagUpdate;
+    path: {
+        /**
+         * The flag's name.
+         */
+        flag: string;
+    };
+    query?: never;
+    url: '/v1/platform/flags/{flag}';
+};
+
+export type PatchPlatformFlagErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such flag in code (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PatchPlatformFlagError = PatchPlatformFlagErrors[keyof PatchPlatformFlagErrors];
+
+export type PatchPlatformFlagResponses = {
+    /**
+     * The flag as it now stands.
+     */
+    200: Flag;
+    /**
+     * A flag gating payments, payouts or dispatch at 100% waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved.
+     */
+    202: Approval;
+};
+
+export type PatchPlatformFlagResponse = PatchPlatformFlagResponses[keyof PatchPlatformFlagResponses];
+
+export type ListMessageTemplatesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this channel's.
+         */
+        channel?: TemplateChannel;
+        /**
+         * Only this event's.
+         */
+        event_type?: string;
+        /**
+         * Only enabled ones, or only withdrawn ones.
+         */
+        enabled?: boolean;
+        /**
+         * Words in the name or the body.
+         */
+        q?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/message-templates';
+};
+
+export type ListMessageTemplatesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListMessageTemplatesError = ListMessageTemplatesErrors[keyof ListMessageTemplatesErrors];
+
+export type ListMessageTemplatesResponses = {
+    /**
+     * A page of templates.
+     */
+    200: MessageTemplateList;
+};
+
+export type ListMessageTemplatesResponse = ListMessageTemplatesResponses[keyof ListMessageTemplatesResponses];
+
+export type CreateMessageTemplateData = {
+    /**
+     * The template.
+     */
+    body: MessageTemplateCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/message-templates';
+};
+
+export type CreateMessageTemplateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * `template_name_taken`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateMessageTemplateError = CreateMessageTemplateErrors[keyof CreateMessageTemplateErrors];
+
+export type CreateMessageTemplateResponses = {
+    /**
+     * The template.
+     */
+    201: MessageTemplate;
+};
+
+export type CreateMessageTemplateResponse = CreateMessageTemplateResponses[keyof CreateMessageTemplateResponses];
+
+export type GetMessageTemplateData = {
+    body?: never;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}';
+};
+
+export type GetMessageTemplateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetMessageTemplateError = GetMessageTemplateErrors[keyof GetMessageTemplateErrors];
+
+export type GetMessageTemplateResponses = {
+    /**
+     * The template.
+     */
+    200: MessageTemplate;
+};
+
+export type GetMessageTemplateResponse = GetMessageTemplateResponses[keyof GetMessageTemplateResponses];
+
+export type PatchMessageTemplateData = {
+    /**
+     * What changes.
+     */
+    body: MessageTemplateUpdate;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}';
+};
+
+export type PatchMessageTemplateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PatchMessageTemplateError = PatchMessageTemplateErrors[keyof PatchMessageTemplateErrors];
+
+export type PatchMessageTemplateResponses = {
+    /**
+     * The template, its new version.
+     */
+    200: MessageTemplate;
+};
+
+export type PatchMessageTemplateResponse = PatchMessageTemplateResponses[keyof PatchMessageTemplateResponses];
+
+export type ListMessageTemplateVersionsData = {
+    body?: never;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}/versions';
+};
+
+export type ListMessageTemplateVersionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListMessageTemplateVersionsError = ListMessageTemplateVersionsErrors[keyof ListMessageTemplateVersionsErrors];
+
+export type ListMessageTemplateVersionsResponses = {
+    /**
+     * The versions.
+     */
+    200: MessageTemplateVersionList;
+};
+
+export type ListMessageTemplateVersionsResponse = ListMessageTemplateVersionsResponses[keyof ListMessageTemplateVersionsResponses];
+
+export type PreviewMessageTemplateData = {
+    /**
+     * Values for its placeholders, or none for the sample data.
+     */
+    body: MessageTemplatePreviewRequest;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}/preview';
+};
+
+export type PreviewMessageTemplateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PreviewMessageTemplateError = PreviewMessageTemplateErrors[keyof PreviewMessageTemplateErrors];
+
+export type PreviewMessageTemplateResponses = {
+    /**
+     * The words.
+     */
+    200: MessageTemplatePreview;
+};
+
+export type PreviewMessageTemplateResponse = PreviewMessageTemplateResponses[keyof PreviewMessageTemplateResponses];
+
+export type TestSendMessageTemplateData = {
+    body?: never;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}/test-send';
+};
+
+export type TestSendMessageTemplateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `template_not_registered`: an SMS template waits for its DLT approval.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type TestSendMessageTemplateError = TestSendMessageTemplateErrors[keyof TestSendMessageTemplateErrors];
+
+export type TestSendMessageTemplateResponses = {
+    /**
+     * Sent.
+     */
+    200: MessageTemplateTestSent;
+};
+
+export type TestSendMessageTemplateResponse = TestSendMessageTemplateResponses[keyof TestSendMessageTemplateResponses];
+
+export type PutMessageTemplateEnabledData = {
+    /**
+     * Enabled or withdrawn.
+     */
+    body: MessageTemplateEnabled;
+    path: {
+        /**
+         * The template.
+         */
+        template_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/message-templates/{template_id}/enabled';
+};
+
+export type PutMessageTemplateEnabledErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * No such template (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `template_not_registered`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutMessageTemplateEnabledError = PutMessageTemplateEnabledErrors[keyof PutMessageTemplateEnabledErrors];
+
+export type PutMessageTemplateEnabledResponses = {
+    /**
+     * The template.
+     */
+    200: MessageTemplate;
+};
+
+export type PutMessageTemplateEnabledResponse = PutMessageTemplateEnabledResponses[keyof PutMessageTemplateEnabledResponses];

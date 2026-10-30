@@ -1,0 +1,57 @@
+type: object
+description: A credit note against an invoice, the `InvoiceCreditNote` schema, numbered in the invoices' sequence.
+required:
+  - id
+  - number
+  - amount
+  - gst
+  - reason
+  - issued_at
+  - issued_by
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The credit note.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000c951
+  number:
+    type: string
+    description: Its number.
+    examples:
+      - PB-2026-00007-C1
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it credits, before GST.
+  gst:
+    $ref: ../common/Money.yaml
+    description: The GST it credits.
+  reason:
+    type: string
+    description: Why.
+    examples:
+      - Plan billed twice in November
+  issued_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-12-04T06:30:00Z
+  issued_by:
+    type: string
+    format: uuid
+    description: Who issued it.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a601
+examples:
+  - id: 019a3d10-2b00-7d00-8a00-00000000c951
+    number: PB-2026-00007-C1
+    amount:
+      minor_units: 49990
+      currency: INR
+    gst:
+      minor_units: 8998
+      currency: INR
+    reason: Plan billed twice in November
+    issued_at: 2026-12-04T06:30:00Z
+    issued_by: 019a3d10-2b00-7d00-8a00-00000000a601

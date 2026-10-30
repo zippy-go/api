@@ -1,0 +1,17 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea002",
+  "type": "configuration.module.switched_off",
+  "version": 1,
+  "occurred_at": "2026-11-20T06:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "module": "dine_in",
+    "by": "plan",
+    "user_id": null,
+    "approval_id": null,
+    "reason": "Moved to Standard",
+    "at": "2026-11-20T06:30:00Z"
+  }
+}

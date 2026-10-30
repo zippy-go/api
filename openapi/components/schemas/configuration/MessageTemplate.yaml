@@ -1,0 +1,139 @@
+type: object
+description: "A message template, the `MessageTemplate` schema: words with placeholders for one event, channel and locale, kept in versions; a message records the version it was rendered from."
+required:
+  - id
+  - name
+  - event_type
+  - channel
+  - locale
+  - title
+  - body
+  - placeholders
+  - variables
+  - enabled
+  - version
+  - registration
+  - dlt_template_id
+  - created_at
+  - updated_at
+  - updated_by
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The template.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000ba01
+  name:
+    type: string
+    description: Its name, unique without regard to case.
+    examples:
+      - order.accepted
+  event_type:
+    type:
+      - string
+      - "null"
+    description: The event it tells, whose variables its placeholders must come from; `null` for one sent by hand.
+    examples:
+      - ordering.order.accepted
+  channel:
+    $ref: ./TemplateChannel.yaml
+    description: Its channel.
+  locale:
+    type: string
+    description: Its locale; `en-IN` is the fallback.
+    examples:
+      - en-IN
+  title:
+    type:
+      - string
+      - "null"
+    description: Its title, at most 120 characters; the push title or the email subject.
+    examples:
+      - Your order is accepted
+  body:
+    type: string
+    description: "Its body with `{placeholder}`s: at most 240 characters for a push, 320 for an SMS, 500 for a notice and 10,000 for an email."
+    examples:
+      - "{store} accepted order {number}; it will be ready by {ready_time}."
+  placeholders:
+    type: array
+    items:
+      type: string
+      description: A placeholder.
+      examples:
+        - store
+    description: The placeholders it uses.
+  variables:
+    type: array
+    items:
+      type: string
+      description: A variable.
+      examples:
+        - store
+    description: The variables its event provides.
+  enabled:
+    type: boolean
+    description: Whether it is sent; a template is withdrawn this way, never deleted once used.
+    examples:
+      - true
+  version:
+    type: integer
+    description: Its version, raised by every edit.
+    examples:
+      - 2
+  registration:
+    $ref: ./TemplateRegistration.yaml
+    description: Where it stands with its rail.
+  dlt_template_id:
+    type:
+      - string
+      - "null"
+    description: An SMS template's DLT template id.
+    examples:
+      - null
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-30T00:00:00Z
+  updated_at:
+    type: string
+    format: date-time
+    description: When its last version was made.
+    examples:
+      - 2026-11-20T06:30:00Z
+  updated_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who made its last version; `null` for the seed.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a601
+examples:
+  - id: 019a3d10-2b00-7d00-8a00-00000000ba01
+    name: order.accepted
+    event_type: ordering.order.accepted
+    channel: push
+    locale: en-IN
+    title: Your order is accepted
+    body: "{store} accepted order {number}; it will be ready by {ready_time}."
+    placeholders:
+      - store
+      - number
+      - ready_time
+    variables:
+      - store
+      - number
+      - ready_time
+      - total
+      - link
+    enabled: true
+    version: 2
+    registration: not_needed
+    dlt_template_id: null
+    created_at: 2026-10-30T00:00:00Z
+    updated_at: 2026-11-20T06:30:00Z
+    updated_by: 019a3d10-2b00-7d00-8a00-00000000a601

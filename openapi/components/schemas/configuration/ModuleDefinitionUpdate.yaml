@@ -1,0 +1,19 @@
+type: object
+description: A module of the catalogue offered or withdrawn, the `ModuleDefinitionUpdate` schema.
+required:
+  - offered
+  - reason
+properties:
+  offered:
+    type: boolean
+    description: Offered, or withdrawn from every Partner.
+    examples:
+      - true
+  reason:
+    type: string
+    description: Why, for the audit log.
+    examples:
+      - Back after the incident review
+examples:
+  - offered: true
+    reason: Back after the incident review

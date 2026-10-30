@@ -1,0 +1,24 @@
+type: object
+description: An order fee of the month, already settled weekly on the payout statements and listed on the invoice for reference, the `InvoiceOrderFee` schema.
+required:
+  - kind
+  - count
+  - amount
+properties:
+  kind:
+    $ref: ./UsageKind.yaml
+    description: The unit.
+  count:
+    type: integer
+    description: How many.
+    examples:
+      - 412
+  amount:
+    $ref: ../common/Money.yaml
+    description: What they came to, before GST.
+examples:
+  - kind: delivery_orders
+    count: 412
+    amount:
+      minor_units: 618000
+      currency: INR

@@ -1,0 +1,17 @@
+type: object
+description: A module a plan sells apart, the `PlanAddOn` schema.
+required:
+  - module
+  - price
+properties:
+  module:
+    $ref: ./ModuleCode.yaml
+    description: The module.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its monthly price, before GST.
+examples:
+  - module: developer
+    price:
+      minor_units: 99900
+      currency: INR

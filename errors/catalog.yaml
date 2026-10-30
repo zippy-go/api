@@ -22,6 +22,9 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: placeholder_unknown
+        message: "A placeholder must be one of the variables its event provides."
+        description: "A message template's placeholder that its event does not provide; the message names the variables available."
       - code: name_too_long
         message: "A name is 1 to 80 characters."
         description: "An offer's name empty or over 80 characters."
@@ -2394,3 +2397,37 @@ errors:
     message: "The store asks for no card hold."
     retryable: false
     description: "A card hold at a Location that asks for none."
+  - code: module_not_enabled
+    status: 403
+    title: Module not enabled
+    message: "{module} is not enabled for this Partner."
+    retryable: false
+    description: "The call goes into a module that is not enabled for the Partner: its plan lacks it, its owner has not switched it on, its Service is off or it is suspended for an invoice unpaid. The detail names the module."
+
+  - code: module_needs_service
+    status: 409
+    title: Module needs a Service
+    message: "{module} needs a {service} Service: enable one first."
+    retryable: false
+    description: "The module needs a kind of Service the Partner has not enabled, so it cannot be switched on yet."
+
+  - code: invoice_not_payable
+    status: 409
+    title: Invoice not payable
+    message: "Invoice {number} is {state}: there is nothing to pay."
+    retryable: false
+    description: "The invoice is paid, credited whole, or settled by deduction from a payout statement already."
+
+  - code: template_name_taken
+    status: 409
+    title: Template name taken
+    message: "A message template is already named \"{name}\"."
+    retryable: false
+    description: "Another message template has that name, whatever its case."
+
+  - code: template_not_registered
+    status: 409
+    title: Template not registered
+    message: "This SMS template needs DLT approval before it is enabled."
+    retryable: false
+    description: "An SMS template is enabled or test-sent only once its DLT template id is approved; locally a stand-in registers it."

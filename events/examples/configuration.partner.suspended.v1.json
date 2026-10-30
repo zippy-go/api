@@ -1,0 +1,17 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea009",
+  "type": "configuration.partner.suspended",
+  "version": 1,
+  "occurred_at": "2026-12-31T00:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "invoice_id": "019a3d10-2b00-7d00-8a00-00000000c901",
+    "modules": [
+      "subscriptions",
+      "promotions"
+    ],
+    "at": "2026-12-31T00:30:00Z"
+  }
+}
