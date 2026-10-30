@@ -16,6 +16,7 @@
     "fulfilment",
     "currency",
     "at",
+    "total",
     "released_at",
     "accept_by",
     "slot",
@@ -135,6 +136,13 @@
       "description": "When it happened.",
       "examples": [
         "2026-11-06T00:05:00Z"
+      ]
+    },
+    "total": {
+      "type": "integer",
+      "description": "The total, tax included, in minor units: what the store's new-order alert shows.",
+      "examples": [
+        6400
       ]
     },
     "released_at": {

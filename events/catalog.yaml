@@ -1610,6 +1610,14 @@ events:
     payload_schema: ./payloads/subscriptions.occurrence.skipped.v1.schema.json
     example: ./examples/subscriptions.occurrence.skipped.v1.json
 
+  - type: subscriptions.balance.low
+    version: 1
+    domain: subscriptions
+    description: >-
+      The Wallet paying a subscription is short: the day before the cutoff when it does not cover tomorrow's delivery, or after a cutoff when it covers fewer than three upcoming deliveries; told once a day per subscription. Consumers: notifications (the customer: how much to top up and by when).
+    payload_schema: ./payloads/subscriptions.balance.low.v1.schema.json
+    example: ./examples/subscriptions.balance.low.v1.json
+
   - type: subscriptions.occurrence.failed
     version: 1
     domain: subscriptions

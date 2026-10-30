@@ -313,10 +313,11 @@ Additive only.
   `.resumed`, `.cancelled` and `.ended`; `subscriptions.day.changed`;
   `subscriptions.occurrence.generated`, `.skipped`, `.failed` and
   `.completed`; `subscriptions.price.announced`;
-  `subscriptions.statement.ready`; `catalog.plan.published` and
-  `.withdrawn`; `ordering.order.released`; `ordering.order.placed` gains the
-  `slot` and the subscription's `occurrence`. None carries a name, a phone
-  number, an email or an address.
+  `subscriptions.statement.ready`; `subscriptions.balance.low`;
+  `catalog.plan.published` and `.withdrawn`; `ordering.order.released`, with
+  the order's `total` for the store's new-order alert; `ordering.order.placed`
+  gains the `slot` and the subscription's `occurrence`. None carries a name, a
+  phone number, an email or an address.
 
 - The shared taxonomy (`Taxonomy` tag): a Vertical's tree, public, depth first
   with each term's rules and how much maps to it

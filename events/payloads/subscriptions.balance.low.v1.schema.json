@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/subscriptions.balance.low.v1.schema.json",
+  "title": "SubscriptionsBalanceLowPayload",
+  "description": "Payload of `subscriptions.balance.low` version 1. The Wallet paying a subscription is short: the day before the cutoff when it does not cover tomorrow's delivery (`covers_deliveries` 0, with `top_up_by`, the cutoff), or after a cutoff when it covers fewer than three upcoming deliveries. Told once a day per subscription. Consumers: notifications (the customer: how much to top up and by when). Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "subscription_id",
+    "customer_id",
+    "partner_id",
+    "location_id",
+    "date",
+    "amount_needed",
+    "top_up_by",
+    "covers_deliveries",
+    "at"
+  ],
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The subscription.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7201"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000006"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000307"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The next delivery day the warning is about.",
+      "examples": [
+        "2026-11-06"
+      ]
+    },
+    "amount_needed": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "The least top-up that covers it: the next delivery when it is not covered, else three deliveries.",
+      "examples": [
+        {
+          "minor_units": 2400,
+          "currency": "INR"
+        }
+      ]
+    },
+    "top_up_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "The cutoff the top-up must come before, the day before a delivery not covered; `null` for a warning of fewer than three.",
+      "examples": [
+        "2026-11-05T14:30:00Z"
+      ]
+    },
+    "covers_deliveries": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "How many upcoming deliveries the available balance covers: 0, 1 or 2.",
+      "examples": [
+        0
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-05T03:30:00Z"
+      ]
+    }
+  }
+}

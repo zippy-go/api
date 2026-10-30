@@ -17,6 +17,7 @@
     "fulfilment": "delivery",
     "currency": "INR",
     "at": "2026-11-06T00:05:00Z",
+    "total": 6400,
     "released_at": "2026-11-06T00:05:00Z",
     "accept_by": "2026-11-06T00:35:00Z",
     "slot": {
