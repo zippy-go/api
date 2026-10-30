@@ -33,7 +33,10 @@ step 9's bookings slice; renumbered by merge order. Additive only.
   `AgentQualification`, `AgentQualifications`, `AgentQualificationsInput`),
   and `qualifications` on `PartnerAgent` and `AgentMembership`.
 - `shifts_required` on `AgentServiceSettings` and its update; going on duty
-  refused with the blocker `no_shift`; `shift_id` on `AgentDuty`.
+  refused with the blocker `no_shift` (`duty_refused`'s field code
+  `duty_no_shift`); `shift_id` on `AgentDuty`. An Agent off duty on the way
+  to a booked job reports positions that are kept, so the order's customer
+  follows them.
 - The on-site job on the task: `appointment` and `on_site_job` in
   `TaskKind`; `started` and `disputed` in `TaskStatus`; `start`, `count`,
   `not_available` and `dispute` in `TaskStepKind`; `count` and `calls` on
@@ -46,8 +49,7 @@ step 9's bookings slice; renumbered by merge order. Additive only.
   `.removed`; `fleet.qualification.approved` and `.withdrawn`;
   `fleet.task.working` and `fleet.task.disputed`. Every `fleet.task.*`
   payload gains `booking_id`, the laundry `leg` and the new kinds and
-  statuses, and
-  `fleet.task.completed` the pickup's `item_count`.
+  statuses, and `fleet.task.completed` the pickup's `item_count`.
 
 ## [0.29.0] - 2026-10-30
 
