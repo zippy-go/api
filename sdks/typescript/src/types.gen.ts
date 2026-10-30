@@ -2816,6 +2816,10 @@ export type OrderSettings = {
      * Scheduled orders.
      */
     scheduled?: ScheduledOrders;
+    /**
+     * The cutoff the evening before, HH:MM on the store's clock, 18:00 to 21:00; 20:00 by default. A change to a subscription's day counts only before it, and its deliveries are generated then. Since 0.24.0.
+     */
+    subscription_cutoff?: string;
 };
 
 /**
@@ -2842,6 +2846,10 @@ export type OrderSettingsUpdate = {
      * Scheduled orders; slot settings are refused while scheduled orders are not taken.
      */
     scheduled?: ScheduledOrdersUpdate | null;
+    /**
+     * A new cutoff, 18:00 to 21:00 (`subscription_cutoff_invalid`). Since 0.24.0.
+     */
+    subscription_cutoff?: string;
 };
 
 /**
@@ -11328,6 +11336,10 @@ export type StoreCard = {
      * The store's best advertised offer open to everyone and how many more it has; `null` when it runs none.
      */
     offer?: StoreOfferBadge | null;
+    /**
+     * Its live plans, as Daily Essentials' cards show them; empty when it offers none. Since 0.24.0.
+     */
+    plans?: Array<StorePlanCard>;
 };
 
 /**
@@ -16878,6 +16890,10 @@ export type BasketChoicesUpdate = {
      * Picks the free item among its choices; `null` goes back to the cheapest.
      */
     free_item_variant_id?: string | null;
+    /**
+     * Schedules the basket into one of checkout's slots, by its start; `null` orders for now. A slot that is full, too soon or before a pre-order item's notice is saved anyway and shows among the basket's refusals with why. Since 0.24.0.
+     */
+    slot?: OrderSlotInput | null;
 };
 
 /**
@@ -17046,6 +17062,10 @@ export type BasketChoices = {
      * The free item the customer picked among its choices; `null` for the cheapest.
      */
     free_item_variant_id?: string | null;
+    /**
+     * The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0.
+     */
+    slot?: OrderSlot | null;
 };
 
 /**
@@ -17317,7 +17337,7 @@ export type BasketList = {
 };
 
 /**
- * The ways the store offers: delivery, with who carries it, and pickup; scheduled orders arrive in a later step.
+ * The ways the store offers: delivery, with who carries it, pickup, scheduled orders into a slot, and whether the basket may go now.
  */
 export type CheckoutFulfilment = {
     /**
@@ -17333,9 +17353,13 @@ export type CheckoutFulfilment = {
      */
     carrier: Carrier | null;
     /**
-     * Whether it takes scheduled orders now; always `false` until scheduled orders arrive.
+     * Whether it takes scheduled orders: checkout then offers `slots`.
      */
     scheduled: boolean;
+    /**
+     * Whether the basket may be placed for now: the store open and no pre-order-only item in it. Since 0.24.0.
+     */
+    now?: boolean;
 };
 
 /**
@@ -17524,6 +17548,14 @@ export type Checkout = {
      * The basket, priced with the answers saved.
      */
     basket: Basket;
+    /**
+     * The slots the basket may be scheduled into over the store's window of days, each with its places left and why it cannot be chosen where it cannot: full, too soon for the store's lead time (its preparation plus 15 minutes) or for a pre-order item's notice, or the store shut then. Empty where the store takes no scheduled orders. Since 0.24.0.
+     */
+    slots?: Array<CheckoutSlot>;
+    /**
+     * The pre-order-only items in the basket with the earliest slot they allow; `null` when there are none. Since 0.24.0.
+     */
+    pre_order?: CheckoutPreOrder | null;
 };
 
 /**
@@ -18224,6 +18256,14 @@ export type CustomerOrder = {
      * The offers the order was placed with, as they were at placing; ending, pausing or editing an offer afterwards never changes them.
      */
     offers?: Array<OrderOffer>;
+    /**
+     * The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0.
+     */
+    slot?: OrderSlot | null;
+    /**
+     * The subscription it was generated for, and its delivery day; `null` for any other order. Since 0.24.0.
+     */
+    subscription?: OrderOccurrence | null;
 };
 
 /**
@@ -18278,6 +18318,10 @@ export type CustomerOrderSummary = {
      * The courier's first name, once the Agent's app has the delivery, as the order's page reads it; `null` before and for a pickup. Since 0.18.0.
      */
     courier?: OrderCourier | null;
+    /**
+     * The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0.
+     */
+    slot?: OrderSlot | null;
 };
 
 /**
@@ -18580,6 +18624,22 @@ export type StoreOrder = {
      * The proof of delivery, once delivered.
      */
     proof?: OrderProof | null;
+    /**
+     * The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0.
+     */
+    slot?: OrderSlot | null;
+    /**
+     * The subscription it was generated for; `null` for any other order. Since 0.24.0.
+     */
+    subscription?: OrderOccurrence | null;
+    /**
+     * Whether it waits under Scheduled: placed for a slot and not yet sent to the store, which it is at the store's lead time before the slot. Since 0.24.0.
+     */
+    scheduled?: boolean;
+    /**
+     * When a scheduled order was sent to the store, or accepted early; `null` for an order for now and one still waiting. Since 0.24.0.
+     */
+    released_at?: string | null;
 };
 
 /**
@@ -18932,6 +18992,14 @@ export type PlatformOrderRow = {
      * What needs attention; empty when nothing does.
      */
     attention: Array<AttentionReason>;
+    /**
+     * The slot it is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in; `null` for an order for now. The slot is its promise. Since 0.24.0.
+     */
+    slot?: OrderSlot | null;
+    /**
+     * Whether it waits under Scheduled, not yet sent to its store. Since 0.24.0.
+     */
+    scheduled?: boolean;
 };
 
 /**
@@ -27477,6 +27545,7 @@ export type StatementPromotion = {
 };
 
 /**
+<<<<<<< HEAD
  * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth pickup collected at a Location.
  */
 export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card';
@@ -28059,6 +28128,867 @@ export type RewardCampaignActions = {
      * Publish it.
      */
     publish: boolean;
+=======
+ * A slot an order is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in. The slot is the order's promise.
+ */
+export type OrderSlot = {
+    /**
+     * When the slot starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+};
+
+/**
+ * The slot checkout chose, by its start; `null` in its place orders for now.
+ */
+export type OrderSlotInput = {
+    /**
+     * The start of one of the slots checkout offers.
+     */
+    starts_at: string;
+};
+
+/**
+ * Why a slot cannot be chosen: `slot_full` (no place left), `slot_past` (it starts sooner than the store's lead time), `item_pre_order_only` (sooner than a pre-order item's notice), `store_closed` (the store is shut then and takes no scheduled orders for it).
+ */
+export type CheckoutSlotCode = 'slot_full' | 'slot_past' | 'item_pre_order_only' | 'store_closed';
+
+/**
+ * One slot checkout offers, open or not with why.
+ */
+export type CheckoutSlot = {
+    /**
+     * When the slot starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * The day it falls on, on the store's clock.
+     */
+    date: string;
+    /**
+     * The slot on the store's clock, as a screen shows it.
+     */
+    label: string;
+    /**
+     * How many more orders it takes; `null` where the store caps no slot.
+     */
+    places_left: number | null;
+    /**
+     * Whether it may be chosen.
+     */
+    open: boolean;
+    /**
+     * Why not.
+     */
+    code: CheckoutSlotCode | null;
+    /**
+     * Why not, as a sentence a screen may show.
+     */
+    reason: string | null;
+};
+
+/**
+ * A pre-order-only item in the basket, with its notice.
+ */
+export type CheckoutPreOrderItem = {
+    /**
+     * The basket line.
+     */
+    line_id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The item's name.
+     */
+    name: string;
+    /**
+     * The notice it needs: 24, 48 or 72 hours.
+     */
+    notice_hours: number;
+    /**
+     * The start of the first slot it may go into.
+     */
+    earliest_at: string;
+};
+
+/**
+ * The pre-order-only items in the basket: the basket goes only into a slot at least as far ahead as the longest notice.
+ */
+export type CheckoutPreOrder = {
+    /**
+     * The items, the longest notice first.
+     */
+    items: Array<CheckoutPreOrderItem>;
+    /**
+     * The start of the first slot every one of them allows.
+     */
+    earliest_at: string;
+    /**
+     * What it means, as a sentence a screen may show.
+     */
+    message: string;
+};
+
+/**
+ * The subscription an order was generated for, one delivery day of it.
+ */
+export type OrderOccurrence = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The plan.
+     */
+    plan_name: string;
+    /**
+     * The delivery day.
+     */
+    date: string;
+};
+
+/**
+ * How many scheduled orders wait in one slot.
+ */
+export type ScheduledSlotCount = {
+    /**
+     * When the slot starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * Scheduled orders in it that are not yet sent to the store.
+     */
+    orders: number;
+    /**
+     * The most it takes; `null` for no cap.
+     */
+    cap: number | null;
+    /**
+     * Places left; `null` for no cap.
+     */
+    places_left: number | null;
+};
+
+/**
+ * A store's scheduled orders not yet sent to it, by slot: a page of the orders soonest slot first, and how many wait in each slot of the days asked.
+ */
+export type ScheduledOrderPage = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The orders, soonest slot first, then in the order they were placed.
+     */
+    items: Array<StoreOrder>;
+    /**
+     * How many wait in each slot, soonest first.
+     */
+    slots: Array<ScheduledSlotCount>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Every scheduled order not yet sent to its store, soonest slot first.
+ */
+export type PlatformScheduledOrderPage = {
+    /**
+     * The orders.
+     */
+    items: Array<PlatformOrderRow>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Orders marked packed and ready together, such as a route's.
+ */
+export type OrdersReadyInput = {
+    /**
+     * The orders, 1 to 50; each is accepted first where it was waiting, then marked ready.
+     */
+    order_ids: Array<string>;
+};
+
+/**
+ * What marking one order ready did.
+ */
+export type OrderReadyOutcome = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its number; `null` for an order the store does not have.
+     */
+    number: string | null;
+    /**
+     * Whether it is ready now.
+     */
+    ready: boolean;
+    /**
+     * Its status after.
+     */
+    status: string | null;
+    /**
+     * Why not, as a catalogued code (`not_found`, `order_moved`).
+     */
+    code: string | null;
+    /**
+     * Why not, as a sentence.
+     */
+    message: string | null;
+};
+
+/**
+ * What marking several orders ready did, order by order.
+ */
+export type OrdersReadyResult = {
+    /**
+     * Each order, in the order asked.
+     */
+    orders: Array<OrderReadyOutcome>;
+    /**
+     * How many are ready now.
+     */
+    ready: number;
+    /**
+     * How many could not be marked.
+     */
+    refused: number;
+};
+
+/**
+ * How often a subscription delivers: `daily`; `weekdays`, Monday to Friday; `weekends`; `alternate_days` from the start date; `weekly` on the chosen days; `custom` days of the week.
+ */
+export type SubscriptionFrequency = 'daily' | 'weekdays' | 'weekends' | 'alternate_days' | 'weekly' | 'custom';
+
+/**
+ * A delivery window on the store's clock.
+ */
+export type DeliveryWindow = {
+    /**
+     * When it starts, HH:MM.
+     */
+    starts: string;
+    /**
+     * When it ends, HH:MM.
+     */
+    ends: string;
+};
+
+/**
+ * Whether a plan takes subscriptions: `live`, or `withdrawn` (it serves the subscriptions it has until each ends, unless the store ended them with notice).
+ */
+export type SubscriptionPlanState = 'live' | 'withdrawn';
+
+/**
+ * One item of a plan: a variant of the store's catalogue at the plan's own price per unit, with the quantities a subscriber may choose.
+ */
+export type SubscriptionPlanItem = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item's name.
+     */
+    name: string;
+    /**
+     * The variant, where the item has several.
+     */
+    variant_label: string | null;
+    /**
+     * The food mark, for food.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * The plan's price of one, GST included; it may differ from the menu's.
+     */
+    unit_price: Money;
+    /**
+     * The quantity a subscriber starts from.
+     */
+    default_quantity: number;
+    /**
+     * The least a day may have.
+     */
+    min_quantity: number;
+    /**
+     * The most a day may have.
+     */
+    max_quantity: number;
+    /**
+     * Whether it is on the store's published menu now.
+     */
+    available: boolean;
+};
+
+/**
+ * One item of a plan as written.
+ */
+export type SubscriptionPlanItemInput = {
+    /**
+     * The item, of the store's catalogue.
+     */
+    item_id: string;
+    /**
+     * The variant; `null` for an item with one.
+     */
+    variant_id?: string | null;
+    /**
+     * The plan's price of one, GST included.
+     */
+    unit_price: Money;
+    /**
+     * The quantity a subscriber starts from; 1 by default.
+     */
+    default_quantity?: number;
+    /**
+     * The least a day may have; 1 by default.
+     */
+    min_quantity?: number;
+    /**
+     * The most a day may have, at most 20; 6 by default.
+     */
+    max_quantity?: number;
+};
+
+/**
+ * A plan: a subscription product of the store's catalogue, offered as its own shelf. Pausing, skipping and the orders a subscription generates are the subscriptions'.
+ */
+export type SubscriptionPlan = {
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The plan's name.
+     */
+    name: string;
+    /**
+     * What it is, as customers read it.
+     */
+    description: string | null;
+    /**
+     * Whether it takes subscriptions.
+     */
+    state: SubscriptionPlanState;
+    /**
+     * Its items.
+     */
+    items: Array<SubscriptionPlanItem>;
+    /**
+     * The frequencies it allows.
+     */
+    frequencies: Array<SubscriptionFrequency>;
+    /**
+     * The delivery window, on the store's clock.
+     */
+    window: DeliveryWindow;
+    /**
+     * The minimum term, in deliveries: the earliest end date a subscriber may choose.
+     */
+    min_deliveries: number;
+    /**
+     * Whether a similar item may stand in for one that cannot be supplied.
+     */
+    substitutions_allowed: boolean;
+    /**
+     * The delivery fee of each delivery; nothing for none.
+     */
+    delivery_fee: Money;
+    /**
+     * The store's cutoff the evening before, HH:MM: changes for a day count only before it.
+     */
+    cutoff: string;
+    /**
+     * The least one delivery costs: every item at its least quantity, with the fee.
+     */
+    from_price: Money;
+    /**
+     * Subscriptions active or paused on it.
+     */
+    active_subscriptions: number;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * When it was withdrawn.
+     */
+    withdrawn_at: string | null;
+    /**
+     * The last delivery of the subscriptions it has, when the store ended them with notice.
+     */
+    existing_end_on: string | null;
+};
+
+/**
+ * A new plan. The store must take scheduled orders and deliver (`scheduled_delivery_off`).
+ */
+export type SubscriptionPlanCreate = {
+    /**
+     * Its name, 1 to 80 characters.
+     */
+    name: string;
+    /**
+     * What it is, at most 500 characters.
+     */
+    description?: string | null;
+    /**
+     * Its items, 1 to 10.
+     */
+    items: Array<SubscriptionPlanItemInput>;
+    /**
+     * The frequencies it allows, at least one.
+     */
+    frequencies: Array<SubscriptionFrequency>;
+    /**
+     * The delivery window, 06:00 to 08:00 by default; at least 30 minutes.
+     */
+    window?: DeliveryWindow;
+    /**
+     * The minimum term in deliveries, 1 to 60; 7 by default.
+     */
+    min_deliveries?: number;
+    /**
+     * Whether substitutions are allowed; `true` by default.
+     */
+    substitutions_allowed?: boolean;
+    /**
+     * The delivery fee of each delivery; none by default.
+     */
+    delivery_fee?: Money;
+};
+
+/**
+ * A change of a plan; absent members keep what is stored. A changed price of an item is announced to every subscriber and applies to them seven days after.
+ */
+export type SubscriptionPlanUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string;
+    /**
+     * What it is; `null` clears.
+     */
+    description?: string | null;
+    /**
+     * Its items, every one: an item left out stops being offered to new subscribers.
+     */
+    items?: Array<SubscriptionPlanItemInput>;
+    /**
+     * The frequencies it allows.
+     */
+    frequencies?: Array<SubscriptionFrequency>;
+    /**
+     * The delivery window; subscribers keep theirs until they change it.
+     */
+    window?: DeliveryWindow;
+    /**
+     * The minimum term in deliveries.
+     */
+    min_deliveries?: number;
+    /**
+     * Whether substitutions are allowed.
+     */
+    substitutions_allowed?: boolean;
+    /**
+     * The delivery fee of each delivery.
+     */
+    delivery_fee?: Money;
+};
+
+/**
+ * A store's plans, live first.
+ */
+export type SubscriptionPlanList = {
+    /**
+     * The plans.
+     */
+    items: Array<SubscriptionPlan>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Withdrawing a plan: it stops taking subscriptions at once.
+ */
+export type SubscriptionPlanWithdrawal = {
+    /**
+     * Also end the subscriptions it has, seven days from now; `false` keeps serving them until each ends. Needs `subscription:manage` as well.
+     */
+    end_existing?: boolean;
+};
+
+/**
+ * Whether the store delivers a plan to the customer's address.
+ */
+export type PlanReach = {
+    /**
+     * The address asked about: the one named, else the customer's selected one; `null` without one.
+     */
+    address_id: string | null;
+    /**
+     * Whether the store delivers there; `null` without an address.
+     */
+    deliverable: boolean | null;
+    /**
+     * The straight-line distance in metres.
+     */
+    distance_metres: number | null;
+    /**
+     * Why not, as a sentence a screen may show; Subscribe is not offered then.
+     */
+    reason: string | null;
+};
+
+/**
+ * A plan as customers read it on the store's page, with whether the store reaches their address.
+ */
+export type StorefrontPlan = {
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store.
+     */
+    store_name: string;
+    /**
+     * The plan.
+     */
+    name: string;
+    /**
+     * What it is.
+     */
+    description: string | null;
+    /**
+     * Its items.
+     */
+    items: Array<SubscriptionPlanItem>;
+    /**
+     * The frequencies it allows.
+     */
+    frequencies: Array<SubscriptionFrequency>;
+    /**
+     * The delivery window.
+     */
+    window: DeliveryWindow;
+    /**
+     * The minimum term in deliveries.
+     */
+    min_deliveries: number;
+    /**
+     * Whether substitutions are allowed.
+     */
+    substitutions_allowed: boolean;
+    /**
+     * The delivery fee of each delivery.
+     */
+    delivery_fee: Money;
+    /**
+     * The cutoff the evening before.
+     */
+    cutoff: string;
+    /**
+     * The first day a subscription made now can start: tomorrow before the cutoff, the day after once it has passed.
+     */
+    earliest_start: string;
+    /**
+     * The least one delivery costs.
+     */
+    from_price: Money;
+    /**
+     * The plan on one line, as a card shows it.
+     */
+    summary: string;
+    /**
+     * Whether the store delivers to the customer's address.
+     */
+    reach: PlanReach;
+};
+
+/**
+ * The live plans of a store, the Subscribe section of its page.
+ */
+export type StorefrontPlanList = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The plans.
+     */
+    items: Array<StorefrontPlan>;
+};
+
+/**
+ * A plan on a store's card.
+ */
+export type StorePlanCard = {
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The plan.
+     */
+    name: string;
+    /**
+     * The least one delivery costs.
+     */
+    from_price: Money;
+    /**
+     * The delivery window.
+     */
+    window: DeliveryWindow;
+    /**
+     * The first day a subscription made now can start.
+     */
+    earliest_start: string;
+    /**
+     * The card's line.
+     */
+    summary: string;
+};
+
+/**
+ * `pending` (waiting for the Wallet to cover the first delivery or the mandate to be confirmed; nothing is scheduled), `active`, `paused`, `cancelled` or `ended` (its end date passed, or its plan ended it).
+ */
+export type SubscriptionState = 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
+
+/**
+ * How a subscription pays: from the `wallet`, or by a UPI AutoPay `mandate` whose debits land in the Wallet before each delivery is held. Never cash.
+ */
+export type SubscriptionPayBy = 'wallet' | 'mandate';
+
+/**
+ * What the store does when an item cannot be supplied: `similar` (a similar item at no extra cost with the same veg mark), `leave_out` (credited back) or `skip_day` (the whole day skipped and credited back).
+ */
+export type SubstitutionPolicy = 'similar' | 'leave_out' | 'skip_day';
+
+/**
+ * Why a subscription is paused: by the `customer`; by itself for want of `balance` (three deliveries in a row) or after `failed_deliveries` (three in 14 days); `mandate_revoked` in the customer's UPI app.
+ */
+export type SubscriptionPauseReason = 'customer' | 'balance' | 'failed_deliveries' | 'mandate_revoked';
+
+/**
+ * Why the customer cancelled, which the churn report counts.
+ */
+export type SubscriptionCancelReason = 'moving' | 'too_expensive' | 'quality' | 'not_needed' | 'other';
+
+/**
+ * A price announced for an item, applying from a day.
+ */
+export type SubscriptionPrice = {
+    /**
+     * The new price of one.
+     */
+    unit_price: Money;
+    /**
+     * The first delivery day it applies to: seven days after the customer was told.
+     */
+    applies_from: string;
+};
+
+/**
+ * One item of a subscription with its everyday quantity and price.
+ */
+export type SubscriptionItem = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item.
+     */
+    name: string;
+    /**
+     * The variant.
+     */
+    variant_label: string | null;
+    /**
+     * How many each delivery day, unless a day says otherwise.
+     */
+    quantity: number;
+    /**
+     * The price of one now.
+     */
+    unit_price: Money;
+    /**
+     * A new price announced and when it applies.
+     */
+    next_price: SubscriptionPrice | null;
+};
+
+/**
+ * A quantity of one of the plan's items.
+ */
+export type SubscriptionItemInput = {
+    /**
+     * The variant, one of the plan's.
+     */
+    variant_id: string;
+    /**
+     * How many, within the plan's range; 0 on a day leaves it out.
+     */
+    quantity: number;
+};
+
+/**
+ * A pause in force or set.
+ */
+export type SubscriptionPause = {
+    /**
+     * The first day without deliveries.
+     */
+    from: string;
+    /**
+     * The last day without them; `null` until resumed.
+     */
+    until: string | null;
+    /**
+     * Why.
+     */
+    reason: SubscriptionPauseReason;
+    /**
+     * What it means, as a screen shows it.
+     */
+    message: string;
+};
+
+/**
+ * The next delivery day.
+ */
+export type SubscriptionNextDelivery = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Its window.
+     */
+    window: DeliveryWindow;
+    /**
+     * What it costs, held from the Wallet at the cutoff.
+     */
+    amount: Money;
+    /**
+     * Whether the cutoff passed for it: it is generated, and changes go to the day after.
+     */
+    locked: boolean;
+    /**
+     * Its order once generated.
+     */
+    order_id: string | null;
+};
+
+/**
+ * Where a subscription delivers.
+ */
+export type SubscriptionAddress = {
+    /**
+     * The customer's saved address.
+     */
+    address_id: string;
+    /**
+     * Home, work or another name.
+     */
+    label: string;
+    /**
+     * The address on one line.
+     */
+    summary: string;
+};
+
+/**
+ * The UPI AutoPay mandate of a subscription, as the subscription knows it; the mandate itself is the payments'.
+ */
+export type SubscriptionMandateSummary = {
+    /**
+     * The mandate, once asked for.
+     */
+    mandate_id: string | null;
+    /**
+     * `pending` until the customer approves it, `confirmed`, `paused`, `cancelled` or `revoked`.
+     */
+    state: string;
+    /**
+     * The most one debit may take: 1.5 times a delivery, rounded up to the next ₹100.
+     */
+    limit: Money;
+};
+
+/**
+ * What a pending subscription waits for.
+ */
+export type SubscriptionPaymentDue = {
+    /**
+     * The least top-up that covers the first week; `null` when it waits for a mandate.
+     */
+    top_up: Money | null;
+    /**
+     * As a screen shows it.
+     */
+    message: string;
+};
+
+/**
+ * What the customer may do now.
+ */
+export type SubscriptionActions = {
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * Pause it.
      */
@@ -28068,6 +28998,7 @@ export type RewardCampaignActions = {
      */
     resume: boolean;
     /**
+<<<<<<< HEAD
      * Stop it.
      */
     stop: boolean;
@@ -28707,11 +29638,45 @@ export type RewardGrant = {
     claw_back: RewardClawBack | null;
     /**
      * When it was earned.
+=======
+     * Skip the next delivery.
+     */
+    skip_next: boolean;
+    /**
+     * Move it to another address.
+     */
+    change_address: boolean;
+    /**
+     * Cancel it.
+     */
+    cancel: boolean;
+};
+
+/**
+ * Days away: no delivery and nothing charged.
+ */
+export type SubscriptionVacation = {
+    /**
+     * The vacation.
+     */
+    vacation_id: string;
+    /**
+     * The first day away.
+     */
+    from: string;
+    /**
+     * The last day away.
+     */
+    to: string;
+    /**
+     * When it was set.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     created_at: string;
 };
 
 /**
+<<<<<<< HEAD
  * Grants, newest first, with the budget they draw on when they are one campaign's.
  */
 export type RewardGrantPage = {
@@ -29081,11 +30046,143 @@ export type ReferralSettings = {
     refund_window_days: number;
     /**
      * Raised on every change.
+=======
+ * A subscription: one customer, one store and one plan, with its items, schedule, window, dates, address and way to pay.
+ */
+export type Subscription = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The store's Partner.
+     */
+    partner_id: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store.
+     */
+    store_name: string;
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The plan.
+     */
+    plan_name: string;
+    /**
+     * Where it stands.
+     */
+    state: SubscriptionState;
+    /**
+     * The pause in force or set.
+     */
+    pause: SubscriptionPause | null;
+    /**
+     * Its items.
+     */
+    items: Array<SubscriptionItem>;
+    /**
+     * How often.
+     */
+    frequency: SubscriptionFrequency;
+    /**
+     * The days of the week it delivers, 1 for Monday to 7 for Sunday; every day for `alternate_days`, whose days follow the start date.
+     */
+    days: Array<number>;
+    /**
+     * The delivery window.
+     */
+    window: DeliveryWindow;
+    /**
+     * The first day it may deliver.
+     */
+    starts_on: string;
+    /**
+     * The last day; `null` while open-ended.
+     */
+    ends_on: string | null;
+    /**
+     * The first delivery day.
+     */
+    first_delivery: string | null;
+    /**
+     * The next delivery day; `null` when none is due.
+     */
+    next_delivery: SubscriptionNextDelivery | null;
+    /**
+     * Where it delivers.
+     */
+    address: SubscriptionAddress;
+    /**
+     * How it pays.
+     */
+    pay_by: SubscriptionPayBy;
+    /**
+     * The mandate, when it pays by one.
+     */
+    mandate: SubscriptionMandateSummary | null;
+    /**
+     * What the store does with an item it cannot supply; `leave_out` where the plan allows no substitution.
+     */
+    substitution: SubstitutionPolicy;
+    /**
+     * A delivery at the everyday quantities, the fee included.
+     */
+    price_per_delivery: Money;
+    /**
+     * The delivery fee of each delivery.
+     */
+    delivery_fee: Money;
+    /**
+     * The store's cutoff the evening before.
+     */
+    cutoff: string;
+    /**
+     * Vacations not yet over.
+     */
+    vacations: Array<SubscriptionVacation>;
+    /**
+     * What a pending subscription waits for.
+     */
+    payment_due: SubscriptionPaymentDue | null;
+    /**
+     * What the customer may do now.
+     */
+    actions: SubscriptionActions;
+    /**
+     * When it was cancelled.
+     */
+    cancelled_at: string | null;
+    /**
+     * Why.
+     */
+    cancel_reason: SubscriptionCancelReason | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * Raised by every change.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     version: number;
 };
 
 /**
+<<<<<<< HEAD
  * A city's referral programme as set.
  */
 export type ReferralSettingsInput = {
@@ -29173,6 +30270,15 @@ export type ReferralPage = {
      * The referrals.
      */
     items: Array<Referral>;
+=======
+ * The customer's subscriptions: active and pending first, then paused, then those cancelled or ended in the last ninety days.
+ */
+export type SubscriptionPage = {
+    /**
+     * The subscriptions.
+     */
+    items: Array<Subscription>;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * The cursor of the next page; `null` on the last.
      */
@@ -29180,6 +30286,7 @@ export type ReferralPage = {
 };
 
 /**
+<<<<<<< HEAD
  * A customer excluded from rewards: they earn nothing from any campaign until the exclusion is lifted.
  */
 export type RewardExclusion = {
@@ -29291,11 +30398,153 @@ export type IncentiveWindow = {
     from: string;
     /**
      * Until, `HH:MM`, after `from`.
+=======
+ * Subscribing to a plan. It starts once the Wallet covers the first delivery, or once the mandate is confirmed; until then it is `pending` and schedules nothing.
+ */
+export type SubscriptionInput = {
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The plan's items and quantities chosen, within each item's range; at least one above 0.
+     */
+    items: Array<SubscriptionItemInput>;
+    /**
+     * One the plan allows.
+     */
+    frequency: SubscriptionFrequency;
+    /**
+     * For `weekly` and `custom`: the days of the week, 1 for Monday to 7 for Sunday.
+     */
+    days?: Array<number>;
+    /**
+     * The first day; `null` or absent for as soon as possible: tomorrow before the cutoff, the day after once it has passed.
+     */
+    starts_on?: string | null;
+    /**
+     * The last day, at most 365 days out and no earlier than the plan's minimum term; `null` or absent for open-ended.
+     */
+    ends_on?: string | null;
+    /**
+     * One of the customer's saved addresses the store delivers to.
+     */
+    address_id: string;
+    /**
+     * How it pays.
+     */
+    pay_by: SubscriptionPayBy;
+    /**
+     * Where the plan allows substitutions; `similar` by default.
+     */
+    substitution?: SubstitutionPolicy;
+};
+
+/**
+ * A change of a subscription; absent members keep what is stored. A new address applies from the next cutoff and must be one the store reaches.
+ */
+export type SubscriptionUpdate = {
+    /**
+     * One of the customer's saved addresses.
+     */
+    address_id?: string;
+    /**
+     * What the store does with an item it cannot supply.
+     */
+    substitution?: SubstitutionPolicy;
+    /**
+     * The last day; `null` makes it open-ended.
+     */
+    ends_on?: string | null;
+};
+
+/**
+ * What a change did: the subscription after it, the first day it applies to and what to tell the customer, such as a change after the cutoff going to the day after.
+ */
+export type SubscriptionChange = {
+    /**
+     * The subscription after the change.
+     */
+    subscription: Subscription;
+    /**
+     * The first day the change applies to.
+     */
+    applies_from: string | null;
+    /**
+     * What to tell the customer.
+     */
+    message: string;
+};
+
+/**
+ * One day's delivery: skipped, or its quantities. A day whose cutoff passed changes the next delivery day instead, as the answer says.
+ */
+export type SubscriptionDayInput = {
+    /**
+     * Skip the day: nothing delivered or charged.
+     */
+    skip?: boolean;
+    /**
+     * The day's quantities; every item at 0 skips it.
+     */
+    quantities?: Array<SubscriptionItemInput>;
+};
+
+/**
+ * Everyday quantities from a day onward; the days before keep theirs.
+ */
+export type SubscriptionQuantitiesInput = {
+    /**
+     * The first day.
+     */
+    from: string;
+    /**
+     * The quantities, each within its range and at least one above 0.
+     */
+    quantities: Array<SubscriptionItemInput>;
+};
+
+/**
+ * Pausing: from a day until resumed or until a day.
+ */
+export type SubscriptionPauseInput = {
+    /**
+     * The first day without deliveries; the next one open to change when absent.
+     */
+    from?: string | null;
+    /**
+     * The last day without deliveries; until resumed when absent.
+     */
+    until?: string | null;
+};
+
+/**
+ * Resuming a paused subscription.
+ */
+export type SubscriptionResumeInput = {
+    /**
+     * The first day to deliver again; the next one open to change when absent.
+     */
+    from?: string | null;
+};
+
+/**
+ * Days away, at most 90.
+ */
+export type SubscriptionVacationInput = {
+    /**
+     * The first day away.
+     */
+    from: string;
+    /**
+     * The last day away.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     to: string;
 };
 
 /**
+<<<<<<< HEAD
  * An incentive's budget and what its Agents earned from it.
  */
 export type IncentiveBudget = {
@@ -29389,10 +30638,283 @@ export type AgentIncentive = {
      * Agents who joined in the current period.
      */
     joined: number;
+=======
+ * Cancelling a subscription, with an optional reason the churn report counts.
+ */
+export type SubscriptionCancelInput = {
+    /**
+     * Why.
+     */
+    reason?: SubscriptionCancelReason | null;
+    /**
+     * More, at most 500 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * One day of a subscription: `none` (not a delivery day), `upcoming`, `generated` (its order made at the cutoff, waiting for its window), `on_its_way`, `delivered`, `skipped`, `paused`, `vacation`, `closed` (the store shut that day), `failed` (could not be delivered, credited back), `unpaid` (skipped at the cutoff for want of balance) or `cancelled` (its order cancelled).
+ */
+export type SubscriptionDayState = 'none' | 'upcoming' | 'generated' | 'on_its_way' | 'delivered' | 'skipped' | 'paused' | 'vacation' | 'closed' | 'failed' | 'unpaid' | 'cancelled';
+
+/**
+ * An item's quantity on a day.
+ */
+export type SubscriptionDayItem = {
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item and its variant.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+};
+
+/**
+ * One day of a subscription's calendar.
+ */
+export type SubscriptionDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * What it is.
+     */
+    state: SubscriptionDayState;
+    /**
+     * In words, as the calendar shows it: "Delivered at 06:40", "Skipped", "Dairy closed".
+     */
+    label: string;
+    /**
+     * Whether its cutoff passed: changes go to the next delivery day.
+     */
+    locked: boolean;
+    /**
+     * Its cutoff, the evening before.
+     */
+    cutoff_at: string;
+    /**
+     * The day's items and quantities; empty on a day without a delivery.
+     */
+    items: Array<SubscriptionDayItem>;
+    /**
+     * What it costs or cost.
+     */
+    amount: Money | null;
+    /**
+     * Its order.
+     */
+    order_id: string | null;
+    /**
+     * Its order's number.
+     */
+    order_number: string | null;
+    /**
+     * When it was delivered.
+     */
+    delivered_at: string | null;
+    /**
+     * The photo at the door, relative to the API host.
+     */
+    proof_url: string | null;
+};
+
+/**
+ * A month of a subscription, day by day. It moves within seconds of an occurrence moving (`subscription.changed` on the customer's channel).
+ */
+export type SubscriptionCalendar = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The month, YYYY-MM.
+     */
+    month: string;
+    /**
+     * Today on the store's clock, as the schedule date reads it.
+     */
+    today: string;
+    /**
+     * Every day of the month.
+     */
+    days: Array<SubscriptionDay>;
+};
+
+/**
+ * One day of a month's statement.
+ */
+export type SubscriptionStatementDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * What it was.
+     */
+    state: SubscriptionDayState;
+    /**
+     * What it cost, or what was credited back.
+     */
+    amount: Money | null;
+    /**
+     * Its order.
+     */
+    order_id: string | null;
+};
+
+/**
+ * A move of the Wallet the statement lists.
+ */
+export type SubscriptionStatementMove = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * `top_up` or `credit_back`.
+     */
+    kind: string;
+    /**
+     * How much.
+     */
+    amount: Money;
+    /**
+     * In words.
+     */
+    description: string;
+};
+
+/**
+ * A subscription's statement for a month: each day delivered with its amount, the skipped and failed days, the top-ups, the credits back and the balances.
+ */
+export type SubscriptionStatement = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The month.
+     */
+    month: string;
+    /**
+     * The store.
+     */
+    store_name: string;
+    /**
+     * The plan.
+     */
+    plan_name: string;
+    /**
+     * When it was issued, on the 1st of the next month; `null` for the month in progress.
+     */
+    ready_at: string | null;
+    /**
+     * The delivery days of the month.
+     */
+    days: Array<SubscriptionStatementDay>;
+    /**
+     * Days delivered.
+     */
+    delivered: number;
+    /**
+     * What they cost.
+     */
+    delivered_amount: Money;
+    /**
+     * Days skipped, paused, away, closed or unpaid.
+     */
+    skipped: number;
+    /**
+     * Days that could not be delivered.
+     */
+    failed: number;
+    /**
+     * What failed days gave back.
+     */
+    credited_back: Money;
+    /**
+     * The Wallet's top-ups in the month.
+     */
+    top_ups: Array<SubscriptionStatementMove>;
+    /**
+     * What came back to the Wallet in the month.
+     */
+    credits_back: Array<SubscriptionStatementMove>;
+    /**
+     * The Wallet at the start of the month.
+     */
+    opening_balance: Money;
+    /**
+     * The Wallet at its end.
+     */
+    closing_balance: Money;
+};
+
+/**
+ * A subscription as its store sees it.
+ */
+export type LocationSubscriptionRow = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The customer's given name and initial.
+     */
+    customer_name: string;
+    /**
+     * The plan.
+     */
+    plan_id: string;
+    /**
+     * The plan.
+     */
+    plan_name: string;
+    /**
+     * Where it stands.
+     */
+    state: SubscriptionState;
+    /**
+     * Its everyday items.
+     */
+    items: Array<SubscriptionDayItem>;
+    /**
+     * How often.
+     */
+    frequency: SubscriptionFrequency;
+    /**
+     * The window.
+     */
+    window: DeliveryWindow;
+    /**
+     * The first day.
+     */
+    starts_on: string;
+    /**
+     * The last day.
+     */
+    ends_on: string | null;
+    /**
+     * The next delivery day.
+     */
+    next_delivery: string | null;
+    /**
+     * Where it delivers, by locality.
+     */
+    locality: string | null;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * When it was made.
      */
     created_at: string;
+<<<<<<< HEAD
     /**
      * When it was published.
      */
@@ -29415,6 +30937,18 @@ export type AgentIncentivePage = {
      * The incentives.
      */
     items: Array<AgentIncentive>;
+=======
+};
+
+/**
+ * A store's subscriptions, newest first.
+ */
+export type LocationSubscriptionPage = {
+    /**
+     * The subscriptions.
+     */
+    items: Array<LocationSubscriptionRow>;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * The cursor of the next page; `null` on the last.
      */
@@ -29422,6 +30956,7 @@ export type AgentIncentivePage = {
 };
 
 /**
+<<<<<<< HEAD
  * A new incentive, kept as a draft: a quest's tiers, or a bonus's amount and window.
  */
 export type AgentIncentiveInput = {
@@ -29741,6 +31276,377 @@ export type AgentBonusLine = {
      * In words.
      */
     words: string;
+=======
+ * How many of one item a day needs.
+ */
+export type SubscriptionItemTotal = {
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item.
+     */
+    name: string;
+    /**
+     * The variant.
+     */
+    variant_label: string | null;
+    /**
+     * How many.
+     */
+    quantity: number;
+};
+
+/**
+ * A window's occurrences on a day, by route once routes are built.
+ */
+export type SubscriptionDaySlot = {
+    /**
+     * The window.
+     */
+    window: DeliveryWindow;
+    /**
+     * The route, once the morning's routes are built; `null` before.
+     */
+    route_id: string | null;
+    /**
+     * How many.
+     */
+    occurrences: number;
+};
+
+/**
+ * How a day's occurrences stand.
+ */
+export type SubscriptionProgress = {
+    /**
+     * Packed and ready.
+     */
+    packed: number;
+    /**
+     * Collected by an Agent.
+     */
+    collected: number;
+    /**
+     * Delivered.
+     */
+    delivered: number;
+    /**
+     * Could not be delivered.
+     */
+    failed: number;
+};
+
+/**
+ * One subscriber's delivery on a day, as the store packs it.
+ */
+export type PartnerOccurrence = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The customer's given name and initial.
+     */
+    customer_name: string;
+    /**
+     * Where it stands.
+     */
+    state: SubscriptionDayState;
+    /**
+     * Its window.
+     */
+    window: DeliveryWindow;
+    /**
+     * What to pack.
+     */
+    items: Array<SubscriptionDayItem>;
+    /**
+     * Its order, once generated.
+     */
+    order_id: string | null;
+    /**
+     * Its order's number.
+     */
+    order_number: string | null;
+    /**
+     * Its route, once built.
+     */
+    route_id: string | null;
+    /**
+     * Where it goes, by locality.
+     */
+    locality: string | null;
+};
+
+/**
+ * A change to a store's subscriptions as it happened.
+ */
+export type SubscriptionChangeNote = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The customer.
+     */
+    customer_name: string;
+    /**
+     * `started`, `paused`, `resumed`, `cancelled`, `ended`, `address_changed` or `day_changed`.
+     */
+    kind: string;
+    /**
+     * In words.
+     */
+    text: string;
+};
+
+/**
+ * A store's subscriptions on one day: the occurrences by slot and route, what to pack, how the day stands and the latest changes.
+ */
+export type PartnerSubscriptionDay = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Whether its cutoff passed: its occurrences are generated.
+     */
+    locked: boolean;
+    /**
+     * Its cutoff, the evening before.
+     */
+    cutoff_at: string;
+    /**
+     * Deliveries that day.
+     */
+    occurrences: number;
+    /**
+     * Subscribers skipping it: skipped, paused, away or unpaid.
+     */
+    skips: number;
+    /**
+     * The occurrences by window and route.
+     */
+    slots: Array<SubscriptionDaySlot>;
+    /**
+     * What to pack, item by item.
+     */
+    totals: Array<SubscriptionItemTotal>;
+    /**
+     * Each delivery.
+     */
+    items: Array<PartnerOccurrence>;
+    /**
+     * How the day stands.
+     */
+    progress: SubscriptionProgress;
+    /**
+     * The latest changes, newest first, at most 20.
+     */
+    changes: Array<SubscriptionChangeNote>;
+};
+
+/**
+ * One day of the demand forecast, or of the deliveries made.
+ */
+export type ForecastDay = {
+    /**
+     * The day.
+     */
+    date: string;
+    /**
+     * Deliveries.
+     */
+    occurrences: number;
+    /**
+     * Item by item.
+     */
+    items: Array<SubscriptionItemTotal>;
+};
+
+/**
+ * A store's demand for the next 14 days, committed by active subscriptions net of the skips, pauses and vacations already set, beside the last 28 days' deliveries.
+ */
+export type SubscriptionForecast = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The first day forecast: tomorrow.
+     */
+    from: string;
+    /**
+     * The last.
+     */
+    to: string;
+    /**
+     * The forecast, day by day.
+     */
+    days: Array<ForecastDay>;
+    /**
+     * The last 28 days' deliveries, day by day.
+     */
+    actuals: Array<ForecastDay>;
+};
+
+/**
+ * A subscription in Mission Control's list.
+ */
+export type PlatformSubscriptionRow = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The customer's name.
+     */
+    customer_name: string;
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * The store.
+     */
+    store_name: string;
+    /**
+     * The plan.
+     */
+    plan_name: string;
+    /**
+     * Where it stands.
+     */
+    state: SubscriptionState;
+    /**
+     * How it pays.
+     */
+    pay_by: SubscriptionPayBy;
+    /**
+     * A delivery at the everyday quantities.
+     */
+    price_per_delivery: Money;
+    /**
+     * The next delivery day.
+     */
+    next_delivery: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+};
+
+/**
+ * Subscriptions across stores, newest first.
+ */
+export type PlatformSubscriptionPage = {
+    /**
+     * The subscriptions.
+     */
+    items: Array<PlatformSubscriptionRow>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A subscription in Mission Control, with its customer and a month of its calendar.
+ */
+export type PlatformSubscription = {
+    /**
+     * The subscription.
+     */
+    subscription: Subscription;
+    /**
+     * The customer's name.
+     */
+    customer_name: string;
+    /**
+     * The month asked for, the current one by default.
+     */
+    calendar: SubscriptionCalendar;
+};
+
+/**
+ * One move of the schedule date.
+ */
+export type ScheduleDateMoveRecord = {
+    /**
+     * When it was moved, in real time.
+     */
+    moved_at: string;
+    /**
+     * The schedule date before.
+     */
+    from: string;
+    /**
+     * The schedule date after.
+     */
+    to: string;
+    /**
+     * Who moved it.
+     */
+    by_name: string | null;
+    /**
+     * Why.
+     */
+    reason: string | null;
+};
+
+/**
+ * The date the cutoffs, the route building, the release of scheduled orders and the start of planned trips read: the real time, unless platform staff moved it forward on a developer's machine or in the sandbox. Everything else keeps the real time.
+ */
+export type ScheduleDate = {
+    /**
+     * The schedule date now.
+     */
+    now: string;
+    /**
+     * The real time now.
+     */
+    real_now: string;
+    /**
+     * Whether it was ever moved.
+     */
+    moved: boolean;
+    /**
+     * Whether it can be moved here: only on a developer's machine or in the sandbox.
+     */
+    movable: boolean;
+    /**
+     * Every move, oldest first; each is in the audit log too.
+     */
+    moves: Array<ScheduleDateMoveRecord>;
+};
+
+/**
+ * Moving the schedule date forward, never back. The cutoffs, the release of scheduled orders and what reads the date take it at once.
+ */
+export type ScheduleDateMove = {
+    /**
+     * The new schedule date, later than the current one.
+     */
+    to: string;
+    /**
+     * Why, at most 200 characters.
+     */
+    reason?: string | null;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
 };
 
 /**
@@ -65584,6 +67490,7 @@ export type GivePersonalCodeResponses = {
 
 export type GivePersonalCodeResponse = GivePersonalCodeResponses[keyof GivePersonalCodeResponses];
 
+<<<<<<< HEAD
 export type GetCustomerRewardsData = {
     body?: never;
     path?: never;
@@ -65592,11 +67499,44 @@ export type GetCustomerRewardsData = {
 };
 
 export type GetCustomerRewardsErrors = {
+=======
+export type ListStorePlansData = {
+    body?: never;
+    path: {
+        /**
+         * The store: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One of the customer's saved addresses to check the reach of.
+         */
+        address_id?: string;
+        /**
+         * A pin's latitude, with `lng`, for a visitor.
+         */
+        lat?: number;
+        /**
+         * A pin's longitude, with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/plans';
+};
+
+export type ListStorePlansErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or coordinate.
+     */
+    400: Problem;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
     /**
+<<<<<<< HEAD
      * `forbidden`: a token of another surface.
      */
     403: Problem;
@@ -65606,6 +67546,13 @@ export type GetCustomerRewardsErrors = {
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * `not_found`: the store, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -65614,6 +67561,7 @@ export type GetCustomerRewardsErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type GetCustomerRewardsError = GetCustomerRewardsErrors[keyof GetCustomerRewardsErrors];
 
 export type GetCustomerRewardsResponses = {
@@ -65626,6 +67574,83 @@ export type GetCustomerRewardsResponses = {
 export type GetCustomerRewardsResponse = GetCustomerRewardsResponses[keyof GetCustomerRewardsResponses];
 
 export type ListCustomerRewardGrantsData = {
+=======
+export type ListStorePlansError = ListStorePlansErrors[keyof ListStorePlansErrors];
+
+export type ListStorePlansResponses = {
+    /**
+     * The plans.
+     */
+    200: StorefrontPlanList;
+};
+
+export type ListStorePlansResponse = ListStorePlansResponses[keyof ListStorePlansResponses];
+
+export type GetStorePlanData = {
+    body?: never;
+    path: {
+        /**
+         * The store: a live store with a published menu.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: {
+        /**
+         * One of the customer's saved addresses to check the reach of.
+         */
+        address_id?: string;
+        /**
+         * A pin's latitude, with `lng`, for a visitor.
+         */
+        lat?: number;
+        /**
+         * A pin's longitude, with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/plans/{plan_id}';
+};
+
+export type GetStorePlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or coordinate.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the store or the plan, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStorePlanError = GetStorePlanErrors[keyof GetStorePlanErrors];
+
+export type GetStorePlanResponses = {
+    /**
+     * The plan.
+     */
+    200: StorefrontPlan;
+};
+
+export type GetStorePlanResponse = GetStorePlanResponses[keyof GetStorePlanResponses];
+
+export type ListCustomerSubscriptionsData = {
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path?: never;
     query?: {
@@ -65634,6 +67659,7 @@ export type ListCustomerRewardGrantsData = {
          */
         limit?: number;
         /**
+<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -65644,6 +67670,18 @@ export type ListCustomerRewardGrantsData = {
 export type ListCustomerRewardGrantsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+=======
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/subscriptions';
+};
+
+export type ListCustomerSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -65655,11 +67693,15 @@ export type ListCustomerRewardGrantsErrors = {
      */
     403: Problem;
     /**
+<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -65668,6 +67710,7 @@ export type ListCustomerRewardGrantsErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type ListCustomerRewardGrantsError = ListCustomerRewardGrantsErrors[keyof ListCustomerRewardGrantsErrors];
 
 export type ListCustomerRewardGrantsResponses = {
@@ -65695,6 +67738,50 @@ export type StartCustomerQuestData = {
 };
 
 export type StartCustomerQuestErrors = {
+=======
+export type ListCustomerSubscriptionsError = ListCustomerSubscriptionsErrors[keyof ListCustomerSubscriptionsErrors];
+
+export type ListCustomerSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: SubscriptionPage;
+};
+
+export type ListCustomerSubscriptionsResponse = ListCustomerSubscriptionsResponses[keyof ListCustomerSubscriptionsResponses];
+
+export type CreateSubscriptionData = {
+    /**
+     * The plan, the items, the schedule, the dates, the address and the way to pay.
+     */
+    body: SubscriptionInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/subscriptions';
+};
+
+export type CreateSubscriptionErrors = {
+    /**
+     * `validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`), a quantity out of the item's range (`quantity_out_of_range`), a frequency the plan does not allow (`frequency_not_offered`), a start before the earliest (`start_before_earliest`), an end before the minimum term or over 365 days out (`end_out_of_range`), or another malformed member.
+     */
+    400: Problem;
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -65704,6 +67791,62 @@ export type StartCustomerQuestErrors = {
      */
     403: Problem;
     /**
+     * `not_found`: the plan, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`, `address_outside_area`, or `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateSubscriptionError = CreateSubscriptionErrors[keyof CreateSubscriptionErrors];
+
+export type CreateSubscriptionResponses = {
+    /**
+     * The subscription, active or pending.
+     */
+    201: Subscription;
+};
+
+export type CreateSubscriptionResponse = CreateSubscriptionResponses[keyof CreateSubscriptionResponses];
+
+export type GetCustomerSubscriptionData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}';
+};
+
+export type GetCustomerSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+<<<<<<< HEAD
      * `not_found`: no such quest is offered to the customer, live and outside their control group.
      */
     404: Problem;
@@ -65713,6 +67856,12 @@ export type StartCustomerQuestErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -65721,6 +67870,65 @@ export type StartCustomerQuestErrors = {
     default: Problem;
 };
 
+export type GetCustomerSubscriptionError = GetCustomerSubscriptionErrors[keyof GetCustomerSubscriptionErrors];
+
+export type GetCustomerSubscriptionResponses = {
+    /**
+     * The subscription.
+     */
+    200: Subscription;
+};
+
+export type GetCustomerSubscriptionResponse = GetCustomerSubscriptionResponses[keyof GetCustomerSubscriptionResponses];
+
+export type UpdateSubscriptionData = {
+    /**
+     * What changes.
+     */
+    body: SubscriptionUpdate;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}';
+};
+
+export type UpdateSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member, or an end before the minimum term (`end_out_of_range`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `address_outside_area`, or `subscription_ended` for one cancelled or ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+<<<<<<< HEAD
 export type StartCustomerQuestError = StartCustomerQuestErrors[keyof StartCustomerQuestErrors];
 
 export type StartCustomerQuestResponses = {
@@ -65740,6 +67948,41 @@ export type GetCustomerReferralData = {
 };
 
 export type GetCustomerReferralErrors = {
+=======
+export type UpdateSubscriptionError = UpdateSubscriptionErrors[keyof UpdateSubscriptionErrors];
+
+export type UpdateSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type UpdateSubscriptionResponse = UpdateSubscriptionResponses[keyof UpdateSubscriptionResponses];
+
+export type GetSubscriptionCalendarData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: {
+        /**
+         * The month, YYYY-MM; the current one on the store's clock by default.
+         */
+        month?: string;
+    };
+    url: '/v1/customer/subscriptions/{subscription_id}/calendar';
+};
+
+export type GetSubscriptionCalendarErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+     */
+    400: Problem;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -65749,11 +67992,19 @@ export type GetCustomerReferralErrors = {
      */
     403: Problem;
     /**
+<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -65762,6 +68013,7 @@ export type GetCustomerReferralErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type GetCustomerReferralError = GetCustomerReferralErrors[keyof GetCustomerReferralErrors];
 
 export type GetCustomerReferralResponses = {
@@ -65781,6 +68033,43 @@ export type RenewCustomerReferralCodeData = {
 };
 
 export type RenewCustomerReferralCodeErrors = {
+=======
+export type GetSubscriptionCalendarError = GetSubscriptionCalendarErrors[keyof GetSubscriptionCalendarErrors];
+
+export type GetSubscriptionCalendarResponses = {
+    /**
+     * The month.
+     */
+    200: SubscriptionCalendar;
+};
+
+export type GetSubscriptionCalendarResponse = GetSubscriptionCalendarResponses[keyof GetSubscriptionCalendarResponses];
+
+export type SetSubscriptionDayData = {
+    /**
+     * The day.
+     */
+    body: SubscriptionDayInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * A delivery day of the subscription.
+         */
+        date: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/days/{date}';
+};
+
+export type SetSubscriptionDayErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
+     */
+    400: Problem;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -65790,6 +68079,7 @@ export type RenewCustomerReferralCodeErrors = {
      */
     403: Problem;
     /**
+<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
@@ -65799,6 +68089,17 @@ export type RenewCustomerReferralCodeErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_day_invalid` (not a delivery day of it, or in the past) or `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -65807,6 +68108,7 @@ export type RenewCustomerReferralCodeErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type RenewCustomerReferralCodeError = RenewCustomerReferralCodeErrors[keyof RenewCustomerReferralCodeErrors];
 
 export type RenewCustomerReferralCodeResponses = {
@@ -65819,12 +68121,420 @@ export type RenewCustomerReferralCodeResponses = {
 export type RenewCustomerReferralCodeResponse = RenewCustomerReferralCodeResponses[keyof RenewCustomerReferralCodeResponses];
 
 export type ListPartnerRewardCampaignsData = {
+=======
+export type SetSubscriptionDayError = SetSubscriptionDayErrors[keyof SetSubscriptionDayErrors];
+
+export type SetSubscriptionDayResponses = {
+    /**
+     * The subscription, the day the change applies to and what to tell the customer.
+     */
+    200: SubscriptionChange;
+};
+
+export type SetSubscriptionDayResponse = SetSubscriptionDayResponses[keyof SetSubscriptionDayResponses];
+
+export type SetSubscriptionQuantitiesData = {
+    /**
+     * The day and the quantities.
+     */
+    body: SubscriptionQuantitiesInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/quantities';
+};
+
+export type SetSubscriptionQuantitiesErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetSubscriptionQuantitiesError = SetSubscriptionQuantitiesErrors[keyof SetSubscriptionQuantitiesErrors];
+
+export type SetSubscriptionQuantitiesResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type SetSubscriptionQuantitiesResponse = SetSubscriptionQuantitiesResponses[keyof SetSubscriptionQuantitiesResponses];
+
+export type PauseSubscriptionData = {
+    /**
+     * From and until.
+     */
+    body: SubscriptionPauseInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/pause';
+};
+
+export type PauseSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member, or `until` before `from`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`, or `subscription_not_active` for one pending.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PauseSubscriptionError = PauseSubscriptionErrors[keyof PauseSubscriptionErrors];
+
+export type PauseSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type PauseSubscriptionResponse = PauseSubscriptionResponses[keyof PauseSubscriptionResponses];
+
+export type ResumeSubscriptionData = {
+    /**
+     * From when.
+     */
+    body: SubscriptionResumeInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/resume';
+};
+
+export type ResumeSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`, or `subscription_not_paused`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumeSubscriptionError = ResumeSubscriptionErrors[keyof ResumeSubscriptionErrors];
+
+export type ResumeSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type ResumeSubscriptionResponse = ResumeSubscriptionResponses[keyof ResumeSubscriptionResponses];
+
+export type AddSubscriptionVacationData = {
+    /**
+     * The days away.
+     */
+    body: SubscriptionVacationInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/vacations';
+};
+
+export type AddSubscriptionVacationErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a range backwards or over 90 days (`vacation_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddSubscriptionVacationError = AddSubscriptionVacationErrors[keyof AddSubscriptionVacationErrors];
+
+export type AddSubscriptionVacationResponses = {
+    /**
+     * The subscription with the vacation.
+     */
+    200: SubscriptionChange;
+};
+
+export type AddSubscriptionVacationResponse = AddSubscriptionVacationResponses[keyof AddSubscriptionVacationResponses];
+
+export type RemoveSubscriptionVacationData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * The vacation.
+         */
+        vacation_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/vacations/{vacation_id}';
+};
+
+export type RemoveSubscriptionVacationErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription or the vacation.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveSubscriptionVacationError = RemoveSubscriptionVacationErrors[keyof RemoveSubscriptionVacationErrors];
+
+export type RemoveSubscriptionVacationResponses = {
+    /**
+     * The subscription without the vacation.
+     */
+    200: SubscriptionChange;
+};
+
+export type RemoveSubscriptionVacationResponse = RemoveSubscriptionVacationResponses[keyof RemoveSubscriptionVacationResponses];
+
+export type CancelSubscriptionData = {
+    /**
+     * Why, optionally.
+     */
+    body: SubscriptionCancelInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/cancel';
+};
+
+export type CancelSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelSubscriptionError = CancelSubscriptionErrors[keyof CancelSubscriptionErrors];
+
+export type CancelSubscriptionResponses = {
+    /**
+     * The cancelled subscription; `applies_from` is the first day without a delivery, and the message names an order that stands.
+     */
+    200: SubscriptionChange;
+};
+
+export type CancelSubscriptionResponse = CancelSubscriptionResponses[keyof CancelSubscriptionResponses];
+
+export type GetSubscriptionStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * The month, YYYY-MM; the month in progress reads so far.
+         */
+        month: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/statements/{month}';
+};
+
+export type GetSubscriptionStatementErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription, or a month it had no day in.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionStatementError = GetSubscriptionStatementErrors[keyof GetSubscriptionStatementErrors];
+
+export type GetSubscriptionStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: SubscriptionStatement;
+};
+
+export type GetSubscriptionStatementResponse = GetSubscriptionStatementResponses[keyof GetSubscriptionStatementResponses];
+
+export type ListScheduledOrdersData = {
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
          */
         partner_id: string;
+<<<<<<< HEAD
     };
     query?: {
         /**
@@ -66493,11 +69203,701 @@ export type ListPlatformRewardCampaignsData = {
          * Words in the name.
          */
         q?: string;
+=======
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One day on the store's clock; every day ahead by default.
+         */
+        date?: string;
         /**
          * How many, 1 to 100; 50 by default.
          */
         limit?: number;
         /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/scheduled';
+};
+
+export type ListScheduledOrdersErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListScheduledOrdersError = ListScheduledOrdersErrors[keyof ListScheduledOrdersErrors];
+
+export type ListScheduledOrdersResponses = {
+    /**
+     * The scheduled orders.
+     */
+    200: ScheduledOrderPage;
+};
+
+export type ListScheduledOrdersResponse = ListScheduledOrdersResponses[keyof ListScheduledOrdersResponses];
+
+export type MarkOrdersReadyData = {
+    /**
+     * The orders.
+     */
+    body: OrdersReadyInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/ready';
+};
+
+export type MarkOrdersReadyErrors = {
+    /**
+     * `validation_failed`: no order, more than 50, or a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrdersReadyError = MarkOrdersReadyErrors[keyof MarkOrdersReadyErrors];
+
+export type MarkOrdersReadyResponses = {
+    /**
+     * What happened to each.
+     */
+    200: OrdersReadyResult;
+};
+
+export type MarkOrdersReadyResponse = MarkOrdersReadyResponses[keyof MarkOrdersReadyResponses];
+
+export type ListLocationSubscriptionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One state.
+         */
+        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
+        /**
+         * One plan.
+         */
+        plan_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions';
+};
+
+export type ListLocationSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationSubscriptionsError = ListLocationSubscriptionsErrors[keyof ListLocationSubscriptionsErrors];
+
+export type ListLocationSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: LocationSubscriptionPage;
+};
+
+export type ListLocationSubscriptionsResponse = ListLocationSubscriptionsResponses[keyof ListLocationSubscriptionsResponses];
+
+export type GetLocationSubscriptionDayData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The day on the store's clock; tomorrow by default.
+         */
+        date?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/calendar';
+};
+
+export type GetLocationSubscriptionDayErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or date.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationSubscriptionDayError = GetLocationSubscriptionDayErrors[keyof GetLocationSubscriptionDayErrors];
+
+export type GetLocationSubscriptionDayResponses = {
+    /**
+     * The day.
+     */
+    200: PartnerSubscriptionDay;
+};
+
+export type GetLocationSubscriptionDayResponse = GetLocationSubscriptionDayResponses[keyof GetLocationSubscriptionDayResponses];
+
+export type GetSubscriptionForecastData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/forecast';
+};
+
+export type GetSubscriptionForecastErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionForecastError = GetSubscriptionForecastErrors[keyof GetSubscriptionForecastErrors];
+
+export type GetSubscriptionForecastResponses = {
+    /**
+     * The forecast.
+     */
+    200: SubscriptionForecast;
+};
+
+export type GetSubscriptionForecastResponse = GetSubscriptionForecastResponses[keyof GetSubscriptionForecastResponses];
+
+export type ListSubscriptionPlansData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
+};
+
+export type ListSubscriptionPlansErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSubscriptionPlansError = ListSubscriptionPlansErrors[keyof ListSubscriptionPlansErrors];
+
+export type ListSubscriptionPlansResponses = {
+    /**
+     * The plans.
+     */
+    200: SubscriptionPlanList;
+};
+
+export type ListSubscriptionPlansResponse = ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses];
+
+export type CreateSubscriptionPlanData = {
+    /**
+     * The plan.
+     */
+    body: SubscriptionPlanCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
+};
+
+export type CreateSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a member out of range, an item or variant not of the store, a window shorter than 30 minutes, or no frequency.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * `scheduled_delivery_off`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateSubscriptionPlanError = CreateSubscriptionPlanErrors[keyof CreateSubscriptionPlanErrors];
+
+export type CreateSubscriptionPlanResponses = {
+    /**
+     * The plan.
+     */
+    201: SubscriptionPlan;
+};
+
+export type CreateSubscriptionPlanResponse = CreateSubscriptionPlanResponses[keyof CreateSubscriptionPlanResponses];
+
+export type DeleteSubscriptionPlanData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type DeleteSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_has_subscriptions`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteSubscriptionPlanError = DeleteSubscriptionPlanErrors[keyof DeleteSubscriptionPlanErrors];
+
+export type DeleteSubscriptionPlanResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteSubscriptionPlanResponse = DeleteSubscriptionPlanResponses[keyof DeleteSubscriptionPlanResponses];
+
+export type GetSubscriptionPlanData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type GetSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionPlanError = GetSubscriptionPlanErrors[keyof GetSubscriptionPlanErrors];
+
+export type GetSubscriptionPlanResponses = {
+    /**
+     * The plan.
+     */
+    200: SubscriptionPlan;
+};
+
+export type GetSubscriptionPlanResponse = GetSubscriptionPlanResponses[keyof GetSubscriptionPlanResponses];
+
+export type UpdateSubscriptionPlanData = {
+    /**
+     * What changes.
+     */
+    body: SubscriptionPlanUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type UpdateSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a member out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateSubscriptionPlanError = UpdateSubscriptionPlanErrors[keyof UpdateSubscriptionPlanErrors];
+
+export type UpdateSubscriptionPlanResponses = {
+    /**
+     * The plan after the change.
+     */
+    200: SubscriptionPlan;
+};
+
+export type UpdateSubscriptionPlanResponse = UpdateSubscriptionPlanResponses[keyof UpdateSubscriptionPlanResponses];
+
+export type WithdrawSubscriptionPlanData = {
+    /**
+     * Whether the subscriptions end too.
+     */
+    body: SubscriptionPlanWithdrawal;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}/withdraw';
+};
+
+export type WithdrawSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WithdrawSubscriptionPlanError = WithdrawSubscriptionPlanErrors[keyof WithdrawSubscriptionPlanErrors];
+
+export type WithdrawSubscriptionPlanResponses = {
+    /**
+     * The withdrawn plan.
+     */
+    200: SubscriptionPlan;
+};
+
+export type WithdrawSubscriptionPlanResponse = WithdrawSubscriptionPlanResponses[keyof WithdrawSubscriptionPlanResponses];
+
+export type ListPlatformScheduledOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One store.
+         */
+        location_id?: string;
+        /**
+         * One day, in India time; every day ahead by default.
+         */
+        date?: string;
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -66508,6 +69908,18 @@ export type ListPlatformRewardCampaignsData = {
 export type ListPlatformRewardCampaignsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+=======
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/orders/scheduled';
+};
+
+export type ListPlatformScheduledOrdersErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -66515,11 +69927,19 @@ export type ListPlatformRewardCampaignsErrors = {
      */
     401: Problem;
     /**
+<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -66528,6 +69948,7 @@ export type ListPlatformRewardCampaignsErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type ListPlatformRewardCampaignsError = ListPlatformRewardCampaignsErrors[keyof ListPlatformRewardCampaignsErrors];
 
 export type ListPlatformRewardCampaignsResponses = {
@@ -67249,10 +70670,25 @@ export type GetPlatformRewardCampaignResultsResponses = {
 export type GetPlatformRewardCampaignResultsResponse = GetPlatformRewardCampaignResultsResponses[keyof GetPlatformRewardCampaignResultsResponses];
 
 export type ListPlatformRewardGrantsData = {
+=======
+export type ListPlatformScheduledOrdersError = ListPlatformScheduledOrdersErrors[keyof ListPlatformScheduledOrdersErrors];
+
+export type ListPlatformScheduledOrdersResponses = {
+    /**
+     * The scheduled orders.
+     */
+    200: PlatformScheduledOrderPage;
+};
+
+export type ListPlatformScheduledOrdersResponse = ListPlatformScheduledOrdersResponses[keyof ListPlatformScheduledOrdersResponses];
+
+export type ListPlatformSubscriptionsData = {
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path?: never;
     query?: {
         /**
+<<<<<<< HEAD
          * Only grants in this state.
          */
         status?: RewardGrantStatus;
@@ -67265,10 +70701,25 @@ export type ListPlatformRewardGrantsData = {
          */
         customer_id?: string;
         /**
+=======
+         * One store.
+         */
+        location_id?: string;
+        /**
+         * One customer.
+         */
+        customer_id?: string;
+        /**
+         * One state.
+         */
+        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
+        /**
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
          * How many, 1 to 100; 50 by default.
          */
         limit?: number;
         /**
+<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -67279,6 +70730,18 @@ export type ListPlatformRewardGrantsData = {
 export type ListPlatformRewardGrantsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+=======
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/subscriptions';
+};
+
+export type ListPlatformSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -67286,11 +70749,19 @@ export type ListPlatformRewardGrantsErrors = {
      */
     401: Problem;
     /**
+<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -67299,6 +70770,7 @@ export type ListPlatformRewardGrantsErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type ListPlatformRewardGrantsError = ListPlatformRewardGrantsErrors[keyof ListPlatformRewardGrantsErrors];
 
 export type ListPlatformRewardGrantsResponses = {
@@ -67499,6 +70971,39 @@ export type SetReferralSettingsData = {
 export type SetReferralSettingsErrors = {
     /**
      * `validation_failed`: a reward or a budget of nothing, or a limit out of range.
+=======
+export type ListPlatformSubscriptionsError = ListPlatformSubscriptionsErrors[keyof ListPlatformSubscriptionsErrors];
+
+export type ListPlatformSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: PlatformSubscriptionPage;
+};
+
+export type ListPlatformSubscriptionsResponse = ListPlatformSubscriptionsResponses[keyof ListPlatformSubscriptionsResponses];
+
+export type GetPlatformSubscriptionData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription.
+         */
+        subscription_id: string;
+    };
+    query?: {
+        /**
+         * The month, YYYY-MM; the current one on the store's clock by default.
+         */
+        month?: string;
+    };
+    url: '/v1/platform/subscriptions/{subscription_id}';
+};
+
+export type GetPlatformSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -67506,6 +71011,7 @@ export type SetReferralSettingsErrors = {
      */
     401: Problem;
     /**
+<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
      */
     403: Problem;
@@ -67519,6 +71025,17 @@ export type SetReferralSettingsErrors = {
     412: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -67527,6 +71044,7 @@ export type SetReferralSettingsErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type SetReferralSettingsError = SetReferralSettingsErrors[keyof SetReferralSettingsErrors];
 
 export type SetReferralSettingsResponses = {
@@ -67565,6 +71083,69 @@ export type ListPlatformReferralsData = {
 export type ListPlatformReferralsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
+=======
+export type GetPlatformSubscriptionError = GetPlatformSubscriptionErrors[keyof GetPlatformSubscriptionErrors];
+
+export type GetPlatformSubscriptionResponses = {
+    /**
+     * The subscription.
+     */
+    200: PlatformSubscription;
+};
+
+export type GetPlatformSubscriptionResponse = GetPlatformSubscriptionResponses[keyof GetPlatformSubscriptionResponses];
+
+export type GetScheduleDateData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/schedule/date';
+};
+
+export type GetScheduleDateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetScheduleDateError = GetScheduleDateErrors[keyof GetScheduleDateErrors];
+
+export type GetScheduleDateResponses = {
+    /**
+     * The schedule date.
+     */
+    200: ScheduleDate;
+};
+
+export type GetScheduleDateResponse = GetScheduleDateResponses[keyof GetScheduleDateResponses];
+
+export type MoveScheduleDateData = {
+    /**
+     * The new date.
+     */
+    body: ScheduleDateMove;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/schedule/date';
+};
+
+export type MoveScheduleDateErrors = {
+    /**
+     * `validation_failed`: `schedule_date_backwards`.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -67572,6 +71153,7 @@ export type ListPlatformReferralsErrors = {
      */
     401: Problem;
     /**
+<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
@@ -67904,6 +71486,17 @@ export type DeleteAgentIncentiveErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+=======
+     * Not a Mission Control token (`forbidden`), or the member lacks `operations:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `schedule_date_fixed`: anywhere but a developer's machine or the sandbox the date cannot move.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -67912,6 +71505,7 @@ export type DeleteAgentIncentiveErrors = {
     default: Problem;
 };
 
+<<<<<<< HEAD
 export type DeleteAgentIncentiveError = DeleteAgentIncentiveErrors[keyof DeleteAgentIncentiveErrors];
 
 export type DeleteAgentIncentiveResponses = {
@@ -68320,3 +71914,15 @@ export type JoinAgentIncentiveResponses = {
 };
 
 export type JoinAgentIncentiveResponse = JoinAgentIncentiveResponses[keyof JoinAgentIncentiveResponses];
+=======
+export type MoveScheduleDateError = MoveScheduleDateErrors[keyof MoveScheduleDateErrors];
+
+export type MoveScheduleDateResponses = {
+    /**
+     * The schedule date after the move.
+     */
+    200: ScheduleDate;
+};
+
+export type MoveScheduleDateResponse = MoveScheduleDateResponses[keyof MoveScheduleDateResponses];
+>>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
