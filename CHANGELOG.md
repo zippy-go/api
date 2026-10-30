@@ -6,6 +6,50 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-10-30
+
+Step 8, the kitchen: the kitchen display a Location runs, with courses from the
+catalogue, its stations, marks made on the display or from the floor and kept
+while offline, and the changes a display reads after a cursor. Step 8's first
+platform slice to merge, so 0.27.0 after step 7's 0.26.0; no edition of the
+default roles. Additive only.
+
+### Added
+
+- A Location's kitchen (`Kitchen` tag): whether it runs the display, and its
+  stations in order (`GET`, `PUT /v1/partners/{partner_id}/locations/{location_id}/kitchen`,
+  `KitchenSettings`, `KitchenSettingsUpdate`, `KitchenStation`,
+  `KitchenStationInput`); `order:read` or `location:read` to read,
+  `location:write` and `If-Match` to set.
+- The display's tickets: an accepted delivery or pickup with every course
+  fired, a dine-in round with its first course fired and the later ones held,
+  each with its courses, its lines at their stations and the history of its
+  marks (`GET .../kitchen/tickets` by station, `GET .../kitchen/tickets/{ticket_id}`,
+  `KitchenTicket`, `KitchenTicketLine`, `KitchenTicketCourse`,
+  `KitchenTicketMark`, `KitchenTicketList`, `KitchenTicketSource`,
+  `KitchenTicketState`, `KitchenLineState`, `KitchenCourseState`); and what
+  changed after a cursor, closed tickets included, for a display that keeps
+  them on the device (`GET .../kitchen/changes`, `KitchenChanges`). A
+  `display_id` counts a display as seen; a ticket made while every display of
+  the Location was away lands `late_to_arrive`. `order:read`.
+- Marks: fire, ready, serve, decline and bump, sent alone or as the queue a
+  display kept offline, each with its own id and the moment it was made,
+  applied by that moment so the later of two marks stands while the history
+  keeps both (`POST .../kitchen/marks`, `KitchenMark`, `KitchenMarkBatch`,
+  `KitchenMarkResult`, `KitchenMarkResults`, `KitchenMarkKind`,
+  `KitchenMarkOutcome`). `order:manage`.
+- A catalogue item's `course` (`ItemCourse`: starters, mains, desserts,
+  drinks or none) and `station_ids` on `CatalogItem` and `CatalogItemRow`, set
+  through `CatalogItemCreate` and `CatalogItemUpdate` with `catalog:write`.
+- Field codes `station_unknown` and `station_name_repeated` under
+  `validation_failed`.
+- Seven events: `kitchen.ticket.created`, `.ready` and `.bumped`;
+  `kitchen.course.fired`, `.ready` and `.flagged` (a held course waiting more
+  than 20 minutes after the course before it was ready); and
+  `kitchen.line.declined`. `ticket.changed` on
+  `private-location-{location_id}-kitchen` tells a display to read the
+  changes.
+
 ## [0.26.0] - 2026-10-30
 
 Step 7, mandates and the subscription's companions: UPI AutoPay mandates with

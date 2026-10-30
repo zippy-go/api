@@ -1,0 +1,10 @@
+type: string
+description: "The course an item is served in, which a kitchen display fires in order: `starters`, `mains`, `desserts`, `drinks`, or `none`. A round fires its first course of starters, mains and desserts when it arrives, with its drinks and its items of no course, and holds the later ones until they are fired; a delivery or a pickup fires every course at acceptance."
+enum:
+  - starters
+  - mains
+  - desserts
+  - drinks
+  - none
+examples:
+  - mains

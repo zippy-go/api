@@ -1,0 +1,22 @@
+type: object
+description: "A Location's kitchen as a whole: stations named are kept or added, and those left out are removed; an item given a removed station shows at every station until given another."
+required:
+  - display_enabled
+  - stations
+properties:
+  display_enabled:
+    type: boolean
+    description: Whether the Location runs the kitchen display.
+    examples:
+      - true
+  stations:
+    type: array
+    items:
+      $ref: ./KitchenStationInput.yaml
+    description: Its stations in order, at most 12.
+examples:
+  - display_enabled: true
+    stations:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+        name: Tandoor
+      - name: Kitchen

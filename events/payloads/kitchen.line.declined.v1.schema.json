@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/kitchen.line.declined.v1.schema.json",
+  "title": "KitchenLineDeclinedPayload",
+  "description": "Payload of `kitchen.line.declined` version 1. The kitchen declined a line not fired yet. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "partner_id",
+    "location_id",
+    "source",
+    "order_id",
+    "tab_id",
+    "round_id",
+    "at",
+    "line_id",
+    "item_id",
+    "name",
+    "quantity",
+    "reason",
+    "by"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ticket."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "source": {
+      "type": "string",
+      "description": "What the ticket came from: `order` or `round`.",
+      "enum": [
+        "order",
+        "round"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order, which for a round is the tab."
+    },
+    "tab_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The tab of a round; `null` for a delivery or a pickup."
+    },
+    "round_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The round; `null` for a delivery or a pickup."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened: for a mark, the moment it was made."
+    },
+    "line_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order's or the round's line."
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The item."
+    },
+    "name": {
+      "type": "string",
+      "description": "The item's name as ordered."
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why: `sold_out`.",
+      "enum": [
+        "sold_out"
+      ]
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who declined it."
+    }
+  }
+}

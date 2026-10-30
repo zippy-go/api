@@ -1,0 +1,104 @@
+type: object
+description: A mark in the ticket's history, kept whatever became of it, with who made it and when.
+required:
+  - id
+  - kind
+  - course
+  - line_id
+  - station_id
+  - made_at
+  - received_at
+  - by
+  - by_name
+  - display_id
+  - outcome
+  - reason
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The mark, as the display made it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+  kind:
+    $ref: ./KitchenMarkKind.yaml
+    description: What it does.
+  course:
+    oneOf:
+      - $ref: ../catalog/ItemCourse.yaml
+      - type: "null"
+    description: The course it marks.
+  line_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The line it marks.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+  station_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The station it marks for.
+    examples:
+      - null
+  made_at:
+    type: string
+    format: date-time
+    description: When it was made, on the display or the floor.
+    examples:
+      - 2026-11-06T14:35:00Z
+  received_at:
+    type: string
+    format: date-time
+    description: When the platform received it.
+    examples:
+      - 2026-11-06T14:35:01Z
+  by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who made it; `null` for the platform's own.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+  by_name:
+    type:
+      - string
+      - "null"
+    description: Their name.
+    examples:
+      - Ravi
+  display_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The display it came from.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+  outcome:
+    $ref: ./KitchenMarkOutcome.yaml
+    description: What became of it.
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why it was refused or superseded, in words.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+    kind: ready
+    course: null
+    line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+    station_id: null
+    made_at: 2026-11-06T14:35:00Z
+    received_at: 2026-11-06T14:35:01Z
+    by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+    by_name: Ravi
+    display_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+    outcome: applied
+    reason: null

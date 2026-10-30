@@ -1,0 +1,11 @@
+type: string
+description: "Where a line stands: `held` until its course is fired, `fired` while in preparation, `ready`, `served` from the floor, `declined` before it was fired, or `voided` from the tab."
+enum:
+  - held
+  - fired
+  - ready
+  - served
+  - declined
+  - voided
+examples:
+  - fired

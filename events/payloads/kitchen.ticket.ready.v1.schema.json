@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/kitchen.ticket.ready.v1.schema.json",
+  "title": "KitchenTicketReadyPayload",
+  "description": "Payload of `kitchen.ticket.ready` version 1. Every line still on a ticket is ready or served. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "partner_id",
+    "location_id",
+    "source",
+    "order_id",
+    "tab_id",
+    "round_id",
+    "at",
+    "by"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ticket."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "source": {
+      "type": "string",
+      "description": "What the ticket came from: `order` or `round`.",
+      "enum": [
+        "order",
+        "round"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order, which for a round is the tab."
+    },
+    "tab_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The tab of a round; `null` for a delivery or a pickup."
+    },
+    "round_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The round; `null` for a delivery or a pickup."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened: for a mark, the moment it was made."
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who made the last mark; `null` for the platform's own."
+    }
+  }
+}

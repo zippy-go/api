@@ -1,0 +1,23 @@
+type: object
+description: "A station as set: an existing one by its id, renamed or moved, or a new one without."
+required:
+  - name
+properties:
+  id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The station kept; absent or `null` for a new one.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+  name:
+    type: string
+    minLength: 1
+    maxLength: 40
+    description: Its name, 1 to 40 characters, once per Location.
+    examples:
+      - Tandoor
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+    name: Tandoor

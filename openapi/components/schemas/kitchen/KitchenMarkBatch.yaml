@@ -1,0 +1,29 @@
+type: object
+description: One mark, or the queue a display kept while offline, in the order they were made.
+required:
+  - marks
+properties:
+  display_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The display sending them, an id it keeps; it is counted as seen.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+  marks:
+    type: array
+    items:
+      $ref: ./KitchenMark.yaml
+    description: The marks, 1 to 100.
+examples:
+  - display_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+    marks:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+        kind: ready
+        ticket_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+        course: null
+        line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+        station_id: null
+        reason: null
+        made_at: 2026-11-06T14:35:00Z

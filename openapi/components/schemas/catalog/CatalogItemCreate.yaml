@@ -102,6 +102,16 @@ properties:
       type: string
       format: uuid
     description: The categories to put it on, last in each.
+  course:
+    $ref: ./ItemCourse.yaml
+    description: The course it is served in on the kitchen display; `none` by default.
+  station_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    maxItems: 12
+    description: The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
 examples:
   - name:
       en: Hyderabadi Biryani

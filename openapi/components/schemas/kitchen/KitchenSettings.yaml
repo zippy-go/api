@@ -1,0 +1,59 @@
+type: object
+description: "A Location's kitchen: whether it runs the kitchen display, which takes a ticket for every order to prepare, and its stations. Versioned: `ETag` and `If-Match` carry the version."
+required:
+  - location_id
+  - display_enabled
+  - stations
+  - held_flag_minutes
+  - version
+  - updated_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  display_enabled:
+    type: boolean
+    description: "Whether the Location runs the kitchen display: tickets are made for its accepted orders and its rounds, and an order is ready once its ticket is."
+    examples:
+      - true
+  stations:
+    type: array
+    items:
+      $ref: ./KitchenStation.yaml
+    description: Its stations in order; an item given to none shows at every station.
+  held_flag_minutes:
+    type: integer
+    minimum: 1
+    description: A held course is flagged once it has waited this long after the course before it was ready.
+    examples:
+      - 20
+  version:
+    type: integer
+    minimum: 0
+    description: The version, which only rises.
+    examples:
+      - 3
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was last set; `null` for a Location that never set it.
+    examples:
+      - 2026-11-06T10:00:00Z
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    display_enabled: true
+    stations:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+        name: Tandoor
+        position: 1
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8102
+        name: Kitchen
+        position: 2
+    held_flag_minutes: 20
+    version: 3
+    updated_at: 2026-11-06T10:00:00Z

@@ -1,0 +1,7 @@
+type: string
+description: "What a ticket came from: an accepted delivery or pickup order (`order`), or a round of a dine-in tab (`round`)."
+enum:
+  - order
+  - round
+examples:
+  - round

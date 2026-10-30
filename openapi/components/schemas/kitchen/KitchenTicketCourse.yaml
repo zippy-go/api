@@ -1,0 +1,55 @@
+type: object
+description: A course of the ticket, in the order it is fired.
+required:
+  - course
+  - state
+  - fired_at
+  - ready_at
+  - waiting_since
+  - flagged_at
+properties:
+  course:
+    $ref: ../catalog/ItemCourse.yaml
+    description: The course.
+  state:
+    $ref: ./KitchenCourseState.yaml
+    description: Where it stands.
+  fired_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was fired; `null` while held.
+    examples:
+      - null
+  ready_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When its last line was ready.
+    examples:
+      - null
+  waiting_since:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "For a held course after the first: when the course before it was ready, from which it waits."
+    examples:
+      - 2026-11-06T14:40:00Z
+  flagged_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was flagged as waiting too long; `null` while it is not.
+    examples:
+      - null
+examples:
+  - course: mains
+    state: held
+    fired_at: null
+    ready_at: null
+    waiting_since: 2026-11-06T14:40:00Z
+    flagged_at: null

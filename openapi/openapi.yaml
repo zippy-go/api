@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.26.0
+  version: 0.27.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -291,6 +291,9 @@ tags:
     description: "What brings customers back (step 6, engagement): reward campaigns of kind streak, quest, tier and punch card, run by Mission Control across Partners and by a Partner on its own Locations, each with versioned rules, a funder or a split, a budget, a schedule, an audience, caps and a control group, moved as an offer is; the rewards engine reading the platform's events once each, granting promotional Wallet credit or an offer held for the customer, with claw-backs, caps, the review of held grants and exclusions; the customer's Rewards and its history; and the referral programme, a friend's first order crediting the referrer. Customers read their own; Partner staff read with `engagement:read` and change with `engagement:write` at the Location; platform staff read with `engagement:read`, change with `engagement:write` and decide held grants and exclusions with `engagement:manage`."
   - name: Incentives
     description: "The Agents' incentives (step 6): quests of drop-off tiers and bonuses a drop-off on a delivery service, joined by the Agent before anything counts, never replacing the pay rule, each with a budget; paid by the platform on its fleet's weekly statements under \"Bonuses and quests\", and reported to a Partner for its own Agents. Who runs the service configures them with `agent:manage`: Mission Control for the platform fleet, a Partner for its own; the Agent app joins them."
+
+  - name: Kitchen
+    description: "The kitchen display (step 8): a ticket for every order to prepare, from an accepted delivery or pickup with every course fired and from a dine-in round with its first course fired and the later ones held; courses from the catalogue and the Location's stations; fire, ready, serve, decline and bump, as marks sent alone or queued while offline, applied by the moment each was made so the later stands; the changes after a cursor, so a display keeps working without the network. Read with `order:read`, marked with `order:manage`, set with `location:write` at the Location."
 
 paths:
   /v1/health:
@@ -1501,6 +1504,18 @@ paths:
     $ref: ./paths/reviews/subscription-review.yaml
   /v1/platform/reports/subscriptions:
     $ref: ./paths/reports/subscriptions.yaml
+
+  # Step 8 kitchen: the kitchen display, its tickets, marks and changes
+  /v1/partners/{partner_id}/locations/{location_id}/kitchen:
+    $ref: ./paths/kitchen/location-kitchen.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/kitchen/tickets:
+    $ref: ./paths/kitchen/kitchen-tickets.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/kitchen/tickets/{ticket_id}:
+    $ref: ./paths/kitchen/kitchen-ticket.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/kitchen/changes:
+    $ref: ./paths/kitchen/kitchen-changes.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/kitchen/marks:
+    $ref: ./paths/kitchen/kitchen-marks.yaml
 
 components:
   securitySchemes:
@@ -4242,3 +4257,45 @@ components:
       $ref: ./components/schemas/reports/SubscriptionsReport.yaml
     OfferWay:
       $ref: ./components/schemas/promotions/OfferWay.yaml
+    ItemCourse:
+      $ref: ./components/schemas/catalog/ItemCourse.yaml
+    KitchenTicketSource:
+      $ref: ./components/schemas/kitchen/KitchenTicketSource.yaml
+    KitchenTicketState:
+      $ref: ./components/schemas/kitchen/KitchenTicketState.yaml
+    KitchenLineState:
+      $ref: ./components/schemas/kitchen/KitchenLineState.yaml
+    KitchenCourseState:
+      $ref: ./components/schemas/kitchen/KitchenCourseState.yaml
+    KitchenMarkKind:
+      $ref: ./components/schemas/kitchen/KitchenMarkKind.yaml
+    KitchenMarkOutcome:
+      $ref: ./components/schemas/kitchen/KitchenMarkOutcome.yaml
+    KitchenStation:
+      $ref: ./components/schemas/kitchen/KitchenStation.yaml
+    KitchenStationInput:
+      $ref: ./components/schemas/kitchen/KitchenStationInput.yaml
+    KitchenSettings:
+      $ref: ./components/schemas/kitchen/KitchenSettings.yaml
+    KitchenSettingsUpdate:
+      $ref: ./components/schemas/kitchen/KitchenSettingsUpdate.yaml
+    KitchenTicketLine:
+      $ref: ./components/schemas/kitchen/KitchenTicketLine.yaml
+    KitchenTicketCourse:
+      $ref: ./components/schemas/kitchen/KitchenTicketCourse.yaml
+    KitchenTicketMark:
+      $ref: ./components/schemas/kitchen/KitchenTicketMark.yaml
+    KitchenTicket:
+      $ref: ./components/schemas/kitchen/KitchenTicket.yaml
+    KitchenTicketList:
+      $ref: ./components/schemas/kitchen/KitchenTicketList.yaml
+    KitchenChanges:
+      $ref: ./components/schemas/kitchen/KitchenChanges.yaml
+    KitchenMark:
+      $ref: ./components/schemas/kitchen/KitchenMark.yaml
+    KitchenMarkBatch:
+      $ref: ./components/schemas/kitchen/KitchenMarkBatch.yaml
+    KitchenMarkResult:
+      $ref: ./components/schemas/kitchen/KitchenMarkResult.yaml
+    KitchenMarkResults:
+      $ref: ./components/schemas/kitchen/KitchenMarkResults.yaml

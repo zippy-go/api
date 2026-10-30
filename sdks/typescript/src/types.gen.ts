@@ -12445,6 +12445,14 @@ export type CatalogItem = {
      * Who last changed it.
      */
     updated_by: string | null;
+    /**
+     * The course it is served in on the kitchen display; `none` when not set.
+     */
+    course: ItemCourse;
+    /**
+     * The kitchen stations it shows at, of its Location; empty for every station.
+     */
+    station_ids: Array<string>;
 };
 
 /**
@@ -12521,6 +12529,14 @@ export type CatalogItemCreate = {
      * The categories to put it on, last in each.
      */
     category_ids?: Array<string>;
+    /**
+     * The course it is served in on the kitchen display; `none` by default.
+     */
+    course?: ItemCourse;
+    /**
+     * The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
+     */
+    station_ids?: Array<string>;
 };
 
 /**
@@ -12597,6 +12613,14 @@ export type CatalogItemUpdate = {
      * The categories it sits on; it keeps its place on those it stays on.
      */
     category_ids?: Array<string>;
+    /**
+     * The course it is served in on the kitchen display; `none` by default.
+     */
+    course?: ItemCourse;
+    /**
+     * The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
+     */
+    station_ids?: Array<string>;
 };
 
 /**
@@ -12683,6 +12707,14 @@ export type CatalogItemRow = {
      * Its version.
      */
     version: number;
+    /**
+     * The course it is served in on the kitchen display; `none` when not set.
+     */
+    course: ItemCourse;
+    /**
+     * The kitchen stations it shows at, of its Location; empty for every station.
+     */
+    station_ids: Array<string>;
 };
 
 /**
@@ -33010,6 +33042,473 @@ export type SubscriptionsReport = {
  * A way of ordering an offer applies to: an order placed `on_demand`, one `scheduled` into a slot, or a `subscription` occurrence generated at the cutoff. No offer applies to subscription occurrences unless it says so.
  */
 export type OfferWay = 'on_demand' | 'scheduled' | 'subscription';
+
+/**
+ * The course an item is served in, which a kitchen display fires in order: `starters`, `mains`, `desserts`, `drinks`, or `none`. A round fires its first course of starters, mains and desserts when it arrives, with its drinks and its items of no course, and holds the later ones until they are fired; a delivery or a pickup fires every course at acceptance.
+ */
+export type ItemCourse = 'starters' | 'mains' | 'desserts' | 'drinks' | 'none';
+
+/**
+ * What a ticket came from: an accepted delivery or pickup order (`order`), or a round of a dine-in tab (`round`).
+ */
+export type KitchenTicketSource = 'order' | 'round';
+
+/**
+ * Where a ticket stands: `open` while anything on it is to cook, `ready` once every line still on it is ready or served, `bumped` once the kitchen took it off the display, `withdrawn` when its round was recalled or its order cancelled.
+ */
+export type KitchenTicketState = 'open' | 'ready' | 'bumped' | 'withdrawn';
+
+/**
+ * Where a line stands: `held` until its course is fired, `fired` while in preparation, `ready`, `served` from the floor, `declined` before it was fired, or `voided` from the tab.
+ */
+export type KitchenLineState = 'held' | 'fired' | 'ready' | 'served' | 'declined' | 'voided';
+
+/**
+ * Where a course stands, from its lines: `held`, `fired` while any line is in preparation, `ready` once every line is ready or served, or `served` once every line is served.
+ */
+export type KitchenCourseState = 'held' | 'fired' | 'ready' | 'served';
+
+/**
+ * What a mark does: `fire` a held course, mark a line or a course `ready`, `serve` a line or a course from the floor, `decline` a line not fired yet as sold out, or `bump` a ready ticket off the display.
+ */
+export type KitchenMarkKind = 'fire' | 'ready' | 'serve' | 'decline' | 'bump';
+
+/**
+ * What became of a mark: `applied`; `unchanged` when what it marks was so already; `superseded` when a mark made later stands; `refused` when it may not be made, with the reason.
+ */
+export type KitchenMarkOutcome = 'applied' | 'unchanged' | 'superseded' | 'refused';
+
+/**
+ * A station of the kitchen, such as the tandoor, which sees only the items given to it.
+ */
+export type KitchenStation = {
+    /**
+     * The station.
+     */
+    id: string;
+    /**
+     * Its name, 1 to 40 characters.
+     */
+    name: string;
+    /**
+     * Its place in the display's list, from 1.
+     */
+    position: number;
+};
+
+/**
+ * A station as set: an existing one by its id, renamed or moved, or a new one without.
+ */
+export type KitchenStationInput = {
+    /**
+     * The station kept; absent or `null` for a new one.
+     */
+    id?: string | null;
+    /**
+     * Its name, 1 to 40 characters, once per Location.
+     */
+    name: string;
+};
+
+/**
+ * A Location's kitchen: whether it runs the kitchen display, which takes a ticket for every order to prepare, and its stations. Versioned: `ETag` and `If-Match` carry the version.
+ */
+export type KitchenSettings = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Whether the Location runs the kitchen display: tickets are made for its accepted orders and its rounds, and an order is ready once its ticket is.
+     */
+    display_enabled: boolean;
+    /**
+     * Its stations in order; an item given to none shows at every station.
+     */
+    stations: Array<KitchenStation>;
+    /**
+     * A held course is flagged once it has waited this long after the course before it was ready.
+     */
+    held_flag_minutes: number;
+    /**
+     * The version, which only rises.
+     */
+    version: number;
+    /**
+     * When it was last set; `null` for a Location that never set it.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * A Location's kitchen as a whole: stations named are kept or added, and those left out are removed; an item given a removed station shows at every station until given another.
+ */
+export type KitchenSettingsUpdate = {
+    /**
+     * Whether the Location runs the kitchen display.
+     */
+    display_enabled: boolean;
+    /**
+     * Its stations in order, at most 12.
+     */
+    stations: Array<KitchenStationInput>;
+};
+
+/**
+ * An item to cook, with the course and the stations the catalogue gives it, as the ticket shows it.
+ */
+export type KitchenTicketLine = {
+    /**
+     * The line on the ticket.
+     */
+    id: string;
+    /**
+     * The order's or the round's line.
+     */
+    order_line_id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item's name as ordered.
+     */
+    name: string;
+    /**
+     * The variant's values; `null` for an item sold one way.
+     */
+    variant_label: string | null;
+    /**
+     * The options chosen, as the kitchen reads them.
+     */
+    options: Array<string>;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The note for the kitchen.
+     */
+    note: string | null;
+    /**
+     * Its veg or non-veg mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * Its course.
+     */
+    course: ItemCourse;
+    /**
+     * The stations it shows at; empty for every station.
+     */
+    station_ids: Array<string>;
+    /**
+     * Where it stands.
+     */
+    state: KitchenLineState;
+    /**
+     * When the mark that set its state was made.
+     */
+    state_at: string;
+};
+
+/**
+ * A course of the ticket, in the order it is fired.
+ */
+export type KitchenTicketCourse = {
+    /**
+     * The course.
+     */
+    course: ItemCourse;
+    /**
+     * Where it stands.
+     */
+    state: KitchenCourseState;
+    /**
+     * When it was fired; `null` while held.
+     */
+    fired_at: string | null;
+    /**
+     * When its last line was ready.
+     */
+    ready_at: string | null;
+    /**
+     * For a held course after the first: when the course before it was ready, from which it waits.
+     */
+    waiting_since: string | null;
+    /**
+     * When it was flagged as waiting too long; `null` while it is not.
+     */
+    flagged_at: string | null;
+};
+
+/**
+ * A mark in the ticket's history, kept whatever became of it, with who made it and when.
+ */
+export type KitchenTicketMark = {
+    /**
+     * The mark, as the display made it.
+     */
+    id: string;
+    /**
+     * What it does.
+     */
+    kind: KitchenMarkKind;
+    /**
+     * The course it marks.
+     */
+    course: ItemCourse | null;
+    /**
+     * The line it marks.
+     */
+    line_id: string | null;
+    /**
+     * The station it marks for.
+     */
+    station_id: string | null;
+    /**
+     * When it was made, on the display or the floor.
+     */
+    made_at: string;
+    /**
+     * When the platform received it.
+     */
+    received_at: string;
+    /**
+     * Who made it; `null` for the platform's own.
+     */
+    by: string | null;
+    /**
+     * Their name.
+     */
+    by_name: string | null;
+    /**
+     * The display it came from.
+     */
+    display_id: string | null;
+    /**
+     * What became of it.
+     */
+    outcome: KitchenMarkOutcome;
+    /**
+     * Why it was refused or superseded, in words.
+     */
+    reason: string | null;
+};
+
+/**
+ * A ticket on the kitchen display: an accepted order, or a round of a tab, with its courses and lines.
+ */
+export type KitchenTicket = {
+    /**
+     * The ticket.
+     */
+    id: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * What it came from.
+     */
+    source: KitchenTicketSource;
+    /**
+     * The order, which for a round is the tab.
+     */
+    order_id: string;
+    /**
+     * The order's number, as said aloud.
+     */
+    number: string;
+    /**
+     * How the order is served: `delivery`, `pickup` or `dine_in`.
+     */
+    fulfilment: 'delivery' | 'pickup' | 'dine_in';
+    /**
+     * The tab of a round.
+     */
+    tab_id: string | null;
+    /**
+     * The round.
+     */
+    round_id: string | null;
+    /**
+     * The round's number on its tab.
+     */
+    round_number: number | null;
+    /**
+     * The table of a round.
+     */
+    table_id: string | null;
+    /**
+     * Its name.
+     */
+    table_name: string | null;
+    /**
+     * Where it stands.
+     */
+    state: KitchenTicketState;
+    /**
+     * Made while every display of the Location was away: it lands marked late to arrive.
+     */
+    late_to_arrive: boolean;
+    /**
+     * When the order was accepted or the round sent.
+     */
+    created_at: string;
+    /**
+     * When it was ready.
+     */
+    ready_at: string | null;
+    /**
+     * When it was taken off the display.
+     */
+    bumped_at: string | null;
+    /**
+     * When it was withdrawn.
+     */
+    withdrawn_at: string | null;
+    /**
+     * Its version, which rises with every change.
+     */
+    version: number;
+    /**
+     * Its courses in the order they fire.
+     */
+    courses: Array<KitchenTicketCourse>;
+    /**
+     * Its lines.
+     */
+    lines: Array<KitchenTicketLine>;
+    /**
+     * Every mark made on it, oldest first.
+     */
+    history: Array<KitchenTicketMark>;
+};
+
+/**
+ * The open and ready tickets of a Location, oldest first, with the cursor to read the changes after them.
+ */
+export type KitchenTicketList = {
+    /**
+     * The tickets; with `station_id`, each ticket's lines at that station only, and only tickets with one.
+     */
+    items: Array<KitchenTicket>;
+    /**
+     * Where the changes after this read start: give it to `listKitchenChanges`.
+     */
+    cursor: string;
+};
+
+/**
+ * Every ticket changed after a cursor, as it stands now, bumped and withdrawn ones included so a display can take them off.
+ */
+export type KitchenChanges = {
+    /**
+     * The tickets changed, in the order of their last change.
+     */
+    tickets: Array<KitchenTicket>;
+    /**
+     * The cursor after the last of them.
+     */
+    cursor: string;
+    /**
+     * Whether more changes wait after this page.
+     */
+    more: boolean;
+};
+
+/**
+ * A mark as made on a display or from the floor, sent alone or in the queue kept while offline. The platform applies it by the moment it was made, so the later of two marks stands, and the history keeps both.
+ */
+export type KitchenMark = {
+    /**
+     * The mark's own id, made where it was made: sending it again changes nothing.
+     */
+    id: string;
+    /**
+     * What it does.
+     */
+    kind: KitchenMarkKind;
+    /**
+     * The ticket.
+     */
+    ticket_id: string;
+    /**
+     * For `fire`, and for `ready` or `serve` of a whole course: the course.
+     */
+    course?: ItemCourse | null;
+    /**
+     * For `decline`, and for `ready` or `serve` of one line: the line on the ticket.
+     */
+    line_id?: string | null;
+    /**
+     * For `ready` of a course at one station: the station, whose lines alone it marks.
+     */
+    station_id?: string | null;
+    /**
+     * For `decline`: why, `sold_out` by default.
+     */
+    reason?: string | null;
+    /**
+     * When it was made; no later than when it is received.
+     */
+    made_at: string;
+};
+
+/**
+ * One mark, or the queue a display kept while offline, in the order they were made.
+ */
+export type KitchenMarkBatch = {
+    /**
+     * The display sending them, an id it keeps; it is counted as seen.
+     */
+    display_id?: string | null;
+    /**
+     * The marks, 1 to 100.
+     */
+    marks: Array<KitchenMark>;
+};
+
+/**
+ * What became of one mark, with its ticket as it stands after the batch.
+ */
+export type KitchenMarkResult = {
+    /**
+     * The mark.
+     */
+    id: string;
+    /**
+     * What became of it.
+     */
+    outcome: KitchenMarkOutcome;
+    /**
+     * Why it was refused or superseded, in words.
+     */
+    reason: string | null;
+    /**
+     * The ticket as it stands now; `null` for a ticket of another Location or none.
+     */
+    ticket: KitchenTicket | null;
+};
+
+/**
+ * The marks' results in the order sent, and the cursor after their changes.
+ */
+export type KitchenMarkResults = {
+    /**
+     * One per mark.
+     */
+    results: Array<KitchenMarkResult>;
+    /**
+     * The changes cursor after the marks.
+     */
+    cursor: string;
+};
 
 /**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
@@ -74785,3 +75284,378 @@ export type GetSubscriptionsReportResponses = {
 };
 
 export type GetSubscriptionsReportResponse = GetSubscriptionsReportResponses[keyof GetSubscriptionsReportResponses];
+
+export type GetLocationKitchenData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen';
+};
+
+export type GetLocationKitchenErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner or Location for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationKitchenError = GetLocationKitchenErrors[keyof GetLocationKitchenErrors];
+
+export type GetLocationKitchenResponses = {
+    /**
+     * The kitchen.
+     */
+    200: KitchenSettings;
+};
+
+export type GetLocationKitchenResponse = GetLocationKitchenResponses[keyof GetLocationKitchenResponses];
+
+export type SetLocationKitchenData = {
+    /**
+     * The kitchen as a whole.
+     */
+    body: KitchenSettingsUpdate;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen';
+};
+
+export type SetLocationKitchenErrors = {
+    /**
+     * `validation_failed`: a name empty or longer than 40 characters, a name twice (`station_name_repeated`), more than 12 stations, or an id that is not one of the Location's stations (`station_unknown`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner or Location for the caller.
+     */
+    404: Problem;
+    /**
+     * `precondition_failed`: the kitchen changed since the `If-Match` version.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetLocationKitchenError = SetLocationKitchenErrors[keyof SetLocationKitchenErrors];
+
+export type SetLocationKitchenResponses = {
+    /**
+     * The kitchen.
+     */
+    200: KitchenSettings;
+};
+
+export type SetLocationKitchenResponse = SetLocationKitchenResponses[keyof SetLocationKitchenResponses];
+
+export type ListKitchenTicketsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One of the Location's stations: each ticket with its lines at that station only, and only the tickets with one; an item given to no station shows at every station.
+         */
+        station_id?: string;
+        /**
+         * The display reading, an id it keeps: it is counted as seen, and a ticket made while every display of the Location was away lands marked late to arrive.
+         */
+        display_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen/tickets';
+};
+
+export type ListKitchenTicketsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier, or a station that is not the Location's (`station_unknown`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner or Location for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListKitchenTicketsError = ListKitchenTicketsErrors[keyof ListKitchenTicketsErrors];
+
+export type ListKitchenTicketsResponses = {
+    /**
+     * The tickets.
+     */
+    200: KitchenTicketList;
+};
+
+export type ListKitchenTicketsResponse = ListKitchenTicketsResponses[keyof ListKitchenTicketsResponses];
+
+export type GetKitchenTicketData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The ticket, of the Location in the path.
+         */
+        ticket_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen/tickets/{ticket_id}';
+};
+
+export type GetKitchenTicketErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or ticket for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetKitchenTicketError = GetKitchenTicketErrors[keyof GetKitchenTicketErrors];
+
+export type GetKitchenTicketResponses = {
+    /**
+     * The ticket.
+     */
+    200: KitchenTicket;
+};
+
+export type GetKitchenTicketResponse = GetKitchenTicketResponses[keyof GetKitchenTicketResponses];
+
+export type ListKitchenChangesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The cursor of the last read: of `listKitchenTickets`, of this operation, or of the marks' results.
+         */
+        after?: string;
+        /**
+         * One of the Location's stations: each ticket with its lines at that station only, and only the tickets with one; an item given to no station shows at every station.
+         */
+        station_id?: string;
+        /**
+         * The display reading, an id it keeps: it is counted as seen, and a ticket made while every display of the Location was away lands marked late to arrive.
+         */
+        display_id?: string;
+        /**
+         * How many tickets, 1 to 100; 100 by default.
+         */
+        limit?: number;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen/changes';
+};
+
+export type ListKitchenChangesErrors = {
+    /**
+     * `validation_failed`: a malformed identifier, a limit out of range, a cursor this caller was not given (`cursor_invalid`), or a station that is not the Location's (`station_unknown`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner or Location for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListKitchenChangesError = ListKitchenChangesErrors[keyof ListKitchenChangesErrors];
+
+export type ListKitchenChangesResponses = {
+    /**
+     * The changes.
+     */
+    200: KitchenChanges;
+};
+
+export type ListKitchenChangesResponse = ListKitchenChangesResponses[keyof ListKitchenChangesResponses];
+
+export type MarkKitchenData = {
+    /**
+     * The marks, in the order they were made.
+     */
+    body: KitchenMarkBatch;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/kitchen/marks';
+};
+
+export type MarkKitchenErrors = {
+    /**
+     * `validation_failed`: no mark or more than 100, a mark without what it marks, a moment later than now, or a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner or Location for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkKitchenError = MarkKitchenErrors[keyof MarkKitchenErrors];
+
+export type MarkKitchenResponses = {
+    /**
+     * What became of each mark.
+     */
+    200: KitchenMarkResults;
+};
+
+export type MarkKitchenResponse = MarkKitchenResponses[keyof MarkKitchenResponses];

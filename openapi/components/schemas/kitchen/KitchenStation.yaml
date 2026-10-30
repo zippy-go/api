@@ -1,0 +1,30 @@
+type: object
+description: A station of the kitchen, such as the tandoor, which sees only the items given to it.
+required:
+  - id
+  - name
+  - position
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The station.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+  name:
+    type: string
+    minLength: 1
+    maxLength: 40
+    description: Its name, 1 to 40 characters.
+    examples:
+      - Tandoor
+  position:
+    type: integer
+    minimum: 1
+    description: Its place in the display's list, from 1.
+    examples:
+      - 1
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+    name: Tandoor
+    position: 1

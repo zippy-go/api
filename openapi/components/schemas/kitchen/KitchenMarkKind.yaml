@@ -1,0 +1,10 @@
+type: string
+description: "What a mark does: `fire` a held course, mark a line or a course `ready`, `serve` a line or a course from the floor, `decline` a line not fired yet as sold out, or `bump` a ready ticket off the display."
+enum:
+  - fire
+  - ready
+  - serve
+  - decline
+  - bump
+examples:
+  - ready

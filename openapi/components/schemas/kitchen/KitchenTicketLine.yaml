@@ -1,0 +1,112 @@
+type: object
+description: An item to cook, with the course and the stations the catalogue gives it, as the ticket shows it.
+required:
+  - id
+  - order_line_id
+  - item_id
+  - variant_id
+  - name
+  - variant_label
+  - options
+  - quantity
+  - note
+  - food_mark
+  - course
+  - station_ids
+  - state
+  - state_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The line on the ticket.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+  order_line_id:
+    type: string
+    format: uuid
+    description: The order's or the round's line.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+  item_id:
+    type: string
+    format: uuid
+    description: The item.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+  variant_id:
+    type: string
+    format: uuid
+    description: The variant.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+  name:
+    type: string
+    description: The item's name as ordered.
+    examples:
+      - Butter Chicken
+  variant_label:
+    type:
+      - string
+      - "null"
+    description: The variant's values; `null` for an item sold one way.
+    examples:
+      - Full
+  options:
+    type: array
+    items:
+      type: string
+    description: The options chosen, as the kitchen reads them.
+  quantity:
+    type: integer
+    minimum: 1
+    description: How many.
+    examples:
+      - 2
+  note:
+    type:
+      - string
+      - "null"
+    description: The note for the kitchen.
+    examples:
+      - Less spicy
+  food_mark:
+    oneOf:
+      - $ref: ../catalog/FoodMark.yaml
+      - type: "null"
+    description: Its veg or non-veg mark.
+  course:
+    $ref: ../catalog/ItemCourse.yaml
+    description: Its course.
+  station_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The stations it shows at; empty for every station.
+  state:
+    $ref: ./KitchenLineState.yaml
+    description: Where it stands.
+  state_at:
+    type: string
+    format: date-time
+    description: When the mark that set its state was made.
+    examples:
+      - 2026-11-06T14:31:05Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+    order_line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+    item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+    variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+    name: Butter Chicken
+    variant_label: Full
+    options:
+      - Extra gravy
+    quantity: 2
+    note: Less spicy
+    food_mark: non_veg
+    course: mains
+    station_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8102
+    state: held
+    state_at: 2026-11-06T14:31:05Z

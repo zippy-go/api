@@ -418,6 +418,16 @@ errors:
         description: >-
           A new version of a campaign's rules given an effective moment in the
           past.
+      - code: station_unknown
+        message: "{station} is not a station of this Location."
+        description: >-
+          A station named that the Location does not have: on a catalogue
+          item, in a kitchen's settings or a ticket's filter.
+      - code: station_name_repeated
+        message: "Each station is named once: {name} is twice."
+        description: >-
+          Two stations of one kitchen with the same name, compared without
+          case.
   - code: channel_unknown
     status: 400
     title: Unknown channel

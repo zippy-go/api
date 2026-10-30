@@ -1832,3 +1832,59 @@ events:
     description: "The bank refused a delivery day's debit: tried once more at 15:00 after the first, and after the second the cutoff takes the Wallet or skips the day. The envelope's `partner_id` is `null`."
     payload_schema: ./payloads/payments.mandate.debit_failed.v1.schema.json
     example: ./examples/payments.mandate.debit_failed.v1.json
+
+  - type: kitchen.ticket.created
+    version: 1
+    domain: kitchen
+    description: >-
+      A ticket reached the kitchen display: an accepted delivery or pickup with every course fired, or a round of a tab with its first course fired and the later ones held, without an accept step. Consumers: the floor and the board, analytics.
+    payload_schema: ./payloads/kitchen.ticket.created.v1.schema.json
+    example: ./examples/kitchen.ticket.created.v1.json
+
+  - type: kitchen.ticket.ready
+    version: 1
+    domain: kitchen
+    description: >-
+      Every line still on a ticket is ready or served. Consumers: ordering (the order ready where its Location runs the display, the round ready on its tab), the floor.
+    payload_schema: ./payloads/kitchen.ticket.ready.v1.schema.json
+    example: ./examples/kitchen.ticket.ready.v1.json
+
+  - type: kitchen.ticket.bumped
+    version: 1
+    domain: kitchen
+    description: >-
+      The kitchen took a ready ticket off its display. Consumers: analytics.
+    payload_schema: ./payloads/kitchen.ticket.bumped.v1.schema.json
+    example: ./examples/kitchen.ticket.bumped.v1.json
+
+  - type: kitchen.course.fired
+    version: 1
+    domain: kitchen
+    description: >-
+      A course is in preparation: fired with its ticket, or a held course fired by the floor or the kitchen. Consumers: ordering (each line's state on the tab), the floor.
+    payload_schema: ./payloads/kitchen.course.fired.v1.schema.json
+    example: ./examples/kitchen.course.fired.v1.json
+
+  - type: kitchen.course.ready
+    version: 1
+    domain: kitchen
+    description: >-
+      Every line of a course is ready or served. Consumers: ordering (each line's state on the tab), the floor.
+    payload_schema: ./payloads/kitchen.course.ready.v1.schema.json
+    example: ./examples/kitchen.course.ready.v1.json
+
+  - type: kitchen.course.flagged
+    version: 1
+    domain: kitchen
+    description: >-
+      A held course has waited longer than the Location allows (20 minutes) after the course before it was ready: the display and the table flag it. Consumers: ordering (the table's flag), the floor.
+    payload_schema: ./payloads/kitchen.course.flagged.v1.schema.json
+    example: ./examples/kitchen.course.flagged.v1.json
+
+  - type: kitchen.line.declined
+    version: 1
+    domain: kitchen
+    description: >-
+      The kitchen declined a line not fired yet, as sold out. Consumers: ordering (the table told at once, the line off the bill), notifications.
+    payload_schema: ./payloads/kitchen.line.declined.v1.schema.json
+    example: ./examples/kitchen.line.declined.v1.json

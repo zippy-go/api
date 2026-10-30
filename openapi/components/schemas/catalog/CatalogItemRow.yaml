@@ -21,6 +21,8 @@ required:
   - has_picture
   - updated_at
   - version
+  - course
+  - station_ids
 properties:
   id:
     type: string
@@ -117,6 +119,16 @@ properties:
     description: Its version.
     examples:
       - 3
+  course:
+    $ref: ./ItemCourse.yaml
+    description: The course it is served in on the kitchen display; `none` when not set.
+  station_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    maxItems: 12
+    description: The kitchen stations it shows at, of its Location; empty for every station.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
     name:
@@ -148,3 +160,5 @@ examples:
     has_picture: true
     updated_at: 2026-10-15T09:00:00Z
     version: 3
+    course: mains
+    station_ids: []

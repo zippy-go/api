@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/kitchen.ticket.created.v1.schema.json",
+  "title": "KitchenTicketCreatedPayload",
+  "description": "Payload of `kitchen.ticket.created` version 1. A ticket reached the kitchen display. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "partner_id",
+    "location_id",
+    "source",
+    "order_id",
+    "tab_id",
+    "round_id",
+    "at",
+    "number",
+    "fulfilment",
+    "round_number",
+    "table_id",
+    "table_name",
+    "courses",
+    "lines",
+    "late_to_arrive"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ticket."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "source": {
+      "type": "string",
+      "description": "What the ticket came from: `order` or `round`.",
+      "enum": [
+        "order",
+        "round"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order, which for a round is the tab."
+    },
+    "tab_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The tab of a round; `null` for a delivery or a pickup."
+    },
+    "round_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The round; `null` for a delivery or a pickup."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened: for a mark, the moment it was made."
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud."
+    },
+    "fulfilment": {
+      "type": "string",
+      "description": "How the order is served.",
+      "enum": [
+        "delivery",
+        "pickup",
+        "dine_in"
+      ]
+    },
+    "round_number": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "description": "The round's number on its tab."
+    },
+    "table_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The table of a round."
+    },
+    "table_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Its name."
+    },
+    "courses": {
+      "type": "array",
+      "description": "Its courses in the order they fire, each fired or held.",
+      "items": {
+        "type": "object",
+        "description": "A course.",
+        "required": [
+          "course",
+          "state"
+        ],
+        "properties": {
+          "course": {
+            "type": "string",
+            "enum": [
+              "starters",
+              "mains",
+              "desserts",
+              "drinks",
+              "none"
+            ],
+            "description": "The course."
+          },
+          "state": {
+            "type": "string",
+            "description": "`fired` or `held`.",
+            "enum": [
+              "fired",
+              "held"
+            ]
+          }
+        }
+      }
+    },
+    "lines": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many lines it carries."
+    },
+    "late_to_arrive": {
+      "type": "boolean",
+      "description": "Made while every display of the Location was away."
+    }
+  }
+}

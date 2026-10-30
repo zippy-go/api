@@ -1,0 +1,9 @@
+type: string
+description: "Where a ticket stands: `open` while anything on it is to cook, `ready` once every line still on it is ready or served, `bumped` once the kitchen took it off the display, `withdrawn` when its round was recalled or its order cancelled."
+enum:
+  - open
+  - ready
+  - bumped
+  - withdrawn
+examples:
+  - open

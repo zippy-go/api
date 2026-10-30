@@ -1,0 +1,9 @@
+type: string
+description: "What became of a mark: `applied`; `unchanged` when what it marks was so already; `superseded` when a mark made later stands; `refused` when it may not be made, with the reason."
+enum:
+  - applied
+  - unchanged
+  - superseded
+  - refused
+examples:
+  - applied

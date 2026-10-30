@@ -1,0 +1,66 @@
+type: object
+description: A mark as made on a display or from the floor, sent alone or in the queue kept while offline. The platform applies it by the moment it was made, so the later of two marks stands, and the history keeps both.
+required:
+  - id
+  - kind
+  - ticket_id
+  - made_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The mark's own id, made where it was made: sending it again changes nothing."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+  kind:
+    $ref: ./KitchenMarkKind.yaml
+    description: What it does.
+  ticket_id:
+    type: string
+    format: uuid
+    description: The ticket.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  course:
+    oneOf:
+      - $ref: ../catalog/ItemCourse.yaml
+      - type: "null"
+    description: "For `fire`, and for `ready` or `serve` of a whole course: the course."
+  line_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "For `decline`, and for `ready` or `serve` of one line: the line on the ticket."
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+  station_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "For `ready` of a course at one station: the station, whose lines alone it marks."
+    examples:
+      - null
+  reason:
+    type:
+      - string
+      - "null"
+    description: "For `decline`: why, `sold_out` by default."
+    examples:
+      - null
+  made_at:
+    type: string
+    format: date-time
+    description: When it was made; no later than when it is received.
+    examples:
+      - 2026-11-06T14:35:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+    kind: ready
+    ticket_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    course: null
+    line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+    station_id: null
+    reason: null
+    made_at: 2026-11-06T14:35:00Z

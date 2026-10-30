@@ -1,0 +1,9 @@
+type: string
+description: "Where a course stands, from its lines: `held`, `fired` while any line is in preparation, `ready` once every line is ready or served, or `served` once every line is served."
+enum:
+  - held
+  - fired
+  - ready
+  - served
+examples:
+  - fired

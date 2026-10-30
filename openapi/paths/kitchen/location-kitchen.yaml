@@ -1,0 +1,116 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/kitchen. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, which must be one of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getLocationKitchen
+  summary: Read a Location's kitchen
+  description: Whether the Location runs the kitchen display, and its stations in order. A Location that never set it runs no display and has no station. `order:read` or `location:read` at the Location. Carries `ETag`.
+  tags:
+    - Kitchen
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The kitchen.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/kitchen/KitchenSettings.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier (`malformed_identifier`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Partner or Location for the caller."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+put:
+  operationId: setLocationKitchen
+  summary: Set a Location's kitchen
+  description: "Switches the kitchen display on or off and sets the stations as a whole: a station named by its id is kept, renamed and moved; one without an id is added; one left out is removed, and its items show at every station until given another. At most 12 stations, each name once. `location:write` at the Location; `If-Match` guards against a stale version (`412`)."
+  tags:
+    - Kitchen
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IfMatchHeader.yaml
+  requestBody:
+    required: true
+    description: The kitchen as a whole.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/kitchen/KitchenSettingsUpdate.yaml
+  responses:
+    "200":
+      description: The kitchen.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/kitchen/KitchenSettings.yaml
+    "400":
+      description: "`validation_failed`: a name empty or longer than 40 characters, a name twice (`station_name_repeated`), more than 12 stations, or an id that is not one of the Location's stations (`station_unknown`)."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Partner or Location for the caller."
+      content:
+        application/problem+json:
+          schema: *a1
+    "412":
+      description: "`precondition_failed`: the kitchen changed since the `If-Match` version."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

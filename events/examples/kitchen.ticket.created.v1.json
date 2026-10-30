@@ -1,0 +1,35 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d9001",
+  "type": "kitchen.ticket.created",
+  "version": 1,
+  "occurred_at": "2026-11-06T14:31:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "ticket_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "source": "round",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201",
+    "tab_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201",
+    "round_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301",
+    "number": "AB0042",
+    "fulfilment": "dine_in",
+    "round_number": 1,
+    "table_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101",
+    "table_name": "12",
+    "courses": [
+      {
+        "course": "starters",
+        "state": "fired"
+      },
+      {
+        "course": "mains",
+        "state": "held"
+      }
+    ],
+    "lines": 4,
+    "late_to_arrive": false,
+    "at": "2026-11-06T14:31:00Z"
+  }
+}

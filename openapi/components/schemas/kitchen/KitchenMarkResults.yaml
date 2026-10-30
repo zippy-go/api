@@ -1,0 +1,78 @@
+type: object
+description: The marks' results in the order sent, and the cursor after their changes.
+required:
+  - results
+  - cursor
+properties:
+  results:
+    type: array
+    items:
+      $ref: ./KitchenMarkResult.yaml
+    description: One per mark.
+  cursor:
+    type: string
+    description: The changes cursor after the marks.
+    examples:
+      - eyJ2IjpbNDJdfQ.c2lnbmVk
+examples:
+  - results:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+        outcome: applied
+        reason: null
+        ticket:
+          id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+          location_id: 01a13a48-9e00-7000-8000-000000000301
+          source: round
+          order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+          number: AB0042
+          fulfilment: dine_in
+          tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+          round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+          round_number: 1
+          table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+          table_name: "12"
+          state: open
+          late_to_arrive: false
+          created_at: 2026-11-06T14:31:00Z
+          ready_at: null
+          bumped_at: null
+          withdrawn_at: null
+          version: 4
+          courses:
+            - course: mains
+              state: held
+              fired_at: null
+              ready_at: null
+              waiting_since: 2026-11-06T14:40:00Z
+              flagged_at: null
+          lines:
+            - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+              order_line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+              item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+              variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+              name: Butter Chicken
+              variant_label: Full
+              options:
+                - Extra gravy
+              quantity: 2
+              note: Less spicy
+              food_mark: non_veg
+              course: mains
+              station_ids:
+                - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8102
+              state: held
+              state_at: 2026-11-06T14:31:05Z
+          history:
+            - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+              kind: ready
+              course: null
+              line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+              station_id: null
+              made_at: 2026-11-06T14:35:00Z
+              received_at: 2026-11-06T14:35:01Z
+              by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+              by_name: Ravi
+              display_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+              outcome: applied
+              reason: null
+    cursor: eyJ2IjpbNDJdfQ.c2lnbmVk

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/kitchen.course.fired.v1.schema.json",
+  "title": "KitchenCourseFiredPayload",
+  "description": "Payload of `kitchen.course.fired` version 1. A course is in preparation. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "partner_id",
+    "location_id",
+    "source",
+    "order_id",
+    "tab_id",
+    "round_id",
+    "at",
+    "course",
+    "line_ids",
+    "automatic",
+    "by"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ticket."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "source": {
+      "type": "string",
+      "description": "What the ticket came from: `order` or `round`.",
+      "enum": [
+        "order",
+        "round"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order, which for a round is the tab."
+    },
+    "tab_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The tab of a round; `null` for a delivery or a pickup."
+    },
+    "round_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The round; `null` for a delivery or a pickup."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened: for a mark, the moment it was made."
+    },
+    "course": {
+      "type": "string",
+      "enum": [
+        "starters",
+        "mains",
+        "desserts",
+        "drinks",
+        "none"
+      ],
+      "description": "The course."
+    },
+    "line_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "description": "The order's or the round's lines it fired."
+    },
+    "automatic": {
+      "type": "boolean",
+      "description": "Fired with its ticket, not by a person."
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who fired it; `null` when it fired with its ticket."
+    }
+  }
+}

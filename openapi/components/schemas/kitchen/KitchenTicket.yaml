@@ -1,0 +1,214 @@
+type: object
+description: "A ticket on the kitchen display: an accepted order, or a round of a tab, with its courses and lines."
+required:
+  - id
+  - location_id
+  - source
+  - order_id
+  - number
+  - fulfilment
+  - tab_id
+  - round_id
+  - round_number
+  - table_id
+  - table_name
+  - state
+  - late_to_arrive
+  - created_at
+  - ready_at
+  - bumped_at
+  - withdrawn_at
+  - version
+  - courses
+  - lines
+  - history
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The ticket.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  source:
+    $ref: ./KitchenTicketSource.yaml
+    description: What it came from.
+  order_id:
+    type: string
+    format: uuid
+    description: The order, which for a round is the tab.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  number:
+    type: string
+    description: The order's number, as said aloud.
+    examples:
+      - AB0042
+  fulfilment:
+    type: string
+    enum:
+      - delivery
+      - pickup
+      - dine_in
+    description: "How the order is served: `delivery`, `pickup` or `dine_in`."
+    examples:
+      - dine_in
+  tab_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The tab of a round.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  round_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The round.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+  round_number:
+    type:
+      - integer
+      - "null"
+    minimum: 1
+    description: The round's number on its tab.
+    examples:
+      - 1
+  table_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The table of a round.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+  table_name:
+    type:
+      - string
+      - "null"
+    description: Its name.
+    examples:
+      - "12"
+  state:
+    $ref: ./KitchenTicketState.yaml
+    description: Where it stands.
+  late_to_arrive:
+    type: boolean
+    description: "Made while every display of the Location was away: it lands marked late to arrive."
+    examples:
+      - false
+  created_at:
+    type: string
+    format: date-time
+    description: When the order was accepted or the round sent.
+    examples:
+      - 2026-11-06T14:31:00Z
+  ready_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was ready.
+    examples:
+      - null
+  bumped_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was taken off the display.
+    examples:
+      - null
+  withdrawn_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was withdrawn.
+    examples:
+      - null
+  version:
+    type: integer
+    minimum: 0
+    description: Its version, which rises with every change.
+    examples:
+      - 4
+  courses:
+    type: array
+    items:
+      $ref: ./KitchenTicketCourse.yaml
+    description: Its courses in the order they fire.
+  lines:
+    type: array
+    items:
+      $ref: ./KitchenTicketLine.yaml
+    description: Its lines.
+  history:
+    type: array
+    items:
+      $ref: ./KitchenTicketMark.yaml
+    description: Every mark made on it, oldest first.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    source: round
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    number: AB0042
+    fulfilment: dine_in
+    tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+    round_number: 1
+    table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+    table_name: "12"
+    state: open
+    late_to_arrive: false
+    created_at: 2026-11-06T14:31:00Z
+    ready_at: null
+    bumped_at: null
+    withdrawn_at: null
+    version: 4
+    courses:
+      - course: mains
+        state: held
+        fired_at: null
+        ready_at: null
+        waiting_since: 2026-11-06T14:40:00Z
+        flagged_at: null
+    lines:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+        order_line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+        item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+        name: Butter Chicken
+        variant_label: Full
+        options:
+          - Extra gravy
+        quantity: 2
+        note: Less spicy
+        food_mark: non_veg
+        course: mains
+        station_ids:
+          - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8102
+        state: held
+        state_at: 2026-11-06T14:31:05Z
+    history:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+        kind: ready
+        course: null
+        line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+        station_id: null
+        made_at: 2026-11-06T14:35:00Z
+        received_at: 2026-11-06T14:35:01Z
+        by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+        by_name: Ravi
+        display_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401
+        outcome: applied
+        reason: null

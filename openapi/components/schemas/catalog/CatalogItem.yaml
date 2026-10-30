@@ -30,6 +30,8 @@ required:
   - updated_at
   - created_by
   - updated_by
+  - course
+  - station_ids
 properties:
   id:
     type: string
@@ -193,6 +195,16 @@ properties:
     description: Who last changed it.
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+  course:
+    $ref: ./ItemCourse.yaml
+    description: The course it is served in on the kitchen display; `none` when not set.
+  station_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    maxItems: 12
+    description: The kitchen stations it shows at, of its Location; empty for every station.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
     location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
@@ -301,3 +313,5 @@ examples:
     updated_at: 2026-10-15T09:00:00Z
     created_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
+    course: mains
+    station_ids: []
