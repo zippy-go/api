@@ -1150,6 +1150,9 @@ errors:
       - code: duty_elsewhere
         message: You are on duty for another service.
         description: The person is on duty in another of their memberships; they go off duty there first.
+      - code: duty_no_shift
+        message: You have no shift now.
+        description: Since 0.27.0. The service requires a shift to go on duty and the Agent has none under way or starting within 30 minutes; the sentence names the shifts with room left today.
 
   - code: tasks_under_way
     status: 409
@@ -2399,14 +2402,14 @@ errors:
     title: Shift full
     message: "The shift has the {needed} Agents it needs"
     retryable: false
-    description: "Every place of the shift is taken; the problem's `next_shift_id` names the next shift of the service with room, when there is one."
+    description: "Every place of the shift is taken; the detail names the next shift of the service with room, when there is one."
 
   - code: shift_overlaps
     status: 409
     title: Another shift at those hours
     message: "You have another shift from {starts} to {ends}"
     retryable: false
-    description: "The Agent has another shift at some of the same hours; the problem's `shift_id` names it."
+    description: "The Agent has another shift at some of the same hours; the detail names its hours."
 
   - code: shift_closed
     status: 409
