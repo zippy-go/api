@@ -45,6 +45,7 @@ examples:
         freeze_used_week: null
         reward_waiting: Free delivery, from your 4-week streak, funded by ZippyGo, until 22 November
         sentence: 4 weeks in a row. Next reward at 8 weeks.
+        counts: weeks
     quests:
       - campaign_id: 01a13a48-9e00-7000-8000-000000006002
         name: Try something new
