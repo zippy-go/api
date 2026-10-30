@@ -72,6 +72,12 @@ examples:
       earnings:
         minor_units: 250000
         currency: INR
+      utilisation:
+        minutes_on_shift: 0
+        minutes_on_task: 0
+        tasks: 0
+        tasks_per_hour: null
+        idle_share: null
     items:
       - agent_id: 01a13a48-9e00-7000-8000-000000000107
         name: Ravi Kumar
@@ -103,4 +109,10 @@ examples:
         earnings:
           minor_units: 12320
           currency: INR
+        utilisation:
+          minutes_on_shift: 0
+          minutes_on_task: 0
+          tasks: 0
+          tasks_per_hour: null
+          idle_share: null
     next_cursor: null

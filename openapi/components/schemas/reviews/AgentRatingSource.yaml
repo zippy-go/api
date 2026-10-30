@@ -1,7 +1,8 @@
 type: string
-description: "Where an Agent's rating came from: the customer's `delivery_rating`, or an `order_review` that says the delivery was late."
+description: "Where an Agent's rating came from: the customer's `delivery_rating`, an `order_review` that says the delivery was late, or, since 0.29.0, a `booking_review`: a completed booking's review, counted for the Agent who did the work."
 enum:
   - delivery_rating
   - order_review
+  - booking_review
 examples:
   - delivery_rating

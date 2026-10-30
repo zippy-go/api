@@ -1,0 +1,89 @@
+type: object
+description: "Since 0.29.0, one shift an Agent held in the range, with its utilisation: the minutes of the shift inside the range, the minutes on task inside it, the tasks completed during it, the tasks per hour and the share of it without a task."
+required:
+  - shift_id
+  - service_id
+  - zone_id
+  - starts_at
+  - ends_at
+  - minutes_on_shift
+  - minutes_on_task
+  - tasks
+  - tasks_per_hour
+  - idle_share
+properties:
+  shift_id:
+    type: string
+    format: uuid
+    description: The shift.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7a01
+  service_id:
+    type: string
+    format: uuid
+    description: Its service.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000202
+  zone_id:
+    type: string
+    format: uuid
+    description: The zone its Agents work.
+    examples:
+      - 01a13a48-9e00-7000-8000-00000000a012
+  starts_at:
+    type: string
+    format: date-time
+    description: When it starts.
+    examples:
+      - 2026-11-07T23:30:00Z
+  ends_at:
+    type: string
+    format: date-time
+    description: When it ends.
+    examples:
+      - 2026-11-08T03:30:00Z
+  minutes_on_shift:
+    type: integer
+    minimum: 0
+    description: Its minutes inside the range.
+    examples:
+      - 240
+  minutes_on_task:
+    type: integer
+    minimum: 0
+    description: Minutes on a task inside it, overlapping tasks counted once.
+    examples:
+      - 180
+  tasks:
+    type: integer
+    minimum: 0
+    description: Tasks completed during it.
+    examples:
+      - 38
+  tasks_per_hour:
+    type:
+      - number
+      - "null"
+    description: Tasks completed per hour of it; `null` when none of it falls in the range.
+    examples:
+      - 9.5
+  idle_share:
+    type:
+      - number
+      - "null"
+    minimum: 0
+    maximum: 1
+    description: The share of it without a task, from 0 to 1; `null` when none of it falls in the range.
+    examples:
+      - 0.25
+examples:
+  - shift_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7a01
+    service_id: 01a13a48-9e00-7000-8000-000000000202
+    zone_id: 01a13a48-9e00-7000-8000-00000000a012
+    starts_at: 2026-11-07T23:30:00Z
+    ends_at: 2026-11-08T03:30:00Z
+    minutes_on_shift: 240
+    minutes_on_task: 180
+    tasks: 38
+    tasks_per_hour: 9.5
+    idle_share: 0.25

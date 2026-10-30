@@ -24,6 +24,7 @@ required:
   - geofence_overrides
   - tips
   - earnings
+  - utilisation
 properties:
   agent_id:
     type: string
@@ -148,6 +149,9 @@ properties:
   earnings:
     $ref: ../common/Money.yaml
     description: What they earned, tips included.
+  utilisation:
+    $ref: ./AgentUtilisation.yaml
+    description: Since 0.29.0, utilisation by shift.
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-000000000107
     name: Ravi Kumar
@@ -179,3 +183,9 @@ examples:
     earnings:
       minor_units: 12320
       currency: INR
+    utilisation:
+      minutes_on_shift: 240
+      minutes_on_task: 180
+      tasks: 38
+      tasks_per_hour: 9.5
+      idle_share: 0.25

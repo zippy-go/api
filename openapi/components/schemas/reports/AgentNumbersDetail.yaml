@@ -10,6 +10,7 @@ required:
   - duty
   - days
   - activity
+  - shifts
 properties:
   from:
     type: string
@@ -61,6 +62,12 @@ properties:
       $ref: ./AgentActivityDay.yaml
       description: A day.
     description: Their activity log by day, newest first.
+  shifts:
+    type: array
+    items:
+      $ref: ./AgentShiftUtilisation.yaml
+      description: A shift.
+    description: Since 0.29.0, the shifts they held in the range with their utilisation, newest first.
 examples:
   - from: 2026-10-01
     until: 2026-10-22
@@ -97,6 +104,12 @@ examples:
       earnings:
         minor_units: 12320
         currency: INR
+      utilisation:
+        minutes_on_shift: 240
+        minutes_on_task: 180
+        tasks: 38
+        tasks_per_hour: 9.5
+        idle_share: 0.25
     deliveries:
       - delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
         order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
@@ -123,3 +136,14 @@ examples:
             kind: delivered
             text: Delivered AB0042
             order_number: AB0042
+    shifts:
+      - shift_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c7a01
+        service_id: 01a13a48-9e00-7000-8000-000000000202
+        zone_id: 01a13a48-9e00-7000-8000-00000000a012
+        starts_at: 2026-10-21T23:30:00Z
+        ends_at: 2026-10-22T03:30:00Z
+        minutes_on_shift: 240
+        minutes_on_task: 180
+        tasks: 38
+        tasks_per_hour: 9.5
+        idle_share: 0.25
