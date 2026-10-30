@@ -1,5 +1,5 @@
 type: string
-description: "What a streak counts (since 0.24.0): `weeks`, Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; or `deliveries`, a subscription's deliveries completed in a row at the campaign's Locations, where a skip the customer asked for, a vacation, a pause or the store's closure keeps the streak, and a failed delivery or a skip for want of money breaks it unless the month's freeze is left. A streak of deliveries reads its milestones, its repeat and `weeks` in deliveries."
+description: "What a streak counts (since 0.25.0): `weeks`, Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; or `deliveries`, a subscription's deliveries completed in a row at the campaign's Locations, where a skip the customer asked for, a vacation, a pause or the store's closure keeps the streak, and a failed delivery or a skip for want of money breaks it unless the month's freeze is left. A streak of deliveries reads its milestones, its repeat and `weeks` in deliveries."
 enum:
   - weeks
   - deliveries
