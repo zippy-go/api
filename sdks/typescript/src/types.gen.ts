@@ -27545,7 +27545,6 @@ export type StatementPromotion = {
 };
 
 /**
-<<<<<<< HEAD
  * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth pickup collected at a Location.
  */
 export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card';
@@ -28128,7 +28127,1691 @@ export type RewardCampaignActions = {
      * Publish it.
      */
     publish: boolean;
-=======
+    /**
+     * Pause it.
+     */
+    pause: boolean;
+    /**
+     * Resume it.
+     */
+    resume: boolean;
+    /**
+     * Stop it.
+     */
+    stop: boolean;
+    /**
+     * Cancel it before it starts.
+     */
+    cancel: boolean;
+    /**
+     * Delete the draft.
+     */
+    delete: boolean;
+    /**
+     * Change its rules from a moment chosen, as a new version (Mission Control only).
+     */
+    new_version: boolean;
+};
+
+/**
+ * Campaigns by state.
+ */
+export type RewardCampaignCounts = {
+    /**
+     * Drafts.
+     */
+    draft: number;
+    /**
+     * Scheduled.
+     */
+    scheduled: number;
+    /**
+     * Live.
+     */
+    live: number;
+    /**
+     * Paused.
+     */
+    paused: number;
+    /**
+     * Ended.
+     */
+    ended: number;
+    /**
+     * Cancelled.
+     */
+    cancelled: number;
+};
+
+/**
+ * A campaign in a list.
+ */
+export type RewardCampaignSummary = {
+    /**
+     * The campaign.
+     */
+    id: string;
+    /**
+     * Who runs it.
+     */
+    owner: RewardCampaignOwner;
+    /**
+     * The Partner whose campaign it is; `null` for the platform's.
+     */
+    partner_id: string | null;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Where it stands.
+     */
+    state: RewardCampaignState;
+    /**
+     * What a customer reads.
+     */
+    line: string;
+    /**
+     * Who pays for its rewards.
+     */
+    funder: RewardFunder;
+    /**
+     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
+     */
+    partner_share_percent: number;
+    /**
+     * Its budget.
+     */
+    budget: RewardBudget;
+    /**
+     * When it runs.
+     */
+    schedule: RewardSchedule;
+    /**
+     * Rewards granted.
+     */
+    grants: number;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+};
+
+/**
+ * A reward campaign: what it counts and gives, who pays and from what budget, when and where it runs, whom it holds out, and what the caller may do with it. Its rules are versioned: a live campaign's rules change only as a new version from a moment chosen, progress made under an earlier one keeps counting, and every grant names the version it came from.
+ */
+export type RewardCampaign = {
+    /**
+     * The campaign.
+     */
+    id: string;
+    /**
+     * Who runs it.
+     */
+    owner: RewardCampaignOwner;
+    /**
+     * The Partner whose campaign it is; `null` for the platform's.
+     */
+    partner_id: string | null;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Where it stands.
+     */
+    state: RewardCampaignState;
+    /**
+     * What a customer reads.
+     */
+    line: string;
+    /**
+     * Who pays for its rewards.
+     */
+    funder: RewardFunder;
+    /**
+     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
+     */
+    partner_share_percent: number;
+    /**
+     * Its budget.
+     */
+    budget: RewardBudget;
+    /**
+     * When it runs.
+     */
+    schedule: RewardSchedule;
+    /**
+     * The Partner that pays its share of a split campaign; `null` otherwise.
+     */
+    funding_partner_id: string | null;
+    /**
+     * For a split campaign, that the operator confirmed the Partner agreed to pay its share.
+     */
+    partner_agreed: boolean;
+    /**
+     * Where it counts.
+     */
+    audience: RewardAudience;
+    /**
+     * Grants a day at most; 1,000 by default.
+     */
+    daily_grant_cap: number;
+    /**
+     * The share of the customers it would reach held out as a control group, who see nothing of it and earn nothing; 10 by default, 0 for tiers.
+     */
+    control_percent: number;
+    /**
+     * The version of the rules in force.
+     */
+    rules_version: number;
+    /**
+     * The rules in force.
+     */
+    rules: RewardRules;
+    /**
+     * Versions of its rules.
+     */
+    versions: number;
+    /**
+     * For a Partner's campaign, whether the Partner confirmed as it published that its business pays.
+     */
+    confirmed: boolean;
+    /**
+     * Whether the platform paused it; a Partner cannot resume it then.
+     */
+    paused_by_platform: boolean;
+    /**
+     * Why it was paused.
+     */
+    pause_reason: string | null;
+    /**
+     * Rewards granted.
+     */
+    grants: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it last changed.
+     */
+    updated_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it ended.
+     */
+    ended_at: string | null;
+    /**
+     * The version of the campaign, raised on every change; send it in `If-Match` to change it.
+     */
+    version: number;
+    /**
+     * What the caller may do now.
+     */
+    actions: RewardCampaignActions;
+};
+
+/**
+ * Campaigns, live ones first, then newest, with counts by state.
+ */
+export type RewardCampaignPage = {
+    /**
+     * The campaigns.
+     */
+    items: Array<RewardCampaignSummary>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * Campaigns by state, whatever the filter on state.
+     */
+    counts: RewardCampaignCounts;
+};
+
+/**
+ * A new campaign, kept as a draft. A Partner's campaign is a streak, a quest naming only its own Partner or Locations, or a punch card, on its own Locations and paid by the Partner in full; a tier is the platform's only (`kind_not_for_partners`).
+ */
+export type RewardCampaignInput = {
+    /**
+     * Its name, 1 to 80 characters.
+     */
+    name: string;
+    /**
+     * What it counts.
+     */
+    kind: RewardCampaignKind;
+    /**
+     * Who pays: the platform by default for Mission Control's, the Partner always for a Partner's.
+     */
+    funder?: RewardFunder | null;
+    /**
+     * A split campaign's Partner share, 1 to 99.
+     */
+    partner_share_percent?: number | null;
+    /**
+     * The Partner paying its share of a split campaign.
+     */
+    funding_partner_id?: string | null;
+    /**
+     * For a split campaign, that the Partner agreed to pay its share; required to publish one.
+     */
+    partner_agreed?: boolean | null;
+    /**
+     * Its budget, more than nothing.
+     */
+    budget: Money;
+    /**
+     * When it starts; when published by default.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends; open by default.
+     */
+    ends_at?: string | null;
+    /**
+     * Where it counts; a Partner's Locations, or everywhere, by default.
+     */
+    audience?: RewardAudienceInput | null;
+    /**
+     * Grants a day at most; 1,000 by default.
+     */
+    daily_grant_cap?: number | null;
+    /**
+     * The share held out, 0 to 50; 10 by default, 0 for tiers.
+     */
+    control_percent?: number | null;
+    /**
+     * Its rules: the member named by its kind.
+     */
+    rules: RewardRulesInput;
+};
+
+/**
+ * A change to a campaign. A draft or a scheduled campaign changes freely. A live or paused one changes only where no customer is surprised: its name, a later end, a larger budget and a higher daily cap; its rules change as a new version (Mission Control), and anything else is refused with `reward_campaign_change_refused`, saying to stop it and run another.
+ */
+export type RewardCampaignUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string | null;
+    /**
+     * Who pays.
+     */
+    funder?: RewardFunder | null;
+    /**
+     * A split campaign's Partner share.
+     */
+    partner_share_percent?: number | null;
+    /**
+     * The Partner paying its share.
+     */
+    funding_partner_id?: string | null;
+    /**
+     * That the Partner agreed to pay its share.
+     */
+    partner_agreed?: boolean | null;
+    /**
+     * Its budget.
+     */
+    budget?: Money | null;
+    /**
+     * When it starts.
+     */
+    starts_at?: string | null;
+    /**
+     * When it ends.
+     */
+    ends_at?: string | null;
+    /**
+     * Where it counts.
+     */
+    audience?: RewardAudienceInput | null;
+    /**
+     * Grants a day at most.
+     */
+    daily_grant_cap?: number | null;
+    /**
+     * The share held out.
+     */
+    control_percent?: number | null;
+    /**
+     * A draft's rules.
+     */
+    rules?: RewardRulesInput | null;
+};
+
+/**
+ * A move's words: the reason for a pause or a stop, which a Partner reads when the platform paused its campaign; and, to publish a Partner's campaign, the Partner's word, exactly "My business pays for this campaign's rewards, as shown." (`funding_not_confirmed` without it).
+ */
+export type RewardCampaignMove = {
+    /**
+     * Why, at most 200 characters; required when the platform pauses a Partner's campaign.
+     */
+    reason?: string | null;
+    /**
+     * The Partner's word.
+     */
+    confirmation?: string | null;
+};
+
+/**
+ * A version of a campaign's rules.
+ */
+export type RewardCampaignVersion = {
+    /**
+     * Its number, from 1.
+     */
+    version: number;
+    /**
+     * When it took or takes effect.
+     */
+    effective_from: string;
+    /**
+     * Its rules.
+     */
+    rules: RewardRules;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * Who made it.
+     */
+    created_by: string | null;
+    /**
+     * Whether it is the version in force now.
+     */
+    in_force: boolean;
+};
+
+/**
+ * Every version of a campaign's rules, oldest first.
+ */
+export type RewardCampaignVersionList = {
+    /**
+     * The versions.
+     */
+    items: Array<RewardCampaignVersion>;
+};
+
+/**
+ * A new version of a live campaign's rules, from a moment chosen, now or later (`effective_from_past` for one before now). Progress made under the earlier version keeps counting.
+ */
+export type RewardCampaignVersionInput = {
+    /**
+     * When it takes effect; now by default.
+     */
+    effective_from?: string | null;
+    /**
+     * The rules.
+     */
+    rules: RewardRulesInput;
+};
+
+/**
+ * One side of a campaign's results: the customers treated or held out, their completed orders and sales in the campaign's scope since it started, the share with a second order within 30 days of their first, and what their rewards cost.
+ */
+export type RewardResultsGroup = {
+    /**
+     * Customers.
+     */
+    customers: number;
+    /**
+     * Completed orders.
+     */
+    orders: number;
+    /**
+     * Their sales.
+     */
+    sales: Money;
+    /**
+     * Orders per customer.
+     */
+    orders_per_customer: number;
+    /**
+     * The share, in percent, with another completed order within 30 days of their first; `null` without customers.
+     */
+    retained_30_days_percent: number | null;
+    /**
+     * What their rewards cost.
+     */
+    reward_cost: Money;
+};
+
+/**
+ * A campaign's results against its control group, worked out when asked for from completed orders.
+ */
+export type RewardCampaignResults = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Since when.
+     */
+    from: string;
+    /**
+     * Until when.
+     */
+    until: string;
+    /**
+     * The share held out.
+     */
+    control_percent: number;
+    /**
+     * The customers it reached.
+     */
+    treated: RewardResultsGroup;
+    /**
+     * The customers held out.
+     */
+    control: RewardResultsGroup;
+    /**
+     * What it shows, in words.
+     */
+    sentence: string;
+};
+
+/**
+ * A signal that held a grant for review, in words.
+ */
+export type RewardSignal = {
+    /**
+     * The signal.
+     */
+    code: RewardSignalCode;
+    /**
+     * In words.
+     */
+    words: string;
+};
+
+/**
+ * A reward taken back after its order was refunded in full or cancelled: what was taken back, and what had been spent already.
+ */
+export type RewardClawBack = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * Why.
+     */
+    reason: ClawBackReason;
+    /**
+     * Why, in words.
+     */
+    words: string;
+    /**
+     * Taken back from what was not spent.
+     */
+    taken_back: Money;
+    /**
+     * Spent already, and so marked clawed back.
+     */
+    unrecovered: Money;
+};
+
+/**
+ * A reward granted, deferred, held, refused or clawed back: its campaign and rule version, what it gives and who pays, the Location whose order earned it, and the words the customer reads.
+ */
+export type RewardGrant = {
+    /**
+     * The grant.
+     */
+    id: string;
+    /**
+     * What granted it.
+     */
+    source: RewardSource;
+    /**
+     * Its campaign; `null` for a referral.
+     */
+    campaign_id: string | null;
+    /**
+     * Its campaign's name, or the city's referrals.
+     */
+    campaign_name: string;
+    /**
+     * Its campaign's kind; `null` for a referral.
+     */
+    campaign_kind: RewardCampaignKind | null;
+    /**
+     * The version of the rules it came from: the campaign's, or the city's referral programme's.
+     */
+    rules_version: number;
+    /**
+     * The customer (a user id).
+     */
+    customer_id: string;
+    /**
+     * Where it stands.
+     */
+    status: RewardGrantStatus;
+    /**
+     * What it gives.
+     */
+    reward: RewardSpec;
+    /**
+     * The credit, or the most the offer can take off.
+     */
+    amount: Money;
+    /**
+     * Who pays.
+     */
+    funder: RewardFunder;
+    /**
+     * The platform's share.
+     */
+    platform_share: Money;
+    /**
+     * The Partner's share.
+     */
+    partner_share: Money;
+    /**
+     * The Partner paying a share.
+     */
+    partner_id: string | null;
+    /**
+     * The Location whose order earned it, which a Partner's share is charged to.
+     */
+    location_id: string | null;
+    /**
+     * Its name.
+     */
+    location_name: string | null;
+    /**
+     * The order that earned it.
+     */
+    order_id: string | null;
+    /**
+     * What the customer reads.
+     */
+    explanation: string;
+    /**
+     * What held it; empty unless held.
+     */
+    signals: Array<RewardSignal>;
+    /**
+     * When it was granted.
+     */
+    granted_at: string | null;
+    /**
+     * When a held offer ends; `null` for credit, which does not expire.
+     */
+    expires_at: string | null;
+    /**
+     * The day a deferred grant is given, when a cap allows.
+     */
+    deferred_until: string | null;
+    /**
+     * Who released or refused it.
+     */
+    decided_by: string | null;
+    /**
+     * When.
+     */
+    decided_at: string | null;
+    /**
+     * Why.
+     */
+    decision_reason: string | null;
+    /**
+     * What was taken back.
+     */
+    claw_back: RewardClawBack | null;
+    /**
+     * When it was earned.
+     */
+    created_at: string;
+};
+
+/**
+ * Grants, newest first, with the budget they draw on when they are one campaign's.
+ */
+export type RewardGrantPage = {
+    /**
+     * The grants.
+     */
+    items: Array<RewardGrant>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+    /**
+     * The campaign's budget, for a campaign's grants; `null` otherwise.
+     */
+    budget: RewardBudget | null;
+};
+
+/**
+ * Why a held grant is released or refused, 1 to 300 characters; in the audit log.
+ */
+export type RewardGrantDecision = {
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * A customer's weekly streak: its weeks in a row, whether this week counted, the next milestone and its reward, the freeze, and what waits.
+ */
+export type StreakProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether it counts.
+     */
+    state: StreakState;
+    /**
+     * Weeks in a row.
+     */
+    weeks: number;
+    /**
+     * This week.
+     */
+    week: string;
+    /**
+     * Whether this week has a completed order.
+     */
+    this_week_counted: boolean;
+    /**
+     * Whether this week has no order yet past Saturday 18:00.
+     */
+    at_risk: boolean;
+    /**
+     * The weeks of the next milestone.
+     */
+    next_milestone: number | null;
+    /**
+     * Its reward.
+     */
+    next_reward: string | null;
+    /**
+     * Whether this month's freeze is unused.
+     */
+    freeze_available: boolean;
+    /**
+     * The week a freeze kept the streak this month.
+     */
+    freeze_used_week: string | null;
+    /**
+     * A reward from it the customer holds.
+     */
+    reward_waiting: string | null;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * A step of a quest the customer started.
+ */
+export type QuestStepProgress = {
+    /**
+     * What counts.
+     */
+    kind: QuestStepKind;
+    /**
+     * In words.
+     */
+    label: string;
+    /**
+     * Counted.
+     */
+    count: number;
+    /**
+     * Needed.
+     */
+    needed: number;
+    /**
+     * Whether it is done.
+     */
+    done: boolean;
+};
+
+/**
+ * A quest as the customer sees it: offered with nothing counted until they press Start, then its steps, its end and its reward.
+ */
+export type QuestProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Where it stands.
+     */
+    state: QuestState;
+    /**
+     * Its steps.
+     */
+    steps: Array<QuestStepProgress>;
+    /**
+     * Steps done.
+     */
+    done: number;
+    /**
+     * Steps.
+     */
+    needed: number;
+    /**
+     * Its reward.
+     */
+    reward: string;
+    /**
+     * Whether Start is offered now.
+     */
+    can_start: boolean;
+    /**
+     * When it was started.
+     */
+    started_at: string | null;
+    /**
+     * When it ends.
+     */
+    ends_at: string | null;
+    /**
+     * When it completed.
+     */
+    completed_at: string | null;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * A customer's tier, how it was earned, what keeps it and when it is next looked at.
+ */
+export type TierStanding = {
+    /**
+     * The tier.
+     */
+    level: TierLevel;
+    /**
+     * Since when.
+     */
+    since: string;
+    /**
+     * Completed orders in the days counted.
+     */
+    orders_in_window: number;
+    /**
+     * The days counted.
+     */
+    window_days: number;
+    /**
+     * How it was earned.
+     */
+    how_earned: string;
+    /**
+     * What keeps it.
+     */
+    keeps: string;
+    /**
+     * When it is next looked at.
+     */
+    next_look_on: string;
+    /**
+     * The tier above; `null` at Gold.
+     */
+    next_level: TierLevel | null;
+    /**
+     * Completed orders more for the tier above.
+     */
+    orders_to_next: number | null;
+    /**
+     * Its perks, and when they arrive.
+     */
+    perks: Array<string>;
+};
+
+/**
+ * A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded.
+ */
+export type PunchCardProgress = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * Pickups counted towards the next reward.
+     */
+    punches: number;
+    /**
+     * Every this many.
+     */
+    every: number;
+    /**
+     * Whether the next pickup is rewarded.
+     */
+    next_rewarded: boolean;
+    /**
+     * Its reward.
+     */
+    reward: string;
+    /**
+     * In words.
+     */
+    sentence: string;
+};
+
+/**
+ * The customer's Rewards: their streaks, quests, tier and punch cards with their progress and what completes them. A campaign that holds the customer out is not listed.
+ */
+export type CustomerRewards = {
+    /**
+     * Weekly streaks.
+     */
+    streaks: Array<StreakProgress>;
+    /**
+     * Quests offered, started, completed or expired.
+     */
+    quests: Array<QuestProgress>;
+    /**
+     * Their tier; `null` when no tier campaign is live.
+     */
+    tier: TierStanding | null;
+    /**
+     * Punch cards with a punch, or near them.
+     */
+    punch_cards: Array<PunchCardProgress>;
+    /**
+     * Promotional credit their rewards gave, all time.
+     */
+    credit_earned: Money;
+};
+
+/**
+ * Where Start was pressed.
+ */
+export type QuestStartInput = {
+    /**
+     * Where; `rewards` by default.
+     */
+    from?: QuestStartedFrom | null;
+};
+
+/**
+ * The customer's referral code and what it does: a friend new to ZippyGo who adds it gets the city's referral offer, and the customer earns promotional credit when the friend's first order completes, at most 20 times a month.
+ */
+export type CustomerReferral = {
+    /**
+     * The code to share.
+     */
+    code: string;
+    /**
+     * A message to share.
+     */
+    share_text: string;
+    /**
+     * What a friend gets.
+     */
+    friend_gets: string;
+    /**
+     * What the customer earns.
+     */
+    you_earn: string;
+    /**
+     * Friends who added the code.
+     */
+    referred: number;
+    /**
+     * Friends whose first order earned the customer credit.
+     */
+    rewarded: number;
+    /**
+     * Credit earned.
+     */
+    earned: Money;
+    /**
+     * Referrals that may earn in a month.
+     */
+    monthly_limit: number;
+    /**
+     * The first day the customer may ask for a new code; `null` when they may now.
+     */
+    new_code_from: string | null;
+};
+
+/**
+ * A city's referral programme: whether it runs, what the referrer earns from what budget, the monthly limit and the refund window. The friend's offer is the city's referral offer in promotions.
+ */
+export type ReferralSettings = {
+    /**
+     * The city.
+     */
+    service_area_id: string;
+    /**
+     * Its name.
+     */
+    service_area_name: string;
+    /**
+     * Whether referrals earn.
+     */
+    enabled: boolean;
+    /**
+     * What the referrer earns, promotional credit funded by the platform.
+     */
+    referrer_reward: Money;
+    /**
+     * The budget.
+     */
+    budget: Money;
+    /**
+     * Granted so far.
+     */
+    granted: Money;
+    /**
+     * Referrals a referrer may earn for in a month.
+     */
+    monthly_limit: number;
+    /**
+     * Days within which a full refund of the friend's first order takes the reward back.
+     */
+    refund_window_days: number;
+    /**
+     * Raised on every change.
+     */
+    version: number;
+};
+
+/**
+ * A city's referral programme as set.
+ */
+export type ReferralSettingsInput = {
+    /**
+     * Whether referrals earn.
+     */
+    enabled: boolean;
+    /**
+     * What the referrer earns, more than nothing.
+     */
+    referrer_reward: Money;
+    /**
+     * The budget.
+     */
+    budget: Money;
+    /**
+     * 20 by default.
+     */
+    monthly_limit?: number | null;
+};
+
+/**
+ * A referral: who referred whom with which code, and what it earned.
+ */
+export type Referral = {
+    /**
+     * The referral.
+     */
+    id: string;
+    /**
+     * The referrer (a user id).
+     */
+    referrer_id: string;
+    /**
+     * The referrer's first name.
+     */
+    referrer_name: string | null;
+    /**
+     * The friend (a user id).
+     */
+    referred_id: string;
+    /**
+     * The friend's first name.
+     */
+    referred_name: string | null;
+    /**
+     * The code.
+     */
+    code: string;
+    /**
+     * The city.
+     */
+    service_area_id: string | null;
+    /**
+     * Where it stands.
+     */
+    state: ReferralState;
+    /**
+     * When the friend added the code.
+     */
+    recorded_at: string;
+    /**
+     * The friend's first order.
+     */
+    order_id: string | null;
+    /**
+     * When the referrer was credited.
+     */
+    rewarded_at: string | null;
+    /**
+     * What the referrer earned.
+     */
+    amount: Money | null;
+    /**
+     * Why it lapsed or was taken back.
+     */
+    reason: string | null;
+};
+
+/**
+ * Referrals, newest first.
+ */
+export type ReferralPage = {
+    /**
+     * The referrals.
+     */
+    items: Array<Referral>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A customer excluded from rewards: they earn nothing from any campaign until the exclusion is lifted.
+ */
+export type RewardExclusion = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * Why.
+     */
+    reason: string;
+    /**
+     * Who excluded them.
+     */
+    by: string | null;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * Why a customer is excluded from rewards, 1 to 300 characters; in the audit log.
+ */
+export type RewardExclusionInput = {
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * A customer's Rewards tab in Mission Control: what the customer sees, every grant, their referrals, the signals on them and whether they are excluded.
+ */
+export type PlatformCustomerRewards = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * What the customer sees.
+     */
+    rewards: CustomerRewards;
+    /**
+     * Their latest 50 grants, newest first.
+     */
+    grants: Array<RewardGrant>;
+    /**
+     * Their referrals, as referrer or friend.
+     */
+    referrals: Array<Referral>;
+    /**
+     * The signals on them now.
+     */
+    signals: Array<RewardSignal>;
+    /**
+     * Their exclusion; `null` when they earn.
+     */
+    excluded: RewardExclusion | null;
+    /**
+     * Whether support blocked the account, so it earns nothing while blocked.
+     */
+    blocked: boolean;
+    /**
+     * What the caller may do.
+     */
+    actions: PlatformCustomerRewardActions;
+};
+
+/**
+ * What the caller may do on the Rewards tab: exclude and lift with `engagement:manage`.
+ */
+export type PlatformCustomerRewardActions = {
+    /**
+     * Exclude the customer from rewards.
+     */
+    exclude: boolean;
+    /**
+     * Lift the exclusion.
+     */
+    lift: boolean;
+};
+
+/**
+ * A tier of a quest: the drop-offs that reach it and what it pays in all, the tiers below included.
+ */
+export type IncentiveTier = {
+    /**
+     * Drop-offs completed.
+     */
+    drop_offs: number;
+    /**
+     * What reaching it pays in all.
+     */
+    amount: Money;
+};
+
+/**
+ * A bonus's window: its days of the week and its hours on the service's clock.
+ */
+export type IncentiveWindow = {
+    /**
+     * The days; every day when empty.
+     */
+    days: Array<Day>;
+    /**
+     * From, `HH:MM`.
+     */
+    from: string;
+    /**
+     * Until, `HH:MM`, after `from`.
+     */
+    to: string;
+};
+
+/**
+ * An incentive's budget and what its Agents earned from it.
+ */
+export type IncentiveBudget = {
+    /**
+     * The budget.
+     */
+    amount: Money;
+    /**
+     * Earned so far.
+     */
+    earned: Money;
+    /**
+     * Left.
+     */
+    left: Money;
+    /**
+     * Whether it is spent: no Agent may join any more.
+     */
+    spent: boolean;
+};
+
+/**
+ * An Agent incentive on a delivery service: a quest of drop-off tiers or a bonus a drop-off, joined by the Agent before anything counts, never replacing the pay rule, with a budget; paid by the platform on its fleet's statements, reported to a Partner for its own Agents.
+ */
+export type AgentIncentive = {
+    /**
+     * The incentive.
+     */
+    id: string;
+    /**
+     * The service's Partner.
+     */
+    partner_id: string;
+    /**
+     * The delivery service.
+     */
+    service_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * Where it stands.
+     */
+    state: IncentiveState;
+    /**
+     * How often it runs.
+     */
+    recurrence: IncentiveRecurrence;
+    /**
+     * Its first day.
+     */
+    starts_on: string;
+    /**
+     * Its last day; `null` until stopped.
+     */
+    ends_on: string | null;
+    /**
+     * A quest's tiers, fewest drop-offs first; empty for a bonus.
+     */
+    tiers: Array<IncentiveTier>;
+    /**
+     * A bonus's amount for each drop-off; `null` for a quest.
+     */
+    amount_per_drop_off: Money | null;
+    /**
+     * A bonus's window; `null` for a quest.
+     */
+    window: IncentiveWindow | null;
+    /**
+     * Its budget.
+     */
+    budget: IncentiveBudget;
+    /**
+     * The service's clock.
+     */
+    time_zone: string;
+    /**
+     * What an Agent reads.
+     */
+    line: string;
+    /**
+     * Who pays it: the platform for its fleet, else the Partner.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * Agents who joined in the current period.
+     */
+    joined: number;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When it was published.
+     */
+    published_at: string | null;
+    /**
+     * When it ended.
+     */
+    ended_at: string | null;
+    /**
+     * Raised on every change.
+     */
+    version: number;
+};
+
+/**
+ * A service's incentives, live ones first.
+ */
+export type AgentIncentivePage = {
+    /**
+     * The incentives.
+     */
+    items: Array<AgentIncentive>;
+    /**
+     * The cursor of the next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A new incentive, kept as a draft: a quest's tiers, or a bonus's amount and window.
+ */
+export type AgentIncentiveInput = {
+    /**
+     * Its name, 1 to 60 characters.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * `weekly` by default.
+     */
+    recurrence?: IncentiveRecurrence | null;
+    /**
+     * Its first day; today by default.
+     */
+    starts_on?: string | null;
+    /**
+     * Its last day.
+     */
+    ends_on?: string | null;
+    /**
+     * A quest's one to five tiers, more drop-offs paying more.
+     */
+    tiers?: Array<IncentiveTier>;
+    /**
+     * A bonus's amount for each drop-off.
+     */
+    amount_per_drop_off?: Money | null;
+    /**
+     * A bonus's window.
+     */
+    window?: IncentiveWindow | null;
+    /**
+     * Its budget, more than nothing.
+     */
+    budget: Money;
+};
+
+/**
+ * A change to an incentive. A draft changes freely; a live one changes only its name, a later last day and a larger budget (`incentive_change_refused` otherwise).
+ */
+export type AgentIncentiveUpdate = {
+    /**
+     * Its name.
+     */
+    name?: string | null;
+    /**
+     * How often.
+     */
+    recurrence?: IncentiveRecurrence | null;
+    /**
+     * Its first day.
+     */
+    starts_on?: string | null;
+    /**
+     * Its last day.
+     */
+    ends_on?: string | null;
+    /**
+     * A quest's tiers.
+     */
+    tiers?: Array<IncentiveTier> | null;
+    /**
+     * A bonus's amount.
+     */
+    amount_per_drop_off?: Money | null;
+    /**
+     * A bonus's window.
+     */
+    window?: IncentiveWindow | null;
+    /**
+     * Its budget.
+     */
+    budget?: Money | null;
+};
+
+/**
+ * An Agent's progress on an incentive in a period.
+ */
+export type AgentIncentiveProgressRow = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The Agent's name.
+     */
+    name: string;
+    /**
+     * When they joined.
+     */
+    joined_at: string;
+    /**
+     * Drop-offs counted.
+     */
+    drop_offs: number;
+    /**
+     * Earned.
+     */
+    earned: Money;
+    /**
+     * A quest's next tier; `null` past the last, or for a bonus.
+     */
+    next_tier: IncentiveTier | null;
+};
+
+/**
+ * The Agents who joined an incentive in a period, with their progress.
+ */
+export type AgentIncentiveProgress = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * The period: a week such as `2026W45`, or the dates of a one-off.
+     */
+    period: string;
+    /**
+     * When it starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * The Agents who joined, most drop-offs first.
+     */
+    items: Array<AgentIncentiveProgressRow>;
+    /**
+     * Agents who joined.
+     */
+    joined: number;
+    /**
+     * Drop-offs counted.
+     */
+    drop_offs: number;
+    /**
+     * Earned.
+     */
+    earned: Money;
+};
+
+/**
+ * What an Agent's next tier pays.
+ */
+export type IncentiveNext = {
+    /**
+     * Drop-offs more.
+     */
+    drop_offs_more: number;
+    /**
+     * What reaching it pays in all.
+     */
+    amount: Money;
+    /**
+     * In words.
+     */
+    words: string;
+};
+
+/**
+ * An incentive as the Agent app shows it: what it pays, the period, whether the Agent joined, their drop-offs counted and what they earned, and who pays.
+ */
+export type AgentIncentiveOffer = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * What it pays.
+     */
+    line: string;
+    /**
+     * The period.
+     */
+    period: string;
+    /**
+     * When the period starts.
+     */
+    starts_at: string;
+    /**
+     * When it ends.
+     */
+    ends_at: string;
+    /**
+     * A bonus's window in words.
+     */
+    window: string | null;
+    /**
+     * Whether the Agent joined: nothing counts before.
+     */
+    joined: boolean;
+    /**
+     * When.
+     */
+    joined_at: string | null;
+    /**
+     * Whether Join is offered now.
+     */
+    can_join: boolean;
+    /**
+     * Drop-offs counted since joining.
+     */
+    drop_offs: number;
+    /**
+     * Earned in the period.
+     */
+    earned: Money;
+    /**
+     * A quest's next tier; `null` past the last, or for a bonus.
+     */
+    next: IncentiveNext | null;
+    /**
+     * Who pays it.
+     */
+    paid_by: AgentPaidBy;
+    /**
+     * Who pays and where it shows.
+     */
+    sentence: string;
+    /**
+     * Progress in words.
+     */
+    progress: string;
+};
+
+/**
+ * The incentives of the Agent's service this week.
+ */
+export type AgentIncentiveOfferList = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * This week.
+     */
+    week: string;
+    /**
+     * Live incentives, joined ones first.
+     */
+    items: Array<AgentIncentiveOffer>;
+    /**
+     * Earned from incentives this week.
+     */
+    earned: Money;
+};
+
+/**
+ * A reward campaign the Partner paid towards in the week: its grants on the Location's orders and the Partner's share of them, less what was taken back.
+ */
+export type StatementRewardRow = {
+    /**
+     * The campaign.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Rewards granted on the Location's orders.
+     */
+    grants: number;
+    /**
+     * The Partner's share.
+     */
+    amount: Money;
+};
+
+/**
+ * An incentive an Agent earned in a week: what reaching a quest's tier or a bonus's drop-offs paid, beside the pay for each task.
+ */
+export type AgentBonusLine = {
+    /**
+     * The incentive.
+     */
+    incentive_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Quest or bonus.
+     */
+    kind: IncentiveKind;
+    /**
+     * The period it was earned in.
+     */
+    period: string;
+    /**
+     * Drop-offs counted when it was earned.
+     */
+    drop_offs: number;
+    /**
+     * What it paid.
+     */
+    amount: Money;
+    /**
+     * When.
+     */
+    earned_at: string;
+    /**
+     * In words.
+     */
+    words: string;
+};
+
+/**
  * A slot an order is placed into: for a delivery the window it arrives in, for a pickup the window it is ready in. The slot is the order's promise.
  */
 export type OrderSlot = {
@@ -28988,7 +30671,6 @@ export type SubscriptionPaymentDue = {
  * What the customer may do now.
  */
 export type SubscriptionActions = {
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * Pause it.
      */
@@ -28998,647 +30680,6 @@ export type SubscriptionActions = {
      */
     resume: boolean;
     /**
-<<<<<<< HEAD
-     * Stop it.
-     */
-    stop: boolean;
-    /**
-     * Cancel it before it starts.
-     */
-    cancel: boolean;
-    /**
-     * Delete the draft.
-     */
-    delete: boolean;
-    /**
-     * Change its rules from a moment chosen, as a new version (Mission Control only).
-     */
-    new_version: boolean;
-};
-
-/**
- * Campaigns by state.
- */
-export type RewardCampaignCounts = {
-    /**
-     * Drafts.
-     */
-    draft: number;
-    /**
-     * Scheduled.
-     */
-    scheduled: number;
-    /**
-     * Live.
-     */
-    live: number;
-    /**
-     * Paused.
-     */
-    paused: number;
-    /**
-     * Ended.
-     */
-    ended: number;
-    /**
-     * Cancelled.
-     */
-    cancelled: number;
-};
-
-/**
- * A campaign in a list.
- */
-export type RewardCampaignSummary = {
-    /**
-     * The campaign.
-     */
-    id: string;
-    /**
-     * Who runs it.
-     */
-    owner: RewardCampaignOwner;
-    /**
-     * The Partner whose campaign it is; `null` for the platform's.
-     */
-    partner_id: string | null;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * What it counts.
-     */
-    kind: RewardCampaignKind;
-    /**
-     * Where it stands.
-     */
-    state: RewardCampaignState;
-    /**
-     * What a customer reads.
-     */
-    line: string;
-    /**
-     * Who pays for its rewards.
-     */
-    funder: RewardFunder;
-    /**
-     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
-     */
-    partner_share_percent: number;
-    /**
-     * Its budget.
-     */
-    budget: RewardBudget;
-    /**
-     * When it runs.
-     */
-    schedule: RewardSchedule;
-    /**
-     * Rewards granted.
-     */
-    grants: number;
-    /**
-     * When it last changed.
-     */
-    updated_at: string;
-};
-
-/**
- * A reward campaign: what it counts and gives, who pays and from what budget, when and where it runs, whom it holds out, and what the caller may do with it. Its rules are versioned: a live campaign's rules change only as a new version from a moment chosen, progress made under an earlier one keeps counting, and every grant names the version it came from.
- */
-export type RewardCampaign = {
-    /**
-     * The campaign.
-     */
-    id: string;
-    /**
-     * Who runs it.
-     */
-    owner: RewardCampaignOwner;
-    /**
-     * The Partner whose campaign it is; `null` for the platform's.
-     */
-    partner_id: string | null;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * What it counts.
-     */
-    kind: RewardCampaignKind;
-    /**
-     * Where it stands.
-     */
-    state: RewardCampaignState;
-    /**
-     * What a customer reads.
-     */
-    line: string;
-    /**
-     * Who pays for its rewards.
-     */
-    funder: RewardFunder;
-    /**
-     * The Partner's share of each reward, in percent: 100 when the Partner pays, 0 when the platform does.
-     */
-    partner_share_percent: number;
-    /**
-     * Its budget.
-     */
-    budget: RewardBudget;
-    /**
-     * When it runs.
-     */
-    schedule: RewardSchedule;
-    /**
-     * The Partner that pays its share of a split campaign; `null` otherwise.
-     */
-    funding_partner_id: string | null;
-    /**
-     * For a split campaign, that the operator confirmed the Partner agreed to pay its share.
-     */
-    partner_agreed: boolean;
-    /**
-     * Where it counts.
-     */
-    audience: RewardAudience;
-    /**
-     * Grants a day at most; 1,000 by default.
-     */
-    daily_grant_cap: number;
-    /**
-     * The share of the customers it would reach held out as a control group, who see nothing of it and earn nothing; 10 by default, 0 for tiers.
-     */
-    control_percent: number;
-    /**
-     * The version of the rules in force.
-     */
-    rules_version: number;
-    /**
-     * The rules in force.
-     */
-    rules: RewardRules;
-    /**
-     * Versions of its rules.
-     */
-    versions: number;
-    /**
-     * For a Partner's campaign, whether the Partner confirmed as it published that its business pays.
-     */
-    confirmed: boolean;
-    /**
-     * Whether the platform paused it; a Partner cannot resume it then.
-     */
-    paused_by_platform: boolean;
-    /**
-     * Why it was paused.
-     */
-    pause_reason: string | null;
-    /**
-     * Rewards granted.
-     */
-    grants: number;
-    /**
-     * When it was made.
-     */
-    created_at: string;
-    /**
-     * When it last changed.
-     */
-    updated_at: string;
-    /**
-     * When it was published.
-     */
-    published_at: string | null;
-    /**
-     * When it ended.
-     */
-    ended_at: string | null;
-    /**
-     * The version of the campaign, raised on every change; send it in `If-Match` to change it.
-     */
-    version: number;
-    /**
-     * What the caller may do now.
-     */
-    actions: RewardCampaignActions;
-};
-
-/**
- * Campaigns, live ones first, then newest, with counts by state.
- */
-export type RewardCampaignPage = {
-    /**
-     * The campaigns.
-     */
-    items: Array<RewardCampaignSummary>;
-    /**
-     * The cursor of the next page; `null` on the last.
-     */
-    next_cursor: string | null;
-    /**
-     * Campaigns by state, whatever the filter on state.
-     */
-    counts: RewardCampaignCounts;
-};
-
-/**
- * A new campaign, kept as a draft. A Partner's campaign is a streak, a quest naming only its own Partner or Locations, or a punch card, on its own Locations and paid by the Partner in full; a tier is the platform's only (`kind_not_for_partners`).
- */
-export type RewardCampaignInput = {
-    /**
-     * Its name, 1 to 80 characters.
-     */
-    name: string;
-    /**
-     * What it counts.
-     */
-    kind: RewardCampaignKind;
-    /**
-     * Who pays: the platform by default for Mission Control's, the Partner always for a Partner's.
-     */
-    funder?: RewardFunder | null;
-    /**
-     * A split campaign's Partner share, 1 to 99.
-     */
-    partner_share_percent?: number | null;
-    /**
-     * The Partner paying its share of a split campaign.
-     */
-    funding_partner_id?: string | null;
-    /**
-     * For a split campaign, that the Partner agreed to pay its share; required to publish one.
-     */
-    partner_agreed?: boolean | null;
-    /**
-     * Its budget, more than nothing.
-     */
-    budget: Money;
-    /**
-     * When it starts; when published by default.
-     */
-    starts_at?: string | null;
-    /**
-     * When it ends; open by default.
-     */
-    ends_at?: string | null;
-    /**
-     * Where it counts; a Partner's Locations, or everywhere, by default.
-     */
-    audience?: RewardAudienceInput | null;
-    /**
-     * Grants a day at most; 1,000 by default.
-     */
-    daily_grant_cap?: number | null;
-    /**
-     * The share held out, 0 to 50; 10 by default, 0 for tiers.
-     */
-    control_percent?: number | null;
-    /**
-     * Its rules: the member named by its kind.
-     */
-    rules: RewardRulesInput;
-};
-
-/**
- * A change to a campaign. A draft or a scheduled campaign changes freely. A live or paused one changes only where no customer is surprised: its name, a later end, a larger budget and a higher daily cap; its rules change as a new version (Mission Control), and anything else is refused with `reward_campaign_change_refused`, saying to stop it and run another.
- */
-export type RewardCampaignUpdate = {
-    /**
-     * Its name.
-     */
-    name?: string | null;
-    /**
-     * Who pays.
-     */
-    funder?: RewardFunder | null;
-    /**
-     * A split campaign's Partner share.
-     */
-    partner_share_percent?: number | null;
-    /**
-     * The Partner paying its share.
-     */
-    funding_partner_id?: string | null;
-    /**
-     * That the Partner agreed to pay its share.
-     */
-    partner_agreed?: boolean | null;
-    /**
-     * Its budget.
-     */
-    budget?: Money | null;
-    /**
-     * When it starts.
-     */
-    starts_at?: string | null;
-    /**
-     * When it ends.
-     */
-    ends_at?: string | null;
-    /**
-     * Where it counts.
-     */
-    audience?: RewardAudienceInput | null;
-    /**
-     * Grants a day at most.
-     */
-    daily_grant_cap?: number | null;
-    /**
-     * The share held out.
-     */
-    control_percent?: number | null;
-    /**
-     * A draft's rules.
-     */
-    rules?: RewardRulesInput | null;
-};
-
-/**
- * A move's words: the reason for a pause or a stop, which a Partner reads when the platform paused its campaign; and, to publish a Partner's campaign, the Partner's word, exactly "My business pays for this campaign's rewards, as shown." (`funding_not_confirmed` without it).
- */
-export type RewardCampaignMove = {
-    /**
-     * Why, at most 200 characters; required when the platform pauses a Partner's campaign.
-     */
-    reason?: string | null;
-    /**
-     * The Partner's word.
-     */
-    confirmation?: string | null;
-};
-
-/**
- * A version of a campaign's rules.
- */
-export type RewardCampaignVersion = {
-    /**
-     * Its number, from 1.
-     */
-    version: number;
-    /**
-     * When it took or takes effect.
-     */
-    effective_from: string;
-    /**
-     * Its rules.
-     */
-    rules: RewardRules;
-    /**
-     * When it was made.
-     */
-    created_at: string;
-    /**
-     * Who made it.
-     */
-    created_by: string | null;
-    /**
-     * Whether it is the version in force now.
-     */
-    in_force: boolean;
-};
-
-/**
- * Every version of a campaign's rules, oldest first.
- */
-export type RewardCampaignVersionList = {
-    /**
-     * The versions.
-     */
-    items: Array<RewardCampaignVersion>;
-};
-
-/**
- * A new version of a live campaign's rules, from a moment chosen, now or later (`effective_from_past` for one before now). Progress made under the earlier version keeps counting.
- */
-export type RewardCampaignVersionInput = {
-    /**
-     * When it takes effect; now by default.
-     */
-    effective_from?: string | null;
-    /**
-     * The rules.
-     */
-    rules: RewardRulesInput;
-};
-
-/**
- * One side of a campaign's results: the customers treated or held out, their completed orders and sales in the campaign's scope since it started, the share with a second order within 30 days of their first, and what their rewards cost.
- */
-export type RewardResultsGroup = {
-    /**
-     * Customers.
-     */
-    customers: number;
-    /**
-     * Completed orders.
-     */
-    orders: number;
-    /**
-     * Their sales.
-     */
-    sales: Money;
-    /**
-     * Orders per customer.
-     */
-    orders_per_customer: number;
-    /**
-     * The share, in percent, with another completed order within 30 days of their first; `null` without customers.
-     */
-    retained_30_days_percent: number | null;
-    /**
-     * What their rewards cost.
-     */
-    reward_cost: Money;
-};
-
-/**
- * A campaign's results against its control group, worked out when asked for from completed orders.
- */
-export type RewardCampaignResults = {
-    /**
-     * The campaign.
-     */
-    campaign_id: string;
-    /**
-     * Since when.
-     */
-    from: string;
-    /**
-     * Until when.
-     */
-    until: string;
-    /**
-     * The share held out.
-     */
-    control_percent: number;
-    /**
-     * The customers it reached.
-     */
-    treated: RewardResultsGroup;
-    /**
-     * The customers held out.
-     */
-    control: RewardResultsGroup;
-    /**
-     * What it shows, in words.
-     */
-    sentence: string;
-};
-
-/**
- * A signal that held a grant for review, in words.
- */
-export type RewardSignal = {
-    /**
-     * The signal.
-     */
-    code: RewardSignalCode;
-    /**
-     * In words.
-     */
-    words: string;
-};
-
-/**
- * A reward taken back after its order was refunded in full or cancelled: what was taken back, and what had been spent already.
- */
-export type RewardClawBack = {
-    /**
-     * When.
-     */
-    at: string;
-    /**
-     * Why.
-     */
-    reason: ClawBackReason;
-    /**
-     * Why, in words.
-     */
-    words: string;
-    /**
-     * Taken back from what was not spent.
-     */
-    taken_back: Money;
-    /**
-     * Spent already, and so marked clawed back.
-     */
-    unrecovered: Money;
-};
-
-/**
- * A reward granted, deferred, held, refused or clawed back: its campaign and rule version, what it gives and who pays, the Location whose order earned it, and the words the customer reads.
- */
-export type RewardGrant = {
-    /**
-     * The grant.
-     */
-    id: string;
-    /**
-     * What granted it.
-     */
-    source: RewardSource;
-    /**
-     * Its campaign; `null` for a referral.
-     */
-    campaign_id: string | null;
-    /**
-     * Its campaign's name, or the city's referrals.
-     */
-    campaign_name: string;
-    /**
-     * Its campaign's kind; `null` for a referral.
-     */
-    campaign_kind: RewardCampaignKind | null;
-    /**
-     * The version of the rules it came from: the campaign's, or the city's referral programme's.
-     */
-    rules_version: number;
-    /**
-     * The customer (a user id).
-     */
-    customer_id: string;
-    /**
-     * Where it stands.
-     */
-    status: RewardGrantStatus;
-    /**
-     * What it gives.
-     */
-    reward: RewardSpec;
-    /**
-     * The credit, or the most the offer can take off.
-     */
-    amount: Money;
-    /**
-     * Who pays.
-     */
-    funder: RewardFunder;
-    /**
-     * The platform's share.
-     */
-    platform_share: Money;
-    /**
-     * The Partner's share.
-     */
-    partner_share: Money;
-    /**
-     * The Partner paying a share.
-     */
-    partner_id: string | null;
-    /**
-     * The Location whose order earned it, which a Partner's share is charged to.
-     */
-    location_id: string | null;
-    /**
-     * Its name.
-     */
-    location_name: string | null;
-    /**
-     * The order that earned it.
-     */
-    order_id: string | null;
-    /**
-     * What the customer reads.
-     */
-    explanation: string;
-    /**
-     * What held it; empty unless held.
-     */
-    signals: Array<RewardSignal>;
-    /**
-     * When it was granted.
-     */
-    granted_at: string | null;
-    /**
-     * When a held offer ends; `null` for credit, which does not expire.
-     */
-    expires_at: string | null;
-    /**
-     * The day a deferred grant is given, when a cap allows.
-     */
-    deferred_until: string | null;
-    /**
-     * Who released or refused it.
-     */
-    decided_by: string | null;
-    /**
-     * When.
-     */
-    decided_at: string | null;
-    /**
-     * Why.
-     */
-    decision_reason: string | null;
-    /**
-     * What was taken back.
-     */
-    claw_back: RewardClawBack | null;
-    /**
-     * When it was earned.
-=======
      * Skip the next delivery.
      */
     skip_next: boolean;
@@ -29670,383 +30711,11 @@ export type SubscriptionVacation = {
     to: string;
     /**
      * When it was set.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     created_at: string;
 };
 
 /**
-<<<<<<< HEAD
- * Grants, newest first, with the budget they draw on when they are one campaign's.
- */
-export type RewardGrantPage = {
-    /**
-     * The grants.
-     */
-    items: Array<RewardGrant>;
-    /**
-     * The cursor of the next page; `null` on the last.
-     */
-    next_cursor: string | null;
-    /**
-     * The campaign's budget, for a campaign's grants; `null` otherwise.
-     */
-    budget: RewardBudget | null;
-};
-
-/**
- * Why a held grant is released or refused, 1 to 300 characters; in the audit log.
- */
-export type RewardGrantDecision = {
-    /**
-     * Why.
-     */
-    reason: string;
-};
-
-/**
- * A customer's weekly streak: its weeks in a row, whether this week counted, the next milestone and its reward, the freeze, and what waits.
- */
-export type StreakProgress = {
-    /**
-     * The campaign.
-     */
-    campaign_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Whether it counts.
-     */
-    state: StreakState;
-    /**
-     * Weeks in a row.
-     */
-    weeks: number;
-    /**
-     * This week.
-     */
-    week: string;
-    /**
-     * Whether this week has a completed order.
-     */
-    this_week_counted: boolean;
-    /**
-     * Whether this week has no order yet past Saturday 18:00.
-     */
-    at_risk: boolean;
-    /**
-     * The weeks of the next milestone.
-     */
-    next_milestone: number | null;
-    /**
-     * Its reward.
-     */
-    next_reward: string | null;
-    /**
-     * Whether this month's freeze is unused.
-     */
-    freeze_available: boolean;
-    /**
-     * The week a freeze kept the streak this month.
-     */
-    freeze_used_week: string | null;
-    /**
-     * A reward from it the customer holds.
-     */
-    reward_waiting: string | null;
-    /**
-     * In words.
-     */
-    sentence: string;
-};
-
-/**
- * A step of a quest the customer started.
- */
-export type QuestStepProgress = {
-    /**
-     * What counts.
-     */
-    kind: QuestStepKind;
-    /**
-     * In words.
-     */
-    label: string;
-    /**
-     * Counted.
-     */
-    count: number;
-    /**
-     * Needed.
-     */
-    needed: number;
-    /**
-     * Whether it is done.
-     */
-    done: boolean;
-};
-
-/**
- * A quest as the customer sees it: offered with nothing counted until they press Start, then its steps, its end and its reward.
- */
-export type QuestProgress = {
-    /**
-     * The campaign.
-     */
-    campaign_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Where it stands.
-     */
-    state: QuestState;
-    /**
-     * Its steps.
-     */
-    steps: Array<QuestStepProgress>;
-    /**
-     * Steps done.
-     */
-    done: number;
-    /**
-     * Steps.
-     */
-    needed: number;
-    /**
-     * Its reward.
-     */
-    reward: string;
-    /**
-     * Whether Start is offered now.
-     */
-    can_start: boolean;
-    /**
-     * When it was started.
-     */
-    started_at: string | null;
-    /**
-     * When it ends.
-     */
-    ends_at: string | null;
-    /**
-     * When it completed.
-     */
-    completed_at: string | null;
-    /**
-     * In words.
-     */
-    sentence: string;
-};
-
-/**
- * A customer's tier, how it was earned, what keeps it and when it is next looked at.
- */
-export type TierStanding = {
-    /**
-     * The tier.
-     */
-    level: TierLevel;
-    /**
-     * Since when.
-     */
-    since: string;
-    /**
-     * Completed orders in the days counted.
-     */
-    orders_in_window: number;
-    /**
-     * The days counted.
-     */
-    window_days: number;
-    /**
-     * How it was earned.
-     */
-    how_earned: string;
-    /**
-     * What keeps it.
-     */
-    keeps: string;
-    /**
-     * When it is next looked at.
-     */
-    next_look_on: string;
-    /**
-     * The tier above; `null` at Gold.
-     */
-    next_level: TierLevel | null;
-    /**
-     * Completed orders more for the tier above.
-     */
-    orders_to_next: number | null;
-    /**
-     * Its perks, and when they arrive.
-     */
-    perks: Array<string>;
-};
-
-/**
- * A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded.
- */
-export type PunchCardProgress = {
-    /**
-     * The campaign.
-     */
-    campaign_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * The Location.
-     */
-    location_id: string;
-    /**
-     * Its name.
-     */
-    location_name: string;
-    /**
-     * Pickups counted towards the next reward.
-     */
-    punches: number;
-    /**
-     * Every this many.
-     */
-    every: number;
-    /**
-     * Whether the next pickup is rewarded.
-     */
-    next_rewarded: boolean;
-    /**
-     * Its reward.
-     */
-    reward: string;
-    /**
-     * In words.
-     */
-    sentence: string;
-};
-
-/**
- * The customer's Rewards: their streaks, quests, tier and punch cards with their progress and what completes them. A campaign that holds the customer out is not listed.
- */
-export type CustomerRewards = {
-    /**
-     * Weekly streaks.
-     */
-    streaks: Array<StreakProgress>;
-    /**
-     * Quests offered, started, completed or expired.
-     */
-    quests: Array<QuestProgress>;
-    /**
-     * Their tier; `null` when no tier campaign is live.
-     */
-    tier: TierStanding | null;
-    /**
-     * Punch cards with a punch, or near them.
-     */
-    punch_cards: Array<PunchCardProgress>;
-    /**
-     * Promotional credit their rewards gave, all time.
-     */
-    credit_earned: Money;
-};
-
-/**
- * Where Start was pressed.
- */
-export type QuestStartInput = {
-    /**
-     * Where; `rewards` by default.
-     */
-    from?: QuestStartedFrom | null;
-};
-
-/**
- * The customer's referral code and what it does: a friend new to ZippyGo who adds it gets the city's referral offer, and the customer earns promotional credit when the friend's first order completes, at most 20 times a month.
- */
-export type CustomerReferral = {
-    /**
-     * The code to share.
-     */
-    code: string;
-    /**
-     * A message to share.
-     */
-    share_text: string;
-    /**
-     * What a friend gets.
-     */
-    friend_gets: string;
-    /**
-     * What the customer earns.
-     */
-    you_earn: string;
-    /**
-     * Friends who added the code.
-     */
-    referred: number;
-    /**
-     * Friends whose first order earned the customer credit.
-     */
-    rewarded: number;
-    /**
-     * Credit earned.
-     */
-    earned: Money;
-    /**
-     * Referrals that may earn in a month.
-     */
-    monthly_limit: number;
-    /**
-     * The first day the customer may ask for a new code; `null` when they may now.
-     */
-    new_code_from: string | null;
-};
-
-/**
- * A city's referral programme: whether it runs, what the referrer earns from what budget, the monthly limit and the refund window. The friend's offer is the city's referral offer in promotions.
- */
-export type ReferralSettings = {
-    /**
-     * The city.
-     */
-    service_area_id: string;
-    /**
-     * Its name.
-     */
-    service_area_name: string;
-    /**
-     * Whether referrals earn.
-     */
-    enabled: boolean;
-    /**
-     * What the referrer earns, promotional credit funded by the platform.
-     */
-    referrer_reward: Money;
-    /**
-     * The budget.
-     */
-    budget: Money;
-    /**
-     * Granted so far.
-     */
-    granted: Money;
-    /**
-     * Referrals a referrer may earn for in a month.
-     */
-    monthly_limit: number;
-    /**
-     * Days within which a full refund of the friend's first order takes the reward back.
-     */
-    refund_window_days: number;
-    /**
-     * Raised on every change.
-=======
  * A subscription: one customer, one store and one plan, with its items, schedule, window, dates, address and way to pay.
  */
 export type Subscription = {
@@ -30176,101 +30845,11 @@ export type Subscription = {
     updated_at: string;
     /**
      * Raised by every change.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     version: number;
 };
 
 /**
-<<<<<<< HEAD
- * A city's referral programme as set.
- */
-export type ReferralSettingsInput = {
-    /**
-     * Whether referrals earn.
-     */
-    enabled: boolean;
-    /**
-     * What the referrer earns, more than nothing.
-     */
-    referrer_reward: Money;
-    /**
-     * The budget.
-     */
-    budget: Money;
-    /**
-     * 20 by default.
-     */
-    monthly_limit?: number | null;
-};
-
-/**
- * A referral: who referred whom with which code, and what it earned.
- */
-export type Referral = {
-    /**
-     * The referral.
-     */
-    id: string;
-    /**
-     * The referrer (a user id).
-     */
-    referrer_id: string;
-    /**
-     * The referrer's first name.
-     */
-    referrer_name: string | null;
-    /**
-     * The friend (a user id).
-     */
-    referred_id: string;
-    /**
-     * The friend's first name.
-     */
-    referred_name: string | null;
-    /**
-     * The code.
-     */
-    code: string;
-    /**
-     * The city.
-     */
-    service_area_id: string | null;
-    /**
-     * Where it stands.
-     */
-    state: ReferralState;
-    /**
-     * When the friend added the code.
-     */
-    recorded_at: string;
-    /**
-     * The friend's first order.
-     */
-    order_id: string | null;
-    /**
-     * When the referrer was credited.
-     */
-    rewarded_at: string | null;
-    /**
-     * What the referrer earned.
-     */
-    amount: Money | null;
-    /**
-     * Why it lapsed or was taken back.
-     */
-    reason: string | null;
-};
-
-/**
- * Referrals, newest first.
- */
-export type ReferralPage = {
-    /**
-     * The referrals.
-     */
-    items: Array<Referral>;
-=======
  * The customer's subscriptions: active and pending first, then paused, then those cancelled or ended in the last ninety days.
  */
 export type SubscriptionPage = {
@@ -30278,7 +30857,6 @@ export type SubscriptionPage = {
      * The subscriptions.
      */
     items: Array<Subscription>;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * The cursor of the next page; `null` on the last.
      */
@@ -30286,119 +30864,6 @@ export type SubscriptionPage = {
 };
 
 /**
-<<<<<<< HEAD
- * A customer excluded from rewards: they earn nothing from any campaign until the exclusion is lifted.
- */
-export type RewardExclusion = {
-    /**
-     * The customer.
-     */
-    customer_id: string;
-    /**
-     * Why.
-     */
-    reason: string;
-    /**
-     * Who excluded them.
-     */
-    by: string | null;
-    /**
-     * When.
-     */
-    at: string;
-};
-
-/**
- * Why a customer is excluded from rewards, 1 to 300 characters; in the audit log.
- */
-export type RewardExclusionInput = {
-    /**
-     * Why.
-     */
-    reason: string;
-};
-
-/**
- * A customer's Rewards tab in Mission Control: what the customer sees, every grant, their referrals, the signals on them and whether they are excluded.
- */
-export type PlatformCustomerRewards = {
-    /**
-     * The customer.
-     */
-    customer_id: string;
-    /**
-     * What the customer sees.
-     */
-    rewards: CustomerRewards;
-    /**
-     * Their latest 50 grants, newest first.
-     */
-    grants: Array<RewardGrant>;
-    /**
-     * Their referrals, as referrer or friend.
-     */
-    referrals: Array<Referral>;
-    /**
-     * The signals on them now.
-     */
-    signals: Array<RewardSignal>;
-    /**
-     * Their exclusion; `null` when they earn.
-     */
-    excluded: RewardExclusion | null;
-    /**
-     * Whether support blocked the account, so it earns nothing while blocked.
-     */
-    blocked: boolean;
-    /**
-     * What the caller may do.
-     */
-    actions: PlatformCustomerRewardActions;
-};
-
-/**
- * What the caller may do on the Rewards tab: exclude and lift with `engagement:manage`.
- */
-export type PlatformCustomerRewardActions = {
-    /**
-     * Exclude the customer from rewards.
-     */
-    exclude: boolean;
-    /**
-     * Lift the exclusion.
-     */
-    lift: boolean;
-};
-
-/**
- * A tier of a quest: the drop-offs that reach it and what it pays in all, the tiers below included.
- */
-export type IncentiveTier = {
-    /**
-     * Drop-offs completed.
-     */
-    drop_offs: number;
-    /**
-     * What reaching it pays in all.
-     */
-    amount: Money;
-};
-
-/**
- * A bonus's window: its days of the week and its hours on the service's clock.
- */
-export type IncentiveWindow = {
-    /**
-     * The days; every day when empty.
-     */
-    days: Array<Day>;
-    /**
-     * From, `HH:MM`.
-     */
-    from: string;
-    /**
-     * Until, `HH:MM`, after `from`.
-=======
  * Subscribing to a plan. It starts once the Wallet covers the first delivery, or once the mandate is confirmed; until then it is `pending` and schedules nothing.
  */
 export type SubscriptionInput = {
@@ -30538,107 +31003,11 @@ export type SubscriptionVacationInput = {
     from: string;
     /**
      * The last day away.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     to: string;
 };
 
 /**
-<<<<<<< HEAD
- * An incentive's budget and what its Agents earned from it.
- */
-export type IncentiveBudget = {
-    /**
-     * The budget.
-     */
-    amount: Money;
-    /**
-     * Earned so far.
-     */
-    earned: Money;
-    /**
-     * Left.
-     */
-    left: Money;
-    /**
-     * Whether it is spent: no Agent may join any more.
-     */
-    spent: boolean;
-};
-
-/**
- * An Agent incentive on a delivery service: a quest of drop-off tiers or a bonus a drop-off, joined by the Agent before anything counts, never replacing the pay rule, with a budget; paid by the platform on its fleet's statements, reported to a Partner for its own Agents.
- */
-export type AgentIncentive = {
-    /**
-     * The incentive.
-     */
-    id: string;
-    /**
-     * The service's Partner.
-     */
-    partner_id: string;
-    /**
-     * The delivery service.
-     */
-    service_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Quest or bonus.
-     */
-    kind: IncentiveKind;
-    /**
-     * Where it stands.
-     */
-    state: IncentiveState;
-    /**
-     * How often it runs.
-     */
-    recurrence: IncentiveRecurrence;
-    /**
-     * Its first day.
-     */
-    starts_on: string;
-    /**
-     * Its last day; `null` until stopped.
-     */
-    ends_on: string | null;
-    /**
-     * A quest's tiers, fewest drop-offs first; empty for a bonus.
-     */
-    tiers: Array<IncentiveTier>;
-    /**
-     * A bonus's amount for each drop-off; `null` for a quest.
-     */
-    amount_per_drop_off: Money | null;
-    /**
-     * A bonus's window; `null` for a quest.
-     */
-    window: IncentiveWindow | null;
-    /**
-     * Its budget.
-     */
-    budget: IncentiveBudget;
-    /**
-     * The service's clock.
-     */
-    time_zone: string;
-    /**
-     * What an Agent reads.
-     */
-    line: string;
-    /**
-     * Who pays it: the platform for its fleet, else the Partner.
-     */
-    paid_by: AgentPaidBy;
-    /**
-     * Agents who joined in the current period.
-     */
-    joined: number;
-=======
  * Cancelling a subscription, with an optional reason the churn report counts.
  */
 export type SubscriptionCancelInput = {
@@ -30909,35 +31278,10 @@ export type LocationSubscriptionRow = {
      * Where it delivers, by locality.
      */
     locality: string | null;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * When it was made.
      */
     created_at: string;
-<<<<<<< HEAD
-    /**
-     * When it was published.
-     */
-    published_at: string | null;
-    /**
-     * When it ended.
-     */
-    ended_at: string | null;
-    /**
-     * Raised on every change.
-     */
-    version: number;
-};
-
-/**
- * A service's incentives, live ones first.
- */
-export type AgentIncentivePage = {
-    /**
-     * The incentives.
-     */
-    items: Array<AgentIncentive>;
-=======
 };
 
 /**
@@ -30948,7 +31292,6 @@ export type LocationSubscriptionPage = {
      * The subscriptions.
      */
     items: Array<LocationSubscriptionRow>;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * The cursor of the next page; `null` on the last.
      */
@@ -30956,327 +31299,6 @@ export type LocationSubscriptionPage = {
 };
 
 /**
-<<<<<<< HEAD
- * A new incentive, kept as a draft: a quest's tiers, or a bonus's amount and window.
- */
-export type AgentIncentiveInput = {
-    /**
-     * Its name, 1 to 60 characters.
-     */
-    name: string;
-    /**
-     * Quest or bonus.
-     */
-    kind: IncentiveKind;
-    /**
-     * `weekly` by default.
-     */
-    recurrence?: IncentiveRecurrence | null;
-    /**
-     * Its first day; today by default.
-     */
-    starts_on?: string | null;
-    /**
-     * Its last day.
-     */
-    ends_on?: string | null;
-    /**
-     * A quest's one to five tiers, more drop-offs paying more.
-     */
-    tiers?: Array<IncentiveTier>;
-    /**
-     * A bonus's amount for each drop-off.
-     */
-    amount_per_drop_off?: Money | null;
-    /**
-     * A bonus's window.
-     */
-    window?: IncentiveWindow | null;
-    /**
-     * Its budget, more than nothing.
-     */
-    budget: Money;
-};
-
-/**
- * A change to an incentive. A draft changes freely; a live one changes only its name, a later last day and a larger budget (`incentive_change_refused` otherwise).
- */
-export type AgentIncentiveUpdate = {
-    /**
-     * Its name.
-     */
-    name?: string | null;
-    /**
-     * How often.
-     */
-    recurrence?: IncentiveRecurrence | null;
-    /**
-     * Its first day.
-     */
-    starts_on?: string | null;
-    /**
-     * Its last day.
-     */
-    ends_on?: string | null;
-    /**
-     * A quest's tiers.
-     */
-    tiers?: Array<IncentiveTier> | null;
-    /**
-     * A bonus's amount.
-     */
-    amount_per_drop_off?: Money | null;
-    /**
-     * A bonus's window.
-     */
-    window?: IncentiveWindow | null;
-    /**
-     * Its budget.
-     */
-    budget?: Money | null;
-};
-
-/**
- * An Agent's progress on an incentive in a period.
- */
-export type AgentIncentiveProgressRow = {
-    /**
-     * The Agent membership.
-     */
-    agent_id: string;
-    /**
-     * The Agent's name.
-     */
-    name: string;
-    /**
-     * When they joined.
-     */
-    joined_at: string;
-    /**
-     * Drop-offs counted.
-     */
-    drop_offs: number;
-    /**
-     * Earned.
-     */
-    earned: Money;
-    /**
-     * A quest's next tier; `null` past the last, or for a bonus.
-     */
-    next_tier: IncentiveTier | null;
-};
-
-/**
- * The Agents who joined an incentive in a period, with their progress.
- */
-export type AgentIncentiveProgress = {
-    /**
-     * The incentive.
-     */
-    incentive_id: string;
-    /**
-     * The period: a week such as `2026W45`, or the dates of a one-off.
-     */
-    period: string;
-    /**
-     * When it starts.
-     */
-    starts_at: string;
-    /**
-     * When it ends.
-     */
-    ends_at: string;
-    /**
-     * The Agents who joined, most drop-offs first.
-     */
-    items: Array<AgentIncentiveProgressRow>;
-    /**
-     * Agents who joined.
-     */
-    joined: number;
-    /**
-     * Drop-offs counted.
-     */
-    drop_offs: number;
-    /**
-     * Earned.
-     */
-    earned: Money;
-};
-
-/**
- * What an Agent's next tier pays.
- */
-export type IncentiveNext = {
-    /**
-     * Drop-offs more.
-     */
-    drop_offs_more: number;
-    /**
-     * What reaching it pays in all.
-     */
-    amount: Money;
-    /**
-     * In words.
-     */
-    words: string;
-};
-
-/**
- * An incentive as the Agent app shows it: what it pays, the period, whether the Agent joined, their drop-offs counted and what they earned, and who pays.
- */
-export type AgentIncentiveOffer = {
-    /**
-     * The incentive.
-     */
-    incentive_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Quest or bonus.
-     */
-    kind: IncentiveKind;
-    /**
-     * What it pays.
-     */
-    line: string;
-    /**
-     * The period.
-     */
-    period: string;
-    /**
-     * When the period starts.
-     */
-    starts_at: string;
-    /**
-     * When it ends.
-     */
-    ends_at: string;
-    /**
-     * A bonus's window in words.
-     */
-    window: string | null;
-    /**
-     * Whether the Agent joined: nothing counts before.
-     */
-    joined: boolean;
-    /**
-     * When.
-     */
-    joined_at: string | null;
-    /**
-     * Whether Join is offered now.
-     */
-    can_join: boolean;
-    /**
-     * Drop-offs counted since joining.
-     */
-    drop_offs: number;
-    /**
-     * Earned in the period.
-     */
-    earned: Money;
-    /**
-     * A quest's next tier; `null` past the last, or for a bonus.
-     */
-    next: IncentiveNext | null;
-    /**
-     * Who pays it.
-     */
-    paid_by: AgentPaidBy;
-    /**
-     * Who pays and where it shows.
-     */
-    sentence: string;
-    /**
-     * Progress in words.
-     */
-    progress: string;
-};
-
-/**
- * The incentives of the Agent's service this week.
- */
-export type AgentIncentiveOfferList = {
-    /**
-     * The Agent membership.
-     */
-    agent_id: string;
-    /**
-     * This week.
-     */
-    week: string;
-    /**
-     * Live incentives, joined ones first.
-     */
-    items: Array<AgentIncentiveOffer>;
-    /**
-     * Earned from incentives this week.
-     */
-    earned: Money;
-};
-
-/**
- * A reward campaign the Partner paid towards in the week: its grants on the Location's orders and the Partner's share of them, less what was taken back.
- */
-export type StatementRewardRow = {
-    /**
-     * The campaign.
-     */
-    campaign_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Rewards granted on the Location's orders.
-     */
-    grants: number;
-    /**
-     * The Partner's share.
-     */
-    amount: Money;
-};
-
-/**
- * An incentive an Agent earned in a week: what reaching a quest's tier or a bonus's drop-offs paid, beside the pay for each task.
- */
-export type AgentBonusLine = {
-    /**
-     * The incentive.
-     */
-    incentive_id: string;
-    /**
-     * Its name.
-     */
-    name: string;
-    /**
-     * Quest or bonus.
-     */
-    kind: IncentiveKind;
-    /**
-     * The period it was earned in.
-     */
-    period: string;
-    /**
-     * Drop-offs counted when it was earned.
-     */
-    drop_offs: number;
-    /**
-     * What it paid.
-     */
-    amount: Money;
-    /**
-     * When.
-     */
-    earned_at: string;
-    /**
-     * In words.
-     */
-    words: string;
-=======
  * How many of one item a day needs.
  */
 export type SubscriptionItemTotal = {
@@ -31646,7 +31668,6 @@ export type ScheduleDateMove = {
      * Why, at most 200 characters.
      */
     reason?: string | null;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
 };
 
 /**
@@ -67490,7 +67511,6 @@ export type GivePersonalCodeResponses = {
 
 export type GivePersonalCodeResponse = GivePersonalCodeResponses[keyof GivePersonalCodeResponses];
 
-<<<<<<< HEAD
 export type GetCustomerRewardsData = {
     body?: never;
     path?: never;
@@ -67499,44 +67519,11 @@ export type GetCustomerRewardsData = {
 };
 
 export type GetCustomerRewardsErrors = {
-=======
-export type ListStorePlansData = {
-    body?: never;
-    path: {
-        /**
-         * The store: a live store with a published menu.
-         */
-        location_id: string;
-    };
-    query?: {
-        /**
-         * One of the customer's saved addresses to check the reach of.
-         */
-        address_id?: string;
-        /**
-         * A pin's latitude, with `lng`, for a visitor.
-         */
-        lat?: number;
-        /**
-         * A pin's longitude, with `lat`.
-         */
-        lng?: number;
-    };
-    url: '/v1/storefront/stores/{location_id}/plans';
-};
-
-export type ListStorePlansErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or coordinate.
-     */
-    400: Problem;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
     401: Problem;
     /**
-<<<<<<< HEAD
      * `forbidden`: a token of another surface.
      */
     403: Problem;
@@ -67546,13 +67533,6 @@ export type ListStorePlansErrors = {
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * `not_found`: the store, or the address is not the customer's.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -67561,7 +67541,6 @@ export type ListStorePlansErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type GetCustomerRewardsError = GetCustomerRewardsErrors[keyof GetCustomerRewardsErrors];
 
 export type GetCustomerRewardsResponses = {
@@ -67574,83 +67553,6 @@ export type GetCustomerRewardsResponses = {
 export type GetCustomerRewardsResponse = GetCustomerRewardsResponses[keyof GetCustomerRewardsResponses];
 
 export type ListCustomerRewardGrantsData = {
-=======
-export type ListStorePlansError = ListStorePlansErrors[keyof ListStorePlansErrors];
-
-export type ListStorePlansResponses = {
-    /**
-     * The plans.
-     */
-    200: StorefrontPlanList;
-};
-
-export type ListStorePlansResponse = ListStorePlansResponses[keyof ListStorePlansResponses];
-
-export type GetStorePlanData = {
-    body?: never;
-    path: {
-        /**
-         * The store: a live store with a published menu.
-         */
-        location_id: string;
-        /**
-         * The plan, of the store in the path.
-         */
-        plan_id: string;
-    };
-    query?: {
-        /**
-         * One of the customer's saved addresses to check the reach of.
-         */
-        address_id?: string;
-        /**
-         * A pin's latitude, with `lng`, for a visitor.
-         */
-        lat?: number;
-        /**
-         * A pin's longitude, with `lat`.
-         */
-        lng?: number;
-    };
-    url: '/v1/storefront/stores/{location_id}/plans/{plan_id}';
-};
-
-export type GetStorePlanErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or coordinate.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `not_found`: the store or the plan, or the address is not the customer's.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetStorePlanError = GetStorePlanErrors[keyof GetStorePlanErrors];
-
-export type GetStorePlanResponses = {
-    /**
-     * The plan.
-     */
-    200: StorefrontPlan;
-};
-
-export type GetStorePlanResponse = GetStorePlanResponses[keyof GetStorePlanResponses];
-
-export type ListCustomerSubscriptionsData = {
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path?: never;
     query?: {
@@ -67659,7 +67561,6 @@ export type ListCustomerSubscriptionsData = {
          */
         limit?: number;
         /**
-<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -67670,18 +67571,6 @@ export type ListCustomerSubscriptionsData = {
 export type ListCustomerRewardGrantsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
-=======
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/customer/subscriptions';
-};
-
-export type ListCustomerSubscriptionsErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -67693,15 +67582,11 @@ export type ListCustomerSubscriptionsErrors = {
      */
     403: Problem;
     /**
-<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -67710,7 +67595,6 @@ export type ListCustomerSubscriptionsErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type ListCustomerRewardGrantsError = ListCustomerRewardGrantsErrors[keyof ListCustomerRewardGrantsErrors];
 
 export type ListCustomerRewardGrantsResponses = {
@@ -67738,50 +67622,6 @@ export type StartCustomerQuestData = {
 };
 
 export type StartCustomerQuestErrors = {
-=======
-export type ListCustomerSubscriptionsError = ListCustomerSubscriptionsErrors[keyof ListCustomerSubscriptionsErrors];
-
-export type ListCustomerSubscriptionsResponses = {
-    /**
-     * A page of subscriptions.
-     */
-    200: SubscriptionPage;
-};
-
-export type ListCustomerSubscriptionsResponse = ListCustomerSubscriptionsResponses[keyof ListCustomerSubscriptionsResponses];
-
-export type CreateSubscriptionData = {
-    /**
-     * The plan, the items, the schedule, the dates, the address and the way to pay.
-     */
-    body: SubscriptionInput;
-    headers?: {
-        /**
-         * A UUID the client mints for this write. The key is scoped to the caller
-         * and remembered for 24 hours: a repeat with the same key and the same
-         * request answers what the first made, with the same status and body and
-         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
-         * key with a different method, path or body is `409`
-         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
-         * being processed waits for it; a first that failed with a `5xx`, or was
-         * refused before it could act (`401`, `403` such as `step_up_required`,
-         * `429`), is processed afresh. Writes that move money or place an order
-         * require the header (`400`, `validation_failed` with
-         * `idempotency_key_missing`); every other write may carry it.
-         *
-         */
-        'Idempotency-Key'?: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/v1/customer/subscriptions';
-};
-
-export type CreateSubscriptionErrors = {
-    /**
-     * `validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`), a quantity out of the item's range (`quantity_out_of_range`), a frequency the plan does not allow (`frequency_not_offered`), a start before the earliest (`start_before_earliest`), an end before the minimum term or over 365 days out (`end_out_of_range`), or another malformed member.
-     */
-    400: Problem;
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -67791,62 +67631,6 @@ export type CreateSubscriptionErrors = {
      */
     403: Problem;
     /**
-     * `not_found`: the plan, or the address is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `plan_withdrawn`, `address_outside_area`, or `idempotency_key_reuse`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type CreateSubscriptionError = CreateSubscriptionErrors[keyof CreateSubscriptionErrors];
-
-export type CreateSubscriptionResponses = {
-    /**
-     * The subscription, active or pending.
-     */
-    201: Subscription;
-};
-
-export type CreateSubscriptionResponse = CreateSubscriptionResponses[keyof CreateSubscriptionResponses];
-
-export type GetCustomerSubscriptionData = {
-    body?: never;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}';
-};
-
-export type GetCustomerSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed identifier.
-     */
-    400: Problem;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-<<<<<<< HEAD
      * `not_found`: no such quest is offered to the customer, live and outside their control group.
      */
     404: Problem;
@@ -67856,12 +67640,6 @@ export type GetCustomerSubscriptionErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
      */
     '4XX': Problem;
     /**
@@ -67870,65 +67648,6 @@ export type GetCustomerSubscriptionErrors = {
     default: Problem;
 };
 
-export type GetCustomerSubscriptionError = GetCustomerSubscriptionErrors[keyof GetCustomerSubscriptionErrors];
-
-export type GetCustomerSubscriptionResponses = {
-    /**
-     * The subscription.
-     */
-    200: Subscription;
-};
-
-export type GetCustomerSubscriptionResponse = GetCustomerSubscriptionResponses[keyof GetCustomerSubscriptionResponses];
-
-export type UpdateSubscriptionData = {
-    /**
-     * What changes.
-     */
-    body: SubscriptionUpdate;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}';
-};
-
-export type UpdateSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed member, or an end before the minimum term (`end_out_of_range`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription, or the address is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `address_outside_area`, or `subscription_ended` for one cancelled or ended.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-<<<<<<< HEAD
 export type StartCustomerQuestError = StartCustomerQuestErrors[keyof StartCustomerQuestErrors];
 
 export type StartCustomerQuestResponses = {
@@ -67948,41 +67667,6 @@ export type GetCustomerReferralData = {
 };
 
 export type GetCustomerReferralErrors = {
-=======
-export type UpdateSubscriptionError = UpdateSubscriptionErrors[keyof UpdateSubscriptionErrors];
-
-export type UpdateSubscriptionResponses = {
-    /**
-     * The subscription after the change.
-     */
-    200: SubscriptionChange;
-};
-
-export type UpdateSubscriptionResponse = UpdateSubscriptionResponses[keyof UpdateSubscriptionResponses];
-
-export type GetSubscriptionCalendarData = {
-    body?: never;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: {
-        /**
-         * The month, YYYY-MM; the current one on the store's clock by default.
-         */
-        month?: string;
-    };
-    url: '/v1/customer/subscriptions/{subscription_id}/calendar';
-};
-
-export type GetSubscriptionCalendarErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or month.
-     */
-    400: Problem;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -67992,19 +67676,11 @@ export type GetSubscriptionCalendarErrors = {
      */
     403: Problem;
     /**
-<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -68013,7 +67689,6 @@ export type GetSubscriptionCalendarErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type GetCustomerReferralError = GetCustomerReferralErrors[keyof GetCustomerReferralErrors];
 
 export type GetCustomerReferralResponses = {
@@ -68033,43 +67708,6 @@ export type RenewCustomerReferralCodeData = {
 };
 
 export type RenewCustomerReferralCodeErrors = {
-=======
-export type GetSubscriptionCalendarError = GetSubscriptionCalendarErrors[keyof GetSubscriptionCalendarErrors];
-
-export type GetSubscriptionCalendarResponses = {
-    /**
-     * The month.
-     */
-    200: SubscriptionCalendar;
-};
-
-export type GetSubscriptionCalendarResponse = GetSubscriptionCalendarResponses[keyof GetSubscriptionCalendarResponses];
-
-export type SetSubscriptionDayData = {
-    /**
-     * The day.
-     */
-    body: SubscriptionDayInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-        /**
-         * A delivery day of the subscription.
-         */
-        date: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/days/{date}';
-};
-
-export type SetSubscriptionDayErrors = {
-    /**
-     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
-     */
-    400: Problem;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     /**
      * No valid access token was sent, or it was refused (`unauthenticated`).
      */
@@ -68079,7 +67717,6 @@ export type SetSubscriptionDayErrors = {
      */
     403: Problem;
     /**
-<<<<<<< HEAD
      * `not_found`: the user has no customer profile.
      */
     404: Problem;
@@ -68089,17 +67726,6 @@ export type SetSubscriptionDayErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_day_invalid` (not a delivery day of it, or in the past) or `subscription_ended`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -68108,7 +67734,6 @@ export type SetSubscriptionDayErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type RenewCustomerReferralCodeError = RenewCustomerReferralCodeErrors[keyof RenewCustomerReferralCodeErrors];
 
 export type RenewCustomerReferralCodeResponses = {
@@ -68121,420 +67746,12 @@ export type RenewCustomerReferralCodeResponses = {
 export type RenewCustomerReferralCodeResponse = RenewCustomerReferralCodeResponses[keyof RenewCustomerReferralCodeResponses];
 
 export type ListPartnerRewardCampaignsData = {
-=======
-export type SetSubscriptionDayError = SetSubscriptionDayErrors[keyof SetSubscriptionDayErrors];
-
-export type SetSubscriptionDayResponses = {
-    /**
-     * The subscription, the day the change applies to and what to tell the customer.
-     */
-    200: SubscriptionChange;
-};
-
-export type SetSubscriptionDayResponse = SetSubscriptionDayResponses[keyof SetSubscriptionDayResponses];
-
-export type SetSubscriptionQuantitiesData = {
-    /**
-     * The day and the quantities.
-     */
-    body: SubscriptionQuantitiesInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/quantities';
-};
-
-export type SetSubscriptionQuantitiesErrors = {
-    /**
-     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_ended`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type SetSubscriptionQuantitiesError = SetSubscriptionQuantitiesErrors[keyof SetSubscriptionQuantitiesErrors];
-
-export type SetSubscriptionQuantitiesResponses = {
-    /**
-     * The subscription after the change.
-     */
-    200: SubscriptionChange;
-};
-
-export type SetSubscriptionQuantitiesResponse = SetSubscriptionQuantitiesResponses[keyof SetSubscriptionQuantitiesResponses];
-
-export type PauseSubscriptionData = {
-    /**
-     * From and until.
-     */
-    body: SubscriptionPauseInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/pause';
-};
-
-export type PauseSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed member, or `until` before `from`.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_ended`, or `subscription_not_active` for one pending.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type PauseSubscriptionError = PauseSubscriptionErrors[keyof PauseSubscriptionErrors];
-
-export type PauseSubscriptionResponses = {
-    /**
-     * The subscription after the change.
-     */
-    200: SubscriptionChange;
-};
-
-export type PauseSubscriptionResponse = PauseSubscriptionResponses[keyof PauseSubscriptionResponses];
-
-export type ResumeSubscriptionData = {
-    /**
-     * From when.
-     */
-    body: SubscriptionResumeInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/resume';
-};
-
-export type ResumeSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed member.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_ended`, or `subscription_not_paused`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type ResumeSubscriptionError = ResumeSubscriptionErrors[keyof ResumeSubscriptionErrors];
-
-export type ResumeSubscriptionResponses = {
-    /**
-     * The subscription after the change.
-     */
-    200: SubscriptionChange;
-};
-
-export type ResumeSubscriptionResponse = ResumeSubscriptionResponses[keyof ResumeSubscriptionResponses];
-
-export type AddSubscriptionVacationData = {
-    /**
-     * The days away.
-     */
-    body: SubscriptionVacationInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/vacations';
-};
-
-export type AddSubscriptionVacationErrors = {
-    /**
-     * `validation_failed`: a malformed member, or a range backwards or over 90 days (`vacation_invalid`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_ended`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type AddSubscriptionVacationError = AddSubscriptionVacationErrors[keyof AddSubscriptionVacationErrors];
-
-export type AddSubscriptionVacationResponses = {
-    /**
-     * The subscription with the vacation.
-     */
-    200: SubscriptionChange;
-};
-
-export type AddSubscriptionVacationResponse = AddSubscriptionVacationResponses[keyof AddSubscriptionVacationResponses];
-
-export type RemoveSubscriptionVacationData = {
-    body?: never;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-        /**
-         * The vacation.
-         */
-        vacation_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/vacations/{vacation_id}';
-};
-
-export type RemoveSubscriptionVacationErrors = {
-    /**
-     * `validation_failed`: a malformed identifier.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription or the vacation.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type RemoveSubscriptionVacationError = RemoveSubscriptionVacationErrors[keyof RemoveSubscriptionVacationErrors];
-
-export type RemoveSubscriptionVacationResponses = {
-    /**
-     * The subscription without the vacation.
-     */
-    200: SubscriptionChange;
-};
-
-export type RemoveSubscriptionVacationResponse = RemoveSubscriptionVacationResponses[keyof RemoveSubscriptionVacationResponses];
-
-export type CancelSubscriptionData = {
-    /**
-     * Why, optionally.
-     */
-    body: SubscriptionCancelInput;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/cancel';
-};
-
-export type CancelSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed member.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription is not the customer's.
-     */
-    404: Problem;
-    /**
-     * `subscription_ended`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type CancelSubscriptionError = CancelSubscriptionErrors[keyof CancelSubscriptionErrors];
-
-export type CancelSubscriptionResponses = {
-    /**
-     * The cancelled subscription; `applies_from` is the first day without a delivery, and the message names an order that stands.
-     */
-    200: SubscriptionChange;
-};
-
-export type CancelSubscriptionResponse = CancelSubscriptionResponses[keyof CancelSubscriptionResponses];
-
-export type GetSubscriptionStatementData = {
-    body?: never;
-    path: {
-        /**
-         * The subscription, the customer's own.
-         */
-        subscription_id: string;
-        /**
-         * The month, YYYY-MM; the month in progress reads so far.
-         */
-        month: string;
-    };
-    query?: never;
-    url: '/v1/customer/subscriptions/{subscription_id}/statements/{month}';
-};
-
-export type GetSubscriptionStatementErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or month.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `forbidden`: a token of another surface.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription, or a month it had no day in.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetSubscriptionStatementError = GetSubscriptionStatementErrors[keyof GetSubscriptionStatementErrors];
-
-export type GetSubscriptionStatementResponses = {
-    /**
-     * The statement.
-     */
-    200: SubscriptionStatement;
-};
-
-export type GetSubscriptionStatementResponse = GetSubscriptionStatementResponses[keyof GetSubscriptionStatementResponses];
-
-export type ListScheduledOrdersData = {
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path: {
         /**
          * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
          */
         partner_id: string;
-<<<<<<< HEAD
     };
     query?: {
         /**
@@ -69203,701 +68420,11 @@ export type ListPlatformRewardCampaignsData = {
          * Words in the name.
          */
         q?: string;
-=======
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: {
-        /**
-         * One day on the store's clock; every day ahead by default.
-         */
-        date?: string;
         /**
          * How many, 1 to 100; 50 by default.
          */
         limit?: number;
         /**
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/scheduled';
-};
-
-export type ListScheduledOrdersErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type ListScheduledOrdersError = ListScheduledOrdersErrors[keyof ListScheduledOrdersErrors];
-
-export type ListScheduledOrdersResponses = {
-    /**
-     * The scheduled orders.
-     */
-    200: ScheduledOrderPage;
-};
-
-export type ListScheduledOrdersResponse = ListScheduledOrdersResponses[keyof ListScheduledOrdersResponses];
-
-export type MarkOrdersReadyData = {
-    /**
-     * The orders.
-     */
-    body: OrdersReadyInput;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/ready';
-};
-
-export type MarkOrdersReadyErrors = {
-    /**
-     * `validation_failed`: no order, more than 50, or a malformed identifier.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type MarkOrdersReadyError = MarkOrdersReadyErrors[keyof MarkOrdersReadyErrors];
-
-export type MarkOrdersReadyResponses = {
-    /**
-     * What happened to each.
-     */
-    200: OrdersReadyResult;
-};
-
-export type MarkOrdersReadyResponse = MarkOrdersReadyResponses[keyof MarkOrdersReadyResponses];
-
-export type ListLocationSubscriptionsData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: {
-        /**
-         * One state.
-         */
-        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
-        /**
-         * One plan.
-         */
-        plan_id?: string;
-        /**
-         * How many, 1 to 100; 50 by default.
-         */
-        limit?: number;
-        /**
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions';
-};
-
-export type ListLocationSubscriptionsErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type ListLocationSubscriptionsError = ListLocationSubscriptionsErrors[keyof ListLocationSubscriptionsErrors];
-
-export type ListLocationSubscriptionsResponses = {
-    /**
-     * A page of subscriptions.
-     */
-    200: LocationSubscriptionPage;
-};
-
-export type ListLocationSubscriptionsResponse = ListLocationSubscriptionsResponses[keyof ListLocationSubscriptionsResponses];
-
-export type GetLocationSubscriptionDayData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: {
-        /**
-         * The day on the store's clock; tomorrow by default.
-         */
-        date?: string;
-    };
-    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/calendar';
-};
-
-export type GetLocationSubscriptionDayErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or date.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetLocationSubscriptionDayError = GetLocationSubscriptionDayErrors[keyof GetLocationSubscriptionDayErrors];
-
-export type GetLocationSubscriptionDayResponses = {
-    /**
-     * The day.
-     */
-    200: PartnerSubscriptionDay;
-};
-
-export type GetLocationSubscriptionDayResponse = GetLocationSubscriptionDayResponses[keyof GetLocationSubscriptionDayResponses];
-
-export type GetSubscriptionForecastData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/forecast';
-};
-
-export type GetSubscriptionForecastErrors = {
-    /**
-     * `validation_failed`: a malformed identifier.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetSubscriptionForecastError = GetSubscriptionForecastErrors[keyof GetSubscriptionForecastErrors];
-
-export type GetSubscriptionForecastResponses = {
-    /**
-     * The forecast.
-     */
-    200: SubscriptionForecast;
-};
-
-export type GetSubscriptionForecastResponse = GetSubscriptionForecastResponses[keyof GetSubscriptionForecastResponses];
-
-export type ListSubscriptionPlansData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: {
-        /**
-         * How many, 1 to 100; 50 by default.
-         */
-        limit?: number;
-        /**
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
-};
-
-export type ListSubscriptionPlansErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type ListSubscriptionPlansError = ListSubscriptionPlansErrors[keyof ListSubscriptionPlansErrors];
-
-export type ListSubscriptionPlansResponses = {
-    /**
-     * The plans.
-     */
-    200: SubscriptionPlanList;
-};
-
-export type ListSubscriptionPlansResponse = ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses];
-
-export type CreateSubscriptionPlanData = {
-    /**
-     * The plan.
-     */
-    body: SubscriptionPlanCreate;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
-};
-
-export type CreateSubscriptionPlanErrors = {
-    /**
-     * `validation_failed`: a member out of range, an item or variant not of the store, a window shorter than 30 minutes, or no frequency.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location.
-     */
-    404: Problem;
-    /**
-     * `scheduled_delivery_off`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type CreateSubscriptionPlanError = CreateSubscriptionPlanErrors[keyof CreateSubscriptionPlanErrors];
-
-export type CreateSubscriptionPlanResponses = {
-    /**
-     * The plan.
-     */
-    201: SubscriptionPlan;
-};
-
-export type CreateSubscriptionPlanResponse = CreateSubscriptionPlanResponses[keyof CreateSubscriptionPlanResponses];
-
-export type DeleteSubscriptionPlanData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-        /**
-         * The plan, of the store in the path.
-         */
-        plan_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
-};
-
-export type DeleteSubscriptionPlanErrors = {
-    /**
-     * `validation_failed`: a malformed identifier.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location or the plan.
-     */
-    404: Problem;
-    /**
-     * `plan_has_subscriptions`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type DeleteSubscriptionPlanError = DeleteSubscriptionPlanErrors[keyof DeleteSubscriptionPlanErrors];
-
-export type DeleteSubscriptionPlanResponses = {
-    /**
-     * Deleted.
-     */
-    204: void;
-};
-
-export type DeleteSubscriptionPlanResponse = DeleteSubscriptionPlanResponses[keyof DeleteSubscriptionPlanResponses];
-
-export type GetSubscriptionPlanData = {
-    body?: never;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-        /**
-         * The plan, of the store in the path.
-         */
-        plan_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
-};
-
-export type GetSubscriptionPlanErrors = {
-    /**
-     * `validation_failed`: a malformed identifier.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location or the plan.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetSubscriptionPlanError = GetSubscriptionPlanErrors[keyof GetSubscriptionPlanErrors];
-
-export type GetSubscriptionPlanResponses = {
-    /**
-     * The plan.
-     */
-    200: SubscriptionPlan;
-};
-
-export type GetSubscriptionPlanResponse = GetSubscriptionPlanResponses[keyof GetSubscriptionPlanResponses];
-
-export type UpdateSubscriptionPlanData = {
-    /**
-     * What changes.
-     */
-    body: SubscriptionPlanUpdate;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-        /**
-         * The plan, of the store in the path.
-         */
-        plan_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
-};
-
-export type UpdateSubscriptionPlanErrors = {
-    /**
-     * `validation_failed`: a member out of range.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location or the plan.
-     */
-    404: Problem;
-    /**
-     * `plan_withdrawn`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type UpdateSubscriptionPlanError = UpdateSubscriptionPlanErrors[keyof UpdateSubscriptionPlanErrors];
-
-export type UpdateSubscriptionPlanResponses = {
-    /**
-     * The plan after the change.
-     */
-    200: SubscriptionPlan;
-};
-
-export type UpdateSubscriptionPlanResponse = UpdateSubscriptionPlanResponses[keyof UpdateSubscriptionPlanResponses];
-
-export type WithdrawSubscriptionPlanData = {
-    /**
-     * Whether the subscriptions end too.
-     */
-    body: SubscriptionPlanWithdrawal;
-    path: {
-        /**
-         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
-         */
-        partner_id: string;
-        /**
-         * The store, which must be a Location of the partner in the path.
-         */
-        location_id: string;
-        /**
-         * The plan, of the store in the path.
-         */
-        plan_id: string;
-    };
-    query?: never;
-    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}/withdraw';
-};
-
-export type WithdrawSubscriptionPlanErrors = {
-    /**
-     * `validation_failed`: a malformed member.
-     */
-    400: Problem;
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
-     */
-    403: Problem;
-    /**
-     * `not_found`: the Location or the plan.
-     */
-    404: Problem;
-    /**
-     * `plan_withdrawn`.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type WithdrawSubscriptionPlanError = WithdrawSubscriptionPlanErrors[keyof WithdrawSubscriptionPlanErrors];
-
-export type WithdrawSubscriptionPlanResponses = {
-    /**
-     * The withdrawn plan.
-     */
-    200: SubscriptionPlan;
-};
-
-export type WithdrawSubscriptionPlanResponse = WithdrawSubscriptionPlanResponses[keyof WithdrawSubscriptionPlanResponses];
-
-export type ListPlatformScheduledOrdersData = {
-    body?: never;
-    path?: never;
-    query?: {
-        /**
-         * One store.
-         */
-        location_id?: string;
-        /**
-         * One day, in India time; every day ahead by default.
-         */
-        date?: string;
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
-        /**
-         * How many, 1 to 100; 50 by default.
-         */
-        limit?: number;
-        /**
-<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -69908,18 +68435,6 @@ export type ListPlatformScheduledOrdersData = {
 export type ListPlatformRewardCampaignsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
-=======
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/platform/orders/scheduled';
-};
-
-export type ListPlatformScheduledOrdersErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -69927,19 +68442,11 @@ export type ListPlatformScheduledOrdersErrors = {
      */
     401: Problem;
     /**
-<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
-     */
-    403: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -69948,7 +68455,6 @@ export type ListPlatformScheduledOrdersErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type ListPlatformRewardCampaignsError = ListPlatformRewardCampaignsErrors[keyof ListPlatformRewardCampaignsErrors];
 
 export type ListPlatformRewardCampaignsResponses = {
@@ -70670,25 +69176,10 @@ export type GetPlatformRewardCampaignResultsResponses = {
 export type GetPlatformRewardCampaignResultsResponse = GetPlatformRewardCampaignResultsResponses[keyof GetPlatformRewardCampaignResultsResponses];
 
 export type ListPlatformRewardGrantsData = {
-=======
-export type ListPlatformScheduledOrdersError = ListPlatformScheduledOrdersErrors[keyof ListPlatformScheduledOrdersErrors];
-
-export type ListPlatformScheduledOrdersResponses = {
-    /**
-     * The scheduled orders.
-     */
-    200: PlatformScheduledOrderPage;
-};
-
-export type ListPlatformScheduledOrdersResponse = ListPlatformScheduledOrdersResponses[keyof ListPlatformScheduledOrdersResponses];
-
-export type ListPlatformSubscriptionsData = {
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
     body?: never;
     path?: never;
     query?: {
         /**
-<<<<<<< HEAD
          * Only grants in this state.
          */
         status?: RewardGrantStatus;
@@ -70701,25 +69192,10 @@ export type ListPlatformSubscriptionsData = {
          */
         customer_id?: string;
         /**
-=======
-         * One store.
-         */
-        location_id?: string;
-        /**
-         * One customer.
-         */
-        customer_id?: string;
-        /**
-         * One state.
-         */
-        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
-        /**
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
          * How many, 1 to 100; 50 by default.
          */
         limit?: number;
         /**
-<<<<<<< HEAD
          * Where the page starts.
          */
         cursor?: string;
@@ -70730,18 +69206,6 @@ export type ListPlatformSubscriptionsData = {
 export type ListPlatformRewardGrantsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
-=======
-         * Where the page starts: the `next_cursor` of the page before.
-         */
-        cursor?: string;
-    };
-    url: '/v1/platform/subscriptions';
-};
-
-export type ListPlatformSubscriptionsErrors = {
-    /**
-     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -70749,19 +69213,11 @@ export type ListPlatformSubscriptionsErrors = {
      */
     401: Problem;
     /**
-<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
-     */
-    403: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -70770,7 +69226,6 @@ export type ListPlatformSubscriptionsErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type ListPlatformRewardGrantsError = ListPlatformRewardGrantsErrors[keyof ListPlatformRewardGrantsErrors];
 
 export type ListPlatformRewardGrantsResponses = {
@@ -70971,39 +69426,6 @@ export type SetReferralSettingsData = {
 export type SetReferralSettingsErrors = {
     /**
      * `validation_failed`: a reward or a budget of nothing, or a limit out of range.
-=======
-export type ListPlatformSubscriptionsError = ListPlatformSubscriptionsErrors[keyof ListPlatformSubscriptionsErrors];
-
-export type ListPlatformSubscriptionsResponses = {
-    /**
-     * A page of subscriptions.
-     */
-    200: PlatformSubscriptionPage;
-};
-
-export type ListPlatformSubscriptionsResponse = ListPlatformSubscriptionsResponses[keyof ListPlatformSubscriptionsResponses];
-
-export type GetPlatformSubscriptionData = {
-    body?: never;
-    path: {
-        /**
-         * The subscription.
-         */
-        subscription_id: string;
-    };
-    query?: {
-        /**
-         * The month, YYYY-MM; the current one on the store's clock by default.
-         */
-        month?: string;
-    };
-    url: '/v1/platform/subscriptions/{subscription_id}';
-};
-
-export type GetPlatformSubscriptionErrors = {
-    /**
-     * `validation_failed`: a malformed identifier or month.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -71011,7 +69433,6 @@ export type GetPlatformSubscriptionErrors = {
      */
     401: Problem;
     /**
-<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:write`).
      */
     403: Problem;
@@ -71025,17 +69446,6 @@ export type GetPlatformSubscriptionErrors = {
     412: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
-     */
-    403: Problem;
-    /**
-     * `not_found`: the subscription.
-     */
-    404: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -71044,7 +69454,6 @@ export type GetPlatformSubscriptionErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type SetReferralSettingsError = SetReferralSettingsErrors[keyof SetReferralSettingsErrors];
 
 export type SetReferralSettingsResponses = {
@@ -71083,69 +69492,6 @@ export type ListPlatformReferralsData = {
 export type ListPlatformReferralsErrors = {
     /**
      * `validation_failed`: a parameter out of range or a cursor this caller was not given (`cursor_invalid`).
-=======
-export type GetPlatformSubscriptionError = GetPlatformSubscriptionErrors[keyof GetPlatformSubscriptionErrors];
-
-export type GetPlatformSubscriptionResponses = {
-    /**
-     * The subscription.
-     */
-    200: PlatformSubscription;
-};
-
-export type GetPlatformSubscriptionResponse = GetPlatformSubscriptionResponses[keyof GetPlatformSubscriptionResponses];
-
-export type GetScheduleDateData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/v1/platform/schedule/date';
-};
-
-export type GetScheduleDateErrors = {
-    /**
-     * No valid access token was sent, or it was refused (`unauthenticated`).
-     */
-    401: Problem;
-    /**
-     * Not a Mission Control token (`forbidden`).
-     */
-    403: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
-     */
-    '4XX': Problem;
-    /**
-     * An unexpected server error, returned as an RFC 9457 problem details document.
-     */
-    default: Problem;
-};
-
-export type GetScheduleDateError = GetScheduleDateErrors[keyof GetScheduleDateErrors];
-
-export type GetScheduleDateResponses = {
-    /**
-     * The schedule date.
-     */
-    200: ScheduleDate;
-};
-
-export type GetScheduleDateResponse = GetScheduleDateResponses[keyof GetScheduleDateResponses];
-
-export type MoveScheduleDateData = {
-    /**
-     * The new date.
-     */
-    body: ScheduleDateMove;
-    path?: never;
-    query?: never;
-    url: '/v1/platform/schedule/date';
-};
-
-export type MoveScheduleDateErrors = {
-    /**
-     * `validation_failed`: `schedule_date_backwards`.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     400: Problem;
     /**
@@ -71153,7 +69499,6 @@ export type MoveScheduleDateErrors = {
      */
     401: Problem;
     /**
-<<<<<<< HEAD
      * `forbidden` (not a Mission Control token) or `access_denied` (the member lacks `engagement:read`).
      */
     403: Problem;
@@ -71486,17 +69831,6 @@ export type DeleteAgentIncentiveErrors = {
     409: Problem;
     /**
      * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
-=======
-     * Not a Mission Control token (`forbidden`), or the member lacks `operations:manage` (`access_denied`).
-     */
-    403: Problem;
-    /**
-     * `schedule_date_fixed`: anywhere but a developer's machine or the sandbox the date cannot move.
-     */
-    409: Problem;
-    /**
-     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
      */
     '4XX': Problem;
     /**
@@ -71505,7 +69839,6 @@ export type DeleteAgentIncentiveErrors = {
     default: Problem;
 };
 
-<<<<<<< HEAD
 export type DeleteAgentIncentiveError = DeleteAgentIncentiveErrors[keyof DeleteAgentIncentiveErrors];
 
 export type DeleteAgentIncentiveResponses = {
@@ -71914,7 +70247,1795 @@ export type JoinAgentIncentiveResponses = {
 };
 
 export type JoinAgentIncentiveResponse = JoinAgentIncentiveResponses[keyof JoinAgentIncentiveResponses];
-=======
+
+export type ListStorePlansData = {
+    body?: never;
+    path: {
+        /**
+         * The store: a live store with a published menu.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One of the customer's saved addresses to check the reach of.
+         */
+        address_id?: string;
+        /**
+         * A pin's latitude, with `lng`, for a visitor.
+         */
+        lat?: number;
+        /**
+         * A pin's longitude, with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/plans';
+};
+
+export type ListStorePlansErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or coordinate.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the store, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListStorePlansError = ListStorePlansErrors[keyof ListStorePlansErrors];
+
+export type ListStorePlansResponses = {
+    /**
+     * The plans.
+     */
+    200: StorefrontPlanList;
+};
+
+export type ListStorePlansResponse = ListStorePlansResponses[keyof ListStorePlansResponses];
+
+export type GetStorePlanData = {
+    body?: never;
+    path: {
+        /**
+         * The store: a live store with a published menu.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: {
+        /**
+         * One of the customer's saved addresses to check the reach of.
+         */
+        address_id?: string;
+        /**
+         * A pin's latitude, with `lng`, for a visitor.
+         */
+        lat?: number;
+        /**
+         * A pin's longitude, with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/plans/{plan_id}';
+};
+
+export type GetStorePlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or coordinate.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the store or the plan, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStorePlanError = GetStorePlanErrors[keyof GetStorePlanErrors];
+
+export type GetStorePlanResponses = {
+    /**
+     * The plan.
+     */
+    200: StorefrontPlan;
+};
+
+export type GetStorePlanResponse = GetStorePlanResponses[keyof GetStorePlanResponses];
+
+export type ListCustomerSubscriptionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/subscriptions';
+};
+
+export type ListCustomerSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerSubscriptionsError = ListCustomerSubscriptionsErrors[keyof ListCustomerSubscriptionsErrors];
+
+export type ListCustomerSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: SubscriptionPage;
+};
+
+export type ListCustomerSubscriptionsResponse = ListCustomerSubscriptionsResponses[keyof ListCustomerSubscriptionsResponses];
+
+export type CreateSubscriptionData = {
+    /**
+     * The plan, the items, the schedule, the dates, the address and the way to pay.
+     */
+    body: SubscriptionInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/subscriptions';
+};
+
+export type CreateSubscriptionErrors = {
+    /**
+     * `validation_failed`: the `Idempotency-Key` header is missing (`idempotency_key_missing`), a quantity out of the item's range (`quantity_out_of_range`), a frequency the plan does not allow (`frequency_not_offered`), a start before the earliest (`start_before_earliest`), an end before the minimum term or over 365 days out (`end_out_of_range`), or another malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the plan, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`, `address_outside_area`, or `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateSubscriptionError = CreateSubscriptionErrors[keyof CreateSubscriptionErrors];
+
+export type CreateSubscriptionResponses = {
+    /**
+     * The subscription, active or pending.
+     */
+    201: Subscription;
+};
+
+export type CreateSubscriptionResponse = CreateSubscriptionResponses[keyof CreateSubscriptionResponses];
+
+export type GetCustomerSubscriptionData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}';
+};
+
+export type GetCustomerSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerSubscriptionError = GetCustomerSubscriptionErrors[keyof GetCustomerSubscriptionErrors];
+
+export type GetCustomerSubscriptionResponses = {
+    /**
+     * The subscription.
+     */
+    200: Subscription;
+};
+
+export type GetCustomerSubscriptionResponse = GetCustomerSubscriptionResponses[keyof GetCustomerSubscriptionResponses];
+
+export type UpdateSubscriptionData = {
+    /**
+     * What changes.
+     */
+    body: SubscriptionUpdate;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}';
+};
+
+export type UpdateSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member, or an end before the minimum term (`end_out_of_range`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription, or the address is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `address_outside_area`, or `subscription_ended` for one cancelled or ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateSubscriptionError = UpdateSubscriptionErrors[keyof UpdateSubscriptionErrors];
+
+export type UpdateSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type UpdateSubscriptionResponse = UpdateSubscriptionResponses[keyof UpdateSubscriptionResponses];
+
+export type GetSubscriptionCalendarData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: {
+        /**
+         * The month, YYYY-MM; the current one on the store's clock by default.
+         */
+        month?: string;
+    };
+    url: '/v1/customer/subscriptions/{subscription_id}/calendar';
+};
+
+export type GetSubscriptionCalendarErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionCalendarError = GetSubscriptionCalendarErrors[keyof GetSubscriptionCalendarErrors];
+
+export type GetSubscriptionCalendarResponses = {
+    /**
+     * The month.
+     */
+    200: SubscriptionCalendar;
+};
+
+export type GetSubscriptionCalendarResponse = GetSubscriptionCalendarResponses[keyof GetSubscriptionCalendarResponses];
+
+export type SetSubscriptionDayData = {
+    /**
+     * The day.
+     */
+    body: SubscriptionDayInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * A delivery day of the subscription.
+         */
+        date: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/days/{date}';
+};
+
+export type SetSubscriptionDayErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_day_invalid` (not a delivery day of it, or in the past) or `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetSubscriptionDayError = SetSubscriptionDayErrors[keyof SetSubscriptionDayErrors];
+
+export type SetSubscriptionDayResponses = {
+    /**
+     * The subscription, the day the change applies to and what to tell the customer.
+     */
+    200: SubscriptionChange;
+};
+
+export type SetSubscriptionDayResponse = SetSubscriptionDayResponses[keyof SetSubscriptionDayResponses];
+
+export type SetSubscriptionQuantitiesData = {
+    /**
+     * The day and the quantities.
+     */
+    body: SubscriptionQuantitiesInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/quantities';
+};
+
+export type SetSubscriptionQuantitiesErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a quantity out of range (`quantity_out_of_range`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetSubscriptionQuantitiesError = SetSubscriptionQuantitiesErrors[keyof SetSubscriptionQuantitiesErrors];
+
+export type SetSubscriptionQuantitiesResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type SetSubscriptionQuantitiesResponse = SetSubscriptionQuantitiesResponses[keyof SetSubscriptionQuantitiesResponses];
+
+export type PauseSubscriptionData = {
+    /**
+     * From and until.
+     */
+    body: SubscriptionPauseInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/pause';
+};
+
+export type PauseSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member, or `until` before `from`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`, or `subscription_not_active` for one pending.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PauseSubscriptionError = PauseSubscriptionErrors[keyof PauseSubscriptionErrors];
+
+export type PauseSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type PauseSubscriptionResponse = PauseSubscriptionResponses[keyof PauseSubscriptionResponses];
+
+export type ResumeSubscriptionData = {
+    /**
+     * From when.
+     */
+    body: SubscriptionResumeInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/resume';
+};
+
+export type ResumeSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`, or `subscription_not_paused`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResumeSubscriptionError = ResumeSubscriptionErrors[keyof ResumeSubscriptionErrors];
+
+export type ResumeSubscriptionResponses = {
+    /**
+     * The subscription after the change.
+     */
+    200: SubscriptionChange;
+};
+
+export type ResumeSubscriptionResponse = ResumeSubscriptionResponses[keyof ResumeSubscriptionResponses];
+
+export type AddSubscriptionVacationData = {
+    /**
+     * The days away.
+     */
+    body: SubscriptionVacationInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/vacations';
+};
+
+export type AddSubscriptionVacationErrors = {
+    /**
+     * `validation_failed`: a malformed member, or a range backwards or over 90 days (`vacation_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddSubscriptionVacationError = AddSubscriptionVacationErrors[keyof AddSubscriptionVacationErrors];
+
+export type AddSubscriptionVacationResponses = {
+    /**
+     * The subscription with the vacation.
+     */
+    200: SubscriptionChange;
+};
+
+export type AddSubscriptionVacationResponse = AddSubscriptionVacationResponses[keyof AddSubscriptionVacationResponses];
+
+export type RemoveSubscriptionVacationData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * The vacation.
+         */
+        vacation_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/vacations/{vacation_id}';
+};
+
+export type RemoveSubscriptionVacationErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription or the vacation.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveSubscriptionVacationError = RemoveSubscriptionVacationErrors[keyof RemoveSubscriptionVacationErrors];
+
+export type RemoveSubscriptionVacationResponses = {
+    /**
+     * The subscription without the vacation.
+     */
+    200: SubscriptionChange;
+};
+
+export type RemoveSubscriptionVacationResponse = RemoveSubscriptionVacationResponses[keyof RemoveSubscriptionVacationResponses];
+
+export type CancelSubscriptionData = {
+    /**
+     * Why, optionally.
+     */
+    body: SubscriptionCancelInput;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/cancel';
+};
+
+export type CancelSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription is not the customer's.
+     */
+    404: Problem;
+    /**
+     * `subscription_ended`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelSubscriptionError = CancelSubscriptionErrors[keyof CancelSubscriptionErrors];
+
+export type CancelSubscriptionResponses = {
+    /**
+     * The cancelled subscription; `applies_from` is the first day without a delivery, and the message names an order that stands.
+     */
+    200: SubscriptionChange;
+};
+
+export type CancelSubscriptionResponse = CancelSubscriptionResponses[keyof CancelSubscriptionResponses];
+
+export type GetSubscriptionStatementData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription, the customer's own.
+         */
+        subscription_id: string;
+        /**
+         * The month, YYYY-MM; the month in progress reads so far.
+         */
+        month: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/statements/{month}';
+};
+
+export type GetSubscriptionStatementErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription, or a month it had no day in.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionStatementError = GetSubscriptionStatementErrors[keyof GetSubscriptionStatementErrors];
+
+export type GetSubscriptionStatementResponses = {
+    /**
+     * The statement.
+     */
+    200: SubscriptionStatement;
+};
+
+export type GetSubscriptionStatementResponse = GetSubscriptionStatementResponses[keyof GetSubscriptionStatementResponses];
+
+export type ListScheduledOrdersData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One day on the store's clock; every day ahead by default.
+         */
+        date?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/scheduled';
+};
+
+export type ListScheduledOrdersErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListScheduledOrdersError = ListScheduledOrdersErrors[keyof ListScheduledOrdersErrors];
+
+export type ListScheduledOrdersResponses = {
+    /**
+     * The scheduled orders.
+     */
+    200: ScheduledOrderPage;
+};
+
+export type ListScheduledOrdersResponse = ListScheduledOrdersResponses[keyof ListScheduledOrdersResponses];
+
+export type MarkOrdersReadyData = {
+    /**
+     * The orders.
+     */
+    body: OrdersReadyInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/ready';
+};
+
+export type MarkOrdersReadyErrors = {
+    /**
+     * `validation_failed`: no order, more than 50, or a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MarkOrdersReadyError = MarkOrdersReadyErrors[keyof MarkOrdersReadyErrors];
+
+export type MarkOrdersReadyResponses = {
+    /**
+     * What happened to each.
+     */
+    200: OrdersReadyResult;
+};
+
+export type MarkOrdersReadyResponse = MarkOrdersReadyResponses[keyof MarkOrdersReadyResponses];
+
+export type ListLocationSubscriptionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One state.
+         */
+        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
+        /**
+         * One plan.
+         */
+        plan_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions';
+};
+
+export type ListLocationSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListLocationSubscriptionsError = ListLocationSubscriptionsErrors[keyof ListLocationSubscriptionsErrors];
+
+export type ListLocationSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: LocationSubscriptionPage;
+};
+
+export type ListLocationSubscriptionsResponse = ListLocationSubscriptionsResponses[keyof ListLocationSubscriptionsResponses];
+
+export type GetLocationSubscriptionDayData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The day on the store's clock; tomorrow by default.
+         */
+        date?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/calendar';
+};
+
+export type GetLocationSubscriptionDayErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or date.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationSubscriptionDayError = GetLocationSubscriptionDayErrors[keyof GetLocationSubscriptionDayErrors];
+
+export type GetLocationSubscriptionDayResponses = {
+    /**
+     * The day.
+     */
+    200: PartnerSubscriptionDay;
+};
+
+export type GetLocationSubscriptionDayResponse = GetLocationSubscriptionDayResponses[keyof GetLocationSubscriptionDayResponses];
+
+export type GetSubscriptionForecastData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/subscriptions/forecast';
+};
+
+export type GetSubscriptionForecastErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `subscription:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionForecastError = GetSubscriptionForecastErrors[keyof GetSubscriptionForecastErrors];
+
+export type GetSubscriptionForecastResponses = {
+    /**
+     * The forecast.
+     */
+    200: SubscriptionForecast;
+};
+
+export type GetSubscriptionForecastResponse = GetSubscriptionForecastResponses[keyof GetSubscriptionForecastResponses];
+
+export type ListSubscriptionPlansData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
+};
+
+export type ListSubscriptionPlansErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListSubscriptionPlansError = ListSubscriptionPlansErrors[keyof ListSubscriptionPlansErrors];
+
+export type ListSubscriptionPlansResponses = {
+    /**
+     * The plans.
+     */
+    200: SubscriptionPlanList;
+};
+
+export type ListSubscriptionPlansResponse = ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses];
+
+export type CreateSubscriptionPlanData = {
+    /**
+     * The plan.
+     */
+    body: SubscriptionPlanCreate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans';
+};
+
+export type CreateSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a member out of range, an item or variant not of the store, a window shorter than 30 minutes, or no frequency.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * `scheduled_delivery_off`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateSubscriptionPlanError = CreateSubscriptionPlanErrors[keyof CreateSubscriptionPlanErrors];
+
+export type CreateSubscriptionPlanResponses = {
+    /**
+     * The plan.
+     */
+    201: SubscriptionPlan;
+};
+
+export type CreateSubscriptionPlanResponse = CreateSubscriptionPlanResponses[keyof CreateSubscriptionPlanResponses];
+
+export type DeleteSubscriptionPlanData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type DeleteSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_has_subscriptions`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteSubscriptionPlanError = DeleteSubscriptionPlanErrors[keyof DeleteSubscriptionPlanErrors];
+
+export type DeleteSubscriptionPlanResponses = {
+    /**
+     * Deleted.
+     */
+    204: void;
+};
+
+export type DeleteSubscriptionPlanResponse = DeleteSubscriptionPlanResponses[keyof DeleteSubscriptionPlanResponses];
+
+export type GetSubscriptionPlanData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type GetSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionPlanError = GetSubscriptionPlanErrors[keyof GetSubscriptionPlanErrors];
+
+export type GetSubscriptionPlanResponses = {
+    /**
+     * The plan.
+     */
+    200: SubscriptionPlan;
+};
+
+export type GetSubscriptionPlanResponse = GetSubscriptionPlanResponses[keyof GetSubscriptionPlanResponses];
+
+export type UpdateSubscriptionPlanData = {
+    /**
+     * What changes.
+     */
+    body: SubscriptionPlanUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}';
+};
+
+export type UpdateSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a member out of range.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateSubscriptionPlanError = UpdateSubscriptionPlanErrors[keyof UpdateSubscriptionPlanErrors];
+
+export type UpdateSubscriptionPlanResponses = {
+    /**
+     * The plan after the change.
+     */
+    200: SubscriptionPlan;
+};
+
+export type UpdateSubscriptionPlanResponse = UpdateSubscriptionPlanResponses[keyof UpdateSubscriptionPlanResponses];
+
+export type WithdrawSubscriptionPlanData = {
+    /**
+     * Whether the subscriptions end too.
+     */
+    body: SubscriptionPlanWithdrawal;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be a Location of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The plan, of the store in the path.
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/catalog/plans/{plan_id}/withdraw';
+};
+
+export type WithdrawSubscriptionPlanErrors = {
+    /**
+     * `validation_failed`: a malformed member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `catalog:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the plan.
+     */
+    404: Problem;
+    /**
+     * `plan_withdrawn`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WithdrawSubscriptionPlanError = WithdrawSubscriptionPlanErrors[keyof WithdrawSubscriptionPlanErrors];
+
+export type WithdrawSubscriptionPlanResponses = {
+    /**
+     * The withdrawn plan.
+     */
+    200: SubscriptionPlan;
+};
+
+export type WithdrawSubscriptionPlanResponse = WithdrawSubscriptionPlanResponses[keyof WithdrawSubscriptionPlanResponses];
+
+export type ListPlatformScheduledOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One store.
+         */
+        location_id?: string;
+        /**
+         * One day, in India time; every day ahead by default.
+         */
+        date?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/orders/scheduled';
+};
+
+export type ListPlatformScheduledOrdersErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformScheduledOrdersError = ListPlatformScheduledOrdersErrors[keyof ListPlatformScheduledOrdersErrors];
+
+export type ListPlatformScheduledOrdersResponses = {
+    /**
+     * The scheduled orders.
+     */
+    200: PlatformScheduledOrderPage;
+};
+
+export type ListPlatformScheduledOrdersResponse = ListPlatformScheduledOrdersResponses[keyof ListPlatformScheduledOrdersResponses];
+
+export type ListPlatformSubscriptionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One store.
+         */
+        location_id?: string;
+        /**
+         * One customer.
+         */
+        customer_id?: string;
+        /**
+         * One state.
+         */
+        state?: 'pending' | 'active' | 'paused' | 'cancelled' | 'ended';
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/subscriptions';
+};
+
+export type ListPlatformSubscriptionsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier (`malformed_identifier`), a limit out of range or a cursor this caller was not given (`cursor_invalid`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformSubscriptionsError = ListPlatformSubscriptionsErrors[keyof ListPlatformSubscriptionsErrors];
+
+export type ListPlatformSubscriptionsResponses = {
+    /**
+     * A page of subscriptions.
+     */
+    200: PlatformSubscriptionPage;
+};
+
+export type ListPlatformSubscriptionsResponse = ListPlatformSubscriptionsResponses[keyof ListPlatformSubscriptionsResponses];
+
+export type GetPlatformSubscriptionData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription.
+         */
+        subscription_id: string;
+    };
+    query?: {
+        /**
+         * The month, YYYY-MM; the current one on the store's clock by default.
+         */
+        month?: string;
+    };
+    url: '/v1/platform/subscriptions/{subscription_id}';
+};
+
+export type GetPlatformSubscriptionErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or month.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `subscription:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `not_found`: the subscription.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformSubscriptionError = GetPlatformSubscriptionErrors[keyof GetPlatformSubscriptionErrors];
+
+export type GetPlatformSubscriptionResponses = {
+    /**
+     * The subscription.
+     */
+    200: PlatformSubscription;
+};
+
+export type GetPlatformSubscriptionResponse = GetPlatformSubscriptionResponses[keyof GetPlatformSubscriptionResponses];
+
+export type GetScheduleDateData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/schedule/date';
+};
+
+export type GetScheduleDateErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetScheduleDateError = GetScheduleDateErrors[keyof GetScheduleDateErrors];
+
+export type GetScheduleDateResponses = {
+    /**
+     * The schedule date.
+     */
+    200: ScheduleDate;
+};
+
+export type GetScheduleDateResponse = GetScheduleDateResponses[keyof GetScheduleDateResponses];
+
+export type MoveScheduleDateData = {
+    /**
+     * The new date.
+     */
+    body: ScheduleDateMove;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/schedule/date';
+};
+
+export type MoveScheduleDateErrors = {
+    /**
+     * `validation_failed`: `schedule_date_backwards`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `operations:manage` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `schedule_date_fixed`: anywhere but a developer's machine or the sandbox the date cannot move.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
 export type MoveScheduleDateError = MoveScheduleDateErrors[keyof MoveScheduleDateErrors];
 
 export type MoveScheduleDateResponses = {
@@ -71925,4 +72046,3 @@ export type MoveScheduleDateResponses = {
 };
 
 export type MoveScheduleDateResponse = MoveScheduleDateResponses[keyof MoveScheduleDateResponses];
->>>>>>> 718511d (api: 0.24.0 the TypeScript SDK generated again after the rebase onto 0.22.0)
