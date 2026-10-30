@@ -15,10 +15,10 @@ properties:
     oneOf:
       - $ref: ../common/Money.yaml
       - type: "null"
-    description: The least a pickup's items must come to.
+    description: The least a visit's items must come to.
   reward:
     $ref: ./RewardSpecInput.yaml
-    description: "Its reward: money off or a free item, held for the nth pickup."
+    description: "Its reward: money off or a free item, held for the nth visit."
 examples:
   - every: 5
     min_spend: null

@@ -1,5 +1,5 @@
 type: object
-description: "A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded."
+description: "A punch card at a Location: a punch for each visit counted, a pickup collected or, since 0.28.0, a tab settled that the customer opened, and whether the next is rewarded."
 required:
   - campaign_id
   - name
@@ -47,17 +47,17 @@ properties:
       - 5
   next_rewarded:
     type: boolean
-    description: Whether the next pickup is rewarded.
+    description: Whether the next visit is rewarded.
   reward:
     type: string
     description: Its reward.
     examples:
-      - ₹50.00 off your 5th pickup
+      - ₹50.00 off your 5th visit
   sentence:
     type: string
     description: In words.
     examples:
-      - 4 of 5. Your next pickup here is rewarded.
+      - 4 of 5. Your next visit here is rewarded.
 examples:
   - campaign_id: 01a13a48-9e00-7000-8000-000000006004
     name: Every 5th pickup
@@ -66,5 +66,5 @@ examples:
     punches: 4
     every: 5
     next_rewarded: true
-    reward: ₹50.00 off your 5th pickup
-    sentence: 4 of 5. Your next pickup here is rewarded.
+    reward: ₹50.00 off your 5th visit
+    sentence: 4 of 5. Your next visit here is rewarded.

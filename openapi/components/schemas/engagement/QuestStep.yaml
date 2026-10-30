@@ -13,7 +13,7 @@ properties:
     description: What counts.
   count:
     type: integer
-    description: "How many make the step: pickups, reviews or orders."
+    description: "How many make the step: pickups, reviews, orders or settled tabs."
     minimum: 1
     examples:
       - 1

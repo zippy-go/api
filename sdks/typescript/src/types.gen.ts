@@ -27621,7 +27621,7 @@ export type StatementPromotion = {
 };
 
 /**
- * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth pickup collected at a Location.
+ * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth visit at a Location: a pickup collected or, since 0.28.0, a tab settled that the customer opened.
  */
 export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card';
 
@@ -27666,9 +27666,9 @@ export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'c
 export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
 
 /**
- * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0).
+ * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0); `dine_in`, tabs settled at a table that the customer opened, at the named Partner or Location when one is named, a first dine-in tab at a count of one (since 0.28.0).
  */
-export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review' | 'subscription_started';
+export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review' | 'subscription_started' | 'dine_in';
 
 /**
  * Where a quest stands for the customer: `offered`, not started; `started`, counting; `completed`; `expired`, its days ran out; `being_checked`, its reward is held for review.
@@ -27889,7 +27889,7 @@ export type QuestStep = {
      */
     kind: QuestStepKind;
     /**
-     * How many make the step: pickups, reviews or orders.
+     * How many make the step: pickups, reviews, orders or settled tabs.
      */
     count: number;
     /**
@@ -28025,19 +28025,19 @@ export type TierRulesInput = {
 };
 
 /**
- * A punch card's rules: every nth pickup collected at its Locations, with at least its minimum spend, earns the reward on that nth pickup; one punch per Location a day.
+ * A punch card's rules: every nth visit at its Locations, a pickup collected or, since 0.28.0, a tab settled that the customer opened, with items of at least its minimum spend after their own offers, earns the reward on that nth visit, held for a pickup or a dine-in tab; one punch per Location a day.
  */
 export type PunchCardRules = {
     /**
-     * Every this many pickups.
+     * Every this many visits.
      */
     every: number;
     /**
-     * The least a pickup's items must come to; `null` without one.
+     * The least a visit's items must come to; `null` without one.
      */
     min_spend: Money | null;
     /**
-     * Its reward, priced on the nth pickup.
+     * Its reward, priced on the nth visit.
      */
     reward: RewardSpec;
 };
@@ -28051,11 +28051,11 @@ export type PunchCardRulesInput = {
      */
     every: number;
     /**
-     * The least a pickup's items must come to.
+     * The least a visit's items must come to.
      */
     min_spend?: Money | null;
     /**
-     * Its reward: money off or a free item, held for the nth pickup.
+     * Its reward: money off or a free item, held for the nth visit.
      */
     reward: RewardSpecInput;
 };
@@ -29085,7 +29085,7 @@ export type TierStanding = {
 };
 
 /**
- * A punch card at a Location: a punch for each pickup counted, and whether the next is rewarded.
+ * A punch card at a Location: a punch for each visit counted, a pickup collected or, since 0.28.0, a tab settled that the customer opened, and whether the next is rewarded.
  */
 export type PunchCardProgress = {
     /**
@@ -29113,7 +29113,7 @@ export type PunchCardProgress = {
      */
     every: number;
     /**
-     * Whether the next pickup is rewarded.
+     * Whether the next visit is rewarded.
      */
     next_rewarded: boolean;
     /**

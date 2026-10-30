@@ -38,6 +38,10 @@ tabs slice; renumbered by merge order among step 8's 0.27.0 to
   `no_show_too_early`; field code `party_too_large`.
 - Events `reservations.reservation.made`, `.cancelled`, `.reminded`, `.seated` and `.no_show`;
   `reviews.review.written` gains the fulfilment `dine_in`.
+- A settled tab is a dine-in visit: `dine_in` in `QuestStepKind`, tabs settled that the customer
+  opened (a first dine-in tab at a count of one); a punch card counts visits, pickups collected
+  and tabs settled, and holds its reward for a pickup or a dine-in tab (`PunchCardRules`,
+  `PunchCardProgress` and `RewardCampaignKind` say visit where they said pickup).
 
 ## [0.27.0] - 2026-10-30
 

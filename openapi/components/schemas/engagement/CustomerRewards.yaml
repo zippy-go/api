@@ -73,8 +73,8 @@ examples:
         punches: 4
         every: 5
         next_rewarded: true
-        reward: ₹50.00 off your 5th pickup
-        sentence: 4 of 5. Your next pickup here is rewarded.
+        reward: ₹50.00 off your 5th visit
+        sentence: 4 of 5. Your next visit here is rewarded.
     credit_earned:
       minor_units: 15000
       currency: INR

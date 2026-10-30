@@ -1,10 +1,11 @@
 type: string
-description: "A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0)."
+description: "A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0); `dine_in`, tabs settled at a table that the customer opened, at the named Partner or Location when one is named, a first dine-in tab at a count of one (since 0.28.0)."
 enum:
   - second_vertical
   - order_at
   - pickups
   - review
   - subscription_started
+  - dine_in
 examples:
   - second_vertical

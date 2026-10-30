@@ -2,7 +2,7 @@
   "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d1f01",
   "type": "reservations.reservation.reminded",
   "version": 1,
-  "occurred_at": "2026-11-02T10:15:00Z",
+  "occurred_at": "2026-11-06T12:30:00Z",
   "partner_id": "01a13a48-9e00-7000-8000-000000000001",
   "correlation_id": null,
   "payload": {
@@ -14,7 +14,7 @@
     "starts_at": "2026-11-07T14:30:00Z",
     "date": "2026-11-07",
     "state": "booked",
-    "at": "2026-11-02T10:15:00Z",
+    "at": "2026-11-06T12:30:00Z",
     "which": "day_before"
   }
 }
