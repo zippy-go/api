@@ -1,0 +1,90 @@
+type: object
+description: "What makes an item bookable work, the `BookableFacts` schema: its duration in steps of 15 minutes, how it is priced (its variant's price is the fixed price, or the visit charge of a service priced from), the qualifications an Agent needs, what is included and left out, what the customer provides, a narrower area than the Service's, and whether it is picked up and returned with a turnaround; with the duration jobs really take once twenty are done."
+required:
+  - duration_minutes
+  - price_kind
+  - qualifications
+  - included
+  - excluded
+  - customer_provides
+  - area_km
+  - pickup_return
+  - turnaround_hours
+  - measured_duration_minutes
+  - measured_jobs
+properties:
+  duration_minutes:
+    type: integer
+    description: How long the job takes, in steps of 15 minutes from 15 to 720.
+    examples:
+      - 60
+  price_kind:
+    $ref: ../bookings/BookingPriceKind.yaml
+    description: Fixed, or from with an estimate on site.
+  qualifications:
+    type: array
+    items:
+      type: string
+    description: The qualifications an Agent needs, codes of the field Service's list.
+  included:
+    type: array
+    items:
+      type: string
+    description: What the price includes, a sentence each.
+  excluded:
+    type: array
+    items:
+      type: string
+    description: What it leaves out, a sentence each.
+  customer_provides:
+    type: array
+    items:
+      type: string
+    description: What the customer provides, a sentence each.
+  area_km:
+    type:
+      - integer
+      - "null"
+    description: A narrower area than the field Service's, in kilometres around the Location; `null` for the Service's.
+    examples:
+      - null
+  pickup_return:
+    type: boolean
+    description: "Picked up at the door and returned, as two legs: laundry, repairs taken away."
+    examples:
+      - false
+  turnaround_hours:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the hours between the pickup and the earliest return.
+    examples:
+      - null
+  measured_duration_minutes:
+    type:
+      - integer
+      - "null"
+    description: The average of the last twenty completed jobs, once there are twenty; slots then use it. `null` before.
+    examples:
+      - null
+  measured_jobs:
+    type: integer
+    description: How many completed jobs the measure counts, up to twenty.
+    examples:
+      - 0
+examples:
+  - duration_minutes: 60
+    price_kind: fixed
+    qualifications:
+      - ac_technician
+    included:
+      - Filter and coil cleaning
+    excluded:
+      - Gas top-up, an extra approved on site
+    customer_provides:
+      - A ladder for units above 8 feet
+    area_km: null
+    pickup_return: false
+    turnaround_hours: null
+    measured_duration_minutes: null
+    measured_jobs: 0

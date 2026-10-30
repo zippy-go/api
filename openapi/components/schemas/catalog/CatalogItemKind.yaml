@@ -1,0 +1,7 @@
+type: string
+description: "What an item is: a `product` sold from the menu, or `bookable` work done at the customer's place, published in the services document and booked into a slot."
+enum:
+  - product
+  - bookable
+examples:
+  - product

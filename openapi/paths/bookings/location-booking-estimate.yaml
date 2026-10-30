@@ -1,0 +1,77 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/estimate. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, which must be one of the partner in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000306
+  - name: booking_id
+    in: path
+    required: true
+    description: The booking, of the Location in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000b001
+post:
+  operationId: recordBookingEstimate
+  summary: Record an estimate
+  description: "Records the estimate of a service priced from, on site before work starts, or the price of a pickup and return service after its pickup with the items priced: it waits for the customer in the app or by a link to their number. `order:manage` at the Location."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The estimate.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/bookings/BookingEstimateInput.yaml
+  responses:
+    "200":
+      description: The booking.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/StoreBooking.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Partner, Location or booking for the caller."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,66 @@
+type: object
+description: An item's bookable facts as set, the `BookableFactsInput` schema.
+required:
+  - duration_minutes
+  - price_kind
+properties:
+  duration_minutes:
+    type: integer
+    description: How long the job takes, in steps of 15 minutes from 15 to 720.
+    examples:
+      - 60
+  price_kind:
+    $ref: ../bookings/BookingPriceKind.yaml
+    description: Fixed, or from with an estimate on site.
+  qualifications:
+    type: array
+    items:
+      type: string
+    description: The qualifications an Agent needs.
+  included:
+    type: array
+    items:
+      type: string
+    description: What the price includes, at most 20.
+  excluded:
+    type: array
+    items:
+      type: string
+    description: What it leaves out, at most 20.
+  customer_provides:
+    type: array
+    items:
+      type: string
+    description: What the customer provides, at most 20.
+  area_km:
+    type:
+      - integer
+      - "null"
+    description: A narrower area than the field Service's, 1 to 25 kilometres.
+    examples:
+      - null
+  pickup_return:
+    type: boolean
+    description: Picked up and returned as two legs.
+    examples:
+      - false
+  turnaround_hours:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, 1 to 336 hours.
+    examples:
+      - null
+examples:
+  - duration_minutes: 60
+    price_kind: fixed
+    qualifications:
+      - ac_technician
+    included:
+      - Filter and coil cleaning
+    excluded:
+      - Gas top-up, an extra approved on site
+    customer_provides: []
+    area_km: null
+    pickup_return: false
+    turnaround_hours: null

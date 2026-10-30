@@ -1,0 +1,7 @@
+type: string
+description: "When a payment was made: `at_booking`, or `on_completion` for what remained."
+enum:
+  - at_booking
+  - on_completion
+examples:
+  - at_booking

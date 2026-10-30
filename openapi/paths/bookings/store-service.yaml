@@ -1,0 +1,87 @@
+# Path item for /v1/storefront/stores/{location_id}/services/{item_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The Location.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000306
+  - name: item_id
+    in: path
+    required: true
+    description: The bookable service, an item of the Location's catalogue.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000d001
+get:
+  operationId: getStoreService
+  summary: Read a service's page
+  description: "A bookable service's page: the service, its booking policy in plain words, the Location's rating, its area, and with an address or a point whether it comes there. Signed out, or as a customer to check a saved address."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: address_id
+      in: query
+      required: false
+      description: One of the signed-in customer's saved addresses, checked against the area.
+      schema:
+        type: string
+        format: uuid
+      example: 019a3d10-2b00-7d00-8a00-00000000a201
+    - name: lat
+      in: query
+      required: false
+      description: "A point to check the area against, with `lng`: the visitor's, when signed out."
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      example: 17.4483
+    - name: lng
+      in: query
+      required: false
+      description: The point's longitude, with `lat`.
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      example: 78.3915
+  responses:
+    "200":
+      description: The page.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/ServicePage.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier, or `lat` without `lng`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Location with a published service, or no such service."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

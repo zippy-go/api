@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.27.0
+  version: 0.28.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -294,6 +294,9 @@ tags:
 
   - name: Kitchen
     description: "The kitchen display (step 8): a ticket for every order to prepare, from an accepted delivery or pickup with every course fired and from a dine-in round with its first course fired and the later ones held; courses from the catalogue and the Location's stations; fire, ready, serve, decline and bump, as marks sent alone or queued while offline, applied by the moment each was made so the later stands; the changes after a cursor, so a display keeps working without the network. Read with `order:read`, marked with `order:manage`, set with `location:write` at the Location."
+
+  - name: Bookings
+    description: "Work done at the customer's place (step 9): a Location's published services with their pages and slots worked out from who is free; holding a slot, booking it as an order of fulfilment on site with the policy frozen, paying a fixed price or a visit charge; the Location confirming with an Agent; estimates and extras approved in the app or by a link; rescheduling and cancelling with their fees; no-shows; pickup and return in two legs; the bill and what remains; the Location's day by Agent or by service; and Mission Control's list."
 
 paths:
   /v1/health:
@@ -1516,6 +1519,66 @@ paths:
     $ref: ./paths/kitchen/kitchen-changes.yaml
   /v1/partners/{partner_id}/locations/{location_id}/kitchen/marks:
     $ref: ./paths/kitchen/kitchen-marks.yaml
+
+  # Step 9 bookings: services, slots, bookings, approvals and the Location's day
+  /v1/storefront/stores/{location_id}/services:
+    $ref: ./paths/bookings/store-services.yaml
+  /v1/storefront/stores/{location_id}/services/{item_id}:
+    $ref: ./paths/bookings/store-service.yaml
+  /v1/storefront/stores/{location_id}/services/{item_id}/slots:
+    $ref: ./paths/bookings/service-slots.yaml
+  /v1/customer/bookings/holds:
+    $ref: ./paths/bookings/booking-holds.yaml
+  /v1/customer/bookings:
+    $ref: ./paths/bookings/customer-bookings.yaml
+  /v1/customer/bookings/{booking_id}:
+    $ref: ./paths/bookings/customer-booking.yaml
+  /v1/customer/bookings/{booking_id}/reschedule:
+    $ref: ./paths/bookings/customer-booking-reschedule.yaml
+  /v1/customer/bookings/{booking_id}/cancellation:
+    $ref: ./paths/bookings/customer-booking-cancellation.yaml
+  /v1/customer/bookings/{booking_id}/cancel:
+    $ref: ./paths/bookings/customer-booking-cancel.yaml
+  /v1/customer/bookings/{booking_id}/estimate/approve:
+    $ref: ./paths/bookings/customer-booking-estimate-approve.yaml
+  /v1/customer/bookings/{booking_id}/estimate/decline:
+    $ref: ./paths/bookings/customer-booking-estimate-decline.yaml
+  /v1/customer/bookings/{booking_id}/extras/{extra_id}/approve:
+    $ref: ./paths/bookings/customer-booking-extra-approve.yaml
+  /v1/customer/bookings/{booking_id}/extras/{extra_id}/decline:
+    $ref: ./paths/bookings/customer-booking-extra-decline.yaml
+  /v1/customer/bookings/{booking_id}/return-slot:
+    $ref: ./paths/bookings/customer-booking-return-slot.yaml
+  /v1/customer/bookings/{booking_id}/payments:
+    $ref: ./paths/bookings/customer-booking-payments.yaml
+  /v1/approvals/{token}:
+    $ref: ./paths/bookings/approval.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings:
+    $ref: ./paths/bookings/location-bookings.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}:
+    $ref: ./paths/bookings/location-booking.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/confirm:
+    $ref: ./paths/bookings/location-booking-confirm.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/decline:
+    $ref: ./paths/bookings/location-booking-decline.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/assign:
+    $ref: ./paths/bookings/location-booking-assign.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/steps:
+    $ref: ./paths/bookings/location-booking-steps.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/estimate:
+    $ref: ./paths/bookings/location-booking-estimate.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/cash:
+    $ref: ./paths/bookings/location-booking-cash.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/return-slot:
+    $ref: ./paths/bookings/location-booking-return-slot.yaml
+  /v1/agent/tasks/{task_id}/estimate:
+    $ref: ./paths/bookings/agent-task-estimate.yaml
+  /v1/agent/tasks/{task_id}/extras:
+    $ref: ./paths/bookings/agent-task-extras.yaml
+  /v1/platform/bookings:
+    $ref: ./paths/bookings/platform-bookings.yaml
+  /v1/platform/bookings/{booking_id}:
+    $ref: ./paths/bookings/platform-booking.yaml
 
 components:
   securitySchemes:
@@ -4299,3 +4362,149 @@ components:
       $ref: ./components/schemas/kitchen/KitchenMarkResult.yaml
     KitchenMarkResults:
       $ref: ./components/schemas/kitchen/KitchenMarkResults.yaml
+    BookingState:
+      $ref: ./components/schemas/bookings/BookingState.yaml
+    BookingPriceKind:
+      $ref: ./components/schemas/bookings/BookingPriceKind.yaml
+    BookingApprovalState:
+      $ref: ./components/schemas/bookings/BookingApprovalState.yaml
+    BookingApprovalKind:
+      $ref: ./components/schemas/bookings/BookingApprovalKind.yaml
+    BookingDecision:
+      $ref: ./components/schemas/bookings/BookingDecision.yaml
+    BookingLegKind:
+      $ref: ./components/schemas/bookings/BookingLegKind.yaml
+    BookingLegState:
+      $ref: ./components/schemas/bookings/BookingLegState.yaml
+    BookingStepKind:
+      $ref: ./components/schemas/bookings/BookingStepKind.yaml
+    BookingDeclineReason:
+      $ref: ./components/schemas/bookings/BookingDeclineReason.yaml
+    BookingCancelReason:
+      $ref: ./components/schemas/bookings/BookingCancelReason.yaml
+    BookingPaymentMethod:
+      $ref: ./components/schemas/bookings/BookingPaymentMethod.yaml
+    BookingPaymentStage:
+      $ref: ./components/schemas/bookings/BookingPaymentStage.yaml
+    BookingBillLineKind:
+      $ref: ./components/schemas/bookings/BookingBillLineKind.yaml
+    ServiceSlotsReason:
+      $ref: ./components/schemas/bookings/ServiceSlotsReason.yaml
+    BookingDayGroup:
+      $ref: ./components/schemas/bookings/BookingDayGroup.yaml
+    CatalogItemKind:
+      $ref: ./components/schemas/catalog/CatalogItemKind.yaml
+    BookableFacts:
+      $ref: ./components/schemas/catalog/BookableFacts.yaml
+    BookableFactsInput:
+      $ref: ./components/schemas/catalog/BookableFactsInput.yaml
+    FieldBookingPolicy:
+      $ref: ./components/schemas/services/FieldBookingPolicy.yaml
+    BookingPolicy:
+      $ref: ./components/schemas/bookings/BookingPolicy.yaml
+    BookingLocation:
+      $ref: ./components/schemas/bookings/BookingLocation.yaml
+    BookingService:
+      $ref: ./components/schemas/bookings/BookingService.yaml
+    BookingAddOn:
+      $ref: ./components/schemas/bookings/BookingAddOn.yaml
+    BookingAddOnInput:
+      $ref: ./components/schemas/bookings/BookingAddOnInput.yaml
+    BookingAddress:
+      $ref: ./components/schemas/bookings/BookingAddress.yaml
+    BookingAgent:
+      $ref: ./components/schemas/bookings/BookingAgent.yaml
+    BookingEstimate:
+      $ref: ./components/schemas/bookings/BookingEstimate.yaml
+    BookingExtra:
+      $ref: ./components/schemas/bookings/BookingExtra.yaml
+    BookingLeg:
+      $ref: ./components/schemas/bookings/BookingLeg.yaml
+    BookingBillLine:
+      $ref: ./components/schemas/bookings/BookingBillLine.yaml
+    BookingPayment:
+      $ref: ./components/schemas/bookings/BookingPayment.yaml
+    BookingBill:
+      $ref: ./components/schemas/bookings/BookingBill.yaml
+    BookingProof:
+      $ref: ./components/schemas/bookings/BookingProof.yaml
+    BookingTimes:
+      $ref: ./components/schemas/bookings/BookingTimes.yaml
+    BookingActions:
+      $ref: ./components/schemas/bookings/BookingActions.yaml
+    Booking:
+      $ref: ./components/schemas/bookings/Booking.yaml
+    StoreBooking:
+      $ref: ./components/schemas/bookings/StoreBooking.yaml
+    BookingSummary:
+      $ref: ./components/schemas/bookings/BookingSummary.yaml
+    BookingList:
+      $ref: ./components/schemas/bookings/BookingList.yaml
+    BookingHoldRequest:
+      $ref: ./components/schemas/bookings/BookingHoldRequest.yaml
+    BookingHold:
+      $ref: ./components/schemas/bookings/BookingHold.yaml
+    BookingRequest:
+      $ref: ./components/schemas/bookings/BookingRequest.yaml
+    PlacedBooking:
+      $ref: ./components/schemas/bookings/PlacedBooking.yaml
+    BookingReschedule:
+      $ref: ./components/schemas/bookings/BookingReschedule.yaml
+    BookingCancellation:
+      $ref: ./components/schemas/bookings/BookingCancellation.yaml
+    BookingCancel:
+      $ref: ./components/schemas/bookings/BookingCancel.yaml
+    BookingReturnSlot:
+      $ref: ./components/schemas/bookings/BookingReturnSlot.yaml
+    BookingPaymentRequest:
+      $ref: ./components/schemas/bookings/BookingPaymentRequest.yaml
+    BookingPaymentStarted:
+      $ref: ./components/schemas/bookings/BookingPaymentStarted.yaml
+    BookingApproval:
+      $ref: ./components/schemas/bookings/BookingApproval.yaml
+    BookingApprovalDecision:
+      $ref: ./components/schemas/bookings/BookingApprovalDecision.yaml
+    BookingDayJob:
+      $ref: ./components/schemas/bookings/BookingDayJob.yaml
+    BookingDayColumn:
+      $ref: ./components/schemas/bookings/BookingDayColumn.yaml
+    BookingServiceDuration:
+      $ref: ./components/schemas/bookings/BookingServiceDuration.yaml
+    LocationBookingDay:
+      $ref: ./components/schemas/bookings/LocationBookingDay.yaml
+    BookingConfirm:
+      $ref: ./components/schemas/bookings/BookingConfirm.yaml
+    BookingDecline:
+      $ref: ./components/schemas/bookings/BookingDecline.yaml
+    BookingAssign:
+      $ref: ./components/schemas/bookings/BookingAssign.yaml
+    BookingStep:
+      $ref: ./components/schemas/bookings/BookingStep.yaml
+    BookingEstimateInput:
+      $ref: ./components/schemas/bookings/BookingEstimateInput.yaml
+    BookingCash:
+      $ref: ./components/schemas/bookings/BookingCash.yaml
+    BookingExtraInput:
+      $ref: ./components/schemas/bookings/BookingExtraInput.yaml
+    PlatformBookingSummary:
+      $ref: ./components/schemas/bookings/PlatformBookingSummary.yaml
+    PlatformBookingList:
+      $ref: ./components/schemas/bookings/PlatformBookingList.yaml
+    ServiceAddOn:
+      $ref: ./components/schemas/bookings/ServiceAddOn.yaml
+    ServiceCard:
+      $ref: ./components/schemas/bookings/ServiceCard.yaml
+    ServicesDocument:
+      $ref: ./components/schemas/bookings/ServicesDocument.yaml
+    ServicePage:
+      $ref: ./components/schemas/bookings/ServicePage.yaml
+    ServiceSlot:
+      $ref: ./components/schemas/bookings/ServiceSlot.yaml
+    ServiceSlots:
+      $ref: ./components/schemas/bookings/ServiceSlots.yaml
+    StoreServiceItem:
+      $ref: ./components/schemas/storefront/StoreServiceItem.yaml
+    StoreServices:
+      $ref: ./components/schemas/storefront/StoreServices.yaml
+    StoreOrderBooking:
+      $ref: ./components/schemas/orders/StoreOrderBooking.yaml

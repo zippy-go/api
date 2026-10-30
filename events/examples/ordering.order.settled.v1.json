@@ -1,0 +1,25 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000e9019",
+  "type": "ordering.order.settled",
+  "version": 1,
+  "occurred_at": "2026-11-07T05:28:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+  "correlation_id": null,
+  "payload": {
+    "order_id": "019a3d10-2b00-7d00-8a00-00000000c001",
+    "number": "ZG-261107-0042",
+    "location_id": "01a13a48-9e00-7000-8000-000000000306",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+    "customer_id": "019a3d10-2b00-7d00-8a00-00000000a501",
+    "status": "accepted",
+    "previous_status": "accepted",
+    "version": 4,
+    "fulfilment": "on_site",
+    "currency": "INR",
+    "at": "2026-11-07T05:28:00Z",
+    "by": "system",
+    "total": 49900,
+    "removed_amount": 0,
+    "charged": 49900
+  }
+}

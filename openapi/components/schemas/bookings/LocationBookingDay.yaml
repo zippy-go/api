@@ -1,0 +1,67 @@
+type: object
+description: "A Location's bookings on a day, the `LocationBookingDay` schema: those awaiting confirmation apart, the rest in a column per Agent or per service with their travel buffers, and each service's set duration beside its measured one."
+required:
+  - location_id
+  - date
+  - group
+  - awaiting
+  - columns
+  - services
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  date:
+    type: string
+    format: date
+    description: The day, at the Location.
+    examples:
+      - 2026-11-07
+  group:
+    $ref: ./BookingDayGroup.yaml
+    description: How the columns are laid out.
+  awaiting:
+    type: array
+    items:
+      $ref: ./BookingDayJob.yaml
+    description: Bookings awaiting confirmation.
+  columns:
+    type: array
+    items:
+      $ref: ./BookingDayColumn.yaml
+    description: The columns.
+  services:
+    type: array
+    items:
+      $ref: ./BookingServiceDuration.yaml
+    description: Each service's durations.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000306
+    date: 2026-11-07
+    group: agent
+    awaiting: []
+    columns:
+      - agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+        item_id: null
+        name: Kiran
+        jobs:
+          - booking_id: 019a3d10-2b00-7d00-8a00-00000000b001
+            number: ZG-261107-0042
+            state: confirmed
+            service_name: AC service, split unit
+            starts_at: 2026-11-07T10:00:00+05:30
+            ends_at: 2026-11-07T11:00:00+05:30
+            buffer_before_minutes: 30
+            buffer_after_minutes: 30
+            agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+            agent_first_name: Kiran
+            area: Road No. 5, Madhapur
+    services:
+      - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+        name: AC service, split unit
+        set_minutes: 60
+        measured_minutes: 64
+        measured_jobs: 12

@@ -1,0 +1,78 @@
+type: object
+description: "A booking's bill: the work at its price as approved, what was paid and refunded, and what remains."
+required:
+  - lines
+  - total
+  - tax_included
+  - paid
+  - refunded
+  - fee_kept
+  - remaining
+  - payments
+properties:
+  lines:
+    type: array
+    items:
+      $ref: ./BookingBillLine.yaml
+    description: The lines.
+  total:
+    $ref: ../common/Money.yaml
+    description: "The bill: what the work costs as approved, or the fee kept."
+  tax_included:
+    $ref: ../common/Money.yaml
+    description: The GST the bill includes.
+  paid:
+    $ref: ../common/Money.yaml
+    description: What was paid.
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What went back.
+  fee_kept:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A fee or visit charge kept on cancelling.
+  remaining:
+    $ref: ../common/Money.yaml
+    description: What remains to pay.
+  payments:
+    type: array
+    items:
+      $ref: ./BookingPayment.yaml
+    description: Each payment.
+examples:
+  - lines:
+      - kind: service
+        name: AC service, split unit
+        amount:
+          minor_units: 49900
+          currency: INR
+      - kind: extra
+        name: Gas top-up
+        amount:
+          minor_units: 150000
+          currency: INR
+    total:
+      minor_units: 199900
+      currency: INR
+    tax_included:
+      minor_units: 30493
+      currency: INR
+    paid:
+      minor_units: 49900
+      currency: INR
+    refunded:
+      minor_units: 0
+      currency: INR
+    fee_kept: null
+    remaining:
+      minor_units: 150000
+      currency: INR
+    payments:
+      - amount:
+          minor_units: 49900
+          currency: INR
+        method: upi
+        stage: at_booking
+        reference: UPI ••4821
+        paid_at: 2026-11-05T19:40:00+05:30

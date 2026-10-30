@@ -1,0 +1,20 @@
+type: string
+description: "Where a booking stands: `paying` until its payment at booking is made; `awaiting_confirmation` until the Location confirms it within its window; `confirmed` with an Agent; `en_route`, `arrived` and `in_progress` (started) as the Agent moves; for pickup and return, `collected` once the pickup leg is done and `returning` once the return leg is asked; then `completed`. It may end `disputed` (the customer would not sign), `not_done` (the estimate declined), `not_available` (the customer was not there), `cancelled`, `declined` (by the Location, or not answered in time) or `expired` (never paid)."
+enum:
+  - paying
+  - awaiting_confirmation
+  - confirmed
+  - en_route
+  - arrived
+  - in_progress
+  - collected
+  - returning
+  - completed
+  - disputed
+  - not_done
+  - not_available
+  - cancelled
+  - declined
+  - expired
+examples:
+  - confirmed

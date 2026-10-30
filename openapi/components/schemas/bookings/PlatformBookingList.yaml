@@ -1,0 +1,38 @@
+type: object
+description: "Bookings across Partners: those not answered, running late or disputed first, then the latest."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PlatformBookingSummary.yaml
+    description: The bookings.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The cursor of the next page, `null` on the last.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 019a3d10-2b00-7d00-8a00-00000000b001
+        number: ZG-261107-0042
+        state: confirmed
+        partner_id: 01a13a48-9e00-7000-8000-000000000007
+        location:
+          location_id: 01a13a48-9e00-7000-8000-000000000306
+          name: Madhapur Home Care
+        service_name: AC service, split unit
+        starts_at: 2026-11-07T10:00:00+05:30
+        agent_first_name: null
+        not_answered: false
+        running_late: false
+        disputed: false
+        total:
+          minor_units: 49900
+          currency: INR
+        created_at: 2026-11-05T19:38:00+05:30
+    next_cursor: null

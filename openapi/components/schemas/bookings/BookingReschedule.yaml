@@ -1,0 +1,22 @@
+type: object
+description: Moving a booking to another open slot.
+required:
+  - starts_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: The new slot's start.
+    examples:
+      - 2026-11-08T11:00:00+05:30
+  hold_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The new slot held, if it was.
+    examples:
+      - null
+examples:
+  - starts_at: 2026-11-08T11:00:00+05:30
+    hold_id: null

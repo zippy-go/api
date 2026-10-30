@@ -1,0 +1,97 @@
+# Path item for /v1/approvals/{token}. Referenced from openapi.yaml.
+parameters:
+  - name: token
+    in: path
+    required: true
+    description: The approval's token, from the link sent to the customer's number.
+    schema:
+      type: string
+      minLength: 16
+      maxLength: 512
+    example: YmtnLTAxOWEzZDEwLmV4dHJh.c2lnbmVk
+get:
+  operationId: getBookingApproval
+  summary: Read an approval by its link
+  description: "An estimate or an extra waiting for the customer, from the link sent to the booking's number: what it is, its price, its photo, and for a price after a pickup both counts and the pickup's photo. Signed out: the token is the authority, until the job ends."
+  tags:
+    - Bookings
+  security: []
+  responses:
+    "200":
+      description: What waits.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/BookingApproval.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such approval, or the link has lapsed."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: answerBookingApproval
+  summary: Answer an approval by its link
+  description: Approves or declines the estimate or the extra the link names, as the app does.
+  tags:
+    - Bookings
+  security: []
+  requestBody:
+    required: true
+    description: The answer.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/bookings/BookingApprovalDecision.yaml
+  responses:
+    "200":
+      description: The answer recorded.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/BookingApproval.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such approval, or the link has lapsed."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`approval_answered`; `booking_moved`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

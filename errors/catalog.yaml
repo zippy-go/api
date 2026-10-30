@@ -2259,3 +2259,66 @@ errors:
     message: "Review it once a delivery is done this month"
     retryable: false
     description: "No delivery of the subscription completed in the month named yet."
+
+  - code: slot_taken
+    status: 409
+    title: Slot taken
+    message: "That slot went; {slots} are open."
+    retryable: false
+    description: "The slot went to another booking or hold while the customer booked. The sentence names the nearest open slots; nothing was charged or held."
+
+  - code: slot_unavailable
+    status: 409
+    title: Slot not offered
+    message: "That slot is not offered; {next} is the next open one."
+    retryable: false
+    description: "The time is not a slot of the service: outside its hours or an Agent's, sooner than its notice, beyond its booking window, or for pickup and return sooner than the turnaround."
+
+  - code: outside_area
+    status: 409
+    title: Outside the area
+    message: "{store} does not come to {address}."
+    retryable: false
+    description: "The service does not come to the address: it is outside the field Service's area or the service's narrower one."
+
+  - code: hold_expired
+    status: 409
+    title: Hold expired
+    message: "The slot was held for ten minutes; hold it again."
+    retryable: false
+    description: "The slot's hold lapsed after ten minutes, or was let go for another of the customer's holds."
+
+  - code: booking_moved
+    status: 409
+    title: Booking moved on
+    message: "The booking is {state}."
+    retryable: false
+    description: "The booking has moved on, so the act no longer applies: the sentence says where it stands. A job never moves back, and a completed one is final."
+
+  - code: reschedule_window_passed
+    status: 409
+    title: Too late to move
+    message: "Inside {hours} hours of the slot, moving it is cancelling and booking again."
+    retryable: false
+    description: "The booking is inside its cancellation window: moving it would be cancelling and booking again, so the customer cancels (the fee is shown first) and books."
+
+  - code: approval_answered
+    status: 409
+    title: Already answered
+    message: "It was {state} already."
+    retryable: false
+    description: "The estimate or the extra was answered already, in the app or by its link."
+
+  - code: estimate_not_approved
+    status: 409
+    title: Estimate not approved
+    message: "The customer has not approved the estimate yet."
+    retryable: false
+    description: "A job priced from starts only once its estimate is approved."
+
+  - code: not_bookable
+    status: 409
+    title: Not bookable
+    message: "{item} is booked into a slot, not ordered."
+    retryable: false
+    description: "A bookable item goes into a booking, not a basket."

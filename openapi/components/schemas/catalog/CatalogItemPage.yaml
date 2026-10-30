@@ -55,4 +55,6 @@ examples:
         version: 3
         course: mains
         station_ids: []
+        kind: product
+        booking: null
     next_cursor: null

@@ -1,7 +1,8 @@
 type: string
-description: "How an order leaves the store: delivered to the customer, or collected at the counter."
+description: "How an order is fulfilled: delivered to the customer, collected at the counter, or `on_site`, a booking's work done at the customer's place."
 enum:
   - delivery
   - pickup
+  - on_site
 examples:
   - delivery

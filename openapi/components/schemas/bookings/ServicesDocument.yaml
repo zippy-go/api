@@ -1,0 +1,57 @@
+type: object
+description: A Location's published services, the `ServicesDocument` schema, beside its menu with the menu's version.
+required:
+  - location_id
+  - version
+  - published_at
+  - services
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  version:
+    type: integer
+    description: The published version, the menu's.
+    examples:
+      - 7
+  published_at:
+    type: string
+    format: date-time
+    description: When it was published.
+    examples:
+      - 2026-11-01T09:00:00+05:30
+  services:
+    type: array
+    items:
+      $ref: ./ServiceCard.yaml
+    description: The services.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000306
+    version: 7
+    published_at: 2026-11-01T09:00:00+05:30
+    services:
+      - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+        variant_id: 019a3d10-2b00-7d00-8a00-00000000d101
+        name:
+          en: AC service, split unit
+        description:
+          en: Indoor and outdoor unit serviced, filters and coils cleaned.
+        picture_url: null
+        price:
+          minor_units: 49900
+          currency: INR
+        price_kind: fixed
+        duration_minutes: 60
+        pickup_return: false
+        turnaround_hours: null
+        qualifications:
+          - ac_technician
+        included:
+          - Filter and coil cleaning
+        excluded:
+          - Gas top-up, an extra approved on site
+        customer_provides: []
+        add_ons: []

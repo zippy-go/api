@@ -1,0 +1,59 @@
+type: object
+description: Work proposed during the job; only an approved one is done and charged.
+required:
+  - extra_id
+  - description
+  - amount
+  - photo_url
+  - state
+  - proposed_at
+  - decided_at
+properties:
+  extra_id:
+    type: string
+    format: uuid
+    description: The extra.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000f001
+  description:
+    type: string
+    description: What it is.
+    examples:
+      - Gas top-up
+  amount:
+    $ref: ../common/Money.yaml
+    description: Its price.
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to its photo.
+    examples:
+      - null
+  state:
+    $ref: ./BookingApprovalState.yaml
+    description: Whether the customer approved it.
+  proposed_at:
+    type: string
+    format: date-time
+    description: When it was proposed.
+    examples:
+      - 2026-11-07T10:25:00+05:30
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the customer answered.
+    examples:
+      - 2026-11-07T10:26:00+05:30
+examples:
+  - extra_id: 019a3d10-2b00-7d00-8a00-00000000f001
+    description: Gas top-up
+    amount:
+      minor_units: 150000
+      currency: INR
+    photo_url: null
+    state: waiting
+    proposed_at: 2026-11-07T10:25:00+05:30
+    decided_at: 2026-11-07T10:26:00+05:30

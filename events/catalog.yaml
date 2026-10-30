@@ -1888,3 +1888,163 @@ events:
       The kitchen declined a line not fired yet, as sold out. Consumers: ordering (the table told at once, the line off the bill), notifications.
     payload_schema: ./payloads/kitchen.line.declined.v1.schema.json
     example: ./examples/kitchen.line.declined.v1.json
+
+  - type: bookings.booking.placed
+    version: 1
+    domain: bookings
+    description: >-
+      A booking was paid at booking (or placed to pay after the job) and awaits the Location's confirmation; it rings there like a new order. Consumers: notifications, analytics, the Partner's board.
+    payload_schema: ./payloads/bookings.booking.placed.v1.schema.json
+    example: ./examples/bookings.booking.placed.v1.json
+
+  - type: bookings.booking.confirmed
+    version: 1
+    domain: bookings
+    description: >-
+      The Location confirmed a booking with its Agent, or it confirmed itself; the job was asked of the workforce. Consumers: notifications (the customer, with the slot and the Agent), the workforce's job, analytics.
+    payload_schema: ./payloads/bookings.booking.confirmed.v1.schema.json
+    example: ./examples/bookings.booking.confirmed.v1.json
+
+  - type: bookings.booking.declined
+    version: 1
+    domain: bookings
+    description: >-
+      A booking awaiting confirmation was declined by the Location, or as not answered when its window ended; everything paid goes back. Consumers: notifications, analytics, Mission Control's list.
+    payload_schema: ./payloads/bookings.booking.declined.v1.schema.json
+    example: ./examples/bookings.booking.declined.v1.json
+
+  - type: bookings.booking.assigned
+    version: 1
+    domain: bookings
+    description: >-
+      A confirmed booking's Agent was assigned or changed. Consumers: notifications (the customer told), the workforce's job.
+    payload_schema: ./payloads/bookings.booking.assigned.v1.schema.json
+    example: ./examples/bookings.booking.assigned.v1.json
+
+  - type: bookings.booking.rescheduled
+    version: 1
+    domain: bookings
+    description: >-
+      A booking moved to another slot, free, its old slot open again. Consumers: notifications, the workforce's job.
+    payload_schema: ./payloads/bookings.booking.rescheduled.v1.schema.json
+    example: ./examples/bookings.booking.rescheduled.v1.json
+
+  - type: bookings.booking.cancelled
+    version: 1
+    domain: bookings
+    description: >-
+      A booking was cancelled: a fee or the visit charge kept where its policy says, the rest refunded the way it was paid. Consumers: notifications, the workforce's job called off, analytics.
+    payload_schema: ./payloads/bookings.booking.cancelled.v1.schema.json
+    example: ./examples/bookings.booking.cancelled.v1.json
+
+  - type: bookings.booking.completed
+    version: 1
+    domain: bookings
+    description: >-
+      A job was completed with a photo of the work and the customer's signature or code; for pickup and return, the items returned. Consumers: notifications (the receipt), reviews (the ask), engagement (the quest's booking step), analytics.
+    payload_schema: ./payloads/bookings.booking.completed.v1.schema.json
+    example: ./examples/bookings.booking.completed.v1.json
+
+  - type: bookings.booking.disputed
+    version: 1
+    domain: bookings
+    description: >-
+      The customer would not sign; the job is disputed with their words (read from the API), nothing more charged. Consumers: Mission Control's list, notifications.
+    payload_schema: ./payloads/bookings.booking.disputed.v1.schema.json
+    example: ./examples/bookings.booking.disputed.v1.json
+
+  - type: bookings.booking.not_available
+    version: 1
+    domain: bookings
+    description: >-
+      The Agent waited fifteen minutes and could not reach the customer: the visit charge kept, the rest refunded. Consumers: notifications, analytics.
+    payload_schema: ./payloads/bookings.booking.not_available.v1.schema.json
+    example: ./examples/bookings.booking.not_available.v1.json
+
+  - type: bookings.booking.reminded
+    version: 1
+    domain: bookings
+    description: >-
+      A reminder is due: the evening before at 18:00 at the Location, and an hour before. Consumers: notifications (the customer, naming the service, the time and the Agent).
+    payload_schema: ./payloads/bookings.booking.reminded.v1.schema.json
+    example: ./examples/bookings.booking.reminded.v1.json
+
+  - type: bookings.estimate.recorded
+    version: 1
+    domain: bookings
+    description: >-
+      An estimate was recorded on site, or the price after a pickup; it waits for the customer in the app or by a link sent to their number. Consumers: notifications (the approval's link by SMS).
+    payload_schema: ./payloads/bookings.estimate.recorded.v1.schema.json
+    example: ./examples/bookings.estimate.recorded.v1.json
+
+  - type: bookings.estimate.approved
+    version: 1
+    domain: bookings
+    description: >-
+      The customer approved the estimate. Consumers: the workforce's job (it may start), analytics.
+    payload_schema: ./payloads/bookings.estimate.approved.v1.schema.json
+    example: ./examples/bookings.estimate.approved.v1.json
+
+  - type: bookings.estimate.declined
+    version: 1
+    domain: bookings
+    description: >-
+      The customer declined the estimate: the job ends as not done with the visit charge kept; for pickup and return the items come back. Consumers: notifications, the workforce's job, analytics.
+    payload_schema: ./payloads/bookings.estimate.declined.v1.schema.json
+    example: ./examples/bookings.estimate.declined.v1.json
+
+  - type: bookings.extra.proposed
+    version: 1
+    domain: bookings
+    description: >-
+      The Agent proposed an extra; it waits for the customer in the app or by a link sent to their number. Consumers: notifications.
+    payload_schema: ./payloads/bookings.extra.proposed.v1.schema.json
+    example: ./examples/bookings.extra.proposed.v1.json
+
+  - type: bookings.extra.approved
+    version: 1
+    domain: bookings
+    description: >-
+      The customer approved an extra: it is done and charged. Consumers: the workforce's job, analytics.
+    payload_schema: ./payloads/bookings.extra.approved.v1.schema.json
+    example: ./examples/bookings.extra.approved.v1.json
+
+  - type: bookings.extra.declined
+    version: 1
+    domain: bookings
+    description: >-
+      The customer declined an extra: it is not done and not charged. Consumers: the workforce's job.
+    payload_schema: ./payloads/bookings.extra.declined.v1.schema.json
+    example: ./examples/bookings.extra.declined.v1.json
+
+  - type: bookings.leg.requested
+    version: 1
+    domain: bookings
+    description: >-
+      A leg of a pickup and return service was asked of the Agents: the pickup at confirmation, the return once its price is approved and its slot chosen. Field work plans each leg as a scheduled delivery of the booking's order, whose address the order carries; the pickup's task counts the items with a photo. Consumers: orchestration.
+    payload_schema: ./payloads/bookings.leg.requested.v1.schema.json
+    example: ./examples/bookings.leg.requested.v1.json
+
+  - type: catalog.services.published
+    version: 1
+    domain: catalog
+    description: >-
+      A Location's services document was published with its menu. Consumers: the storefront's cards, search.
+    payload_schema: ./payloads/catalog.services.published.v1.schema.json
+    example: ./examples/catalog.services.published.v1.json
+
+  - type: ordering.order.settled
+    version: 1
+    domain: ordering
+    description: >-
+      A booking's order of fulfilment on site was settled on what it keeps: everything at completion, the fee or the visit charge on a cancellation or a no-show; the rest refunded the way it was paid. It splits the order's money as `ordering.order.accepted` does for a delivery. Consumers: the ledger.
+    payload_schema: ./payloads/ordering.order.settled.v1.schema.json
+    example: ./examples/ordering.order.settled.v1.json
+
+  - type: ordering.order.completed
+    version: 1
+    domain: ordering
+    description: >-
+      A booking's order of fulfilment on site ended with what it kept: the job done, or a fee or visit charge kept; cash the Agent took is collected now. Consumers: payments (cash collected), payouts (the week's line), analytics.
+    payload_schema: ./payloads/ordering.order.completed.v1.schema.json
+    example: ./examples/ordering.order.completed.v1.json

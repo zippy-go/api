@@ -1,0 +1,59 @@
+# Path item for /v1/customer/bookings/holds. Referenced from openapi.yaml.
+post:
+  operationId: holdBookingSlot
+  summary: Hold a slot
+  description: "Holds an open slot for ten minutes while the customer books; a slot taken meanwhile is refused with `slot_taken`, naming the nearest open ones. A customer holds one slot of a service at a time: a new hold lets the old one go."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The slot.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/bookings/BookingHoldRequest.yaml
+  responses:
+    "201":
+      description: The slot held.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/BookingHold.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Location with a published service, or no such service."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`slot_taken`: the slot went; the sentence names the nearest open ones. `slot_unavailable`: not a slot of the service (outside its hours, sooner than its notice or beyond its window). `outside_area`: the service does not come to the address."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

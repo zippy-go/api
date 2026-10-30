@@ -1,0 +1,135 @@
+type: object
+description: A booking placed, with what the customer does next to pay.
+required:
+  - booking
+  - next_action
+properties:
+  booking:
+    $ref: ./Booking.yaml
+    description: The booking.
+  next_action:
+    oneOf:
+      - $ref: ../orders/NextAction.yaml
+      - type: "null"
+    description: The provider's page while the payment waits.
+examples:
+  - booking:
+      id: 019a3d10-2b00-7d00-8a00-00000000b001
+      number: ZG-261107-0042
+      order_id: 019a3d10-2b00-7d00-8a00-00000000c001
+      state: confirmed
+      location:
+        location_id: 01a13a48-9e00-7000-8000-000000000306
+        name: Madhapur Home Care
+      service:
+        item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+        variant_id: 019a3d10-2b00-7d00-8a00-00000000d101
+        name: AC service, split unit
+        price_kind: fixed
+        price:
+          minor_units: 49900
+          currency: INR
+        duration_minutes: 60
+        pickup_return: false
+        turnaround_hours: null
+      starts_at: 2026-11-07T10:00:00+05:30
+      ends_at: 2026-11-07T11:00:00+05:30
+      add_ons: []
+      address:
+        address_id: 019a3d10-2b00-7d00-8a00-00000000a201
+        line1: Flat 402, Lake View Residency
+        line2: Road No. 5, Madhapur
+        city: Hyderabad
+        postal_code: "500081"
+        lat: 17.4483
+        lng: 78.3915
+      instructions: Gate code 4421
+      agent:
+        agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+        first_name: Kiran
+        photo_url: null
+        rating: 4.8
+      policy:
+        confirmation_minutes: 60
+        cancellation_window_hours: 2
+        late_fee_percent: 20
+        visit_charge:
+          minor_units: 9900
+          currency: INR
+        pay_after_job: false
+        confirm_automatically: false
+        words: Free to cancel until 2 hours before. After that, cancelling costs 20%. Once the Agent is on the way, ₹99.00 is kept.
+      estimate: null
+      extras:
+        - extra_id: 019a3d10-2b00-7d00-8a00-00000000f001
+          description: Gas top-up
+          amount:
+            minor_units: 150000
+            currency: INR
+          photo_url: null
+          state: waiting
+          proposed_at: 2026-11-07T10:25:00+05:30
+          decided_at: 2026-11-07T10:26:00+05:30
+      legs: []
+      bill:
+        lines:
+          - kind: service
+            name: AC service, split unit
+            amount:
+              minor_units: 49900
+              currency: INR
+          - kind: extra
+            name: Gas top-up
+            amount:
+              minor_units: 150000
+              currency: INR
+        total:
+          minor_units: 199900
+          currency: INR
+        tax_included:
+          minor_units: 30493
+          currency: INR
+        paid:
+          minor_units: 49900
+          currency: INR
+        refunded:
+          minor_units: 0
+          currency: INR
+        fee_kept: null
+        remaining:
+          minor_units: 150000
+          currency: INR
+        payments:
+          - amount:
+              minor_units: 49900
+              currency: INR
+            method: upi
+            stage: at_booking
+            reference: UPI ••4821
+            paid_at: 2026-11-05T19:40:00+05:30
+      proof: null
+      payment: null
+      can:
+        reschedule: true
+        cancel: true
+        pay: false
+      times:
+        placed_at: 2026-11-05T19:40:00+05:30
+        confirmed_at: 2026-11-05T19:52:00+05:30
+        en_route_at: null
+        arrived_at: null
+        started_at: null
+        completed_at: null
+        ended_at: null
+      decline_reason: null
+      cancel_reason: null
+      dispute: null
+      running_late: false
+      created_at: 2026-11-05T19:38:00+05:30
+      version: 4
+      completion_code: null
+    next_action:
+      kind: open_page
+      url: https://pay.example/checkout/0192b6f4
+      expires_at: 2026-10-16T13:15:00Z
+      message: Pay in your UPI app on the page that opens.

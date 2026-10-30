@@ -1,0 +1,15 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000e9018",
+  "type": "catalog.services.published",
+  "version": 1,
+  "occurred_at": "2026-11-01T03:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+  "correlation_id": null,
+  "payload": {
+    "location_id": "01a13a48-9e00-7000-8000-000000000306",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+    "version": 7,
+    "services": 3,
+    "at": "2026-11-01T03:30:00Z"
+  }
+}

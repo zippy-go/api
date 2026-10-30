@@ -1,0 +1,63 @@
+type: object
+description: The service booked, as it was when booked.
+required:
+  - item_id
+  - variant_id
+  - name
+  - price_kind
+  - price
+  - duration_minutes
+  - pickup_return
+  - turnaround_hours
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The bookable item.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  variant_id:
+    type: string
+    format: uuid
+    description: Its variant.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d101
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - AC service, split unit
+  price_kind:
+    $ref: ./BookingPriceKind.yaml
+    description: Fixed, or from with an estimate on site.
+  price:
+    $ref: ../common/Money.yaml
+    description: The fixed price, or the visit charge of a service priced from.
+  duration_minutes:
+    type: integer
+    description: The duration booked, with the add-ons.
+    examples:
+      - 60
+  pickup_return:
+    type: boolean
+    description: Picked up and returned as two legs.
+    examples:
+      - false
+  turnaround_hours:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the hours between the legs at least.
+    examples:
+      - null
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    variant_id: 019a3d10-2b00-7d00-8a00-00000000d101
+    name: AC service, split unit
+    price_kind: fixed
+    price:
+      minor_units: 49900
+      currency: INR
+    duration_minutes: 60
+    pickup_return: false
+    turnaround_hours: null

@@ -1,5 +1,5 @@
 type: object
-description: 'A store as a card, the `StoreCard` schema: what a customer decides on.'
+description: "A store as a card, the `StoreCard` schema: what a customer decides on."
 required:
   - location_id
   - partner_id
@@ -33,7 +33,7 @@ properties:
       - ZippyGo Dev Partner
   partner_kind:
     type: string
-    description: '`organisation` or `individual`.'
+    description: "`organisation` or `individual`."
     examples:
       - organisation
   shelves:
@@ -57,7 +57,7 @@ properties:
     description: How it fulfils orders.
   is_new:
     type: boolean
-    description: '`true` in its first thirty days.'
+    description: "`true` in its first thirty days."
   highlights:
     type: array
     items:
@@ -66,69 +66,69 @@ properties:
   banner_url:
     type:
       - string
-      - 'null'
+      - "null"
     description: The store's banner, a rendition relative to the API host.
   catalogue:
     oneOf:
       - $ref: ./StoreCatalogueSummary.yaml
-      - type: 'null'
+      - type: "null"
     description: The catalogue's summary of the published menu; `null` until the catalogue supplies it.
   delivers_to_pin:
     type:
       - boolean
-      - 'null'
+      - "null"
     description: Whether the store delivers to the pin; `null` without a pin, `false` for a store that offers no delivery. A store out of reach is still listed.
   delivery_fee:
     oneOf:
       - $ref: ../common/Money.yaml
-      - type: 'null'
+      - type: "null"
     description: The delivery fee from the resolved policy, when one is set.
   delivery_minutes:
     type:
       - integer
-      - 'null'
+      - "null"
     description: The delivery estimate from the resolved policy, in minutes.
     examples:
       - 30
   distance_metres:
     type:
       - integer
-      - 'null'
+      - "null"
     description: The straight-line distance from the pin, rounded to 50 metres under a kilometre and to a tenth of a kilometre above; `null` without a pin.
     examples:
       - 1200
   logo_url:
     type:
       - string
-      - 'null'
+      - "null"
     description: The store's square mark, a rendition relative to the API host.
   minimum_order:
     oneOf:
       - $ref: ../common/Money.yaml
-      - type: 'null'
+      - type: "null"
     description: The minimum order from the resolved policy, when one is set.
   offline_message:
     type:
       - string
-      - 'null'
+      - "null"
     description: What the store says while it is offline.
   state_until:
     type:
       - string
-      - 'null'
+      - "null"
     format: date-time
-    description: 'When the state changes: closing time when open, opening time when shut, back-at time when offline; `null` when unknown.'
+    description: "When the state changes: closing time when open, opening time when shut, back-at time when offline; `null` when unknown."
   zone_id:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
     description: The zone the store is in.
   rating:
     oneOf:
       - $ref: ../reviews/LocationRating.yaml
       - type: "null"
-    description: "The store's rating, the share of thumbs up with how many reviews (\"72% (18)\"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0."
+    description: The store's rating, the share of thumbs up with how many reviews ("72% (18)"); `null` with no reviews or when it takes none, rather than 0%. Since 0.19.0.
   offer:
     oneOf:
       - $ref: ../promotions/StoreOfferBadge.yaml
@@ -139,6 +139,11 @@ properties:
     items:
       $ref: ./StorePlanCard.yaml
     description: Its live plans, as Daily Essentials' cards show them; empty when it offers none. Since 0.24.0.
+  services:
+    oneOf:
+      - $ref: ./StoreServices.yaml
+      - type: "null"
+    description: "A field service store's services: the first three, the lowest price and the next open slot; `null` for a store without bookable services."
 examples:
   - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
     partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02

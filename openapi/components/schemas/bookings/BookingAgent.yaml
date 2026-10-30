@@ -1,0 +1,38 @@
+type: object
+description: The Agent doing the job, as the customer sees them.
+required:
+  - agent_id
+  - first_name
+  - photo_url
+  - rating
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: The Agent.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000e001
+  first_name:
+    type: string
+    description: Their first name.
+    examples:
+      - Kiran
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to their photo, when they have one.
+    examples:
+      - null
+  rating:
+    type:
+      - number
+      - "null"
+    description: Their rating out of 5, when counted.
+    examples:
+      - 4.8
+examples:
+  - agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+    first_name: Kiran
+    photo_url: null
+    rating: 4.8

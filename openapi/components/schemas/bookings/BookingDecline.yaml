@@ -1,0 +1,18 @@
+type: object
+description: "Declining a booking: everything paid goes back."
+required:
+  - reason
+properties:
+  reason:
+    $ref: ./BookingDeclineReason.yaml
+    description: "Why: `no_availability`, `outside_area`, `customer_asked` or `other`."
+  note:
+    type:
+      - string
+      - "null"
+    description: A note, for `other`.
+    examples:
+      - null
+examples:
+  - reason: no_availability
+    note: null

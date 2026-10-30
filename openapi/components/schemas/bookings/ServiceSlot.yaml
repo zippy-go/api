@@ -1,0 +1,21 @@
+type: object
+description: A slot that can be booked.
+required:
+  - starts_at
+  - ends_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: Its start.
+    examples:
+      - 2026-11-07T09:00:00+05:30
+  ends_at:
+    type: string
+    format: date-time
+    description: The job's expected end.
+    examples:
+      - 2026-11-07T10:00:00+05:30
+examples:
+  - starts_at: 2026-11-07T09:00:00+05:30
+    ends_at: 2026-11-07T10:00:00+05:30

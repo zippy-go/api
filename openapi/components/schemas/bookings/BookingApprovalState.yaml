@@ -1,0 +1,8 @@
+type: string
+description: "Where an estimate or an extra stands with the customer: `waiting`, `approved` or `declined`. One never answered is not done and not charged."
+enum:
+  - waiting
+  - approved
+  - declined
+examples:
+  - waiting

@@ -1,0 +1,41 @@
+type: object
+description: An add-on booked, as it was.
+required:
+  - item_id
+  - name
+  - quantity
+  - price
+  - minutes
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The add-on, an answer of the service's question.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d201
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Balcony
+  quantity:
+    type: integer
+    description: How many.
+    examples:
+      - 1
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price each.
+  minutes:
+    type: integer
+    description: The time each adds.
+    examples:
+      - 30
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d201
+    name: Balcony
+    quantity: 1
+    price:
+      minor_units: 29900
+      currency: INR
+    minutes: 30

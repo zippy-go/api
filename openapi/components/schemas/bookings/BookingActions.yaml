@@ -1,0 +1,26 @@
+type: object
+description: What the customer may do now.
+required:
+  - reschedule
+  - cancel
+  - pay
+properties:
+  reschedule:
+    type: boolean
+    description: Move it to another slot, free until the cancellation window.
+    examples:
+      - true
+  cancel:
+    type: boolean
+    description: Cancel it, with the fee shown first.
+    examples:
+      - true
+  pay:
+    type: boolean
+    description: Pay what remains.
+    examples:
+      - false
+examples:
+  - reschedule: true
+    cancel: true
+    pay: false

@@ -1,0 +1,53 @@
+type: object
+description: A slot held for ten minutes.
+required:
+  - hold_id
+  - location_id
+  - item_id
+  - starts_at
+  - ends_at
+  - expires_at
+properties:
+  hold_id:
+    type: string
+    format: uuid
+    description: The hold.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a001
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  starts_at:
+    type: string
+    format: date-time
+    description: The slot's start.
+    examples:
+      - 2026-11-07T10:00:00+05:30
+  ends_at:
+    type: string
+    format: date-time
+    description: The job's expected end.
+    examples:
+      - 2026-11-07T11:00:00+05:30
+  expires_at:
+    type: string
+    format: date-time
+    description: When the hold lapses.
+    examples:
+      - 2026-11-05T19:48:00+05:30
+examples:
+  - hold_id: 019a3d10-2b00-7d00-8a00-00000000a001
+    location_id: 01a13a48-9e00-7000-8000-000000000306
+    item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    starts_at: 2026-11-07T10:00:00+05:30
+    ends_at: 2026-11-07T11:00:00+05:30
+    expires_at: 2026-11-05T19:48:00+05:30

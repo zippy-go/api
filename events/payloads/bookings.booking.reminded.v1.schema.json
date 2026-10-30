@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/bookings.booking.reminded.v1.schema.json",
+  "title": "BookingsBookingRemindedPayload",
+  "description": "Payload of `bookings.booking.reminded` version 1. A reminder is due. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "booking_id",
+    "number",
+    "order_id",
+    "partner_id",
+    "location_id",
+    "customer_id",
+    "service_id",
+    "item_id",
+    "state",
+    "starts_at",
+    "ends_at",
+    "agent_id",
+    "version",
+    "at",
+    "kind"
+  ],
+  "properties": {
+    "booking_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The booking."
+    },
+    "number": {
+      "type": "string",
+      "description": "Its number, its order's."
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order of fulfilment on site it is."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed."
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The field Service."
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The bookable item."
+    },
+    "state": {
+      "type": "string",
+      "description": "Where the booking stands after the change.",
+      "enum": [
+        "paying",
+        "awaiting_confirmation",
+        "confirmed",
+        "en_route",
+        "arrived",
+        "in_progress",
+        "collected",
+        "returning",
+        "completed",
+        "disputed",
+        "not_done",
+        "not_available",
+        "cancelled",
+        "declined",
+        "expired"
+      ]
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The slot's start; for pickup and return, the pickup's."
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the job is expected to end."
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Its Agent, once confirmed."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The booking's version after the change."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "kind": {
+      "type": "string",
+      "description": "Which: `evening_before` or `hour_before`.",
+      "enum": [
+        "evening_before",
+        "hour_before"
+      ]
+    }
+  }
+}

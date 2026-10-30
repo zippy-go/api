@@ -1,0 +1,33 @@
+type: object
+description: An add-on of a service.
+required:
+  - item_id
+  - name
+  - price
+  - minutes
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The add-on.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d201
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price.
+  minutes:
+    type: integer
+    description: The time it adds.
+    examples:
+      - 30
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d201
+    name:
+      en: Balcony
+    price:
+      minor_units: 29900
+      currency: INR
+    minutes: 30

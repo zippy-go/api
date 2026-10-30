@@ -115,9 +115,10 @@
       "type": "string",
       "enum": [
         "delivery",
-        "pickup"
+        "pickup",
+        "on_site"
       ],
-      "description": "Delivery or pickup.",
+      "description": "Delivery or pickup, or `on_site` for a booking's order.",
       "examples": [
         "delivery"
       ]

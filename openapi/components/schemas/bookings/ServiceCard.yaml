@@ -1,0 +1,117 @@
+type: object
+description: A bookable service as the services document publishes it.
+required:
+  - item_id
+  - variant_id
+  - name
+  - description
+  - picture_url
+  - price
+  - price_kind
+  - duration_minutes
+  - pickup_return
+  - turnaround_hours
+  - qualifications
+  - included
+  - excluded
+  - customer_provides
+  - add_ons
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  variant_id:
+    type: string
+    format: uuid
+    description: Its variant.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d101
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  description:
+    oneOf:
+      - $ref: ../catalog/LocalizedText.yaml
+      - type: "null"
+    description: What it is.
+  picture_url:
+    type:
+      - string
+      - "null"
+    description: Its picture.
+    examples:
+      - null
+  price:
+    $ref: ../common/Money.yaml
+    description: The fixed price, or the visit charge of a service priced from.
+  price_kind:
+    $ref: ./BookingPriceKind.yaml
+    description: Fixed, or from.
+  duration_minutes:
+    type: integer
+    description: Its duration.
+    examples:
+      - 60
+  pickup_return:
+    type: boolean
+    description: Picked up and returned as two legs.
+    examples:
+      - false
+  turnaround_hours:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the hours between the legs at least.
+    examples:
+      - null
+  qualifications:
+    type: array
+    items:
+      type: string
+    description: What an Agent needs.
+  included:
+    type: array
+    items:
+      type: string
+    description: What the price includes.
+  excluded:
+    type: array
+    items:
+      type: string
+    description: What it leaves out.
+  customer_provides:
+    type: array
+    items:
+      type: string
+    description: What the customer provides.
+  add_ons:
+    type: array
+    items:
+      $ref: ./ServiceAddOn.yaml
+    description: Its add-ons.
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    variant_id: 019a3d10-2b00-7d00-8a00-00000000d101
+    name:
+      en: AC service, split unit
+    description:
+      en: Indoor and outdoor unit serviced, filters and coils cleaned.
+    picture_url: null
+    price:
+      minor_units: 49900
+      currency: INR
+    price_kind: fixed
+    duration_minutes: 60
+    pickup_return: false
+    turnaround_hours: null
+    qualifications:
+      - ac_technician
+    included:
+      - Filter and coil cleaning
+    excluded:
+      - Gas top-up, an extra approved on site
+    customer_provides: []
+    add_ons: []

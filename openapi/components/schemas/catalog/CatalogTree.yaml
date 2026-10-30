@@ -109,6 +109,8 @@ examples:
         version: 3
         course: mains
         station_ids: []
+        kind: product
+        booking: null
       0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102:
         id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc102
         name:
@@ -136,3 +138,5 @@ examples:
         version: 1
         course: mains
         station_ids: []
+        kind: product
+        booking: null

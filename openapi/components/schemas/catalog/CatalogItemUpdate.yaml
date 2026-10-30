@@ -109,6 +109,14 @@ properties:
       format: uuid
     maxItems: 12
     description: The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
+  kind:
+    $ref: ./CatalogItemKind.yaml
+    description: A product (the default), or bookable work, which needs `booking`.
+  booking:
+    oneOf:
+      - $ref: ./BookableFactsInput.yaml
+      - type: "null"
+    description: What makes it bookable work, for kind `bookable`; `null` for a product.
 examples:
   - description:
       en: Slow-cooked over the dum.

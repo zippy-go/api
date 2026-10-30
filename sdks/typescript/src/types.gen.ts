@@ -3252,7 +3252,7 @@ export type FieldServiceSettings = {
      */
     booking_window_days?: number;
     /**
-     * The buffer between jobs, in minutes.
+     * The travel buffer either side of a job, 0 to 120 minutes; 30 by default.
      */
     buffer_minutes?: number;
     /**
@@ -3264,9 +3264,13 @@ export type FieldServiceSettings = {
      */
     min_notice_minutes?: number;
     /**
-     * The slot length, 15, 30 or 60 minutes.
+     * The slot length, 15, 30 or 60 minutes; 30 by default.
      */
     slot_minutes?: number;
+    /**
+     * How it takes bookings here: the window to confirm, the window to cancel free and the fee after it, the visit charge, paying after the job and confirming by itself. A booking keeps it as it was when booked.
+     */
+    booking_policy?: FieldBookingPolicy;
 };
 
 /**
@@ -11348,6 +11352,10 @@ export type StoreCard = {
      * Its live plans, as Daily Essentials' cards show them; empty when it offers none. Since 0.24.0.
      */
     plans?: Array<StorePlanCard>;
+    /**
+     * A field service store's services: the first three, the lowest price and the next open slot; `null` for a store without bookable services.
+     */
+    services?: StoreServices | null;
 };
 
 /**
@@ -12453,6 +12461,14 @@ export type CatalogItem = {
      * The kitchen stations it shows at, of its Location; empty for every station.
      */
     station_ids: Array<string>;
+    /**
+     * A product, or bookable work.
+     */
+    kind: CatalogItemKind;
+    /**
+     * What makes it bookable work; `null` for a product.
+     */
+    booking: BookableFacts | null;
 };
 
 /**
@@ -12537,6 +12553,14 @@ export type CatalogItemCreate = {
      * The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
      */
     station_ids?: Array<string>;
+    /**
+     * A product (the default), or bookable work, which needs `booking`.
+     */
+    kind?: CatalogItemKind;
+    /**
+     * What makes it bookable work, for kind `bookable`; `null` for a product.
+     */
+    booking?: BookableFactsInput | null;
 };
 
 /**
@@ -12621,6 +12645,14 @@ export type CatalogItemUpdate = {
      * The kitchen stations it shows at, each one of its Location's (`station_unknown` otherwise); empty for every station.
      */
     station_ids?: Array<string>;
+    /**
+     * A product (the default), or bookable work, which needs `booking`.
+     */
+    kind?: CatalogItemKind;
+    /**
+     * What makes it bookable work, for kind `bookable`; `null` for a product.
+     */
+    booking?: BookableFactsInput | null;
 };
 
 /**
@@ -12715,6 +12747,14 @@ export type CatalogItemRow = {
      * The kitchen stations it shows at, of its Location; empty for every station.
      */
     station_ids: Array<string>;
+    /**
+     * A product, or bookable work.
+     */
+    kind: CatalogItemKind;
+    /**
+     * What makes it bookable work; `null` for a product.
+     */
+    booking: BookableFacts | null;
 };
 
 /**
@@ -16720,9 +16760,9 @@ export type TrialBalance = {
 export type OrderStatus = 'paying' | 'placed' | 'accepted' | 'ready' | 'on_its_way' | 'completed' | 'undelivered' | 'declined' | 'cancelled' | 'expired';
 
 /**
- * How an order leaves the store: delivered to the customer, or collected at the counter.
+ * How an order is fulfilled: delivered to the customer, collected at the counter, or `on_site`, a booking's work done at the customer's place.
  */
-export type OrderFulfilment = 'delivery' | 'pickup';
+export type OrderFulfilment = 'delivery' | 'pickup' | 'on_site';
 
 /**
  * How what the Wallet does not cover is paid: UPI, a card, or cash to the agent or at the counter.
@@ -18308,6 +18348,10 @@ export type CustomerOrder = {
      * The subscription it was generated for, and its delivery day; `null` for any other order. Since 0.24.0.
      */
     subscription?: OrderOccurrence | null;
+    /**
+     * The booking an order of fulfilment on site is; its page has the slot, the Agent, the estimate, the extras and the proof. `null` for any other order.
+     */
+    booking_id?: string | null;
 };
 
 /**
@@ -18684,6 +18728,10 @@ export type StoreOrder = {
      * When a scheduled order was sent to the store, or accepted early; `null` for an order for now and one still waiting. Since 0.24.0.
      */
     released_at?: string | null;
+    /**
+     * The booking an order of fulfilment on site is, with its slot; `null` for any other order.
+     */
+    booking?: StoreOrderBooking | null;
 };
 
 /**
@@ -33508,6 +33556,1844 @@ export type KitchenMarkResults = {
      * The changes cursor after the marks.
      */
     cursor: string;
+};
+
+/**
+ * Where a booking stands: `paying` until its payment at booking is made; `awaiting_confirmation` until the Location confirms it within its window; `confirmed` with an Agent; `en_route`, `arrived` and `in_progress` (started) as the Agent moves; for pickup and return, `collected` once the pickup leg is done and `returning` once the return leg is asked; then `completed`. It may end `disputed` (the customer would not sign), `not_done` (the estimate declined), `not_available` (the customer was not there), `cancelled`, `declined` (by the Location, or not answered in time) or `expired` (never paid).
+ */
+export type BookingState = 'paying' | 'awaiting_confirmation' | 'confirmed' | 'en_route' | 'arrived' | 'in_progress' | 'collected' | 'returning' | 'completed' | 'disputed' | 'not_done' | 'not_available' | 'cancelled' | 'declined' | 'expired';
+
+/**
+ * How a service is priced: `fixed`, paid in full at booking (or after the job where the Location allows it), or `from`, a visit charge paid at booking and off the final bill, with the price confirmed on site as an estimate the customer approves.
+ */
+export type BookingPriceKind = 'fixed' | 'from';
+
+/**
+ * Where an estimate or an extra stands with the customer: `waiting`, `approved` or `declined`. One never answered is not done and not charged.
+ */
+export type BookingApprovalState = 'waiting' | 'approved' | 'declined';
+
+/**
+ * What waits for the customer: an `estimate` or an `extra`.
+ */
+export type BookingApprovalKind = 'estimate' | 'extra';
+
+/**
+ * The customer's answer: `approve` or `decline`.
+ */
+export type BookingDecision = 'approve' | 'decline';
+
+/**
+ * A leg of a pickup and return service: the `pickup` at the door, or the `return`.
+ */
+export type BookingLegKind = 'pickup' | 'return';
+
+/**
+ * Where a leg stands: `requested` of the Agents, `collected` (a pickup done, the items counted), `returned` (the return done with a photo at the door), or `cancelled`.
+ */
+export type BookingLegState = 'requested' | 'collected' | 'returned' | 'cancelled';
+
+/**
+ * A step of the job: `en_route`, `arrived`, `started` (once an estimate is approved where there is one), `completed` (with a photo of the work and the customer's signature or their one-time code), `not_available` (the customer was not there after fifteen minutes and two calls, with a photo), or `disputed` (the customer would not sign, with their words).
+ */
+export type BookingStepKind = 'en_route' | 'arrived' | 'started' | 'completed' | 'not_available' | 'disputed';
+
+/**
+ * Why a booking was declined: `no_availability`, `outside_area`, `customer_asked` or `other` with a note, by the Location; `not_answered` when its confirmation window ended.
+ */
+export type BookingDeclineReason = 'no_availability' | 'outside_area' | 'customer_asked' | 'other' | 'not_answered';
+
+/**
+ * Why the customer cancelled: `changed_my_mind`, `booked_by_mistake`, `agent_late` or `other`.
+ */
+export type BookingCancelReason = 'changed_my_mind' | 'booked_by_mistake' | 'agent_late' | 'other';
+
+/**
+ * How a booking's money is paid: `upi` or `card` on the provider's page, the `wallet`, or `cash` taken by the Agent, who records it.
+ */
+export type BookingPaymentMethod = 'upi' | 'card' | 'wallet' | 'cash';
+
+/**
+ * When a payment was made: `at_booking`, or `on_completion` for what remained.
+ */
+export type BookingPaymentStage = 'at_booking' | 'on_completion';
+
+/**
+ * What a line of the bill is: the `service` at its fixed price, an `add_on`, the `visit_charge` of a service priced from, the approved `estimate`, an approved `extra`, or a `fee` kept on cancelling.
+ */
+export type BookingBillLineKind = 'service' | 'add_on' | 'visit_charge' | 'estimate' | 'extra' | 'fee';
+
+/**
+ * Why no slot is offered: `outside_area` (the service does not come to the address), `no_qualified_agent` (no Agent of the service holds the qualifications it needs), `no_availability` (nobody is free that day), `closed` (the service does not work that day), or `out_of_window` (sooner than the notice or beyond the booking window).
+ */
+export type ServiceSlotsReason = 'outside_area' | 'no_qualified_agent' | 'no_availability' | 'closed' | 'out_of_window';
+
+/**
+ * How a day's calendar is laid out: a column per `agent`, or per `service`.
+ */
+export type BookingDayGroup = 'agent' | 'service';
+
+/**
+ * What an item is: a `product` sold from the menu, or `bookable` work done at the customer's place, published in the services document and booked into a slot.
+ */
+export type CatalogItemKind = 'product' | 'bookable';
+
+/**
+ * What makes an item bookable work, the `BookableFacts` schema: its duration in steps of 15 minutes, how it is priced (its variant's price is the fixed price, or the visit charge of a service priced from), the qualifications an Agent needs, what is included and left out, what the customer provides, a narrower area than the Service's, and whether it is picked up and returned with a turnaround; with the duration jobs really take once twenty are done.
+ */
+export type BookableFacts = {
+    /**
+     * How long the job takes, in steps of 15 minutes from 15 to 720.
+     */
+    duration_minutes: number;
+    /**
+     * Fixed, or from with an estimate on site.
+     */
+    price_kind: BookingPriceKind;
+    /**
+     * The qualifications an Agent needs, codes of the field Service's list.
+     */
+    qualifications: Array<string>;
+    /**
+     * What the price includes, a sentence each.
+     */
+    included: Array<string>;
+    /**
+     * What it leaves out, a sentence each.
+     */
+    excluded: Array<string>;
+    /**
+     * What the customer provides, a sentence each.
+     */
+    customer_provides: Array<string>;
+    /**
+     * A narrower area than the field Service's, in kilometres around the Location; `null` for the Service's.
+     */
+    area_km: number | null;
+    /**
+     * Picked up at the door and returned, as two legs: laundry, repairs taken away.
+     */
+    pickup_return: boolean;
+    /**
+     * For pickup and return, the hours between the pickup and the earliest return.
+     */
+    turnaround_hours: number | null;
+    /**
+     * The average of the last twenty completed jobs, once there are twenty; slots then use it. `null` before.
+     */
+    measured_duration_minutes: number | null;
+    /**
+     * How many completed jobs the measure counts, up to twenty.
+     */
+    measured_jobs: number;
+};
+
+/**
+ * An item's bookable facts as set, the `BookableFactsInput` schema.
+ */
+export type BookableFactsInput = {
+    /**
+     * How long the job takes, in steps of 15 minutes from 15 to 720.
+     */
+    duration_minutes: number;
+    /**
+     * Fixed, or from with an estimate on site.
+     */
+    price_kind: BookingPriceKind;
+    /**
+     * The qualifications an Agent needs.
+     */
+    qualifications?: Array<string>;
+    /**
+     * What the price includes, at most 20.
+     */
+    included?: Array<string>;
+    /**
+     * What it leaves out, at most 20.
+     */
+    excluded?: Array<string>;
+    /**
+     * What the customer provides, at most 20.
+     */
+    customer_provides?: Array<string>;
+    /**
+     * A narrower area than the field Service's, 1 to 25 kilometres.
+     */
+    area_km?: number | null;
+    /**
+     * Picked up and returned as two legs.
+     */
+    pickup_return?: boolean;
+    /**
+     * For pickup and return, 1 to 336 hours.
+     */
+    turnaround_hours?: number | null;
+};
+
+/**
+ * How a field Service takes bookings at a Location, the `FieldBookingPolicy` schema: the window to confirm, the window to cancel free with the fee after it, the visit charge kept once the Agent is on the way, paying after the job, and confirming by itself. A booking keeps the policy as it was when booked.
+ */
+export type FieldBookingPolicy = {
+    /**
+     * Minutes the Location has to confirm a booking, 15 to 240; 60 by default. Unconfirmed, it is declined as not answered and refunded.
+     */
+    confirmation_minutes: number;
+    /**
+     * Hours before the slot from which cancelling costs a fee, 2 to 24; 2 by default.
+     */
+    cancellation_window_hours: number;
+    /**
+     * The fee for cancelling inside the window, a share of a fixed price, 0 to 50; 20 by default. A service priced from keeps its visit charge instead.
+     */
+    late_fee_percent: number;
+    /**
+     * Kept once the Agent is on the way, or when the customer is not there; ₹99 by default.
+     */
+    visit_charge: Money;
+    /**
+     * Whether a fixed price may be paid after the job, in cash to the Agent.
+     */
+    pay_after_job: boolean;
+    /**
+     * Whether a booking confirms itself with the Agent whose time made the slot.
+     */
+    confirm_automatically: boolean;
+};
+
+/**
+ * The policy a booking keeps as it was when booked, the `BookingPolicy` schema, with its words.
+ */
+export type BookingPolicy = {
+    /**
+     * Minutes the Location had to confirm.
+     */
+    confirmation_minutes: number;
+    /**
+     * Hours before the slot from which cancelling costs a fee.
+     */
+    cancellation_window_hours: number;
+    /**
+     * The fee inside the window, a share of the fixed price.
+     */
+    late_fee_percent: number;
+    /**
+     * Kept once the Agent is on the way, or when the customer is not there.
+     */
+    visit_charge: Money;
+    /**
+     * Whether the price may be paid after the job.
+     */
+    pay_after_job: boolean;
+    /**
+     * Whether bookings confirm themselves.
+     */
+    confirm_automatically: boolean;
+    /**
+     * The policy in plain words, as the service's page says it.
+     */
+    words: string;
+};
+
+/**
+ * The Location a booking is with.
+ */
+export type BookingLocation = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+};
+
+/**
+ * The service booked, as it was when booked.
+ */
+export type BookingService = {
+    /**
+     * The bookable item.
+     */
+    item_id: string;
+    /**
+     * Its variant.
+     */
+    variant_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Fixed, or from with an estimate on site.
+     */
+    price_kind: BookingPriceKind;
+    /**
+     * The fixed price, or the visit charge of a service priced from.
+     */
+    price: Money;
+    /**
+     * The duration booked, with the add-ons.
+     */
+    duration_minutes: number;
+    /**
+     * Picked up and returned as two legs.
+     */
+    pickup_return: boolean;
+    /**
+     * For pickup and return, the hours between the legs at least.
+     */
+    turnaround_hours: number | null;
+};
+
+/**
+ * An add-on booked, as it was.
+ */
+export type BookingAddOn = {
+    /**
+     * The add-on, an answer of the service's question.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * Its price each.
+     */
+    price: Money;
+    /**
+     * The time each adds.
+     */
+    minutes: number;
+};
+
+/**
+ * An add-on chosen.
+ */
+export type BookingAddOnInput = {
+    /**
+     * The add-on, an answer of one of the service's questions.
+     */
+    item_id: string;
+    /**
+     * How many, 1 to 10; 1 by default.
+     */
+    quantity?: number;
+};
+
+/**
+ * Where the job is: one of the customer's saved addresses as it was when booked.
+ */
+export type BookingAddress = {
+    /**
+     * The saved address it came from.
+     */
+    address_id: string | null;
+    /**
+     * The first line.
+     */
+    line1: string;
+    /**
+     * The second line.
+     */
+    line2: string | null;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * The PIN code.
+     */
+    postal_code: string | null;
+    /**
+     * Its latitude.
+     */
+    lat: number;
+    /**
+     * Its longitude.
+     */
+    lng: number;
+};
+
+/**
+ * The Agent doing the job, as the customer sees them.
+ */
+export type BookingAgent = {
+    /**
+     * The Agent.
+     */
+    agent_id: string;
+    /**
+     * Their first name.
+     */
+    first_name: string;
+    /**
+     * A signed link to their photo, when they have one.
+     */
+    photo_url: string | null;
+    /**
+     * Their rating out of 5, when counted.
+     */
+    rating: number | null;
+};
+
+/**
+ * The price confirmed on site for a service priced from, or the price after a pickup.
+ */
+export type BookingEstimate = {
+    /**
+     * The estimate.
+     */
+    amount: Money;
+    /**
+     * What it covers.
+     */
+    note: string | null;
+    /**
+     * Whether the customer approved it.
+     */
+    state: BookingApprovalState;
+    /**
+     * For pickup and return, the items the Partner priced.
+     */
+    items_counted: number | null;
+    /**
+     * For pickup and return, the items counted at the pickup.
+     */
+    pickup_count: number | null;
+    /**
+     * For pickup and return, a signed link to the pickup's photo.
+     */
+    pickup_photo_url: string | null;
+    /**
+     * A signed link to a photo with the estimate.
+     */
+    photo_url: string | null;
+    /**
+     * When it was recorded.
+     */
+    recorded_at: string;
+    /**
+     * When the customer answered.
+     */
+    decided_at: string | null;
+};
+
+/**
+ * Work proposed during the job; only an approved one is done and charged.
+ */
+export type BookingExtra = {
+    /**
+     * The extra.
+     */
+    extra_id: string;
+    /**
+     * What it is.
+     */
+    description: string;
+    /**
+     * Its price.
+     */
+    amount: Money;
+    /**
+     * A signed link to its photo.
+     */
+    photo_url: string | null;
+    /**
+     * Whether the customer approved it.
+     */
+    state: BookingApprovalState;
+    /**
+     * When it was proposed.
+     */
+    proposed_at: string;
+    /**
+     * When the customer answered.
+     */
+    decided_at: string | null;
+};
+
+/**
+ * A leg of a pickup and return service.
+ */
+export type BookingLeg = {
+    /**
+     * The leg.
+     */
+    leg_id: string;
+    /**
+     * Pickup or return.
+     */
+    kind: BookingLegKind;
+    /**
+     * Its slot's start.
+     */
+    starts_at: string;
+    /**
+     * Its slot's end.
+     */
+    ends_at: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingLegState;
+    /**
+     * The items counted at the door, for the pickup.
+     */
+    items_counted: number | null;
+    /**
+     * A signed link to the photo at the door.
+     */
+    photo_url: string | null;
+    /**
+     * When it was done.
+     */
+    done_at: string | null;
+};
+
+/**
+ * A line of a booking's bill.
+ */
+export type BookingBillLine = {
+    /**
+     * What it is.
+     */
+    kind: BookingBillLineKind;
+    /**
+     * Its words.
+     */
+    name: string;
+    /**
+     * Its amount.
+     */
+    amount: Money;
+};
+
+/**
+ * A payment of a booking.
+ */
+export type BookingPayment = {
+    /**
+     * What was paid.
+     */
+    amount: Money;
+    /**
+     * How.
+     */
+    method: BookingPaymentMethod;
+    /**
+     * At booking, or on completion.
+     */
+    stage: BookingPaymentStage;
+    /**
+     * The provider's reference, masked.
+     */
+    reference: string | null;
+    /**
+     * When.
+     */
+    paid_at: string;
+};
+
+/**
+ * A booking's bill: the work at its price as approved, what was paid and refunded, and what remains.
+ */
+export type BookingBill = {
+    /**
+     * The lines.
+     */
+    lines: Array<BookingBillLine>;
+    /**
+     * The bill: what the work costs as approved, or the fee kept.
+     */
+    total: Money;
+    /**
+     * The GST the bill includes.
+     */
+    tax_included: Money;
+    /**
+     * What was paid.
+     */
+    paid: Money;
+    /**
+     * What went back.
+     */
+    refunded: Money;
+    /**
+     * A fee or visit charge kept on cancelling.
+     */
+    fee_kept: Money | null;
+    /**
+     * What remains to pay.
+     */
+    remaining: Money;
+    /**
+     * Each payment.
+     */
+    payments: Array<BookingPayment>;
+};
+
+/**
+ * What the job was completed with.
+ */
+export type BookingProof = {
+    /**
+     * A signed link to the photo of the work.
+     */
+    photo_url: string | null;
+    /**
+     * A signed link to the customer's signature.
+     */
+    signature_url: string | null;
+    /**
+     * Completed with the customer's one-time code instead of a signature.
+     */
+    code_used: boolean;
+    /**
+     * When.
+     */
+    completed_at: string;
+};
+
+/**
+ * When a booking moved.
+ */
+export type BookingTimes = {
+    /**
+     * Paid and placed.
+     */
+    placed_at: string | null;
+    /**
+     * Confirmed.
+     */
+    confirmed_at: string | null;
+    /**
+     * The Agent on the way.
+     */
+    en_route_at: string | null;
+    /**
+     * Arrived.
+     */
+    arrived_at: string | null;
+    /**
+     * Started.
+     */
+    started_at: string | null;
+    /**
+     * Completed.
+     */
+    completed_at: string | null;
+    /**
+     * Ended otherwise.
+     */
+    ended_at: string | null;
+};
+
+/**
+ * What the customer may do now.
+ */
+export type BookingActions = {
+    /**
+     * Move it to another slot, free until the cancellation window.
+     */
+    reschedule: boolean;
+    /**
+     * Cancel it, with the fee shown first.
+     */
+    cancel: boolean;
+    /**
+     * Pay what remains.
+     */
+    pay: boolean;
+};
+
+/**
+ * A booking as the customer sees it, the `Booking` schema: an order of fulfilment on site with its slot, address, Agent, policy as booked, estimate, extras, legs, bill and proof.
+ */
+export type Booking = {
+    /**
+     * The booking.
+     */
+    id: string;
+    /**
+     * Its number, the order's.
+     */
+    number: string;
+    /**
+     * The order of fulfilment on site it is.
+     */
+    order_id: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingState;
+    /**
+     * The Location.
+     */
+    location: BookingLocation;
+    /**
+     * The service booked.
+     */
+    service: BookingService;
+    /**
+     * The slot's start; for pickup and return, the pickup's.
+     */
+    starts_at: string;
+    /**
+     * When the job is expected to end.
+     */
+    ends_at: string;
+    /**
+     * The add-ons booked.
+     */
+    add_ons: Array<BookingAddOn>;
+    /**
+     * Where.
+     */
+    address: BookingAddress;
+    /**
+     * The customer's access instructions.
+     */
+    instructions: string | null;
+    /**
+     * The Agent once confirmed.
+     */
+    agent: BookingAgent | null;
+    /**
+     * The policy as it was when booked.
+     */
+    policy: BookingPolicy;
+    /**
+     * The estimate, for a service priced from or after a pickup.
+     */
+    estimate: BookingEstimate | null;
+    /**
+     * Extras proposed.
+     */
+    extras: Array<BookingExtra>;
+    /**
+     * The legs of a pickup and return service.
+     */
+    legs: Array<BookingLeg>;
+    /**
+     * The bill.
+     */
+    bill: BookingBill;
+    /**
+     * The photo and signature, once completed.
+     */
+    proof: BookingProof | null;
+    /**
+     * What the customer does next to pay, while a payment waits.
+     */
+    payment: NextAction | null;
+    /**
+     * What the customer may do now.
+     */
+    can: BookingActions;
+    /**
+     * When it moved.
+     */
+    times: BookingTimes;
+    /**
+     * Why it was declined.
+     */
+    decline_reason: BookingDeclineReason | null;
+    /**
+     * Why it was cancelled.
+     */
+    cancel_reason: string | null;
+    /**
+     * The customer's words when they would not sign.
+     */
+    dispute: string | null;
+    /**
+     * No Agent arrived thirty minutes after the slot's end: the customer may cancel with everything refunded.
+     */
+    running_late: boolean;
+    /**
+     * When it was booked.
+     */
+    created_at: string;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * The customer's one-time code, which the Agent enters to complete the job when the customer will not sign on the Agent's phone; shown from the Agent's arrival until the job ends.
+     */
+    completion_code: string | null;
+};
+
+/**
+ * A booking as its Location and Mission Control see it, the `StoreBooking` schema: the customer's booking with the customer's first name and number for the day, the Agent proposed, the job's task, and whether it was missed.
+ */
+export type StoreBooking = {
+    /**
+     * The booking.
+     */
+    id: string;
+    /**
+     * Its number, the order's.
+     */
+    number: string;
+    /**
+     * The order of fulfilment on site it is.
+     */
+    order_id: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingState;
+    /**
+     * The Location.
+     */
+    location: BookingLocation;
+    /**
+     * The service booked.
+     */
+    service: BookingService;
+    /**
+     * The slot's start; for pickup and return, the pickup's.
+     */
+    starts_at: string;
+    /**
+     * When the job is expected to end.
+     */
+    ends_at: string;
+    /**
+     * The add-ons booked.
+     */
+    add_ons: Array<BookingAddOn>;
+    /**
+     * Where.
+     */
+    address: BookingAddress;
+    /**
+     * The customer's access instructions.
+     */
+    instructions: string | null;
+    /**
+     * The Agent once confirmed.
+     */
+    agent: BookingAgent | null;
+    /**
+     * The policy as it was when booked.
+     */
+    policy: BookingPolicy;
+    /**
+     * The estimate, for a service priced from or after a pickup.
+     */
+    estimate: BookingEstimate | null;
+    /**
+     * Extras proposed.
+     */
+    extras: Array<BookingExtra>;
+    /**
+     * The legs of a pickup and return service.
+     */
+    legs: Array<BookingLeg>;
+    /**
+     * The bill.
+     */
+    bill: BookingBill;
+    /**
+     * The photo and signature, once completed.
+     */
+    proof: BookingProof | null;
+    /**
+     * What the customer does next to pay, while a payment waits.
+     */
+    payment: NextAction | null;
+    /**
+     * What the customer may do now.
+     */
+    can: BookingActions;
+    /**
+     * When it moved.
+     */
+    times: BookingTimes;
+    /**
+     * Why it was declined.
+     */
+    decline_reason: BookingDeclineReason | null;
+    /**
+     * Why it was cancelled.
+     */
+    cancel_reason: string | null;
+    /**
+     * The customer's words when they would not sign.
+     */
+    dispute: string | null;
+    /**
+     * No Agent arrived thirty minutes after the slot's end: the customer may cancel with everything refunded.
+     */
+    running_late: boolean;
+    /**
+     * When it was booked.
+     */
+    created_at: string;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * The customer's first name.
+     */
+    customer_first_name: string | null;
+    /**
+     * The number to reach the customer on the day.
+     */
+    contact_phone: string | null;
+    /**
+     * The Agent whose time made the slot.
+     */
+    proposed_agent: BookingAgent | null;
+    /**
+     * The job's task in the workforce, once asked.
+     */
+    task_id: string | null;
+    /**
+     * The field Service.
+     */
+    service_id: string;
+    /**
+     * No Agent arrived thirty minutes after the slot's end.
+     */
+    missed: boolean;
+};
+
+/**
+ * A booking in a list.
+ */
+export type BookingSummary = {
+    /**
+     * The booking.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingState;
+    /**
+     * The service.
+     */
+    service_name: string;
+    /**
+     * The Location.
+     */
+    location: BookingLocation;
+    /**
+     * The slot's start.
+     */
+    starts_at: string;
+    /**
+     * When the job is expected to end.
+     */
+    ends_at: string;
+    /**
+     * The Agent, once confirmed.
+     */
+    agent_first_name: string | null;
+    /**
+     * The bill so far.
+     */
+    total: Money;
+    /**
+     * When it was booked.
+     */
+    created_at: string;
+};
+
+/**
+ * A customer's bookings, the latest slot first.
+ */
+export type BookingList = {
+    /**
+     * The bookings.
+     */
+    items: Array<BookingSummary>;
+    /**
+     * The cursor of the next page, `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A slot to hold while the customer books.
+ */
+export type BookingHoldRequest = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * The slot's start, as offered.
+     */
+    starts_at: string;
+    /**
+     * The add-ons, which lengthen the job.
+     */
+    add_ons?: Array<BookingAddOnInput>;
+    /**
+     * The saved address, checked against the area.
+     */
+    address_id?: string | null;
+};
+
+/**
+ * A slot held for ten minutes.
+ */
+export type BookingHold = {
+    /**
+     * The hold.
+     */
+    hold_id: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * The slot's start.
+     */
+    starts_at: string;
+    /**
+     * The job's expected end.
+     */
+    ends_at: string;
+    /**
+     * When the hold lapses.
+     */
+    expires_at: string;
+};
+
+/**
+ * Booking a slot, the `BookingRequest` schema: the held slot (or the slot itself), the add-ons, one of the customer's saved addresses inside the area, access instructions, a number for the day (the account's by default), the way to pay, and for pickup and return the return slot.
+ */
+export type BookingRequest = {
+    /**
+     * The slot held; else `location_id`, `item_id` and `starts_at` name a slot still open.
+     */
+    hold_id?: string | null;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * The slot's start; for pickup and return, the pickup's.
+     */
+    starts_at?: string;
+    /**
+     * The add-ons.
+     */
+    add_ons?: Array<BookingAddOnInput>;
+    /**
+     * The saved address.
+     */
+    address_id: string;
+    /**
+     * Access instructions, up to 300 characters.
+     */
+    instructions?: string | null;
+    /**
+     * A number to reach the customer on the day; the account's by default.
+     */
+    contact_phone?: string | null;
+    /**
+     * How to pay at booking: `upi`, `card` or `wallet`, or `cash` after the job where the Location allows it.
+     */
+    payment_method: BookingPaymentMethod;
+    /**
+     * Whether the Wallet pays first.
+     */
+    use_wallet?: boolean;
+    /**
+     * A saved card or UPI ID of the method.
+     */
+    saved_method_id?: string | null;
+    /**
+     * For pickup and return, the return slot, no sooner than the turnaround; `null` to have the Partner propose one after pricing.
+     */
+    return_starts_at?: string | null;
+    /**
+     * Where the provider's page sends the customer back; the booking's page by default.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A booking placed, with what the customer does next to pay.
+ */
+export type PlacedBooking = {
+    /**
+     * The booking.
+     */
+    booking: Booking;
+    /**
+     * The provider's page while the payment waits.
+     */
+    next_action: NextAction | null;
+};
+
+/**
+ * Moving a booking to another open slot.
+ */
+export type BookingReschedule = {
+    /**
+     * The new slot's start.
+     */
+    starts_at: string;
+    /**
+     * The new slot held, if it was.
+     */
+    hold_id?: string | null;
+};
+
+/**
+ * What cancelling now costs, shown before the customer confirms.
+ */
+export type BookingCancellation = {
+    /**
+     * Whether the customer may cancel here; once the job started, it is through Get help.
+     */
+    allowed: boolean;
+    /**
+     * The fee kept.
+     */
+    fee: Money;
+    /**
+     * What goes back the way it was paid.
+     */
+    refund: Money;
+    /**
+     * The sentence to show.
+     */
+    words: string;
+};
+
+/**
+ * Cancelling a booking.
+ */
+export type BookingCancel = {
+    /**
+     * Why.
+     */
+    reason?: BookingCancelReason;
+    /**
+     * A note, for `other`.
+     */
+    note?: string | null;
+};
+
+/**
+ * The return slot of a pickup and return service.
+ */
+export type BookingReturnSlot = {
+    /**
+     * The return slot's start, no sooner than the turnaround after the pickup.
+     */
+    starts_at: string;
+};
+
+/**
+ * Paying what remains.
+ */
+export type BookingPaymentRequest = {
+    /**
+     * `upi`, `card` or `wallet`.
+     */
+    method: BookingPaymentMethod;
+    /**
+     * Whether the Wallet pays first.
+     */
+    use_wallet?: boolean;
+    /**
+     * A saved card or UPI ID.
+     */
+    saved_method_id?: string | null;
+    /**
+     * Where the provider's page sends the customer back.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A payment of what remains, started.
+ */
+export type BookingPaymentStarted = {
+    /**
+     * The booking.
+     */
+    booking: Booking;
+    /**
+     * What is being paid.
+     */
+    amount: Money;
+    /**
+     * The provider's page while the payment waits.
+     */
+    next_action: NextAction | null;
+};
+
+/**
+ * An estimate or an extra waiting for the customer, as its link shows it, the `BookingApproval` schema.
+ */
+export type BookingApproval = {
+    /**
+     * What waits.
+     */
+    kind: BookingApprovalKind;
+    /**
+     * Whether it was answered.
+     */
+    state: BookingApprovalState;
+    /**
+     * The booking.
+     */
+    booking_number: string;
+    /**
+     * The service.
+     */
+    service_name: string;
+    /**
+     * The Location.
+     */
+    location_name: string;
+    /**
+     * What it is.
+     */
+    description: string;
+    /**
+     * Its price.
+     */
+    amount: Money;
+    /**
+     * A signed link to its photo.
+     */
+    photo_url: string | null;
+    /**
+     * For a price after a pickup, the items counted at the door.
+     */
+    pickup_count: number | null;
+    /**
+     * For a price after a pickup, the items priced.
+     */
+    items_counted: number | null;
+    /**
+     * For a price after a pickup, a signed link to the pickup's photo.
+     */
+    pickup_photo_url: string | null;
+    /**
+     * Until when the link works.
+     */
+    expires_at: string;
+};
+
+/**
+ * The customer's answer.
+ */
+export type BookingApprovalDecision = {
+    /**
+     * Approve or decline.
+     */
+    decision: BookingDecision;
+};
+
+/**
+ * A job on a day's calendar.
+ */
+export type BookingDayJob = {
+    /**
+     * The booking.
+     */
+    booking_id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingState;
+    /**
+     * The service.
+     */
+    service_name: string;
+    /**
+     * The slot's start.
+     */
+    starts_at: string;
+    /**
+     * The job's expected end.
+     */
+    ends_at: string;
+    /**
+     * The travel buffer before it.
+     */
+    buffer_before_minutes: number;
+    /**
+     * The travel buffer after it.
+     */
+    buffer_after_minutes: number;
+    /**
+     * Its Agent.
+     */
+    agent_id: string | null;
+    /**
+     * Its Agent's first name.
+     */
+    agent_first_name: string | null;
+    /**
+     * Where, the address's second line or city.
+     */
+    area: string;
+};
+
+/**
+ * A column of a day's calendar: an Agent's jobs, or a service's.
+ */
+export type BookingDayColumn = {
+    /**
+     * The Agent, by agent.
+     */
+    agent_id: string | null;
+    /**
+     * The service, by service.
+     */
+    item_id: string | null;
+    /**
+     * The column's heading.
+     */
+    name: string;
+    /**
+     * Its jobs in order.
+     */
+    jobs: Array<BookingDayJob>;
+};
+
+/**
+ * A service's set duration beside what its jobs take.
+ */
+export type BookingServiceDuration = {
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The duration set.
+     */
+    set_minutes: number;
+    /**
+     * The average of its last twenty completed jobs; `null` before any.
+     */
+    measured_minutes: number | null;
+    /**
+     * How many jobs the average counts.
+     */
+    measured_jobs: number;
+};
+
+/**
+ * A Location's bookings on a day, the `LocationBookingDay` schema: those awaiting confirmation apart, the rest in a column per Agent or per service with their travel buffers, and each service's set duration beside its measured one.
+ */
+export type LocationBookingDay = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The day, at the Location.
+     */
+    date: string;
+    /**
+     * How the columns are laid out.
+     */
+    group: BookingDayGroup;
+    /**
+     * Bookings awaiting confirmation.
+     */
+    awaiting: Array<BookingDayJob>;
+    /**
+     * The columns.
+     */
+    columns: Array<BookingDayColumn>;
+    /**
+     * Each service's durations.
+     */
+    services: Array<BookingServiceDuration>;
+};
+
+/**
+ * Confirming a booking.
+ */
+export type BookingConfirm = {
+    /**
+     * The Agent; the one proposed by default, or `null` to leave the service to choose the nearest one free with the qualifications.
+     */
+    agent_id?: string | null;
+};
+
+/**
+ * Declining a booking: everything paid goes back.
+ */
+export type BookingDecline = {
+    /**
+     * Why: `no_availability`, `outside_area`, `customer_asked` or `other`.
+     */
+    reason: BookingDeclineReason;
+    /**
+     * A note, for `other`.
+     */
+    note?: string | null;
+};
+
+/**
+ * Assigning or reassigning a booking, until its Agent is on the way.
+ */
+export type BookingAssign = {
+    /**
+     * The Agent, or `null` to leave the service to choose.
+     */
+    agent_id: string | null;
+};
+
+/**
+ * A step of the job, on the Agent's behalf, the `BookingStep` schema.
+ */
+export type BookingStep = {
+    /**
+     * The step.
+     */
+    step: BookingStepKind;
+    /**
+     * A photo uploaded as proof: of the work to complete, at the door when the customer is not there.
+     */
+    photo_asset_id?: string | null;
+    /**
+     * The customer's signature, uploaded as proof, to complete.
+     */
+    signature_asset_id?: string | null;
+    /**
+     * The customer's one-time code, to complete without a signature.
+     */
+    code?: string | null;
+    /**
+     * Why `arrived` was recorded away from the address.
+     */
+    override_reason?: string | null;
+    /**
+     * The customer's words, for `disputed`.
+     */
+    words?: string | null;
+};
+
+/**
+ * Recording an estimate, or the price after a pickup.
+ */
+export type BookingEstimateInput = {
+    /**
+     * The price of the work.
+     */
+    amount: Money;
+    /**
+     * What it covers.
+     */
+    note?: string | null;
+    /**
+     * For pickup and return, the items priced.
+     */
+    items_counted?: number | null;
+    /**
+     * A photo uploaded as proof.
+     */
+    photo_asset_id?: string | null;
+};
+
+/**
+ * Cash the Agent took for what remained.
+ */
+export type BookingCash = {
+    /**
+     * The cash taken, what remains.
+     */
+    amount: Money;
+};
+
+/**
+ * Proposing an extra.
+ */
+export type BookingExtraInput = {
+    /**
+     * What it is, 1 to 120 characters.
+     */
+    description: string;
+    /**
+     * Its price.
+     */
+    amount: Money;
+    /**
+     * A photo uploaded as proof.
+     */
+    photo_asset_id?: string | null;
+};
+
+/**
+ * A booking in Mission Control's list.
+ */
+export type PlatformBookingSummary = {
+    /**
+     * The booking.
+     */
+    id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * Where it stands.
+     */
+    state: BookingState;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Location.
+     */
+    location: BookingLocation;
+    /**
+     * The service.
+     */
+    service_name: string;
+    /**
+     * The slot's start.
+     */
+    starts_at: string;
+    /**
+     * Its Agent.
+     */
+    agent_first_name: string | null;
+    /**
+     * Declined because the Location did not answer in time.
+     */
+    not_answered: boolean;
+    /**
+     * No Agent arrived thirty minutes after the slot's end.
+     */
+    running_late: boolean;
+    /**
+     * The customer would not sign.
+     */
+    disputed: boolean;
+    /**
+     * The bill so far.
+     */
+    total: Money;
+    /**
+     * When it was booked.
+     */
+    created_at: string;
+};
+
+/**
+ * Bookings across Partners: those not answered, running late or disputed first, then the latest.
+ */
+export type PlatformBookingList = {
+    /**
+     * The bookings.
+     */
+    items: Array<PlatformBookingSummary>;
+    /**
+     * The cursor of the next page, `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An add-on of a service.
+ */
+export type ServiceAddOn = {
+    /**
+     * The add-on.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its price.
+     */
+    price: Money;
+    /**
+     * The time it adds.
+     */
+    minutes: number;
+};
+
+/**
+ * A bookable service as the services document publishes it.
+ */
+export type ServiceCard = {
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * Its variant.
+     */
+    variant_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * What it is.
+     */
+    description: LocalizedText | null;
+    /**
+     * Its picture.
+     */
+    picture_url: string | null;
+    /**
+     * The fixed price, or the visit charge of a service priced from.
+     */
+    price: Money;
+    /**
+     * Fixed, or from.
+     */
+    price_kind: BookingPriceKind;
+    /**
+     * Its duration.
+     */
+    duration_minutes: number;
+    /**
+     * Picked up and returned as two legs.
+     */
+    pickup_return: boolean;
+    /**
+     * For pickup and return, the hours between the legs at least.
+     */
+    turnaround_hours: number | null;
+    /**
+     * What an Agent needs.
+     */
+    qualifications: Array<string>;
+    /**
+     * What the price includes.
+     */
+    included: Array<string>;
+    /**
+     * What it leaves out.
+     */
+    excluded: Array<string>;
+    /**
+     * What the customer provides.
+     */
+    customer_provides: Array<string>;
+    /**
+     * Its add-ons.
+     */
+    add_ons: Array<ServiceAddOn>;
+};
+
+/**
+ * A Location's published services, the `ServicesDocument` schema, beside its menu with the menu's version.
+ */
+export type ServicesDocument = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The published version, the menu's.
+     */
+    version: number;
+    /**
+     * When it was published.
+     */
+    published_at: string;
+    /**
+     * The services.
+     */
+    services: Array<ServiceCard>;
+};
+
+/**
+ * A service's page, the `ServicePage` schema: the service, its policy in plain words, its rating, its area and whether it comes to the address given.
+ */
+export type ServicePage = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The Location's name.
+     */
+    store_name: string;
+    /**
+     * The service.
+     */
+    service: ServiceCard;
+    /**
+     * The booking policy, as a booking now would keep it.
+     */
+    policy: BookingPolicy;
+    /**
+     * The Location's rating out of 5, when counted.
+     */
+    rating: number | null;
+    /**
+     * How many ratings it counts.
+     */
+    ratings: number;
+    /**
+     * The area around the Location, in kilometres, when it is a radius.
+     */
+    area_km: number | null;
+    /**
+     * Whether the service comes to the address or point given; `null` without one.
+     */
+    reaches: boolean | null;
+    /**
+     * Why not, when it does not.
+     */
+    words: string | null;
+};
+
+/**
+ * A slot that can be booked.
+ */
+export type ServiceSlot = {
+    /**
+     * Its start.
+     */
+    starts_at: string;
+    /**
+     * The job's expected end.
+     */
+    ends_at: string;
+};
+
+/**
+ * A service's open slots on a day, or why there are none.
+ */
+export type ServiceSlots = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * The day, at the Location.
+     */
+    date: string;
+    /**
+     * The duration counted, with the add-ons.
+     */
+    duration_minutes: number;
+    /**
+     * The slots, in order.
+     */
+    slots: Array<ServiceSlot>;
+    /**
+     * Why there are none.
+     */
+    reason: ServiceSlotsReason | null;
+    /**
+     * The reason in words.
+     */
+    words: string | null;
+};
+
+/**
+ * A service on a store's card.
+ */
+export type StoreServiceItem = {
+    /**
+     * The service.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: LocalizedText;
+    /**
+     * Its price, or its visit charge.
+     */
+    price: Money;
+    /**
+     * Fixed, or from.
+     */
+    price_kind: BookingPriceKind;
+};
+
+/**
+ * A field service store's services on its card: the first three, the lowest price and the next open slot.
+ */
+export type StoreServices = {
+    /**
+     * The first three services.
+     */
+    items: Array<StoreServiceItem>;
+    /**
+     * How many services it publishes.
+     */
+    count: number;
+    /**
+     * The lowest price or visit charge.
+     */
+    lowest_price: Money;
+    /**
+     * The next open slot of its first service, within two days.
+     */
+    next_slot_at: string | null;
+};
+
+/**
+ * The booking an order of fulfilment on site is.
+ */
+export type StoreOrderBooking = {
+    /**
+     * The booking.
+     */
+    booking_id: string;
+    /**
+     * Its slot's start.
+     */
+    starts_at: string;
+    /**
+     * The job's expected end.
+     */
+    ends_at: string;
 };
 
 /**
@@ -75659,3 +77545,1806 @@ export type MarkKitchenResponses = {
 };
 
 export type MarkKitchenResponse = MarkKitchenResponses[keyof MarkKitchenResponses];
+
+export type GetStoreServicesData = {
+    body?: never;
+    headers?: {
+        /**
+         * The entity tag the caller holds, as returned in the `ETag` of a previous read. When it names the current version the answer is `304` and nothing is transferred.
+         */
+        'If-None-Match'?: string;
+    };
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/storefront/stores/{location_id}/services';
+};
+
+export type GetStoreServicesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such Location with a published service, or no such service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreServicesError = GetStoreServicesErrors[keyof GetStoreServicesErrors];
+
+export type GetStoreServicesResponses = {
+    /**
+     * The services.
+     */
+    200: ServicesDocument;
+};
+
+export type GetStoreServicesResponse = GetStoreServicesResponses[keyof GetStoreServicesResponses];
+
+export type GetStoreServiceData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The bookable service, an item of the Location's catalogue.
+         */
+        item_id: string;
+    };
+    query?: {
+        /**
+         * One of the signed-in customer's saved addresses, checked against the area.
+         */
+        address_id?: string;
+        /**
+         * A point to check the area against, with `lng`: the visitor's, when signed out.
+         */
+        lat?: number;
+        /**
+         * The point's longitude, with `lat`.
+         */
+        lng?: number;
+    };
+    url: '/v1/storefront/stores/{location_id}/services/{item_id}';
+};
+
+export type GetStoreServiceErrors = {
+    /**
+     * `validation_failed`: a malformed identifier, or `lat` without `lng`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such Location with a published service, or no such service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreServiceError = GetStoreServiceErrors[keyof GetStoreServiceErrors];
+
+export type GetStoreServiceResponses = {
+    /**
+     * The page.
+     */
+    200: ServicePage;
+};
+
+export type GetStoreServiceResponse = GetStoreServiceResponses[keyof GetStoreServiceResponses];
+
+export type ListServiceSlotsData = {
+    body?: never;
+    path: {
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The bookable service, an item of the Location's catalogue.
+         */
+        item_id: string;
+    };
+    query?: {
+        /**
+         * The day, at the Location; today by default.
+         */
+        date?: string;
+        /**
+         * One of the signed-in customer's saved addresses, checked against the area.
+         */
+        address_id?: string;
+        /**
+         * A point to check the area against, with `lng`: the visitor's, when signed out.
+         */
+        lat?: number;
+        /**
+         * The point's longitude, with `lat`.
+         */
+        lng?: number;
+        /**
+         * The add-ons chosen, their item ids comma separated; each lengthens the job.
+         */
+        add_ons?: string;
+    };
+    url: '/v1/storefront/stores/{location_id}/services/{item_id}/slots';
+};
+
+export type ListServiceSlotsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or date, an add-on that is not one of the service's.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such Location with a published service, or no such service.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListServiceSlotsError = ListServiceSlotsErrors[keyof ListServiceSlotsErrors];
+
+export type ListServiceSlotsResponses = {
+    /**
+     * The slots.
+     */
+    200: ServiceSlots;
+};
+
+export type ListServiceSlotsResponse = ListServiceSlotsResponses[keyof ListServiceSlotsResponses];
+
+export type HoldBookingSlotData = {
+    /**
+     * The slot.
+     */
+    body: BookingHoldRequest;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/bookings/holds';
+};
+
+export type HoldBookingSlotErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Location with a published service, or no such service.
+     */
+    404: Problem;
+    /**
+     * `slot_taken`: the slot went; the sentence names the nearest open ones. `slot_unavailable`: not a slot of the service (outside its hours, sooner than its notice or beyond its window). `outside_area`: the service does not come to the address.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type HoldBookingSlotError = HoldBookingSlotErrors[keyof HoldBookingSlotErrors];
+
+export type HoldBookingSlotResponses = {
+    /**
+     * The slot held.
+     */
+    201: BookingHold;
+};
+
+export type HoldBookingSlotResponse = HoldBookingSlotResponses[keyof HoldBookingSlotResponses];
+
+export type ListCustomerBookingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/bookings';
+};
+
+export type ListCustomerBookingsErrors = {
+    /**
+     * `validation_failed`, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerBookingsError = ListCustomerBookingsErrors[keyof ListCustomerBookingsErrors];
+
+export type ListCustomerBookingsResponses = {
+    /**
+     * The bookings.
+     */
+    200: BookingList;
+};
+
+export type ListCustomerBookingsResponse = ListCustomerBookingsResponses[keyof ListCustomerBookingsResponses];
+
+export type PlaceBookingData = {
+    /**
+     * The booking.
+     */
+    body: BookingRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/bookings';
+};
+
+export type PlaceBookingErrors = {
+    /**
+     * `validation_failed`: a missing or malformed member, an add-on not of the service, a return slot sooner than the turnaround; `idempotency_key_missing`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Location, service, hold or saved address of the customer.
+     */
+    404: Problem;
+    /**
+     * `slot_taken` naming the nearest open slots; `slot_unavailable`; `hold_expired`; `outside_area`; `method_not_offered` for cash where the Location does not take payment after the job.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PlaceBookingError = PlaceBookingErrors[keyof PlaceBookingErrors];
+
+export type PlaceBookingResponses = {
+    /**
+     * The booking, with the provider's page while the payment waits.
+     */
+    201: PlacedBooking;
+};
+
+export type PlaceBookingResponse = PlaceBookingResponses[keyof PlaceBookingResponses];
+
+export type GetCustomerBookingData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}';
+};
+
+export type GetCustomerBookingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerBookingError = GetCustomerBookingErrors[keyof GetCustomerBookingErrors];
+
+export type GetCustomerBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type GetCustomerBookingResponse = GetCustomerBookingResponses[keyof GetCustomerBookingResponses];
+
+export type RescheduleBookingData = {
+    /**
+     * The new slot.
+     */
+    body: BookingReschedule;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/reschedule';
+};
+
+export type RescheduleBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `slot_taken` naming the nearest open slots; `slot_unavailable`; `reschedule_window_passed`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RescheduleBookingError = RescheduleBookingErrors[keyof RescheduleBookingErrors];
+
+export type RescheduleBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type RescheduleBookingResponse = RescheduleBookingResponses[keyof RescheduleBookingResponses];
+
+export type GetBookingCancellationData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/cancellation';
+};
+
+export type GetBookingCancellationErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetBookingCancellationError = GetBookingCancellationErrors[keyof GetBookingCancellationErrors];
+
+export type GetBookingCancellationResponses = {
+    /**
+     * What cancelling costs.
+     */
+    200: BookingCancellation;
+};
+
+export type GetBookingCancellationResponse = GetBookingCancellationResponses[keyof GetBookingCancellationResponses];
+
+export type CancelBookingData = {
+    /**
+     * Why.
+     */
+    body: BookingCancel;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/cancel';
+};
+
+export type CancelBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the job started (Get help), or the booking ended.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CancelBookingError = CancelBookingErrors[keyof CancelBookingErrors];
+
+export type CancelBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type CancelBookingResponse = CancelBookingResponses[keyof CancelBookingResponses];
+
+export type ApproveBookingEstimateData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/estimate/approve';
+};
+
+export type ApproveBookingEstimateErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `approval_answered` when it was answered already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveBookingEstimateError = ApproveBookingEstimateErrors[keyof ApproveBookingEstimateErrors];
+
+export type ApproveBookingEstimateResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type ApproveBookingEstimateResponse = ApproveBookingEstimateResponses[keyof ApproveBookingEstimateResponses];
+
+export type DeclineBookingEstimateData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/estimate/decline';
+};
+
+export type DeclineBookingEstimateErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `approval_answered`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineBookingEstimateError = DeclineBookingEstimateErrors[keyof DeclineBookingEstimateErrors];
+
+export type DeclineBookingEstimateResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type DeclineBookingEstimateResponse = DeclineBookingEstimateResponses[keyof DeclineBookingEstimateResponses];
+
+export type ApproveBookingExtraData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+        /**
+         * The extra, of the booking in the path.
+         */
+        extra_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/extras/{extra_id}/approve';
+};
+
+export type ApproveBookingExtraErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `approval_answered`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveBookingExtraError = ApproveBookingExtraErrors[keyof ApproveBookingExtraErrors];
+
+export type ApproveBookingExtraResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type ApproveBookingExtraResponse = ApproveBookingExtraResponses[keyof ApproveBookingExtraResponses];
+
+export type DeclineBookingExtraData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+        /**
+         * The extra, of the booking in the path.
+         */
+        extra_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/extras/{extra_id}/decline';
+};
+
+export type DeclineBookingExtraErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `approval_answered`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineBookingExtraError = DeclineBookingExtraErrors[keyof DeclineBookingExtraErrors];
+
+export type DeclineBookingExtraResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type DeclineBookingExtraResponse = DeclineBookingExtraResponses[keyof DeclineBookingExtraResponses];
+
+export type ChooseBookingReturnSlotData = {
+    /**
+     * The return slot.
+     */
+    body: BookingReturnSlot;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/return-slot';
+};
+
+export type ChooseBookingReturnSlotErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `slot_unavailable` sooner than the turnaround.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ChooseBookingReturnSlotError = ChooseBookingReturnSlotErrors[keyof ChooseBookingReturnSlotErrors];
+
+export type ChooseBookingReturnSlotResponses = {
+    /**
+     * The booking.
+     */
+    200: Booking;
+};
+
+export type ChooseBookingReturnSlotResponse = ChooseBookingReturnSlotResponses[keyof ChooseBookingReturnSlotResponses];
+
+export type PayBookingRemainderData = {
+    /**
+     * How to pay.
+     */
+    body: BookingPaymentRequest;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/bookings/{booking_id}/payments';
+};
+
+export type PayBookingRemainderErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking of the customer.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `nothing_to_pay`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PayBookingRemainderError = PayBookingRemainderErrors[keyof PayBookingRemainderErrors];
+
+export type PayBookingRemainderResponses = {
+    /**
+     * The payment started.
+     */
+    201: BookingPaymentStarted;
+};
+
+export type PayBookingRemainderResponse = PayBookingRemainderResponses[keyof PayBookingRemainderResponses];
+
+export type GetBookingApprovalData = {
+    body?: never;
+    path: {
+        /**
+         * The approval's token, from the link sent to the customer's number.
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/v1/approvals/{token}';
+};
+
+export type GetBookingApprovalErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such approval, or the link has lapsed.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetBookingApprovalError = GetBookingApprovalErrors[keyof GetBookingApprovalErrors];
+
+export type GetBookingApprovalResponses = {
+    /**
+     * What waits.
+     */
+    200: BookingApproval;
+};
+
+export type GetBookingApprovalResponse = GetBookingApprovalResponses[keyof GetBookingApprovalResponses];
+
+export type AnswerBookingApprovalData = {
+    /**
+     * The answer.
+     */
+    body: BookingApprovalDecision;
+    path: {
+        /**
+         * The approval's token, from the link sent to the customer's number.
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/v1/approvals/{token}';
+};
+
+export type AnswerBookingApprovalErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such approval, or the link has lapsed.
+     */
+    404: Problem;
+    /**
+     * `approval_answered`; `booking_moved`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AnswerBookingApprovalError = AnswerBookingApprovalErrors[keyof AnswerBookingApprovalErrors];
+
+export type AnswerBookingApprovalResponses = {
+    /**
+     * The answer recorded.
+     */
+    200: BookingApproval;
+};
+
+export type AnswerBookingApprovalResponse = AnswerBookingApprovalResponses[keyof AnswerBookingApprovalResponses];
+
+export type GetLocationBookingDayData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * The day, at the Location; today by default.
+         */
+        date?: string;
+        /**
+         * A column per `agent` (the default) or per `service`.
+         */
+        group?: BookingDayGroup;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings';
+};
+
+export type GetLocationBookingDayErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationBookingDayError = GetLocationBookingDayErrors[keyof GetLocationBookingDayErrors];
+
+export type GetLocationBookingDayResponses = {
+    /**
+     * The day.
+     */
+    200: LocationBookingDay;
+};
+
+export type GetLocationBookingDayResponse = GetLocationBookingDayResponses[keyof GetLocationBookingDayResponses];
+
+export type GetLocationBookingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}';
+};
+
+export type GetLocationBookingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationBookingError = GetLocationBookingErrors[keyof GetLocationBookingErrors];
+
+export type GetLocationBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type GetLocationBookingResponse = GetLocationBookingResponses[keyof GetLocationBookingResponses];
+
+export type ConfirmBookingData = {
+    /**
+     * The Agent.
+     */
+    body: BookingConfirm;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/confirm';
+};
+
+export type ConfirmBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `slot_taken` when the Agent named is no longer free.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ConfirmBookingError = ConfirmBookingErrors[keyof ConfirmBookingErrors];
+
+export type ConfirmBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type ConfirmBookingResponse = ConfirmBookingResponses[keyof ConfirmBookingResponses];
+
+export type DeclineBookingData = {
+    /**
+     * Why.
+     */
+    body: BookingDecline;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/decline';
+};
+
+export type DeclineBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineBookingError = DeclineBookingErrors[keyof DeclineBookingErrors];
+
+export type DeclineBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type DeclineBookingResponse = DeclineBookingResponses[keyof DeclineBookingResponses];
+
+export type AssignBookingData = {
+    /**
+     * The Agent.
+     */
+    body: BookingAssign;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/assign';
+};
+
+export type AssignBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: its Agent is on the way; `slot_taken` when the Agent is not free then.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AssignBookingError = AssignBookingErrors[keyof AssignBookingErrors];
+
+export type AssignBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type AssignBookingResponse = AssignBookingResponses[keyof AssignBookingResponses];
+
+export type StepBookingData = {
+    /**
+     * The step.
+     */
+    body: BookingStep;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/steps';
+};
+
+export type StepBookingErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `estimate_not_approved` before an estimate is approved.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StepBookingError = StepBookingErrors[keyof StepBookingErrors];
+
+export type StepBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type StepBookingResponse = StepBookingResponses[keyof StepBookingResponses];
+
+export type RecordBookingEstimateData = {
+    /**
+     * The estimate.
+     */
+    body: BookingEstimateInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/estimate';
+};
+
+export type RecordBookingEstimateErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecordBookingEstimateError = RecordBookingEstimateErrors[keyof RecordBookingEstimateErrors];
+
+export type RecordBookingEstimateResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type RecordBookingEstimateResponse = RecordBookingEstimateResponses[keyof RecordBookingEstimateResponses];
+
+export type RecordBookingCashData = {
+    /**
+     * The cash taken.
+     */
+    body: BookingCash;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/cash';
+};
+
+export type RecordBookingCashErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`; `nothing_to_pay`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecordBookingCashError = RecordBookingCashErrors[keyof RecordBookingCashErrors];
+
+export type RecordBookingCashResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type RecordBookingCashResponse = RecordBookingCashResponses[keyof RecordBookingCashResponses];
+
+export type ProposeBookingReturnSlotData = {
+    /**
+     * The return slot.
+     */
+    body: BookingReturnSlot;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be one of the partner in the path.
+         */
+        location_id: string;
+        /**
+         * The booking, of the Location in the path.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/bookings/{booking_id}/return-slot';
+};
+
+export type ProposeBookingReturnSlotErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden` for a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such Partner, Location or booking for the caller.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ProposeBookingReturnSlotError = ProposeBookingReturnSlotErrors[keyof ProposeBookingReturnSlotErrors];
+
+export type ProposeBookingReturnSlotResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type ProposeBookingReturnSlotResponse = ProposeBookingReturnSlotResponses[keyof ProposeBookingReturnSlotResponses];
+
+export type RecordTaskEstimateData = {
+    /**
+     * The estimate.
+     */
+    body: BookingEstimateInput;
+    path: {
+        /**
+         * The job's task, the Agent's own.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/estimate';
+};
+
+export type RecordTaskEstimateErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a task that is not the caller's.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's, or a task that is not a booking's job.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecordTaskEstimateError = RecordTaskEstimateErrors[keyof RecordTaskEstimateErrors];
+
+export type RecordTaskEstimateResponses = {
+    /**
+     * The booking, as the customer sees it.
+     */
+    200: Booking;
+};
+
+export type RecordTaskEstimateResponse = RecordTaskEstimateResponses[keyof RecordTaskEstimateResponses];
+
+export type ProposeTaskExtraData = {
+    /**
+     * The extra.
+     */
+    body: BookingExtraInput;
+    path: {
+        /**
+         * The job's task, the Agent's own.
+         */
+        task_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/tasks/{task_id}/extras';
+};
+
+export type ProposeTaskExtraErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface, or a task that is not the caller's.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such task of the caller's, or a task that is not a booking's job.
+     */
+    404: Problem;
+    /**
+     * `booking_moved`: the booking has moved on and this no longer applies; the sentence says where it stands.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ProposeTaskExtraError = ProposeTaskExtraErrors[keyof ProposeTaskExtraErrors];
+
+export type ProposeTaskExtraResponses = {
+    /**
+     * The booking, as the customer sees it.
+     */
+    200: Booking;
+};
+
+export type ProposeTaskExtraResponse = ProposeTaskExtraResponses[keyof ProposeTaskExtraResponses];
+
+export type ListPlatformBookingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only bookings in this state.
+         */
+        state?: BookingState;
+        /**
+         * Only this Location's.
+         */
+        location_id?: string;
+        /**
+         * Only those not answered, running late or disputed.
+         */
+        flagged?: boolean;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/bookings';
+};
+
+export type ListPlatformBookingsErrors = {
+    /**
+     * `validation_failed`, or `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`: the staff member lacks `order:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformBookingsError = ListPlatformBookingsErrors[keyof ListPlatformBookingsErrors];
+
+export type ListPlatformBookingsResponses = {
+    /**
+     * The bookings.
+     */
+    200: PlatformBookingList;
+};
+
+export type ListPlatformBookingsResponse = ListPlatformBookingsResponses[keyof ListPlatformBookingsResponses];
+
+export type GetPlatformBookingData = {
+    body?: never;
+    path: {
+        /**
+         * The booking.
+         */
+        booking_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/bookings/{booking_id}';
+};
+
+export type GetPlatformBookingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`: the staff member lacks `order:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such booking.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformBookingError = GetPlatformBookingErrors[keyof GetPlatformBookingErrors];
+
+export type GetPlatformBookingResponses = {
+    /**
+     * The booking.
+     */
+    200: StoreBooking;
+};
+
+export type GetPlatformBookingResponse = GetPlatformBookingResponses[keyof GetPlatformBookingResponses];

@@ -1,0 +1,28 @@
+type: object
+description: Proposing an extra.
+required:
+  - description
+  - amount
+properties:
+  description:
+    type: string
+    description: What it is, 1 to 120 characters.
+    examples:
+      - Gas top-up
+  amount:
+    $ref: ../common/Money.yaml
+    description: Its price.
+  photo_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A photo uploaded as proof.
+    examples:
+      - null
+examples:
+  - description: Gas top-up
+    amount:
+      minor_units: 150000
+      currency: INR
+    photo_asset_id: null

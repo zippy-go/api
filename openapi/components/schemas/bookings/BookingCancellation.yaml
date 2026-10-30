@@ -1,0 +1,33 @@
+type: object
+description: What cancelling now costs, shown before the customer confirms.
+required:
+  - allowed
+  - fee
+  - refund
+  - words
+properties:
+  allowed:
+    type: boolean
+    description: Whether the customer may cancel here; once the job started, it is through Get help.
+    examples:
+      - true
+  fee:
+    $ref: ../common/Money.yaml
+    description: The fee kept.
+  refund:
+    $ref: ../common/Money.yaml
+    description: What goes back the way it was paid.
+  words:
+    type: string
+    description: The sentence to show.
+    examples:
+      - Cancelling now costs ₹99.80, 20% of ₹499.00; ₹399.20 goes back to your UPI account.
+examples:
+  - allowed: true
+    fee:
+      minor_units: 9980
+      currency: INR
+    refund:
+      minor_units: 39920
+      currency: INR
+    words: Cancelling now costs ₹99.80, 20% of ₹499.00; ₹399.20 goes back to your UPI account.

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.order.settled.v1.schema.json",
+  "title": "OrderingOrderSettledPayload",
+  "description": "Payload of `ordering.order.settled` version 1. An order on site was settled. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "order_id",
+    "number",
+    "location_id",
+    "partner_id",
+    "customer_id",
+    "status",
+    "previous_status",
+    "version",
+    "fulfilment",
+    "currency",
+    "at",
+    "by",
+    "total",
+    "removed_amount",
+    "charged"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order."
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number, as said aloud."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too."
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer (a user id); fetch personal data from the API when it is needed."
+    },
+    "status": {
+      "type": "string",
+      "description": "The status after the change.",
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired"
+      ]
+    },
+    "previous_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paying",
+        "placed",
+        "accepted",
+        "ready",
+        "on_its_way",
+        "completed",
+        "undelivered",
+        "declined",
+        "cancelled",
+        "expired",
+        null
+      ],
+      "description": "The status before; `null` for a first status."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The order's version after the change; it only rises, and signals carry it."
+    },
+    "fulfilment": {
+      "type": "string",
+      "description": "`on_site`: a booking's order.",
+      "enum": [
+        "delivery",
+        "pickup",
+        "on_site"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "The currency of every amount, in its minor unit."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "by": {
+      "type": "string",
+      "description": "Who made the move.",
+      "enum": [
+        "customer",
+        "staff",
+        "platform",
+        "system"
+      ]
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The order's total, in minor units of the currency."
+    },
+    "removed_amount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What went back, in minor units of the currency."
+    },
+    "charged": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What is kept, in minor units of the currency."
+    }
+  }
+}

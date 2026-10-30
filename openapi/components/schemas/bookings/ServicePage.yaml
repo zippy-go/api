@@ -1,0 +1,104 @@
+type: object
+description: "A service's page, the `ServicePage` schema: the service, its policy in plain words, its rating, its area and whether it comes to the address given."
+required:
+  - location_id
+  - store_name
+  - service
+  - policy
+  - rating
+  - ratings
+  - area_km
+  - reaches
+  - words
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  store_name:
+    type: string
+    description: The Location's name.
+    examples:
+      - Madhapur Home Care
+  service:
+    $ref: ./ServiceCard.yaml
+    description: The service.
+  policy:
+    $ref: ./BookingPolicy.yaml
+    description: The booking policy, as a booking now would keep it.
+  rating:
+    type:
+      - number
+      - "null"
+    description: The Location's rating out of 5, when counted.
+    examples:
+      - 4.6
+  ratings:
+    type: integer
+    description: How many ratings it counts.
+    examples:
+      - 128
+  area_km:
+    type:
+      - integer
+      - "null"
+    description: The area around the Location, in kilometres, when it is a radius.
+    examples:
+      - 10
+  reaches:
+    type:
+      - boolean
+      - "null"
+    description: Whether the service comes to the address or point given; `null` without one.
+    examples:
+      - true
+  words:
+    type:
+      - string
+      - "null"
+    description: Why not, when it does not.
+    examples:
+      - null
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000306
+    store_name: Madhapur Home Care
+    service:
+      item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+      variant_id: 019a3d10-2b00-7d00-8a00-00000000d101
+      name:
+        en: AC service, split unit
+      description:
+        en: Indoor and outdoor unit serviced, filters and coils cleaned.
+      picture_url: null
+      price:
+        minor_units: 49900
+        currency: INR
+      price_kind: fixed
+      duration_minutes: 60
+      pickup_return: false
+      turnaround_hours: null
+      qualifications:
+        - ac_technician
+      included:
+        - Filter and coil cleaning
+      excluded:
+        - Gas top-up, an extra approved on site
+      customer_provides: []
+      add_ons: []
+    policy:
+      confirmation_minutes: 60
+      cancellation_window_hours: 2
+      late_fee_percent: 20
+      visit_charge:
+        minor_units: 9900
+        currency: INR
+      pay_after_job: false
+      confirm_automatically: false
+      words: Free to cancel until 2 hours before. After that, cancelling costs 20%. Once the Agent is on the way, ₹99.00 is kept.
+    rating: 4.6
+    ratings: 128
+    area_km: 10
+    reaches: true
+    words: null

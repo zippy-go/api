@@ -1,0 +1,15 @@
+type: object
+description: Assigning or reassigning a booking, until its Agent is on the way.
+required:
+  - agent_id
+properties:
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent, or `null` to leave the service to choose.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000e001
+examples:
+  - agent_id: 019a3d10-2b00-7d00-8a00-00000000e001

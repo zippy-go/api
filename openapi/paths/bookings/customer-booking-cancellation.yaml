@@ -1,0 +1,51 @@
+# Path item for /v1/customer/bookings/{booking_id}/cancellation. Referenced from openapi.yaml.
+parameters:
+  - name: booking_id
+    in: path
+    required: true
+    description: The booking.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000b001
+get:
+  operationId: getBookingCancellation
+  summary: See what cancelling costs
+  description: "What cancelling now keeps and gives back, in words, to show before the customer confirms: free until the cancellation window; inside it the fee, a share of a fixed price or a service's visit charge; once the Agent is on the way the visit charge; nothing kept when no Agent arrived thirty minutes after the slot's end. Once the job started, the customer cancels through Get help."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: What cancelling costs.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/BookingCancellation.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such booking of the customer."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
