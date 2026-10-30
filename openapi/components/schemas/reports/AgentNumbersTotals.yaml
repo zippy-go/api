@@ -15,6 +15,7 @@ required:
   - geofence_overrides
   - tips
   - earnings
+  - utilisation
 properties:
   agents:
     type: integer
@@ -92,6 +93,9 @@ properties:
   earnings:
     $ref: ../common/Money.yaml
     description: Earnings, tips included.
+  utilisation:
+    $ref: ./AgentUtilisation.yaml
+    description: Since 0.29.0, everyone's utilisation by shift.
 examples:
   - agents: 20
     online: 8
@@ -111,3 +115,9 @@ examples:
     earnings:
       minor_units: 250000
       currency: INR
+    utilisation:
+      minutes_on_shift: 240
+      minutes_on_task: 180
+      tasks: 38
+      tasks_per_hour: 9.5
+      idle_share: 0.25

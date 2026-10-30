@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.28.0
+  version: 0.29.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -3646,6 +3646,10 @@ components:
       $ref: ./components/schemas/reports/AgentNumbers.yaml
     AgentNumbersTotals:
       $ref: ./components/schemas/reports/AgentNumbersTotals.yaml
+    AgentUtilisation:
+      $ref: ./components/schemas/reports/AgentUtilisation.yaml
+    AgentShiftUtilisation:
+      $ref: ./components/schemas/reports/AgentShiftUtilisation.yaml
     AgentNumbersPage:
       $ref: ./components/schemas/reports/AgentNumbersPage.yaml
     AgentNumbersDelivery:

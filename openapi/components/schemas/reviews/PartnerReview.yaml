@@ -88,6 +88,14 @@ properties:
       - $ref: ./ReviewSubscription.yaml
       - type: "null"
     description: The subscription it reviews for a month; `null` on a review of an order.
+  booking_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "Since 0.29.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews."
+    examples:
+      - null
 examples:
   - id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
     location_id: "01a13a48-9e00-7000-8000-000000000301"

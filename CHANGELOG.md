@@ -6,6 +6,29 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-30
+
+Step 9, companions: a completed booking reviewed with its own tags and counted for the Agent
+who did the work, the quest's booking step, and utilisation by shift on the Agents numbers.
+Written as the next minor after 0.28.0, beside step 8's tabs slice and step 9's bookings and
+field work slices; renumbered by merge order. Additive only.
+
+### Added
+
+- A completed booking's review on the order review routes, through the booking's order of
+  fulfilment on site: `on_site` in `ReviewFulfilment`, its tags up "On time", "Great work",
+  "Tidy", "Good value" and down "Late", "Work not finished", "Damage", "Rude" in
+  `ReviewTagOffer`, and `booking_id` on `PartnerReview` and `PlatformReview`. It counts in the
+  Location's rating and, as `booking_review` in `AgentRatingSource`, in the rating of the Agent
+  who did the work.
+- `booking` in `QuestStepKind`: bookings completed, at the named Partner or Location when one is
+  named.
+- Utilisation by shift on the Agents numbers: `utilisation` (`AgentUtilisation`: minutes on
+  shift, minutes on task inside them, tasks completed during them, tasks per hour on shift and
+  the idle share) on `AgentNumbers` and `AgentNumbersTotals`, and `shifts`
+  (`AgentShiftUtilisation`) on `AgentNumbersDetail`.
+- `reviews.review.written` gains the fulfilment `on_site` and `booking_id`.
+
 ## [0.28.0] - 2026-10-30
 
 Step 8, reservations and the tab's companions: table reservations at a store's slots, the day's

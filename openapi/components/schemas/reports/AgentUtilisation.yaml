@@ -1,0 +1,49 @@
+type: object
+description: "Since 0.29.0, an Agent's utilisation by shift over the range (analytics R12): the minutes of the shifts they held, the minutes on task inside those shifts, the tasks they completed during them (a delivery's drop, a laundry leg's drop or a booked job; a pickup is part of its delivery), the tasks per hour on shift and the share of shift time without a task. An Agent without shifts reads zero minutes and `null` rates. Days are read on the report's clock."
+required:
+  - minutes_on_shift
+  - minutes_on_task
+  - tasks
+  - tasks_per_hour
+  - idle_share
+properties:
+  minutes_on_shift:
+    type: integer
+    minimum: 0
+    description: Minutes of the shifts held in the range.
+    examples:
+      - 240
+  minutes_on_task:
+    type: integer
+    minimum: 0
+    description: Minutes on a task inside those shifts, from setting off to the end of the task, overlapping tasks counted once.
+    examples:
+      - 180
+  tasks:
+    type: integer
+    minimum: 0
+    description: Tasks completed during those shifts.
+    examples:
+      - 38
+  tasks_per_hour:
+    type:
+      - number
+      - "null"
+    description: Tasks completed per hour on shift; `null` without shift time.
+    examples:
+      - 9.5
+  idle_share:
+    type:
+      - number
+      - "null"
+    minimum: 0
+    maximum: 1
+    description: The share of shift time without a task, from 0 to 1; `null` without shift time.
+    examples:
+      - 0.25
+examples:
+  - minutes_on_shift: 240
+    minutes_on_task: 180
+    tasks: 38
+    tasks_per_hour: 9.5
+    idle_share: 0.25

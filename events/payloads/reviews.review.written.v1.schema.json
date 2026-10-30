@@ -112,9 +112,10 @@
         "delivered",
         "delivered_by_own_agent",
         "collected",
-        "dine_in"
+        "dine_in",
+        "on_site"
       ],
-      "description": "How the order reached the customer: `delivered`, `delivered_by_own_agent`, `collected`, or, since 0.28.0, `dine_in` for a settled tab's review (the tab's id is `order_id`).",
+      "description": "How the order reached the customer: `delivered`, `delivered_by_own_agent`, `collected`, or, since 0.28.0, `dine_in` for a settled tab's review (the tab's id is `order_id`), or, since 0.29.0, `on_site` for a completed booking.",
       "examples": [
         "delivered"
       ]
@@ -125,9 +126,20 @@
         "null"
       ],
       "format": "uuid",
-      "description": "The Agent who carried a delivery; `null` for a collection.",
+      "description": "The Agent who carried a delivery or, since 0.29.0, did a booked job; `null` for a collection.",
       "examples": [
         "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "booking_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Since 0.29.0, the booking a completed booking's review is about (`order_id` is the booking's order of fulfilment on site); absent or `null` on other reviews.",
+      "examples": [
+        null
       ]
     },
     "at": {
