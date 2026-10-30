@@ -78,7 +78,7 @@
         "weeks",
         "deliveries"
       ],
-      "description": "What the streak counts (since 0.25.0): weeks with an order, or a subscription's deliveries in a row; absent for weeks.",
+      "description": "What the streak counts (since 0.26.0): weeks with an order, or a subscription's deliveries in a row; absent for weeks.",
       "examples": [
         "deliveries"
       ]
@@ -89,7 +89,7 @@
         "null"
       ],
       "format": "uuid",
-      "description": "For a streak of deliveries, the subscription whose delivery moved it (since 0.25.0).",
+      "description": "For a streak of deliveries, the subscription whose delivery moved it (since 0.26.0).",
       "examples": [
         "01a13a48-9e00-7000-8000-000000007001"
       ]
@@ -100,7 +100,7 @@
         "null"
       ],
       "format": "date",
-      "description": "For a streak of deliveries, the delivery's day (since 0.25.0).",
+      "description": "For a streak of deliveries, the delivery's day (since 0.26.0).",
       "examples": [
         "2026-12-04"
       ]

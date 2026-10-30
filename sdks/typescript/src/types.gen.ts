@@ -20794,6 +20794,10 @@ export type StoreReview = {
      * The store's published reply.
      */
     reply: PublishedReply | null;
+    /**
+     * The subscription it reviews for a month; `null` on a review of an order.
+     */
+    subscription?: ReviewSubscription | null;
 };
 
 /**
@@ -20983,6 +20987,10 @@ export type PartnerReview = {
      * Why not, in words; `null` when a reply may be written.
      */
     reply_refusal: string | null;
+    /**
+     * The subscription it reviews for a month; `null` on a review of an order.
+     */
+    subscription?: ReviewSubscription | null;
 };
 
 /**
@@ -21506,6 +21514,10 @@ export type PlatformReview = {
      * The Partner's replies, oldest first.
      */
     replies: Array<ReviewReply>;
+    /**
+     * The subscription it reviews for a month; `null` on a review of an order.
+     */
+    subscription?: ReviewSubscription | null;
 };
 
 /**
@@ -26034,6 +26046,10 @@ export type Offer = {
      * When it ended or was cancelled.
      */
     ended_at: string | null;
+    /**
+     * The ways of ordering it applies to; `on_demand` and `scheduled` by default. It applies to subscription occurrences only when `subscription` is among them.
+     */
+    ways?: Array<OfferWay>;
 };
 
 /**
@@ -26112,6 +26128,10 @@ export type OfferInput = {
      * Show a code-only offer's code on Location pages.
      */
     show_code?: boolean;
+    /**
+     * The ways of ordering it applies to; `on_demand` and `scheduled` by default. It applies to subscription occurrences only when `subscription` is among them.
+     */
+    ways?: Array<OfferWay>;
 };
 
 /**
@@ -27614,7 +27634,7 @@ export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'c
 export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
 
 /**
- * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.24.0).
+ * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0).
  */
 export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review' | 'subscription_started';
 
@@ -27639,7 +27659,7 @@ export type TierLevel = 'member' | 'silver' | 'gold';
 export type StreakState = 'active' | 'broken';
 
 /**
- * What a streak counts (since 0.24.0): `weeks`, Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; or `deliveries`, a subscription's deliveries completed in a row at the campaign's Locations, where a skip the customer asked for, a vacation, a pause or the store's closure keeps the streak, and a failed delivery or a skip for want of money breaks it unless the month's freeze is left. A streak of deliveries reads its milestones, its repeat and `weeks` in deliveries.
+ * What a streak counts (since 0.26.0): `weeks`, Monday to Sunday on the Location's clock, each with at least one completed order at the campaign's Locations; or `deliveries`, a subscription's deliveries completed in a row at the campaign's Locations, where a skip the customer asked for, a vacation, a pause or the store's closure keeps the streak, and a failed delivery or a skip for want of money breaks it unless the month's freeze is left. A streak of deliveries reads its milestones, its repeat and `weeks` in deliveries.
  */
 export type StreakCounts = 'weeks' | 'deliveries';
 
@@ -32631,6 +32651,365 @@ export type BundleTaken = {
      */
     words: string;
 };
+
+/**
+ * A UPI AutoPay mandate's state: `pending` until the customer approves it on the provider's page, `confirmed` while it debits, `paused` with its subscription, `cancelled` by ZippyGo or declined or left to expire on the page, `revoked` by the customer in their UPI app.
+ */
+export type MandateState = 'pending' | 'confirmed' | 'paused' | 'cancelled' | 'revoked';
+
+/**
+ * A delivery day's debit: `notified` once the pre-debit notice went, `debited` once taken into the Wallet, `retrying` after the first try was refused, `refused` after the second, when the cutoff takes the Wallet or skips the day.
+ */
+export type MandateDebitState = 'notified' | 'debited' | 'retrying' | 'refused';
+
+/**
+ * Why a mandate ended: `declined` or `expired` on the provider's page, `cancelled` with its subscription or set up again, `revoked` by the customer in their UPI app.
+ */
+export type MandateEndReason = 'declined' | 'expired' | 'cancelled' | 'revoked';
+
+/**
+ * Where the customer approves a pending mandate: the provider's page, standing in for their UPI app, until it expires.
+ */
+export type MandateApproval = {
+    /**
+     * The provider's page.
+     */
+    url: string;
+    /**
+     * When the page stops taking an approval; the mandate is then cancelled as expired.
+     */
+    expires_at: string;
+};
+
+/**
+ * One delivery day's debit under a mandate: the pre-debit notice at 08:00 two days before, then the debit asked at 09:00 the day before and once more at 15:00 if the bank refused it. A debit taken lands in the customer's Wallet, from which the day is held at the cutoff.
+ */
+export type MandateDebit = {
+    /**
+     * The delivery day it pays for.
+     */
+    date: string;
+    /**
+     * What it takes, at most the mandate's limit.
+     */
+    amount: Money;
+    /**
+     * Where it stands.
+     */
+    state: MandateDebitState;
+    /**
+     * How many times it was asked.
+     */
+    attempts: number;
+    /**
+     * Why the bank refused the last try, in the provider's words; `null` otherwise.
+     */
+    reason: string | null;
+    /**
+     * When the pre-debit notice went.
+     */
+    notified_at: string | null;
+    /**
+     * When it was taken.
+     */
+    debited_at: string | null;
+    /**
+     * What it did, in words.
+     */
+    text: string;
+};
+
+/**
+ * A UPI AutoPay mandate paying a subscription: approved by the customer on the provider's page for at most 1.5 times a delivery's price rounded up to the next ₹100, never above the provider's ₹15,000.00; paused, resumed and cancelled with its subscription; revoked in the customer's UPI app. Each debit lands in the Wallet before its day is held.
+ */
+export type Mandate = {
+    /**
+     * The mandate.
+     */
+    id: string;
+    /**
+     * The subscription it pays.
+     */
+    subscription_id: string | null;
+    /**
+     * Where it stands.
+     */
+    state: MandateState;
+    /**
+     * The most one debit may take.
+     */
+    limit: Money;
+    /**
+     * How often it debits: the subscription's `daily`, `weekdays`, `alternate_days`, `weekly` or `custom`.
+     */
+    frequency: string;
+    /**
+     * Its first day.
+     */
+    starts_on: string;
+    /**
+     * Its last day; `null` until cancelled.
+     */
+    ends_on: string | null;
+    /**
+     * The UPI ID it debits, masked; `null` until approved.
+     */
+    upi_id: string | null;
+    /**
+     * The provider that holds it.
+     */
+    provider: string;
+    /**
+     * The provider's page while it is pending; `null` otherwise.
+     */
+    approval: MandateApproval | null;
+    /**
+     * Where it stands, in words.
+     */
+    text: string;
+    /**
+     * Why it ended; `null` while it stands.
+     */
+    ended_reason: MandateEndReason | null;
+    /**
+     * When it was asked for.
+     */
+    created_at: string;
+    /**
+     * When the customer approved it.
+     */
+    confirmed_at: string | null;
+    /**
+     * When it was cancelled or revoked.
+     */
+    ended_at: string | null;
+    /**
+     * Its debits, the latest delivery day first: every one on a single mandate, the last fourteen in a list.
+     */
+    debits?: Array<MandateDebit>;
+};
+
+/**
+ * Asking for a subscription's mandate: its pending mandate with the provider's page, or, after one was declined, expired or revoked, a new one on the same terms.
+ */
+export type MandateCreate = {
+    /**
+     * The subscription, paid by UPI AutoPay.
+     */
+    subscription_id: string;
+};
+
+/**
+ * A page of mandates, the newest first.
+ */
+export type MandatePage = {
+    /**
+     * The mandates.
+     */
+    items: Array<Mandate>;
+    /**
+     * The next page; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A subscription's review for a month: `not_due` until a delivery completed in it, `due` then, `written` once reviewed, refused again until the next month.
+ */
+export type SubscriptionReviewState = 'not_due' | 'due' | 'written';
+
+/**
+ * The subscription a review is of, reviewed once for a calendar month on the Location's clock; `null` on a review of an order.
+ */
+export type ReviewSubscription = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The month it reviews, `YYYY-MM`.
+     */
+    month: string;
+};
+
+/**
+ * A subscription's review: a thumb, tags from the thumb's list and an optional note, for the month on the Location's clock unless another is named.
+ */
+export type SubscriptionReviewInput = {
+    /**
+     * The month it reviews, `YYYY-MM`; this month on the Location's clock by default.
+     */
+    month?: string | null;
+    /**
+     * Up or down.
+     */
+    thumb: ReviewThumb;
+    /**
+     * Tag codes from the thumb's list, as many as apply.
+     */
+    tags?: Array<string>;
+    /**
+     * A note, at most 500 characters.
+     */
+    note?: string | null;
+};
+
+/**
+ * A subscription's review for one calendar month on the Location's clock: due once a delivery completed in the month, written once and counted once in the Location's rating, refused again until the next month.
+ */
+export type SubscriptionReview = {
+    /**
+     * The subscription.
+     */
+    subscription_id: string;
+    /**
+     * The month, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * Whether it may be written.
+     */
+    state: SubscriptionReviewState;
+    /**
+     * The deliveries completed in the month so far.
+     */
+    deliveries_completed: number;
+    /**
+     * The review written for the month; `null` before.
+     */
+    review: CustomerReview | null;
+    /**
+     * A subscription's tags under each thumb.
+     */
+    tags: ReviewTagOffer;
+    /**
+     * Once written, the month it may be reviewed again.
+     */
+    next_month: string | null;
+    /**
+     * Where it stands, in words.
+     */
+    text: string;
+};
+
+/**
+ * A reason customers gave when cancelling, with how many gave it.
+ */
+export type SubscriptionsReportReason = {
+    /**
+     * `none` when they gave none.
+     */
+    reason: 'moving' | 'too_expensive' | 'quality' | 'not_needed' | 'other' | 'none';
+    /**
+     * How many.
+     */
+    count: number;
+};
+
+/**
+ * A plan's subscriptions in the month at one store, or the total: those active at its start, started, paused, resumed and ended, the ending split into cancelled by the customer, cancelled by the store or ZippyGo, run to their end date and ended with their plan. Churn is those cancelled by customers over those active at the start.
+ */
+export type SubscriptionsReportRow = {
+    /**
+     * The Partner; `null` on the total.
+     */
+    partner_id: string | null;
+    /**
+     * The Partner's name.
+     */
+    partner_name: string | null;
+    /**
+     * The store; `null` on the total.
+     */
+    location_id: string | null;
+    /**
+     * The store's name.
+     */
+    location_name: string | null;
+    /**
+     * The store's Vertical, by code.
+     */
+    vertical: string | null;
+    /**
+     * The plan; `null` on the total.
+     */
+    plan_id: string | null;
+    /**
+     * The plan's name.
+     */
+    plan_name: string | null;
+    /**
+     * Started before the month and not ended by its first day, paused ones included.
+     */
+    active_at_start: number;
+    /**
+     * Started in the month.
+     */
+    started: number;
+    /**
+     * Paused in the month, by the customer or by itself.
+     */
+    paused: number;
+    /**
+     * Resumed in the month.
+     */
+    resumed: number;
+    /**
+     * Cancelled by the customer in the month.
+     */
+    cancelled_by_customer: number;
+    /**
+     * Cancelled by the store or by ZippyGo in the month.
+     */
+    cancelled_other: number;
+    /**
+     * Run to their end date in the month.
+     */
+    ended_by_date: number;
+    /**
+     * Ended in the month because the plan was withdrawn.
+     */
+    plan_ended: number;
+    /**
+     * Not ended by the month's last day.
+     */
+    active_at_end: number;
+    /**
+     * Cancelled by customers over active at the start, in percent to one place; `null` with none active at the start.
+     */
+    churn_percent: number | null;
+    /**
+     * The reasons customers gave when cancelling, the most given first.
+     */
+    reasons: Array<SubscriptionsReportReason>;
+};
+
+/**
+ * Subscriptions in a calendar month on the platform's clock, by store and plan with a total, computed from the event warehouse and saying the moment its data is current to.
+ */
+export type SubscriptionsReport = {
+    /**
+     * The month, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * The warehouse holds every event up to here.
+     */
+    current_to: string;
+    /**
+     * One row per store and plan, the most subscriptions at the start first.
+     */
+    rows: Array<SubscriptionsReportRow>;
+    /**
+     * Every row together.
+     */
+    total: SubscriptionsReportRow;
+};
+
+/**
+ * A way of ordering an offer applies to: an order placed `on_demand`, one `scheduled` into a slot, or a `subscription` occurrence generated at the cutoff. No offer applies to subscription occurrences unless it says so.
+ */
+export type OfferWay = 'on_demand' | 'scheduled' | 'subscription';
 
 /**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
@@ -74025,3 +74404,384 @@ export type StopPlatformBundleResponses = {
 };
 
 export type StopPlatformBundleResponse = StopPlatformBundleResponses[keyof StopPlatformBundleResponses];
+
+export type ListCustomerMandatesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 20 by default.
+         */
+        limit?: number;
+        /**
+         * The page after the one that answered it.
+         */
+        cursor?: string;
+    };
+    url: '/v1/customer/mandates';
+};
+
+export type ListCustomerMandatesErrors = {
+    /**
+     * A parameter failed validation (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerMandatesError = ListCustomerMandatesErrors[keyof ListCustomerMandatesErrors];
+
+export type ListCustomerMandatesResponses = {
+    /**
+     * The mandates.
+     */
+    200: MandatePage;
+};
+
+export type ListCustomerMandatesResponse = ListCustomerMandatesResponses[keyof ListCustomerMandatesResponses];
+
+export type CreateCustomerMandateData = {
+    /**
+     * The subscription.
+     */
+    body: MandateCreate;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/mandates';
+};
+
+export type CreateCustomerMandateErrors = {
+    /**
+     * The body failed validation (`validation_failed`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `subscription_not_mandated`: the subscription is not the customer's, or does not pay by UPI AutoPay.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateCustomerMandateError = CreateCustomerMandateErrors[keyof CreateCustomerMandateErrors];
+
+export type CreateCustomerMandateResponses = {
+    /**
+     * The subscription's mandate as it stands.
+     */
+    200: Mandate;
+    /**
+     * A new mandate on the same terms, pending.
+     */
+    201: Mandate;
+};
+
+export type CreateCustomerMandateResponse = CreateCustomerMandateResponses[keyof CreateCustomerMandateResponses];
+
+export type GetCustomerMandateData = {
+    body?: never;
+    path: {
+        /**
+         * The mandate.
+         */
+        mandate_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/mandates/{mandate_id}';
+};
+
+export type GetCustomerMandateErrors = {
+    /**
+     * A malformed identifier (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No such mandate of the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerMandateError = GetCustomerMandateErrors[keyof GetCustomerMandateErrors];
+
+export type GetCustomerMandateResponses = {
+    /**
+     * The mandate.
+     */
+    200: Mandate;
+};
+
+export type GetCustomerMandateResponse = GetCustomerMandateResponses[keyof GetCustomerMandateResponses];
+
+export type ListPlatformCustomerMandatesData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: {
+        /**
+         * How many, 1 to 100; 20 by default.
+         */
+        limit?: number;
+        /**
+         * The page after the one that answered it.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/customers/{customer_id}/mandates';
+};
+
+export type ListPlatformCustomerMandatesErrors = {
+    /**
+     * A parameter failed validation (`validation_failed`), or a malformed identifier (`malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:read`, or `forbidden` (another surface).
+     */
+    403: Problem;
+    /**
+     * No such customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformCustomerMandatesError = ListPlatformCustomerMandatesErrors[keyof ListPlatformCustomerMandatesErrors];
+
+export type ListPlatformCustomerMandatesResponses = {
+    /**
+     * The mandates.
+     */
+    200: MandatePage;
+};
+
+export type ListPlatformCustomerMandatesResponse = ListPlatformCustomerMandatesResponses[keyof ListPlatformCustomerMandatesResponses];
+
+export type GetSubscriptionReviewData = {
+    body?: never;
+    path: {
+        /**
+         * The subscription.
+         */
+        subscription_id: string;
+    };
+    query?: {
+        /**
+         * The month, `YYYY-MM`; this month on the Location's clock by default.
+         */
+        month?: string;
+    };
+    url: '/v1/customer/subscriptions/{subscription_id}/review';
+};
+
+export type GetSubscriptionReviewErrors = {
+    /**
+     * A malformed month or identifier (`validation_failed`, `malformed_identifier`).
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No delivery of this subscription was ever completed for the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionReviewError = GetSubscriptionReviewErrors[keyof GetSubscriptionReviewErrors];
+
+export type GetSubscriptionReviewResponses = {
+    /**
+     * The month's review.
+     */
+    200: SubscriptionReview;
+};
+
+export type GetSubscriptionReviewResponse = GetSubscriptionReviewResponses[keyof GetSubscriptionReviewResponses];
+
+export type ReviewSubscriptionData = {
+    /**
+     * The review.
+     */
+    body: SubscriptionReviewInput;
+    path: {
+        /**
+         * The subscription.
+         */
+        subscription_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/subscriptions/{subscription_id}/review';
+};
+
+export type ReviewSubscriptionErrors = {
+    /**
+     * `validation_failed`: a tag of the other thumb or unknown, a note over 500 characters, a malformed month, or a month in the future.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * No delivery of this subscription was ever completed for the customer (`not_found`).
+     */
+    404: Problem;
+    /**
+     * `review_month_taken`: the month was reviewed already, until the next; `review_not_due`: no delivery completed in the month yet.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReviewSubscriptionError = ReviewSubscriptionErrors[keyof ReviewSubscriptionErrors];
+
+export type ReviewSubscriptionResponses = {
+    /**
+     * The month's review, written.
+     */
+    201: SubscriptionReview;
+};
+
+export type ReviewSubscriptionResponse = ReviewSubscriptionResponses[keyof ReviewSubscriptionResponses];
+
+export type GetSubscriptionsReportData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The month, `YYYY-MM`.
+         */
+        month: string;
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * Only this store's.
+         */
+        location_id?: string;
+        /**
+         * Only this Vertical's, by code.
+         */
+        vertical?: string;
+    };
+    url: '/v1/platform/reports/subscriptions';
+};
+
+export type GetSubscriptionsReportErrors = {
+    /**
+     * `validation_failed`: a malformed or missing month, or a month in the future; or a malformed identifier.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `report:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetSubscriptionsReportError = GetSubscriptionsReportErrors[keyof GetSubscriptionsReportErrors];
+
+export type GetSubscriptionsReportResponses = {
+    /**
+     * The report, or the spreadsheet.
+     */
+    200: SubscriptionsReport;
+};
+
+export type GetSubscriptionsReportResponse = GetSubscriptionsReportResponses[keyof GetSubscriptionsReportResponses];
