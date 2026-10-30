@@ -1,5 +1,5 @@
 type: object
-description: "How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates. Since 0.28.0, whether a shift is required to go on duty."
+description: "How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates. Since 0.30.0, whether a shift is required to go on duty."
 required:
   - service_id
   - partner_id

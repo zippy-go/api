@@ -1152,7 +1152,7 @@ errors:
         description: The person is on duty in another of their memberships; they go off duty there first.
       - code: duty_no_shift
         message: You have no shift now.
-        description: Since 0.28.0. The service requires a shift to go on duty and the Agent has none under way or starting within 30 minutes; the sentence names the shifts with room left today.
+        description: Since 0.30.0. The service requires a shift to go on duty and the Agent has none under way or starting within 30 minutes; the sentence names the shifts with room left today.
 
   - code: tasks_under_way
     status: 409

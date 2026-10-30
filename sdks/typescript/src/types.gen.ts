@@ -4592,12 +4592,12 @@ export type AgentDocumentStatus = 'uploaded' | 'under_review' | 'approved' | 're
 export type AgentDocumentDecision = 'approve' | 'reject';
 
 /**
- * The kind of stop a task is: `pickup` at the store, or at the customer's door for a laundry leg; `drop_off` at the customer, or at the store for a laundry leg; `appointment`, a visit at a booked time; `on_site_job`, work done at the customer's place (since 0.28.0). Returns come with later steps; clients must tolerate values they do not know.
+ * The kind of stop a task is: `pickup` at the store, or at the customer's door for a laundry leg; `drop_off` at the customer, or at the store for a laundry leg; `appointment`, a visit at a booked time; `on_site_job`, work done at the customer's place (since 0.30.0). Returns come with later steps; clients must tolerate values they do not know.
  */
 export type TaskKind = 'pickup' | 'drop_off' | 'appointment' | 'on_site_job';
 
 /**
- * Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way). Since 0.28.0, an on-site job is `started` once its work begins, and `disputed` when the customer refuses to sign.
+ * Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way). Since 0.30.0, an on-site job is `started` once its work begins, and `disputed` when the customer refuses to sign.
  */
 export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | 'failed' | 'called_off' | 'handed_back' | 'returned' | 'started' | 'disputed';
 
@@ -4607,7 +4607,7 @@ export type TaskStatus = 'accepted' | 'on_the_way' | 'arrived' | 'completed' | '
 export type TaskAssignment = 'offer' | 'direct';
 
 /**
- * A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop: en route), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`. Since 0.28.0: `start` (an on-site job's work begins, once any estimate is approved), `count` (a laundry pickup's items counted, with a photo), and two that end an on-site job, `not_available` (fifteen minutes after arriving and two calls, with a photo) and `dispute` (the customer refuses to sign, with their words).
+ * A step of a task's workflow, and what the Agent app records: `navigate` (starts towards the stop: en route), `arrive` (within the stop's geofence, or with an override and its reason), `scan` (the order label's number), `photo`, `signature`, `code` (the customer's 4-digit code), `cash` (the amount collected), `notes`, and the two that end a task, `complete` and `fail`. Since 0.30.0: `start` (an on-site job's work begins, once any estimate is approved), `count` (a laundry pickup's items counted, with a photo), and two that end an on-site job, `not_available` (fifteen minutes after arriving and two calls, with a photo) and `dispute` (the customer refuses to sign, with their words).
  */
 export type TaskStepKind = 'navigate' | 'arrive' | 'scan' | 'photo' | 'signature' | 'code' | 'cash' | 'notes' | 'complete' | 'fail' | 'start' | 'count' | 'not_available' | 'dispute';
 
@@ -4632,7 +4632,7 @@ export type ProofKind = 'photo' | 'signature' | 'scan' | 'code';
 export type TeamAreaSource = 'service_zones' | 'location_zones' | 'none';
 
 /**
- * Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Since 0.28.0, `no_shift`: the service requires a shift and the Agent has none under way or starting within 30 minutes. Clients must tolerate values they do not know.
+ * Why an Agent cannot be activated, cannot go on duty or cannot take work: the membership is `not_active`, `suspended` or `offboarded`; a required document is `document_missing`, `document_pending` (under review), `document_rejected` or `document_expired`; the person is `on_duty_elsewhere` in another membership. Since 0.30.0, `no_shift`: the service requires a shift and the Agent has none under way or starting within 30 minutes. Clients must tolerate values they do not know.
  */
 export type AgentBlockerCode = 'not_active' | 'suspended' | 'offboarded' | 'document_missing' | 'document_pending' | 'document_rejected' | 'document_expired' | 'on_duty_elsewhere' | 'no_shift';
 
@@ -5114,7 +5114,7 @@ export type AgentCounts = {
 };
 
 /**
- * An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.28.0, the qualifications the Partner approved for the Agent.
+ * An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.30.0, the qualifications the Partner approved for the Agent.
  */
 export type PartnerAgent = {
     /**
@@ -5288,7 +5288,7 @@ export type DutyClosure = {
 };
 
 /**
- * An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled. Since 0.28.0, the shift the stretch works.
+ * An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled. Since 0.30.0, the shift the stretch works.
  */
 export type AgentDuty = {
     /**
@@ -5446,7 +5446,7 @@ export type AgentPositionsAccepted = {
 };
 
 /**
- * One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force. Since 0.28.0, the qualifications the Partner approved for the Agent.
+ * One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force. Since 0.30.0, the qualifications the Partner approved for the Agent.
  */
 export type AgentMembership = {
     /**
@@ -5706,7 +5706,7 @@ export type PayQuote = {
 };
 
 /**
- * A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.28.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted.
+ * A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.30.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted.
  */
 export type AgentTask = {
     /**
@@ -5896,7 +5896,7 @@ export type AgentTaskPage = {
 };
 
 /**
- * A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence. Since 0.28.0: the `count` of items for a count, with its photo's `asset_id`; for not available, the photo's `asset_id` and the `calls` the app made; for dispute, the customer's words as the `note`.
+ * A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence. Since 0.30.0: the `count` of items for a count, with its photo's `asset_id`; for not available, the photo's `asset_id` and the `calls` the app made; for dispute, the customer's words as the `note`.
  */
 export type TaskStepRecord = {
     /**
@@ -6788,7 +6788,7 @@ export type TaskJob = {
 };
 
 /**
- * How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates. Since 0.28.0, whether a shift is required to go on duty.
+ * How a delivery service runs its Agents' work: the geofence of arrival, whether a drop asks for the customer's code or a signature, whether police verification is required, the cash ceiling, the limit of deliveries under way (from the service's delivery configuration) and the workflow templates. Since 0.30.0, whether a shift is required to go on duty.
  */
 export type AgentServiceSettings = {
     /**
@@ -6846,7 +6846,7 @@ export type AgentServiceSettings = {
 };
 
 /**
- * Changes a service's settings; absent members are kept. Since 0.28.0, `shifts_required`.
+ * Changes a service's settings; absent members are kept. Since 0.30.0, `shifts_required`.
  */
 export type AgentServiceSettingsUpdate = {
     /**
@@ -36462,7 +36462,7 @@ export type SetAgentDutyErrors = {
      */
     404: Problem;
     /**
-     * `duty_refused` with the blockers in `errors` (`duty_not_active`, `duty_document_expired`, `duty_elsewhere`, and since 0.28.0 `duty_no_shift`), or `tasks_under_way` going off duty with a delivery under way.
+     * `duty_refused` with the blockers in `errors` (`duty_not_active`, `duty_document_expired`, `duty_elsewhere`, and since 0.30.0 `duty_no_shift`), or `tasks_under_way` going off duty with a delivery under way.
      */
     409: Problem;
     /**

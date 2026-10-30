@@ -1,5 +1,5 @@
 type: string
-description: "Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way). Since 0.28.0, an on-site job is `started` once its work begins, and `disputed` when the customer refuses to sign."
+description: "Where a task stands. It moves only forward: `accepted` (the Agent has it), `on_the_way`, `arrived`, then `completed`, or `failed` with a reason from the template's list. It also ends as `called_off` (the delivery was called off), `handed_back` (the Agent gave a direct assignment back within its minute) or `returned` (the membership was suspended or offboarded, or the duty closed, while it was under way). Since 0.30.0, an on-site job is `started` once its work begins, and `disputed` when the customer refuses to sign."
 enum:
   - accepted
   - on_the_way

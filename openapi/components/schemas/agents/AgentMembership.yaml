@@ -1,5 +1,5 @@
 type: object
-description: "One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force. Since 0.28.0, the qualifications the Partner approved for the Agent."
+description: "One of the person's Agent memberships as the Agent app reads it: the service, where it stands and why, the documents still needed, duty, cash in hand and the pay rule in force. Since 0.30.0, the qualifications the Partner approved for the Agent."
 required:
   - id
   - partner_id

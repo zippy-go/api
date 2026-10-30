@@ -1,5 +1,5 @@
 type: object
-description: "An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled. Since 0.28.0, the shift the stretch works."
+description: "An Agent's duty: whether a stretch is open, in which zone, since when, and whether the Agent may go on duty now. Shifts are not required by any service yet, so every stretch is unscheduled. Since 0.30.0, the shift the stretch works."
 required:
   - agent_id
   - on_duty

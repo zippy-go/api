@@ -1,5 +1,5 @@
 type: object
-description: "A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.28.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted."
+description: "A task: one stop of a trip, with what the Agent carries, the customer while it is under way, the workflow's steps and the pay. The Agent app shows the trip's next stop first. Since 0.30.0: the `window` of a booked job or a laundry leg, an on-site job's `job`, and a pickup's `item_count` once counted."
 required:
   - id
   - trip_id

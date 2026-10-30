@@ -1,5 +1,5 @@
 type: object
-description: Changes a service's settings; absent members are kept. Since 0.28.0, `shifts_required`.
+description: Changes a service's settings; absent members are kept. Since 0.30.0, `shifts_required`.
 properties:
   geofence_metres:
     type:

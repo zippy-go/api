@@ -1,5 +1,5 @@
 type: object
-description: "A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence. Since 0.28.0: the `count` of items for a count, with its photo's `asset_id`; for not available, the photo's `asset_id` and the `calls` the app made; for dispute, the customer's words as the `note`."
+description: "A step recorded in the Agent app, sent in order and applied once however often it is sent. Each carries a client id, when and where it was recorded, and what its kind needs: the scanned or typed `value` for a scan, the entered `value` for a code, an `asset_id` for a photo or a signature, the `amount` for cash, a `note`, a `reason` to fail, an `override_reason` to arrive from outside the geofence. Since 0.30.0: the `count` of items for a count, with its photo's `asset_id`; for not available, the photo's `asset_id` and the `calls` the app made; for dispute, the customer's words as the `note`."
 required:
   - client_id
   - kind

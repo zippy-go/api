@@ -1,5 +1,5 @@
 type: object
-description: "An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.28.0, the qualifications the Partner approved for the Agent."
+description: "An Agent membership as the Partner's console and Mission Control read it: who, of what kind, where it stands and why, the documents it needs, its duty and presence, its current task and its cash in hand. Since 0.30.0, the qualifications the Partner approved for the Agent."
 required:
   - id
   - partner_id

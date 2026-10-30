@@ -11,8 +11,8 @@ the version numbers follow the versioning policy.
 Step 9, field work: qualifications the Partner approves per Agent, shifts
 published, picked and given, the shift a service may require to go on duty,
 the on-site job's steps on the task, and a laundry pickup's count of items.
-Written as the next minor after 0.27.0, beside step 8's other slices and
-step 9's bookings slice; renumbered by merge order. Additive only.
+The first platform slice of step 9 to merge, after step 8's tabs (0.29.0).
+Additive only.
 
 ### Added
 
