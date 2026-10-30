@@ -23,3 +23,7 @@ examples:
         updated_at: 2026-10-15T09:00:00Z
         updated_by: 01a13a48-9e00-7000-8000-00000000a014
         value: 25000
+        group: reference
+        needs_second_person: false
+        pending_approval_id: null
+        ignored: false

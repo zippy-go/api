@@ -1,0 +1,16 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea004",
+  "type": "configuration.plan.price_announced",
+  "version": 1,
+  "occurred_at": "2026-11-20T06:30:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "plan": "standard",
+    "price": 249900,
+    "currency": "INR",
+    "applies_from": "2027-01-01",
+    "approval_id": "019a3d10-2b00-7d00-8a00-00000000ab01",
+    "at": "2026-11-20T06:30:00Z"
+  }
+}

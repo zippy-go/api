@@ -19,6 +19,7 @@ required:
   - total
   - payable
   - carried_out
+  - bill_deductions
 properties:
   sales:
     $ref: ../common/Money.yaml
@@ -77,6 +78,9 @@ properties:
   rewards:
     $ref: ../common/Money.yaml
     description: "What the Partner paid towards reward campaigns: its share of the rewards granted on the Location's orders, less what was taken back. Absent before step 6; nothing when there were none."
+  bill_deductions:
+    $ref: ../common/Money.yaml
+    description: Monthly invoices of the platform settled on this statement by deduction (since step 10).
 examples:
   - sales:
       minor_units: 50000
@@ -130,5 +134,8 @@ examples:
       minor_units: 42920
       currency: INR
     carried_out:
+      minor_units: 0
+      currency: INR
+    bill_deductions:
       minor_units: 0
       currency: INR

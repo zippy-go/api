@@ -1,0 +1,25 @@
+type: object
+description: "A template test-sent to the editor's own number or address, the `MessageTemplateTestSent` schema: locally the message inbox."
+required:
+  - channel
+  - to
+  - message_id
+properties:
+  channel:
+    $ref: ./TemplateChannel.yaml
+    description: The channel.
+  to:
+    type: string
+    description: Where, masked.
+    examples:
+      - a…n@zippygo.local
+  message_id:
+    type: string
+    format: uuid
+    description: The message, in the delivery log.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000bb01
+examples:
+  - channel: push
+    to: a…n@zippygo.local
+    message_id: 019a3d10-2b00-7d00-8a00-00000000bb01

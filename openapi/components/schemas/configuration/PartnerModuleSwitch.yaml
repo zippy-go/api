@@ -1,0 +1,20 @@
+type: object
+description: A module switched on or off, the `PartnerModuleSwitch` schema.
+required:
+  - on
+properties:
+  on:
+    type: boolean
+    description: On, or off. What was placed in a module switched off still completes.
+    examples:
+      - true
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, for the audit log; required of platform staff acting on the Partner's behalf.
+    examples:
+      - null
+examples:
+  - on: true
+    reason: null

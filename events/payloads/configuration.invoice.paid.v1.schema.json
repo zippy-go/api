@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.invoice.paid.v1.schema.json",
+  "title": "ConfigurationInvoicePaidPayload",
+  "description": "Payload of `configuration.invoice.paid` version 1. A monthly invoice was paid. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "invoice_id",
+    "number",
+    "partner_id",
+    "month",
+    "currency",
+    "at",
+    "amount",
+    "method",
+    "statement_id"
+  ],
+  "properties": {
+    "invoice_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The invoice."
+    },
+    "number": {
+      "type": "string",
+      "description": "Its number."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "month": {
+      "type": "string",
+      "description": "The month it bills, `YYYY-MM`.",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of every amount.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "amount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What was paid, in paise."
+    },
+    "method": {
+      "type": "string",
+      "description": "How.",
+      "enum": [
+        "deduction",
+        "upi",
+        "card"
+      ]
+    },
+    "statement_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The payout statement, for a deduction."
+    }
+  }
+}

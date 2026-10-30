@@ -1,0 +1,34 @@
+type: object
+description: "A message template edited, the `MessageTemplateUpdate` schema: a new version, the old ones kept; absent members are kept."
+properties:
+  title:
+    type:
+      - string
+      - "null"
+    description: Its title.
+    examples:
+      - Your order is on
+  body:
+    type: string
+    description: Its body.
+    examples:
+      - "{store} accepted order {number}; it will be ready by {ready_time}."
+  dlt_template_id:
+    type:
+      - string
+      - "null"
+    description: An SMS template's DLT template id.
+    examples:
+      - null
+  reason:
+    type:
+      - string
+      - "null"
+    description: Why, for the audit log.
+    examples:
+      - Warmer words
+examples:
+  - title: Your order is on
+    body: "{store} accepted order {number}; it will be ready by {ready_time}."
+    dlt_template_id: null
+    reason: Warmer words

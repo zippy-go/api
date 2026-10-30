@@ -1,8 +1,7 @@
 type: object
-description: 'The request body of `POST /v1/platform/approvals`: the act, the platform membership it is about and its parameters.'
+description: "The request body of `POST /v1/platform/approvals`: the act, what it is about and its parameters. An act on a platform membership names `membership_id`; the acts of step 10 name their parameters."
 required:
   - action
-  - membership_id
 properties:
   action:
     $ref: ./ApprovalAction.yaml
@@ -10,24 +9,34 @@ properties:
   membership_id:
     type: string
     format: uuid
-    description: The platform membership the act is about.
+    description: The platform membership the act is about, for the acts on a membership.
   grant_id:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
-    description: 'For `revoke_platform_role`: the grant to revoke.'
+    description: "For `revoke_platform_role`: the grant to revoke."
   reason:
     type:
       - string
-      - 'null'
+      - "null"
     description: Why, shown to whoever decides.
   role_id:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
-    description: 'For `grant_platform_role`: the platform role to grant.'
+    description: "For `grant_platform_role`: the platform role to grant."
+  partner_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The Partner the act is about: `change_partner_plan`, `switch_module_off`, `mark_statement_paid`, `create_payout_adjustment`."
+  parameters:
+    type: object
+    description: "The parameters of a step 10 act, checked and frozen when proposed: `plan` and `at_once` for `change_partner_plan`; `plan` and `price` for `set_plan_price`; `country` and `fee_rule` for `set_fee_rule`; `key` and `value` for `set_setting`; `module` for `switch_module_off`; `flag` and the flag's update for `set_flag`; `statement_id` and `reference` for `mark_statement_paid`; the adjustment for `create_payout_adjustment`; `customer_id`, `amount` and `reason` for `credit_wallet`."
+    additionalProperties: true
 examples:
   - action: grant_platform_role
     membership_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a33

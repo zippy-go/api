@@ -1,0 +1,51 @@
+type: object
+description: "A flag's targeting changed, the `FlagUpdate` schema: absent members are kept. A flag gating payments, payouts or dispatch taken to 100% waits for a second person."
+required:
+  - reason
+properties:
+  subject:
+    $ref: ./FlagSubject.yaml
+    description: What the percentage and lists count.
+  percentage:
+    type: integer
+    minimum: 0
+    maximum: 100
+    description: The share of subjects on, 0 to 100.
+    examples:
+      - 10
+  on:
+    type: array
+    items:
+      type: string
+      format: uuid
+      description: A Partner, Location or customer.
+      examples:
+        - 01a13a48-9e00-7000-8000-000000000301
+    description: Always on, replaced as a whole.
+  off:
+    type: array
+    items:
+      type: string
+      format: uuid
+      description: A Partner, Location or customer.
+      examples:
+        - 019a3d10-2b00-7d00-8a00-00000000a501
+    description: Always off, replaced as a whole.
+  staff_only:
+    type: boolean
+    description: On only for platform staff.
+    examples:
+      - false
+  reason:
+    type: string
+    description: Why, for the audit log.
+    examples:
+      - Asha reported a broken shelf
+examples:
+  - subject: customer
+    percentage: 10
+    on: []
+    off:
+      - 019a3d10-2b00-7d00-8a00-00000000a501
+    staff_only: false
+    reason: Asha reported a broken shelf

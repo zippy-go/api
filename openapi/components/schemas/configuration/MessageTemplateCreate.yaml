@@ -1,0 +1,55 @@
+type: object
+description: "A message template made, the `MessageTemplateCreate` schema: its placeholders are checked against its event's variables."
+required:
+  - name
+  - channel
+  - locale
+  - body
+properties:
+  name:
+    type: string
+    description: Its name, at most 80 characters.
+    examples:
+      - order.accepted.festive
+  event_type:
+    type:
+      - string
+      - "null"
+    description: The event it tells; `null` for one sent by hand.
+    examples:
+      - ordering.order.accepted
+  channel:
+    $ref: ./TemplateChannel.yaml
+    description: Its channel.
+  locale:
+    type: string
+    description: Its locale.
+    examples:
+      - en-IN
+  title:
+    type:
+      - string
+      - "null"
+    description: Its title.
+    examples:
+      - Your order is accepted
+  body:
+    type: string
+    description: Its body.
+    examples:
+      - "{store} accepted order {number}: happy Diwali!"
+  dlt_template_id:
+    type:
+      - string
+      - "null"
+    description: An SMS template's DLT template id.
+    examples:
+      - null
+examples:
+  - name: order.accepted.festive
+    event_type: ordering.order.accepted
+    channel: push
+    locale: en-IN
+    title: Your order is accepted
+    body: "{store} accepted order {number}: happy Diwali!"
+    dlt_template_id: null

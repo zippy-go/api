@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/access.approval.proposed.v1.schema.json",
+  "title": "AccessApprovalProposedPayload",
+  "description": "Payload of `access.approval.proposed` version 1. An act was proposed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "approval_id",
+    "action",
+    "subject_kind",
+    "subject_id",
+    "partner_id",
+    "proposed_by",
+    "at",
+    "expires_at"
+  ],
+  "properties": {
+    "approval_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The proposal."
+    },
+    "action": {
+      "type": "string",
+      "description": "The act proposed; consumers must tolerate values they do not know."
+    },
+    "subject_kind": {
+      "type": "string",
+      "description": "What it is about: `membership`, `partner`, `plan`, `fee_rule`, `setting`, `flag`, `module`, `statement`, `adjustment` or `wallet`."
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "Its id or key."
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Partner it is about, when it is about one; the envelope's `partner_id` too."
+    },
+    "proposed_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The platform member who proposed it."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it expires undecided."
+    }
+  }
+}

@@ -1,0 +1,8 @@
+type: string
+description: "How a Partner pays its monthly invoices: by `deduction` from the next payout statement (the default), or by `upi` or `card` on the payment page."
+enum:
+  - deduction
+  - upi
+  - card
+examples:
+  - deduction

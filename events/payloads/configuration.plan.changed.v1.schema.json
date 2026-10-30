@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.plan.changed.v1.schema.json",
+  "title": "ConfigurationPlanChangedPayload",
+  "description": "Payload of `configuration.plan.changed` version 1. A Partner's plan changed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "from",
+    "to",
+    "by",
+    "user_id",
+    "approval_id",
+    "prorated",
+    "effective_at",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "from": {
+      "type": "string",
+      "description": "The plan before.",
+      "enum": [
+        "starter",
+        "standard",
+        "pro"
+      ]
+    },
+    "to": {
+      "type": "string",
+      "description": "The plan now.",
+      "enum": [
+        "starter",
+        "standard",
+        "pro"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "description": "Who: an `owner`, platform `staff`, the `trial` ending, or a `scheduled` downgrade at the month's end.",
+      "enum": [
+        "owner",
+        "staff",
+        "trial",
+        "scheduled"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person who changed it; `null` for the platform's own acts."
+    },
+    "approval_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The proposal approved, for a move at once by staff."
+    },
+    "prorated": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "What the rest of the month costs on the new plan, for an upgrade, in paise."
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it took effect."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

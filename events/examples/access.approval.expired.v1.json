@@ -1,0 +1,17 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea017",
+  "type": "access.approval.expired",
+  "version": 1,
+  "occurred_at": "2026-11-27T06:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "approval_id": "019a3d10-2b00-7d00-8a00-00000000ab01",
+    "action": "change_partner_plan",
+    "subject_kind": "partner",
+    "subject_id": "01a13a48-9e00-7000-8000-000000000001",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "proposed_by": "019a3d10-2b00-7d00-8a00-00000000a601",
+    "at": "2026-11-27T06:30:00Z"
+  }
+}

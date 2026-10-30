@@ -1,0 +1,30 @@
+type: object
+description: The flags, the `FlagList` schema, by name, the stale first.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Flag.yaml
+    description: The flags.
+examples:
+  - items:
+      - name: storefront.recommendations
+        description: Cross-sell's recommendations on the storefront and in the Customer app.
+        owner: growth
+        default: true
+        expires_on: 2027-01-28
+        stale: false
+        gates: null
+        targeting:
+          subject: customer
+          percentage: 100
+          on: []
+          off:
+            - id: 019a3d10-2b00-7d00-8a00-00000000a501
+              label: Asha Rao
+          staff_only: false
+        version: 3
+        updated_at: 2026-11-20T06:30:00Z
+        updated_by: 019a3d10-2b00-7d00-8a00-00000000a601

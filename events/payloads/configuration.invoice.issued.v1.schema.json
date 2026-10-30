@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.invoice.issued.v1.schema.json",
+  "title": "ConfigurationInvoiceIssuedPayload",
+  "description": "Payload of `configuration.invoice.issued` version 1. A monthly invoice was issued. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "invoice_id",
+    "number",
+    "partner_id",
+    "month",
+    "currency",
+    "at",
+    "subtotal",
+    "gst",
+    "total",
+    "method",
+    "due_on"
+  ],
+  "properties": {
+    "invoice_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The invoice."
+    },
+    "number": {
+      "type": "string",
+      "description": "Its number."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "month": {
+      "type": "string",
+      "description": "The month it bills, `YYYY-MM`.",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of every amount.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    },
+    "subtotal": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Its lines, before GST, in paise."
+    },
+    "gst": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Its GST, in paise."
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "What it comes to, in paise."
+    },
+    "method": {
+      "type": "string",
+      "description": "How it is paid.",
+      "enum": [
+        "deduction",
+        "upi",
+        "card"
+      ]
+    },
+    "due_on": {
+      "type": "string",
+      "format": "date",
+      "description": "When it is due."
+    }
+  }
+}

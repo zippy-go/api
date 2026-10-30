@@ -1,0 +1,20 @@
+type: object
+description: One Partner, Location or customer on a flag's list, the `FlagTarget` schema.
+required:
+  - id
+  - label
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Its id.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a501
+  label:
+    type: string
+    description: Its name as staff read it.
+    examples:
+      - Asha Rao
+examples:
+  - id: 019a3d10-2b00-7d00-8a00-00000000a501
+    label: Asha Rao

@@ -1,0 +1,71 @@
+type: object
+description: A Partner's usage of a calendar month on its clock, the `PartnerUsage` schema.
+required:
+  - partner_id
+  - month
+  - time_zone
+  - fee_rule
+  - lines
+  - invoice_estimate
+  - counted_at
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  month:
+    type: string
+    pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    description: The month, `YYYY-MM`.
+    examples:
+      - 2026-11
+  time_zone:
+    type: string
+    description: The clock the month is counted on.
+    examples:
+      - Asia/Kolkata
+  fee_rule:
+    type: string
+    enum:
+      - commission
+      - flat
+    description: "The fee rule its orders carry: `commission` (a percentage of each order, as since step 5) or `flat` (a flat fee per order and the marketplace fee)."
+    examples:
+      - commission
+  lines:
+    type: array
+    items:
+      $ref: ./UsageLine.yaml
+    description: Each unit counted.
+  invoice_estimate:
+    $ref: ../common/Money.yaml
+    description: "What the month's invoice comes to so far before GST: the plan, the add-ons and the messages."
+  counted_at:
+    type: string
+    format: date-time
+    description: When it was counted up to.
+    examples:
+      - 2026-11-20T06:30:00Z
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000001
+    month: 2026-11
+    time_zone: Asia/Kolkata
+    fee_rule: commission
+    lines:
+      - kind: delivery_orders
+        label: Delivery orders
+        count: 412
+        unit_fee:
+          minor_units: 1500
+          currency: INR
+        amount:
+          minor_units: 618000
+          currency: INR
+        settled: weekly
+        words: 412 delivery orders at ₹15.00 each, settled weekly on your statements
+    invoice_estimate:
+      minor_units: 499900
+      currency: INR
+    counted_at: 2026-11-20T06:30:00Z

@@ -1,0 +1,69 @@
+# Path item for /v1/partners/{partner_id}/modules/{module}. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: module
+    in: path
+    required: true
+    description: The module.
+    schema:
+      $ref: ../../components/schemas/configuration/ModuleCode.yaml
+    example: subscriptions
+put:
+  operationId: switchPartnerModule
+  summary: Switch a module on or off
+  description: "Switches a module on or off for the Partner, recorded with who and when; its pages appear or leave the console and the app within a minute, and what was already placed in a module switched off still completes. A module the plan lacks answers `not_in_plan` naming the plan that includes it; one whose Service is not on answers `module_needs_service`. The Partner's owners (`plan:write`); platform staff (`partner:write`) switch one on at once on the Partner's behalf, and propose switching one off: that answers 202 with the proposal."
+  tags:
+    - Configuration
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: On or off, and why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/configuration/PartnerModuleSwitch.yaml
+  responses:
+    "200":
+      description: The module as it now stands.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/PartnerModule.yaml
+    "202":
+      description: "Switching a module off on a Partner's behalf waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`; `not_in_plan`, naming the plan that includes the module."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: The Partner is not one the caller belongs to, or does not exist (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`module_needs_service`: the module needs a Service the Partner has not enabled."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

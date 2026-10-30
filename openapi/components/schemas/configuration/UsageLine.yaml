@@ -1,0 +1,60 @@
+type: object
+description: One kind of unit of a month, the `UsageLine` schema, with what each will cost under the rule in force.
+required:
+  - kind
+  - label
+  - count
+  - unit_fee
+  - amount
+  - settled
+  - words
+properties:
+  kind:
+    $ref: ./UsageKind.yaml
+    description: The unit.
+  label:
+    type: string
+    description: Its name.
+    examples:
+      - Delivery orders
+  count:
+    type: integer
+    description: How many so far.
+    examples:
+      - 412
+  unit_fee:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "What one costs under the rule in force, before GST: an order's fee, a message's pass-through; `null` when it costs nothing."
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What they cost so far, before GST; `null` when nothing.
+  settled:
+    type: string
+    enum:
+      - weekly
+      - invoice
+      - free
+    description: "Where it is paid: `weekly` on the payout statement (an order's fees), `invoice` on the monthly invoice (messages), or `free`."
+    examples:
+      - weekly
+  words:
+    type: string
+    description: The line in a sentence.
+    examples:
+      - 412 delivery orders at ₹15.00 each, settled weekly on your statements
+examples:
+  - kind: delivery_orders
+    label: Delivery orders
+    count: 412
+    unit_fee:
+      minor_units: 1500
+      currency: INR
+    amount:
+      minor_units: 618000
+      currency: INR
+    settled: weekly
+    words: 412 delivery orders at ₹15.00 each, settled weekly on your statements

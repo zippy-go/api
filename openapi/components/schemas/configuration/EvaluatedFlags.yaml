@@ -1,0 +1,22 @@
+type: object
+description: The flags as they read for the caller, the `EvaluatedFlags` schema, read again on `flags.changed` on the `broadcast` channel.
+required:
+  - flags
+  - evaluated_at
+properties:
+  flags:
+    type: array
+    items:
+      $ref: ./EvaluatedFlag.yaml
+    description: Every flag, evaluated for the caller.
+  evaluated_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-20T06:30:00Z
+examples:
+  - flags:
+      - name: storefront.recommendations
+        on: true
+    evaluated_at: 2026-11-20T06:30:00Z

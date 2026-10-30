@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.flag.changed.v1.schema.json",
+  "title": "ConfigurationFlagChangedPayload",
+  "description": "Payload of `configuration.flag.changed` version 1. A feature flag changed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "flag",
+    "version",
+    "subject",
+    "percentage",
+    "on_count",
+    "off_count",
+    "staff_only",
+    "user_id",
+    "approval_id",
+    "at"
+  ],
+  "properties": {
+    "flag": {
+      "type": "string",
+      "description": "The flag."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Its version after the change."
+    },
+    "subject": {
+      "type": "string",
+      "description": "What its percentage counts.",
+      "enum": [
+        "partner",
+        "location",
+        "customer"
+      ]
+    },
+    "percentage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The share on."
+    },
+    "on_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many subjects its on list names."
+    },
+    "off_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many subjects its off list names."
+    },
+    "staff_only": {
+      "type": "boolean",
+      "description": "On only for platform staff."
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who changed it."
+    },
+    "approval_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The proposal approved, for a flag gating payments, payouts or dispatch taken to 100%."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

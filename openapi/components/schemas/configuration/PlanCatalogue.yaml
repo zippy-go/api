@@ -1,0 +1,38 @@
+type: object
+description: The plans, the `PlanCatalogue` schema, cheapest first.
+required:
+  - plans
+properties:
+  plans:
+    type: array
+    items:
+      $ref: ./PlanDefinition.yaml
+    description: The plans.
+examples:
+  - plans:
+      - plan: standard
+        label: Standard
+        price:
+          minor_units: 199900
+          currency: INR
+        next_price: null
+        modules:
+          - delivery
+          - pickup
+          - promotions
+          - loyalty
+          - subscriptions
+          - inventory
+          - own_fleet
+        limits:
+          locations: 5
+          staff: 20
+          agents: 50
+          api_keys: 5
+          webhook_endpoints: 5
+        add_ons:
+          - module: developer
+            price:
+              minor_units: 99900
+              currency: INR
+        partners: 12

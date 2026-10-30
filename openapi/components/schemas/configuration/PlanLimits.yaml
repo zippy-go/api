@@ -1,0 +1,40 @@
+type: object
+description: What a plan allows, the `PlanLimits` schema.
+required:
+  - locations
+  - staff
+  - agents
+  - api_keys
+  - webhook_endpoints
+properties:
+  locations:
+    type: integer
+    description: Locations.
+    examples:
+      - 50
+  staff:
+    type: integer
+    description: Staff members.
+    examples:
+      - 200
+  agents:
+    type: integer
+    description: Agents.
+    examples:
+      - 500
+  api_keys:
+    type: integer
+    description: API keys per environment.
+    examples:
+      - 20
+  webhook_endpoints:
+    type: integer
+    description: Webhook endpoints per environment.
+    examples:
+      - 10
+examples:
+  - locations: 50
+    staff: 200
+    agents: 500
+    api_keys: 20
+    webhook_endpoints: 10

@@ -1,0 +1,10 @@
+type: object
+description: How a Partner pays its monthly invoices, as chosen, the `BillingSettingsUpdate` schema.
+required:
+  - method
+properties:
+  method:
+    $ref: ./BillingMethod.yaml
+    description: How.
+examples:
+  - method: deduction

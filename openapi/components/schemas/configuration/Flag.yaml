@@ -1,0 +1,101 @@
+type: object
+description: "A feature flag, the `Flag` schema: declared in code with its owner, default and expiry, targeted in Mission Control, evaluated on the server and in force on every instance within 30 seconds."
+required:
+  - name
+  - description
+  - owner
+  - default
+  - expires_on
+  - stale
+  - gates
+  - targeting
+  - version
+  - updated_at
+  - updated_by
+properties:
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - storefront.recommendations
+  description:
+    type: string
+    description: What it gates.
+    examples:
+      - Cross-sell's recommendations on the storefront and in the Customer app.
+  owner:
+    type: string
+    description: The team that owns it.
+    examples:
+      - growth
+  default:
+    type: boolean
+    description: Its value where nothing targets the subject.
+    examples:
+      - true
+  expires_on:
+    type: string
+    format: date
+    description: When it should be gone from the code.
+    examples:
+      - 2027-01-28
+  stale:
+    type: boolean
+    description: Past its expiry and still in the code; the build warns naming it and its owner.
+    examples:
+      - false
+  gates:
+    type:
+      - string
+      - "null"
+    enum:
+      - payments
+      - payouts
+      - dispatch
+      - null
+    description: "What it gates, when changing it to 100% needs a second person: `payments`, `payouts` or `dispatch`."
+    examples:
+      - null
+  targeting:
+    $ref: ./FlagTargeting.yaml
+    description: How it is targeted.
+  version:
+    type: integer
+    description: Raised on every change; the entity tag.
+    examples:
+      - 3
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was last changed.
+    examples:
+      - 2026-11-20T06:30:00Z
+  updated_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who changed it.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a601
+examples:
+  - name: storefront.recommendations
+    description: Cross-sell's recommendations on the storefront and in the Customer app.
+    owner: growth
+    default: true
+    expires_on: 2027-01-28
+    stale: false
+    gates: null
+    targeting:
+      subject: customer
+      percentage: 100
+      on: []
+      off:
+        - id: 019a3d10-2b00-7d00-8a00-00000000a501
+          label: Asha Rao
+      staff_only: false
+    version: 3
+    updated_at: 2026-11-20T06:30:00Z
+    updated_by: 019a3d10-2b00-7d00-8a00-00000000a601

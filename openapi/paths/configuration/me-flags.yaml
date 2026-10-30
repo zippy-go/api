@@ -1,0 +1,35 @@
+# Path item for /v1/me/flags. Referenced from openapi.yaml.
+get:
+  operationId: getMyFlags
+  summary: Get the flags as they read for the caller
+  description: "Every feature flag evaluated for the caller, the answers only and never the rules: a customer, Partner, Agent app or Mission Control token, a visitor's token in `X-Visitor-Token`, or nobody. A client reads it on opening and again on `flags.changed` on the `broadcast` channel; a change is in force within 30 seconds."
+  tags:
+    - Configuration
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/VisitorTokenHeader.yaml
+  responses:
+    "200":
+      description: The flags.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/EvaluatedFlags.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,42 @@
+type: object
+description: "A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel."
+required:
+  - partner_id
+  - plan
+  - suspended
+  - modules
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  plan:
+    $ref: ../plans/Plan.yaml
+    description: The plan in force.
+  suspended:
+    type: boolean
+    description: Whether its paid modules are suspended for an invoice unpaid.
+    examples:
+      - false
+  modules:
+    type: array
+    items:
+      $ref: ./PartnerModule.yaml
+    description: Every module of the catalogue, in its order.
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000001
+    plan: pro
+    suspended: false
+    modules:
+      - module: subscriptions
+        name: Subscriptions
+        state: enabled
+        included_from: standard
+        add_on_price: null
+        add_on: false
+        needs: product_sales
+        switched_on_at: 2026-11-03T05:30:00Z
+        switched_on_by: 019a3d10-2b00-7d00-8a00-00000000a601
+        words: On since 3 Nov.

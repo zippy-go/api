@@ -168,6 +168,9 @@ examples:
         carried_out:
           minor_units: 0
           currency: INR
+        bill_deductions:
+          minor_units: 0
+          currency: INR
       rows:
         - order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
           number: AB0042

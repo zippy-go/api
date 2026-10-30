@@ -1,0 +1,74 @@
+type: object
+description: "A plan as the platform keeps it, the `PlanDefinition` schema: its price in force and any announced, its modules, its limits and its add-ons."
+required:
+  - plan
+  - label
+  - price
+  - next_price
+  - modules
+  - limits
+  - add_ons
+  - partners
+properties:
+  plan:
+    $ref: ../plans/Plan.yaml
+    description: The plan.
+  label:
+    type: string
+    description: Its name.
+    examples:
+      - Standard
+  price:
+    $ref: ../common/Money.yaml
+    description: The monthly price in force, before GST.
+  next_price:
+    oneOf:
+      - $ref: ./PlanPriceVersion.yaml
+      - type: "null"
+    description: A price announced and not yet in force.
+  modules:
+    type: array
+    items:
+      $ref: ./ModuleCode.yaml
+      description: A module.
+    description: The modules it includes.
+  limits:
+    $ref: ./PlanLimits.yaml
+    description: What it allows.
+  add_ons:
+    type: array
+    items:
+      $ref: ./PlanAddOn.yaml
+    description: The modules it sells apart.
+  partners:
+    type: integer
+    description: How many Partners are on it.
+    examples:
+      - 12
+examples:
+  - plan: standard
+    label: Standard
+    price:
+      minor_units: 199900
+      currency: INR
+    next_price: null
+    modules:
+      - delivery
+      - pickup
+      - promotions
+      - loyalty
+      - subscriptions
+      - inventory
+      - own_fleet
+    limits:
+      locations: 5
+      staff: 20
+      agents: 50
+      api_keys: 5
+      webhook_endpoints: 5
+    add_ons:
+      - module: developer
+        price:
+          minor_units: 99900
+          currency: INR
+    partners: 12

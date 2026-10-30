@@ -24,3 +24,7 @@ examples:
         decided_by: null
         decision_reason: null
         reason: Joins the finance team on Monday
+        subject: null
+        partner_id: null
+        before: null
+        after: null

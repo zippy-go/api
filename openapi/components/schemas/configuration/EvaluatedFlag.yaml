@@ -1,0 +1,19 @@
+type: object
+description: "One flag as it reads for the caller, the `EvaluatedFlag` schema: the answer only, never the rules."
+required:
+  - name
+  - on
+properties:
+  name:
+    type: string
+    description: The flag.
+    examples:
+      - storefront.recommendations
+  on:
+    type: boolean
+    description: Whether it is on for the caller.
+    examples:
+      - true
+examples:
+  - name: storefront.recommendations
+    on: true

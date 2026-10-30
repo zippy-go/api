@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.module.switched_on.v1.schema.json",
+  "title": "ConfigurationModuleSwitchedOnPayload",
+  "description": "Payload of `configuration.module.switched_on` version 1. A module was switched on for a Partner. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "module",
+    "by",
+    "user_id",
+    "approval_id",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "module": {
+      "type": "string",
+      "description": "The module.",
+      "enum": [
+        "delivery",
+        "pickup",
+        "dine_in",
+        "subscriptions",
+        "field_services",
+        "promotions",
+        "loyalty",
+        "inventory",
+        "own_fleet",
+        "developer"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "description": "Who: an `owner`, platform `staff` (after a second person's approval when switching off), the `plan` changing, `billing` suspending or restoring, or the `trial` ending.",
+      "enum": [
+        "owner",
+        "staff",
+        "plan",
+        "billing",
+        "trial"
+      ]
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The person who switched it; `null` for the platform's own acts."
+    },
+    "approval_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The proposal approved, for staff switching it off."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

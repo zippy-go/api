@@ -1,0 +1,75 @@
+type: object
+description: "A module as one Partner has it, the `PartnerModule` schema: its state, why, and who switched it on."
+required:
+  - module
+  - name
+  - state
+  - included_from
+  - add_on_price
+  - add_on
+  - needs
+  - switched_on_at
+  - switched_on_by
+  - words
+properties:
+  module:
+    $ref: ./ModuleCode.yaml
+    description: The module.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Subscriptions
+  state:
+    $ref: ./ModuleState.yaml
+    description: Where it stands for the Partner.
+  included_from:
+    $ref: ../plans/Plan.yaml
+    description: The lowest plan that includes it.
+  add_on_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its monthly price as an add-on, before GST, when the Partner's plan does not include it but it is sold apart.
+  add_on:
+    type: boolean
+    description: Whether the Partner bought it as an add-on.
+    examples:
+      - false
+  needs:
+    oneOf:
+      - $ref: ../services/ServiceKind.yaml
+      - type: "null"
+    description: The kind of Service it needs on; `null` for none.
+  switched_on_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was switched on; `null` while off.
+    examples:
+      - 2026-11-03T05:30:00Z
+  switched_on_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "Who switched it on: an owner, or platform staff on the Partner's behalf."
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a601
+  words:
+    type: string
+    description: Its state in a sentence the console shows as it is.
+    examples:
+      - On since 3 Nov.
+examples:
+  - module: subscriptions
+    name: Subscriptions
+    state: enabled
+    included_from: standard
+    add_on_price: null
+    add_on: false
+    needs: product_sales
+    switched_on_at: 2026-11-03T05:30:00Z
+    switched_on_by: 019a3d10-2b00-7d00-8a00-00000000a601
+    words: On since 3 Nov.

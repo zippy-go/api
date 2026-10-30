@@ -1,0 +1,19 @@
+type: object
+description: "A credit note issued against an invoice, the `InvoiceCreditNoteCreate` schema: at most what the invoice still carries."
+required:
+  - amount
+  - reason
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it credits, before GST.
+  reason:
+    type: string
+    description: Why, printed on it.
+    examples:
+      - Plan billed twice in November
+examples:
+  - amount:
+      minor_units: 49990
+      currency: INR
+    reason: Plan billed twice in November

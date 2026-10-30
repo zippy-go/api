@@ -66,7 +66,7 @@ properties:
       - Delivery
   everywhere:
     type: boolean
-    description: '`true` when it is switched on at every Location of the Partner, present and future.'
+    description: "`true` when it is switched on at every Location of the Partner, present and future."
   location_ids:
     type: array
     items:
@@ -80,12 +80,12 @@ properties:
     description: The documents it waits for, while `awaiting_documents`.
   trading:
     type: boolean
-    description: '`true` when it trades somewhere now: enabled, in the plan, the Partner active, switched on at a Location, and with agents for an agent-based kind.'
+    description: "`true` when it trades somewhere now: enabled, in the plan, the Partner active, switched on at a Location, and with agents for an agent-based kind."
   blockers:
     type: array
     items:
       $ref: ../partners/Blocker.yaml
-    description: 'What stops it trading, each with its code: `service_disabled`, `document_missing`, `document_pending`, `document_rejected`, `document_expired`, `not_in_plan`, `partner_not_active`, `switched_on_nowhere`, `no_agents`.'
+    description: "What stops it trading, each with its code: `service_disabled`, `document_missing`, `document_pending`, `document_rejected`, `document_expired`, `not_in_plan`, `partner_not_active`, `switched_on_nowhere`, `no_agents`."
   version:
     type: integer
     description: The version, raised by one on every change.
@@ -94,7 +94,7 @@ properties:
   agents:
     type:
       - integer
-      - 'null'
+      - "null"
     description: The agents holding a membership in it, for delivery and field Services; `null` for product sales or when the fleet cannot say.
     minimum: 0
     examples:
@@ -102,27 +102,27 @@ properties:
   created_by:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
     description: Who registered it; `null` for the step 1 rows and the seed.
   pricing_version:
     type:
       - integer
-      - 'null'
+      - "null"
     description: The current pricing version, for a delivery Service that has one.
     examples:
       - 3
   status_reason:
     type:
       - string
-      - 'null'
+      - "null"
     description: Why it is in its status, when platform staff or a plan change set it.
     examples:
       - Not in the Starter plan
   updated_by:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
     description: Who last changed it.
 examples:

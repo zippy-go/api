@@ -15,13 +15,13 @@ properties:
     oneOf:
       - $ref: ./SourcedRate.yaml
         description: Commission percent.
-      - type: 'null'
+      - type: "null"
     description: The commission percent.
   coverage_radius_metres:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Coverage radius in metres.
-      - type: 'null'
+      - type: "null"
     description: The coverage radius metres.
   currency:
     type: string
@@ -32,74 +32,79 @@ properties:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Delivery estimate in minutes.
-      - type: 'null'
+      - type: "null"
     description: The delivery estimate minutes.
   delivery_fee:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Delivery fee.
-      - type: 'null'
+      - type: "null"
     description: The delivery fee.
   fee_by_distance:
     oneOf:
       - $ref: ./SourcedLadder.yaml
         description: Fee by distance.
-      - type: 'null'
+      - type: "null"
     description: The fee by distance.
   fee_by_order_value:
     oneOf:
       - $ref: ./SourcedLadder.yaml
         description: Fee by order value.
-      - type: 'null'
+      - type: "null"
     description: The fee by order value.
   gst_rate_percent:
     oneOf:
       - $ref: ./SourcedRate.yaml
         description: GST rate percent.
-      - type: 'null'
+      - type: "null"
     description: The gst rate percent.
   minimum_order_value:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Minimum order value.
-      - type: 'null'
+      - type: "null"
     description: The minimum order value.
   prescription_fee:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Prescription fee per line.
-      - type: 'null'
+      - type: "null"
     description: The prescription fee.
   prices_include_tax:
     oneOf:
       - $ref: ./SourcedFlag.yaml
         description: Whether prices include tax.
-      - type: 'null'
+      - type: "null"
     description: The prices include tax.
   service_fee_ceiling:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Service fee ceiling.
-      - type: 'null'
+      - type: "null"
     description: The service fee ceiling.
   service_fee_floor:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Service fee floor.
-      - type: 'null'
+      - type: "null"
     description: The service fee floor.
   service_fee_percent:
     oneOf:
       - $ref: ./SourcedRate.yaml
         description: Service fee percent.
-      - type: 'null'
+      - type: "null"
     description: The service fee percent.
   small_order_fee:
     oneOf:
       - $ref: ./SourcedAmount.yaml
         description: Small order fee.
-      - type: 'null'
+      - type: "null"
     description: The small order fee.
+  fee_rule:
+    oneOf:
+      - $ref: ./FeeRule.yaml
+      - type: "null"
+    description: The fee rule in force, with the layer it came from in `chain`; `null` reads as the commission.
 examples:
   - chain:
       - key: IN

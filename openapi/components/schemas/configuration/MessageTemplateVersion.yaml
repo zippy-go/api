@@ -1,0 +1,53 @@
+type: object
+description: One version of a message template, the `MessageTemplateVersion` schema.
+required:
+  - version
+  - title
+  - body
+  - created_at
+  - created_by
+  - used
+properties:
+  version:
+    type: integer
+    description: The version.
+    examples:
+      - 1
+  title:
+    type:
+      - string
+      - "null"
+    description: Its title.
+    examples:
+      - Your order is accepted
+  body:
+    type: string
+    description: Its body.
+    examples:
+      - "{store} accepted order {number}; it will be ready by {ready_time}."
+  created_at:
+    type: string
+    format: date-time
+    description: When it was made.
+    examples:
+      - 2026-10-30T00:00:00Z
+  created_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Who made it; `null` for the seed.
+    examples:
+      - null
+  used:
+    type: boolean
+    description: Whether a message was rendered from it.
+    examples:
+      - true
+examples:
+  - version: 1
+    title: Your order is accepted
+    body: "{store} accepted order {number}; it will be ready by {ready_time}."
+    created_at: 2026-10-30T00:00:00Z
+    created_by: null
+    used: true

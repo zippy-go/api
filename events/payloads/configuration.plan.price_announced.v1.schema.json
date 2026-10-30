@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/configuration.plan.price_announced.v1.schema.json",
+  "title": "ConfigurationPlanPriceAnnouncedPayload",
+  "description": "Payload of `configuration.plan.price_announced` version 1. A plan's price was announced. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "plan",
+    "price",
+    "currency",
+    "applies_from",
+    "approval_id",
+    "at"
+  ],
+  "properties": {
+    "plan": {
+      "type": "string",
+      "description": "The plan.",
+      "enum": [
+        "starter",
+        "standard",
+        "pro"
+      ]
+    },
+    "price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The monthly price, before GST, in paise."
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "applies_from": {
+      "type": "string",
+      "format": "date",
+      "description": "The first month it applies to, its first day."
+    },
+    "approval_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The proposal approved."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

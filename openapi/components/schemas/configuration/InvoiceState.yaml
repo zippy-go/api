@@ -1,0 +1,9 @@
+type: string
+description: "Where a monthly invoice stands: `issued` (due in 15 days), `paid`, `overdue` (past its due day; the paid modules are suspended 15 days after, after a warning 7 days before) or `credited` (credit notes cover it whole). An invoice never changes once issued; a correction is a credit note."
+enum:
+  - issued
+  - paid
+  - overdue
+  - credited
+examples:
+  - issued

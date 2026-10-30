@@ -1,0 +1,19 @@
+type: object
+description: "A plan's new price proposed, the `PlanPriceUpdate` schema: a second person approves it, and it applies to months starting 30 days or more after."
+required:
+  - price
+  - reason
+properties:
+  price:
+    $ref: ../common/Money.yaml
+    description: The monthly price, before GST.
+  reason:
+    type: string
+    description: Why, shown to whoever decides and kept in the audit log.
+    examples:
+      - Costs of the message rails went up
+examples:
+  - price:
+      minor_units: 249900
+      currency: INR
+    reason: Costs of the message rails went up

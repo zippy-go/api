@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/reference.fee_rule.versioned.v1.schema.json",
+  "title": "ReferenceFeeRuleVersionedPayload",
+  "description": "Payload of `reference.fee_rule.versioned` version 1. A country's fee rule changed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "country",
+    "version",
+    "fee_model",
+    "approval_id",
+    "at"
+  ],
+  "properties": {
+    "country": {
+      "type": "string",
+      "description": "The country, ISO 3166-1 alpha-2.",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The country policy's version after the change."
+    },
+    "fee_model": {
+      "type": "string",
+      "description": "The rule: `commission`, or `flat` with the marketplace fee.",
+      "enum": [
+        "commission",
+        "flat"
+      ]
+    },
+    "approval_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The proposal approved."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened."
+    }
+  }
+}

@@ -1,0 +1,59 @@
+type: object
+description: "A module of the catalogue, the `ModuleDefinition` schema: what it is, the Service it needs, the lowest plan that includes it and its add-on price where it can be bought apart."
+required:
+  - module
+  - name
+  - description
+  - needs
+  - included_from
+  - add_on_price
+  - offered
+  - flag
+properties:
+  module:
+    $ref: ./ModuleCode.yaml
+    description: The module.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Subscriptions
+  description:
+    type: string
+    description: What it does, a sentence.
+    examples:
+      - Daily and weekly plans customers subscribe to, generated each day at the cutoff.
+  needs:
+    oneOf:
+      - $ref: ../services/ServiceKind.yaml
+      - type: "null"
+    description: The kind of Service it needs on; `null` for none.
+  included_from:
+    $ref: ../plans/Plan.yaml
+    description: The lowest plan that includes it.
+  add_on_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its monthly price as an add-on to a plan that does not include it, before GST; `null` when it is not sold apart.
+  offered:
+    type: boolean
+    description: Whether the platform offers it at all; a module withdrawn is off for every Partner.
+    examples:
+      - true
+  flag:
+    type:
+      - string
+      - "null"
+    description: The feature flag it ships behind, when one gates it.
+    examples:
+      - null
+examples:
+  - module: subscriptions
+    name: Subscriptions
+    description: Daily and weekly plans customers subscribe to, generated each day at the cutoff.
+    needs: product_sales
+    included_from: standard
+    add_on_price: null
+    offered: true
+    flag: null

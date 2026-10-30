@@ -1,0 +1,19 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000ea006",
+  "type": "configuration.invoice.paid",
+  "version": 1,
+  "occurred_at": "2026-12-08T03:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "invoice_id": "019a3d10-2b00-7d00-8a00-00000000c901",
+    "number": "PB-2026-00007",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "month": "2026-11",
+    "currency": "INR",
+    "at": "2026-12-08T03:30:00Z",
+    "amount": 589882,
+    "method": "deduction",
+    "statement_id": "019a3d10-2b00-7d00-8a00-00000000c501"
+  }
+}

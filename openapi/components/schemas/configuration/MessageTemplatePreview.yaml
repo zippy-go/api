@@ -1,0 +1,28 @@
+type: object
+description: A template rendered with sample data, the `MessageTemplatePreview` schema.
+required:
+  - title
+  - body
+  - characters
+properties:
+  title:
+    type:
+      - string
+      - "null"
+    description: The title.
+    examples:
+      - Your order is accepted
+  body:
+    type: string
+    description: The body.
+    examples:
+      - Dev Kitchen Gachibowli accepted order AB0042; it will be ready by 13:40.
+  characters:
+    type: integer
+    description: The body's length, against the channel's limit.
+    examples:
+      - 74
+examples:
+  - title: Your order is accepted
+    body: Dev Kitchen Gachibowli accepted order AB0042; it will be ready by 13:40.
+    characters: 74

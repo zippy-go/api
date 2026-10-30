@@ -9,6 +9,10 @@ required:
   - default
   - choices
   - overridden
+  - group
+  - needs_second_person
+  - pending_approval_id
+  - ignored
 properties:
   choices:
     type: array
@@ -33,13 +37,13 @@ properties:
   maximum:
     type:
       - integer
-      - 'null'
+      - "null"
     format: int64
     description: The maximum, for a range.
   minimum:
     type:
       - integer
-      - 'null'
+      - "null"
     format: int64
     description: The minimum, for a range.
   overridden:
@@ -51,26 +55,43 @@ properties:
   unit:
     type:
       - string
-      - 'null'
+      - "null"
     description: The unit, for a range.
   updated_at:
     type:
       - string
-      - 'null'
+      - "null"
     format: date-time
     description: When the stored value was set.
   updated_by:
     type:
       - string
-      - 'null'
+      - "null"
     format: uuid
     description: Who set it.
   value:
     type: integer
     format: int64
-    description: 'The value in force: the override when one is stored and in range, else the default.'
+    description: "The value in force: the override when one is stored and in range, else the default."
     examples:
       - 25000
+  group:
+    type: string
+    description: "Its group: `codes`, `ordering`, `preparation`, `retention`, `display` and the groups of earlier steps (`reference`, `notifications`, `dispatch` and the rest)."
+    examples:
+      - retention
+  needs_second_person:
+    type: boolean
+    description: "Whether a change waits for a second person: the retention periods."
+  pending_approval_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A change proposed and waiting for its second person.
+  ignored:
+    type: boolean
+    description: Whether the stored value falls outside this build's bounds, so the default is in force and the page shows the stored value as ignored.
 examples:
   - choices:
       - label: Keeps the drawer open
@@ -87,3 +108,7 @@ examples:
     updated_at: 2026-10-15T09:00:00Z
     updated_by: 01a13a48-9e00-7000-8000-00000000a014
     value: 25000
+    group: reference
+    needs_second_person: false
+    pending_approval_id: null
+    ignored: false

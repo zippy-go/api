@@ -1,0 +1,36 @@
+type: object
+description: What a proposal is about, the `ApprovalSubject` schema, for an act that is not about a platform membership.
+required:
+  - kind
+  - id
+  - label
+properties:
+  kind:
+    type: string
+    enum:
+      - partner
+      - plan
+      - fee_rule
+      - setting
+      - flag
+      - module
+      - statement
+      - adjustment
+      - wallet
+    description: What it is.
+    examples:
+      - partner
+  id:
+    type: string
+    description: Its id or key.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  label:
+    type: string
+    description: Its name as staff read it.
+    examples:
+      - ZippyGo Dev Partner
+examples:
+  - kind: partner
+    id: 01a13a48-9e00-7000-8000-000000000001
+    label: ZippyGo Dev Partner

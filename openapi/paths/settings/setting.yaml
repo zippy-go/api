@@ -1,4 +1,3 @@
-# Path item for /v1/settings/{key}. Referenced from openapi.yaml.
 parameters:
   - name: key
     in: path
@@ -16,31 +15,31 @@ get:
   security:
     - Bearer: []
   responses:
-    '200':
+    "200":
       description: The setting
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/reference/Setting.yaml
-    '401':
+    "401":
       description: No valid token
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: '`access_denied`: a Mission Control token without `setting:read`'
+    "403":
+      description: "`access_denied`: a Mission Control token without `setting:read`"
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: No setting with that key is declared
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store is unavailable
       content:
         application/problem+json:
@@ -61,7 +60,7 @@ get:
 put:
   operationId: putSetting
   summary: Stores a value within the setting's bounds
-  description: Stores a value within the setting's bounds; platform staff.
+  description: "Stores a value within the setting's bounds; platform staff. A retention period (`needs_second_person`) changes only with a second person: the change is proposed and answers 202 with the proposal."
   tags:
     - Settings
   security:
@@ -74,37 +73,43 @@ put:
         schema:
           $ref: ../../components/schemas/reference/SettingValue.yaml
   responses:
-    '200':
+    "200":
       description: The setting after the change
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/reference/Setting.yaml
-    '400':
+    "202":
+      description: "A retention period waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
+    "400":
       description: Malformed body, or `setting_out_of_range`
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '401':
+    "401":
       description: No valid token
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: 'Not platform staff, or `access_denied` without `setting:write`'
+    "403":
+      description: Not platform staff, or `access_denied` without `setting:write`
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: No setting with that key is declared
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store is unavailable
       content:
         application/problem+json:
@@ -131,31 +136,31 @@ delete:
   security:
     - Bearer: []
   responses:
-    '200':
+    "200":
       description: The setting at its default
       content:
         application/json:
           schema:
             $ref: ../../components/schemas/reference/Setting.yaml
-    '401':
+    "401":
       description: No valid token
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '403':
-      description: 'Not platform staff, or `access_denied` without `setting:write`'
+    "403":
+      description: Not platform staff, or `access_denied` without `setting:write`
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '404':
+    "404":
       description: No setting with that key is declared
       content:
         application/problem+json:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
-    '503':
+    "503":
       description: A store is unavailable
       content:
         application/problem+json:

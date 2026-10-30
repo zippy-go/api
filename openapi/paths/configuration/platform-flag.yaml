@@ -1,0 +1,104 @@
+# Path item for /v1/platform/flags/{flag}. Referenced from openapi.yaml.
+parameters:
+  - name: flag
+    in: path
+    required: true
+    description: The flag's name.
+    schema:
+      type: string
+      pattern: ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$
+      maxLength: 80
+    example: storefront.recommendations
+get:
+  operationId: getPlatformFlag
+  summary: Get a feature flag
+  description: A flag with its targeting. `setting:read`.
+  tags: &a2
+    - Configuration
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The flag.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/Flag.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: No such flag in code (`not_found`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+patch:
+  operationId: patchPlatformFlag
+  summary: Target a feature flag
+  description: "Changes a flag's percentage, subject, lists or staff-only targeting, audited and in force on every instance within 30 seconds (`configuration.flag.changed`, then `flags.changed` on `broadcast`). A flag gating payments, payouts or dispatch taken to 100% waits for a second person: that answers 202 with the proposal. `flag:write`."
+  tags: *a2
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The targeting changed, and why.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/configuration/FlagUpdate.yaml
+  responses:
+    "200":
+      description: The flag as it now stands.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/configuration/Flag.yaml
+    "202":
+      description: "A flag gating payments, payouts or dispatch at 100% waits for a different platform member holding `approval:decide`: the proposal, which expires after 7 days. Nothing changes until it is approved."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: No such flag in code (`not_found`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
