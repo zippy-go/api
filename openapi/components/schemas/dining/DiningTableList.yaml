@@ -1,0 +1,23 @@
+type: object
+description: A Location's tables, by name.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./DiningTable.yaml
+    description: The tables.
+examples:
+  - items:
+      - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+        location_id: 01a13a48-9e00-7000-8000-000000000301
+        name: "12"
+        seats: 4
+        area: Terrace
+        service: order
+        code: T7Q2M9XK
+        link: https://zippygo.local/t/T7Q2M9XK
+        code_regenerated_at: null
+        version: 1
+        created_at: 2026-11-06T10:00:00Z

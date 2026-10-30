@@ -2289,3 +2289,108 @@ errors:
     message: "Review it once a delivery is done this month"
     retryable: false
     description: "No delivery of the subscription completed in the month named yet."
+
+  - code: table_code_inactive
+    status: 409
+    title: Code not active
+    message: "This table's code is not active."
+    retryable: false
+    description: "A table's code regenerated since its sheet was printed, or its table removed: the store's page opens with the notice and no tab opens."
+
+  - code: dine_in_off
+    status: 409
+    title: Dine-in off
+    message: "The store takes no dine-in tabs."
+    retryable: false
+    description: "The Location has dine-in switched off."
+
+  - code: table_pay_only
+    status: 409
+    title: Pay-only table
+    message: "Staff take the order at this table."
+    retryable: false
+    description: "A diner ordering at a pay-only table: staff take the order and diners scan to pay."
+
+  - code: table_occupied
+    status: 409
+    title: Table occupied
+    message: "A tab is open at this table."
+    retryable: false
+    description: "Opening a tab, moving one or removing a table where a tab is already open: join it, or settle it first."
+
+  - code: table_name_taken
+    status: 409
+    title: Table name taken
+    message: "The Location already has a table of that name."
+    retryable: false
+    description: "A table's name used by another table of the Location."
+
+  - code: tab_not_open
+    status: 409
+    title: Tab not open
+    message: "The tab takes no rounds now."
+    retryable: false
+    description: "A round or a change of a tab whose bill was presented (staff reopen it), or one settled, closed or cancelled."
+
+  - code: tab_bill_not_presented
+    status: 409
+    title: Bill not asked for
+    message: "Ask for the bill first."
+    retryable: false
+    description: "Paying or reading the bill of a tab whose bill was not asked for."
+
+  - code: tab_has_payments
+    status: 409
+    title: Payments made
+    message: "The bill has payments."
+    retryable: false
+    description: "Removing the service charge, or voiding a line paid by items, once a payment of the bill was made."
+
+  - code: join_code_wrong
+    status: 409
+    title: Wrong join code
+    message: "That join code is not right."
+    retryable: false
+    description: "A join code that is not the open tab's; five in a row lock joining at the table for ten minutes."
+
+  - code: joining_locked
+    status: 409
+    title: Joining locked
+    message: "Too many wrong codes; try again in ten minutes."
+    retryable: false
+    description: "Five wrong join codes in a row at a table lock joining there for ten minutes."
+
+  - code: joining_closed
+    status: 409
+    title: Joining closed
+    message: "The tab takes no new members."
+    retryable: false
+    description: "The tab's opener closed it to joiners."
+
+  - code: round_fired
+    status: 409
+    title: Round already fired
+    message: "The kitchen has started it: ask the staff."
+    retryable: false
+    description: "Recalling a round whose first course the kitchen fired."
+
+  - code: line_fired
+    status: 409
+    title: Line already fired
+    message: "The kitchen has started it: serve or void it."
+    retryable: false
+    description: "Declining a line the kitchen fired: it can only be served, or voided by a manager."
+
+  - code: tab_payment_over
+    status: 409
+    title: More than remains
+    message: "{remaining} remains to pay."
+    retryable: false
+    description: "A share over what remains of the bill; the sentence says what remains."
+
+  - code: card_hold_off
+    status: 409
+    title: No card hold
+    message: "The store asks for no card hold."
+    retryable: false
+    description: "A card hold at a Location that asks for none."

@@ -1,0 +1,20 @@
+type: object
+description: The table a tab is on.
+required:
+  - table_id
+  - name
+properties:
+  table_id:
+    type: string
+    format: uuid
+    description: The table.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - "12"
+examples:
+  - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+    name: "12"

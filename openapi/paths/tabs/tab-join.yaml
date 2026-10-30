@@ -1,0 +1,57 @@
+# Path item for /v1/tabs/join. Referenced from openapi.yaml.
+post:
+  operationId: joinTab
+  summary: Join a tab
+  description: "Joins the tab open on the table of `code` with its join code: the joiner sees the whole tab and sends rounds of their own, each line marked with their name. Five wrong codes in a row lock joining at that table for ten minutes (`joining_locked`). Joining a tab one is already in answers it."
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: X-Visitor-Token
+      in: header
+      required: false
+      description: A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+      schema:
+        type: string
+  requestBody:
+    required: true
+    description: The table's code, the join code and the joiner's name.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/tabs/TabJoin.yaml
+  responses:
+    "200":
+      description: The tab.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/Tab.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or member."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "A refusal: `join_code_wrong`, `joining_locked`, `joining_closed`, `table_code_inactive` or `tab_not_open`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

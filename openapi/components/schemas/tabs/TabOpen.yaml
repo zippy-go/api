@@ -1,0 +1,33 @@
+type: object
+description: Opening a tab with its first round from a table's code.
+required:
+  - code
+  - name
+  - lines
+properties:
+  code:
+    type: string
+    description: The table's code.
+    examples:
+      - T7Q2M9XK
+  name:
+    type: string
+    minLength: 1
+    maxLength: 30
+    description: The name the opener gives, shown on their lines.
+    examples:
+      - Asha
+  lines:
+    type: array
+    items:
+      $ref: ./TabLineInput.yaml
+    description: The first round; empty under a card hold, which opens the tab before any round.
+examples:
+  - code: T7Q2M9XK
+    name: Asha
+    lines:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602
+        quantity: 1
+        answers: []
+        note: null

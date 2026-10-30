@@ -12105,6 +12105,10 @@ export type CatalogVariant = {
      * Enabled, in stock and not counted down to nothing.
      */
     sellable: boolean;
+    /**
+     * Its price at the Location's tables, which the dine-in menu and tabs charge; `null` charges `price`. Since 0.29.0.
+     */
+    dine_in_price?: Money | null;
 };
 
 /**
@@ -12151,6 +12155,10 @@ export type CatalogVariantInput = {
      * How many are on hand, where the type tracks inventory.
      */
     quantity?: number | null;
+    /**
+     * Its price at the Location's tables in minor units; `null` charges `price`. Since 0.29.0.
+     */
+    dine_in_price?: number | null;
 };
 
 /**
@@ -14222,6 +14230,10 @@ export type MenuVariant = {
      * Its own picture.
      */
     picture: CataloguePicture | null;
+    /**
+     * Its price at the Location's tables, which the dine-in menu and tabs charge; `null` charges what a basket pays. In `mode=dine_in`, `price` is already it. Since 0.29.0; absent from a menu published before.
+     */
+    dine_in_price?: Money | null;
 };
 
 /**
@@ -33891,6 +33903,1351 @@ export type ReservationSeatInput = {
      * The table, one of the Location's.
      */
     table_id: string;
+};
+
+/**
+ * How a table is served: `order` (diners scan, order rounds and pay from their phones) or `pay_only` (staff take the order; diners scan only to pay).
+ */
+export type DineInService = 'order' | 'pay_only';
+
+/**
+ * A table of a Location with its seats, its area, how it is served and the code printed on its sheet. Regenerating the code makes every sheet printed before it inactive.
+ */
+export type DiningTable = {
+    /**
+     * The table.
+     */
+    table_id: string;
+    /**
+     * Its Location.
+     */
+    location_id: string;
+    /**
+     * Its name as staff and diners read it.
+     */
+    name: string;
+    /**
+     * How many it seats.
+     */
+    seats: number;
+    /**
+     * The area it stands in, such as Terrace.
+     */
+    area: string | null;
+    /**
+     * How it is served; the Location's setting unless set here.
+     */
+    service: DineInService;
+    /**
+     * The code printed on its sheet, read by a scan; the link carries it.
+     */
+    code: string;
+    /**
+     * The link the sheet's QR code carries: the storefront's table page, which the Customer app opens as its own.
+     */
+    link: string;
+    /**
+     * When its code was last regenerated; sheets printed before it no longer open a tab.
+     */
+    code_regenerated_at: string | null;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+    /**
+     * When it was added.
+     */
+    created_at: string;
+};
+
+/**
+ * A Location's tables, by name.
+ */
+export type DiningTableList = {
+    /**
+     * The tables.
+     */
+    items: Array<DiningTable>;
+};
+
+/**
+ * A table to add.
+ */
+export type DiningTableInput = {
+    /**
+     * Its name, unique at the Location.
+     */
+    name: string;
+    /**
+     * How many it seats.
+     */
+    seats: number;
+    /**
+     * The area it stands in.
+     */
+    area?: string | null;
+    /**
+     * How it is served; the Location's setting when `null`.
+     */
+    service?: DineInService | null;
+};
+
+/**
+ * A change of a table; absent members keep what is stored.
+ */
+export type DiningTableUpdate = {
+    /**
+     * A new name, unique at the Location.
+     */
+    name?: string;
+    /**
+     * How many it seats.
+     */
+    seats?: number;
+    /**
+     * The area; `null` clears it.
+     */
+    area?: string | null;
+    /**
+     * How it is served; `null` follows the Location again.
+     */
+    service?: DineInService | null;
+};
+
+/**
+ * How a Location runs dine-in: whether it takes it, how its tables are served by default, pay-first from an hour, a card hold for open tabs, GST added at the bill and an optional service charge.
+ */
+export type DineInSettings = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Whether tables open tabs; scans of a Location that takes none open its page with a notice.
+     */
+    enabled: boolean;
+    /**
+     * How its tables are served unless a table says otherwise.
+     */
+    service: DineInService;
+    /**
+     * From this time on its clock until closing, a round is paid before it reaches the kitchen; `null` never.
+     */
+    pay_first_from: string | null;
+    /**
+     * An amount held on a card before a tab's first round reaches the kitchen, charged for what the tab comes to and released for the rest; `null` asks for none.
+     */
+    card_hold: Money | null;
+    /**
+     * GST added at the bill, in percent, where prices are written before tax; `null` when prices include it.
+     */
+    gst_percent: number | null;
+    /**
+     * An optional service charge in percent, shown on the bill and removable by the diners; `null` takes none.
+     */
+    service_charge_percent: number | null;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+};
+
+/**
+ * A change of the dine-in settings; absent members keep what is stored.
+ */
+export type DineInSettingsUpdate = {
+    /**
+     * Whether tables open tabs.
+     */
+    enabled?: boolean;
+    /**
+     * How tables are served by default.
+     */
+    service?: DineInService;
+    /**
+     * Pay-first from this time; `null` turns it off.
+     */
+    pay_first_from?: string | null;
+    /**
+     * A card hold; `null` asks for none.
+     */
+    card_hold?: Money | null;
+    /**
+     * GST added at the bill; `null` when prices include it.
+     */
+    gst_percent?: number | null;
+    /**
+     * A service charge; `null` takes none.
+     */
+    service_charge_percent?: number | null;
+};
+
+/**
+ * Where a tab is: `open` (rounds go to the kitchen), `bill_presented` (frozen: no new round until staff reopen it), `settled` (paid in full: a completed order), `closed_unpaid` (closed by a manager with what was owed charged or written off), `cancelled` (opened by mistake, nothing served).
+ */
+export type TabState = 'open' | 'bill_presented' | 'settled' | 'closed_unpaid' | 'cancelled';
+
+/**
+ * Where a tab's line is: `awaiting_payment` (a round waiting before the kitchen: paid first, or until the card is held), `sent` (at the kitchen), `held` (its course waits to be fired), `fired` (in preparation), `ready`, `served`, `declined` (the kitchen could not make it: it leaves the bill), `voided` (taken off by a manager), `recalled` (its round was taken back before anything was fired).
+ */
+export type TabLineState = 'awaiting_payment' | 'sent' | 'held' | 'fired' | 'ready' | 'served' | 'declined' | 'voided' | 'recalled';
+
+/**
+ * One line of a round: a variant of an item of the store's dine-in menu.
+ */
+export type TabLineInput = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The answers to the item's questions, three deep, as a basket takes them; each priced answer is charged on the line.
+     */
+    answers?: Array<BasketAnswerInput>;
+    /**
+     * A note for the kitchen.
+     */
+    note?: string | null;
+};
+
+/**
+ * Someone at the tab: whoever opened it or joined it, signed in or a guest.
+ */
+export type TabMember = {
+    /**
+     * The member.
+     */
+    member_id: string;
+    /**
+     * The name they gave, as each line shows it.
+     */
+    name: string;
+    /**
+     * Whether they are signed in as a customer, rather than a guest on a visitor token.
+     */
+    signed_in: boolean;
+    /**
+     * When they opened or joined the tab.
+     */
+    joined_at: string;
+};
+
+/**
+ * A line of a tab: what was sent, by whom, at the dine-in price, and where it is.
+ */
+export type TabLine = {
+    /**
+     * The line.
+     */
+    line_id: string;
+    /**
+     * Its round.
+     */
+    round_id: string;
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant.
+     */
+    variant_id: string;
+    /**
+     * The item's name as sent.
+     */
+    name: string;
+    /**
+     * The variant's values.
+     */
+    variant_label: string | null;
+    /**
+     * Its veg or non-veg mark.
+     */
+    food_mark: FoodMark | null;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The price of one as sent: the dine-in price, its priced answers included.
+     */
+    unit_price: Money;
+    /**
+     * The answers to its questions, as sold.
+     */
+    answers: Array<OrderAnswer>;
+    /**
+     * What the line costs: the price times the quantity; nothing once declined, voided or recalled.
+     */
+    total: Money;
+    /**
+     * Where it is.
+     */
+    state: TabLineState;
+    /**
+     * Who added it.
+     */
+    member_id: string;
+    /**
+     * Their name.
+     */
+    member_name: string;
+    /**
+     * The note for the kitchen.
+     */
+    note: string | null;
+    /**
+     * Why it was declined or voided.
+     */
+    reason: string | null;
+};
+
+/**
+ * A round: lines sent together by one member.
+ */
+export type TabRound = {
+    /**
+     * The round.
+     */
+    round_id: string;
+    /**
+     * Its number on the tab, from 1.
+     */
+    number: number;
+    /**
+     * Who sent it.
+     */
+    member_id: string;
+    /**
+     * Their name.
+     */
+    member_name: string;
+    /**
+     * When it was sent.
+     */
+    sent_at: string;
+    /**
+     * Whether it was recalled.
+     */
+    recalled: boolean;
+    /**
+     * Whether it may still be recalled: nothing of it fired yet.
+     */
+    recallable: boolean;
+    /**
+     * Whether it was paid before it reached the kitchen, under pay-first.
+     */
+    paid_first: boolean;
+    /**
+     * Its lines.
+     */
+    lines: Array<TabLine>;
+};
+
+/**
+ * The service charge on the bill: optional, removable by the diners, the Location seeing that it was removed.
+ */
+export type TabServiceCharge = {
+    /**
+     * In percent.
+     */
+    percent: number;
+    /**
+     * What it comes to.
+     */
+    amount: Money;
+    /**
+     * Whether it is on the bill.
+     */
+    included: boolean;
+};
+
+/**
+ * What a tab comes to so far, as the bill draws it.
+ */
+export type TabTotals = {
+    /**
+     * Its lines' total, declined, voided and recalled lines left out.
+     */
+    items: Money;
+    /**
+     * What offers and staff discounts took off.
+     */
+    discounts: Money;
+    /**
+     * The service charge; `null` where the Location takes none.
+     */
+    service_charge: TabServiceCharge | null;
+    /**
+     * GST added at the bill; nothing where prices include it.
+     */
+    gst: Money;
+    /**
+     * What the tab costs.
+     */
+    total: Money;
+    /**
+     * What its payments took so far, tips left out.
+     */
+    paid: Money;
+    /**
+     * What is left to pay.
+     */
+    remaining: Money;
+    /**
+     * Tips the payers added, the restaurant's own.
+     */
+    tips: Money;
+};
+
+/**
+ * The table a tab is on.
+ */
+export type TabTable = {
+    /**
+     * The table.
+     */
+    table_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+};
+
+/**
+ * A card hold on an open tab.
+ */
+export type TabHold = {
+    /**
+     * The payment holding it.
+     */
+    payment_id: string;
+    /**
+     * What is held.
+     */
+    amount: Money;
+    /**
+     * `pending` until the card holds it, `held`, then `charged` or `released`.
+     */
+    state: 'pending' | 'held' | 'charged' | 'released';
+};
+
+/**
+ * A payment of a tab: from a diner's phone or recorded at the counter.
+ */
+export type TabPaymentSummary = {
+    /**
+     * The payment.
+     */
+    payment_id: string;
+    /**
+     * `diner` or `counter`.
+     */
+    by: 'diner' | 'counter';
+    /**
+     * The diner who paid; `null` at the counter.
+     */
+    member_name: string | null;
+    /**
+     * `upi`, `card`, `wallet` or, at the counter, `cash`.
+     */
+    method: 'upi' | 'card' | 'wallet' | 'cash';
+    /**
+     * What it paid of the bill.
+     */
+    amount: Money;
+    /**
+     * The tip added to it.
+     */
+    tip: Money;
+    /**
+     * `pending` until the provider confirms it, then `paid`, or `failed`.
+     */
+    status: 'pending' | 'paid' | 'failed';
+    /**
+     * When it was confirmed.
+     */
+    paid_at: string | null;
+    /**
+     * The receipt's token, for the caller's own payment once paid: its page at `/receipts/{token}`.
+     */
+    receipt_token?: string | null;
+};
+
+/**
+ * A tab as its members read it: an order bound to a table that collects rounds until it is paid. `tab.changed` on `tab-{tab_id}`, heard by anybody holding the tab's id, says it changed and its version, never what changed: a member reads it again.
+ */
+export type Tab = {
+    /**
+     * The tab, which is the order's id.
+     */
+    tab_id: string;
+    /**
+     * The order's number.
+     */
+    number: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * The Location's name.
+     */
+    store_name: string;
+    /**
+     * The table it is on.
+     */
+    table: TabTable;
+    /**
+     * Where it is.
+     */
+    state: TabState;
+    /**
+     * The code friends enter to join, shown to its members.
+     */
+    join_code: string;
+    /**
+     * Whether others may join it.
+     */
+    joining_open: boolean;
+    /**
+     * Whether a round is paid before it reaches the kitchen now.
+     */
+    pay_first: boolean;
+    /**
+     * The member the caller is; `null` for staff.
+     */
+    you: string | null;
+    /**
+     * Its members.
+     */
+    members: Array<TabMember>;
+    /**
+     * Its rounds, the first first.
+     */
+    rounds: Array<TabRound>;
+    /**
+     * What it comes to so far.
+     */
+    totals: TabTotals;
+    /**
+     * The card hold, where the Location asks for one.
+     */
+    hold: TabHold | null;
+    /**
+     * Its payments.
+     */
+    payments: Array<TabPaymentSummary>;
+    /**
+     * When its first round was sent.
+     */
+    opened_at: string;
+    /**
+     * When the bill was asked for.
+     */
+    bill_presented_at: string | null;
+    /**
+     * Raised by every change.
+     */
+    version: number;
+};
+
+/**
+ * Opening a tab with its first round from a table's code.
+ */
+export type TabOpen = {
+    /**
+     * The table's code.
+     */
+    code: string;
+    /**
+     * The name the opener gives, shown on their lines.
+     */
+    name: string;
+    /**
+     * The first round; empty under a card hold, which opens the tab before any round.
+     */
+    lines: Array<TabLineInput>;
+};
+
+/**
+ * Joining a tab, which makes the caller a member who reads its bill and pays: the table's code with the tab's join code; the table's code alone while the table is pay-only; or the bill's key its link carries (`?key=`), which stops working once the tab is settled or closed.
+ */
+export type TabJoin = {
+    /**
+     * The table's code; `null` with a `bill_key`.
+     */
+    code?: string | null;
+    /**
+     * The tab's join code; `null` at a pay-only table or with a `bill_key`.
+     */
+    join_code?: string | null;
+    /**
+     * The key the bill's link carries as `?key=`.
+     */
+    bill_key?: string | null;
+    /**
+     * The name the joiner gives.
+     */
+    name: string;
+};
+
+/**
+ * A round to send.
+ */
+export type TabRoundInput = {
+    /**
+     * Its lines, 1 to 30.
+     */
+    lines: Array<TabLineInput>;
+};
+
+/**
+ * Opening or closing the tab to joiners.
+ */
+export type TabJoining = {
+    /**
+     * Whether others may join.
+     */
+    open: boolean;
+};
+
+/**
+ * A card to hold the Location's amount on.
+ */
+export type TabHoldInput = {
+    /**
+     * One of the customer's saved cards; a new card on the provider's page when `null`.
+     */
+    saved_method_id?: string | null;
+    /**
+     * Where the provider's page sends the diner back; the tab's page by default.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A line of the bill.
+ */
+export type TabBillLine = {
+    /**
+     * The tab's line.
+     */
+    line_id: string;
+    /**
+     * What it is.
+     */
+    name: string;
+    /**
+     * How many.
+     */
+    quantity: number;
+    /**
+     * The answers to its questions, as sold.
+     */
+    answers: Array<OrderAnswer>;
+    /**
+     * What it costs, its priced answers included.
+     */
+    total: Money;
+    /**
+     * Whether a payment by items paid it.
+     */
+    paid: boolean;
+};
+
+/**
+ * The bill: the tab frozen with its lines, GST, the optional service charge, what is paid and what remains. Every member reads the same bill.
+ */
+export type TabBill = {
+    /**
+     * The tab.
+     */
+    tab_id: string;
+    /**
+     * When it was asked for.
+     */
+    presented_at: string;
+    /**
+     * Its lines.
+     */
+    lines: Array<TabBillLine>;
+    /**
+     * What it comes to.
+     */
+    totals: TabTotals;
+    /**
+     * Its payments so far.
+     */
+    payments: Array<TabPaymentSummary>;
+    /**
+     * The ways a diner may pay it from their phone.
+     */
+    methods: Array<'upi' | 'card' | 'wallet'>;
+};
+
+/**
+ * Keeping or removing the service charge.
+ */
+export type TabServiceChargeChoice = {
+    /**
+     * Whether the bill carries it.
+     */
+    included: boolean;
+};
+
+/**
+ * How a payment takes its share: `whole` (what remains), `equal` (what remains over `parts` payers), `items` (the lines named, with their share of GST and the service charge), `amount` (a sum, at most what remains).
+ */
+export type TabSplitKind = 'whole' | 'equal' | 'items' | 'amount';
+
+/**
+ * The share a payment takes.
+ */
+export type TabSplit = {
+    /**
+     * How.
+     */
+    kind: TabSplitKind;
+    /**
+     * For `equal`, how many pay.
+     */
+    parts?: number | null;
+    /**
+     * For `items`, the lines.
+     */
+    line_ids?: Array<string>;
+    /**
+     * For `amount`, the sum.
+     */
+    amount?: Money | null;
+};
+
+/**
+ * A diner paying their share from their phone.
+ */
+export type TabPaymentInput = {
+    /**
+     * The share.
+     */
+    split: TabSplit;
+    /**
+     * `upi`, `card` or `wallet`.
+     */
+    method: 'upi' | 'card' | 'wallet';
+    /**
+     * A saved card or UPI ID.
+     */
+    saved_method_id?: string | null;
+    /**
+     * A tip for the restaurant, never taxed.
+     */
+    tip?: Money | null;
+    /**
+     * Under pay-first, the round it pays.
+     */
+    round_id?: string | null;
+    /**
+     * Where the provider's page sends the diner back.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A payment of a share started: paid at once from the Wallet, or waiting for the provider's page or the UPI app.
+ */
+export type TabPaymentStarted = {
+    /**
+     * The payment.
+     */
+    payment_id: string;
+    /**
+     * What it pays of the bill.
+     */
+    amount: Money;
+    /**
+     * The tip added.
+     */
+    tip: Money;
+    /**
+     * `paid` or `pending`.
+     */
+    status: 'paid' | 'pending';
+    /**
+     * What the diner does next; `null` once paid.
+     */
+    next_action: NextAction | null;
+    /**
+     * The receipt's token once paid: its page at `/receipts/{token}`.
+     */
+    receipt_token: string | null;
+    /**
+     * The tab after it.
+     */
+    tab: Tab;
+};
+
+/**
+ * A payer's receipt: their payment of a tab with the bill it paid.
+ */
+export type TabReceipt = {
+    /**
+     * The receipt's token.
+     */
+    token: string;
+    /**
+     * The tab.
+     */
+    tab_id: string;
+    /**
+     * The order's number.
+     */
+    number: string;
+    /**
+     * The Location.
+     */
+    store_name: string;
+    /**
+     * The table's name.
+     */
+    table: string;
+    /**
+     * When it was paid.
+     */
+    paid_at: string;
+    /**
+     * How.
+     */
+    method: 'upi' | 'card' | 'wallet';
+    /**
+     * What it paid of the bill.
+     */
+    amount: Money;
+    /**
+     * The tip.
+     */
+    tip: Money;
+    /**
+     * The bill it paid.
+     */
+    totals: TabTotals;
+    /**
+     * Whether a guest may keep it by signing in.
+     */
+    claimable: boolean;
+};
+
+/**
+ * Keeping a guest's tabs under the account that just signed in.
+ */
+export type TabClaim = {
+    /**
+     * The visitor token the guest used at the table.
+     */
+    visitor_token: string;
+};
+
+/**
+ * The tabs kept.
+ */
+export type TabClaimed = {
+    /**
+     * The tabs now the customer's.
+     */
+    tab_ids: Array<string>;
+};
+
+/**
+ * What a table's code opens: the store, the table, ordering or pay-only, an open tab to join, pay-first and a card hold in force, or why the code is not active.
+ */
+export type TableScan = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    store_name: string;
+    /**
+     * The table; `null` when the code is not active.
+     */
+    table: TabTable | null;
+    /**
+     * Whether the code opens a tab.
+     */
+    active: boolean;
+    /**
+     * Why not, as a screen shows it: a regenerated code, a removed table, or dine-in switched off.
+     */
+    reason: string | null;
+    /**
+     * Ordering, or paying only: at a pay-only table staff take the order, and a diner joins its open tab with the table's code alone (`POST /v1/tabs/join`) to read the bill and pay.
+     */
+    service: DineInService;
+    /**
+     * What the page says over the dine-in menu.
+     */
+    heading: string;
+    /**
+     * The tab open on the table, to join or to pay; `null` when none.
+     */
+    open_tab: TableScanTab | null;
+    /**
+     * Whether rounds are paid before they reach the kitchen now.
+     */
+    pay_first: boolean;
+    /**
+     * The card hold the Location asks for before the first round.
+     */
+    card_hold: Money | null;
+};
+
+/**
+ * The tab open on a scanned table.
+ */
+export type TableScanTab = {
+    /**
+     * The tab.
+     */
+    tab_id: string;
+    /**
+     * Where it is.
+     */
+    state: TabState;
+    /**
+     * Whether it takes joiners.
+     */
+    joining_open: boolean;
+    /**
+     * How many are at it.
+     */
+    members: number;
+    /**
+     * Whether the caller is already a member.
+     */
+    member: boolean;
+    /**
+     * What is left to pay, for pay-only.
+     */
+    remaining: Money;
+};
+
+/**
+ * Staff opening a tab on a table, with a first round keyed in or none.
+ */
+export type TabStaffOpen = {
+    /**
+     * A name for the table's party.
+     */
+    name?: string | null;
+    /**
+     * The lines keyed in.
+     */
+    lines?: Array<TabLineInput>;
+};
+
+/**
+ * Moving a tab to another table.
+ */
+export type TabMove = {
+    /**
+     * The free table it moves to.
+     */
+    table_id: string;
+};
+
+/**
+ * Merging another open tab of the Location into this one.
+ */
+export type TabMerge = {
+    /**
+     * The tab merged in; its rounds, members and payments follow.
+     */
+    tab_id: string;
+};
+
+/**
+ * Why staff took a line off.
+ */
+export type TabReason = {
+    /**
+     * Why, kept in the tab's history.
+     */
+    reason: string;
+};
+
+/**
+ * A discount staff give on the bill: an amount or a percentage.
+ */
+export type TabDiscountInput = {
+    /**
+     * An amount off.
+     */
+    amount?: Money | null;
+    /**
+     * A percentage off.
+     */
+    percent?: number | null;
+    /**
+     * Why.
+     */
+    reason: string;
+};
+
+/**
+ * A payment taken at the counter and recorded by staff: collected by the Location.
+ */
+export type TabCounterPayment = {
+    /**
+     * What it pays of the bill.
+     */
+    amount: Money;
+    /**
+     * `cash`, or a `card` or `upi` taken on the Location's own terminal.
+     */
+    method: 'cash' | 'card' | 'upi';
+    /**
+     * A tip added.
+     */
+    tip?: Money | null;
+    /**
+     * A note.
+     */
+    note?: string | null;
+};
+
+/**
+ * A manager closing a tab unpaid: a card hold charged for what the tab comes to, the rest written off.
+ */
+export type TabCloseUnpaid = {
+    /**
+     * Why, kept with the tab and shown in Mission Control.
+     */
+    note: string;
+};
+
+/**
+ * Sending a pay-only table's bill link by SMS.
+ */
+export type TabBillSend = {
+    /**
+     * The diner's mobile number.
+     */
+    mobile: string;
+};
+
+/**
+ * The bill link sent.
+ */
+export type TabBillSent = {
+    /**
+     * The number, masked.
+     */
+    sent_to: string;
+    /**
+     * The bill's link, carrying the tab's bill key as `?key=`: opening it joins the tab with `bill_key` (`POST /v1/tabs/join`), until the tab is settled or closed.
+     */
+    link: string;
+};
+
+/**
+ * A dynamic UPI code for what a tab has left to pay, a payment of the tab through payments: paying it in a UPI app settles the tab.
+ */
+export type TabUpiCode = {
+    /**
+     * The tab's payment it starts.
+     */
+    payment_id: string;
+    /**
+     * What it asks.
+     */
+    amount: Money;
+    /**
+     * The link the code carries: the provider's UPI link; with the simulated provider, its page.
+     */
+    upi_uri: string;
+    /**
+     * The code itself, an SVG to print or show.
+     */
+    qr_svg: string;
+    /**
+     * When it stops working.
+     */
+    expires_at: string;
+};
+
+/**
+ * One act on a tab, kept with who made it.
+ */
+export type TabHistoryEntry = {
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * What: `opened`, `joined`, `round_sent`, `round_recalled`, `line_declined`, `line_voided`, `discounted`, `bill_presented`, `reopened`, `moved`, `merged`, `paid`, `settled`, `closed_unpaid`, `cancelled`, `card_hold`, `card_held`, `card_not_held`, `card_released`, `upi_code`, `bill_sent`, `flagged`.
+     */
+    act: string;
+    /**
+     * Who: a member's name, a staff member's or `kitchen`.
+     */
+    by: string;
+    /**
+     * What it said, such as a void's reason.
+     */
+    detail: string | null;
+};
+
+/**
+ * A tab as the floor reads it: the members' tab with its history.
+ */
+export type StoreTab = {
+    /**
+     * The tab.
+     */
+    tab: Tab;
+    /**
+     * Every act on it, the latest last.
+     */
+    history: Array<TabHistoryEntry>;
+    /**
+     * Whether the Location's closing time passed with it open: staff settle it.
+     */
+    flagged: boolean;
+    /**
+     * Whether the diners removed the service charge.
+     */
+    service_charge_removed: boolean;
+    /**
+     * The party's name: staff's when they opened the tab, or the reservation's once its party was seated at the table, which the tab keeps.
+     */
+    party_name: string | null;
+    /**
+     * The reservation it is bound to: its party was seated at the table while the tab was open, or within the hour before it opened (`reservations.reservation.seated`).
+     */
+    reservation_id: string | null;
+};
+
+/**
+ * A table on the floor: `free`, `occupied` (a tab open), `bill_presented`, `paid` (settled within the last 15 minutes).
+ */
+export type FloorTableState = 'free' | 'occupied' | 'bill_presented' | 'paid';
+
+/**
+ * A table as the floor shows it.
+ */
+export type FloorTable = {
+    /**
+     * The table.
+     */
+    table_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its seats.
+     */
+    seats: number;
+    /**
+     * Its area.
+     */
+    area: string | null;
+    /**
+     * How it is served.
+     */
+    service: DineInService;
+    /**
+     * Where it is.
+     */
+    state: FloorTableState;
+    /**
+     * Its open tab.
+     */
+    tab_id: string | null;
+    /**
+     * How many are at its tab.
+     */
+    members: number;
+    /**
+     * How many rounds its tab sent.
+     */
+    rounds: number;
+    /**
+     * What its tab comes to.
+     */
+    total: Money | null;
+    /**
+     * What is left to pay.
+     */
+    remaining: Money | null;
+    /**
+     * When its tab opened.
+     */
+    opened_at: string | null;
+    /**
+     * Whether its tab is still open after closing time.
+     */
+    flagged: boolean;
+    /**
+     * Its open tab's party: staff's name for it, or the reservation's once its party was seated.
+     */
+    party_name: string | null;
+};
+
+/**
+ * The floor of a Location: each table with its state as it happens. `table.changed` on `private-location-{location_id}-tables` tells the floor to read it again.
+ */
+export type Floor = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its tables, by area and name.
+     */
+    tables: Array<FloorTable>;
+};
+
+/**
+ * A tab in Mission Control's Dine-in list.
+ */
+export type PlatformTabRow = {
+    /**
+     * The tab.
+     */
+    tab_id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    store_name: string;
+    /**
+     * The table's name.
+     */
+    table: string;
+    /**
+     * Where it is.
+     */
+    state: TabState;
+    /**
+     * What it came to.
+     */
+    total: Money;
+    /**
+     * What was paid.
+     */
+    paid: Money;
+    /**
+     * When it opened.
+     */
+    opened_at: string;
+    /**
+     * When it was settled or closed.
+     */
+    closed_at: string | null;
+    /**
+     * A closing note.
+     */
+    note: string | null;
+};
+
+/**
+ * A tab in a signed-in customer's history, beside their orders in My orders.
+ */
+export type CustomerTab = {
+    /**
+     * The tab, read with `GET /v1/tabs/{tab_id}`.
+     */
+    tab_id: string;
+    /**
+     * Its number.
+     */
+    number: string;
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    store_name: string;
+    /**
+     * The table.
+     */
+    table: string;
+    /**
+     * Where it is.
+     */
+    state: TabState;
+    /**
+     * What it came to.
+     */
+    total: Money;
+    /**
+     * What the customer paid of it, tips included.
+     */
+    you_paid: Money;
+    /**
+     * When it opened.
+     */
+    opened_at: string;
+    /**
+     * When it ended.
+     */
+    closed_at: string | null;
+};
+
+/**
+ * A page of a customer's tabs, the newest first.
+ */
+export type CustomerTabPage = {
+    /**
+     * The tabs.
+     */
+    items: Array<CustomerTab>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A page of tabs, closed unpaid first, then the newest.
+ */
+export type PlatformTabPage = {
+    /**
+     * The tabs.
+     */
+    items: Array<PlatformTabRow>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
 };
 
 /**
@@ -54462,6 +55819,10 @@ export type GetStoreMenuData = {
          * The menu version the client was told of; the answer is that version or a later one, never an older one.
          */
         version?: number;
+        /**
+         * The menu's mode: `delivery` (default) or `dine_in`, which prices every variant at its dine-in price, as tabs charge. Since 0.29.0.
+         */
+        mode?: 'delivery' | 'dine_in';
     };
     url: '/v1/storefront/stores/{location_id}/menu';
 };
@@ -76632,3 +77993,2374 @@ export type MarkKitchenResponses = {
 };
 
 export type MarkKitchenResponse = MarkKitchenResponses[keyof MarkKitchenResponses];
+
+export type ScanTableData = {
+    body?: never;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The code printed on the table's sheet.
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/v1/storefront/tables/{code}';
+};
+
+export type ScanTableErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no table has ever had this code.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ScanTableError = ScanTableErrors[keyof ScanTableErrors];
+
+export type ScanTableResponses = {
+    /**
+     * What the code opens.
+     */
+    200: TableScan;
+};
+
+export type ScanTableResponse = ScanTableResponses[keyof ScanTableResponses];
+
+export type OpenTabData = {
+    /**
+     * The table's code, the opener's name and the first round.
+     */
+    body: TabOpen;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/tabs';
+};
+
+export type OpenTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A refusal with its code: `table_code_inactive`, `dine_in_off`, `table_pay_only`, `table_occupied`, `lines_refused`, `store_not_trading`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type OpenTabError = OpenTabErrors[keyof OpenTabErrors];
+
+export type OpenTabResponses = {
+    /**
+     * The tab, with its join code.
+     */
+    201: Tab;
+};
+
+export type OpenTabResponse = OpenTabResponses[keyof OpenTabResponses];
+
+export type JoinTabData = {
+    /**
+     * The table's code, the join code and the joiner's name.
+     */
+    body: TabJoin;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/tabs/join';
+};
+
+export type JoinTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * A refusal: `join_code_wrong`, `joining_locked`, `joining_closed`, `table_code_inactive` or `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type JoinTabError = JoinTabErrors[keyof JoinTabErrors];
+
+export type JoinTabResponses = {
+    /**
+     * The tab.
+     */
+    200: Tab;
+};
+
+export type JoinTabResponse = JoinTabResponses[keyof JoinTabResponses];
+
+export type ClaimTabsData = {
+    /**
+     * The guest's visitor token.
+     */
+    body: TabClaim;
+    path?: never;
+    query?: never;
+    url: '/v1/tabs/claim';
+};
+
+export type ClaimTabsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ClaimTabsError = ClaimTabsErrors[keyof ClaimTabsErrors];
+
+export type ClaimTabsResponses = {
+    /**
+     * The tabs kept.
+     */
+    200: TabClaimed;
+};
+
+export type ClaimTabsResponse = ClaimTabsResponses[keyof ClaimTabsResponses];
+
+export type ListMyTabsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/me/tabs';
+};
+
+export type ListMyTabsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListMyTabsError = ListMyTabsErrors[keyof ListMyTabsErrors];
+
+export type ListMyTabsResponses = {
+    /**
+     * A page of tabs.
+     */
+    200: CustomerTabPage;
+};
+
+export type ListMyTabsResponse = ListMyTabsResponses[keyof ListMyTabsResponses];
+
+export type GetTabData = {
+    body?: never;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}';
+};
+
+export type GetTabErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetTabError = GetTabErrors[keyof GetTabErrors];
+
+export type GetTabResponses = {
+    /**
+     * The tab.
+     */
+    200: Tab;
+};
+
+export type GetTabResponse = GetTabResponses[keyof GetTabResponses];
+
+export type SendTabRoundData = {
+    /**
+     * The round.
+     */
+    body: TabRoundInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/rounds';
+};
+
+export type SendTabRoundErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open` or `lines_refused`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendTabRoundError = SendTabRoundErrors[keyof SendTabRoundErrors];
+
+export type SendTabRoundResponses = {
+    /**
+     * The tab with the round.
+     */
+    201: Tab;
+};
+
+export type SendTabRoundResponse = SendTabRoundResponses[keyof SendTabRoundResponses];
+
+export type RecallTabRoundData = {
+    body?: never;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+        /**
+         * The round, of the tab in the path.
+         */
+        round_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/rounds/{round_id}/recall';
+};
+
+export type RecallTabRoundErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `round_fired`, or `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecallTabRoundError = RecallTabRoundErrors[keyof RecallTabRoundErrors];
+
+export type RecallTabRoundResponses = {
+    /**
+     * The tab without the round.
+     */
+    200: Tab;
+};
+
+export type RecallTabRoundResponse = RecallTabRoundResponses[keyof RecallTabRoundResponses];
+
+export type SetTabJoiningData = {
+    /**
+     * Whether others may join.
+     */
+    body: TabJoining;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/joining';
+};
+
+export type SetTabJoiningErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetTabJoiningError = SetTabJoiningErrors[keyof SetTabJoiningErrors];
+
+export type SetTabJoiningResponses = {
+    /**
+     * The tab.
+     */
+    200: Tab;
+};
+
+export type SetTabJoiningResponse = SetTabJoiningResponses[keyof SetTabJoiningResponses];
+
+export type HoldTabCardData = {
+    /**
+     * The card.
+     */
+    body: TabHoldInput;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/hold';
+};
+
+export type HoldTabCardErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`, or the Location asks for no hold (`card_hold_off`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type HoldTabCardError = HoldTabCardErrors[keyof HoldTabCardErrors];
+
+export type HoldTabCardResponses = {
+    /**
+     * The hold started.
+     */
+    201: TabPaymentStarted;
+};
+
+export type HoldTabCardResponse = HoldTabCardResponses[keyof HoldTabCardResponses];
+
+export type GetTabBillData = {
+    body?: never;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/bill';
+};
+
+export type GetTabBillErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_bill_not_presented`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetTabBillError = GetTabBillErrors[keyof GetTabBillErrors];
+
+export type GetTabBillResponses = {
+    /**
+     * The bill.
+     */
+    200: TabBill;
+};
+
+export type GetTabBillResponse = GetTabBillResponses[keyof GetTabBillResponses];
+
+export type AskTabBillData = {
+    body?: never;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/bill';
+};
+
+export type AskTabBillErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`: settled, closed or cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AskTabBillError = AskTabBillErrors[keyof AskTabBillErrors];
+
+export type AskTabBillResponses = {
+    /**
+     * The bill.
+     */
+    200: TabBill;
+};
+
+export type AskTabBillResponse = AskTabBillResponses[keyof AskTabBillResponses];
+
+export type SetTabServiceChargeData = {
+    /**
+     * Whether the bill carries it.
+     */
+    body: TabServiceChargeChoice;
+    headers?: {
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/bill/service-charge';
+};
+
+export type SetTabServiceChargeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_bill_not_presented`, or a payment was made (`tab_has_payments`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetTabServiceChargeError = SetTabServiceChargeErrors[keyof SetTabServiceChargeErrors];
+
+export type SetTabServiceChargeResponses = {
+    /**
+     * The bill.
+     */
+    200: TabBill;
+};
+
+export type SetTabServiceChargeResponse = SetTabServiceChargeResponses[keyof SetTabServiceChargeResponses];
+
+export type PayTabData = {
+    /**
+     * The share, the way to pay and the tip.
+     */
+    body: TabPaymentInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+        /**
+         * A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path: {
+        /**
+         * The tab, of which the caller is a member.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/tabs/{tab_id}/payments';
+};
+
+export type PayTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: the tab, or the caller is not one of its members.
+     */
+    404: Problem;
+    /**
+     * `tab_payment_over`, `tab_bill_not_presented`, `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PayTabError = PayTabErrors[keyof PayTabErrors];
+
+export type PayTabResponses = {
+    /**
+     * The payment started.
+     */
+    201: TabPaymentStarted;
+};
+
+export type PayTabResponse = PayTabResponses[keyof PayTabResponses];
+
+export type GetReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * The receipt's token, from its link.
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/v1/receipts/{token}';
+};
+
+export type GetReceiptErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no such receipt.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetReceiptError = GetReceiptErrors[keyof GetReceiptErrors];
+
+export type GetReceiptResponses = {
+    /**
+     * The receipt.
+     */
+    200: TabReceipt;
+};
+
+export type GetReceiptResponse = GetReceiptResponses[keyof GetReceiptResponses];
+
+export type GetDineInSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/dine-in';
+};
+
+export type GetDineInSettingsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDineInSettingsError = GetDineInSettingsErrors[keyof GetDineInSettingsErrors];
+
+export type GetDineInSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: DineInSettings;
+};
+
+export type GetDineInSettingsResponse = GetDineInSettingsResponses[keyof GetDineInSettingsResponses];
+
+export type UpdateDineInSettingsData = {
+    /**
+     * The change.
+     */
+    body: DineInSettingsUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/dine-in';
+};
+
+export type UpdateDineInSettingsErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateDineInSettingsError = UpdateDineInSettingsErrors[keyof UpdateDineInSettingsErrors];
+
+export type UpdateDineInSettingsResponses = {
+    /**
+     * The settings.
+     */
+    200: DineInSettings;
+};
+
+export type UpdateDineInSettingsResponse = UpdateDineInSettingsResponses[keyof UpdateDineInSettingsResponses];
+
+export type ListDiningTablesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables';
+};
+
+export type ListDiningTablesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListDiningTablesError = ListDiningTablesErrors[keyof ListDiningTablesErrors];
+
+export type ListDiningTablesResponses = {
+    /**
+     * The tables.
+     */
+    200: DiningTableList;
+};
+
+export type ListDiningTablesResponse = ListDiningTablesResponses[keyof ListDiningTablesResponses];
+
+export type CreateDiningTableData = {
+    /**
+     * The table.
+     */
+    body: DiningTableInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables';
+};
+
+export type CreateDiningTableErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * `table_name_taken`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateDiningTableError = CreateDiningTableErrors[keyof CreateDiningTableErrors];
+
+export type CreateDiningTableResponses = {
+    /**
+     * The table.
+     */
+    201: DiningTable;
+};
+
+export type CreateDiningTableResponse = CreateDiningTableResponses[keyof CreateDiningTableResponses];
+
+export type GetDiningTableSheetsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * One table only.
+         */
+        table_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables/sheets';
+};
+
+export type GetDiningTableSheetsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the table.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDiningTableSheetsError = GetDiningTableSheetsErrors[keyof GetDiningTableSheetsErrors];
+
+export type GetDiningTableSheetsResponses = {
+    /**
+     * The sheets as `application/pdf`.
+     */
+    200: unknown;
+};
+
+export type DeleteDiningTableData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The table, of the Location in the path.
+         */
+        table_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}';
+};
+
+export type DeleteDiningTableErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `table_occupied`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeleteDiningTableError = DeleteDiningTableErrors[keyof DeleteDiningTableErrors];
+
+export type DeleteDiningTableResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type DeleteDiningTableResponse = DeleteDiningTableResponses[keyof DeleteDiningTableResponses];
+
+export type UpdateDiningTableData = {
+    /**
+     * The change.
+     */
+    body: DiningTableUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The table, of the Location in the path.
+         */
+        table_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}';
+};
+
+export type UpdateDiningTableErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `table_name_taken`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateDiningTableError = UpdateDiningTableErrors[keyof UpdateDiningTableErrors];
+
+export type UpdateDiningTableResponses = {
+    /**
+     * The table.
+     */
+    200: DiningTable;
+};
+
+export type UpdateDiningTableResponse = UpdateDiningTableResponses[keyof UpdateDiningTableResponses];
+
+export type RegenerateDiningTableCodeData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The table, of the Location in the path.
+         */
+        table_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}/code';
+};
+
+export type RegenerateDiningTableCodeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RegenerateDiningTableCodeError = RegenerateDiningTableCodeErrors[keyof RegenerateDiningTableCodeErrors];
+
+export type RegenerateDiningTableCodeResponses = {
+    /**
+     * The table with its new code.
+     */
+    200: DiningTable;
+};
+
+export type RegenerateDiningTableCodeResponse = RegenerateDiningTableCodeResponses[keyof RegenerateDiningTableCodeResponses];
+
+export type GetFloorData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/floor';
+};
+
+export type GetFloorErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetFloorError = GetFloorErrors[keyof GetFloorErrors];
+
+export type GetFloorResponses = {
+    /**
+     * The floor.
+     */
+    200: Floor;
+};
+
+export type GetFloorResponse = GetFloorResponses[keyof GetFloorResponses];
+
+export type GetStoreTabData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}';
+};
+
+export type GetStoreTabErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreTabError = GetStoreTabErrors[keyof GetStoreTabErrors];
+
+export type GetStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type GetStoreTabResponse = GetStoreTabResponses[keyof GetStoreTabResponses];
+
+export type OpenStoreTabData = {
+    /**
+     * The party's name and the lines.
+     */
+    body: TabStaffOpen;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The table, of the Location in the path.
+         */
+        table_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}/tabs';
+};
+
+export type OpenStoreTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `table_occupied`, `lines_refused`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type OpenStoreTabError = OpenStoreTabErrors[keyof OpenStoreTabErrors];
+
+export type OpenStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    201: StoreTab;
+};
+
+export type OpenStoreTabResponse = OpenStoreTabResponses[keyof OpenStoreTabResponses];
+
+export type SendStoreTabRoundData = {
+    /**
+     * The round.
+     */
+    body: TabRoundInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/rounds';
+};
+
+export type SendStoreTabRoundErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendStoreTabRoundError = SendStoreTabRoundErrors[keyof SendStoreTabRoundErrors];
+
+export type SendStoreTabRoundResponses = {
+    /**
+     * The tab with the round.
+     */
+    201: StoreTab;
+};
+
+export type SendStoreTabRoundResponse = SendStoreTabRoundResponses[keyof SendStoreTabRoundResponses];
+
+export type MoveStoreTabData = {
+    /**
+     * The table.
+     */
+    body: TabMove;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/move';
+};
+
+export type MoveStoreTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`, `table_occupied`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MoveStoreTabError = MoveStoreTabErrors[keyof MoveStoreTabErrors];
+
+export type MoveStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type MoveStoreTabResponse = MoveStoreTabResponses[keyof MoveStoreTabResponses];
+
+export type MergeStoreTabData = {
+    /**
+     * The tab merged in.
+     */
+    body: TabMerge;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/merge';
+};
+
+export type MergeStoreTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type MergeStoreTabError = MergeStoreTabErrors[keyof MergeStoreTabErrors];
+
+export type MergeStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type MergeStoreTabResponse = MergeStoreTabResponses[keyof MergeStoreTabResponses];
+
+export type ReopenStoreTabData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/reopen';
+};
+
+export type ReopenStoreTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`: settled, closed or cancelled.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReopenStoreTabError = ReopenStoreTabErrors[keyof ReopenStoreTabErrors];
+
+export type ReopenStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type ReopenStoreTabResponse = ReopenStoreTabResponses[keyof ReopenStoreTabResponses];
+
+export type PresentStoreTabBillData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill';
+};
+
+export type PresentStoreTabBillErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PresentStoreTabBillError = PresentStoreTabBillErrors[keyof PresentStoreTabBillErrors];
+
+export type PresentStoreTabBillResponses = {
+    /**
+     * The bill.
+     */
+    200: TabBill;
+};
+
+export type PresentStoreTabBillResponse = PresentStoreTabBillResponses[keyof PresentStoreTabBillResponses];
+
+export type SendStoreTabBillData = {
+    /**
+     * The number.
+     */
+    body: TabBillSend;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill/send';
+};
+
+export type SendStoreTabBillErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_bill_not_presented`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SendStoreTabBillError = SendStoreTabBillErrors[keyof SendStoreTabBillErrors];
+
+export type SendStoreTabBillResponses = {
+    /**
+     * Sent.
+     */
+    202: TabBillSent;
+};
+
+export type SendStoreTabBillResponse = SendStoreTabBillResponses[keyof SendStoreTabBillResponses];
+
+export type CreateStoreTabUpiCodeData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill/upi-code';
+};
+
+export type CreateStoreTabUpiCodeErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_bill_not_presented`, `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateStoreTabUpiCodeError = CreateStoreTabUpiCodeErrors[keyof CreateStoreTabUpiCodeErrors];
+
+export type CreateStoreTabUpiCodeResponses = {
+    /**
+     * The code.
+     */
+    201: TabUpiCode;
+};
+
+export type CreateStoreTabUpiCodeResponse = CreateStoreTabUpiCodeResponses[keyof CreateStoreTabUpiCodeResponses];
+
+export type VoidStoreTabLineData = {
+    /**
+     * Why.
+     */
+    body: TabReason;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+        /**
+         * The line, of the tab in the path.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/lines/{line_id}/void';
+};
+
+export type VoidStoreTabLineErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `tab:adjust` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`, or the line was paid by items (`tab_has_payments`).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VoidStoreTabLineError = VoidStoreTabLineErrors[keyof VoidStoreTabLineErrors];
+
+export type VoidStoreTabLineResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type VoidStoreTabLineResponse = VoidStoreTabLineResponses[keyof VoidStoreTabLineResponses];
+
+export type DeclineStoreTabLineData = {
+    /**
+     * Why.
+     */
+    body: TabReason;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+        /**
+         * The line, of the tab in the path.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/lines/{line_id}/decline';
+};
+
+export type DeclineStoreTabLineErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `line_fired`, `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineStoreTabLineError = DeclineStoreTabLineErrors[keyof DeclineStoreTabLineErrors];
+
+export type DeclineStoreTabLineResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type DeclineStoreTabLineResponse = DeclineStoreTabLineResponses[keyof DeclineStoreTabLineResponses];
+
+export type DiscountStoreTabData = {
+    /**
+     * The discount.
+     */
+    body: TabDiscountInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/discounts';
+};
+
+export type DiscountStoreTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `tab:adjust` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DiscountStoreTabError = DiscountStoreTabErrors[keyof DiscountStoreTabErrors];
+
+export type DiscountStoreTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type DiscountStoreTabResponse = DiscountStoreTabResponses[keyof DiscountStoreTabResponses];
+
+export type RecordStoreTabCounterPaymentData = {
+    /**
+     * The payment.
+     */
+    body: TabCounterPayment;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/counter-payments';
+};
+
+export type RecordStoreTabCounterPaymentErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `order:manage` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_payment_over`, `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RecordStoreTabCounterPaymentError = RecordStoreTabCounterPaymentErrors[keyof RecordStoreTabCounterPaymentErrors];
+
+export type RecordStoreTabCounterPaymentResponses = {
+    /**
+     * The tab.
+     */
+    201: StoreTab;
+};
+
+export type RecordStoreTabCounterPaymentResponse = RecordStoreTabCounterPaymentResponses[keyof RecordStoreTabCounterPaymentResponses];
+
+export type CloseStoreTabUnpaidData = {
+    /**
+     * Why.
+     */
+    body: TabCloseUnpaid;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, which must be the partner's in the path.
+         */
+        location_id: string;
+        /**
+         * The tab, open at the Location in the path.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/close-unpaid';
+};
+
+export type CloseStoreTabUnpaidErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` (the member lacks `tab:adjust` at the Location), `not_enabled_for_partner`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Location or the tab.
+     */
+    404: Problem;
+    /**
+     * `tab_not_open`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CloseStoreTabUnpaidError = CloseStoreTabUnpaidErrors[keyof CloseStoreTabUnpaidErrors];
+
+export type CloseStoreTabUnpaidResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type CloseStoreTabUnpaidResponse = CloseStoreTabUnpaidResponses[keyof CloseStoreTabUnpaidResponses];
+
+export type ListPlatformTabsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One state.
+         */
+        state?: TabState;
+        /**
+         * One Location.
+         */
+        location_id?: string;
+        /**
+         * The day they opened, on the Location's clock.
+         */
+        date?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/tabs';
+};
+
+export type ListPlatformTabsErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformTabsError = ListPlatformTabsErrors[keyof ListPlatformTabsErrors];
+
+export type ListPlatformTabsResponses = {
+    /**
+     * A page of tabs.
+     */
+    200: PlatformTabPage;
+};
+
+export type ListPlatformTabsResponse = ListPlatformTabsResponses[keyof ListPlatformTabsResponses];
+
+export type GetPlatformTabData = {
+    body?: never;
+    path: {
+        /**
+         * The tab, any Partner's.
+         */
+        tab_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/tabs/{tab_id}';
+};
+
+export type GetPlatformTabErrors = {
+    /**
+     * `validation_failed`: a malformed identifier or member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformTabError = GetPlatformTabErrors[keyof GetPlatformTabErrors];
+
+export type GetPlatformTabResponses = {
+    /**
+     * The tab.
+     */
+    200: StoreTab;
+};
+
+export type GetPlatformTabResponse = GetPlatformTabResponses[keyof GetPlatformTabResponses];

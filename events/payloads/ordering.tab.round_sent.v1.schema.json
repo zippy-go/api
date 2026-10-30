@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.tab.round_sent.v1.schema.json",
+  "title": "OrderingTabRoundSentPayload",
+  "description": "Payload of `ordering.tab.round_sent` version 1. A round reached the kitchen: sent by a member or keyed in by staff, at once or, under pay-first, once paid. Consumers: the kitchen (a ticket with its first course fired), the floor, analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "tab_id",
+    "number",
+    "partner_id",
+    "location_id",
+    "table_id",
+    "table_name",
+    "state",
+    "version",
+    "at",
+    "round_id",
+    "round_number",
+    "member_id",
+    "sent_by",
+    "lines"
+  ],
+  "properties": {
+    "tab_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tab, which is the order's id.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "table_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The table it is on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101"
+      ]
+    },
+    "table_name": {
+      "type": "string",
+      "description": "The table's name.",
+      "examples": [
+        "12"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "bill_presented",
+        "settled",
+        "closed_unpaid",
+        "cancelled"
+      ],
+      "description": "The tab's state after the change.",
+      "examples": [
+        "open"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The tab's version after the change.",
+      "examples": [
+        2
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-06T14:31:00Z"
+      ]
+    },
+    "round_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The round.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301"
+      ]
+    },
+    "round_number": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Its number on the tab.",
+      "examples": [
+        1
+      ]
+    },
+    "member_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The member who sent it; `null` when staff keyed it in.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501"
+      ]
+    },
+    "sent_by": {
+      "type": "string",
+      "enum": [
+        "diner",
+        "staff"
+      ],
+      "description": "Who sent it.",
+      "examples": [
+        "diner"
+      ]
+    },
+    "lines": {
+      "type": "array",
+      "description": "Its lines.",
+      "items": {
+        "type": "object",
+        "description": "A line of the round.",
+        "required": [
+          "line_id",
+          "item_id",
+          "variant_id",
+          "name",
+          "quantity",
+          "unit_price",
+          "answers",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The line.",
+            "examples": [
+              "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401"
+            ]
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The item.",
+            "examples": [
+              "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601"
+            ]
+          },
+          "variant_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The variant.",
+            "examples": [
+              "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The item's name as sent.",
+            "examples": [
+              "Paneer Tikka"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "How many.",
+            "examples": [
+              1
+            ]
+          },
+          "unit_price": {
+            "type": "object",
+            "required": [
+              "minor_units",
+              "currency"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "minor_units": {
+                "type": "integer",
+                "description": "The amount in paise."
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "description": "The ISO 4217 code."
+              }
+            },
+            "description": "The price of one: the dine-in price, its priced answers included.",
+            "examples": [
+              {
+                "minor_units": 32000,
+                "currency": "INR"
+              }
+            ]
+          },
+          "answers": {
+            "type": "array",
+            "description": "The answers to its questions, as sold, in the `OrderAnswer` shape: the question, the answer's name, its quantity and price each, its veg mark and its own answers.",
+            "items": {
+              "type": "object"
+            },
+            "examples": [
+              []
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The note for the kitchen.",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "examples": [
+          {
+            "line_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401",
+            "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601",
+            "variant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602",
+            "name": "Paneer Tikka",
+            "quantity": 1,
+            "unit_price": {
+              "minor_units": 32000,
+              "currency": "INR"
+            },
+            "answers": [],
+            "note": null
+          }
+        ]
+      },
+      "examples": [
+        [
+          {
+            "line_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401",
+            "item_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601",
+            "variant_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602",
+            "name": "Paneer Tikka",
+            "quantity": 1,
+            "unit_price": {
+              "minor_units": 32000,
+              "currency": "INR"
+            },
+            "answers": [],
+            "note": null
+          }
+        ]
+      ]
+    }
+  }
+}

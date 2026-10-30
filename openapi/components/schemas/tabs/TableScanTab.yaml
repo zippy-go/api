@@ -1,0 +1,47 @@
+type: object
+description: The tab open on a scanned table.
+required:
+  - tab_id
+  - state
+  - joining_open
+  - members
+  - member
+  - remaining
+properties:
+  tab_id:
+    type: string
+    format: uuid
+    description: The tab.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  state:
+    $ref: ./TabState.yaml
+    description: Where it is.
+  joining_open:
+    type: boolean
+    description: Whether it takes joiners.
+    examples:
+      - true
+  members:
+    type: integer
+    minimum: 1
+    description: How many are at it.
+    examples:
+      - 2
+  member:
+    type: boolean
+    description: Whether the caller is already a member.
+    examples:
+      - false
+  remaining:
+    $ref: ../common/Money.yaml
+    description: What is left to pay, for pay-only.
+examples:
+  - tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    state: open
+    joining_open: true
+    members: 2
+    member: false
+    remaining:
+      minor_units: 84000
+      currency: INR

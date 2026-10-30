@@ -90,6 +90,11 @@ properties:
   sellable:
     type: boolean
     description: Enabled, in stock and not counted down to nothing.
+  dine_in_price:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: Its price at the Location's tables, which the dine-in menu and tabs charge; `null` charges `price`. Since 0.29.0.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc201
     selection:

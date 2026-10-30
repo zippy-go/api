@@ -1,0 +1,151 @@
+type: object
+description: "A payment of a share started: paid at once from the Wallet, or waiting for the provider's page or the UPI app."
+required:
+  - payment_id
+  - amount
+  - tip
+  - status
+  - next_action
+  - receipt_token
+  - tab
+properties:
+  payment_id:
+    type: string
+    format: uuid
+    description: The payment.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it pays of the bill.
+  tip:
+    $ref: ../common/Money.yaml
+    description: The tip added.
+  status:
+    type: string
+    enum:
+      - paid
+      - pending
+    description: "`paid` or `pending`."
+    examples:
+      - pending
+  next_action:
+    oneOf:
+      - $ref: ../orders/NextAction.yaml
+      - type: "null"
+    description: What the diner does next; `null` once paid.
+  receipt_token:
+    type:
+      - string
+      - "null"
+    description: "The receipt's token once paid: its page at `/receipts/{token}`."
+    examples:
+      - null
+  tab:
+    $ref: ./Tab.yaml
+    description: The tab after it.
+examples:
+  - payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+    amount:
+      minor_units: 28875
+      currency: INR
+    tip:
+      minor_units: 0
+      currency: INR
+    status: pending
+    next_action: null
+    receipt_token: null
+    tab:
+      tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+      number: AB0042
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      store_name: Dev Kitchen Gachibowli
+      table:
+        table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+        name: "12"
+      state: open
+      join_code: 7K4P
+      joining_open: true
+      pay_first: false
+      you: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+      members:
+        - member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+          name: Asha
+          signed_in: false
+          joined_at: 2026-11-06T14:30:00Z
+      rounds:
+        - round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+          number: 1
+          member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+          member_name: Asha
+          sent_at: 2026-11-06T14:31:00Z
+          recalled: false
+          recallable: true
+          paid_first: false
+          lines:
+            - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+              round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+              item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+              variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602
+              name: Paneer Tikka
+              variant_label: null
+              food_mark: veg
+              quantity: 1
+              unit_price:
+                minor_units: 32000
+                currency: INR
+              answers: []
+              total:
+                minor_units: 32000
+                currency: INR
+              state: fired
+              member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+              member_name: Asha
+              note: null
+              reason: null
+      totals:
+        items:
+          minor_units: 100000
+          currency: INR
+        discounts:
+          minor_units: 0
+          currency: INR
+        service_charge:
+          percent: 10
+          amount:
+            minor_units: 10000
+            currency: INR
+          included: true
+        gst:
+          minor_units: 5500
+          currency: INR
+        total:
+          minor_units: 115500
+          currency: INR
+        paid:
+          minor_units: 0
+          currency: INR
+        remaining:
+          minor_units: 115500
+          currency: INR
+        tips:
+          minor_units: 0
+          currency: INR
+      hold: null
+      payments:
+        - payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+          by: diner
+          member_name: Asha
+          method: upi
+          amount:
+            minor_units: 28875
+            currency: INR
+          tip:
+            minor_units: 0
+            currency: INR
+          status: paid
+          paid_at: 2026-11-06T16:12:00Z
+          receipt_token: null
+      opened_at: 2026-11-06T14:31:00Z
+      bill_presented_at: null
+      version: 1

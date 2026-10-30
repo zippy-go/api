@@ -1,0 +1,49 @@
+type: object
+description: A line of the bill.
+required:
+  - line_id
+  - name
+  - quantity
+  - answers
+  - total
+  - paid
+properties:
+  line_id:
+    type: string
+    format: uuid
+    description: The tab's line.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+  name:
+    type: string
+    description: What it is.
+    examples:
+      - Butter Chicken
+  quantity:
+    type: integer
+    minimum: 1
+    description: How many.
+    examples:
+      - 1
+  answers:
+    type: array
+    items:
+      $ref: ../orders/OrderAnswer.yaml
+    description: The answers to its questions, as sold.
+  total:
+    $ref: ../common/Money.yaml
+    description: What it costs, its priced answers included.
+  paid:
+    type: boolean
+    description: Whether a payment by items paid it.
+    examples:
+      - false
+examples:
+  - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+    name: Butter Chicken
+    quantity: 1
+    answers: []
+    total:
+      minor_units: 38000
+      currency: INR
+    paid: false

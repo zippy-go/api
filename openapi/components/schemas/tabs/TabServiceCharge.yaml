@@ -1,0 +1,28 @@
+type: object
+description: "The service charge on the bill: optional, removable by the diners, the Location seeing that it was removed."
+required:
+  - percent
+  - amount
+  - included
+properties:
+  percent:
+    type: integer
+    minimum: 0
+    maximum: 20
+    description: In percent.
+    examples:
+      - 10
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it comes to.
+  included:
+    type: boolean
+    description: Whether it is on the bill.
+    examples:
+      - true
+examples:
+  - percent: 10
+    amount:
+      minor_units: 10000
+      currency: INR
+    included: true

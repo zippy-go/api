@@ -1,0 +1,118 @@
+type: object
+description: A table as the floor shows it.
+required:
+  - table_id
+  - name
+  - seats
+  - area
+  - service
+  - state
+  - tab_id
+  - members
+  - rounds
+  - total
+  - remaining
+  - opened_at
+  - flagged
+  - party_name
+properties:
+  table_id:
+    type: string
+    format: uuid
+    description: The table.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - "12"
+  seats:
+    type: integer
+    minimum: 1
+    description: Its seats.
+    examples:
+      - 4
+  area:
+    type:
+      - string
+      - "null"
+    description: Its area.
+    examples:
+      - null
+  service:
+    $ref: ./DineInService.yaml
+    description: How it is served.
+  state:
+    $ref: ./FloorTableState.yaml
+    description: Where it is.
+  tab_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Its open tab.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  members:
+    type: integer
+    minimum: 0
+    description: How many are at its tab.
+    examples:
+      - 2
+  rounds:
+    type: integer
+    minimum: 0
+    description: How many rounds its tab sent.
+    examples:
+      - 1
+  total:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What its tab comes to.
+  remaining:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What is left to pay.
+  opened_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When its tab opened.
+    examples:
+      - 2026-11-06T14:31:00Z
+  flagged:
+    type: boolean
+    description: Whether its tab is still open after closing time.
+    examples:
+      - false
+  party_name:
+    type:
+      - string
+      - "null"
+    maxLength: 120
+    description: "Its open tab's party: staff's name for it, or the reservation's once its party was seated."
+    examples:
+      - Sharma
+examples:
+  - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+    name: "12"
+    seats: 4
+    area: null
+    service: order
+    state: occupied
+    tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    members: 2
+    rounds: 1
+    total:
+      minor_units: 70000
+      currency: INR
+    remaining:
+      minor_units: 70000
+      currency: INR
+    opened_at: 2026-11-06T14:31:00Z
+    flagged: false
+    party_name: Sharma

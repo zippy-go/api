@@ -1,0 +1,35 @@
+type: object
+description: "Someone at the tab: whoever opened it or joined it, signed in or a guest."
+required:
+  - member_id
+  - name
+  - signed_in
+  - joined_at
+properties:
+  member_id:
+    type: string
+    format: uuid
+    description: The member.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+  name:
+    type: string
+    description: The name they gave, as each line shows it.
+    examples:
+      - Asha
+  signed_in:
+    type: boolean
+    description: Whether they are signed in as a customer, rather than a guest on a visitor token.
+    examples:
+      - false
+  joined_at:
+    type: string
+    format: date-time
+    description: When they opened or joined the tab.
+    examples:
+      - 2026-11-06T14:30:00Z
+examples:
+  - member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+    name: Asha
+    signed_in: false
+    joined_at: 2026-11-06T14:30:00Z

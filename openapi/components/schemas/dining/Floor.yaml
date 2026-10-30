@@ -1,0 +1,38 @@
+type: object
+description: "The floor of a Location: each table with its state as it happens. `table.changed` on `private-location-{location_id}-tables` tells the floor to read it again."
+required:
+  - location_id
+  - tables
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  tables:
+    type: array
+    items:
+      $ref: ./FloorTable.yaml
+    description: Its tables, by area and name.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    tables:
+      - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+        name: "12"
+        seats: 4
+        area: null
+        service: order
+        state: occupied
+        tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+        members: 2
+        rounds: 1
+        total:
+          minor_units: 70000
+          currency: INR
+        remaining:
+          minor_units: 70000
+          currency: INR
+        opened_at: 2026-11-06T14:31:00Z
+        flagged: false
+        party_name: Sharma

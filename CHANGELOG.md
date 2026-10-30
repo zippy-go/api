@@ -6,6 +6,99 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-30
+
+Step 8, tabs: dine-in at a Location's tables. Tables with their codes and
+sheets, the Location's dine-in settings and the floor; tabs, each an order bound
+to a table that diners open by scanning its code and join with a join code,
+sending rounds to the kitchen, asking for the bill and paying it whole or split
+from their phones, with tips the restaurant's own; staff keying rounds in,
+moving, merging, voiding, declining, discounting, reopening, recording payments
+at the counter and closing tabs unpaid; Mission Control's list; a reservation's
+party bound to its tab. After the kitchen's 0.27.0 and reservations' 0.28.0,
+step 8's last platform slice. Additive only.
+
+### Added
+
+- Tables (`Dine-in` tag): a Location's tables with their codes
+  (`GET`, `POST /v1/partners/{partner_id}/locations/{location_id}/tables`,
+  `PATCH`, `DELETE .../tables/{table_id}`, `DiningTable`, `DiningTableInput`,
+  `DiningTableUpdate`, `DiningTableList`, `DineInService`), a code regenerated
+  (`POST .../tables/{table_id}/code`), the sheets as a PDF
+  (`GET .../tables/sheets`); the dine-in settings (`GET`, `PUT .../dine-in`,
+  `DineInSettings`, `DineInSettingsUpdate`); the floor (`GET .../floor`,
+  `Floor`, `FloorTable`, `FloorTableState`).
+- Tabs for diners, signed in or guests with `X-Visitor-Token`: a table's code
+  scanned (`GET /v1/storefront/tables/{code}`, `TableScan`, `TableScanTab`),
+  a tab opened with its first round (`POST /v1/tabs`, `TabOpen`,
+  `TabLineInput`) and joined (`POST /v1/tabs/join`, `TabJoin`), read
+  (`GET /v1/tabs/{tab_id}`, `Tab`, `TabMember`, `TabRound`, `TabLine`,
+  `TabLineState`, `TabState`, `TabTable`, `TabTotals`, `TabServiceCharge`,
+  `TabHold`, `TabPaymentSummary`), rounds sent and recalled
+  (`POST .../rounds`, `POST .../rounds/{round_id}/recall`, `TabRoundInput`),
+  joining opened or closed (`PUT .../joining`, `TabJoining`), a card hold
+  (`POST .../hold`, `TabHoldInput`), the bill asked for and read
+  (`POST`, `GET .../bill`, `TabBill`, `TabBillLine`), the service charge kept
+  or removed (`PUT .../bill/service-charge`, `TabServiceChargeChoice`), a share
+  paid (`POST .../payments`, `TabPaymentInput`, `TabSplit`, `TabSplitKind`,
+  `TabPaymentStarted`), a receipt (`GET /v1/receipts/{token}`, `TabReceipt`)
+  and a guest's tabs kept at sign-in (`POST /v1/tabs/claim`, `TabClaim`,
+  `TabClaimed`).
+- The floor's acts at `/v1/partners/{partner_id}/locations/{location_id}`: a
+  tab read (`GET .../tabs/{tab_id}`, `StoreTab`, `TabHistoryEntry`) and opened
+  on a table (`POST .../tables/{table_id}/tabs`, `TabStaffOpen`); a round keyed
+  in, a move, a merge, reopening, the bill presented, sent by SMS and as a
+  dynamic UPI code, a line voided or declined, a discount, a payment at the
+  counter and closing unpaid (`.../tabs/{tab_id}/rounds`, `/move`, `/merge`,
+  `/reopen`, `/bill`, `/bill/send`, `/bill/upi-code`,
+  `/lines/{line_id}/void`, `/lines/{line_id}/decline`, `/discounts`,
+  `/counter-payments`, `/close-unpaid`; `TabMove`, `TabMerge`, `TabReason`,
+  `TabDiscountInput`, `TabCounterPayment`, `TabCloseUnpaid`, `TabBillSend`,
+  `TabBillSent`, `TabUpiCode`).
+- Mission Control's tabs (`GET /v1/platform/tabs`, `PlatformTabPage`,
+  `PlatformTabRow`) and a tab's page (`GET /v1/platform/tabs/{tab_id}`).
+- A signed-in customer's tabs beside their orders (`GET /v1/me/tabs`,
+  `CustomerTabPage`, `CustomerTab`).
+- Paying a tab through payments, several payments to its order: each share
+  taken at once with its own receipt, the card hold before the first round
+  reaches the kitchen (let go when the tab is paid, charged up to what is owed
+  when it is closed unpaid, a card that cannot be held turning the tab to
+  paying each round first by UPI), the dynamic UPI code (`qr_svg` on
+  `TabUpiCode`) and the bill link by SMS. A tab's payments read as the order's
+  payments in Mission Control.
+- `tab.changed` on `tab-{tab_id}`, heard by anybody holding the tab's id and
+  saying only that it changed and its version.
+- A round's lines take the answers to their items' questions (`answers` on
+  `TabLineInput`, as `BasketLineInput` takes them), priced as a basket prices
+  them at the dine-in price, shown as sold on `TabLine` and `TabBillLine` in
+  the `OrderAnswer` shape and carried on `ordering.tab.round_sent`.
+- Joining a tab (`TabJoin`) takes, instead of the join code, the table's code
+  alone while the table is pay-only, or the bill's key (`bill_key`) that the
+  bill's link sent by SMS carries as `?key=`, which stops working once the tab
+  is settled or closed; either way the caller becomes a member who reads the
+  bill and pays.
+- `dine_in_price` on `CatalogVariant`, `CatalogVariantInput` and
+  `MenuVariant`; `mode` on `GET /v1/storefront/stores/{location_id}/menu` for
+  the dine-in menu, every variant priced as tabs charge it. A tab's bill is
+  priced with the promotions engine's offers for dine-in, in `discounts`.
+- A reservation's party seated at a table (`reservations.reservation.seated`)
+  binds the table's open tab, or else the next tab opened there within the
+  hour, to the reservation; the tab takes the party's name and keeps it:
+  `party_name` and `reservation_id` on `StoreTab`, `party_name` on
+  `FloorTable`, and `reservation_id` on `ordering.tab.opened`.
+- The permission `tab:adjust` for voids, discounts and closing unpaid; edition
+  12 of the default roles, after reservations' 11, gives Manager `tab:adjust`.
+- Problem codes `table_code_inactive`, `dine_in_off`, `table_pay_only`,
+  `table_occupied`, `table_name_taken`, `tab_not_open`,
+  `tab_bill_not_presented`, `tab_has_payments`, `join_code_wrong`,
+  `joining_locked`, `joining_closed`, `round_fired`, `line_fired`,
+  `tab_payment_over` and `card_hold_off`.
+- Events `ordering.tab.opened`, `.joined`, `.round_sent`, `.round_recalled`,
+  `.line_declined`, `.line_voided`, `.discounted`, `.bill_presented`,
+  `.reopened`, `.moved`, `.merged`, `.settled`, `.closed_unpaid` and
+  `.cancelled`; `dining.table.created`, `.changed`, `.code_regenerated` and
+  `.removed`. None carries a name of a person, a phone number or an email.
+
 ## [0.28.0] - 2026-10-30
 
 Step 8, reservations and the tab's companions: table reservations at a store's slots, the day's

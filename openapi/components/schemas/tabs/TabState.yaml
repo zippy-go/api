@@ -1,0 +1,10 @@
+type: string
+description: "Where a tab is: `open` (rounds go to the kitchen), `bill_presented` (frozen: no new round until staff reopen it), `settled` (paid in full: a completed order), `closed_unpaid` (closed by a manager with what was owed charged or written off), `cancelled` (opened by mistake, nothing served)."
+enum:
+  - open
+  - bill_presented
+  - settled
+  - closed_unpaid
+  - cancelled
+examples:
+  - open

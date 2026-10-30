@@ -1,0 +1,13 @@
+type: object
+description: Keeping a guest's tabs under the account that just signed in.
+required:
+  - visitor_token
+properties:
+  visitor_token:
+    type: string
+    minLength: 16
+    description: The visitor token the guest used at the table.
+    examples:
+      - vt_3Kq8Zp2Rm7Wx4Nc9
+examples:
+  - visitor_token: vt_3Kq8Zp2Rm7Wx4Nc9

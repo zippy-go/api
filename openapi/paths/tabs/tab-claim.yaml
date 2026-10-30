@@ -1,0 +1,44 @@
+# Path item for /v1/tabs/claim. Referenced from openapi.yaml.
+post:
+  operationId: claimTabs
+  summary: Keep a guest's tabs
+  description: At sign-in, keeps under the customer every tab the visitor token joined or opened and every receipt it paid, so they show in the customer's orders. Claiming again changes nothing.
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The guest's visitor token.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/tabs/TabClaim.yaml
+  responses:
+    "200":
+      description: The tabs kept.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/TabClaimed.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or member."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

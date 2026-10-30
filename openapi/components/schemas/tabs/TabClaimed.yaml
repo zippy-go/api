@@ -1,0 +1,14 @@
+type: object
+description: The tabs kept.
+required:
+  - tab_ids
+properties:
+  tab_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: The tabs now the customer's.
+examples:
+  - tab_ids:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201

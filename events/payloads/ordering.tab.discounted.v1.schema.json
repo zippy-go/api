@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.tab.discounted.v1.schema.json",
+  "title": "OrderingTabDiscountedPayload",
+  "description": "Payload of `ordering.tab.discounted` version 1. Staff gave a discount on the bill. Consumers: analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "tab_id",
+    "number",
+    "partner_id",
+    "location_id",
+    "table_id",
+    "table_name",
+    "state",
+    "version",
+    "at",
+    "amount",
+    "reason"
+  ],
+  "properties": {
+    "tab_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tab, which is the order's id.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "table_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The table it is on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101"
+      ]
+    },
+    "table_name": {
+      "type": "string",
+      "description": "The table's name.",
+      "examples": [
+        "12"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "bill_presented",
+        "settled",
+        "closed_unpaid",
+        "cancelled"
+      ],
+      "description": "The tab's state after the change.",
+      "examples": [
+        "open"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The tab's version after the change.",
+      "examples": [
+        2
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-06T14:31:00Z"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What it took off.",
+      "examples": [
+        {
+          "minor_units": 10000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why.",
+      "examples": [
+        "Long wait"
+      ]
+    }
+  }
+}

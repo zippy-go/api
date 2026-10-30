@@ -1,0 +1,9 @@
+type: string
+description: "How a payment takes its share: `whole` (what remains), `equal` (what remains over `parts` payers), `items` (the lines named, with their share of GST and the service charge), `amount` (a sum, at most what remains)."
+enum:
+  - whole
+  - equal
+  - items
+  - amount
+examples:
+  - equal

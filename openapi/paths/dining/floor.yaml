@@ -1,0 +1,52 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/floor. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, which must be the partner's in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: getFloor
+  summary: Read the floor
+  description: Each table with its state and its open tab, as it happens. `order:read` at the Location.
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The floor.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dining/Floor.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks `order:read` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

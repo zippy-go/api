@@ -1,0 +1,38 @@
+type: object
+description: "A payment taken at the counter and recorded by staff: collected by the Location."
+required:
+  - amount
+  - method
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: What it pays of the bill.
+  method:
+    type: string
+    enum:
+      - cash
+      - card
+      - upi
+    description: "`cash`, or a `card` or `upi` taken on the Location's own terminal."
+    examples:
+      - cash
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A tip added.
+  note:
+    type:
+      - string
+      - "null"
+    maxLength: 140
+    description: A note.
+    examples:
+      - null
+examples:
+  - amount:
+      minor_units: 66625
+      currency: INR
+    method: cash
+    tip: null
+    note: null

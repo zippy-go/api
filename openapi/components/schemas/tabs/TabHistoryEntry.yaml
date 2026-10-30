@@ -1,0 +1,36 @@
+type: object
+description: One act on a tab, kept with who made it.
+required:
+  - at
+  - act
+  - by
+  - detail
+properties:
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-06T14:31:00Z
+  act:
+    type: string
+    description: "What: `opened`, `joined`, `round_sent`, `round_recalled`, `line_declined`, `line_voided`, `discounted`, `bill_presented`, `reopened`, `moved`, `merged`, `paid`, `settled`, `closed_unpaid`, `cancelled`, `card_hold`, `card_held`, `card_not_held`, `card_released`, `upi_code`, `bill_sent`, `flagged`."
+    examples:
+      - round_sent
+  by:
+    type: string
+    description: "Who: a member's name, a staff member's or `kitchen`."
+    examples:
+      - Asha
+  detail:
+    type:
+      - string
+      - "null"
+    description: What it said, such as a void's reason.
+    examples:
+      - null
+examples:
+  - at: 2026-11-06T14:31:00Z
+    act: round_sent
+    by: Asha
+    detail: null

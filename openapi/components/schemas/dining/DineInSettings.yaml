@@ -1,0 +1,72 @@
+type: object
+description: "How a Location runs dine-in: whether it takes it, how its tables are served by default, pay-first from an hour, a card hold for open tabs, GST added at the bill and an optional service charge."
+required:
+  - location_id
+  - enabled
+  - service
+  - pay_first_from
+  - card_hold
+  - gst_percent
+  - service_charge_percent
+  - version
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  enabled:
+    type: boolean
+    description: Whether tables open tabs; scans of a Location that takes none open its page with a notice.
+    examples:
+      - true
+  service:
+    $ref: ./DineInService.yaml
+    description: How its tables are served unless a table says otherwise.
+  pay_first_from:
+    type:
+      - string
+      - "null"
+    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+    description: From this time on its clock until closing, a round is paid before it reaches the kitchen; `null` never.
+    examples:
+      - 22:00
+  card_hold:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: An amount held on a card before a tab's first round reaches the kitchen, charged for what the tab comes to and released for the rest; `null` asks for none.
+  gst_percent:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    maximum: 28
+    description: GST added at the bill, in percent, where prices are written before tax; `null` when prices include it.
+    examples:
+      - 5
+  service_charge_percent:
+    type:
+      - integer
+      - "null"
+    minimum: 0
+    maximum: 20
+    description: An optional service charge in percent, shown on the bill and removable by the diners; `null` takes none.
+    examples:
+      - 10
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change.
+    examples:
+      - 1
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    enabled: true
+    service: order
+    pay_first_from: 22:00
+    card_hold: null
+    gst_percent: 5
+    service_charge_percent: 10
+    version: 1

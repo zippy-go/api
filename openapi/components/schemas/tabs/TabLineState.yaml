@@ -1,0 +1,14 @@
+type: string
+description: "Where a tab's line is: `awaiting_payment` (a round waiting before the kitchen: paid first, or until the card is held), `sent` (at the kitchen), `held` (its course waits to be fired), `fired` (in preparation), `ready`, `served`, `declined` (the kitchen could not make it: it leaves the bill), `voided` (taken off by a manager), `recalled` (its round was taken back before anything was fired)."
+enum:
+  - awaiting_payment
+  - sent
+  - held
+  - fired
+  - ready
+  - served
+  - declined
+  - voided
+  - recalled
+examples:
+  - sent

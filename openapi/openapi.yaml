@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.28.0
+  version: 0.29.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -278,6 +278,8 @@ tags:
     description: The events the platform publishes, as a list to poll and as a stream.
   - name: Subscriptions
     description: "Daily essentials on a schedule: a customer subscribes to a store's plan with the items and quantities they want, how often, in its morning window, from a start date to an optional end, paying from the Wallet or by a UPI AutoPay mandate, and changes, skips, pauses, sets days away or cancels from a calendar until the store's cutoff the evening before. At the cutoff each delivery day becomes an ordinary order held from the Wallet, generated once; a failed delivery is credited back, a price change is announced a week ahead and each month ends with a statement. The store reads its calendar, what to pack and a forecast for two weeks (`subscription:read` at the Location); Mission Control reads every subscription (`subscription:read`) and moves the schedule date on a developer's machine or in the sandbox (`operations:manage`). Every change signals `subscription.changed` on the customer's channel."
+  - name: Dine-in
+    description: "Dine-in: a Location's tables with their codes and sheets, its dine-in settings and the floor; tabs, each an order bound to a table that diners open by scanning its code and join with its join code, sending rounds to the kitchen, asking for the bill and paying it whole or split from their phones, or staff recording payments at the counter; the floor's acts (rounds keyed in, moves, merges, voids, declines, discounts, reopening, closing unpaid) and Mission Control's list. A guest uses a visitor token (`X-Visitor-Token`) and keeps the tab by signing in. `table.changed` on `private-location-{location_id}-tables` tells the floor when to read again, and `tab.changed` on `tab-{tab_id}` a tab's diners, heard by anybody holding its id and saying only that it changed."
   - name: Webhooks
     description: Webhook endpoints and event delivery.
   - name: Reviews
@@ -1535,6 +1537,80 @@ paths:
     $ref: ./paths/kitchen/kitchen-changes.yaml
   /v1/partners/{partner_id}/locations/{location_id}/kitchen/marks:
     $ref: ./paths/kitchen/kitchen-marks.yaml
+
+  # Step 8 tabs: tables, the floor, tabs, the bill and paying
+  /v1/storefront/tables/{code}:
+    $ref: ./paths/tabs/table-scan.yaml
+  /v1/tabs:
+    $ref: ./paths/tabs/tabs.yaml
+  /v1/tabs/join:
+    $ref: ./paths/tabs/tab-join.yaml
+  /v1/tabs/claim:
+    $ref: ./paths/tabs/tab-claim.yaml
+  /v1/me/tabs:
+    $ref: ./paths/tabs/me-tabs.yaml
+  /v1/tabs/{tab_id}:
+    $ref: ./paths/tabs/tab.yaml
+  /v1/tabs/{tab_id}/rounds:
+    $ref: ./paths/tabs/tab-rounds.yaml
+  /v1/tabs/{tab_id}/rounds/{round_id}/recall:
+    $ref: ./paths/tabs/tab-round-recall.yaml
+  /v1/tabs/{tab_id}/joining:
+    $ref: ./paths/tabs/tab-joining.yaml
+  /v1/tabs/{tab_id}/hold:
+    $ref: ./paths/tabs/tab-hold.yaml
+  /v1/tabs/{tab_id}/bill:
+    $ref: ./paths/tabs/tab-bill.yaml
+  /v1/tabs/{tab_id}/bill/service-charge:
+    $ref: ./paths/tabs/tab-bill-service-charge.yaml
+  /v1/tabs/{tab_id}/payments:
+    $ref: ./paths/tabs/tab-payments.yaml
+  /v1/receipts/{token}:
+    $ref: ./paths/tabs/receipt.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/dine-in:
+    $ref: ./paths/dining/dine-in-settings.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tables:
+    $ref: ./paths/dining/tables.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tables/sheets:
+    $ref: ./paths/dining/table-sheets.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}:
+    $ref: ./paths/dining/table.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}/code:
+    $ref: ./paths/dining/table-code.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/floor:
+    $ref: ./paths/dining/floor.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}:
+    $ref: ./paths/tabs/store-tab.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tables/{table_id}/tabs:
+    $ref: ./paths/tabs/table-tabs.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/rounds:
+    $ref: ./paths/tabs/store-tab-rounds.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/move:
+    $ref: ./paths/tabs/store-tab-move.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/merge:
+    $ref: ./paths/tabs/store-tab-merge.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/reopen:
+    $ref: ./paths/tabs/store-tab-reopen.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill:
+    $ref: ./paths/tabs/store-tab-bill.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill/send:
+    $ref: ./paths/tabs/store-tab-bill-send.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/bill/upi-code:
+    $ref: ./paths/tabs/store-tab-upi-code.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/lines/{line_id}/void:
+    $ref: ./paths/tabs/store-tab-line-void.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/lines/{line_id}/decline:
+    $ref: ./paths/tabs/store-tab-line-decline.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/discounts:
+    $ref: ./paths/tabs/store-tab-discounts.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/counter-payments:
+    $ref: ./paths/tabs/store-tab-counter-payments.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/tabs/{tab_id}/close-unpaid:
+    $ref: ./paths/tabs/store-tab-close-unpaid.yaml
+  /v1/platform/tabs:
+    $ref: ./paths/tabs/platform-tabs.yaml
+  /v1/platform/tabs/{tab_id}:
+    $ref: ./paths/tabs/platform-tab.yaml
 
 components:
   securitySchemes:
@@ -4343,3 +4419,114 @@ components:
       $ref: ./components/schemas/reservations/LocationReservationList.yaml
     ReservationSeatInput:
       $ref: ./components/schemas/reservations/ReservationSeatInput.yaml
+    # Step 8 tabs
+    DineInService:
+      $ref: ./components/schemas/dining/DineInService.yaml
+    DiningTable:
+      $ref: ./components/schemas/dining/DiningTable.yaml
+    DiningTableList:
+      $ref: ./components/schemas/dining/DiningTableList.yaml
+    DiningTableInput:
+      $ref: ./components/schemas/dining/DiningTableInput.yaml
+    DiningTableUpdate:
+      $ref: ./components/schemas/dining/DiningTableUpdate.yaml
+    DineInSettings:
+      $ref: ./components/schemas/dining/DineInSettings.yaml
+    DineInSettingsUpdate:
+      $ref: ./components/schemas/dining/DineInSettingsUpdate.yaml
+    TabState:
+      $ref: ./components/schemas/tabs/TabState.yaml
+    TabLineState:
+      $ref: ./components/schemas/tabs/TabLineState.yaml
+    TabLineInput:
+      $ref: ./components/schemas/tabs/TabLineInput.yaml
+    TabMember:
+      $ref: ./components/schemas/tabs/TabMember.yaml
+    TabLine:
+      $ref: ./components/schemas/tabs/TabLine.yaml
+    TabRound:
+      $ref: ./components/schemas/tabs/TabRound.yaml
+    TabServiceCharge:
+      $ref: ./components/schemas/tabs/TabServiceCharge.yaml
+    TabTotals:
+      $ref: ./components/schemas/tabs/TabTotals.yaml
+    TabTable:
+      $ref: ./components/schemas/tabs/TabTable.yaml
+    TabHold:
+      $ref: ./components/schemas/tabs/TabHold.yaml
+    TabPaymentSummary:
+      $ref: ./components/schemas/tabs/TabPaymentSummary.yaml
+    Tab:
+      $ref: ./components/schemas/tabs/Tab.yaml
+    TabOpen:
+      $ref: ./components/schemas/tabs/TabOpen.yaml
+    TabJoin:
+      $ref: ./components/schemas/tabs/TabJoin.yaml
+    TabRoundInput:
+      $ref: ./components/schemas/tabs/TabRoundInput.yaml
+    TabJoining:
+      $ref: ./components/schemas/tabs/TabJoining.yaml
+    TabHoldInput:
+      $ref: ./components/schemas/tabs/TabHoldInput.yaml
+    TabBillLine:
+      $ref: ./components/schemas/tabs/TabBillLine.yaml
+    TabBill:
+      $ref: ./components/schemas/tabs/TabBill.yaml
+    TabServiceChargeChoice:
+      $ref: ./components/schemas/tabs/TabServiceChargeChoice.yaml
+    TabSplitKind:
+      $ref: ./components/schemas/tabs/TabSplitKind.yaml
+    TabSplit:
+      $ref: ./components/schemas/tabs/TabSplit.yaml
+    TabPaymentInput:
+      $ref: ./components/schemas/tabs/TabPaymentInput.yaml
+    TabPaymentStarted:
+      $ref: ./components/schemas/tabs/TabPaymentStarted.yaml
+    TabReceipt:
+      $ref: ./components/schemas/tabs/TabReceipt.yaml
+    TabClaim:
+      $ref: ./components/schemas/tabs/TabClaim.yaml
+    TabClaimed:
+      $ref: ./components/schemas/tabs/TabClaimed.yaml
+    TableScan:
+      $ref: ./components/schemas/tabs/TableScan.yaml
+    TableScanTab:
+      $ref: ./components/schemas/tabs/TableScanTab.yaml
+    TabStaffOpen:
+      $ref: ./components/schemas/tabs/TabStaffOpen.yaml
+    TabMove:
+      $ref: ./components/schemas/tabs/TabMove.yaml
+    TabMerge:
+      $ref: ./components/schemas/tabs/TabMerge.yaml
+    TabReason:
+      $ref: ./components/schemas/tabs/TabReason.yaml
+    TabDiscountInput:
+      $ref: ./components/schemas/tabs/TabDiscountInput.yaml
+    TabCounterPayment:
+      $ref: ./components/schemas/tabs/TabCounterPayment.yaml
+    TabCloseUnpaid:
+      $ref: ./components/schemas/tabs/TabCloseUnpaid.yaml
+    TabBillSend:
+      $ref: ./components/schemas/tabs/TabBillSend.yaml
+    TabBillSent:
+      $ref: ./components/schemas/tabs/TabBillSent.yaml
+    TabUpiCode:
+      $ref: ./components/schemas/tabs/TabUpiCode.yaml
+    TabHistoryEntry:
+      $ref: ./components/schemas/tabs/TabHistoryEntry.yaml
+    StoreTab:
+      $ref: ./components/schemas/tabs/StoreTab.yaml
+    FloorTableState:
+      $ref: ./components/schemas/dining/FloorTableState.yaml
+    FloorTable:
+      $ref: ./components/schemas/dining/FloorTable.yaml
+    Floor:
+      $ref: ./components/schemas/dining/Floor.yaml
+    PlatformTabRow:
+      $ref: ./components/schemas/tabs/PlatformTabRow.yaml
+    CustomerTab:
+      $ref: ./components/schemas/tabs/CustomerTab.yaml
+    CustomerTabPage:
+      $ref: ./components/schemas/tabs/CustomerTabPage.yaml
+    PlatformTabPage:
+      $ref: ./components/schemas/tabs/PlatformTabPage.yaml

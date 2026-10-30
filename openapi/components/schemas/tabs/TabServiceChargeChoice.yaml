@@ -1,0 +1,12 @@
+type: object
+description: Keeping or removing the service charge.
+required:
+  - included
+properties:
+  included:
+    type: boolean
+    description: Whether the bill carries it.
+    examples:
+      - false
+examples:
+  - included: false

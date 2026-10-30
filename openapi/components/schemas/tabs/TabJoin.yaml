@@ -1,0 +1,41 @@
+type: object
+description: "Joining a tab, which makes the caller a member who reads its bill and pays: the table's code with the tab's join code; the table's code alone while the table is pay-only; or the bill's key its link carries (`?key=`), which stops working once the tab is settled or closed."
+required:
+  - name
+properties:
+  code:
+    type:
+      - string
+      - "null"
+    description: The table's code; `null` with a `bill_key`.
+    examples:
+      - T7Q2M9XK
+  join_code:
+    type:
+      - string
+      - "null"
+    pattern: ^[A-Za-z0-9]{4}$
+    description: The tab's join code; `null` at a pay-only table or with a `bill_key`.
+    examples:
+      - 7K4P
+  bill_key:
+    type:
+      - string
+      - "null"
+    minLength: 16
+    maxLength: 64
+    description: The key the bill's link carries as `?key=`.
+    examples:
+      - null
+  name:
+    type: string
+    minLength: 1
+    maxLength: 30
+    description: The name the joiner gives.
+    examples:
+      - Ravi
+examples:
+  - code: T7Q2M9XK
+    join_code: 7K4P
+    bill_key: null
+    name: Ravi

@@ -1,0 +1,56 @@
+type: object
+description: A diner paying their share from their phone.
+required:
+  - split
+  - method
+properties:
+  split:
+    $ref: ./TabSplit.yaml
+    description: The share.
+  method:
+    type: string
+    enum:
+      - upi
+      - card
+      - wallet
+    description: "`upi`, `card` or `wallet`."
+    examples:
+      - upi
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A saved card or UPI ID.
+    examples:
+      - null
+  tip:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A tip for the restaurant, never taxed.
+  round_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: Under pay-first, the round it pays.
+    examples:
+      - null
+  return_url:
+    type:
+      - string
+      - "null"
+    format: uri
+    description: Where the provider's page sends the diner back.
+    examples:
+      - null
+examples:
+  - split:
+      kind: equal
+      parts: 4
+    method: upi
+    saved_method_id: null
+    tip: null
+    round_id: null
+    return_url: null

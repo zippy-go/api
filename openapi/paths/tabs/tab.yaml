@@ -1,0 +1,54 @@
+# Path item for /v1/tabs/{tab_id}. Referenced from openapi.yaml.
+parameters:
+  - name: tab_id
+    in: path
+    required: true
+    description: The tab, of which the caller is a member.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+get:
+  operationId: getTab
+  summary: Read a tab
+  description: "The tab as its members read it: its members, rounds and each line's state with who added it, what it comes to, the bill once asked for, and its payments. A tab is read by its members only."
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: X-Visitor-Token
+      in: header
+      required: false
+      description: A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The tab.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/Tab.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the tab, or the caller is not one of its members."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

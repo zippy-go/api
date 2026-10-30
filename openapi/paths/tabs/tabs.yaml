@@ -1,0 +1,58 @@
+# Path item for /v1/tabs. Referenced from openapi.yaml.
+post:
+  operationId: openTab
+  summary: Open a tab
+  description: "Opens a tab on the table of `code` with its first round, which goes to the kitchen at once (pay-first: once paid; a card hold: once held). Opening again with one `Idempotency-Key` answers the tab the first opened. A guest opens with a visitor token and keeps the tab by signing in (`POST /v1/tabs/claim`). `409`: `table_code_inactive`, `dine_in_off`, `table_pay_only`, `table_occupied` (a tab is open there: join it), `lines_refused` with each line's code, or `store_not_trading`."
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+    - name: X-Visitor-Token
+      in: header
+      required: false
+      description: A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+      schema:
+        type: string
+  requestBody:
+    required: true
+    description: The table's code, the opener's name and the first round.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/tabs/TabOpen.yaml
+  responses:
+    "201":
+      description: The tab, with its join code.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/Tab.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or member."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "A refusal with its code: `table_code_inactive`, `dine_in_off`, `table_pay_only`, `table_occupied`, `lines_refused`, `store_not_trading`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,100 @@
+# Path item for /v1/tabs/{tab_id}/bill. Referenced from openapi.yaml.
+parameters:
+  - name: tab_id
+    in: path
+    required: true
+    description: The tab, of which the caller is a member.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+post:
+  operationId: askTabBill
+  summary: Ask for the bill
+  description: "Asks for the bill: the tab freezes, every member sees the bill, the floor shows the table as bill presented, and a new round is refused until staff reopen it. Asking again answers the same bill."
+  tags: &a2
+    - Dine-in
+  security: &a3
+    - Bearer: []
+    - {}
+  parameters:
+    - &a4
+      name: X-Visitor-Token
+      in: header
+      required: false
+      description: A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The bill.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/TabBill.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: the tab, or the caller is not one of its members."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`tab_not_open`: settled, closed or cancelled."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+get:
+  operationId: getTabBill
+  summary: Read the bill
+  description: The bill with what is paid and what remains. A tab whose bill was not asked for answers `409` `tab_bill_not_presented`.
+  tags: *a2
+  security: *a3
+  parameters:
+    - *a4
+  responses:
+    "200":
+      description: The bill.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/TabBill.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the tab, or the caller is not one of its members."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`tab_bill_not_presented`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

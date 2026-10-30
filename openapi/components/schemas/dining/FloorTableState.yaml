@@ -1,0 +1,9 @@
+type: string
+description: "A table on the floor: `free`, `occupied` (a tab open), `bill_presented`, `paid` (settled within the last 15 minutes)."
+enum:
+  - free
+  - occupied
+  - bill_presented
+  - paid
+examples:
+  - occupied

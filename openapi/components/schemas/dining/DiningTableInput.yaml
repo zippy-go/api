@@ -1,0 +1,38 @@
+type: object
+description: A table to add.
+required:
+  - name
+  - seats
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 20
+    description: Its name, unique at the Location.
+    examples:
+      - "12"
+  seats:
+    type: integer
+    minimum: 1
+    maximum: 40
+    description: How many it seats.
+    examples:
+      - 4
+  area:
+    type:
+      - string
+      - "null"
+    maxLength: 40
+    description: The area it stands in.
+    examples:
+      - null
+  service:
+    oneOf:
+      - $ref: ./DineInService.yaml
+      - type: "null"
+    description: How it is served; the Location's setting when `null`.
+examples:
+  - name: "12"
+    seats: 4
+    area: null
+    service: null

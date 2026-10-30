@@ -1,0 +1,20 @@
+type: object
+description: The bill link sent.
+required:
+  - sent_to
+  - link
+properties:
+  sent_to:
+    type: string
+    description: The number, masked.
+    examples:
+      - +91 98•••••210
+  link:
+    type: string
+    format: uri
+    description: "The bill's link, carrying the tab's bill key as `?key=`: opening it joins the tab with `bill_key` (`POST /v1/tabs/join`), until the tab is settled or closed."
+    examples:
+      - https://zippygo.local/tabs/0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201/bill?key=b_7Qm2Xk9Pz4Rt8Wn3Ys6Lc1Hv5Jd0Fg
+examples:
+  - sent_to: +91 98•••••210
+    link: https://zippygo.local/tabs/0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201/bill?key=b_7Qm2Xk9Pz4Rt8Wn3Ys6Lc1Hv5Jd0Fg

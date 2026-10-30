@@ -1928,3 +1928,147 @@ events:
       Staff marked a booked party that did not come, from 15 minutes after its time. Consumers: analytics. No payload carries the reservation's code, a name, a phone number or an email: the floor reads the party's name from the reservations module.
     payload_schema: ./payloads/reservations.reservation.no_show.v1.schema.json
     example: ./examples/reservations.reservation.no_show.v1.json
+
+  - type: ordering.tab.opened
+    version: 1
+    domain: ordering
+    description: >-
+      A tab opened on a table: by a diner's first round, or by staff. Consumers: the floor, Mission Control, analytics.
+    payload_schema: ./payloads/ordering.tab.opened.v1.schema.json
+    example: ./examples/ordering.tab.opened.v1.json
+
+  - type: ordering.tab.joined
+    version: 1
+    domain: ordering
+    description: >-
+      Someone joined a tab with its join code. Consumers: the floor.
+    payload_schema: ./payloads/ordering.tab.joined.v1.schema.json
+    example: ./examples/ordering.tab.joined.v1.json
+
+  - type: ordering.tab.round_sent
+    version: 1
+    domain: ordering
+    description: >-
+      A round reached the kitchen: sent by a member or keyed in by staff, at once or, under pay-first, once paid. Consumers: the kitchen (a ticket with its first course fired), the floor, analytics.
+    payload_schema: ./payloads/ordering.tab.round_sent.v1.schema.json
+    example: ./examples/ordering.tab.round_sent.v1.json
+
+  - type: ordering.tab.round_recalled
+    version: 1
+    domain: ordering
+    description: >-
+      A member recalled a round before anything of it was fired: it leaves the display and the bill. Consumers: the kitchen (the ticket withdrawn).
+    payload_schema: ./payloads/ordering.tab.round_recalled.v1.schema.json
+    example: ./examples/ordering.tab.round_recalled.v1.json
+
+  - type: ordering.tab.line_declined
+    version: 1
+    domain: ordering
+    description: >-
+      A line was declined before it was fired, such as sold out: it leaves the bill and the table is told. Consumers: the floor, notifications.
+    payload_schema: ./payloads/ordering.tab.line_declined.v1.schema.json
+    example: ./examples/ordering.tab.line_declined.v1.json
+
+  - type: ordering.tab.line_voided
+    version: 1
+    domain: ordering
+    description: >-
+      A manager voided a line with a reason. Consumers: the floor, analytics.
+    payload_schema: ./payloads/ordering.tab.line_voided.v1.schema.json
+    example: ./examples/ordering.tab.line_voided.v1.json
+
+  - type: ordering.tab.discounted
+    version: 1
+    domain: ordering
+    description: >-
+      Staff gave a discount on the bill. Consumers: analytics.
+    payload_schema: ./payloads/ordering.tab.discounted.v1.schema.json
+    example: ./examples/ordering.tab.discounted.v1.json
+
+  - type: ordering.tab.bill_presented
+    version: 1
+    domain: ordering
+    description: >-
+      The bill was asked for or presented: the tab is frozen. Consumers: the floor, notifications.
+    payload_schema: ./payloads/ordering.tab.bill_presented.v1.schema.json
+    example: ./examples/ordering.tab.bill_presented.v1.json
+
+  - type: ordering.tab.reopened
+    version: 1
+    domain: ordering
+    description: >-
+      Staff reopened a tab whose bill was presented, so the table may order again. Consumers: the floor.
+    payload_schema: ./payloads/ordering.tab.reopened.v1.schema.json
+    example: ./examples/ordering.tab.reopened.v1.json
+
+  - type: ordering.tab.moved
+    version: 1
+    domain: ordering
+    description: >-
+      Staff moved a tab to another table: its rounds, members and join code followed. Consumers: the kitchen (its tickets under the new table), the floor.
+    payload_schema: ./payloads/ordering.tab.moved.v1.schema.json
+    example: ./examples/ordering.tab.moved.v1.json
+
+  - type: ordering.tab.merged
+    version: 1
+    domain: ordering
+    description: >-
+      Staff merged another tab into this one: its rounds, members and payments followed, and the other was cancelled. Consumers: the kitchen, the floor.
+    payload_schema: ./payloads/ordering.tab.merged.v1.schema.json
+    example: ./examples/ordering.tab.merged.v1.json
+
+  - type: ordering.tab.settled
+    version: 1
+    domain: ordering
+    description: >-
+      A tab was paid in full: a completed order. What diners paid through the platform, tips included, is the Partner's; what the counter took was collected by the Location. Consumers: the ledger, payouts, reviews (the ask), engagement (a dine-in visit), analytics.
+    payload_schema: ./payloads/ordering.tab.settled.v1.schema.json
+    example: ./examples/ordering.tab.settled.v1.json
+
+  - type: ordering.tab.closed_unpaid
+    version: 1
+    domain: ordering
+    description: >-
+      A manager closed a tab unpaid with a note: a card hold charged for what it came to, the rest written off. Consumers: the ledger, payouts, Mission Control, analytics.
+    payload_schema: ./payloads/ordering.tab.closed_unpaid.v1.schema.json
+    example: ./examples/ordering.tab.closed_unpaid.v1.json
+
+  - type: ordering.tab.cancelled
+    version: 1
+    domain: ordering
+    description: >-
+      A tab was cancelled with nothing to pay: opened by mistake, everything recalled or declined, or merged into another. Consumers: the floor, the kitchen, analytics.
+    payload_schema: ./payloads/ordering.tab.cancelled.v1.schema.json
+    example: ./examples/ordering.tab.cancelled.v1.json
+
+  - type: dining.table.created
+    version: 1
+    domain: dining
+    description: >-
+      A Location added a table. Consumers: the floor.
+    payload_schema: ./payloads/dining.table.created.v1.schema.json
+    example: ./examples/dining.table.created.v1.json
+
+  - type: dining.table.changed
+    version: 1
+    domain: dining
+    description: >-
+      A table's name, seats, area or service changed. Consumers: the floor.
+    payload_schema: ./payloads/dining.table.changed.v1.schema.json
+    example: ./examples/dining.table.changed.v1.json
+
+  - type: dining.table.code_regenerated
+    version: 1
+    domain: dining
+    description: >-
+      A table's code was regenerated: sheets printed before stop opening tabs. The code itself is not carried. Consumers: the floor.
+    payload_schema: ./payloads/dining.table.code_regenerated.v1.schema.json
+    example: ./examples/dining.table.code_regenerated.v1.json
+
+  - type: dining.table.removed
+    version: 1
+    domain: dining
+    description: >-
+      A table was removed; its code stops opening tabs. Consumers: the floor.
+    payload_schema: ./payloads/dining.table.removed.v1.schema.json
+    example: ./examples/dining.table.removed.v1.json

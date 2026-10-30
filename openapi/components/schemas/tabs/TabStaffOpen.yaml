@@ -1,0 +1,19 @@
+type: object
+description: Staff opening a tab on a table, with a first round keyed in or none.
+properties:
+  name:
+    type:
+      - string
+      - "null"
+    maxLength: 30
+    description: A name for the table's party.
+    examples:
+      - null
+  lines:
+    type: array
+    items:
+      $ref: ./TabLineInput.yaml
+    description: The lines keyed in.
+examples:
+  - name: null
+    lines: []

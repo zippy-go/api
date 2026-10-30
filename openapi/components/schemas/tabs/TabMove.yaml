@@ -1,0 +1,13 @@
+type: object
+description: Moving a tab to another table.
+required:
+  - table_id
+properties:
+  table_id:
+    type: string
+    format: uuid
+    description: The free table it moves to.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0115
+examples:
+  - table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0115

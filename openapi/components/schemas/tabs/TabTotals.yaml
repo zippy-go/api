@@ -1,0 +1,66 @@
+type: object
+description: What a tab comes to so far, as the bill draws it.
+required:
+  - items
+  - discounts
+  - service_charge
+  - gst
+  - total
+  - paid
+  - remaining
+  - tips
+properties:
+  items:
+    $ref: ../common/Money.yaml
+    description: Its lines' total, declined, voided and recalled lines left out.
+  discounts:
+    $ref: ../common/Money.yaml
+    description: What offers and staff discounts took off.
+  service_charge:
+    oneOf:
+      - $ref: ./TabServiceCharge.yaml
+      - type: "null"
+    description: The service charge; `null` where the Location takes none.
+  gst:
+    $ref: ../common/Money.yaml
+    description: GST added at the bill; nothing where prices include it.
+  total:
+    $ref: ../common/Money.yaml
+    description: What the tab costs.
+  paid:
+    $ref: ../common/Money.yaml
+    description: What its payments took so far, tips left out.
+  remaining:
+    $ref: ../common/Money.yaml
+    description: What is left to pay.
+  tips:
+    $ref: ../common/Money.yaml
+    description: Tips the payers added, the restaurant's own.
+examples:
+  - items:
+      minor_units: 100000
+      currency: INR
+    discounts:
+      minor_units: 0
+      currency: INR
+    service_charge:
+      percent: 10
+      amount:
+        minor_units: 10000
+        currency: INR
+      included: true
+    gst:
+      minor_units: 5500
+      currency: INR
+    total:
+      minor_units: 115500
+      currency: INR
+    paid:
+      minor_units: 0
+      currency: INR
+    remaining:
+      minor_units: 115500
+      currency: INR
+    tips:
+      minor_units: 0
+      currency: INR

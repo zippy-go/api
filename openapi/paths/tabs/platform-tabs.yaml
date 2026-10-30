@@ -1,0 +1,78 @@
+# Path item for /v1/platform/tabs. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformTabs
+  summary: List tabs
+  description: Every tab, closed unpaid first and then the newest, by state, Location and day. `order:read`.
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+  parameters:
+    - name: state
+      in: query
+      required: false
+      description: One state.
+      schema:
+        $ref: ../../components/schemas/tabs/TabState.yaml
+    - name: location_id
+      in: query
+      required: false
+      description: One Location.
+      schema:
+        type: string
+        format: uuid
+    - name: date
+      in: query
+      required: false
+      description: The day they opened, on the Location's clock.
+      schema:
+        type: string
+        format: date
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of tabs.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/PlatformTabPage.yaml
+    "400":
+      description: "`validation_failed`: a malformed identifier or member."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: Not a Mission Control token (`forbidden`), or the member lacks `order:read` (`access_denied`).
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

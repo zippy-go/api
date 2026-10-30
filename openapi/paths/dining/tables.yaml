@@ -1,0 +1,108 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/tables. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: The Location, which must be the partner's in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000301
+get:
+  operationId: listDiningTables
+  summary: List the tables
+  description: The Location's tables with their codes. `location:read` at the Location.
+  tags: &a2
+    - Dine-in
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The tables.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dining/DiningTableList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` (the member lacks `location:read` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: createDiningTable
+  summary: Add a table
+  description: Adds a table with a fresh code. A name the Location already uses is refused (`table_name_taken`). Audited. `location:write` at the Location.
+  tags: *a2
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The table.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/dining/DiningTableInput.yaml
+  responses:
+    "201":
+      description: The table.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dining/DiningTable.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`access_denied` (the member lacks `location:write` at the Location), `not_enabled_for_partner`, or `forbidden`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Location."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`table_name_taken`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

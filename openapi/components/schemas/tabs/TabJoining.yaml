@@ -1,0 +1,12 @@
+type: object
+description: Opening or closing the tab to joiners.
+required:
+  - open
+properties:
+  open:
+    type: boolean
+    description: Whether others may join.
+    examples:
+      - false
+examples:
+  - open: false

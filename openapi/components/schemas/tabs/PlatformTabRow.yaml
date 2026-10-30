@@ -1,0 +1,96 @@
+type: object
+description: A tab in Mission Control's Dine-in list.
+required:
+  - tab_id
+  - number
+  - partner_id
+  - location_id
+  - store_name
+  - table
+  - state
+  - total
+  - paid
+  - opened_at
+  - closed_at
+  - note
+properties:
+  tab_id:
+    type: string
+    format: uuid
+    description: The tab.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  number:
+    type: string
+    description: Its number.
+    examples:
+      - AB0042
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  store_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  table:
+    type: string
+    description: The table's name.
+    examples:
+      - "12"
+  state:
+    $ref: ./TabState.yaml
+    description: Where it is.
+  total:
+    $ref: ../common/Money.yaml
+    description: What it came to.
+  paid:
+    $ref: ../common/Money.yaml
+    description: What was paid.
+  opened_at:
+    type: string
+    format: date-time
+    description: When it opened.
+    examples:
+      - 2026-11-06T14:31:00Z
+  closed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was settled or closed.
+    examples:
+      - 2026-11-06T17:00:00Z
+  note:
+    type:
+      - string
+      - "null"
+    description: A closing note.
+    examples:
+      - Walked out
+examples:
+  - tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    number: AB0042
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    store_name: Dev Kitchen Gachibowli
+    table: "12"
+    state: closed_unpaid
+    total:
+      minor_units: 42000
+      currency: INR
+    paid:
+      minor_units: 42000
+      currency: INR
+    opened_at: 2026-11-06T14:31:00Z
+    closed_at: 2026-11-06T17:00:00Z
+    note: Walked out

@@ -1,0 +1,211 @@
+type: object
+description: "A tab as its members read it: an order bound to a table that collects rounds until it is paid. `tab.changed` on `tab-{tab_id}`, heard by anybody holding the tab's id, says it changed and its version, never what changed: a member reads it again."
+required:
+  - tab_id
+  - number
+  - location_id
+  - store_name
+  - table
+  - state
+  - join_code
+  - joining_open
+  - pay_first
+  - you
+  - members
+  - rounds
+  - totals
+  - hold
+  - payments
+  - opened_at
+  - bill_presented_at
+  - version
+properties:
+  tab_id:
+    type: string
+    format: uuid
+    description: The tab, which is the order's id.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+  number:
+    type: string
+    description: The order's number.
+    examples:
+      - AB0042
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  store_name:
+    type: string
+    description: The Location's name.
+    examples:
+      - Dev Kitchen Gachibowli
+  table:
+    $ref: ./TabTable.yaml
+    description: The table it is on.
+  state:
+    $ref: ./TabState.yaml
+    description: Where it is.
+  join_code:
+    type: string
+    pattern: ^[A-Z0-9]{4}$
+    description: The code friends enter to join, shown to its members.
+    examples:
+      - 7K4P
+  joining_open:
+    type: boolean
+    description: Whether others may join it.
+    examples:
+      - true
+  pay_first:
+    type: boolean
+    description: Whether a round is paid before it reaches the kitchen now.
+    examples:
+      - false
+  you:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The member the caller is; `null` for staff.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+  members:
+    type: array
+    items:
+      $ref: ./TabMember.yaml
+    description: Its members.
+  rounds:
+    type: array
+    items:
+      $ref: ./TabRound.yaml
+    description: Its rounds, the first first.
+  totals:
+    $ref: ./TabTotals.yaml
+    description: What it comes to so far.
+  hold:
+    oneOf:
+      - $ref: ./TabHold.yaml
+      - type: "null"
+    description: The card hold, where the Location asks for one.
+  payments:
+    type: array
+    items:
+      $ref: ./TabPaymentSummary.yaml
+    description: Its payments.
+  opened_at:
+    type: string
+    format: date-time
+    description: When its first round was sent.
+    examples:
+      - 2026-11-06T14:31:00Z
+  bill_presented_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the bill was asked for.
+    examples:
+      - null
+  version:
+    type: integer
+    minimum: 1
+    description: Raised by every change.
+    examples:
+      - 1
+examples:
+  - tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+    number: AB0042
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    store_name: Dev Kitchen Gachibowli
+    table:
+      table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+      name: "12"
+    state: open
+    join_code: 7K4P
+    joining_open: true
+    pay_first: false
+    you: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+    members:
+      - member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+        name: Asha
+        signed_in: false
+        joined_at: 2026-11-06T14:30:00Z
+    rounds:
+      - round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+        number: 1
+        member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+        member_name: Asha
+        sent_at: 2026-11-06T14:31:00Z
+        recalled: false
+        recallable: true
+        paid_first: false
+        lines:
+          - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+            round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+            item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+            variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602
+            name: Paneer Tikka
+            variant_label: null
+            food_mark: veg
+            quantity: 1
+            unit_price:
+              minor_units: 32000
+              currency: INR
+            answers: []
+            total:
+              minor_units: 32000
+              currency: INR
+            state: fired
+            member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+            member_name: Asha
+            note: null
+            reason: null
+    totals:
+      items:
+        minor_units: 100000
+        currency: INR
+      discounts:
+        minor_units: 0
+        currency: INR
+      service_charge:
+        percent: 10
+        amount:
+          minor_units: 10000
+          currency: INR
+        included: true
+      gst:
+        minor_units: 5500
+        currency: INR
+      total:
+        minor_units: 115500
+        currency: INR
+      paid:
+        minor_units: 0
+        currency: INR
+      remaining:
+        minor_units: 115500
+        currency: INR
+      tips:
+        minor_units: 0
+        currency: INR
+    hold: null
+    payments:
+      - payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+        by: diner
+        member_name: Asha
+        method: upi
+        amount:
+          minor_units: 28875
+          currency: INR
+        tip:
+          minor_units: 0
+          currency: INR
+        status: paid
+        paid_at: 2026-11-06T16:12:00Z
+        receipt_token: null
+    opened_at: 2026-11-06T14:31:00Z
+    bill_presented_at: null
+    version: 1

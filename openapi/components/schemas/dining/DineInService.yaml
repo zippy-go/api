@@ -1,0 +1,7 @@
+type: string
+description: "How a table is served: `order` (diners scan, order rounds and pay from their phones) or `pay_only` (staff take the order; diners scan only to pay)."
+enum:
+  - order
+  - pay_only
+examples:
+  - order

@@ -1,0 +1,22 @@
+type: object
+description: A card to hold the Location's amount on.
+properties:
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: One of the customer's saved cards; a new card on the provider's page when `null`.
+    examples:
+      - null
+  return_url:
+    type:
+      - string
+      - "null"
+    format: uri
+    description: Where the provider's page sends the diner back; the tab's page by default.
+    examples:
+      - null
+examples:
+  - saved_method_id: null
+    return_url: null

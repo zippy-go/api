@@ -1,0 +1,54 @@
+# Path item for /v1/storefront/tables/{code}. Referenced from openapi.yaml.
+parameters:
+  - name: code
+    in: path
+    required: true
+    description: The code printed on the table's sheet.
+    schema:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}$
+    example: T7Q2M9XK
+get:
+  operationId: scanTable
+  summary: Scan a table
+  description: "What a table's code opens: the store, the table, ordering or paying only, the tab open there to join or pay, pay-first and a card hold in force, or why the code is not active (regenerated, the table removed, dine-in off), in which case the store's page opens with the notice and no tab opens. Anybody may read it."
+  tags:
+    - Dine-in
+  security:
+    - Bearer: []
+    - {}
+  parameters:
+    - name: X-Visitor-Token
+      in: header
+      required: false
+      description: A guest's visitor token (`POST /v1/visitor-tokens`), in place of a customer's bearer token.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: What the code opens.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/tabs/TableScan.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no table has ever had this code."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

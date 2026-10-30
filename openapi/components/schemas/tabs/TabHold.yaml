@@ -1,0 +1,32 @@
+type: object
+description: A card hold on an open tab.
+required:
+  - payment_id
+  - amount
+  - state
+properties:
+  payment_id:
+    type: string
+    format: uuid
+    description: The payment holding it.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+  amount:
+    $ref: ../common/Money.yaml
+    description: What is held.
+  state:
+    type: string
+    enum:
+      - pending
+      - held
+      - charged
+      - released
+    description: "`pending` until the card holds it, `held`, then `charged` or `released`."
+    examples:
+      - held
+examples:
+  - payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+    amount:
+      minor_units: 50000
+      currency: INR
+    state: held

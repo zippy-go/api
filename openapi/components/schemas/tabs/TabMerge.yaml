@@ -1,0 +1,13 @@
+type: object
+description: Merging another open tab of the Location into this one.
+required:
+  - tab_id
+properties:
+  tab_id:
+    type: string
+    format: uuid
+    description: The tab merged in; its rounds, members and payments follow.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0202
+examples:
+  - tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0202

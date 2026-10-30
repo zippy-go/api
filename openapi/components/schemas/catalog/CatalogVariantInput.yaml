@@ -69,6 +69,15 @@ properties:
     minimum: 0
     examples:
       - null
+  dine_in_price:
+    type:
+      - integer
+      - "null"
+    format: int64
+    minimum: 0
+    examples:
+      - null
+    description: Its price at the Location's tables in minor units; `null` charges `price`. Since 0.29.0.
 examples:
   - selection:
       Portion: Half

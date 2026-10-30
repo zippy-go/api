@@ -1,0 +1,33 @@
+type: object
+description: The share a payment takes.
+required:
+  - kind
+properties:
+  kind:
+    $ref: ./TabSplitKind.yaml
+    description: How.
+  parts:
+    type:
+      - integer
+      - "null"
+    minimum: 2
+    maximum: 20
+    description: For `equal`, how many pay.
+    examples:
+      - 4
+  line_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: For `items`, the lines.
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: For `amount`, the sum.
+examples:
+  - kind: equal
+    parts: 4
+    line_ids: []
+    amount: null

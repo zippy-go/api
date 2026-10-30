@@ -1,0 +1,148 @@
+type: object
+description: "A tab as the floor reads it: the members' tab with its history."
+required:
+  - tab
+  - history
+  - flagged
+  - service_charge_removed
+  - party_name
+  - reservation_id
+properties:
+  tab:
+    $ref: ./Tab.yaml
+    description: The tab.
+  history:
+    type: array
+    items:
+      $ref: ./TabHistoryEntry.yaml
+    description: Every act on it, the latest last.
+  flagged:
+    type: boolean
+    description: "Whether the Location's closing time passed with it open: staff settle it."
+    examples:
+      - false
+  service_charge_removed:
+    type: boolean
+    description: Whether the diners removed the service charge.
+    examples:
+      - false
+  party_name:
+    type:
+      - string
+      - "null"
+    maxLength: 120
+    description: "The party's name: staff's when they opened the tab, or the reservation's once its party was seated at the table, which the tab keeps."
+    examples:
+      - Sharma
+  reservation_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The reservation it is bound to: its party was seated at the table while the tab was open, or within the hour before it opened (`reservations.reservation.seated`)."
+    examples:
+      - null
+examples:
+  - tab:
+      tab_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201
+      number: AB0042
+      location_id: 01a13a48-9e00-7000-8000-000000000301
+      store_name: Dev Kitchen Gachibowli
+      table:
+        table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+        name: "12"
+      state: open
+      join_code: 7K4P
+      joining_open: true
+      pay_first: false
+      you: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+      members:
+        - member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+          name: Asha
+          signed_in: false
+          joined_at: 2026-11-06T14:30:00Z
+      rounds:
+        - round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+          number: 1
+          member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+          member_name: Asha
+          sent_at: 2026-11-06T14:31:00Z
+          recalled: false
+          recallable: true
+          paid_first: false
+          lines:
+            - line_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0401
+              round_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0301
+              item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+              variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602
+              name: Paneer Tikka
+              variant_label: null
+              food_mark: veg
+              quantity: 1
+              unit_price:
+                minor_units: 32000
+                currency: INR
+              answers: []
+              total:
+                minor_units: 32000
+                currency: INR
+              state: fired
+              member_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0501
+              member_name: Asha
+              note: null
+              reason: null
+      totals:
+        items:
+          minor_units: 100000
+          currency: INR
+        discounts:
+          minor_units: 0
+          currency: INR
+        service_charge:
+          percent: 10
+          amount:
+            minor_units: 10000
+            currency: INR
+          included: true
+        gst:
+          minor_units: 5500
+          currency: INR
+        total:
+          minor_units: 115500
+          currency: INR
+        paid:
+          minor_units: 0
+          currency: INR
+        remaining:
+          minor_units: 115500
+          currency: INR
+        tips:
+          minor_units: 0
+          currency: INR
+      hold: null
+      payments:
+        - payment_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0701
+          by: diner
+          member_name: Asha
+          method: upi
+          amount:
+            minor_units: 28875
+            currency: INR
+          tip:
+            minor_units: 0
+            currency: INR
+          status: paid
+          paid_at: 2026-11-06T16:12:00Z
+          receipt_token: null
+      opened_at: 2026-11-06T14:31:00Z
+      bill_presented_at: null
+      version: 1
+    history:
+      - at: 2026-11-06T14:31:00Z
+        act: round_sent
+        by: Asha
+        detail: null
+    flagged: false
+    service_charge_removed: false
+    party_name: Sharma
+    reservation_id: null

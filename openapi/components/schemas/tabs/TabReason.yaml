@@ -1,0 +1,14 @@
+type: object
+description: Why staff took a line off.
+required:
+  - reason
+properties:
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 140
+    description: Why, kept in the tab's history.
+    examples:
+      - not served
+examples:
+  - reason: not served

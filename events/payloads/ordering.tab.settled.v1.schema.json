@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.tab.settled.v1.schema.json",
+  "title": "OrderingTabSettledPayload",
+  "description": "Payload of `ordering.tab.settled` version 1. A tab was paid in full: a completed order. What diners paid through the platform, tips included, is the Partner's; what the counter took was collected by the Location. Consumers: the ledger, payouts, reviews (the ask), engagement (a dine-in visit), analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "tab_id",
+    "number",
+    "partner_id",
+    "location_id",
+    "table_id",
+    "table_name",
+    "state",
+    "version",
+    "at",
+    "total",
+    "tips",
+    "paid_through_platform",
+    "collected_by_location",
+    "customer_id",
+    "payers",
+    "items",
+    "staff_discounts",
+    "discounts",
+    "service_charge",
+    "gst",
+    "offers"
+  ],
+  "properties": {
+    "tab_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tab, which is the order's id.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "table_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The table it is on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101"
+      ]
+    },
+    "table_name": {
+      "type": "string",
+      "description": "The table's name.",
+      "examples": [
+        "12"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "bill_presented",
+        "settled",
+        "closed_unpaid",
+        "cancelled"
+      ],
+      "description": "The tab's state after the change.",
+      "examples": [
+        "open"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The tab's version after the change.",
+      "examples": [
+        2
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it happened.",
+      "examples": [
+        "2026-11-06T14:31:00Z"
+      ]
+    },
+    "total": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What it came to, tips left out.",
+      "examples": [
+        {
+          "minor_units": 115500,
+          "currency": "INR"
+        }
+      ]
+    },
+    "tips": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "The tips added, the restaurant's own.",
+      "examples": [
+        {
+          "minor_units": 5000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "paid_through_platform": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What diners paid from their phones, tips left out.",
+      "examples": [
+        {
+          "minor_units": 66625,
+          "currency": "INR"
+        }
+      ]
+    },
+    "collected_by_location": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What staff recorded at the counter, tips left out.",
+      "examples": [
+        {
+          "minor_units": 48875,
+          "currency": "INR"
+        }
+      ]
+    },
+    "customer_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The signed-in customer who opened it, who may review it.",
+      "examples": [
+        null
+      ]
+    },
+    "payers": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many payments paid it.",
+      "examples": [
+        2
+      ]
+    },
+    "items": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "Its lines' total, declined, voided and recalled lines left out.",
+      "examples": [
+        {
+          "minor_units": 105000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "staff_discounts": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What staff took off.",
+      "examples": [
+        {
+          "minor_units": 0,
+          "currency": "INR"
+        }
+      ]
+    },
+    "discounts": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What staff and the offers took off.",
+      "examples": [
+        {
+          "minor_units": 5000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "service_charge": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "The service charge the bill carried; nothing where it was removed or none is taken.",
+      "examples": [
+        {
+          "minor_units": 10000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "gst": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "The GST added at the bill; nothing where prices include it.",
+      "examples": [
+        {
+          "minor_units": 5500,
+          "currency": "INR"
+        }
+      ]
+    },
+    "offers": {
+      "type": "array",
+      "description": "The offers the promotions engine priced the bill with, each with its cost split.",
+      "items": {
+        "type": "object",
+        "description": "An offer applied.",
+        "required": [
+          "offer_id",
+          "line",
+          "owner",
+          "kind",
+          "saving",
+          "partner_cost",
+          "platform_cost"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The offer.",
+            "examples": [
+              "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101"
+            ]
+          },
+          "line": {
+            "type": "string",
+            "description": "Its line, as the customer read it.",
+            "examples": [
+              "₹50 off dine-in bills over ₹999"
+            ]
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "partner",
+              "platform"
+            ],
+            "description": "Who runs it.",
+            "examples": [
+              "partner"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "item",
+              "basket",
+              "delivery",
+              "free_item"
+            ],
+            "description": "What it takes off.",
+            "examples": [
+              "basket"
+            ]
+          },
+          "saving": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "What it saved, in paise.",
+            "examples": [
+              5000
+            ]
+          },
+          "partner_cost": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "What the Partner paid of it, in paise.",
+            "examples": [
+              5000
+            ]
+          },
+          "platform_cost": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "What the platform paid of it, in paise.",
+            "examples": [
+              0
+            ]
+          }
+        },
+        "examples": [
+          {
+            "offer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101",
+            "line": "₹50 off dine-in bills over ₹999",
+            "owner": "partner",
+            "kind": "basket",
+            "saving": 5000,
+            "partner_cost": 5000,
+            "platform_cost": 0
+          }
+        ]
+      },
+      "examples": [
+        [
+          {
+            "offer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9101",
+            "line": "₹50 off dine-in bills over ₹999",
+            "owner": "partner",
+            "kind": "basket",
+            "saving": 5000,
+            "partner_cost": 5000,
+            "platform_cost": 0
+          }
+        ]
+      ]
+    }
+  }
+}

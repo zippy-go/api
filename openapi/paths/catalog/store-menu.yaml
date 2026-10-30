@@ -26,6 +26,16 @@ get:
         minimum: 1
       example: 42
     - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
+    - name: mode
+      in: query
+      required: false
+      description: "The menu's mode: `delivery` (default) or `dine_in`, which prices every variant at its dine-in price, as tabs charge. Since 0.29.0."
+      schema:
+        type: string
+        enum:
+          - delivery
+          - dine_in
+        default: delivery
   responses:
     "200":
       description: The published menu, with its version as the `ETag`.

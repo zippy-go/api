@@ -1,0 +1,86 @@
+type: object
+description: "What a table's code opens: the store, the table, ordering or pay-only, an open tab to join, pay-first and a card hold in force, or why the code is not active."
+required:
+  - location_id
+  - partner_id
+  - store_name
+  - table
+  - active
+  - reason
+  - service
+  - heading
+  - open_tab
+  - pay_first
+  - card_hold
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  partner_id:
+    type: string
+    format: uuid
+    description: Its Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  store_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  table:
+    oneOf:
+      - $ref: ./TabTable.yaml
+      - type: "null"
+    description: The table; `null` when the code is not active.
+  active:
+    type: boolean
+    description: Whether the code opens a tab.
+    examples:
+      - true
+  reason:
+    type:
+      - string
+      - "null"
+    description: "Why not, as a screen shows it: a regenerated code, a removed table, or dine-in switched off."
+    examples:
+      - null
+  service:
+    $ref: ../dining/DineInService.yaml
+    description: "Ordering, or paying only: at a pay-only table staff take the order, and a diner joins its open tab with the table's code alone (`POST /v1/tabs/join`) to read the bill and pay."
+  heading:
+    type: string
+    description: What the page says over the dine-in menu.
+    examples:
+      - Dining in at table 12
+  open_tab:
+    oneOf:
+      - $ref: ./TableScanTab.yaml
+      - type: "null"
+    description: The tab open on the table, to join or to pay; `null` when none.
+  pay_first:
+    type: boolean
+    description: Whether rounds are paid before they reach the kitchen now.
+    examples:
+      - false
+  card_hold:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: The card hold the Location asks for before the first round.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    partner_id: 01a13a48-9e00-7000-8000-000000000001
+    store_name: Dev Kitchen Gachibowli
+    table:
+      table_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101
+      name: "12"
+    active: true
+    reason: null
+    service: order
+    heading: Dining in at table 12
+    open_tab: null
+    pay_first: false
+    card_hold: null

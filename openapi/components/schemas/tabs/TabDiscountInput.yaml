@@ -1,0 +1,32 @@
+type: object
+description: "A discount staff give on the bill: an amount or a percentage."
+required:
+  - reason
+properties:
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: An amount off.
+  percent:
+    type:
+      - integer
+      - "null"
+    minimum: 1
+    maximum: 100
+    description: A percentage off.
+    examples:
+      - null
+  reason:
+    type: string
+    minLength: 1
+    maxLength: 140
+    description: Why.
+    examples:
+      - Long wait
+examples:
+  - amount:
+      minor_units: 10000
+      currency: INR
+    percent: null
+    reason: Long wait

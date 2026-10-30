@@ -1,0 +1,17 @@
+type: object
+description: A round to send.
+required:
+  - lines
+properties:
+  lines:
+    type: array
+    items:
+      $ref: ./TabLineInput.yaml
+    description: Its lines, 1 to 30.
+examples:
+  - lines:
+      - item_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0601
+        variant_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0602
+        quantity: 1
+        answers: []
+        note: null

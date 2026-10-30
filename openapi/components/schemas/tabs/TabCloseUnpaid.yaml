@@ -1,0 +1,14 @@
+type: object
+description: "A manager closing a tab unpaid: a card hold charged for what the tab comes to, the rest written off."
+required:
+  - note
+properties:
+  note:
+    type: string
+    minLength: 1
+    maxLength: 280
+    description: Why, kept with the tab and shown in Mission Control.
+    examples:
+      - Walked out
+examples:
+  - note: Walked out
