@@ -45,7 +45,8 @@ step 9's bookings slice; renumbered by merge order. Additive only.
 - Events `fleet.shift.published`, `.changed`, `.picked`, `.assigned` and
   `.removed`; `fleet.qualification.approved` and `.withdrawn`;
   `fleet.task.working` and `fleet.task.disputed`. Every `fleet.task.*`
-  payload gains `booking_id` and the new kinds and statuses, and
+  payload gains `booking_id`, the laundry `leg` and the new kinds and
+  statuses, and
   `fleet.task.completed` the pickup's `item_count`.
 
 ## [0.29.0] - 2026-10-30

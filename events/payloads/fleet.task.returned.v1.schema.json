@@ -231,6 +231,21 @@
       "examples": [
         "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c9201"
       ]
+    },
+    "leg": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "pickup",
+        "return",
+        null
+      ],
+      "description": "The laundry leg the task carries (since 0.28.0): `pickup` collects at the customer's door and drops at the store, `return` brings the items back to the door; `null` for a delivery or a booked job.",
+      "examples": [
+        "pickup"
+      ]
     }
   }
 }
