@@ -54,7 +54,7 @@ get:
 put:
   operationId: putPartnerPlan
   summary: Change the partner's plan
-  description: "Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write`, which the owner holds (platform staff: `partner:write`)."
+  description: "Changes the Partner's plan. Since step 10 the owner (`plan:write`) moves it: an upgrade at once, the rest of the month prorated on the next invoice, a downgrade on the 1st of next month. Platform staff (`partner:write`) schedule a move with a reason at `effective_at`; a staff move at once answers 409 `approval_required` and is proposed at `POST /v1/platform/approvals` (`change_partner_plan`). At the moment a move takes effect every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write` (platform staff: `partner:write`)."
   tags:
     - Plans
   security:
@@ -86,7 +86,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "403":
-      description: The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).
+      description: The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`).
       content:
         application/problem+json:
           schema:
@@ -98,7 +98,7 @@ put:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "409":
-      description: "`partner_archived`."
+      description: "`partner_archived`; `approval_required` for a staff move at once."
       content:
         application/problem+json:
           schema:
