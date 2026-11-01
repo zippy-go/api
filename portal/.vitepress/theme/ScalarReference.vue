@@ -11,12 +11,16 @@ const ApiReference = defineAsyncComponent(() =>
 );
 
 // `openapi.json` is copied into portal/public by `pnpm portal:sync`.
+// The try-it calls the sandbox with the developer's own sandbox key (`ApiKey`), which Scalar
+// keeps in this browser's storage and sends to the sandbox only: there is no proxy, so the key
+// never reaches this site. `VITE_SANDBOX_URL` names the sandbox; a developer's machine runs it on
+// the local stack.
+const sandbox = import.meta.env.VITE_SANDBOX_URL ?? 'http://localhost:8080';
 const configuration = {
   url: withBase('/openapi.json'),
-  // The hosts in the document are placeholders, so the built-in API client
-  // and "test request" buttons would only produce failed requests.
-  hideClientButton: true,
-  hideTestRequestButton: true,
+  servers: [{ url: sandbox, description: 'Sandbox: a sandbox key (zg_test_) only' }],
+  authentication: { preferredSecurityScheme: 'ApiKey' },
+  persistAuth: true,
   // Keep the page to the reference itself: no Scalar hosted-service toolbar
   // and no chat assistant.
   showDeveloperTools: 'never',

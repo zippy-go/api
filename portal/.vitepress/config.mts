@@ -11,7 +11,9 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/getting-started' },
       { text: 'Reference', link: '/reference' },
-      { text: 'Events', link: '/events' },
+      { text: 'Sandbox', link: '/sandbox' },
+      { text: 'Events', link: '/event-catalog' },
+      { text: 'Errors', link: '/errors' },
       { text: 'Changelog', link: '/changelog' },
     ],
     sidebar: [
@@ -22,6 +24,8 @@ export default defineConfig({
           { text: 'Authentication', link: '/authentication' },
           { text: 'Conventions', link: '/conventions' },
           { text: 'Concepts', link: '/concepts' },
+          { text: 'The sandbox', link: '/sandbox' },
+          { text: 'Going live', link: '/going-live' },
         ],
       },
       {
@@ -30,11 +34,14 @@ export default defineConfig({
           { text: 'API reference', link: '/reference' },
           { text: 'Live streams', link: '/live-streams' },
           { text: 'Events', link: '/events' },
+          { text: 'Event catalog', link: '/event-catalog' },
+          { text: 'Errors', link: '/errors' },
         ],
       },
       {
         text: 'Policies',
         items: [
+          { text: 'Limits', link: '/limits' },
           { text: 'Versioning', link: '/versioning' },
           { text: 'Changelog', link: '/changelog' },
         ],

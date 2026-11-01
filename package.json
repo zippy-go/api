@@ -17,11 +17,12 @@
     "gen:ts": "openapi-ts",
     "typecheck": "tsc -p sdks/typescript/tsconfig.json --noEmit",
     "events:check": "node scripts/check-events.mjs",
-    "portal:sync": "node scripts/sync-spec.mjs",
+    "portal:sync": "node scripts/sync-spec.mjs && node scripts/sync-pages.mjs",
     "portal:dev": "pnpm bundle && pnpm portal:sync && vitepress dev portal",
     "portal:build": "pnpm bundle && pnpm portal:sync && vitepress build portal",
     "portal:preview": "vitepress preview portal",
     "platform:check": "node scripts/check-platform.mjs",
+    "webhook:receive": "node scripts/webhook-receiver.mjs",
     "check": "pnpm lint && pnpm gen:ts && pnpm typecheck && pnpm events:check && pnpm platform:check && pnpm portal:build"
   },
   "devDependencies": {

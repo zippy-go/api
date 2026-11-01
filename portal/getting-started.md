@@ -31,9 +31,10 @@ expires, after 15 minutes.
 lifetimes, how browsers and native apps handle the refresh token and how
 to verify tokens yourself.
 
-Server-to-server integrations will use partner-scoped API keys in the
-`X-Api-Key` header (`ApiKey` in the reference); the operations that issue
-keys are not released yet. Background jobs authenticate with service
+Server-to-server integrations use partner-scoped API keys in the
+`X-Api-Key` header (`ApiKey` in the reference): a sandbox key (`zg_test_`)
+acts on the Partner's [sandbox](/sandbox), a production key on the Partner
+itself once it [goes live](/going-live). Background jobs authenticate with service
 tokens minted from their credential at `POST /v1/auth/service-tokens`;
 the simulator's token is the only credential `POST /v1/fleet/location-pings`
 takes.

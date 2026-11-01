@@ -7,6 +7,8 @@ sdks/typescript/dist/
 portal/.vitepress/cache/
 portal/.vitepress/dist/
 portal/public/openapi.json
+portal/errors.md
+portal/event-catalog.md
 
 # Local environment
 .env
