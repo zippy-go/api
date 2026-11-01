@@ -1719,7 +1719,7 @@ export const getPartnerPlan = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Change the partner's plan
  *
- * Changes the Partner's plan. Platform staff move it, with a reason, now or at `effective_at`; at that moment every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write`, which the owner holds (platform staff: `partner:write`).
+ * Changes the Partner's plan. Since step 10 the owner (`plan:write`) moves it: an upgrade at once, the rest of the month prorated on the next invoice, a downgrade on the 1st of next month. Platform staff (`partner:write`) schedule a move with a reason at `effective_at`; a staff move at once answers 409 `approval_required` and is proposed at `POST /v1/platform/approvals` (`change_partner_plan`). At the moment a move takes effect every Service of a kind the new plan lacks is disabled, and the Partner is told by email. Choosing the plan the trial ends into needs `plan:write` (platform staff: `partner:write`).
  */
 export const putPartnerPlan = <ThrowOnError extends boolean = false>(options: Options<PutPartnerPlanData, ThrowOnError>): RequestResult<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError> => (options.client ?? client).put<PutPartnerPlanResponses, PutPartnerPlanErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

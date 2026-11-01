@@ -9,5 +9,11 @@ properties:
     description: The value, within the declared bounds.
     examples:
       - 25000
+  reason:
+    type:
+      - string
+      - "null"
+    maxLength: 1000
+    description: Why, for a change a second person decides (a retention period). Since 0.33.0.
 examples:
   - value: 25000

@@ -9506,6 +9506,10 @@ export type SettingValue = {
      * The value, within the declared bounds.
      */
     value: number;
+    /**
+     * Why, for a change a second person decides (a retention period). Since 0.33.0.
+     */
+    reason?: string | null;
 };
 
 /**
@@ -44874,7 +44878,7 @@ export type PutPartnerPlanErrors = {
      */
     401: Problem;
     /**
-     * The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`), or somebody who is not platform staff moved the plan (`forbidden`).
+     * The caller lacks `plan:write` (`access_denied`; platform staff need `partner:write`).
      */
     403: Problem;
     /**
@@ -44882,7 +44886,7 @@ export type PutPartnerPlanErrors = {
      */
     404: Problem;
     /**
-     * `partner_archived`.
+     * `partner_archived`; `approval_required` for a staff move at once.
      */
     409: Problem;
     /**
