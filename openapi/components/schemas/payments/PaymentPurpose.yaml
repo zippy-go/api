@@ -1,5 +1,5 @@
 type: string
-description: "What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.34.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know."
+description: "What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know."
 enum:
   - order
   - wallet_top_up

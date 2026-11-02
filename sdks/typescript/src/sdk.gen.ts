@@ -4053,7 +4053,7 @@ export const getLiveConfig = <ThrowOnError extends boolean = false>(options?: Op
  * agents and deliveries (`private-partner-{partner_id}-agents`,
  * `private-partner-{partner_id}-deliveries`) with `dispatch:read` in the
  * partner, and its partner's own channel (`private-partner-{partner_id}`,
- * since 0.34.0) whatever it holds there, where `modules.changed` tells
+ * since 0.33.0) whatever it holds there, where `modules.changed` tells
  * that the partner's modules were switched, suspended or restored or its
  * plan moved, so the console and the Partner app read
  * `GET /v1/partners/{partner_id}/modules` again; a Mission Control token hears the network's orders
@@ -5971,7 +5971,7 @@ export const listCustomerWalletEntries = <ThrowOnError extends boolean = false>(
 /**
  * Give a customer credit
  *
- * Adds credit to a customer's promotional balance: at least ₹1.00, with a reason of at most 40 characters and a note the customer reads, and who pays for it, the platform or a named Partner, settled when it is given. The customer is told. Since 0.34.0 a credit over ₹2,000.00 is proposed for a second person and answers 202. `wallet:write`; requires `Idempotency-Key`, so a retried credit is given once. Written to the audit log.
+ * Adds credit to a customer's promotional balance: at least ₹1.00, with a reason of at most 40 characters and a note the customer reads, and who pays for it, the platform or a named Partner, settled when it is given. The customer is told. Since 0.33.0 a credit over ₹2,000.00 is proposed for a second person and answers 202. `wallet:write`; requires `Idempotency-Key`, so a retried credit is given once. Written to the audit log.
  */
 export const creditCustomerWallet = <ThrowOnError extends boolean = false>(options: Options<CreditCustomerWalletData, ThrowOnError>): RequestResult<CreditCustomerWalletResponses, CreditCustomerWalletErrors, ThrowOnError> => (options.client ?? client).post<CreditCustomerWalletResponses, CreditCustomerWalletErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -7505,7 +7505,7 @@ export const getStatementDocument = <ThrowOnError extends boolean = false>(optio
 /**
  * Mark a Location's statement paid by hand
  *
- * Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. Since 0.34.0 it is proposed for a second person and answers 202. `payout:manage`.
+ * Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. Since 0.33.0 it is proposed for a second person and answers 202. `payout:manage`.
  */
 export const markStatementPaid = <ThrowOnError extends boolean = false>(options: Options<MarkStatementPaidData, ThrowOnError>): RequestResult<MarkStatementPaidResponses, MarkStatementPaidErrors, ThrowOnError> => (options.client ?? client).post<MarkStatementPaidResponses, MarkStatementPaidErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -7605,7 +7605,7 @@ export const listLocationPayoutAdjustments = <ThrowOnError extends boolean = fal
 /**
  * Adjust a Location's payout
  *
- * Adds money to a Location's payout or takes money off it, at most ₹100,000.00 either way and never nothing, with a reason the payee reads and an optional note. An adjustment lands in the payee's first week not locked yet: the week just ended until its lock, then the week in progress; it is settled into the statement that locks that week. A fee correction credits back a fee found wrong with its GST, and the statement that settles it carries a credit note. Written to the audit log. Since 0.34.0 it is proposed for a second person and answers 202. `payout:manage`.
+ * Adds money to a Location's payout or takes money off it, at most ₹100,000.00 either way and never nothing, with a reason the payee reads and an optional note. An adjustment lands in the payee's first week not locked yet: the week just ended until its lock, then the week in progress; it is settled into the statement that locks that week. A fee correction credits back a fee found wrong with its GST, and the statement that settles it carries a credit note. Written to the audit log. Since 0.33.0 it is proposed for a second person and answers 202. `payout:manage`.
  */
 export const addLocationPayoutAdjustment = <ThrowOnError extends boolean = false>(options: Options<AddLocationPayoutAdjustmentData, ThrowOnError>): RequestResult<AddLocationPayoutAdjustmentResponses, AddLocationPayoutAdjustmentErrors, ThrowOnError> => (options.client ?? client).post<AddLocationPayoutAdjustmentResponses, AddLocationPayoutAdjustmentErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -7716,7 +7716,7 @@ export const getAgentStatementDocument = <ThrowOnError extends boolean = false>(
 /**
  * Mark an Agent's statement paid by hand
  *
- * Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. Since 0.34.0 it is proposed for a second person and answers 202. `payout:manage`.
+ * Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. Since 0.33.0 it is proposed for a second person and answers 202. `payout:manage`.
  */
 export const markAgentStatementPaid = <ThrowOnError extends boolean = false>(options: Options<MarkAgentStatementPaidData, ThrowOnError>): RequestResult<MarkAgentStatementPaidResponses, MarkAgentStatementPaidErrors, ThrowOnError> => (options.client ?? client).post<MarkAgentStatementPaidResponses, MarkAgentStatementPaidErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -7816,7 +7816,7 @@ export const listAgentPayoutAdjustments = <ThrowOnError extends boolean = false>
 /**
  * Adjust an Agent's payout
  *
- * Adds money to an Agent's payout or takes money off it, at most ₹100,000.00 either way and never nothing, with a reason the payee reads and an optional note. An adjustment lands in the payee's first week not locked yet: the week just ended until its lock, then the week in progress; it is settled into the statement that locks that week. A fee correction credits back a fee found wrong with its GST, and the statement that settles it carries a credit note. Written to the audit log. Since 0.34.0 it is proposed for a second person and answers 202. `payout:manage`.
+ * Adds money to an Agent's payout or takes money off it, at most ₹100,000.00 either way and never nothing, with a reason the payee reads and an optional note. An adjustment lands in the payee's first week not locked yet: the week just ended until its lock, then the week in progress; it is settled into the statement that locks that week. A fee correction credits back a fee found wrong with its GST, and the statement that settles it carries a credit note. Written to the audit log. Since 0.33.0 it is proposed for a second person and answers 202. `payout:manage`.
  */
 export const addAgentPayoutAdjustment = <ThrowOnError extends boolean = false>(options: Options<AddAgentPayoutAdjustmentData, ThrowOnError>): RequestResult<AddAgentPayoutAdjustmentResponses, AddAgentPayoutAdjustmentErrors, ThrowOnError> => (options.client ?? client).post<AddAgentPayoutAdjustmentResponses, AddAgentPayoutAdjustmentErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

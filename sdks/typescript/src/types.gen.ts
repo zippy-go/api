@@ -15564,7 +15564,7 @@ export type PaymentMethodKind = 'upi' | 'card' | 'cash' | 'wallet';
 export type PaymentStatus = 'requires_payment' | 'confirmed' | 'settled' | 'released' | 'failed';
 
 /**
- * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.34.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know.
+ * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know.
  */
 export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice';
 
@@ -24472,7 +24472,7 @@ export type PayoutWorking = {
      */
     rewards?: Array<StatementRewardRow>;
     /**
-     * Monthly invoices of the platform the statement will deduct (since 0.34.0).
+     * Monthly invoices of the platform the statement will deduct (since 0.33.0).
      */
     bill_deductions?: Array<StatementBillDeduction>;
 };
@@ -62940,7 +62940,7 @@ export type CreditCustomerWalletResponses = {
      */
     201: WalletEntry;
     /**
-     * Since 0.34.0 a second person decides: the proposal (`credit_wallet`), checked now and done once a different platform member approves it.
+     * Since 0.33.0 a second person decides: the proposal (`credit_wallet`), checked now and done once a different platform member approves it.
      */
     202: Approval;
 };
@@ -70076,7 +70076,7 @@ export type MarkStatementPaidResponses = {
      */
     200: Statement;
     /**
-     * Since 0.34.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
+     * Since 0.33.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
      */
     202: Approval;
 };
@@ -70633,7 +70633,7 @@ export type AddLocationPayoutAdjustmentResponses = {
      */
     201: PayoutAdjustment;
     /**
-     * Since 0.34.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
+     * Since 0.33.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
      */
     202: Approval;
 };
@@ -71139,7 +71139,7 @@ export type MarkAgentStatementPaidResponses = {
      */
     200: AgentStatement;
     /**
-     * Since 0.34.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
+     * Since 0.33.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
      */
     202: Approval;
 };
@@ -71691,7 +71691,7 @@ export type AddAgentPayoutAdjustmentResponses = {
      */
     201: PayoutAdjustment;
     /**
-     * Since 0.34.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
+     * Since 0.33.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
      */
     202: Approval;
 };

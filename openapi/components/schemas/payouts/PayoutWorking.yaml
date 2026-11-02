@@ -78,7 +78,7 @@ properties:
     items:
       $ref: ./StatementBillDeduction.yaml
       description: An invoice.
-    description: Monthly invoices of the platform the statement will deduct (since 0.34.0).
+    description: Monthly invoices of the platform the statement will deduct (since 0.33.0).
 examples:
   - from: 2026-10-26
     until: 2026-11-01

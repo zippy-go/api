@@ -6,11 +6,10 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
-## [0.34.0] - 2026-11-02
+## [0.33.0] - 2026-11-02
 
-Step 10, configuration: a Partner's edition and the platform's configuration. Written as
-0.34.0, a placeholder: step 10's platform slices take
-0.33.0 to 0.35.0 in merge order, and this slice is renumbered then. Additive only.
+Step 10, configuration: a Partner's edition and the platform's configuration. The first of
+step 10's platform slices to merge, after step 9's companions (0.32.0). Additive only.
 
 ### Added
 

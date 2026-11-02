@@ -6,7 +6,7 @@ post:
     - Bearer: []
   operationId: creditCustomerWallet
   summary: Give a customer credit
-  description: "Adds credit to a customer's promotional balance: at least ₹1.00, with a reason of at most 40 characters and a note the customer reads, and who pays for it, the platform or a named Partner, settled when it is given. The customer is told. Since 0.34.0 a credit over ₹2,000.00 is proposed for a second person and answers 202. `wallet:write`; requires `Idempotency-Key`, so a retried credit is given once. Written to the audit log."
+  description: "Adds credit to a customer's promotional balance: at least ₹1.00, with a reason of at most 40 characters and a note the customer reads, and who pays for it, the platform or a named Partner, settled when it is given. The customer is told. Since 0.33.0 a credit over ₹2,000.00 is proposed for a second person and answers 202. `wallet:write`; requires `Idempotency-Key`, so a retried credit is given once. Written to the audit log."
   parameters:
     - name: customer_id
       in: path
@@ -31,7 +31,7 @@ post:
           schema:
             $ref: ../../components/schemas/wallet/WalletEntry.yaml
     "202":
-      description: "Since 0.34.0 a second person decides: the proposal (`credit_wallet`), checked now and done once a different platform member approves it."
+      description: "Since 0.33.0 a second person decides: the proposal (`credit_wallet`), checked now and done once a different platform member approves it."
       content:
         application/json:
           schema:
