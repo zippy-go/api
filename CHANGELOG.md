@@ -10,8 +10,8 @@ the version numbers follow the versioning policy.
 
 Step 9, companions: a completed booking reviewed with its own tags and counted for the Agent
 who did the work, the quest's booking step, and utilisation by shift on the Agents numbers.
-Written as the next minor after 0.28.0, beside step 8's tabs slice and step 9's bookings and
-field work slices; renumbered by merge order. Additive only.
+Written as the next minor after 0.30.0, beside step 9's bookings slice; a placeholder,
+renumbered by merge order (most likely 0.32.0). Additive only.
 
 ### Added
 
@@ -28,6 +28,13 @@ field work slices; renumbered by merge order. Additive only.
   the idle share) on `AgentNumbers` and `AgentNumbersTotals`, and `shifts`
   (`AgentShiftUtilisation`) on `AgentNumbersDetail`.
 - `reviews.review.written` gains the fulfilment `on_site` and `booking_id`.
+- `ordering.tab.claimed`: a guest who opened a tab signs in and claims it, and the tab is
+  theirs; a settled tab is then reviewed by the claimant, one still open names them on
+  `ordering.tab.settled`.
+- `job_photo` in `AssetPurposeCode`, granted by `location_orders` in `AssetGrantor`: a booked
+  job's photo a Partner's staff upload on `POST /v1/partners/{partner_id}/assets/grants` with
+  `order:manage` at the Location, proving the job's completion or the customer not there when
+  they record those steps on the Agent's behalf.
 
 ## [0.31.0] - 2026-11-02
 

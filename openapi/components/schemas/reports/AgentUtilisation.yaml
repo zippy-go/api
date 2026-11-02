@@ -1,5 +1,5 @@
 type: object
-description: "Since 0.29.0, an Agent's utilisation by shift over the range (analytics R12): the minutes of the shifts they held, the minutes on task inside those shifts, the tasks they completed during them (a delivery's drop, a laundry leg's drop or a booked job; a pickup is part of its delivery), the tasks per hour on shift and the share of shift time without a task. An Agent without shifts reads zero minutes and `null` rates. Days are read on the report's clock."
+description: "Since 0.31.0, an Agent's utilisation by shift over the range (analytics R12): the minutes of the shifts they held, the minutes on task inside those shifts, the tasks they completed during them (a delivery's drop, a laundry leg's drop or a booked job; a pickup is part of its delivery), the tasks per hour on shift and the share of shift time without a task. An Agent without shifts reads zero minutes and `null` rates. Days are read on the report's clock."
 required:
   - minutes_on_shift
   - minutes_on_task

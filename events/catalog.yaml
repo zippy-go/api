@@ -2025,6 +2025,14 @@ events:
     payload_schema: ./payloads/ordering.tab.settled.v1.schema.json
     example: ./examples/ordering.tab.settled.v1.json
 
+  - type: ordering.tab.claimed
+    version: 1
+    domain: ordering
+    description: >-
+      Since 0.31.0. A guest who opened a tab signed in and claimed it: the tab is the customer's from then on, and one still open names them on `ordering.tab.settled`. Consumers: reviews (a settled tab reviewed by its claimant).
+    payload_schema: ./payloads/ordering.tab.claimed.v1.schema.json
+    example: ./examples/ordering.tab.claimed.v1.json
+
   - type: ordering.tab.closed_unpaid
     version: 1
     domain: ordering

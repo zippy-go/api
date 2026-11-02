@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/ordering.tab.claimed.v1.schema.json",
+  "title": "OrderingTabClaimedPayload",
+  "description": "Payload of `ordering.tab.claimed` version 1. A guest who opened a tab signed in and claimed it: the tab is the customer's from then on, and one still open names them on `ordering.tab.settled`. Consumers: reviews (a settled tab reviewed by its claimant). Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "tab_id",
+    "number",
+    "partner_id",
+    "location_id",
+    "table_id",
+    "table_name",
+    "state",
+    "version",
+    "at",
+    "customer_id",
+    "total",
+    "ended_at"
+  ],
+  "properties": {
+    "tab_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tab, which is the order's id.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0201"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "description": "The order's number.",
+      "examples": [
+        "AB0042"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location's Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "table_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The table it is on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d0101"
+      ]
+    },
+    "table_name": {
+      "type": "string",
+      "description": "The table's name.",
+      "examples": [
+        "12"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "bill_presented",
+        "settled",
+        "closed_unpaid",
+        "cancelled"
+      ],
+      "description": "The tab's state after the change.",
+      "examples": [
+        "open"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The tab's version; a claim leaves it as it was.",
+      "examples": [
+        2
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the customer claimed it.",
+      "examples": [
+        "2026-11-06T14:31:00Z"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer who signed in and claimed the tab they opened as a guest (a user id); fetch personal data from the API when it is needed.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000501"
+      ]
+    },
+    "total": {
+      "type": "object",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "description": "What it came to, tips left out.",
+      "examples": [
+        {
+          "minor_units": 115500,
+          "currency": "INR"
+        }
+      ]
+    },
+    "ended_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When the tab ended: when it settled, for a settled tab; `null` while it is open.",
+      "examples": [
+        "2026-10-30T15:10:00Z"
+      ]
+    }
+  }
+}

@@ -95,7 +95,7 @@ properties:
     description: Earnings, tips included.
   utilisation:
     $ref: ./AgentUtilisation.yaml
-    description: Since 0.29.0, everyone's utilisation by shift.
+    description: Since 0.31.0, everyone's utilisation by shift.
 examples:
   - agents: 20
     online: 8

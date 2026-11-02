@@ -67,7 +67,7 @@ properties:
     items:
       $ref: ./AgentShiftUtilisation.yaml
       description: A shift.
-    description: Since 0.29.0, the shifts they held in the range with their utilisation, newest first.
+    description: Since 0.31.0, the shifts they held in the range with their utilisation, newest first.
 examples:
   - from: 2026-10-01
     until: 2026-10-22
