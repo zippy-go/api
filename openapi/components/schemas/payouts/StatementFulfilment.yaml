@@ -1,0 +1,9 @@
+type: string
+description: "How the order of a statement row was fulfilled: `delivery`, `pickup`, `dine_in` for a dine-in tab, or `on_site` for a booking's job at the customer's place. Rows kept before step 9 carry the fulfilment the order was placed with."
+enum:
+  - delivery
+  - pickup
+  - dine_in
+  - on_site
+examples:
+  - delivery

@@ -1,0 +1,9 @@
+type: string
+description: "Where a leg stands: `requested` of the Agents, `collected` (a pickup done, the items counted), `returned` (the return done with a photo at the door), or `cancelled`."
+enum:
+  - requested
+  - collected
+  - returned
+  - cancelled
+examples:
+  - requested

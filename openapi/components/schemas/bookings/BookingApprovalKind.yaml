@@ -1,0 +1,7 @@
+type: string
+description: "What waits for the customer: an `estimate` or an `extra`."
+enum:
+  - estimate
+  - extra
+examples:
+  - extra

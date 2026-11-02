@@ -1,0 +1,31 @@
+type: object
+description: A service on a store's card.
+required:
+  - item_id
+  - name
+  - price
+  - price_kind
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  name:
+    $ref: ../catalog/LocalizedText.yaml
+    description: Its name.
+  price:
+    $ref: ../common/Money.yaml
+    description: Its price, or its visit charge.
+  price_kind:
+    $ref: ../bookings/BookingPriceKind.yaml
+    description: Fixed, or from.
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    name:
+      en: AC service, split unit
+    price:
+      minor_units: 49900
+      currency: INR
+    price_kind: fixed

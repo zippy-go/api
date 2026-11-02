@@ -1,0 +1,19 @@
+type: object
+description: An add-on chosen.
+required:
+  - item_id
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The add-on, an answer of one of the service's questions.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d201
+  quantity:
+    type: integer
+    description: How many, 1 to 10; 1 by default.
+    examples:
+      - 1
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d201
+    quantity: 1

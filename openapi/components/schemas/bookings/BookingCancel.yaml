@@ -1,0 +1,16 @@
+type: object
+description: Cancelling a booking.
+properties:
+  reason:
+    $ref: ./BookingCancelReason.yaml
+    description: Why.
+  note:
+    type:
+      - string
+      - "null"
+    description: A note, for `other`.
+    examples:
+      - null
+examples:
+  - reason: changed_my_mind
+    note: null

@@ -1,0 +1,50 @@
+type: object
+description: "A column of a day's calendar: an Agent's jobs, or a service's."
+required:
+  - agent_id
+  - item_id
+  - name
+  - jobs
+properties:
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Agent, by agent.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000e001
+  item_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The service, by service.
+    examples:
+      - null
+  name:
+    type: string
+    description: The column's heading.
+    examples:
+      - Kiran
+  jobs:
+    type: array
+    items:
+      $ref: ./BookingDayJob.yaml
+    description: Its jobs in order.
+examples:
+  - agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+    item_id: null
+    name: Kiran
+    jobs:
+      - booking_id: 019a3d10-2b00-7d00-8a00-00000000b001
+        number: ZG-261107-0042
+        state: confirmed
+        service_name: AC service, split unit
+        starts_at: 2026-11-07T10:00:00+05:30
+        ends_at: 2026-11-07T11:00:00+05:30
+        buffer_before_minutes: 30
+        buffer_after_minutes: 30
+        agent_id: 019a3d10-2b00-7d00-8a00-00000000e001
+        agent_first_name: Kiran
+        area: Road No. 5, Madhapur

@@ -1,0 +1,37 @@
+type: object
+description: Recording an estimate, or the price after a pickup.
+required:
+  - amount
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The price of the work.
+  note:
+    type:
+      - string
+      - "null"
+    description: What it covers.
+    examples:
+      - Replace the burnt switchboard and two sockets.
+  items_counted:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the items priced.
+    examples:
+      - null
+  photo_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A photo uploaded as proof.
+    examples:
+      - null
+examples:
+  - amount:
+      minor_units: 140000
+      currency: INR
+    note: Replace the burnt switchboard and two sockets.
+    items_counted: null
+    photo_asset_id: null

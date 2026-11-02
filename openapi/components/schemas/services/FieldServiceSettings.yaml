@@ -12,7 +12,7 @@ properties:
       - 14
   buffer_minutes:
     type: integer
-    description: The buffer between jobs, in minutes.
+    description: The travel buffer either side of a job, 0 to 120 minutes; 30 by default.
     minimum: 0
     examples:
       - 15
@@ -29,10 +29,13 @@ properties:
       - 120
   slot_minutes:
     type: integer
-    description: The slot length, 15, 30 or 60 minutes.
+    description: The slot length, 15, 30 or 60 minutes; 30 by default.
     minimum: 0
     examples:
       - 60
+  booking_policy:
+    $ref: ./FieldBookingPolicy.yaml
+    description: "How it takes bookings here: the window to confirm, the window to cancel free and the fee after it, the visit charge, paying after the job and confirming by itself. A booking keeps it as it was when booked."
 examples:
   - area:
       radius_km: 10
@@ -47,3 +50,12 @@ examples:
     buffer_minutes: 15
     min_notice_minutes: 120
     booking_window_days: 14
+    booking_policy:
+      confirmation_minutes: 60
+      cancellation_window_hours: 2
+      late_fee_percent: 20
+      visit_charge:
+        minor_units: 9900
+        currency: INR
+      pay_after_job: false
+      confirm_automatically: false

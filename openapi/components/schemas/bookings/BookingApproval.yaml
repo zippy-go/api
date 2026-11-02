@@ -1,0 +1,94 @@
+type: object
+description: An estimate or an extra waiting for the customer, as its link shows it, the `BookingApproval` schema.
+required:
+  - kind
+  - state
+  - booking_number
+  - service_name
+  - location_name
+  - description
+  - amount
+  - photo_url
+  - pickup_count
+  - items_counted
+  - pickup_photo_url
+  - expires_at
+properties:
+  kind:
+    $ref: ./BookingApprovalKind.yaml
+    description: What waits.
+  state:
+    $ref: ./BookingApprovalState.yaml
+    description: Whether it was answered.
+  booking_number:
+    type: string
+    description: The booking.
+    examples:
+      - ZG-261107-0042
+  service_name:
+    type: string
+    description: The service.
+    examples:
+      - AC service, split unit
+  location_name:
+    type: string
+    description: The Location.
+    examples:
+      - Madhapur Home Care
+  description:
+    type: string
+    description: What it is.
+    examples:
+      - Gas top-up
+  amount:
+    $ref: ../common/Money.yaml
+    description: Its price.
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to its photo.
+    examples:
+      - null
+  pickup_count:
+    type:
+      - integer
+      - "null"
+    description: For a price after a pickup, the items counted at the door.
+    examples:
+      - null
+  items_counted:
+    type:
+      - integer
+      - "null"
+    description: For a price after a pickup, the items priced.
+    examples:
+      - null
+  pickup_photo_url:
+    type:
+      - string
+      - "null"
+    description: For a price after a pickup, a signed link to the pickup's photo.
+    examples:
+      - null
+  expires_at:
+    type: string
+    format: date-time
+    description: Until when the link works.
+    examples:
+      - 2026-11-07T23:59:00+05:30
+examples:
+  - kind: extra
+    state: waiting
+    booking_number: ZG-261107-0042
+    service_name: AC service, split unit
+    location_name: Madhapur Home Care
+    description: Gas top-up
+    amount:
+      minor_units: 150000
+      currency: INR
+    photo_url: null
+    pickup_count: null
+    items_counted: null
+    pickup_photo_url: null
+    expires_at: 2026-11-07T23:59:00+05:30

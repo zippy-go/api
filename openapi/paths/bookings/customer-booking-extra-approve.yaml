@@ -1,0 +1,69 @@
+# Path item for /v1/customer/bookings/{booking_id}/extras/{extra_id}/approve. Referenced from openapi.yaml.
+parameters:
+  - name: booking_id
+    in: path
+    required: true
+    description: The booking.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000b001
+  - name: extra_id
+    in: path
+    required: true
+    description: The extra, of the booking in the path.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000f001
+post:
+  operationId: approveBookingExtra
+  summary: Approve an extra
+  description: "Approves an extra the Agent proposed: it is done and charged on the final bill."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The booking.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/Booking.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such booking of the customer."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`booking_moved`; `approval_answered`."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

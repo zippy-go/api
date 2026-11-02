@@ -1,0 +1,47 @@
+# Path item for /v1/storefront/stores/{location_id}/services. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: The Location.
+    schema:
+      type: string
+      format: uuid
+    example: 01a13a48-9e00-7000-8000-000000000306
+get:
+  operationId: getStoreServices
+  summary: Read a store's services
+  description: "The services document: the Location's bookable services as published, beside its menu and with its version, each with its price fixed or from, its duration, what it includes and leaves out, what an Agent needs and its add-ons. Signed out. Carries `ETag`; `If-None-Match` answers `304`."
+  tags:
+    - Bookings
+  security: []
+  parameters:
+    - $ref: ../../components/parameters/IfNoneMatchHeader.yaml
+  responses:
+    "200":
+      description: The services.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/ServicesDocument.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no such Location with a published service, or no such service."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

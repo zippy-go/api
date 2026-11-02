@@ -1,0 +1,61 @@
+type: object
+description: "Where the job is: one of the customer's saved addresses as it was when booked."
+required:
+  - address_id
+  - line1
+  - line2
+  - city
+  - postal_code
+  - lat
+  - lng
+properties:
+  address_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The saved address it came from.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a201
+  line1:
+    type: string
+    description: The first line.
+    examples:
+      - Flat 402, Lake View Residency
+  line2:
+    type:
+      - string
+      - "null"
+    description: The second line.
+    examples:
+      - Road No. 5, Madhapur
+  city:
+    type: string
+    description: The city.
+    examples:
+      - Hyderabad
+  postal_code:
+    type:
+      - string
+      - "null"
+    description: The PIN code.
+    examples:
+      - "500081"
+  lat:
+    type: number
+    description: Its latitude.
+    examples:
+      - 17.4483
+  lng:
+    type: number
+    description: Its longitude.
+    examples:
+      - 78.3915
+examples:
+  - address_id: 019a3d10-2b00-7d00-8a00-00000000a201
+    line1: Flat 402, Lake View Residency
+    line2: Road No. 5, Madhapur
+    city: Hyderabad
+    postal_code: "500081"
+    lat: 17.4483
+    lng: 78.3915

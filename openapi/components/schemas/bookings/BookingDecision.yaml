@@ -1,0 +1,7 @@
+type: string
+description: "The customer's answer: `approve` or `decline`."
+enum:
+  - approve
+  - decline
+examples:
+  - approve

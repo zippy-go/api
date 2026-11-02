@@ -1,0 +1,9 @@
+type: string
+description: "Why the customer cancelled: `changed_my_mind`, `booked_by_mistake`, `agent_late` or `other`."
+enum:
+  - changed_my_mind
+  - booked_by_mistake
+  - agent_late
+  - other
+examples:
+  - changed_my_mind

@@ -208,7 +208,7 @@ properties:
     oneOf:
       - $ref: ./StoreCourier.yaml
       - type: "null"
-    description: "Who carries a delivery and a way to call them, once the Agent's app has it; `null` before and for a pickup."
+    description: Who carries a delivery and a way to call them, once the Agent's app has it; `null` before and for a pickup.
   expected_at:
     type:
       - string
@@ -216,7 +216,7 @@ properties:
     format: date-time
     examples:
       - 2026-10-16T13:44:00Z
-    description: "When it is expected at the door now, as the customer was last told."
+    description: When it is expected at the door now, as the customer was last told.
   delivery_id:
     type:
       - string
@@ -224,7 +224,7 @@ properties:
     format: uuid
     examples:
       - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bd401
-    description: "The delivery under way, or the last one; read it from the dispatch routes. `null` for a pickup and before acceptance."
+    description: The delivery under way, or the last one; read it from the dispatch routes. `null` for a pickup and before acceptance.
   carried_by_provider:
     type: boolean
     examples:
@@ -234,7 +234,7 @@ properties:
     oneOf:
       - $ref: ./OrderProof.yaml
       - type: "null"
-    description: "The proof of delivery, once delivered."
+    description: The proof of delivery, once delivered.
   slot:
     oneOf:
       - $ref: ./OrderSlot.yaml
@@ -258,6 +258,11 @@ properties:
     examples:
       - null
     description: When a scheduled order was sent to the store, or accepted early; `null` for an order for now and one still waiting. Since 0.24.0.
+  booking:
+    oneOf:
+      - $ref: ./StoreOrderBooking.yaml
+      - type: "null"
+    description: The booking an order of fulfilment on site is, with its slot; `null` for any other order.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01
     number: AB0042

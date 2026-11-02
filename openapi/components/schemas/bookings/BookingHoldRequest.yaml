@@ -1,0 +1,44 @@
+type: object
+description: A slot to hold while the customer books.
+required:
+  - location_id
+  - item_id
+  - starts_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  starts_at:
+    type: string
+    format: date-time
+    description: The slot's start, as offered.
+    examples:
+      - 2026-11-07T10:00:00+05:30
+  add_ons:
+    type: array
+    items:
+      $ref: ./BookingAddOnInput.yaml
+    description: The add-ons, which lengthen the job.
+  address_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The saved address, checked against the area.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a201
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000306
+    item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    starts_at: 2026-11-07T10:00:00+05:30
+    add_ons: []
+    address_id: 019a3d10-2b00-7d00-8a00-00000000a201

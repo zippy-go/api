@@ -213,7 +213,7 @@ properties:
     oneOf:
       - $ref: ./ReadsAs.yaml
       - type: 'null'
-    description: A store when a product-sales Service is on there, else a branch; on reads.
+    description: A store when a product-sales Service or a field Service is on there, else a branch; on reads.
   services:
     type:
       - array

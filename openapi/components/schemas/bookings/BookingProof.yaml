@@ -1,0 +1,38 @@
+type: object
+description: What the job was completed with.
+required:
+  - photo_url
+  - signature_url
+  - code_used
+  - completed_at
+properties:
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to the photo of the work.
+    examples:
+      - https://files.zippygo.local/proof/0192b6f4.jpg?signature=…
+  signature_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to the customer's signature.
+    examples:
+      - https://files.zippygo.local/proof/0192b6f5.png?signature=…
+  code_used:
+    type: boolean
+    description: Completed with the customer's one-time code instead of a signature.
+    examples:
+      - false
+  completed_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-07T10:58:00+05:30
+examples:
+  - photo_url: https://files.zippygo.local/proof/0192b6f4.jpg?signature=…
+    signature_url: https://files.zippygo.local/proof/0192b6f5.png?signature=…
+    code_used: false
+    completed_at: 2026-11-07T10:58:00+05:30

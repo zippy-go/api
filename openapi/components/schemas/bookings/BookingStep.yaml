@@ -1,0 +1,52 @@
+type: object
+description: A step of the job, on the Agent's behalf, the `BookingStep` schema.
+required:
+  - step
+properties:
+  step:
+    $ref: ./BookingStepKind.yaml
+    description: The step.
+  photo_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "A photo uploaded as proof: of the work to complete, at the door when the customer is not there."
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a301
+  signature_asset_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The customer's signature, uploaded as proof, to complete.
+    examples:
+      - null
+  code:
+    type:
+      - string
+      - "null"
+    description: The customer's one-time code, to complete without a signature.
+    examples:
+      - null
+  override_reason:
+    type:
+      - string
+      - "null"
+    description: Why `arrived` was recorded away from the address.
+    examples:
+      - null
+  words:
+    type:
+      - string
+      - "null"
+    description: The customer's words, for `disputed`.
+    examples:
+      - null
+examples:
+  - step: en_route
+    photo_asset_id: 019a3d10-2b00-7d00-8a00-00000000a301
+    signature_asset_id: null
+    code: null
+    override_reason: null
+    words: null

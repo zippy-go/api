@@ -1,0 +1,30 @@
+{
+  "id": "019a3d10-2b00-7d00-8a00-0000000e9006",
+  "type": "bookings.booking.cancelled",
+  "version": 1,
+  "occurred_at": "2026-11-07T03:30:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+  "correlation_id": null,
+  "payload": {
+    "booking_id": "019a3d10-2b00-7d00-8a00-00000000b001",
+    "number": "ZG-261107-0042",
+    "order_id": "019a3d10-2b00-7d00-8a00-00000000c001",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000007",
+    "location_id": "01a13a48-9e00-7000-8000-000000000306",
+    "customer_id": "019a3d10-2b00-7d00-8a00-00000000a501",
+    "service_id": "019a3d10-2b00-7d00-8a00-00000000a401",
+    "item_id": "019a3d10-2b00-7d00-8a00-00000000d001",
+    "state": "cancelled",
+    "starts_at": "2026-11-07T04:30:00Z",
+    "ends_at": "2026-11-07T05:30:00Z",
+    "agent_id": "019a3d10-2b00-7d00-8a00-00000000e001",
+    "version": 3,
+    "at": "2026-11-07T03:30:00Z",
+    "reason": "changed_my_mind",
+    "by": "customer",
+    "currency": "INR",
+    "fee_kept": 9980,
+    "refunded": 39920,
+    "agent_never_came": false
+  }
+}

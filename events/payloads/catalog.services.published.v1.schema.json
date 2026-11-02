@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/catalog.services.published.v1.schema.json",
+  "title": "CatalogServicesPublishedPayload",
+  "description": "Payload of `catalog.services.published` version 1. A services document was published. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "partner_id",
+    "version",
+    "services",
+    "at"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its Partner; the envelope's `partner_id` too."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The published version, the menu's."
+    },
+    "services": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many services it publishes."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was published."
+    }
+  }
+}

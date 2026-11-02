@@ -1,0 +1,47 @@
+type: object
+description: "How a field Service takes bookings at a Location, the `FieldBookingPolicy` schema: the window to confirm, the window to cancel free with the fee after it, the visit charge kept once the Agent is on the way, paying after the job, and confirming by itself. A booking keeps the policy as it was when booked."
+required:
+  - confirmation_minutes
+  - cancellation_window_hours
+  - late_fee_percent
+  - visit_charge
+  - pay_after_job
+  - confirm_automatically
+properties:
+  confirmation_minutes:
+    type: integer
+    description: Minutes the Location has to confirm a booking, 15 to 240; 60 by default. Unconfirmed, it is declined as not answered and refunded.
+    examples:
+      - 60
+  cancellation_window_hours:
+    type: integer
+    description: Hours before the slot from which cancelling costs a fee, 2 to 24; 2 by default.
+    examples:
+      - 2
+  late_fee_percent:
+    type: integer
+    description: The fee for cancelling inside the window, a share of a fixed price, 0 to 50; 20 by default. A service priced from keeps its visit charge instead.
+    examples:
+      - 20
+  visit_charge:
+    $ref: ../common/Money.yaml
+    description: Kept once the Agent is on the way, or when the customer is not there; ₹99 by default.
+  pay_after_job:
+    type: boolean
+    description: Whether a fixed price may be paid after the job, in cash to the Agent.
+    examples:
+      - false
+  confirm_automatically:
+    type: boolean
+    description: Whether a booking confirms itself with the Agent whose time made the slot.
+    examples:
+      - false
+examples:
+  - confirmation_minutes: 60
+    cancellation_window_hours: 2
+    late_fee_percent: 20
+    visit_charge:
+      minor_units: 9900
+      currency: INR
+    pay_after_job: false
+    confirm_automatically: false

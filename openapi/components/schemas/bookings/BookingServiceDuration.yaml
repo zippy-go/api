@@ -1,0 +1,43 @@
+type: object
+description: A service's set duration beside what its jobs take.
+required:
+  - item_id
+  - name
+  - set_minutes
+  - measured_minutes
+  - measured_jobs
+properties:
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - AC service, split unit
+  set_minutes:
+    type: integer
+    description: The duration set.
+    examples:
+      - 60
+  measured_minutes:
+    type:
+      - integer
+      - "null"
+    description: The average of its last twenty completed jobs; `null` before any.
+    examples:
+      - 64
+  measured_jobs:
+    type: integer
+    description: How many jobs the average counts.
+    examples:
+      - 12
+examples:
+  - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    name: AC service, split unit
+    set_minutes: 60
+    measured_minutes: 64
+    measured_jobs: 12

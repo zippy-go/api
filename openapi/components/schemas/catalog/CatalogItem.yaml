@@ -32,6 +32,8 @@ required:
   - updated_by
   - course
   - station_ids
+  - kind
+  - booking
 properties:
   id:
     type: string
@@ -205,6 +207,14 @@ properties:
       format: uuid
     maxItems: 12
     description: The kitchen stations it shows at, of its Location; empty for every station.
+  kind:
+    $ref: ./CatalogItemKind.yaml
+    description: A product, or bookable work.
+  booking:
+    oneOf:
+      - $ref: ./BookableFacts.yaml
+      - type: "null"
+    description: What makes it bookable work; `null` for a product.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4bc101
     location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
@@ -315,3 +325,5 @@ examples:
     updated_by: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a20
     course: mains
     station_ids: []
+    kind: product
+    booking: null

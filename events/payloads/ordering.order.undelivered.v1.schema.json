@@ -114,13 +114,14 @@
     },
     "fulfilment": {
       "type": "string",
-      "description": "Delivery or pickup.",
+      "description": "Delivery or pickup, or `on_site` for a booking's order.",
       "examples": [
         "delivery"
       ],
       "enum": [
         "delivery",
-        "pickup"
+        "pickup",
+        "on_site"
       ]
     },
     "currency": {

@@ -1,0 +1,104 @@
+type: object
+description: "Booking a slot, the `BookingRequest` schema: the held slot (or the slot itself), the add-ons, one of the customer's saved addresses inside the area, access instructions, a number for the day (the account's by default), the way to pay, and for pickup and return the return slot."
+required:
+  - location_id
+  - item_id
+  - address_id
+  - payment_method
+properties:
+  hold_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The slot held; else `location_id`, `item_id` and `starts_at` name a slot still open.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a001
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  item_id:
+    type: string
+    format: uuid
+    description: The service.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000d001
+  starts_at:
+    type: string
+    format: date-time
+    description: The slot's start; for pickup and return, the pickup's.
+    examples:
+      - 2026-11-07T10:00:00+05:30
+  add_ons:
+    type: array
+    items:
+      $ref: ./BookingAddOnInput.yaml
+    description: The add-ons.
+  address_id:
+    type: string
+    format: uuid
+    description: The saved address.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000a201
+  instructions:
+    type:
+      - string
+      - "null"
+    description: Access instructions, up to 300 characters.
+    examples:
+      - Gate code 4421
+  contact_phone:
+    type:
+      - string
+      - "null"
+    description: A number to reach the customer on the day; the account's by default.
+    examples:
+      - null
+  payment_method:
+    $ref: ./BookingPaymentMethod.yaml
+    description: "How to pay at booking: `upi`, `card` or `wallet`, or `cash` after the job where the Location allows it."
+  use_wallet:
+    type: boolean
+    description: Whether the Wallet pays first.
+    examples:
+      - false
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A saved card or UPI ID of the method.
+    examples:
+      - null
+  return_starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: For pickup and return, the return slot, no sooner than the turnaround; `null` to have the Partner propose one after pricing.
+    examples:
+      - null
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the provider's page sends the customer back; the booking's page by default.
+    examples:
+      - null
+examples:
+  - hold_id: 019a3d10-2b00-7d00-8a00-00000000a001
+    location_id: 01a13a48-9e00-7000-8000-000000000306
+    item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+    starts_at: 2026-11-07T10:00:00+05:30
+    add_ons: []
+    address_id: 019a3d10-2b00-7d00-8a00-00000000a201
+    instructions: Gate code 4421
+    contact_phone: null
+    payment_method: upi
+    use_wallet: false
+    saved_method_id: null
+    return_starts_at: null
+    return_url: null

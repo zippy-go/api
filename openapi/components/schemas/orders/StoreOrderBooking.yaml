@@ -1,0 +1,29 @@
+type: object
+description: The booking an order of fulfilment on site is.
+required:
+  - booking_id
+  - starts_at
+  - ends_at
+properties:
+  booking_id:
+    type: string
+    format: uuid
+    description: The booking.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000b001
+  starts_at:
+    type: string
+    format: date-time
+    description: Its slot's start.
+    examples:
+      - 2026-11-07T10:00:00+05:30
+  ends_at:
+    type: string
+    format: date-time
+    description: The job's expected end.
+    examples:
+      - 2026-11-07T11:00:00+05:30
+examples:
+  - booking_id: 019a3d10-2b00-7d00-8a00-00000000b001
+    starts_at: 2026-11-07T10:00:00+05:30
+    ends_at: 2026-11-07T11:00:00+05:30

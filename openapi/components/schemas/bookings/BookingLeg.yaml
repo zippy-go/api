@@ -1,0 +1,67 @@
+type: object
+description: A leg of a pickup and return service.
+required:
+  - leg_id
+  - kind
+  - starts_at
+  - ends_at
+  - state
+  - items_counted
+  - photo_url
+  - done_at
+properties:
+  leg_id:
+    type: string
+    format: uuid
+    description: The leg.
+    examples:
+      - 019a3d10-2b00-7d00-8a00-00000000f101
+  kind:
+    $ref: ./BookingLegKind.yaml
+    description: Pickup or return.
+  starts_at:
+    type: string
+    format: date-time
+    description: Its slot's start.
+    examples:
+      - 2026-11-09T18:00:00+05:30
+  ends_at:
+    type: string
+    format: date-time
+    description: Its slot's end.
+    examples:
+      - 2026-11-09T18:30:00+05:30
+  state:
+    $ref: ./BookingLegState.yaml
+    description: Where it stands.
+  items_counted:
+    type:
+      - integer
+      - "null"
+    description: The items counted at the door, for the pickup.
+    examples:
+      - null
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to the photo at the door.
+    examples:
+      - null
+  done_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was done.
+    examples:
+      - null
+examples:
+  - leg_id: 019a3d10-2b00-7d00-8a00-00000000f101
+    kind: pickup
+    starts_at: 2026-11-09T18:00:00+05:30
+    ends_at: 2026-11-09T18:30:00+05:30
+    state: requested
+    items_counted: null
+    photo_url: null
+    done_at: null

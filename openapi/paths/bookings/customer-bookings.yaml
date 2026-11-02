@@ -1,0 +1,117 @@
+# Path item for /v1/customer/bookings. Referenced from openapi.yaml.
+get:
+  operationId: listCustomerBookings
+  summary: List the customer's bookings
+  description: The customer's bookings, the latest slot first, beside step 8's reservations in the account.
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  parameters:
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The bookings.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/BookingList.yaml
+    "400":
+      description: "`validation_failed`, or `cursor_invalid`."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+post:
+  operationId: placeBooking
+  summary: Book a slot
+  description: "Books a held slot (or a slot still open) at one of the customer's saved addresses inside the area, with add-ons, instructions and a number for the day, keeping the service's price and policy as they are now. The booking is an order of fulfilment on site: a fixed price is paid now by UPI, card or the Wallet (or after the job in cash where the Location allows it), a service priced from takes its visit charge now. Once paid it awaits the Location's confirmation and rings there. One booking per `Idempotency-Key`."
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  requestBody:
+    required: true
+    description: The booking.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/bookings/BookingRequest.yaml
+  responses:
+    "201":
+      description: The booking, with the provider's page while the payment waits.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/PlacedBooking.yaml
+    "400":
+      description: "`validation_failed`: a missing or malformed member, an add-on not of the service, a return slot sooner than the turnaround; `idempotency_key_missing`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such Location, service, hold or saved address of the customer."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`slot_taken` naming the nearest open slots; `slot_unavailable`; `hold_expired`; `outside_area`; `method_not_offered` for cash where the Location does not take payment after the job."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

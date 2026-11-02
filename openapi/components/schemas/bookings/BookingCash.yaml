@@ -1,0 +1,12 @@
+type: object
+description: Cash the Agent took for what remained.
+required:
+  - amount
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The cash taken, what remains.
+examples:
+  - amount:
+      minor_units: 150000
+      currency: INR

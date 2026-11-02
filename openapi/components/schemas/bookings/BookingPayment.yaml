@@ -1,0 +1,39 @@
+type: object
+description: A payment of a booking.
+required:
+  - amount
+  - method
+  - stage
+  - reference
+  - paid_at
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: What was paid.
+  method:
+    $ref: ./BookingPaymentMethod.yaml
+    description: How.
+  stage:
+    $ref: ./BookingPaymentStage.yaml
+    description: At booking, or on completion.
+  reference:
+    type:
+      - string
+      - "null"
+    description: The provider's reference, masked.
+    examples:
+      - UPI ••4821
+  paid_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-05T19:40:00+05:30
+examples:
+  - amount:
+      minor_units: 49900
+      currency: INR
+    method: upi
+    stage: at_booking
+    reference: UPI ••4821
+    paid_at: 2026-11-05T19:40:00+05:30

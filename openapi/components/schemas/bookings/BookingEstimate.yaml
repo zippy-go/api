@@ -1,0 +1,80 @@
+type: object
+description: The price confirmed on site for a service priced from, or the price after a pickup.
+required:
+  - amount
+  - note
+  - state
+  - items_counted
+  - pickup_count
+  - pickup_photo_url
+  - photo_url
+  - recorded_at
+  - decided_at
+properties:
+  amount:
+    $ref: ../common/Money.yaml
+    description: The estimate.
+  note:
+    type:
+      - string
+      - "null"
+    description: What it covers.
+    examples:
+      - Replace the burnt switchboard and two sockets.
+  state:
+    $ref: ./BookingApprovalState.yaml
+    description: Whether the customer approved it.
+  items_counted:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the items the Partner priced.
+    examples:
+      - null
+  pickup_count:
+    type:
+      - integer
+      - "null"
+    description: For pickup and return, the items counted at the pickup.
+    examples:
+      - null
+  pickup_photo_url:
+    type:
+      - string
+      - "null"
+    description: For pickup and return, a signed link to the pickup's photo.
+    examples:
+      - null
+  photo_url:
+    type:
+      - string
+      - "null"
+    description: A signed link to a photo with the estimate.
+    examples:
+      - null
+  recorded_at:
+    type: string
+    format: date-time
+    description: When it was recorded.
+    examples:
+      - 2026-11-07T10:20:00+05:30
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the customer answered.
+    examples:
+      - null
+examples:
+  - amount:
+      minor_units: 140000
+      currency: INR
+    note: Replace the burnt switchboard and two sockets.
+    state: waiting
+    items_counted: null
+    pickup_count: null
+    pickup_photo_url: null
+    photo_url: null
+    recorded_at: 2026-11-07T10:20:00+05:30
+    decided_at: null

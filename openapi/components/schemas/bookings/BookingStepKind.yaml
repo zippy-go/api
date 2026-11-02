@@ -1,0 +1,11 @@
+type: string
+description: "A step of the job: `en_route`, `arrived`, `started` (once an estimate is approved where there is one), `completed` (with a photo of the work and the customer's signature or their one-time code), `not_available` (the customer was not there after fifteen minutes and two calls, with a photo), or `disputed` (the customer would not sign, with their words)."
+enum:
+  - en_route
+  - arrived
+  - started
+  - completed
+  - not_available
+  - disputed
+examples:
+  - en_route

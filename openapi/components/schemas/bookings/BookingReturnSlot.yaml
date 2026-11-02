@@ -1,0 +1,13 @@
+type: object
+description: The return slot of a pickup and return service.
+required:
+  - starts_at
+properties:
+  starts_at:
+    type: string
+    format: date-time
+    description: The return slot's start, no sooner than the turnaround after the pickup.
+    examples:
+      - 2026-11-11T18:00:00+05:30
+examples:
+  - starts_at: 2026-11-11T18:00:00+05:30

@@ -1,0 +1,11 @@
+type: string
+description: "What a line of the bill is: the `service` at its fixed price, an `add_on`, the `visit_charge` of a service priced from, the approved `estimate`, an approved `extra`, or a `fee` kept on cancelling."
+enum:
+  - service
+  - add_on
+  - visit_charge
+  - estimate
+  - extra
+  - fee
+examples:
+  - service

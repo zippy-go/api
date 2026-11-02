@@ -1,0 +1,7 @@
+type: string
+description: "How a day's calendar is laid out: a column per `agent`, or per `service`."
+enum:
+  - agent
+  - service
+examples:
+  - agent

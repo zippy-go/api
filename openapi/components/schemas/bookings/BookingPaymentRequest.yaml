@@ -1,0 +1,33 @@
+type: object
+description: Paying what remains.
+required:
+  - method
+properties:
+  method:
+    $ref: ./BookingPaymentMethod.yaml
+    description: "`upi`, `card` or `wallet`."
+  use_wallet:
+    type: boolean
+    description: Whether the Wallet pays first.
+    examples:
+      - false
+  saved_method_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: A saved card or UPI ID.
+    examples:
+      - null
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the provider's page sends the customer back.
+    examples:
+      - null
+examples:
+  - method: upi
+    use_wallet: false
+    saved_method_id: null
+    return_url: null

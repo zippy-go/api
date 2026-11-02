@@ -1,0 +1,7 @@
+type: string
+description: "A leg of a pickup and return service: the `pickup` at the door, or the `return`."
+enum:
+  - pickup
+  - return
+examples:
+  - pickup

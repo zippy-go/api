@@ -1,0 +1,43 @@
+type: object
+description: "A field service store's services on its card: the first three, the lowest price and the next open slot."
+required:
+  - items
+  - count
+  - lowest_price
+  - next_slot_at
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./StoreServiceItem.yaml
+    description: The first three services.
+  count:
+    type: integer
+    description: How many services it publishes.
+    examples:
+      - 3
+  lowest_price:
+    $ref: ../common/Money.yaml
+    description: The lowest price or visit charge.
+  next_slot_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: The next open slot of its first service, within two days.
+    examples:
+      - 2026-11-06T09:00:00+05:30
+examples:
+  - items:
+      - item_id: 019a3d10-2b00-7d00-8a00-00000000d001
+        name:
+          en: AC service, split unit
+        price:
+          minor_units: 49900
+          currency: INR
+        price_kind: fixed
+    count: 3
+    lowest_price:
+      minor_units: 19900
+      currency: INR
+    next_slot_at: 2026-11-06T09:00:00+05:30

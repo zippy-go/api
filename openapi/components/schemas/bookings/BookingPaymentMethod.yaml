@@ -1,0 +1,9 @@
+type: string
+description: "How a booking's money is paid: `upi` or `card` on the provider's page, the `wallet`, or `cash` taken by the Agent, who records it."
+enum:
+  - upi
+  - card
+  - wallet
+  - cash
+examples:
+  - upi

@@ -1,0 +1,24 @@
+type: object
+description: A line of a booking's bill.
+required:
+  - kind
+  - name
+  - amount
+properties:
+  kind:
+    $ref: ./BookingBillLineKind.yaml
+    description: What it is.
+  name:
+    type: string
+    description: Its words.
+    examples:
+      - AC service, split unit
+  amount:
+    $ref: ../common/Money.yaml
+    description: Its amount.
+examples:
+  - kind: service
+    name: AC service, split unit
+    amount:
+      minor_units: 49900
+      currency: INR

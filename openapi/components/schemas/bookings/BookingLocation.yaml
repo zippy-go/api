@@ -1,0 +1,27 @@
+type: object
+description: The Location a booking is with.
+required:
+  - location_id
+  - name
+  - time_zone
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The Location.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000306
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Madhapur Home Care
+  time_zone:
+    type: string
+    description: Its time zone (IANA), on which the booking's times are told. Since 0.31.0.
+    examples:
+      - Asia/Kolkata
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000306
+    name: Madhapur Home Care
+    time_zone: Asia/Kolkata

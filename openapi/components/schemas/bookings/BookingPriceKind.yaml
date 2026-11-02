@@ -1,0 +1,7 @@
+type: string
+description: "How a service is priced: `fixed`, paid in full at booking (or after the job where the Location allows it), or `from`, a visit charge paid at booking and off the final bill, with the price confirmed on site as an estimate the customer approves."
+enum:
+  - fixed
+  - from
+examples:
+  - fixed

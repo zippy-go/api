@@ -1,0 +1,10 @@
+type: string
+description: "Why no slot is offered: `outside_area` (the service does not come to the address), `no_qualified_agent` (no Agent of the service holds the qualifications it needs), `no_availability` (nobody is free that day), `closed` (the service does not work that day), or `out_of_window` (sooner than the notice or beyond the booking window)."
+enum:
+  - outside_area
+  - no_qualified_agent
+  - no_availability
+  - closed
+  - out_of_window
+examples:
+  - no_availability

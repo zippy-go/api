@@ -1,0 +1,51 @@
+# Path item for /v1/customer/bookings/{booking_id}. Referenced from openapi.yaml.
+parameters:
+  - name: booking_id
+    in: path
+    required: true
+    description: The booking.
+    schema:
+      type: string
+      format: uuid
+    example: 019a3d10-2b00-7d00-8a00-00000000b001
+get:
+  operationId: getCustomerBooking
+  summary: Read a booking
+  description: The booking with its Agent once confirmed (first name, photo and rating), its legs, the estimate and extras waiting or answered, the bill with each payment, and the photo and signature once completed. `order.changed` and `courier.position` on `private-order-{order_id}` tell a screen to read it again.
+  tags:
+    - Bookings
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: The booking.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/bookings/Booking.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: no such booking of the customer."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

@@ -1,0 +1,10 @@
+type: string
+description: "Why a booking was declined: `no_availability`, `outside_area`, `customer_asked` or `other` with a note, by the Location; `not_answered` when its confirmation window ended."
+enum:
+  - no_availability
+  - outside_area
+  - customer_asked
+  - other
+  - not_answered
+examples:
+  - no_availability

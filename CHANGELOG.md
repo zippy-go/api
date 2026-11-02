@@ -6,6 +6,86 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-11-02
+
+Step 9, bookings: work done at the customer's place, booked into a slot worked
+out from who is free, as an order of fulfilment on site. The second platform slice of
+step 9 to merge, after field work (0.30.0). Additive only.
+
+### Added
+
+- A Location's services (`Bookings` tag): the services document beside the
+  menu with its version (`GET /v1/storefront/stores/{location_id}/services`,
+  `ServicesDocument`, `ServiceCard`, `ServiceAddOn`), a service's page with its
+  policy in plain words, its rating and whether it comes to an address or a
+  point (`GET .../services/{item_id}`, `ServicePage`), and its open slots by
+  day, address and add-ons, or why there are none
+  (`GET .../services/{item_id}/slots`, `ServiceSlots`, `ServiceSlot`,
+  `ServiceSlotsReason`). Signed out.
+- Booking as a customer: a slot held ten minutes
+  (`POST /v1/customer/bookings/holds`, `BookingHoldRequest`, `BookingHold`);
+  booking it with `Idempotency-Key` (`POST /v1/customer/bookings`,
+  `BookingRequest`, `PlacedBooking`); the list and the booking
+  (`GET /v1/customer/bookings`, `GET .../{booking_id}`, `Booking`,
+  `BookingSummary`, `BookingList` and their parts); moving it
+  (`.../reschedule`), what cancelling costs (`GET .../cancellation`) and
+  cancelling (`.../cancel`); approving or declining the estimate and extras
+  (`.../estimate/approve`, `.../estimate/decline`,
+  `.../extras/{extra_id}/approve`, `.../decline`); the return slot of a pickup
+  and return service (`.../return-slot`); and paying what remains
+  (`.../payments`, `BookingPaymentRequest`, `BookingPaymentStarted`).
+- Approvals by link, signed out (`GET`, `POST /v1/approvals/{token}`,
+  `BookingApproval`, `BookingApprovalDecision`).
+- The Location's bookings: a day by Agent or by service with the travel
+  buffers, those awaiting confirmation apart and each service's measured
+  duration (`GET /v1/partners/{partner_id}/locations/{location_id}/bookings`,
+  `LocationBookingDay`); a booking (`GET .../bookings/{booking_id}`,
+  `StoreBooking`); confirming, declining and assigning (`.../confirm`,
+  `.../decline`, `.../assign`); the job's steps on the Agent's behalf
+  (`.../steps`, `BookingStep`); an estimate, cash taken and the return slot
+  (`.../estimate`, `.../cash`, `.../return-slot`). `order:read` and
+  `order:manage` at the Location.
+- The Agent app: the job's estimate and extras on its task
+  (`POST /v1/agent/tasks/{task_id}/estimate`, `.../extras`).
+- Mission Control's bookings, those not answered, running late and disputed
+  first (`GET /v1/platform/bookings`, `GET .../{booking_id}`,
+  `PlatformBookingList`).
+- A catalogue item's `kind` (`product` or `bookable`) and its `booking` facts
+  (`BookableFacts`, `BookableFactsInput`): a duration in steps of 15 minutes,
+  fixed or from, qualifications, what is included and left out, what the
+  customer provides, a narrower area, pickup and return with a turnaround, and
+  the measured duration.
+- The field Service's `booking_policy` (`FieldBookingPolicy`) on
+  `FieldServiceSettings`; slots of 30 minutes and a 30-minute travel buffer
+  by default.
+- `services` on `StoreCard` (`StoreServices`, `StoreServiceItem`); `booking`
+  on `StoreOrder` (`StoreOrderBooking`); `booking_id` on `CustomerOrder`;
+  `on_site` in `OrderFulfilment` and in ordering's events.
+- `fulfilment` on `StatementOrderRow` (`StatementFulfilment`: `delivery`,
+  `pickup`, `dine_in` or `on_site`), so the Partner's statement tells a tab's
+  row and a booking's from a pickup's; rows kept before carry the fulfilment
+  their order was placed with.
+- Problem types `slot_taken`, `slot_unavailable`, `outside_area`,
+  `hold_expired`, `booking_moved`, `reschedule_window_passed`,
+  `approval_answered`, `estimate_not_approved` and `not_bookable`.
+- Events: `bookings.booking.placed`, `.confirmed`, `.declined`, `.assigned`,
+  `.rescheduled`, `.cancelled`, `.completed`, `.disputed`, `.not_available`
+  and `.reminded`; `bookings.estimate.recorded`, `.approved` and `.declined`;
+  `bookings.extra.proposed`, `.approved` and `.declined`;
+  `bookings.leg.requested`; `catalog.services.published`; and ordering's
+  `ordering.order.settled` and `ordering.order.completed` for an order on
+  site.
+
+- `time_zone` (IANA) on `BookingLocation` and `ServicePage`: the Location's, on
+  which a booking's and a service's times are told.
+
+### Changed
+
+- A Location where a field Service is on reads as a `store`: it takes
+  bookings and is listed in its Vertical, needing no way to fulfil since its
+  work goes to the customer. The descriptions of `ReadsAs` and
+  `Location.reads_as` say so; a delivery depot stays a `branch`.
+
 ## [0.30.0] - 2026-10-30
 
 Step 9, field work: qualifications the Partner approves per Agent, shifts
