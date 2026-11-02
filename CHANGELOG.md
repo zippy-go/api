@@ -6,12 +6,12 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
-## [0.32.0] - 2026-10-30
+## [0.32.0] - 2026-11-02
 
 Step 9, companions: a completed booking reviewed with its own tags and counted for the Agent
 who did the work, the quest's booking step, and utilisation by shift on the Agents numbers.
-Written as the next minor after 0.30.0, beside step 9's bookings slice; a placeholder,
-renumbered by merge order (most likely 0.32.0). Additive only.
+The third of step 9's platform slices to merge, after field work (0.30.0) and bookings
+(0.31.0). Additive only.
 
 ### Added
 

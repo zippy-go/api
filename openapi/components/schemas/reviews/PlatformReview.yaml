@@ -112,7 +112,7 @@ properties:
       - string
       - "null"
     format: uuid
-    description: "Since 0.31.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews."
+    description: "Since 0.32.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews."
     examples:
       - null
 examples:

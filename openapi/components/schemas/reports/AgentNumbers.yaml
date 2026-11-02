@@ -151,7 +151,7 @@ properties:
     description: What they earned, tips included.
   utilisation:
     $ref: ./AgentUtilisation.yaml
-    description: Since 0.31.0, utilisation by shift.
+    description: Since 0.32.0, utilisation by shift.
 examples:
   - agent_id: 01a13a48-9e00-7000-8000-000000000107
     name: Ravi Kumar

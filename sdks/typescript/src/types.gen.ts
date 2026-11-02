@@ -10357,7 +10357,7 @@ export type AssetGrant = {
 };
 
 /**
- * Who may ask for a grant of a purpose. Since 0.31.0 `location_orders`: staff with `order:manage` at the Location (a job's photo).
+ * Who may ask for a grant of a purpose. Since 0.32.0 `location_orders`: staff with `order:manage` at the Location (a job's photo).
  */
 export type AssetGrantor = 'platform_staff' | 'partner_staff' | 'location_staff' | 'catalogue_staff' | 'location_orders' | 'customer' | 'agent' | 'platform';
 
@@ -10389,7 +10389,7 @@ export type PartnerAssetGrantRequest = {
 };
 
 /**
- * A purpose of the closed catalogue. Since 0.31.0 `job_photo`: a booked job's photo, of the work or at the door, a Partner's staff upload at a Location with `order:manage` when they record the job's steps on the Agent's behalf.
+ * A purpose of the closed catalogue. Since 0.32.0 `job_photo`: a booked job's photo, of the work or at the door, a Partner's staff upload at a Location with `order:manage` when they record the job's steps on the Agent's behalf.
  */
 export type AssetPurposeCode = 'vertical_image' | 'vertical_category_image' | 'campaign_artwork' | 'partner_document' | 'partner_logo' | 'partner_banner' | 'location_logo' | 'location_banner' | 'product_image' | 'catalogue_category_image' | 'review_photo' | 'prescription_file' | 'agent_document' | 'proof_of_delivery_photo' | 'job_photo' | 'table_code_image';
 
@@ -20979,7 +20979,7 @@ export type ReviewTagOption = {
 };
 
 /**
- * The tags offered under each thumb. An order's: up "Tasted great", "Great value", "Accurate order", "Well packed"; down "Late delivery" (on a delivery only), "Missing item(s)", "Wrong item(s)", "Cold/damaged". Since 0.28.0 a settled tab's: up "Great food" (`great_food`), "Friendly service" (`friendly_service`), "Quick service" (`quick_service`), "Good value" (`good_value`); down "Slow service" (`slow_service`), "Wrong order" (`wrong_order`), "Billing issue" (`billing_issue`), "Cleanliness" (`cleanliness`). Since 0.31.0 a completed booking's: up "On time" (`on_time`), "Great work" (`great_work`), "Tidy" (`tidy`), "Good value" (`good_value`); down "Late" (`late`), "Work not finished" (`work_not_finished`), "Damage" (`damage`), "Rude" (`rude`). A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note.
+ * The tags offered under each thumb. An order's: up "Tasted great", "Great value", "Accurate order", "Well packed"; down "Late delivery" (on a delivery only), "Missing item(s)", "Wrong item(s)", "Cold/damaged". Since 0.28.0 a settled tab's: up "Great food" (`great_food`), "Friendly service" (`friendly_service`), "Quick service" (`quick_service`), "Good value" (`good_value`); down "Slow service" (`slow_service`), "Wrong order" (`wrong_order`), "Billing issue" (`billing_issue`), "Cleanliness" (`cleanliness`). Since 0.32.0 a completed booking's: up "On time" (`on_time`), "Great work" (`great_work`), "Tidy" (`tidy`), "Good value" (`good_value`); down "Late" (`late`), "Work not finished" (`work_not_finished`), "Damage" (`damage`), "Rude" (`rude`). A rating keeps only the tags of the thumb chosen; switching the thumb drops the others' tags and keeps the note.
  */
 export type ReviewTagOffer = {
     /**
@@ -21025,7 +21025,7 @@ export type RatingShare = {
 };
 
 /**
- * How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered), `collected`, or, since 0.28.0, `dine_in` for a settled tab (the tab's id is its order id), or, since 0.31.0, `on_site` for a completed booking (its order of fulfilment on site).
+ * How the order reached the customer: `delivered`, `delivered_by_own_agent` (by one of the store's own Agents; customers read it as delivered), `collected`, or, since 0.28.0, `dine_in` for a settled tab (the tab's id is its order id), or, since 0.32.0, `on_site` for a completed booking (its order of fulfilment on site).
  */
 export type ReviewFulfilment = 'delivered' | 'delivered_by_own_agent' | 'collected' | 'dine_in' | 'on_site';
 
@@ -21482,7 +21482,7 @@ export type PartnerReview = {
      */
     subscription?: ReviewSubscription | null;
     /**
-     * Since 0.31.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews.
+     * Since 0.32.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews.
      */
     booking_id?: string | null;
 };
@@ -21579,7 +21579,7 @@ export type ReviewReplyInput = {
 };
 
 /**
- * Where an Agent's rating came from: the customer's `delivery_rating`, an `order_review` that says the delivery was late, or, since 0.31.0, a `booking_review`: a completed booking's review, counted for the Agent who did the work.
+ * Where an Agent's rating came from: the customer's `delivery_rating`, an `order_review` that says the delivery was late, or, since 0.32.0, a `booking_review`: a completed booking's review, counted for the Agent who did the work.
  */
 export type AgentRatingSource = 'delivery_rating' | 'order_review' | 'booking_review';
 
@@ -22013,7 +22013,7 @@ export type PlatformReview = {
      */
     subscription?: ReviewSubscription | null;
     /**
-     * Since 0.31.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews.
+     * Since 0.32.0, the booking a completed booking's review is about (its order is the booking's order of fulfilment on site); `null` on other reviews.
      */
     booking_id?: string | null;
 };
@@ -25558,7 +25558,7 @@ export type AgentNumbers = {
      */
     earnings: Money;
     /**
-     * Since 0.31.0, utilisation by shift.
+     * Since 0.32.0, utilisation by shift.
      */
     utilisation: AgentUtilisation;
 };
@@ -25624,13 +25624,13 @@ export type AgentNumbersTotals = {
      */
     earnings: Money;
     /**
-     * Since 0.31.0, everyone's utilisation by shift.
+     * Since 0.32.0, everyone's utilisation by shift.
      */
     utilisation: AgentUtilisation;
 };
 
 /**
- * Since 0.31.0, an Agent's utilisation by shift over the range (analytics R12): the minutes of the shifts they held, the minutes on task inside those shifts, the tasks they completed during them (a delivery's drop, a laundry leg's drop or a booked job; a pickup is part of its delivery), the tasks per hour on shift and the share of shift time without a task. An Agent without shifts reads zero minutes and `null` rates. Days are read on the report's clock.
+ * Since 0.32.0, an Agent's utilisation by shift over the range (analytics R12): the minutes of the shifts they held, the minutes on task inside those shifts, the tasks they completed during them (a delivery's drop, a laundry leg's drop or a booked job; a pickup is part of its delivery), the tasks per hour on shift and the share of shift time without a task. An Agent without shifts reads zero minutes and `null` rates. Days are read on the report's clock.
  */
 export type AgentUtilisation = {
     /**
@@ -25656,7 +25656,7 @@ export type AgentUtilisation = {
 };
 
 /**
- * Since 0.31.0, one shift an Agent held in the range, with its utilisation: the minutes of the shift inside the range, the minutes on task inside it, the tasks completed during it, the tasks per hour and the share of it without a task.
+ * Since 0.32.0, one shift an Agent held in the range, with its utilisation: the minutes of the shift inside the range, the minutes on task inside it, the tasks completed during it, the tasks per hour and the share of it without a task.
  */
 export type AgentShiftUtilisation = {
     /**
@@ -25894,7 +25894,7 @@ export type AgentNumbersDetail = {
      */
     activity: Array<AgentActivityDay>;
     /**
-     * Since 0.31.0, the shifts they held in the range with their utilisation, newest first.
+     * Since 0.32.0, the shifts they held in the range with their utilisation, newest first.
      */
     shifts: Array<AgentShiftUtilisation>;
 };
@@ -28225,7 +28225,7 @@ export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'c
 export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
 
 /**
- * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0); `dine_in`, tabs settled at a table that the customer opened, at the named Partner or Location when one is named, a first dine-in tab at a count of one (since 0.28.0); `booking`, bookings completed, at the named Partner or Location when one is named, a first booking at a count of one (since 0.31.0).
+ * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0); `dine_in`, tabs settled at a table that the customer opened, at the named Partner or Location when one is named, a first dine-in tab at a count of one (since 0.28.0); `booking`, bookings completed, at the named Partner or Location when one is named, a first booking at a count of one (since 0.32.0).
  */
 export type QuestStepKind = 'second_vertical' | 'order_at' | 'pickups' | 'review' | 'subscription_started' | 'dine_in' | 'booking';
 

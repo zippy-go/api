@@ -1,5 +1,5 @@
 type: object
-description: "Since 0.31.0, one shift an Agent held in the range, with its utilisation: the minutes of the shift inside the range, the minutes on task inside it, the tasks completed during it, the tasks per hour and the share of it without a task."
+description: "Since 0.32.0, one shift an Agent held in the range, with its utilisation: the minutes of the shift inside the range, the minutes on task inside it, the tasks completed during it, the tasks per hour and the share of it without a task."
 required:
   - shift_id
   - service_id

@@ -1,5 +1,5 @@
 type: string
-description: "Who may ask for a grant of a purpose. Since 0.31.0 `location_orders`: staff with `order:manage` at the Location (a job's photo)."
+description: "Who may ask for a grant of a purpose. Since 0.32.0 `location_orders`: staff with `order:manage` at the Location (a job's photo)."
 enum:
   - platform_staff
   - partner_staff
