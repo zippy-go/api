@@ -39160,6 +39160,660 @@ export type SandboxInboxPage = {
 };
 
 /**
+ * Where a key acts: `sandbox` (the Partner's sandbox twin; keys start `zg_test_`) or `production` (the Partner itself; keys start `zg_live_`).
+ */
+export type ApiKeyEnvironment = 'sandbox' | 'production';
+
+/**
+ * What a key may do. Each scope holds the permissions of its area: `orders:write` places orders and moves them on, `webhooks:manage` registers webhook endpoints and reads the delivery log.
+ */
+export type ApiKeyScope = 'catalog:read' | 'catalog:write' | 'orders:read' | 'orders:write' | 'deliveries:read' | 'deliveries:write' | 'fleet:read' | 'fleet:write' | 'bookings:read' | 'bookings:write' | 'subscriptions:read' | 'subscriptions:write' | 'webhooks:manage' | 'customers:read';
+
+/**
+ * Where a key stands: `active`; `expiring`, replaced by a rotation and still accepted until `expires_at`; `revoked`, refused with 401.
+ */
+export type ApiKeyState = 'active' | 'expiring' | 'revoked';
+
+/**
+ * An API key as its Partner lists it; its secret is shown once, at creation.
+ */
+export type ApiKey = {
+    /**
+     * The key.
+     */
+    key_id: string;
+    /**
+     * What it is for.
+     */
+    name: string;
+    environment: ApiKeyEnvironment;
+    /**
+     * The first characters of the key, which tell it apart.
+     */
+    prefix: string;
+    /**
+     * What it may do.
+     */
+    scopes: Array<ApiKeyScope>;
+    state: ApiKeyState;
+    /**
+     * Who created it (a user id).
+     */
+    created_by: string | null;
+    /**
+     * Their name.
+     */
+    created_by_name: string | null;
+    /**
+     * When it was created.
+     */
+    created_at: string;
+    /**
+     * When it last answered a request; `null` until it has.
+     */
+    last_used_at: string | null;
+    /**
+     * When a rotated key stops being accepted.
+     */
+    expires_at: string | null;
+    /**
+     * When it was revoked.
+     */
+    revoked_at: string | null;
+    /**
+     * The key this one replaced by a rotation.
+     */
+    rotated_from: string | null;
+    /**
+     * Whether it has not been used for 180 days; it is never revoked for that.
+     */
+    unused: boolean;
+};
+
+/**
+ * A Partner's keys, the newest first.
+ */
+export type ApiKeyList = {
+    /**
+     * The keys.
+     */
+    items: Array<ApiKey>;
+};
+
+/**
+ * A new key.
+ */
+export type ApiKeyInput = {
+    /**
+     * What it is for, 1 to 80 characters.
+     */
+    name: string;
+    environment: ApiKeyEnvironment;
+    /**
+     * What it may do; at least one.
+     */
+    scopes: Array<ApiKeyScope>;
+};
+
+/**
+ * A key with its secret, shown this once.
+ */
+export type ApiKeyCreated = {
+    key: ApiKey;
+    /**
+     * The whole key, to send as `X-Api-Key`. It is never shown again.
+     */
+    secret: string;
+};
+
+/**
+ * How long the old key overlaps its successor.
+ */
+export type ApiKeyRotateInput = {
+    /**
+     * Hours the old key keeps working, 0 to 168; 24 by default.
+     */
+    grace_hours?: number;
+};
+
+/**
+ * A deprecated operation a key called in the last 30 days.
+ */
+export type ApiKeyDeprecatedCall = {
+    /**
+     * Its method.
+     */
+    method: string;
+    /**
+     * Its path.
+     */
+    path: string;
+    /**
+     * How many times.
+     */
+    calls: number;
+    /**
+     * When last.
+     */
+    last_called_at: string;
+    /**
+     * When it stops answering (410).
+     */
+    sunset_at: string | null;
+};
+
+/**
+ * How a key has been used.
+ */
+export type ApiKeyUsage = {
+    /**
+     * The key.
+     */
+    key_id: string;
+    /**
+     * When it last answered a request.
+     */
+    last_used_at: string | null;
+    /**
+     * The deprecated operations it called in the last 30 days.
+     */
+    deprecated_operations: Array<ApiKeyDeprecatedCall>;
+};
+
+/**
+ * An event a webhook endpoint may subscribe to.
+ */
+export type WebhookEventType = {
+    /**
+     * The event type.
+     */
+    type: string;
+    /**
+     * Its current version.
+     */
+    version: number;
+    /**
+     * What it says.
+     */
+    description: string;
+};
+
+/**
+ * The events webhook endpoints may subscribe to.
+ */
+export type WebhookEventTypeList = {
+    /**
+     * The event types.
+     */
+    items: Array<WebhookEventType>;
+};
+
+/**
+ * Where an endpoint stands: `unverified` until it answers the first `platform.ping` with a 2xx, `active`, or `disabled` after failing every delivery for 24 hours or by its Partner.
+ */
+export type WebhookEndpointState = 'unverified' | 'active' | 'disabled';
+
+/**
+ * A webhook endpoint of a Partner.
+ */
+export type WebhookEndpoint = {
+    /**
+     * The endpoint.
+     */
+    endpoint_id: string;
+    /**
+     * Where deliveries go: HTTPS, or `localhost` on a developer's machine.
+     */
+    url: string;
+    environment: ApiKeyEnvironment;
+    /**
+     * What it subscribes to.
+     */
+    event_types: Array<string>;
+    /**
+     * What it is for.
+     */
+    description: string | null;
+    state: WebhookEndpointState;
+    /**
+     * When it answered its first ping with a 2xx.
+     */
+    verified_at: string | null;
+    /**
+     * When it was disabled.
+     */
+    disabled_at: string | null;
+    /**
+     * Why: `failing` after 24 hours of failures, or `partner`.
+     */
+    disabled_reason: string | null;
+    /**
+     * Since when every delivery has failed.
+     */
+    failing_since: string | null;
+    /**
+     * The first characters of its secret.
+     */
+    secret_prefix: string;
+    /**
+     * Until when deliveries are signed with the secret before a rotation too.
+     */
+    previous_secret_until: string | null;
+    /**
+     * When it was registered.
+     */
+    created_at: string;
+    /**
+     * When it last received a delivery.
+     */
+    last_delivery_at: string | null;
+};
+
+/**
+ * A Partner's webhook endpoints.
+ */
+export type WebhookEndpointList = {
+    /**
+     * The endpoints.
+     */
+    items: Array<WebhookEndpoint>;
+};
+
+/**
+ * A new webhook endpoint.
+ */
+export type WebhookEndpointInput = {
+    /**
+     * HTTPS, or `localhost` on a developer's machine.
+     */
+    url: string;
+    environment: ApiKeyEnvironment;
+    /**
+     * What it subscribes to; at least one.
+     */
+    event_types: Array<string>;
+    /**
+     * What it is for, up to 120 characters.
+     */
+    description?: string | null;
+};
+
+/**
+ * An endpoint with its signing secret, shown this once.
+ */
+export type WebhookEndpointCreated = {
+    endpoint: WebhookEndpoint;
+    /**
+     * The signing secret. It is never shown again.
+     */
+    secret: string;
+};
+
+/**
+ * What changes on an endpoint; what is left out stays.
+ */
+export type WebhookEndpointUpdate = {
+    /**
+     * A new address; it must be verified again.
+     */
+    url?: string;
+    /**
+     * What it subscribes to.
+     */
+    event_types?: Array<string>;
+    /**
+     * What it is for.
+     */
+    description?: string | null;
+};
+
+/**
+ * Where a delivery stands: `pending` (its first attempt is due), `retrying` (an attempt failed; the next is due), `delivered` (a 2xx), or `failed` (every attempt failed, or its endpoint was disabled).
+ */
+export type WebhookDeliveryOutcome = 'pending' | 'retrying' | 'delivered' | 'failed';
+
+/**
+ * One event delivered to one endpoint, with its attempts counted.
+ */
+export type WebhookDelivery = {
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * The endpoint.
+     */
+    endpoint_id: string;
+    /**
+     * The event's id, the same on every attempt and replay: deduplicate on it.
+     */
+    event_id: string;
+    /**
+     * Its type.
+     */
+    event_type: string;
+    /**
+     * What it is about; deliveries of one aggregate are attempted in order.
+     */
+    aggregate_id: string | null;
+    outcome: WebhookDeliveryOutcome;
+    /**
+     * How many attempts.
+     */
+    attempts: number;
+    /**
+     * The last answer's status code; `null` without one.
+     */
+    last_status: number | null;
+    /**
+     * When the next attempt is due.
+     */
+    next_attempt_at: string | null;
+    /**
+     * When it was made.
+     */
+    created_at: string;
+    /**
+     * When a 2xx answered it.
+     */
+    delivered_at: string | null;
+};
+
+/**
+ * A page of deliveries, the latest first.
+ */
+export type WebhookDeliveryPage = {
+    /**
+     * The deliveries.
+     */
+    items: Array<WebhookDelivery>;
+    /**
+     * The next page's cursor; `null` on the last page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One attempt of a delivery, kept 30 days.
+ */
+export type WebhookAttempt = {
+    /**
+     * Its number.
+     */
+    attempt: number;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * The answer's status code; `null` when none came.
+     */
+    status_code: number | null;
+    /**
+     * How long the answer took.
+     */
+    latency_ms: number;
+    /**
+     * The answer's first kilobyte.
+     */
+    response_snippet: string | null;
+    /**
+     * Why no answer came: `timeout` after 10 seconds, or the connection's failure.
+     */
+    error: string | null;
+};
+
+/**
+ * A delivery with its payload and every attempt.
+ */
+export type WebhookDeliveryDetail = {
+    delivery: WebhookDelivery;
+    /**
+     * The body sent: the event's envelope.
+     */
+    payload: {
+        [key: string]: unknown;
+    };
+    /**
+     * Its attempts, the first first.
+     */
+    attempts: Array<WebhookAttempt>;
+};
+
+/**
+ * The failed deliveries of a period to replay.
+ */
+export type WebhookReplayInput = {
+    /**
+     * From when.
+     */
+    from: string;
+    /**
+     * Until when.
+     */
+    to: string;
+    /**
+     * Only this endpoint's.
+     */
+    endpoint_id?: string | null;
+};
+
+/**
+ * How many deliveries were sent again.
+ */
+export type WebhookReplayed = {
+    /**
+     * How many.
+     */
+    replayed: number;
+};
+
+/**
+ * A step to going live: `first_call` (a key answered a request), `endpoint_verified` (a webhook endpoint answered its ping), `test_order_delivered` (an order delivered in the sandbox), `live` (a production key made).
+ */
+export type DeveloperChecklistStep = 'first_call' | 'endpoint_verified' | 'test_order_delivered' | 'live';
+
+/**
+ * A step of the checklist.
+ */
+export type DeveloperChecklistItem = {
+    step: DeveloperChecklistStep;
+    /**
+     * Whether it is done.
+     */
+    done: boolean;
+    /**
+     * When.
+     */
+    done_at: string | null;
+};
+
+/**
+ * A Partner's way to going live.
+ */
+export type DeveloperChecklist = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The steps, in order.
+     */
+    items: Array<DeveloperChecklistItem>;
+};
+
+/**
+ * A key as Mission Control lists it.
+ */
+export type PlatformApiKey = {
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    key: ApiKey;
+};
+
+/**
+ * A page of keys across Partners.
+ */
+export type PlatformApiKeyPage = {
+    /**
+     * The keys.
+     */
+    items: Array<PlatformApiKey>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * An endpoint as Mission Control lists it.
+ */
+export type PlatformWebhookEndpoint = {
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    endpoint: WebhookEndpoint;
+};
+
+/**
+ * A page of endpoints across Partners, the failing first.
+ */
+export type PlatformWebhookEndpointPage = {
+    /**
+     * The endpoints.
+     */
+    items: Array<PlatformWebhookEndpoint>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * What the deprecated operation answers.
+ */
+export type DeprecatedEcho = {
+    /**
+     * The key that called it.
+     */
+    key_id: string | null;
+    /**
+     * Words.
+     */
+    message: string;
+};
+
+/**
+ * The Partner's own customer the order is for; never a marketplace account.
+ */
+export type ApiOrderCustomer = {
+    /**
+     * Their name.
+     */
+    name: string;
+    /**
+     * Their mobile number in E.164.
+     */
+    mobile: string;
+};
+
+/**
+ * Where a delivery goes.
+ */
+export type ApiOrderAddress = {
+    /**
+     * The first line.
+     */
+    line1: string;
+    /**
+     * The second line.
+     */
+    line2?: string | null;
+    /**
+     * The city.
+     */
+    city: string;
+    /**
+     * The PIN code.
+     */
+    postal_code?: string | null;
+    /**
+     * Latitude.
+     */
+    lat: number;
+    /**
+     * Longitude.
+     */
+    lng: number;
+};
+
+/**
+ * A line from the store's published menu, at its prices.
+ */
+export type ApiOrderLine = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * The variant; the item's only one when left out.
+     */
+    variant_id?: string | null;
+    /**
+     * How many, 1 to 99.
+     */
+    quantity: number;
+    /**
+     * The answers to its questions.
+     */
+    answers?: Array<BasketAnswerInput>;
+};
+
+/**
+ * How the order is paid: `paid` (to the Partner already, outside ZippyGo) or `cash_on_delivery` (collected at the door or the counter).
+ */
+export type ApiOrderPayment = 'paid' | 'cash_on_delivery';
+
+/**
+ * An order a Partner places through the API at one of its Locations, for its own customer: channel `api`, no marketplace fee.
+ */
+export type ApiOrderInput = {
+    customer: ApiOrderCustomer;
+    /**
+     * `delivery` or `pickup`.
+     */
+    fulfilment: 'delivery' | 'pickup';
+    /**
+     * Where a delivery goes; `null` for a pickup.
+     */
+    address?: ApiOrderAddress | null;
+    /**
+     * What is ordered; 1 to 50 lines.
+     */
+    lines: Array<ApiOrderLine>;
+    payment: ApiOrderPayment;
+    /**
+     * The integrator's own reference for the order, up to 64 characters.
+     */
+    reference?: string | null;
+    /**
+     * A note for the store, up to 200 characters.
+     */
+    note?: string | null;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -88476,3 +89130,1225 @@ export type ListSandboxInboxResponses = {
 };
 
 export type ListSandboxInboxResponse = ListSandboxInboxResponses[keyof ListSandboxInboxResponses];
+
+export type ListApiKeysData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only this environment's.
+         */
+        environment?: ApiKeyEnvironment;
+    };
+    url: '/v1/partners/{partner_id}/api-keys';
+};
+
+export type ListApiKeysErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`; `forbidden` for an API key.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListApiKeysError = ListApiKeysErrors[keyof ListApiKeysErrors];
+
+export type ListApiKeysResponses = {
+    /**
+     * The keys.
+     */
+    200: ApiKeyList;
+};
+
+export type ListApiKeysResponse = ListApiKeysResponses[keyof ListApiKeysResponses];
+
+export type CreateApiKeyData = {
+    /**
+     * The key.
+     */
+    body: ApiKeyInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/api-keys';
+};
+
+export type CreateApiKeyErrors = {
+    /**
+     * `validation_failed`: a name or scope out of bounds.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:manage`; `forbidden` for an API key.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * `api_key_limit` at 20 active keys in the environment; `production_key_needs_active_partner` while the Partner is not active.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type CreateApiKeyError = CreateApiKeyErrors[keyof CreateApiKeyErrors];
+
+export type CreateApiKeyResponses = {
+    /**
+     * The key and its secret.
+     */
+    201: ApiKeyCreated;
+};
+
+export type CreateApiKeyResponse = CreateApiKeyResponses[keyof CreateApiKeyResponses];
+
+export type RevokeApiKeyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The key.
+         */
+        key_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/api-keys/{key_id}';
+};
+
+export type RevokeApiKeyErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:manage`; `forbidden` for an API key.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner or the key.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RevokeApiKeyError = RevokeApiKeyErrors[keyof RevokeApiKeyErrors];
+
+export type RevokeApiKeyResponses = {
+    /**
+     * Revoked.
+     */
+    204: void;
+};
+
+export type RevokeApiKeyResponse = RevokeApiKeyResponses[keyof RevokeApiKeyResponses];
+
+export type RotateApiKeyData = {
+    /**
+     * The grace.
+     */
+    body?: ApiKeyRotateInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The key.
+         */
+        key_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/api-keys/{key_id}/rotate';
+};
+
+export type RotateApiKeyErrors = {
+    /**
+     * `validation_failed`: a grace out of bounds.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:manage`; `forbidden` for an API key.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner or the key.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the key is revoked or already replaced.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RotateApiKeyError = RotateApiKeyErrors[keyof RotateApiKeyErrors];
+
+export type RotateApiKeyResponses = {
+    /**
+     * The successor and its secret.
+     */
+    201: ApiKeyCreated;
+};
+
+export type RotateApiKeyResponse = RotateApiKeyResponses[keyof RotateApiKeyResponses];
+
+export type GetApiKeyUsageData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The key.
+         */
+        key_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/api-keys/{key_id}/usage';
+};
+
+export type GetApiKeyUsageErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner or the key.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetApiKeyUsageError = GetApiKeyUsageErrors[keyof GetApiKeyUsageErrors];
+
+export type GetApiKeyUsageResponses = {
+    /**
+     * Its use.
+     */
+    200: ApiKeyUsage;
+};
+
+export type GetApiKeyUsageResponse = GetApiKeyUsageResponses[keyof GetApiKeyUsageResponses];
+
+export type ListWebhookEventTypesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/webhook-event-types';
+};
+
+export type ListWebhookEventTypesErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListWebhookEventTypesError = ListWebhookEventTypesErrors[keyof ListWebhookEventTypesErrors];
+
+export type ListWebhookEventTypesResponses = {
+    /**
+     * The event types.
+     */
+    200: WebhookEventTypeList;
+};
+
+export type ListWebhookEventTypesResponse = ListWebhookEventTypesResponses[keyof ListWebhookEventTypesResponses];
+
+export type ListWebhookEndpointsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints';
+};
+
+export type ListWebhookEndpointsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage` for a key without it.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListWebhookEndpointsError = ListWebhookEndpointsErrors[keyof ListWebhookEndpointsErrors];
+
+export type ListWebhookEndpointsResponses = {
+    /**
+     * The endpoints.
+     */
+    200: WebhookEndpointList;
+};
+
+export type ListWebhookEndpointsResponse = ListWebhookEndpointsResponses[keyof ListWebhookEndpointsResponses];
+
+export type RegisterWebhookEndpointData = {
+    /**
+     * The endpoint.
+     */
+    body: WebhookEndpointInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints';
+};
+
+export type RegisterWebhookEndpointErrors = {
+    /**
+     * `validation_failed`: an address that is not HTTPS (`webhook_url_not_https`), or an unknown event type.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * `webhook_endpoint_limit` at 10 in the environment.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RegisterWebhookEndpointError = RegisterWebhookEndpointErrors[keyof RegisterWebhookEndpointErrors];
+
+export type RegisterWebhookEndpointResponses = {
+    /**
+     * The endpoint and its secret.
+     */
+    201: WebhookEndpointCreated;
+};
+
+export type RegisterWebhookEndpointResponse = RegisterWebhookEndpointResponses[keyof RegisterWebhookEndpointResponses];
+
+export type RemoveWebhookEndpointData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The endpoint.
+         */
+        endpoint_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}';
+};
+
+export type RemoveWebhookEndpointErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveWebhookEndpointError = RemoveWebhookEndpointErrors[keyof RemoveWebhookEndpointErrors];
+
+export type RemoveWebhookEndpointResponses = {
+    /**
+     * Removed.
+     */
+    204: void;
+};
+
+export type RemoveWebhookEndpointResponse = RemoveWebhookEndpointResponses[keyof RemoveWebhookEndpointResponses];
+
+export type UpdateWebhookEndpointData = {
+    /**
+     * What changes.
+     */
+    body: WebhookEndpointUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The endpoint.
+         */
+        endpoint_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}';
+};
+
+export type UpdateWebhookEndpointErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type UpdateWebhookEndpointError = UpdateWebhookEndpointErrors[keyof UpdateWebhookEndpointErrors];
+
+export type UpdateWebhookEndpointResponses = {
+    /**
+     * The endpoint.
+     */
+    200: WebhookEndpoint;
+};
+
+export type UpdateWebhookEndpointResponse = UpdateWebhookEndpointResponses[keyof UpdateWebhookEndpointResponses];
+
+export type PingWebhookEndpointData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The endpoint.
+         */
+        endpoint_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/ping';
+};
+
+export type PingWebhookEndpointErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the endpoint is not disabled (enable).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PingWebhookEndpointError = PingWebhookEndpointErrors[keyof PingWebhookEndpointErrors];
+
+export type PingWebhookEndpointResponses = {
+    /**
+     * Done.
+     */
+    202: WebhookDelivery;
+};
+
+export type PingWebhookEndpointResponse = PingWebhookEndpointResponses[keyof PingWebhookEndpointResponses];
+
+export type RotateWebhookSecretData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The endpoint.
+         */
+        endpoint_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/rotate-secret';
+};
+
+export type RotateWebhookSecretErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the endpoint is not disabled (enable).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RotateWebhookSecretError = RotateWebhookSecretErrors[keyof RotateWebhookSecretErrors];
+
+export type RotateWebhookSecretResponses = {
+    /**
+     * Done.
+     */
+    200: WebhookEndpointCreated;
+};
+
+export type RotateWebhookSecretResponse = RotateWebhookSecretResponses[keyof RotateWebhookSecretResponses];
+
+export type EnableWebhookEndpointData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The endpoint.
+         */
+        endpoint_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/enable';
+};
+
+export type EnableWebhookEndpointErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the endpoint is not disabled (enable).
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EnableWebhookEndpointError = EnableWebhookEndpointErrors[keyof EnableWebhookEndpointErrors];
+
+export type EnableWebhookEndpointResponses = {
+    /**
+     * Done.
+     */
+    200: WebhookEndpoint;
+};
+
+export type EnableWebhookEndpointResponse = EnableWebhookEndpointResponses[keyof EnableWebhookEndpointResponses];
+
+export type ListWebhookDeliveriesData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * Only this endpoint's.
+         */
+        endpoint_id?: string;
+        /**
+         * Only this event type.
+         */
+        event_type?: string;
+        /**
+         * Only this outcome.
+         */
+        outcome?: WebhookDeliveryOutcome;
+        /**
+         * Made from.
+         */
+        from?: string;
+        /**
+         * Made until.
+         */
+        to?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/webhook-deliveries';
+};
+
+export type ListWebhookDeliveriesErrors = {
+    /**
+     * `validation_failed`: a filter out of range or a cursor this caller was not given.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListWebhookDeliveriesError = ListWebhookDeliveriesErrors[keyof ListWebhookDeliveriesErrors];
+
+export type ListWebhookDeliveriesResponses = {
+    /**
+     * A page of deliveries.
+     */
+    200: WebhookDeliveryPage;
+};
+
+export type ListWebhookDeliveriesResponse = ListWebhookDeliveriesResponses[keyof ListWebhookDeliveriesResponses];
+
+export type GetWebhookDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-deliveries/{delivery_id}';
+};
+
+export type GetWebhookDeliveryErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetWebhookDeliveryError = GetWebhookDeliveryErrors[keyof GetWebhookDeliveryErrors];
+
+export type GetWebhookDeliveryResponses = {
+    /**
+     * The delivery.
+     */
+    200: WebhookDeliveryDetail;
+};
+
+export type GetWebhookDeliveryResponse = GetWebhookDeliveryResponses[keyof GetWebhookDeliveryResponses];
+
+export type ReplayWebhookDeliveryData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-deliveries/{delivery_id}/replay';
+};
+
+export type ReplayWebhookDeliveryErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReplayWebhookDeliveryError = ReplayWebhookDeliveryErrors[keyof ReplayWebhookDeliveryErrors];
+
+export type ReplayWebhookDeliveryResponses = {
+    /**
+     * Sent again.
+     */
+    202: WebhookDelivery;
+};
+
+export type ReplayWebhookDeliveryResponse = ReplayWebhookDeliveryResponses[keyof ReplayWebhookDeliveryResponses];
+
+export type ReplayWebhookDeliveriesData = {
+    /**
+     * The period.
+     */
+    body: WebhookReplayInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/webhook-deliveries/replay';
+};
+
+export type ReplayWebhookDeliveriesErrors = {
+    /**
+     * `validation_failed`: a period over 30 days or ending before it starts.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`; `forbidden` naming `webhooks:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReplayWebhookDeliveriesError = ReplayWebhookDeliveriesErrors[keyof ReplayWebhookDeliveriesErrors];
+
+export type ReplayWebhookDeliveriesResponses = {
+    /**
+     * How many were sent again.
+     */
+    202: WebhookReplayed;
+};
+
+export type ReplayWebhookDeliveriesResponse = ReplayWebhookDeliveriesResponses[keyof ReplayWebhookDeliveriesResponses];
+
+export type GetDeveloperChecklistData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/developer/checklist';
+};
+
+export type GetDeveloperChecklistErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDeveloperChecklistError = GetDeveloperChecklistErrors[keyof GetDeveloperChecklistErrors];
+
+export type GetDeveloperChecklistResponses = {
+    /**
+     * The checklist.
+     */
+    200: DeveloperChecklist;
+};
+
+export type GetDeveloperChecklistResponse = GetDeveloperChecklistResponses[keyof GetDeveloperChecklistResponses];
+
+export type ListPlatformApiKeysData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * Only this environment's.
+         */
+        environment?: ApiKeyEnvironment;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/api-keys';
+};
+
+export type ListPlatformApiKeysErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformApiKeysError = ListPlatformApiKeysErrors[keyof ListPlatformApiKeysErrors];
+
+export type ListPlatformApiKeysResponses = {
+    /**
+     * A page of keys.
+     */
+    200: PlatformApiKeyPage;
+};
+
+export type ListPlatformApiKeysResponse = ListPlatformApiKeysResponses[keyof ListPlatformApiKeysResponses];
+
+export type ListPlatformWebhookEndpointsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this Partner's.
+         */
+        partner_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/webhook-endpoints';
+};
+
+export type ListPlatformWebhookEndpointsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `developer:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformWebhookEndpointsError = ListPlatformWebhookEndpointsErrors[keyof ListPlatformWebhookEndpointsErrors];
+
+export type ListPlatformWebhookEndpointsResponses = {
+    /**
+     * A page of endpoints.
+     */
+    200: PlatformWebhookEndpointPage;
+};
+
+export type ListPlatformWebhookEndpointsResponse = ListPlatformWebhookEndpointsResponses[keyof ListPlatformWebhookEndpointsResponses];
+
+export type GetDeprecatedEchoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/developer/deprecated-echo';
+};
+
+export type GetDeprecatedEchoErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `gone` after its sunset.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDeprecatedEchoError = GetDeprecatedEchoErrors[keyof GetDeprecatedEchoErrors];
+
+export type GetDeprecatedEchoResponses = {
+    /**
+     * Its words.
+     */
+    200: DeprecatedEcho;
+};
+
+export type GetDeprecatedEchoResponse = GetDeprecatedEchoResponses[keyof GetDeprecatedEchoResponses];
+
+export type PlaceApiOrderData = {
+    /**
+     * The order.
+     */
+    body: ApiOrderInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location, one of the Partner's (the sandbox twin's for a sandbox key).
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders';
+};
+
+export type PlaceApiOrderErrors = {
+    /**
+     * `validation_failed`: a line not on the menu, an answer that does not fit, an address missing for a delivery; `idempotency_key_required`.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden` naming `orders:write` for a key without it; `access_denied`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the Partner or the Location.
+     */
+    404: Problem;
+    /**
+     * `store_not_trading`; `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PlaceApiOrderError = PlaceApiOrderErrors[keyof PlaceApiOrderErrors];
+
+export type PlaceApiOrderResponses = {
+    /**
+     * The order, placed.
+     */
+    201: StoreOrder;
+};
+
+export type PlaceApiOrderResponse = PlaceApiOrderResponses[keyof PlaceApiOrderResponses];
