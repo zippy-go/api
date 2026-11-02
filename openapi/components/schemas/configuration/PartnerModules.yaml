@@ -1,5 +1,5 @@
 type: object
-description: "A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel."
+description: "A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel `private-partner-{partner_id}`."
 required:
   - partner_id
   - plan

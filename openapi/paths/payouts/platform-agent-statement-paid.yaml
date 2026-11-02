@@ -12,7 +12,7 @@ parameters:
 post:
   operationId: markAgentStatementPaid
   summary: Mark an Agent's statement paid by hand
-  description: Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. `payout:manage`.
+  description: Marks a due or unpaid statement paid outside the payout provider, with the day, not in the future, and the transfer's reference. The payee is told the payout was sent. Written into the statement's history and the audit log. Since 0.34.0 it is proposed for a second person and answers 202. `payout:manage`.
   tags:
     - Payouts
   security:
@@ -31,6 +31,12 @@ post:
         application/json:
           schema:
             $ref: ../../components/schemas/payouts/AgentStatement.yaml
+    "202":
+      description: "Since 0.34.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
     "400":
       description: "`validation_failed`: `paid_on_in_future`, an empty reference, or `idempotency_key_missing`."
       content:

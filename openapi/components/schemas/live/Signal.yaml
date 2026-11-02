@@ -19,7 +19,7 @@ properties:
       `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
       `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
       `duty.changed`, `agent.changed`, `delivery.changed` (on the dispatch board channels, subject
-      `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject `offer`, its status) and, since step 10, `flags.changed` (on `broadcast`, subject `flag` with its name: read `GET /v1/me/flags` again).
+      `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject `offer`, its status) and, since step 10, `flags.changed` (on `broadcast`, subject `flag` with its name: read `GET /v1/me/flags` again) and `modules.changed` (on `private-partner-{partner_id}`, subject `partner`: read `GET /v1/partners/{partner_id}/modules` again).
     examples:
       - vertical.transitioned
   status:

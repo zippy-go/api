@@ -35,7 +35,8 @@
       "type": "string",
       "enum": [
         "order",
-        "wallet_top_up"
+        "wallet_top_up",
+        "invoice"
       ],
       "description": "An order's payment or a Wallet top-up."
     },
@@ -102,7 +103,8 @@
         "charged_at_checkout",
         "hold_expiring",
         "cash_collected",
-        "top_up"
+        "top_up",
+        "invoice"
       ],
       "description": "What took the money: a UPI payment (`upi_paid`), a card charged when the Location accepted (`acceptance`), a card that cannot be held charged at checkout (`charged_at_checkout`), the Wallet spent at acceptance (also `acceptance`), a hold charged before it would lapse (`hold_expiring`), cash collected (`cash_collected`), a top-up paid (`top_up`)."
     },

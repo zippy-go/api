@@ -10180,7 +10180,7 @@ export type Signal = {
      * `catalog.changed`, `order.changed`, `wallet.changed`, `notice.sent`, `ticket.changed`,
      * `table.changed`, `task.changed`, `membership.changed`, `document.changed`,
      * `duty.changed`, `agent.changed`, `delivery.changed` (on the dispatch board channels, subject
-     * `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject `offer`, its status) and, since step 10, `flags.changed` (on `broadcast`, subject `flag` with its name: read `GET /v1/me/flags` again).
+     * `delivery`, its state and version) and `offer.changed` (on an Agent's task channel, subject `offer`, its status) and, since step 10, `flags.changed` (on `broadcast`, subject `flag` with its name: read `GET /v1/me/flags` again) and `modules.changed` (on `private-partner-{partner_id}`, subject `partner`: read `GET /v1/partners/{partner_id}/modules` again).
      */
     kind: string;
     /**
@@ -15564,9 +15564,9 @@ export type PaymentMethodKind = 'upi' | 'card' | 'cash' | 'wallet';
 export type PaymentStatus = 'requires_payment' | 'confirmed' | 'settled' | 'released' | 'failed';
 
 /**
- * What a payment is for: an order, or a top-up of the customer's Wallet.
+ * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.34.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know.
  */
-export type PaymentPurpose = 'order' | 'wallet_top_up';
+export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice';
 
 /**
  * How an attempt reaches the customer: a UPI app opened on the device (`upi_intent`), a collect request to a UPI ID (`upi_collect`), or the provider's card form (`card`).
@@ -24471,6 +24471,10 @@ export type PayoutWorking = {
      * "Rewards you paid for" in the days worked out, as a statement shows them.
      */
     rewards?: Array<StatementRewardRow>;
+    /**
+     * Monthly invoices of the platform the statement will deduct (since 0.34.0).
+     */
+    bill_deductions?: Array<StatementBillDeduction>;
 };
 
 /**
@@ -37851,7 +37855,7 @@ export type PartnerModule = {
 };
 
 /**
- * A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel.
+ * A Partner's edition, the `PartnerModules` schema: its plan and every module with its state. The console and the Partner app hide the pages of a module that is not `enabled`, read again within a minute of `modules.changed` on the Partner's channel `private-partner-{partner_id}`.
  */
 export type PartnerModules = {
     /**
@@ -62935,6 +62939,10 @@ export type CreditCustomerWalletResponses = {
      * The credit's entry.
      */
     201: WalletEntry;
+    /**
+     * Since 0.34.0 a second person decides: the proposal (`credit_wallet`), checked now and done once a different platform member approves it.
+     */
+    202: Approval;
 };
 
 export type CreditCustomerWalletResponse = CreditCustomerWalletResponses[keyof CreditCustomerWalletResponses];
@@ -70067,6 +70075,10 @@ export type MarkStatementPaidResponses = {
      * The statement after the move.
      */
     200: Statement;
+    /**
+     * Since 0.34.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
+     */
+    202: Approval;
 };
 
 export type MarkStatementPaidResponse = MarkStatementPaidResponses[keyof MarkStatementPaidResponses];
@@ -70620,6 +70632,10 @@ export type AddLocationPayoutAdjustmentResponses = {
      * The adjustment.
      */
     201: PayoutAdjustment;
+    /**
+     * Since 0.34.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
+     */
+    202: Approval;
 };
 
 export type AddLocationPayoutAdjustmentResponse = AddLocationPayoutAdjustmentResponses[keyof AddLocationPayoutAdjustmentResponses];
@@ -71122,6 +71138,10 @@ export type MarkAgentStatementPaidResponses = {
      * The statement after the move.
      */
     200: AgentStatement;
+    /**
+     * Since 0.34.0 a second person decides: the proposal (`mark_statement_paid`), checked now and done once a different platform member approves it.
+     */
+    202: Approval;
 };
 
 export type MarkAgentStatementPaidResponse = MarkAgentStatementPaidResponses[keyof MarkAgentStatementPaidResponses];
@@ -71670,6 +71690,10 @@ export type AddAgentPayoutAdjustmentResponses = {
      * The adjustment.
      */
     201: PayoutAdjustment;
+    /**
+     * Since 0.34.0 a second person decides: the proposal (`create_payout_adjustment`), checked now and done once a different platform member approves it.
+     */
+    202: Approval;
 };
 
 export type AddAgentPayoutAdjustmentResponse = AddAgentPayoutAdjustmentResponses[keyof AddAgentPayoutAdjustmentResponses];

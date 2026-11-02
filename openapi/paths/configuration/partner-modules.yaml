@@ -4,7 +4,7 @@ parameters:
 get:
   operationId: getPartnerModules
   summary: Get the Partner's modules
-  description: "The Partner's edition: its plan and every module of the catalogue with its state, why and who switched it on. The Partner console and the Partner app show a module's pages only while it is `enabled`, and read this again within a minute of `modules.changed` on the Partner's channel. Any member of the Partner; platform staff with `partner:read`."
+  description: "The Partner's edition: its plan and every module of the catalogue with its state, why and who switched it on. The Partner console and the Partner app show a module's pages only while it is `enabled`, and read this again within a minute of `modules.changed` on the Partner's channel `private-partner-{partner_id}`. Any member of the Partner; platform staff with `partner:read`."
   tags:
     - Configuration
   security:

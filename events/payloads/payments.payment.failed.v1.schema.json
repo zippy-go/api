@@ -29,7 +29,8 @@
       "type": "string",
       "enum": [
         "order",
-        "wallet_top_up"
+        "wallet_top_up",
+        "invoice"
       ],
       "description": "An order's payment or a Wallet top-up."
     },

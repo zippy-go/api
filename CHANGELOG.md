@@ -14,6 +14,15 @@ Step 10, configuration: a Partner's edition and the platform's configuration. Wr
 
 ### Added
 
+- The Partner's own realtime channel `private-partner-{partner_id}`, every member's whatever
+  they hold, where `modules.changed` (subject `partner`) tells that its modules were switched,
+  suspended or restored or its plan moved; named in the live stream, `Signal.kind` and the
+  modules' descriptions.
+- `invoice` in `PaymentPurpose` and in the payment events' `purpose`, and in the capture's
+  `cause`: an invoice paid by UPI or card through the payments module.
+- 202 with the proposal on a statement marked paid by hand (`mark_statement_paid`), a payout
+  adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`);
+  `bill_deductions` on `PayoutWorking`.
 - A Partner's edition (`Configuration` tag): the catalogue of modules (`ModuleCode`:
   delivery, pickup, dine-in, subscriptions, field services, promotions, loyalty, inventory,
   own fleet and developer) with the Service each needs, the lowest plan that includes it and its

@@ -73,6 +73,12 @@ properties:
       $ref: ./StatementRewardRow.yaml
       description: A campaign.
     description: '"Rewards you paid for" in the days worked out, as a statement shows them.'
+  bill_deductions:
+    type: array
+    items:
+      $ref: ./StatementBillDeduction.yaml
+      description: An invoice.
+    description: Monthly invoices of the platform the statement will deduct (since 0.34.0).
 examples:
   - from: 2026-10-26
     until: 2026-11-01
