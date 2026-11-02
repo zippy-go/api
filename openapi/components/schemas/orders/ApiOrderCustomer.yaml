@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "The Partner's own customer the order is for; never a marketplace account.",
+  "required": [
+    "name",
+    "mobile"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Their name.",
+      "minLength": 1,
+      "maxLength": 80,
+      "examples": [
+        "Asha Rao"
+      ]
+    },
+    "mobile": {
+      "type": "string",
+      "description": "Their mobile number in E.164.",
+      "examples": [
+        "+919000000001"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "name": "Asha Rao",
+      "mobile": "+919000000001"
+    }
+  ]
+}

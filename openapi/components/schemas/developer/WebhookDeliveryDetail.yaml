@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "description": "A delivery with its payload and every attempt.",
+  "required": [
+    "delivery",
+    "payload",
+    "attempts"
+  ],
+  "properties": {
+    "delivery": {
+      "$ref": "./WebhookDelivery.yaml"
+    },
+    "payload": {
+      "type": "object",
+      "description": "The body sent: the event's envelope.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7f01",
+          "type": "ordering.order.placed",
+          "version": 1
+        }
+      ]
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "$ref": "./WebhookAttempt.yaml"
+      },
+      "description": "Its attempts, the first first."
+    }
+  },
+  "examples": [
+    {
+      "delivery": {
+        "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7d01",
+        "endpoint_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01",
+        "event_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7f01",
+        "event_type": "ordering.order.placed",
+        "aggregate_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01",
+        "outcome": "delivered",
+        "attempts": 1,
+        "last_status": 200,
+        "next_attempt_at": null,
+        "created_at": "2026-11-02T10:15:00Z",
+        "delivered_at": "2026-11-02T10:15:00Z"
+      },
+      "payload": {
+        "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7f01",
+        "type": "ordering.order.placed",
+        "version": 1
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "at": "2026-11-02T10:15:00Z",
+          "status_code": 200,
+          "latency_ms": 84,
+          "response_snippet": "ok",
+          "error": null
+        }
+      ]
+    }
+  ]
+}

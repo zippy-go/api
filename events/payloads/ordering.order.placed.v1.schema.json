@@ -467,6 +467,30 @@
           "waived": 4000
         }
       ]
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "marketplace",
+        "api",
+        "subscription",
+        "staff"
+      ],
+      "description": "How it was placed: `api` by a Partner through the API (since 0.33.0); absent on earlier events, which were placed on the marketplace or by a subscription.",
+      "examples": [
+        "marketplace"
+      ]
+    },
+    "api_key_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The API key that placed it, for an order of channel `api` (since 0.33.0).",
+      "examples": [
+        null
+      ]
     }
   }
 }

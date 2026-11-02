@@ -1,0 +1,13 @@
+{
+  "type": "string",
+  "description": "Where a delivery stands: `pending` (its first attempt is due), `retrying` (an attempt failed; the next is due), `delivered` (a 2xx), or `failed` (every attempt failed, or its endpoint was disabled).",
+  "enum": [
+    "pending",
+    "retrying",
+    "delivered",
+    "failed"
+  ],
+  "examples": [
+    "delivered"
+  ]
+}

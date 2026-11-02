@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "description": "A deprecated operation a key called in the last 30 days.",
+  "required": [
+    "method",
+    "path",
+    "calls",
+    "last_called_at",
+    "sunset_at"
+  ],
+  "properties": {
+    "method": {
+      "type": "string",
+      "description": "Its method.",
+      "examples": [
+        "GET"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "description": "Its path.",
+      "examples": [
+        "/v1/developer/deprecated-echo"
+      ]
+    },
+    "calls": {
+      "type": "integer",
+      "description": "How many times.",
+      "minimum": 1,
+      "examples": [
+        3
+      ]
+    },
+    "last_called_at": {
+      "type": "string",
+      "description": "When last.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "sunset_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it stops answering (410).",
+      "format": "date-time",
+      "examples": [
+        "2027-06-30T00:00:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "method": "GET",
+      "path": "/v1/developer/deprecated-echo",
+      "calls": 3,
+      "last_called_at": "2026-11-02T10:15:00Z",
+      "sunset_at": "2027-06-30T00:00:00Z"
+    }
+  ]
+}

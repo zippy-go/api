@@ -1,0 +1,166 @@
+{
+  "type": "object",
+  "description": "A webhook endpoint of a Partner.",
+  "required": [
+    "endpoint_id",
+    "url",
+    "environment",
+    "event_types",
+    "description",
+    "state",
+    "verified_at",
+    "disabled_at",
+    "disabled_reason",
+    "failing_since",
+    "secret_prefix",
+    "previous_secret_until",
+    "created_at",
+    "last_delivery_at"
+  ],
+  "properties": {
+    "endpoint_id": {
+      "type": "string",
+      "description": "The endpoint.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "description": "Where deliveries go: HTTPS, or `localhost` on a developer's machine.",
+      "format": "uri",
+      "examples": [
+        "https://pos.example.com/zippygo"
+      ]
+    },
+    "environment": {
+      "$ref": "./ApiKeyEnvironment.yaml"
+    },
+    "event_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "An event type.",
+        "examples": [
+          "ordering.order.placed"
+        ]
+      },
+      "description": "What it subscribes to."
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "What it is for.",
+      "examples": [
+        "POS bridge"
+      ]
+    },
+    "state": {
+      "$ref": "./WebhookEndpointState.yaml"
+    },
+    "verified_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it answered its first ping with a 2xx.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "disabled_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it was disabled.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "disabled_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why: `failing` after 24 hours of failures, or `partner`.",
+      "examples": [
+        null
+      ]
+    },
+    "failing_since": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Since when every delivery has failed.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "secret_prefix": {
+      "type": "string",
+      "description": "The first characters of its secret.",
+      "examples": [
+        "whsec_Xy7Q"
+      ]
+    },
+    "previous_secret_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Until when deliveries are signed with the secret before a rotation too.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "When it was registered.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "last_delivery_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it last received a delivery.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "endpoint_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01",
+      "url": "https://pos.example.com/zippygo",
+      "environment": "sandbox",
+      "event_types": [
+        "ordering.order.placed",
+        "orchestration.delivery.assigned"
+      ],
+      "description": "POS bridge",
+      "state": "active",
+      "verified_at": "2026-11-02T10:15:00Z",
+      "disabled_at": null,
+      "disabled_reason": null,
+      "failing_since": null,
+      "secret_prefix": "whsec_Xy7Q",
+      "previous_secret_until": null,
+      "created_at": "2026-11-02T10:15:00Z",
+      "last_delivery_at": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

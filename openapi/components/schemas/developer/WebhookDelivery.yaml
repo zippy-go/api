@@ -1,0 +1,127 @@
+{
+  "type": "object",
+  "description": "One event delivered to one endpoint, with its attempts counted.",
+  "required": [
+    "delivery_id",
+    "endpoint_id",
+    "event_id",
+    "event_type",
+    "aggregate_id",
+    "outcome",
+    "attempts",
+    "last_status",
+    "next_attempt_at",
+    "created_at",
+    "delivered_at"
+  ],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "description": "The delivery.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7d01"
+      ]
+    },
+    "endpoint_id": {
+      "type": "string",
+      "description": "The endpoint.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01"
+      ]
+    },
+    "event_id": {
+      "type": "string",
+      "description": "The event's id, the same on every attempt and replay: deduplicate on it.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7f01"
+      ]
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Its type.",
+      "examples": [
+        "ordering.order.placed"
+      ]
+    },
+    "aggregate_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "What it is about; deliveries of one aggregate are attempted in order.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01"
+      ]
+    },
+    "outcome": {
+      "$ref": "./WebhookDeliveryOutcome.yaml"
+    },
+    "attempts": {
+      "type": "integer",
+      "description": "How many attempts.",
+      "minimum": 0,
+      "examples": [
+        1
+      ]
+    },
+    "last_status": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The last answer's status code; `null` without one.",
+      "examples": [
+        200
+      ]
+    },
+    "next_attempt_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When the next attempt is due.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "When it was made.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "delivered_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When a 2xx answered it.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7d01",
+      "endpoint_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01",
+      "event_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7f01",
+      "event_type": "ordering.order.placed",
+      "aggregate_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01",
+      "outcome": "delivered",
+      "attempts": 1,
+      "last_status": 200,
+      "next_attempt_at": null,
+      "created_at": "2026-11-02T10:15:00Z",
+      "delivered_at": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "description": "A Partner's way to going live.",
+  "required": [
+    "partner_id",
+    "items"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "The Partner.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./DeveloperChecklistItem.yaml"
+      },
+      "description": "The steps, in order."
+    }
+  },
+  "examples": [
+    {
+      "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+      "items": [
+        {
+          "step": "first_call",
+          "done": true,
+          "done_at": "2026-11-02T10:15:00Z"
+        }
+      ]
+    }
+  ]
+}

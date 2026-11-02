@@ -173,6 +173,16 @@
       "examples": [
         "missing_item"
       ]
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "api"
+      ],
+      "description": "`api` on every event of an order placed through the API, so the marketplace's own readers leave it to its Partner (since 0.33.0); absent otherwise.",
+      "examples": [
+        "api"
+      ]
     }
   }
 }

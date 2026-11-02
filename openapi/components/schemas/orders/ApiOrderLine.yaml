@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "description": "A line from the store's published menu, at its prices.",
+  "required": [
+    "item_id",
+    "quantity"
+  ],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "description": "The item.",
+      "format": "uuid",
+      "examples": [
+        "01a13a48-9e00-7000-8000-00000000c001"
+      ]
+    },
+    "variant_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The variant; the item's only one when left out.",
+      "format": "uuid",
+      "examples": [
+        null
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "description": "How many, 1 to 99.",
+      "minimum": 1,
+      "maximum": 99,
+      "examples": [
+        2
+      ]
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "$ref": "./BasketAnswerInput.yaml"
+      },
+      "description": "The answers to its questions."
+    }
+  },
+  "examples": [
+    {
+      "item_id": "01a13a48-9e00-7000-8000-00000000c001",
+      "variant_id": null,
+      "quantity": 2,
+      "answers": []
+    }
+  ]
+}

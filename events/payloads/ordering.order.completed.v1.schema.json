@@ -124,6 +124,16 @@
       "type": "integer",
       "minimum": 0,
       "description": "What was kept, in minor units of the currency."
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "api"
+      ],
+      "description": "`api` on every event of an order placed through the API, so the marketplace's own readers leave it to its Partner (since 0.33.0); absent otherwise.",
+      "examples": [
+        "api"
+      ]
     }
   }
 }

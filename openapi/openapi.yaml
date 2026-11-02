@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.34.0
+  version: 0.35.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -282,8 +282,10 @@ tags:
     description: "Daily essentials on a schedule: a customer subscribes to a store's plan with the items and quantities they want, how often, in its morning window, from a start date to an optional end, paying from the Wallet or by a UPI AutoPay mandate, and changes, skips, pauses, sets days away or cancels from a calendar until the store's cutoff the evening before. At the cutoff each delivery day becomes an ordinary order held from the Wallet, generated once; a failed delivery is credited back, a price change is announced a week ahead and each month ends with a statement. The store reads its calendar, what to pack and a forecast for two weeks (`subscription:read` at the Location); Mission Control reads every subscription (`subscription:read`) and moves the schedule date on a developer's machine or in the sandbox (`operations:manage`). Every change signals `subscription.changed` on the customer's channel."
   - name: Dine-in
     description: "Dine-in: a Location's tables with their codes and sheets, its dine-in settings and the floor; tabs, each an order bound to a table that diners open by scanning its code and join with its join code, sending rounds to the kitchen, asking for the bill and paying it whole or split from their phones, or staff recording payments at the counter; the floor's acts (rounds keyed in, moves, merges, voids, declines, discounts, reopening, closing unpaid) and Mission Control's list. A guest uses a visitor token (`X-Visitor-Token`) and keeps the tab by signing in. `table.changed` on `private-location-{location_id}-tables` tells the floor when to read again, and `tab.changed` on `tab-{tab_id}` a tab's diners, heard by anybody holding its id and saying only that it changed."
+  - name: Developer
+    description: "API keys and the way to going live: a Partner's keys per environment with their scopes, shown once and kept hashed, rotated with an overlap and revoked at once; each key's use and the deprecated operations it called; the checklist; Mission Control's keys across Partners. A key (`X-Api-Key`) acts with its scopes on its Partner, a sandbox key on the Partner's sandbox twin, and never reaches another Partner (404). Members need `developer:read` and `developer:manage`, which owners and the Developer role hold."
   - name: Webhooks
-    description: Webhook endpoints and event delivery.
+    description: "Webhook endpoints per Partner and environment, subscribed by event type and verified by a `platform.ping`; deliveries signed with `ZippyGo-Signature: t=<unix seconds>,v1=<hex>` (the HMAC-SHA256 of `<t>.<body>` with the endpoint's secret, a second `v1` while a rotation overlaps), expecting a 2xx within 10 seconds, retried after 1 minute, 5 minutes, 30 minutes, 2 hours, 6 hours and 24 hours, in order per aggregate, an endpoint disabled after 24 hours of failures; the log of 30 days and replays with the original event id."
   - name: Reviews
     description: "What customers say about what they bought, and how Agents are rated: a thumb up or down on one completed order with tags from a short list, a note and photos, asked once by push; the delivery rated apart from the food; a store's rating as the share of thumbs up, counted when asked for; the Partner's reading and its one reply, moderated by the platform; Mission Control's reading, hiding a note and moderating replies; an Agent's rating, one per delivery over 90 days, and the flags an Agent raises on a rating they find unfair. Customers read reviews with no account; Partner staff with `review:read` at the Location and reply with `review:reply`; platform staff read with `review:read` and moderate with `review:manage`."
   - name: Customers
@@ -1754,6 +1756,46 @@ paths:
     $ref: ./paths/sandbox/sandbox-delivery-step.yaml
   /v1/sandbox/inbox:
     $ref: ./paths/sandbox/sandbox-inbox.yaml
+  # Step 10 developer: API keys, webhooks and orders through the API
+  /v1/partners/{partner_id}/api-keys:
+    $ref: ./paths/developer/api-keys.yaml
+  /v1/partners/{partner_id}/api-keys/{key_id}:
+    $ref: ./paths/developer/api-key.yaml
+  /v1/partners/{partner_id}/api-keys/{key_id}/rotate:
+    $ref: ./paths/developer/api-key-rotate.yaml
+  /v1/partners/{partner_id}/api-keys/{key_id}/usage:
+    $ref: ./paths/developer/api-key-usage.yaml
+  /v1/webhook-event-types:
+    $ref: ./paths/developer/webhook-event-types.yaml
+  /v1/partners/{partner_id}/webhook-endpoints:
+    $ref: ./paths/developer/webhook-endpoints.yaml
+  /v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}:
+    $ref: ./paths/developer/webhook-endpoint.yaml
+  /v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/ping:
+    $ref: ./paths/developer/webhook-endpoint-ping.yaml
+  /v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/rotate-secret:
+    $ref: ./paths/developer/webhook-endpoint-rotate-secret.yaml
+  /v1/partners/{partner_id}/webhook-endpoints/{endpoint_id}/enable:
+    $ref: ./paths/developer/webhook-endpoint-enable.yaml
+  /v1/partners/{partner_id}/webhook-deliveries:
+    $ref: ./paths/developer/webhook-deliveries.yaml
+  /v1/partners/{partner_id}/webhook-deliveries/{delivery_id}:
+    $ref: ./paths/developer/webhook-delivery.yaml
+  /v1/partners/{partner_id}/webhook-deliveries/{delivery_id}/replay:
+    $ref: ./paths/developer/webhook-delivery-replay.yaml
+  /v1/partners/{partner_id}/webhook-deliveries/replay:
+    $ref: ./paths/developer/webhook-deliveries-replay.yaml
+  /v1/partners/{partner_id}/developer/checklist:
+    $ref: ./paths/developer/developer-checklist.yaml
+  /v1/platform/api-keys:
+    $ref: ./paths/developer/platform-api-keys.yaml
+  /v1/platform/webhook-endpoints:
+    $ref: ./paths/developer/platform-webhook-endpoints.yaml
+  /v1/developer/deprecated-echo:
+    $ref: ./paths/developer/deprecated-echo.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders:
+    $ref: ./paths/orders/location-orders.yaml
+
 components:
   securitySchemes:
     ApiKey:

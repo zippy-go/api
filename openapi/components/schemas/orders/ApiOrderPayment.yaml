@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "description": "How the order is paid: `paid` (to the Partner already, outside ZippyGo) or `cash_on_delivery` (collected at the door or the counter).",
+  "enum": [
+    "paid",
+    "cash_on_delivery"
+  ],
+  "examples": [
+    "paid"
+  ]
+}

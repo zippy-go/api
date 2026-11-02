@@ -1,0 +1,71 @@
+{
+  "type": "object",
+  "description": "Where a delivery goes.",
+  "required": [
+    "line1",
+    "city",
+    "lat",
+    "lng"
+  ],
+  "properties": {
+    "line1": {
+      "type": "string",
+      "description": "The first line.",
+      "minLength": 1,
+      "examples": [
+        "Road No 36"
+      ]
+    },
+    "line2": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The second line.",
+      "examples": [
+        null
+      ]
+    },
+    "city": {
+      "type": "string",
+      "description": "The city.",
+      "examples": [
+        "Hyderabad"
+      ]
+    },
+    "postal_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The PIN code.",
+      "examples": [
+        "500033"
+      ]
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitude.",
+      "examples": [
+        17.4316
+      ]
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitude.",
+      "examples": [
+        78.4078
+      ]
+    }
+  },
+  "examples": [
+    {
+      "line1": "Road No 36",
+      "line2": null,
+      "city": "Hyderabad",
+      "postal_code": "500033",
+      "lat": 17.4316,
+      "lng": 78.4078
+    }
+  ]
+}

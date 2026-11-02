@@ -157,6 +157,16 @@
       "examples": [
         "2026-10-16T13:25:00Z"
       ]
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "api"
+      ],
+      "description": "`api` on every event of an order placed through the API, so the marketplace's own readers leave it to its Partner (since 0.33.0); absent otherwise.",
+      "examples": [
+        "api"
+      ]
     }
   }
 }

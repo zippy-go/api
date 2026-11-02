@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "description": "A new webhook endpoint.",
+  "required": [
+    "url",
+    "environment",
+    "event_types"
+  ],
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "HTTPS, or `localhost` on a developer's machine.",
+      "format": "uri",
+      "examples": [
+        "https://pos.example.com/zippygo"
+      ]
+    },
+    "environment": {
+      "$ref": "./ApiKeyEnvironment.yaml"
+    },
+    "event_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "An event type of `GET /v1/webhook-event-types`.",
+        "examples": [
+          "ordering.order.placed"
+        ]
+      },
+      "description": "What it subscribes to; at least one.",
+      "minItems": 1
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "What it is for, up to 120 characters.",
+      "maxLength": 120,
+      "examples": [
+        "POS bridge"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "url": "https://pos.example.com/zippygo",
+      "environment": "sandbox",
+      "event_types": [
+        "ordering.order.placed"
+      ],
+      "description": "POS bridge"
+    }
+  ]
+}

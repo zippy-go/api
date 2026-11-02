@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "description": "An event a webhook endpoint may subscribe to.",
+  "required": [
+    "type",
+    "version",
+    "description"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "The event type.",
+      "examples": [
+        "ordering.order.placed"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Its current version.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "What it says.",
+      "examples": [
+        "An order was placed at one of your stores."
+      ]
+    }
+  },
+  "examples": [
+    {
+      "type": "ordering.order.placed",
+      "version": 1,
+      "description": "An order was placed at one of your stores."
+    }
+  ]
+}

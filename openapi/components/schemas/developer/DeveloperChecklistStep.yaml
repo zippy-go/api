@@ -1,0 +1,13 @@
+{
+  "type": "string",
+  "description": "A step to going live: `first_call` (a key answered a request), `endpoint_verified` (a webhook endpoint answered its ping), `test_order_delivered` (an order delivered in the sandbox), `live` (a production key made).",
+  "enum": [
+    "first_call",
+    "endpoint_verified",
+    "test_order_delivered",
+    "live"
+  ],
+  "examples": [
+    "first_call"
+  ]
+}

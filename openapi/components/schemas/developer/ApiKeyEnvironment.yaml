@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "description": "Where a key acts: `sandbox` (the Partner's sandbox twin; keys start `zg_test_`) or `production` (the Partner itself; keys start `zg_live_`).",
+  "enum": [
+    "sandbox",
+    "production"
+  ],
+  "examples": [
+    "sandbox"
+  ]
+}

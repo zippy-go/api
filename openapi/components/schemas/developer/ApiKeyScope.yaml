@@ -1,0 +1,23 @@
+{
+  "type": "string",
+  "description": "What a key may do. Each scope holds the permissions of its area: `orders:write` places orders and moves them on, `webhooks:manage` registers webhook endpoints and reads the delivery log.",
+  "enum": [
+    "catalog:read",
+    "catalog:write",
+    "orders:read",
+    "orders:write",
+    "deliveries:read",
+    "deliveries:write",
+    "fleet:read",
+    "fleet:write",
+    "bookings:read",
+    "bookings:write",
+    "subscriptions:read",
+    "subscriptions:write",
+    "webhooks:manage",
+    "customers:read"
+  ],
+  "examples": [
+    "orders:read"
+  ]
+}

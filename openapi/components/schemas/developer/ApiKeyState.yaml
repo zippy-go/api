@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "description": "Where a key stands: `active`; `expiring`, replaced by a rotation and still accepted until `expires_at`; `revoked`, refused with 401.",
+  "enum": [
+    "active",
+    "expiring",
+    "revoked"
+  ],
+  "examples": [
+    "active"
+  ]
+}

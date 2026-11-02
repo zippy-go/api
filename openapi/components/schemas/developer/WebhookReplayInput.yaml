@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "description": "The failed deliveries of a period to replay.",
+  "required": [
+    "from",
+    "to"
+  ],
+  "properties": {
+    "from": {
+      "type": "string",
+      "description": "From when.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-01T00:00:00Z"
+      ]
+    },
+    "to": {
+      "type": "string",
+      "description": "Until when.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T00:00:00Z"
+      ]
+    },
+    "endpoint_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Only this endpoint's.",
+      "format": "uuid",
+      "examples": [
+        null
+      ]
+    }
+  },
+  "examples": [
+    {
+      "from": "2026-11-01T00:00:00Z",
+      "to": "2026-11-02T00:00:00Z"
+    }
+  ]
+}

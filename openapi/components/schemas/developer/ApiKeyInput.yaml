@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "A new key.",
+  "required": [
+    "name",
+    "environment",
+    "scopes"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "What it is for, 1 to 80 characters.",
+      "minLength": 1,
+      "maxLength": 80,
+      "examples": [
+        "POS bridge"
+      ]
+    },
+    "environment": {
+      "$ref": "./ApiKeyEnvironment.yaml"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "$ref": "./ApiKeyScope.yaml"
+      },
+      "description": "What it may do; at least one.",
+      "minItems": 1
+    }
+  },
+  "examples": [
+    {
+      "name": "POS bridge",
+      "environment": "sandbox",
+      "scopes": [
+        "orders:read",
+        "orders:write"
+      ]
+    }
+  ]
+}

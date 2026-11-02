@@ -1,0 +1,100 @@
+{
+  "get": {
+    "operationId": "listPlatformWebhookEndpoints",
+    "summary": "List webhook endpoints across Partners",
+    "description": "Every Partner's endpoints, the failing and disabled first. Platform staff need `developer:read`.",
+    "tags": [
+      "Webhooks"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "partner_id",
+        "in": "query",
+        "required": false,
+        "description": "Only this Partner's.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "How many, 1 to 100; 50 by default.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Where the page starts: the `next_cursor` of the page before.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "A page of endpoints.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/developer/PlatformWebhookEndpointPage.yaml"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "`access_denied` without `developer:read`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

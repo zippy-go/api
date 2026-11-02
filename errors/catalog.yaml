@@ -22,6 +22,9 @@ errors:
       The `errors` member lists each offending field with a JSON Pointer and
       a reason, and a `code` when one is defined below.
     details:
+      - code: webhook_url_not_https
+        message: "An endpoint is an HTTPS address."
+        description: "A webhook endpoint's address that is not HTTPS (only `localhost` may be plain HTTP, on a developer's machine)."
       - code: placeholder_unknown
         message: "A placeholder must be one of the variables its event provides."
         description: "A message template's placeholder that its event does not provide; the message names the variables available."
@@ -2552,3 +2555,31 @@ errors:
     message: "The delivery is {state} already."
     retryable: false
     description: "Stepping a sandbox delivery to a state it is at or past, or a delivery that ended; the sentence says where it is."
+
+  - code: api_key_limit
+    status: 409
+    title: Too many keys
+    message: "The Partner holds 20 active {environment} keys: revoke one first."
+    retryable: false
+    description: "A 21st active key in one environment."
+
+  - code: production_key_needs_active_partner
+    status: 409
+    title: Production keys need an active Partner
+    message: "Production keys need an active Partner; a sandbox key works at once."
+    retryable: false
+    description: "A production key asked for while the Partner is pending or suspended."
+
+  - code: webhook_endpoint_limit
+    status: 409
+    title: Too many endpoints
+    message: "The Partner holds 10 {environment} webhook endpoints: remove one first."
+    retryable: false
+    description: "An 11th webhook endpoint in one environment."
+
+  - code: gone
+    status: 410
+    title: Gone
+    message: "This operation's sunset passed: see the changelog for its replacement."
+    retryable: false
+    description: "A deprecated operation called after its sunset."

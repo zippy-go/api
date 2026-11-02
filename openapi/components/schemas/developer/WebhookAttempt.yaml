@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "description": "One attempt of a delivery, kept 30 days.",
+  "required": [
+    "attempt",
+    "at",
+    "status_code",
+    "latency_ms",
+    "response_snippet",
+    "error"
+  ],
+  "properties": {
+    "attempt": {
+      "type": "integer",
+      "description": "Its number.",
+      "minimum": 1,
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "description": "When.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "status_code": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The answer's status code; `null` when none came.",
+      "examples": [
+        200
+      ]
+    },
+    "latency_ms": {
+      "type": "integer",
+      "description": "How long the answer took.",
+      "minimum": 0,
+      "examples": [
+        84
+      ]
+    },
+    "response_snippet": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The answer's first kilobyte.",
+      "examples": [
+        "ok"
+      ]
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why no answer came: `timeout` after 10 seconds, or the connection's failure.",
+      "examples": [
+        null
+      ]
+    }
+  },
+  "examples": [
+    {
+      "attempt": 1,
+      "at": "2026-11-02T10:15:00Z",
+      "status_code": 200,
+      "latency_ms": 84,
+      "response_snippet": "ok",
+      "error": null
+    }
+  ]
+}

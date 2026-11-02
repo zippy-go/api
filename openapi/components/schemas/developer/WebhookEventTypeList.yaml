@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "description": "The events webhook endpoints may subscribe to.",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./WebhookEventType.yaml"
+      },
+      "description": "The event types."
+    }
+  },
+  "examples": [
+    {
+      "items": [
+        {
+          "type": "ordering.order.placed",
+          "version": 1,
+          "description": "An order was placed at one of your stores."
+        }
+      ]
+    }
+  ]
+}

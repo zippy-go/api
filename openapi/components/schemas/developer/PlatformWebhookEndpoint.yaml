@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "description": "An endpoint as Mission Control lists it.",
+  "required": [
+    "partner_id",
+    "partner_name",
+    "endpoint"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "Its Partner.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Its Partner's name.",
+      "examples": [
+        "Dev Kitchen"
+      ]
+    },
+    "endpoint": {
+      "$ref": "./WebhookEndpoint.yaml"
+    }
+  },
+  "examples": [
+    {
+      "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02",
+      "partner_name": "Dev Kitchen",
+      "endpoint": {
+        "endpoint_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01",
+        "url": "https://pos.example.com/zippygo",
+        "environment": "sandbox",
+        "event_types": [
+          "ordering.order.placed",
+          "orchestration.delivery.assigned"
+        ],
+        "description": "POS bridge",
+        "state": "active",
+        "verified_at": "2026-11-02T10:15:00Z",
+        "disabled_at": null,
+        "disabled_reason": null,
+        "failing_since": null,
+        "secret_prefix": "whsec_Xy7Q",
+        "previous_secret_until": null,
+        "created_at": "2026-11-02T10:15:00Z",
+        "last_delivery_at": "2026-11-02T10:15:00Z"
+      }
+    }
+  ]
+}

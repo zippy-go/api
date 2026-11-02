@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "description": "An order a Partner places through the API at one of its Locations, for its own customer: channel `api`, no marketplace fee.",
+  "required": [
+    "customer",
+    "fulfilment",
+    "lines",
+    "payment"
+  ],
+  "properties": {
+    "customer": {
+      "$ref": "./ApiOrderCustomer.yaml"
+    },
+    "fulfilment": {
+      "type": "string",
+      "description": "`delivery` or `pickup`.",
+      "enum": [
+        "delivery",
+        "pickup"
+      ],
+      "examples": [
+        "delivery"
+      ]
+    },
+    "address": {
+      "oneOf": [
+        {
+          "$ref": "./ApiOrderAddress.yaml"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Where a delivery goes; `null` for a pickup."
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "$ref": "./ApiOrderLine.yaml"
+      },
+      "description": "What is ordered; 1 to 50 lines.",
+      "minItems": 1,
+      "maxItems": 50
+    },
+    "payment": {
+      "$ref": "./ApiOrderPayment.yaml"
+    },
+    "reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The integrator's own reference for the order, up to 64 characters.",
+      "maxLength": 64,
+      "examples": [
+        "POS-10442"
+      ]
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A note for the store, up to 200 characters.",
+      "maxLength": 200,
+      "examples": [
+        null
+      ]
+    }
+  },
+  "examples": [
+    {
+      "customer": {
+        "name": "Asha Rao",
+        "mobile": "+919000000001"
+      },
+      "fulfilment": "delivery",
+      "address": {
+        "line1": "Road No 36",
+        "city": "Hyderabad",
+        "lat": 17.4316,
+        "lng": 78.4078
+      },
+      "lines": [
+        {
+          "item_id": "01a13a48-9e00-7000-8000-00000000c001",
+          "quantity": 2
+        }
+      ],
+      "payment": "paid",
+      "reference": "POS-10442",
+      "note": null
+    }
+  ]
+}

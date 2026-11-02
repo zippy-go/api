@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "description": "How long the old key overlaps its successor.",
+  "required": [],
+  "properties": {
+    "grace_hours": {
+      "type": "integer",
+      "description": "Hours the old key keeps working, 0 to 168; 24 by default.",
+      "minimum": 0,
+      "maximum": 168,
+      "examples": [
+        24
+      ]
+    }
+  },
+  "examples": [
+    {
+      "grace_hours": 24
+    }
+  ]
+}

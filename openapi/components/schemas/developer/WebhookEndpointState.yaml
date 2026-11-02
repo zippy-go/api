@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "description": "Where an endpoint stands: `unverified` until it answers the first `platform.ping` with a 2xx, `active`, or `disabled` after failing every delivery for 24 hours or by its Partner.",
+  "enum": [
+    "unverified",
+    "active",
+    "disabled"
+  ],
+  "examples": [
+    "active"
+  ]
+}

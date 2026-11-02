@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "description": "A step of the checklist.",
+  "required": [
+    "step",
+    "done",
+    "done_at"
+  ],
+  "properties": {
+    "step": {
+      "$ref": "./DeveloperChecklistStep.yaml"
+    },
+    "done": {
+      "type": "boolean",
+      "description": "Whether it is done.",
+      "examples": [
+        true
+      ]
+    },
+    "done_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "step": "first_call",
+      "done": true,
+      "done_at": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

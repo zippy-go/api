@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "description": "An endpoint with its signing secret, shown this once.",
+  "required": [
+    "endpoint",
+    "secret"
+  ],
+  "properties": {
+    "endpoint": {
+      "$ref": "./WebhookEndpoint.yaml"
+    },
+    "secret": {
+      "type": "string",
+      "description": "The signing secret. It is never shown again.",
+      "examples": [
+        "whsec_Xy7Qm3LkP9vT2nB8cR5wZ1aD"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "endpoint": {
+        "endpoint_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01",
+        "url": "https://pos.example.com/zippygo",
+        "environment": "sandbox",
+        "event_types": [
+          "ordering.order.placed",
+          "orchestration.delivery.assigned"
+        ],
+        "description": "POS bridge",
+        "state": "active",
+        "verified_at": "2026-11-02T10:15:00Z",
+        "disabled_at": null,
+        "disabled_reason": null,
+        "failing_since": null,
+        "secret_prefix": "whsec_Xy7Q",
+        "previous_secret_until": null,
+        "created_at": "2026-11-02T10:15:00Z",
+        "last_delivery_at": "2026-11-02T10:15:00Z"
+      },
+      "secret": "whsec_Xy7Qm3LkP9vT2nB8cR5wZ1aD"
+    }
+  ]
+}

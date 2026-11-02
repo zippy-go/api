@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/developer.endpoint.enabled.v1.schema.json",
+  "title": "DeveloperEndpointEnabledPayload",
+  "description": "Payload of `developer.endpoint.enabled` version 1. A disabled webhook endpoint was enabled again, and what failed since replayed. Consumers: analytics. No payload carries a key, a secret, a name of a person, a phone number or an email. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "endpoint_id",
+    "partner_id",
+    "environment",
+    "replayed",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "endpoint_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The endpoint.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7e01"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "environment": {
+      "type": "string",
+      "description": "`sandbox` or `production`.",
+      "examples": [
+        "sandbox"
+      ],
+      "enum": [
+        "sandbox",
+        "production"
+      ]
+    },
+    "replayed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many deliveries were replayed.",
+      "examples": [
+        12
+      ]
+    },
+    "by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "Who enabled it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

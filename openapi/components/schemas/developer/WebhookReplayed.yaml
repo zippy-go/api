@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "description": "How many deliveries were sent again.",
+  "required": [
+    "replayed"
+  ],
+  "properties": {
+    "replayed": {
+      "type": "integer",
+      "description": "How many.",
+      "minimum": 0,
+      "examples": [
+        4
+      ]
+    }
+  },
+  "examples": [
+    {
+      "replayed": 4
+    }
+  ]
+}

@@ -6,6 +6,50 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.35.0] - 2026-11-02
+
+Step 10, the developer platform: API keys, webhooks and orders through the API, after
+configuration (0.33.0) and the sandbox (0.34.0). A key's call into a module its Partner switched
+off, or with the Developer module off, answers 403 `module_not_enabled`. Additive only.
+
+### Added
+
+- API keys (`Developer` tag): a Partner's keys per environment with scopes, shown once
+  (`GET`, `POST /v1/partners/{partner_id}/api-keys`, `ApiKey`, `ApiKeyList`, `ApiKeyInput`,
+  `ApiKeyCreated`, `ApiKeyEnvironment`, `ApiKeyScope`, `ApiKeyState`), revoked
+  (`DELETE .../api-keys/{key_id}`), rotated with a grace (`POST .../rotate`,
+  `ApiKeyRotateInput`) and their use with the deprecated operations they called
+  (`GET .../usage`, `ApiKeyUsage`, `ApiKeyDeprecatedCall`); the checklist
+  (`GET .../developer/checklist`, `DeveloperChecklist`, `DeveloperChecklistItem`,
+  `DeveloperChecklistStep`); Mission Control's keys (`GET /v1/platform/api-keys`,
+  `PlatformApiKey`, `PlatformApiKeyPage`). `X-Api-Key` (`ApiKey`) authenticates on every
+  operation a key's scopes reach.
+- Webhooks (`Webhooks` tag): the event types (`GET /v1/webhook-event-types`,
+  `WebhookEventType`, `WebhookEventTypeList`); endpoints (`GET`, `POST .../webhook-endpoints`,
+  `PATCH`, `DELETE .../{endpoint_id}`, `POST .../ping`, `.../rotate-secret`, `.../enable`,
+  `WebhookEndpoint`, `WebhookEndpointList`, `WebhookEndpointInput`, `WebhookEndpointUpdate`,
+  `WebhookEndpointCreated`, `WebhookEndpointState`); the delivery log and replays
+  (`GET .../webhook-deliveries`, `GET .../{delivery_id}`, `POST .../{delivery_id}/replay`,
+  `POST .../webhook-deliveries/replay`, `WebhookDelivery`, `WebhookDeliveryPage`,
+  `WebhookDeliveryDetail`, `WebhookAttempt`, `WebhookDeliveryOutcome`, `WebhookReplayInput`,
+  `WebhookReplayed`); Mission Control's endpoints (`GET /v1/platform/webhook-endpoints`,
+  `PlatformWebhookEndpoint`, `PlatformWebhookEndpointPage`).
+- Orders through the API: `POST /v1/partners/{partner_id}/locations/{location_id}/orders`
+  (`ApiOrderInput`, `ApiOrderCustomer`, `ApiOrderAddress`, `ApiOrderLine`, `ApiOrderPayment`),
+  channel `api`; `ordering.order.placed` gains `api_key_id` and `channel`, and every other
+  `ordering.order.*` event of an API order carries `channel: api`.
+- A deprecated operation proving the deprecation machinery (`GET /v1/developer/deprecated-echo`,
+  `DeprecatedEcho`), answered with `Deprecation` and `Sunset` and 410 after its sunset.
+- Permissions `developer:read` and `developer:manage` and the Developer role; the next edition
+  of the default roles gives Owner and Developer both and Mission Control's engineering and
+  support `developer:read`.
+- Problem codes `api_key_limit`, `production_key_needs_active_partner`,
+  `webhook_endpoint_limit` and `gone`; field code `webhook_url_not_https`.
+- Events `developer.key.created`, `.rotated`, `.revoked`, `.unused`;
+  `developer.endpoint.registered`, `.verified`, `.disabled`, `.enabled`, `.secret_rotated`,
+  `.removed`; webhooks' test event is the existing `platform.ping` (v1, no business data),
+  never on the outbox.
+
 ## [0.34.0] - 2026-11-02
 
 Step 10, the sandbox: a Partner's twin where its developers integrate, the pace a sandbox key

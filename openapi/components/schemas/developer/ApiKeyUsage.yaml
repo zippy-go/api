@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "description": "How a key has been used.",
+  "required": [
+    "key_id",
+    "last_used_at",
+    "deprecated_operations"
+  ],
+  "properties": {
+    "key_id": {
+      "type": "string",
+      "description": "The key.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7c01"
+      ]
+    },
+    "last_used_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it last answered a request.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "deprecated_operations": {
+      "type": "array",
+      "items": {
+        "$ref": "./ApiKeyDeprecatedCall.yaml"
+      },
+      "description": "The deprecated operations it called in the last 30 days."
+    }
+  },
+  "examples": [
+    {
+      "key_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b7c01",
+      "last_used_at": "2026-11-02T10:15:00Z",
+      "deprecated_operations": [
+        {
+          "method": "GET",
+          "path": "/v1/developer/deprecated-echo",
+          "calls": 3,
+          "last_called_at": "2026-11-02T10:15:00Z",
+          "sunset_at": "2027-06-30T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}
