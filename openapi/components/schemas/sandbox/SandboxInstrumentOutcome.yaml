@@ -1,0 +1,10 @@
+type: string
+description: "What a test instrument does: `succeeds`, `fails` (with the code and words the real gateway's adapter gives), `times_out` (never answered, expired after the payment's window), `declined` (the bank declines a card) or `not_held` (a card charged at once that cannot be held)."
+enum:
+  - succeeds
+  - fails
+  - times_out
+  - declined
+  - not_held
+examples:
+  - succeeds

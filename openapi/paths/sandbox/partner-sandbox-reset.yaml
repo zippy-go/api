@@ -1,0 +1,46 @@
+# Path item for /v1/partners/{partner_id}/sandbox/reset. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+post:
+  operationId: resetPartnerSandbox
+  summary: Reset the Partner's sandbox
+  description: "Makes the sandbox's twin again from the Partner's Locations, services and published menus as they are now: the twin's orders, deliveries and inbox are let go, its Locations get new ids, and each key's pace is kept. Makes it if there is none. Announced as `sandbox.partner.reset` (`sandbox.partner.made` the first time). Members need `developer:manage`. Audited."
+  tags:
+    - Sandbox
+  security:
+    - Bearer: []
+  parameters:
+    - $ref: ../../components/parameters/IdempotencyKeyHeader.yaml
+  responses:
+    "200":
+      description: The sandbox, made again.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/sandbox/PartnerSandbox.yaml
+    "401":
+      description: "No valid access token was sent, or it was refused (`unauthenticated`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `developer:manage`."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: "`not_found`: the Partner."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

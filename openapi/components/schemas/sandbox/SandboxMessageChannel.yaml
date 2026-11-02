@@ -1,0 +1,9 @@
+type: string
+description: The channel the message would have gone by.
+enum:
+  - sms
+  - whatsapp
+  - email
+  - push
+examples:
+  - sms

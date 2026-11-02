@@ -1,0 +1,43 @@
+type: object
+description: A sandbox delivery after a step. The webhook for each state it passed follows.
+required:
+  - delivery_id
+  - order_id
+  - state
+  - agent_id
+  - stepped_at
+properties:
+  delivery_id:
+    type: string
+    format: uuid
+    description: The delivery.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5d01
+  order_id:
+    type: string
+    format: uuid
+    description: Its order.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01
+  state:
+    $ref: ../dispatch/DeliveryState.yaml
+  agent_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The sandbox's Agent, once assigned.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5f01
+  stepped_at:
+    type: string
+    format: date-time
+    description: When it was stepped.
+    examples:
+      - "2026-11-02T10:15:00Z"
+examples:
+  - delivery_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5d01
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01
+    state: collected
+    agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5f01
+    stepped_at: "2026-11-02T10:15:00Z"

@@ -1,0 +1,26 @@
+type: object
+description: A documented test instrument the sandbox's simulated payment provider answers by.
+required:
+  - kind
+  - value
+  - outcome
+properties:
+  kind:
+    type: string
+    enum:
+      - upi_id
+      - card
+    description: A UPI ID or a card number.
+    examples:
+      - upi_id
+  value:
+    type: string
+    description: The UPI ID, or the card number (any future expiry, any CVV).
+    examples:
+      - success@zgsandbox
+  outcome:
+    $ref: ./SandboxInstrumentOutcome.yaml
+examples:
+  - kind: upi_id
+    value: success@zgsandbox
+    outcome: succeeds

@@ -270,6 +270,9 @@ with the identifiers when it is needed.
 | `access.approval.approved` | 1 | A proposal was approved by a different platform member and the act ran. Never offered to webhooks. Payload: `approval_id`, `action`, `subject_kind`, `subject_id`, `partner_id`, `proposed_by`, `at`, `decided_by`. |
 | `access.approval.refused` | 1 | A proposal was refused by a different platform member; nothing changed. Never offered to webhooks. Payload: `approval_id`, `action`, `subject_kind`, `subject_id`, `partner_id`, `proposed_by`, `at`, `decided_by`. |
 | `access.approval.expired` | 1 | A proposal expired undecided; nothing changed. Never offered to webhooks. Payload: `approval_id`, `action`, `subject_kind`, `subject_id`, `partner_id`, `proposed_by`, `at`. |
+| `sandbox.partner.made` | 1 | A Partner's sandbox twin was made, at its first sandbox key or its owner's first reset, from its Locations, services and published menus. Consumers: the Partner console's checklist, analytics. The twin is never listed, paid out or messaged. Payload: `partner_id`, `twin_partner_id`, `key_id`, `locations`, `at`. |
+| `sandbox.partner.reset` | 1 | A Partner's sandbox was made again from the Partner as it is now: the twin's orders, deliveries and inbox let go. Consumers: analytics. Payload: `partner_id`, `twin_partner_id`, `by`, `locations`, `at`. |
+| `sandbox.partner.purged` | 1 | A Partner's sandbox untouched for 90 days was purged: its twin and everything placed in it are gone, and its next sandbox key makes it again. Consumers: analytics. Payload: `partner_id`, `twin_partner_id`, `touched_at`, `at`. |
 
 ## Consuming events
 

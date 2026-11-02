@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/sandbox.partner.purged.v1.schema.json",
+  "title": "SandboxPartnerPurgedPayload",
+  "description": "Payload of `sandbox.partner.purged` version 1. A Partner's sandbox untouched for 90 days was purged: its twin and everything placed in it are gone, and its next sandbox key makes it again. Consumers: analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "twin_partner_id",
+    "touched_at",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "twin_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The twin, the Partner the sandbox keys act on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5a02"
+      ]
+    },
+    "touched_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When a sandbox key last acted on it.",
+      "examples": [
+        "2026-08-02T10:15:00Z"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was purged.",
+      "examples": [
+        "2026-10-31T03:00:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

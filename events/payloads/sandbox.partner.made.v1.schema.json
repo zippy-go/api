@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/sandbox.partner.made.v1.schema.json",
+  "title": "SandboxPartnerMadePayload",
+  "description": "Payload of `sandbox.partner.made` version 1. A Partner's sandbox twin was made, at its first sandbox key or its owner's first reset, from its Locations, services and published menus. Consumers: the Partner console's checklist, analytics. The twin is never listed, paid out or messaged. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "twin_partner_id",
+    "key_id",
+    "locations",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "twin_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The twin, the Partner the sandbox keys act on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5a02"
+      ]
+    },
+    "key_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The sandbox key whose creation made it; `null` when its owner made it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5c01"
+      ]
+    },
+    "locations": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many Locations the twin has.",
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was made.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

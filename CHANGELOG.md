@@ -6,6 +6,26 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-11-02
+
+Step 10, the sandbox: a Partner's twin where its developers integrate, the pace a sandbox key
+sets, a delivery stepped by hand and the sandbox inbox. Additive only.
+
+### Added
+
+- The Partner's sandbox in the Partner console (`Sandbox` tag): its twin, Locations, pace,
+  test instruments, fixed one-time code and inbox count
+  (`GET /v1/partners/{partner_id}/sandbox`, `PartnerSandbox`, `SandboxState`,
+  `SandboxLocation`, `SandboxInstrument`, `SandboxInstrumentOutcome`), and a reset
+  (`POST .../sandbox/reset`); `developer:read` and `developer:manage`.
+- The sandbox's own operations, for a sandbox key only: the key's pace (`GET`,
+  `PUT /v1/sandbox/pace`, `SandboxPace`, `SandboxPaceInput`), a delivery stepped by hand
+  (`POST /v1/sandbox/deliveries/{delivery_id}/step`, `SandboxStepInput`,
+  `SandboxDeliveryStep`, `SandboxDelivery`) and the inbox (`GET /v1/sandbox/inbox`,
+  `SandboxInboxPage`, `SandboxMessage`, `SandboxMessageChannel`).
+- Problem codes `sandbox_key_required` and `delivery_step_passed`.
+- Events `sandbox.partner.made`, `.reset` and `.purged`.
+
 ## [0.33.0] - 2026-11-02
 
 Step 10, configuration: a Partner's edition and the platform's configuration. The first of

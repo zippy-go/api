@@ -1,0 +1,65 @@
+# Path item for /v1/sandbox/inbox. Referenced from openapi.yaml.
+get:
+  operationId: listSandboxInbox
+  summary: Read the sandbox inbox
+  description: "The messages the key's sandbox would have sent, by SMS, WhatsApp, email or push, the latest first; no carrier is ever involved. A sandbox key only."
+  tags:
+    - Sandbox
+  security:
+    - ApiKey: []
+  parameters:
+    - name: order_id
+      in: query
+      required: false
+      description: Only the messages about this order.
+      schema:
+        type: string
+        format: uuid
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: "Where the page starts: the `next_cursor` of the page before."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of messages.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/sandbox/SandboxInboxPage.yaml
+    "400":
+      description: "`validation_failed`: a limit out of range or a cursor this caller was not given (`cursor_invalid`)."
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: "No sandbox key was sent, or it was refused (`unauthenticated`)."
+      content:
+        application/problem+json:
+          schema: *a1
+    "403":
+      description: "`sandbox_key_required`: a production key, or a token; the sandbox's operations take a sandbox key (`zg_test_`) only."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

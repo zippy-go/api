@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/sandbox.partner.reset.v1.schema.json",
+  "title": "SandboxPartnerResetPayload",
+  "description": "Payload of `sandbox.partner.reset` version 1. A Partner's sandbox was made again from the Partner as it is now: the twin's orders, deliveries and inbox let go. Consumers: analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "twin_partner_id",
+    "by",
+    "locations",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02"
+      ]
+    },
+    "twin_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The twin, the Partner the sandbox keys act on.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5a02"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who reset it (a user id).",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+      ]
+    },
+    "locations": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many Locations the twin has now.",
+      "examples": [
+        1
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was reset.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
