@@ -1,0 +1,51 @@
+type: object
+description: "A referral commission on a Location's statement (since 0.38.0): paid to another Partner for a first order its page referred, or received for one this Location's page referred; with the quest, the order and the customer's first name only."
+required:
+  - commission_id
+  - direction
+  - quest_name
+  - order_number
+  - customer_first_name
+  - amount
+properties:
+  commission_id:
+    type: string
+    format: uuid
+    description: The commission.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+  direction:
+    type: string
+    description: "`paid` or `received`."
+    enum:
+      - paid
+      - received
+    examples:
+      - paid
+  quest_name:
+    type: string
+    description: The quest's name.
+    examples:
+      - Your first order from Charminar Bakes Gachibowli
+  order_number:
+    type: string
+    description: The order's number.
+    examples:
+      - ZG-24817
+  customer_first_name:
+    type: string
+    description: The customer's first name only.
+    examples:
+      - Asha
+  amount:
+    $ref: ../common/Money.yaml
+    description: Positive when received, negative when paid.
+examples:
+  - commission_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+    direction: paid
+    quest_name: Your first order from Charminar Bakes Gachibowli
+    order_number: ZG-24817
+    customer_first_name: Asha
+    amount:
+      minor_units: 1250
+      currency: USD

@@ -1,0 +1,8 @@
+type: string
+description: "A store's shelf (since 0.38.0): its `top_sellers`, two points for each unit of a completed order in the last week and one for each in the three before; its `new_additions` of the last four weeks, the newest first; or the items it puts in the `spotlight`, in the menu's order."
+enum:
+  - top_sellers
+  - new_additions
+  - spotlight
+examples:
+  - top_sellers

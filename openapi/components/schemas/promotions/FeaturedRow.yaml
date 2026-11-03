@@ -1,0 +1,86 @@
+type: object
+description: "A featured row as the storefront draws it (since 0.38.0): the platform's featured-Location campaign under its headline, with the Locations its rule finds among the stores serving the visitor's area, fifteen at most, and whether \"See all\" has more. A row that finds none is left out of the answer."
+required:
+  - offer_id
+  - headline
+  - rule
+  - stores
+  - more
+  - sponsored
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The campaign; `GET /v1/storefront/featured/{offer_id}/stores` lists the whole row.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+  headline:
+    type: string
+    description: Its headline.
+    examples:
+      - Most popular
+  rule:
+    $ref: ./FeaturedRule.yaml
+    description: How the row finds its Locations.
+  stores:
+    type: array
+    items:
+      $ref: ../storefront/StoreCard.yaml
+    description: The Locations, as cards, in the rule's order; fifteen at most.
+    maxItems: 15
+  more:
+    type: boolean
+    description: Whether more Locations wait behind "See all".
+    examples:
+      - false
+  sponsored:
+    type: boolean
+    description: Whether a placement in it was paid for, said "Sponsored" where it is shown; `false` for every rule of this version.
+    examples:
+      - false
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+    headline: Most popular
+    rule: most_popular
+    stores:
+      - location_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a40
+        partner_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a02
+        name: Dev Kitchen Gachibowli
+        partner_name: ZippyGo Dev Partner
+        partner_kind: organisation
+        logo_url: null
+        banner_url: null
+        zone_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
+        shelves:
+          - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a13
+            label: Biryani
+            icon_url: null
+        state: open
+        state_until: 2026-10-15T17:30:00Z
+        offline_message: null
+        preparation_minutes: 20
+        distance_metres: 1200
+        delivers_to_pin: true
+        fulfilment:
+          - delivery
+          - pickup
+        is_new: true
+        highlights: []
+        delivery_fee:
+          minor_units: 3000
+          currency: INR
+        minimum_order: null
+        delivery_minutes: 30
+        catalogue: null
+        rating:
+          percent: 72
+          count: 18
+          great: false
+        offer:
+          offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6001
+          line: Buy 1, get 1 free
+          more: 1
+          code: null
+          shelf: deals
+    more: false
+    sponsored: false

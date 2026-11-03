@@ -81,6 +81,9 @@ properties:
   bill_deductions:
     $ref: ../common/Money.yaml
     description: Monthly invoices of the platform settled on this statement by deduction (since step 10).
+  commissions:
+    $ref: ../common/Money.yaml
+    description: Referral commissions received less those paid (since 0.38.0); the total adds it.
 examples:
   - sales:
       minor_units: 50000

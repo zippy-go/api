@@ -1,0 +1,43 @@
+type: object
+description: "Points converted (since 0.38.0): the credit that landed in the Wallet, promotional and never expiring, and what is left."
+required:
+  - id
+  - points
+  - credit
+  - balance
+  - at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The conversion.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+  points:
+    type: integer
+    description: Points converted.
+    examples:
+      - 600
+  credit:
+    $ref: ../common/Money.yaml
+    description: The promotional Wallet credit given, 100 points to ₹10.
+  balance:
+    type: integer
+    description: Points left.
+    minimum: 0
+    examples:
+      - 50
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-03T14:25:00Z
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8101
+    points: 600
+    credit:
+      minor_units: 1250
+      currency: USD
+    balance: 50
+    at: 2026-11-03T14:25:00Z

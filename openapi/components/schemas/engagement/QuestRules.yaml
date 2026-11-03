@@ -30,6 +30,11 @@ properties:
   reward:
     $ref: ./RewardSpec.yaml
     description: Its reward.
+  commission:
+    oneOf:
+      - $ref: ./QuestCommission.yaml
+      - type: "null"
+    description: Its referral commission (since 0.38.0), a Partner's quest naming its own Location; `null` without.
 examples:
   - steps:
       - kind: second_vertical

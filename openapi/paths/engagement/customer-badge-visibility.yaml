@@ -1,0 +1,59 @@
+# Path item for /v1/customer/rewards/badges/visibility. Referenced from openapi.yaml.
+put:
+  operationId: setBadgeVisibility
+  summary: Hide or show badges
+  description: Hides one badge, or every badge when `badge` is left out, from any public view, or shows it again; announced as `engagement.badge.hidden`. Answers the badges.
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: Which, and whether hidden.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/engagement/BadgeVisibilityInput.yaml
+  responses:
+    "200":
+      description: Their badges.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/EarnedBadgeList.yaml
+    "400":
+      description: "`validation_failed`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`forbidden`: a token of another surface."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: a badge they have not earned."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

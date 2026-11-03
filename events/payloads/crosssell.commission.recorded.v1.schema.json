@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/crosssell.commission.recorded.v1.schema.json",
+  "title": "CrosssellCommissionRecordedPayload",
+  "description": "Payload of `crosssell.commission.recorded` version 1. A referral commission between two Partners was recorded: a customer completed a quest carrying a commission, having started it on the page of a Partner that agreed to show it. The ledger posts it from the funding Partner to the referring one, and payouts puts it on both statements at the next settlement. Never names the customer beyond their first name. Consumers: the ledger, payouts, analytics.",
+  "type": "object",
+  "required": [
+    "commission_id",
+    "agreement_id",
+    "campaign_id",
+    "quest_name",
+    "order_id",
+    "order_number",
+    "funder_partner_id",
+    "funder_location_id",
+    "referrer_partner_id",
+    "referrer_location_id",
+    "amount",
+    "customer_first_name",
+    "at"
+  ],
+  "properties": {
+    "commission_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The commission.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301"
+      ]
+    },
+    "agreement_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The agreement.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The quest.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001"
+      ]
+    },
+    "quest_name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Your first order from Charminar Bakes Gachibowli"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The first order that completed it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "order_number": {
+      "type": "string",
+      "description": "Its number.",
+      "examples": [
+        "ZG-24817"
+      ]
+    },
+    "funder_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who pays.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000003"
+      ]
+    },
+    "funder_location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where the order was.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000308"
+      ]
+    },
+    "referrer_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who is paid.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "referrer_location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Whose page it was started on.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "description": "The commission.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 4000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "customer_first_name": {
+      "type": "string",
+      "description": "The customer's first name only.",
+      "examples": [
+        "Asha"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-03T14:20:00Z"
+      ]
+    }
+  }
+}

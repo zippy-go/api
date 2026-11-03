@@ -1,0 +1,14 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f9002",
+  "type": "engagement.badge.hidden",
+  "version": 1,
+  "occurred_at": "2026-11-03T14:20:00Z",
+  "partner_id": null,
+  "correlation_id": null,
+  "payload": {
+    "badge": "explorer",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "hidden": true,
+    "at": "2026-11-03T14:20:00Z"
+  }
+}

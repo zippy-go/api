@@ -107,6 +107,72 @@ properties:
       - $ref: ./StampReward.yaml
       - type: "null"
     description: A stamp card's reward.
+  headline:
+    type:
+      - string
+      - "null"
+    description: "A display kind (since 0.38.0): a featured row's, a shelf's or an announcement's headline, 1 to 60 characters."
+    maxLength: 60
+    examples:
+      - null
+  placement:
+    oneOf:
+      - $ref: ./FeaturedPlacement.yaml
+      - type: "null"
+    description: "A featured row: where it is shown."
+  vertical_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "A featured row shown on Vertical pages: the Verticals; empty for every Vertical it runs in."
+  rule:
+    oneOf:
+      - $ref: ./FeaturedRule.yaml
+      - type: "null"
+    description: "A featured row: how it finds its Locations; `named` takes the aim's Locations."
+  shelf:
+    oneOf:
+      - $ref: ./DisplayShelfKind.yaml
+      - type: "null"
+    description: "A shelf: which; a `spotlight` shows the items it is `on`."
+  message:
+    type:
+      - string
+      - "null"
+    description: "An announcement: what it says beneath its headline, at most 280 characters."
+    maxLength: 280
+    examples:
+      - null
+  colour:
+    type:
+      - string
+      - "null"
+    description: "An announcement: its colour, `#RRGGBB`; the platform's brand blue by default."
+    pattern: ^#[0-9A-Fa-f]{6}$
+    examples:
+      - null
+  priority:
+    type:
+      - integer
+      - "null"
+    description: "An announcement: 1 to 10, the highest first; 5 by default."
+    minimum: 1
+    maximum: 10
+    examples:
+      - null
+  button:
+    oneOf:
+      - $ref: ./AnnouncementButton.yaml
+      - type: "null"
+    description: "An announcement: its button, where it has one."
+  closable:
+    type:
+      - boolean
+      - "null"
+    description: "An announcement: whether a customer may close it; `true` by default."
+    examples:
+      - null
 examples:
   - mechanic: multibuy
     amount_off: null

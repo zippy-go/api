@@ -26,6 +26,16 @@ properties:
       - $ref: ./PunchCardRules.yaml
       - type: "null"
     description: A punch card's rules.
+  badge:
+    oneOf:
+      - $ref: ./BadgeRules.yaml
+      - type: "null"
+    description: A badge's rules (since 0.38.0).
+  points:
+    oneOf:
+      - $ref: ./PointsRules.yaml
+      - type: "null"
+    description: A points campaign's rules (since 0.38.0).
 examples:
   - streak: null
     quest:

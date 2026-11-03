@@ -1,0 +1,8 @@
+type: string
+description: "Where a featured row is shown (since 0.38.0): on the `home` screen, on the pages of the `verticals` it names, or `both`."
+enum:
+  - home
+  - verticals
+  - both
+examples:
+  - home

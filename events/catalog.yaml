@@ -2588,3 +2588,59 @@ events:
       A prescription line was dispensed, its order delivered or collected, and written into the pharmacy's dispensing register. No names, numbers or the medicine. Consumers: payouts counting the prescription fee. Never kept by the event warehouse nor sent to a vendor.
     payload_schema: ./payloads/prescriptions.line.dispensed.v1.schema.json
     example: ./examples/prescriptions.line.dispensed.v1.json
+
+  - type: engagement.badge.earned
+    version: 1
+    domain: engagement
+    description: >-
+      A customer earned a badge, once; it carries no money.
+    payload_schema: ./payloads/engagement.badge.earned.v1.schema.json
+    example: ./examples/engagement.badge.earned.v1.json
+
+  - type: engagement.badge.hidden
+    version: 1
+    domain: engagement
+    description: >-
+      A customer hid a badge from any public view, or showed it again.
+    payload_schema: ./payloads/engagement.badge.hidden.v1.schema.json
+    example: ./examples/engagement.badge.hidden.v1.json
+
+  - type: engagement.points.granted
+    version: 1
+    domain: engagement
+    description: >-
+      Points were granted on a completed order, a settled tab or a completed booking at a points campaign's Locations: a liability in the ledger from now, its funder paying for them.
+    payload_schema: ./payloads/engagement.points.granted.v1.schema.json
+    example: ./examples/engagement.points.granted.v1.json
+
+  - type: engagement.points.converted
+    version: 1
+    domain: engagement
+    description: >-
+      A customer converted points into promotional Wallet credit, the oldest first; the ledger moves their liability into the Wallet.
+    payload_schema: ./payloads/engagement.points.converted.v1.schema.json
+    example: ./examples/engagement.points.converted.v1.json
+
+  - type: engagement.points.expired
+    version: 1
+    domain: engagement
+    description: >-
+      Points expired twelve months (the campaign's months) after they were earned, oldest first; the ledger releases their liability back to the funder.
+    payload_schema: ./payloads/engagement.points.expired.v1.schema.json
+    example: ./examples/engagement.points.expired.v1.json
+
+  - type: crosssell.commission.recorded
+    version: 1
+    domain: crosssell
+    description: >-
+      A referral commission between two Partners was recorded: a customer completed a quest carrying a commission, having started it on the page of a Partner that agreed to show it. The ledger posts it from the funding Partner to the referring one, and payouts puts it on both statements at the next settlement. Never names the customer beyond their first name.
+    payload_schema: ./payloads/crosssell.commission.recorded.v1.schema.json
+    example: ./examples/crosssell.commission.recorded.v1.json
+
+  - type: crosssell.commission.taken_back
+    version: 1
+    domain: crosssell
+    description: >-
+      A referral commission was taken back: its order was refunded in full within 7 days of completing. The ledger and both statements reverse it.
+    payload_schema: ./payloads/crosssell.commission.taken_back.v1.schema.json
+    example: ./examples/crosssell.commission.taken_back.v1.json

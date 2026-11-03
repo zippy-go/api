@@ -22,6 +22,11 @@ properties:
     items:
       $ref: ./StorefrontVertical.yaml
     description: Every Vertical the platform offers, each flagged with whether it trades here; archived ones are absent. Empty only when nothing resolved.
+  featured:
+    type: array
+    items:
+      $ref: ../promotions/FeaturedRow.yaml
+    description: Featured rows placed on the home screen (since 0.38.0), each with the Locations its rule finds here; a row that finds none is left out.
 examples:
   - place:
       resolution: inside

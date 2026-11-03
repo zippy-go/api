@@ -1,0 +1,35 @@
+type: object
+description: A points campaign as set (since 0.38.0); left out, each takes its default.
+required: []
+properties:
+  rupees_per_point:
+    type:
+      - integer
+      - "null"
+    description: 10 by default.
+    minimum: 1
+    maximum: 1000
+    examples:
+      - 10
+  max_per_order:
+    type:
+      - integer
+      - "null"
+    description: 200 by default.
+    minimum: 1
+    maximum: 10000
+    examples:
+      - 200
+  expiry_months:
+    type:
+      - integer
+      - "null"
+    description: 12 by default.
+    minimum: 1
+    maximum: 36
+    examples:
+      - 12
+examples:
+  - rupees_per_point: 10
+    max_per_order: 200
+    expiry_months: 12

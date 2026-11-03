@@ -1,0 +1,21 @@
+type: object
+description: "An announcement's button (since 0.38.0): its words and where it leads, a page of the platform's (a path) or an https address."
+required:
+  - label
+  - link
+properties:
+  label:
+    type: string
+    description: Its words, 1 to 24 characters.
+    minLength: 1
+    maxLength: 24
+    examples:
+      - See the menu
+  link:
+    type: string
+    description: A path of the platform's (`/stores/...`) or an `https://` address.
+    examples:
+      - /stores/01a13a48-9e00-7000-8000-000000000301
+examples:
+  - label: See the menu
+    link: /stores/01a13a48-9e00-7000-8000-000000000301

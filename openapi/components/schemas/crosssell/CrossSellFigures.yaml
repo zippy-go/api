@@ -1,0 +1,76 @@
+type: object
+description: "What cross-sell did for a Partner's stores over a range (since 0.38.0): recommendations of their items shown, accepted, and the completed orders and sales they brought; counts and sums, never a customer."
+required:
+  - from
+  - until
+  - location_id
+  - shown
+  - accepted
+  - orders
+  - sales
+  - kinds
+properties:
+  from:
+    type: string
+    format: date
+    description: The first day, on India's clock.
+    examples:
+      - 2026-10-01
+  until:
+    type: string
+    format: date
+    description: The last day.
+    examples:
+      - 2026-10-31
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Location they are narrowed to; `null` for every Location of the Partner.
+    examples:
+      - null
+  shown:
+    type: integer
+    description: Times shown.
+    minimum: 0
+    examples:
+      - 1240
+  accepted:
+    type: integer
+    description: Times accepted.
+    minimum: 0
+    examples:
+      - 96
+  orders:
+    type: integer
+    description: Completed orders carrying an accepted item.
+    minimum: 0
+    examples:
+      - 71
+  sales:
+    $ref: ../common/Money.yaml
+    description: What the accepted items came to in those orders, after their own offers.
+  kinds:
+    type: array
+    items:
+      $ref: ./CrossSellFiguresKind.yaml
+    description: By kind of recommendation.
+examples:
+  - from: 2026-10-01
+    until: 2026-10-31
+    location_id: null
+    shown: 1240
+    accepted: 96
+    orders: 71
+    sales:
+      minor_units: 1250
+      currency: USD
+    kinds:
+      - kind: nearby_complement
+        shown: 1240
+        accepted: 96
+        orders: 71
+        sales:
+          minor_units: 1250
+          currency: USD

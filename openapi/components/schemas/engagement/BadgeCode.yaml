@@ -1,0 +1,11 @@
+type: string
+description: "A badge the platform runs (since 0.38.0): `first_order`; `explorer`, completed orders in three Verticals; `regular`, ten completed orders at one Location; `early_bird`, five subscription deliveries completed before 07:00; `reviewer`, ten reviews written; `table_for_two`, a first dine-in tab settled."
+enum:
+  - first_order
+  - explorer
+  - regular
+  - early_bird
+  - reviewer
+  - table_for_two
+examples:
+  - explorer

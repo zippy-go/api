@@ -1,0 +1,7 @@
+type: string
+description: "Where an agreement stands (since 0.38.0): `agreed`, or `withdrawn` by the referring Partner."
+enum:
+  - agreed
+  - withdrawn
+examples:
+  - agreed

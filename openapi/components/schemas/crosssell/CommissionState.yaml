@@ -1,0 +1,7 @@
+type: string
+description: "Where a commission stands (since 0.38.0): `recorded`, or `taken_back` after the order was refunded in full within 7 days."
+enum:
+  - recorded
+  - taken_back
+examples:
+  - recorded

@@ -1,0 +1,11 @@
+type: string
+description: "How a featured row finds its Locations (since 0.38.0), worked out each time it is shown: the Locations it `named` in its aim; `premium` or `exclusive` by the Location's highlights; `best_rated` by the share of thumbs up, three reviews at least; `most_popular` by completed orders in the last seven days; `quickest` by the time a delivery takes."
+enum:
+  - named
+  - premium
+  - exclusive
+  - best_rated
+  - most_popular
+  - quickest
+examples:
+  - most_popular

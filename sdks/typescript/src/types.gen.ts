@@ -11706,6 +11706,10 @@ export type StorefrontHome = {
      * Every Vertical the platform offers, each flagged with whether it trades here; archived ones are absent. Empty only when nothing resolved.
      */
     verticals: Array<StorefrontVertical>;
+    /**
+     * Featured rows placed on the home screen (since 0.38.0), each with the Locations its rule finds here; a row that finds none is left out.
+     */
+    featured?: Array<FeaturedRow>;
 };
 
 /**
@@ -11892,6 +11896,10 @@ export type StoreCardList = {
      * The Vertical's offer shelves: free delivery, multibuys and deals, money off and free items, each the stores with a live offer of its kind, open ones first; a shelf with none is left out.
      */
     shelves?: Array<OfferShelf>;
+    /**
+     * Featured rows placed on this Vertical's page (since 0.38.0), its stores only.
+     */
+    featured?: Array<FeaturedRow>;
 };
 
 /**
@@ -15318,6 +15326,18 @@ export type StorePage = {
      * The store's best advertised offer, as on its card; its page lists them all (`GET /v1/storefront/stores/{location_id}/offers`).
      */
     offer?: StoreOfferBadge | null;
+    /**
+     * Its announcements (since 0.38.0), above its offers and menu, the highest priority first.
+     */
+    announcements?: Array<StoreAnnouncement>;
+    /**
+     * Its shelves (since 0.38.0), after its offers: top sellers, new additions and the spotlight, each of what can be ordered now.
+     */
+    shelves?: Array<StoreShelf>;
+    /**
+     * Other Partners' quests it agreed to show (since 0.38.0), each a "Partner offer".
+     */
+    quests?: Array<StoreQuest>;
 };
 
 /**
@@ -16886,9 +16906,9 @@ export type WalletCorrectionRequest = {
 };
 
 /**
- * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), the memorandum pair `card_holds` and `card_holds_contra`, and since contract 0.19.0 `agent_pay_expense` (the platform fleet's pay to its Agents), `payout_adjustments` (adjustments to Partners' and Agents' payouts) and `payouts_clearing` (money the payout provider sends to Partners and Agents). Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet), and since 0.19.0 `agent_payable` (owed to a platform fleet Agent).
+ * What a ledger account records. The platform's: `provider_clearing` (money the payment provider holds until it settles), `cash_in_transit` (cash agents collected and have not deposited), `order_clearing` (customers' money for orders not yet split, or cash still to collect), `commission_revenue`, `delivery_fee_revenue` (the platform fleet's delivery fees, net of GST), `fee_revenue` (the platform's other fees on orders, such as the small-order fee, net of GST), `gst_payable`, `tips_payable` (owed to the platform fleet's agents), `promotions_expense` (credit the platform gives), `refunds_expense` (refunds the platform bears), `wallet_adjustments` (corrections of Wallets), the memorandum pair `card_holds` and `card_holds_contra`, and since contract 0.19.0 `agent_pay_expense` (the platform fleet's pay to its Agents), `payout_adjustments` (adjustments to Partners' and Agents' payouts) and `payouts_clearing` (money the payout provider sends to Partners and Agents), and since 0.38.0 `points_liability` (points granted and not yet converted or expired). Per party: `partner_payable` (owed to a Partner), `customer_wallet_paid` and `customer_wallet_promotional` (a customer's Wallet), and since 0.19.0 `agent_payable` (owed to a platform fleet Agent).
  */
-export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional' | 'agent_payable' | 'agent_pay_expense' | 'payout_adjustments' | 'payouts_clearing';
+export type LedgerAccountKind = 'provider_clearing' | 'cash_in_transit' | 'order_clearing' | 'commission_revenue' | 'delivery_fee_revenue' | 'fee_revenue' | 'gst_payable' | 'tips_payable' | 'promotions_expense' | 'refunds_expense' | 'wallet_adjustments' | 'card_holds' | 'card_holds_contra' | 'partner_payable' | 'customer_wallet_paid' | 'customer_wallet_promotional' | 'agent_payable' | 'agent_pay_expense' | 'payout_adjustments' | 'payouts_clearing' | 'points_liability';
 
 /**
  * The account's class: an asset, a liability, revenue, an expense, or a memorandum account that records a promise (a card hold) without moving money.
@@ -16901,9 +16921,9 @@ export type LedgerAccountClass = 'asset' | 'liability' | 'revenue' | 'expense' |
 export type LedgerSide = 'debit' | 'credit';
 
 /**
- * What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected; since contract 0.19.0 a week settled when its statement was locked (the GST its invoice bills beyond the orders' own, cancellation fees, fee credits, adjustments, the cash a Location or an Agent kept, an Agent's pay and tips), a payout paid, and a payout reversed when a paid statement came back unpaid.
+ * What a journal entry records: a payment captured (UPI paid, a card charged, the Wallet spent, cash collected, a top-up), a card held or its hold given back (memorandum), an order's money split at acceptance or its reversal when an accepted order is cancelled, a refund issued, a source refund that went to the Wallet instead, credit given, a Wallet corrected; since contract 0.19.0 a week settled when its statement was locked (the GST its invoice bills beyond the orders' own, cancellation fees, fee credits, adjustments, the cash a Location or an Agent kept, an Agent's pay and tips), a payout paid, and a payout reversed when a paid statement came back unpaid; since contract 0.38.0 points granted (a liability against their funder), converted into promotional credit and expired or taken back, and a referral commission between Partners recorded or taken back.
  */
-export type LedgerEntryKind = 'payment_captured' | 'card_held' | 'card_hold_released' | 'order_split' | 'order_split_reversed' | 'refund_issued' | 'refund_to_wallet' | 'wallet_credit' | 'wallet_correction' | 'statement_settled' | 'payout_paid' | 'payout_reversed';
+export type LedgerEntryKind = 'payment_captured' | 'card_held' | 'card_hold_released' | 'order_split' | 'order_split_reversed' | 'refund_issued' | 'refund_to_wallet' | 'wallet_credit' | 'wallet_correction' | 'statement_settled' | 'payout_paid' | 'payout_reversed' | 'points_granted' | 'points_converted' | 'points_expired' | 'commission_recorded' | 'commission_taken_back';
 
 /**
  * A ledger account with what was posted to it. Its balance is the sum of its postings, shown in its normal direction.
@@ -23470,6 +23490,10 @@ export type StatementFigures = {
      * Monthly invoices of the platform settled on this statement by deduction (since step 10).
      */
     bill_deductions: Money;
+    /**
+     * Referral commissions received less those paid (since 0.38.0); the total adds it.
+     */
+    commissions?: Money;
 };
 
 /**
@@ -24292,6 +24316,10 @@ export type Statement = {
      * Monthly invoices of the platform it settles by deduction, a line each (since step 10).
      */
     bill_deductions: Array<StatementBillDeduction>;
+    /**
+     * Referral commissions paid and received in the week, a line each (since 0.38.0); they add up to `figures.commissions`.
+     */
+    commissions?: Array<StatementCommission>;
 };
 
 /**
@@ -26184,9 +26212,9 @@ export type OfferPurpose = 'first_order' | 'referral';
 export type OfferState = 'draft' | 'scheduled' | 'live' | 'paused' | 'ended' | 'cancelled';
 
 /**
- * An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card.
+ * An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card; and since 0.38.0 the display kinds, which price nothing and are shown instead: `featured` Locations as a row on the home screen or Vertical pages (the platform's alone), and on one Location's page a `shelf` or an `announcement`.
  */
-export type OfferMechanic = 'basket_off' | 'free_delivery' | 'items_off' | 'multibuy' | 'n_for_price' | 'bundle' | 'free_item' | 'stamp_card';
+export type OfferMechanic = 'basket_off' | 'free_delivery' | 'items_off' | 'multibuy' | 'n_for_price' | 'bundle' | 'free_item' | 'stamp_card' | 'featured' | 'shelf' | 'announcement';
 
 /**
  * Whom an offer is for: everyone, customers new to the Location, to the city or to ZippyGo, customers lapsed at the Location, or holders of a code.
@@ -26375,6 +26403,46 @@ export type OfferTerms = {
      * A stamp card's reward.
      */
     reward?: StampReward | null;
+    /**
+     * A display kind (since 0.38.0): a featured row's, a shelf's or an announcement's headline, 1 to 60 characters.
+     */
+    headline?: string | null;
+    /**
+     * A featured row: where it is shown.
+     */
+    placement?: FeaturedPlacement | null;
+    /**
+     * A featured row shown on Vertical pages: the Verticals; empty for every Vertical it runs in.
+     */
+    vertical_ids?: Array<string>;
+    /**
+     * A featured row: how it finds its Locations; `named` takes the aim's Locations.
+     */
+    rule?: FeaturedRule | null;
+    /**
+     * A shelf: which; a `spotlight` shows the items it is `on`.
+     */
+    shelf?: DisplayShelfKind | null;
+    /**
+     * An announcement: what it says beneath its headline, at most 280 characters.
+     */
+    message?: string | null;
+    /**
+     * An announcement: its colour, `#RRGGBB`; the platform's brand blue by default.
+     */
+    colour?: string | null;
+    /**
+     * An announcement: 1 to 10, the highest first; 5 by default.
+     */
+    priority?: number | null;
+    /**
+     * An announcement: its button, where it has one.
+     */
+    button?: AnnouncementButton | null;
+    /**
+     * An announcement: whether a customer may close it; `true` by default.
+     */
+    closable?: boolean | null;
 };
 
 /**
@@ -27675,6 +27743,10 @@ export type CustomerOffer = {
      * Who pays for a reward, in words.
      */
     funded_text: string | null;
+    /**
+     * Whether the customer sees and uses it 24 hours before it starts for everyone, as Silver or Gold (since 0.38.0).
+     */
+    early_access?: boolean;
 };
 
 /**
@@ -28298,9 +28370,9 @@ export type StatementPromotion = {
 };
 
 /**
- * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth visit at a Location: a pickup collected or, since 0.28.0, a tab settled that the customer opened.
+ * What a reward campaign counts: `streak`, weeks in a row with a completed order; `quest`, a named goal of one to five steps, counted once the customer presses Start; `tier`, Member, Silver and Gold by completed orders in 90 days, the platform's only; `punch_card`, every nth visit at a Location: a pickup collected or, since 0.28.0, a tab settled that the customer opened; and since 0.38.0 `badge`, a badge earned once, the platform's only, and `points`, points on completed orders converted into credit.
  */
-export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card';
+export type RewardCampaignKind = 'streak' | 'quest' | 'tier' | 'punch_card' | 'badge' | 'points';
 
 /**
  * Where a reward campaign stands: `draft` until published; `scheduled` until its start; `live` while it grants; `paused` by its owner or by the platform; `ended` when stopped, past its end or out of budget; `cancelled` when stopped before it started.
@@ -28637,6 +28709,10 @@ export type QuestRules = {
      * Its reward.
      */
     reward: RewardSpec;
+    /**
+     * Its referral commission (since 0.38.0), a Partner's quest naming its own Location; `null` without.
+     */
+    commission?: QuestCommission | null;
 };
 
 /**
@@ -28663,6 +28739,10 @@ export type QuestRulesInput = {
      * Its reward.
      */
     reward: RewardSpecInput;
+    /**
+     * A referral commission (since 0.38.0): a Partner's quest naming its own Location only, an amount or a share, not both.
+     */
+    commission?: QuestCommission | null;
 };
 
 /**
@@ -28757,6 +28837,14 @@ export type RewardRules = {
      * A punch card's rules.
      */
     punch_card: PunchCardRules | null;
+    /**
+     * A badge's rules (since 0.38.0).
+     */
+    badge?: BadgeRules | null;
+    /**
+     * A points campaign's rules (since 0.38.0).
+     */
+    points?: PointsRules | null;
 };
 
 /**
@@ -28779,6 +28867,14 @@ export type RewardRulesInput = {
      * A punch card's rules.
      */
     punch_card?: PunchCardRulesInput | null;
+    /**
+     * A badge's rules (since 0.38.0).
+     */
+    badge?: BadgeRules | null;
+    /**
+     * A points campaign's rules (since 0.38.0).
+     */
+    points?: PointsRulesInput | null;
 };
 
 /**
@@ -29827,6 +29923,14 @@ export type CustomerRewards = {
      * Promotional credit their rewards gave, all time.
      */
     credit_earned: Money;
+    /**
+     * Badges earned (since 0.38.0), the latest first.
+     */
+    badges?: Array<EarnedBadge>;
+    /**
+     * Their points (since 0.38.0); `null` while they never had any and no points campaign runs for them.
+     */
+    points?: PointsBalance | null;
 };
 
 /**
@@ -29837,6 +29941,10 @@ export type QuestStartInput = {
      * Where; `rewards` by default.
      */
     from?: QuestStartedFrom | null;
+    /**
+     * The store whose page Start was pressed on (since 0.38.0), with `from` `store`; it earns the quest's commission for that store's Partner where it agreed to show it.
+     */
+    location_id?: string | null;
 };
 
 /**
@@ -39401,6 +39509,781 @@ export type PrescriptionVerificationInput = {
      * The prescription's date; one older than six months is not valid.
      */
     prescribed_on?: string | null;
+};
+
+/**
+ * Where a featured row is shown (since 0.38.0): on the `home` screen, on the pages of the `verticals` it names, or `both`.
+ */
+export type FeaturedPlacement = 'home' | 'verticals' | 'both';
+
+/**
+ * How a featured row finds its Locations (since 0.38.0), worked out each time it is shown: the Locations it `named` in its aim; `premium` or `exclusive` by the Location's highlights; `best_rated` by the share of thumbs up, three reviews at least; `most_popular` by completed orders in the last seven days; `quickest` by the time a delivery takes.
+ */
+export type FeaturedRule = 'named' | 'premium' | 'exclusive' | 'best_rated' | 'most_popular' | 'quickest';
+
+/**
+ * A store's shelf (since 0.38.0): its `top_sellers`, two points for each unit of a completed order in the last week and one for each in the three before; its `new_additions` of the last four weeks, the newest first; or the items it puts in the `spotlight`, in the menu's order.
+ */
+export type DisplayShelfKind = 'top_sellers' | 'new_additions' | 'spotlight';
+
+/**
+ * An announcement's button (since 0.38.0): its words and where it leads, a page of the platform's (a path) or an https address.
+ */
+export type AnnouncementButton = {
+    /**
+     * Its words, 1 to 24 characters.
+     */
+    label: string;
+    /**
+     * A path of the platform's (`/stores/...`) or an `https://` address.
+     */
+    link: string;
+};
+
+/**
+ * A featured row as the storefront draws it (since 0.38.0): the platform's featured-Location campaign under its headline, with the Locations its rule finds among the stores serving the visitor's area, fifteen at most, and whether "See all" has more. A row that finds none is left out of the answer.
+ */
+export type FeaturedRow = {
+    /**
+     * The campaign; `GET /v1/storefront/featured/{offer_id}/stores` lists the whole row.
+     */
+    offer_id: string;
+    /**
+     * Its headline.
+     */
+    headline: string;
+    /**
+     * How the row finds its Locations.
+     */
+    rule: FeaturedRule;
+    /**
+     * The Locations, as cards, in the rule's order; fifteen at most.
+     */
+    stores: Array<StoreCard>;
+    /**
+     * Whether more Locations wait behind "See all".
+     */
+    more: boolean;
+    /**
+     * Whether a placement in it was paid for, said "Sponsored" where it is shown; `false` for every rule of this version.
+     */
+    sponsored: boolean;
+};
+
+/**
+ * A featured row's page, "See all" (since 0.38.0): every Location the row finds in the visitor's area, in its order, or why it finds none here.
+ */
+export type FeaturedRowStores = {
+    /**
+     * The campaign.
+     */
+    offer_id: string;
+    /**
+     * Its headline.
+     */
+    headline: string;
+    /**
+     * How the row finds its Locations.
+     */
+    rule: FeaturedRule;
+    /**
+     * Every Location it finds, at most 100.
+     */
+    stores: Array<StoreCard>;
+    /**
+     * Why it finds none in this area, in words; `null` when it finds some.
+     */
+    reason: string | null;
+};
+
+/**
+ * A store's announcement as its page leads with it (since 0.38.0): the highest priority first, drawn in its colour with words in `text_colour`, white or near-black so they read on it.
+ */
+export type StoreAnnouncement = {
+    /**
+     * The announcement; a device that closed it keeps it closed by this id.
+     */
+    offer_id: string;
+    /**
+     * Its headline.
+     */
+    headline: string;
+    /**
+     * What it says beneath, at most 280 characters.
+     */
+    message: string | null;
+    /**
+     * Its colour, `#RRGGBB`.
+     */
+    colour: string;
+    /**
+     * The words' colour on it: `#FFFFFF` or `#111827`, whichever reads better.
+     */
+    text_colour: string;
+    /**
+     * 1 to 10, the highest first.
+     */
+    priority: number;
+    /**
+     * Its button, where it has one; `null` without.
+     */
+    button: AnnouncementButton | null;
+    /**
+     * Whether a customer may close it, which then stays closed on that device.
+     */
+    closable: boolean;
+};
+
+/**
+ * An item on a shelf (since 0.38.0), as the menu draws it; a tap opens its sheet.
+ */
+export type StoreShelfItem = {
+    /**
+     * The item.
+     */
+    item_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its first picture, a rendition relative to the API host.
+     */
+    picture_url: string | null;
+    /**
+     * The least it costs, before offers.
+     */
+    from_price: Money;
+    /**
+     * The offer open to everyone it is under, with its price after it, as the menu carries it.
+     */
+    promotion: MenuItemPromotion | null;
+};
+
+/**
+ * A store's shelf on its page (since 0.38.0), after its offers: what can be ordered now, ten at most, under its headline; a shelf with nothing to show is left out.
+ */
+export type StoreShelf = {
+    /**
+     * The shelf.
+     */
+    offer_id: string;
+    /**
+     * Top sellers, new additions or a spotlight.
+     */
+    kind: DisplayShelfKind;
+    /**
+     * Its headline.
+     */
+    headline: string;
+    /**
+     * Its items, ten at most.
+     */
+    items: Array<StoreShelfItem>;
+};
+
+/**
+ * Figures of completed orders over a span of time (since 0.38.0).
+ */
+export type OfferResultsPeriod = {
+    /**
+     * The period's first instant.
+     */
+    from: string;
+    /**
+     * The instant after its last.
+     */
+    until: string;
+    /**
+     * Completed orders.
+     */
+    orders: number;
+    /**
+     * The item sales of those orders after their item offers, tax included.
+     */
+    sales: Money;
+    /**
+     * Customers whose first completed order at the Location it was.
+     */
+    new_customers: number;
+    /**
+     * The others.
+     */
+    returning_customers: number;
+    /**
+     * New customers as a share of the customers, rounded; `null` with no orders.
+     */
+    new_share_percent: number | null;
+};
+
+/**
+ * An offer's results since it started (since 0.38.0), worked out from completed orders when asked: the orders that used it, their sales, its cost and who paid, new and returning customers and sales per rupee of cost; compared with the same hours in the four weeks before it started, the Location's (or the aim's) completed orders in those hours whether or not they took an offer.
+ */
+export type OfferResults = {
+    /**
+     * The offer.
+     */
+    offer_id: string;
+    /**
+     * The code the figures are narrowed to; `null` for the whole offer.
+     */
+    code_id: string | null;
+    /**
+     * When it started.
+     */
+    from: string;
+    /**
+     * When it ended, or now.
+     */
+    until: string;
+    /**
+     * Completed orders that used it.
+     */
+    orders: number;
+    /**
+     * The item sales of those orders after their item offers, tax included.
+     */
+    sales: Money;
+    /**
+     * What the offer took off them.
+     */
+    cost: Money;
+    /**
+     * The Partner's share of the cost.
+     */
+    partner_cost: Money;
+    /**
+     * The platform's share of the cost.
+     */
+    platform_cost: Money;
+    /**
+     * Customers whose first completed order at the Location it was.
+     */
+    new_customers: number;
+    /**
+     * The others.
+     */
+    returning_customers: number;
+    /**
+     * New customers as a share, rounded; `null` with no orders.
+     */
+    new_share_percent: number | null;
+    /**
+     * Sales per rupee of cost, to two places; `null` when it cost nothing.
+     */
+    sales_per_rupee: number | null;
+    /**
+     * The same hours in the four weeks before it started, at the same Locations.
+     */
+    before: OfferResultsPeriod;
+};
+
+/**
+ * A badge the platform runs (since 0.38.0): `first_order`; `explorer`, completed orders in three Verticals; `regular`, ten completed orders at one Location; `early_bird`, five subscription deliveries completed before 07:00; `reviewer`, ten reviews written; `table_for_two`, a first dine-in tab settled.
+ */
+export type BadgeCode = 'first_order' | 'explorer' | 'regular' | 'early_bird' | 'reviewer' | 'table_for_two';
+
+/**
+ * A badge campaign's rules (since 0.38.0): the badge it awards, once per customer; it carries no money and is never a condition of a reward. The platform's alone.
+ */
+export type BadgeRules = {
+    /**
+     * The badge the campaign gives.
+     */
+    badge: BadgeCode;
+};
+
+/**
+ * A points campaign's rules (since 0.38.0): a point for each `rupees_per_point` of a completed order's items after discounts, rounded down, at most `max_per_order` points an order, at its Locations; points expire `expiry_months` after they were earned, oldest first, told 30 days before.
+ */
+export type PointsRules = {
+    /**
+     * Rupees of items after discounts for a point; 10 by default.
+     */
+    rupees_per_point: number;
+    /**
+     * The most points one order earns; 200 by default.
+     */
+    max_per_order: number;
+    /**
+     * Months a point lasts; 12 by default.
+     */
+    expiry_months: number;
+};
+
+/**
+ * A points campaign as set (since 0.38.0); left out, each takes its default.
+ */
+export type PointsRulesInput = {
+    /**
+     * 10 by default.
+     */
+    rupees_per_point?: number | null;
+    /**
+     * 200 by default.
+     */
+    max_per_order?: number | null;
+    /**
+     * 12 by default.
+     */
+    expiry_months?: number | null;
+};
+
+/**
+ * A badge the customer earned (since 0.38.0), with when; hidden from any public view when they chose.
+ */
+export type EarnedBadge = {
+    /**
+     * The badge.
+     */
+    badge: BadgeCode;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What earned it.
+     */
+    description: string;
+    /**
+     * When.
+     */
+    earned_at: string;
+    /**
+     * Whether the customer hid it from any public view.
+     */
+    hidden: boolean;
+};
+
+/**
+ * The customer's badges (since 0.38.0), the latest first.
+ */
+export type EarnedBadgeList = {
+    /**
+     * Their badges.
+     */
+    items: Array<EarnedBadge>;
+};
+
+/**
+ * Hide a badge, or every badge, from any public view, or show it again (since 0.38.0).
+ */
+export type BadgeVisibilityInput = {
+    /**
+     * The badge; left out or `null` for every badge.
+     */
+    badge?: BadgeCode | null;
+    /**
+     * Hidden, or shown again.
+     */
+    hidden: boolean;
+};
+
+/**
+ * How points moved (since 0.38.0): `granted` by an order, `converted` into credit, or `expired`.
+ */
+export type PointsEntryKind = 'granted' | 'converted' | 'expired';
+
+/**
+ * Points that moved (since 0.38.0), in words.
+ */
+export type PointsEntry = {
+    /**
+     * Granted, converted or expired.
+     */
+    kind: PointsEntryKind;
+    /**
+     * How many: positive when granted, negative when converted or expired.
+     */
+    points: number;
+    /**
+     * When.
+     */
+    at: string;
+    /**
+     * In words.
+     */
+    explanation: string;
+};
+
+/**
+ * The customer's points (since 0.38.0): the balance and what it is worth, what expires next, how they convert, and the latest movements.
+ */
+export type PointsBalance = {
+    /**
+     * Points held.
+     */
+    balance: number;
+    /**
+     * What the points held are worth converted, 10 paise a point.
+     */
+    worth: Money;
+    /**
+     * Points expiring next, within 30 days; 0 when none.
+     */
+    expiring: number;
+    /**
+     * The day they expire; `null` when none within 30 days.
+     */
+    expiring_on: string | null;
+    /**
+     * The fewest points converted at a time, in whole hundreds.
+     */
+    minimum_conversion: number;
+    /**
+     * How points convert, in words.
+     */
+    rate: string;
+    /**
+     * The latest movements, twenty at most, the latest first.
+     */
+    history: Array<PointsEntry>;
+};
+
+/**
+ * Points to convert into promotional Wallet credit (since 0.38.0): whole hundreds, at least 500.
+ */
+export type PointsConversionInput = {
+    /**
+     * How many.
+     */
+    points: number;
+};
+
+/**
+ * Points converted (since 0.38.0): the credit that landed in the Wallet, promotional and never expiring, and what is left.
+ */
+export type PointsConversion = {
+    /**
+     * The conversion.
+     */
+    id: string;
+    /**
+     * Points converted.
+     */
+    points: number;
+    /**
+     * The promotional Wallet credit given, 100 points to ₹10.
+     */
+    credit: Money;
+    /**
+     * Points left.
+     */
+    balance: number;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * A quest's referral commission (since 0.38.0), set by the Partner funding the quest: a fixed amount, or a share of the first order's items; paid to a Partner that agreed to show the quest when a customer completes it having started it from that Partner's page.
+ */
+export type QuestCommission = {
+    /**
+     * A fixed amount; `null` with a share.
+     */
+    amount?: Money | null;
+    /**
+     * A share of the completing order's items after discounts, 1 to 50.
+     */
+    percent_of_items?: number | null;
+};
+
+/**
+ * A quest a store's page shows (since 0.38.0) because the store agreed to show another Partner's quest; said "Partner offer" where it is shown.
+ */
+export type StoreQuest = {
+    /**
+     * The quest; Start it with `location_id` this store.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * What it asks and gives, in words.
+     */
+    line: string;
+    /**
+     * How it is labelled.
+     */
+    label: string;
+};
+
+/**
+ * Where an agreement stands (since 0.38.0): `agreed`, or `withdrawn` by the referring Partner.
+ */
+export type CommissionAgreementState = 'agreed' | 'withdrawn';
+
+/**
+ * A Partner's agreement to show another Partner's quest with its referral commission on one of its Locations' pages (since 0.38.0), as either Partner reads it, with what it earned: counts and sums, never a customer.
+ */
+export type CommissionAgreement = {
+    /**
+     * The agreement.
+     */
+    id: string;
+    /**
+     * The quest.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    quest_name: string;
+    /**
+     * The Partner funding the quest, who pays the commission.
+     */
+    funder_partner_id: string;
+    /**
+     * Its name.
+     */
+    funder_name: string;
+    /**
+     * The Partner that agreed to show it, who is paid.
+     */
+    referrer_partner_id: string;
+    /**
+     * Its name.
+     */
+    referrer_name: string;
+    /**
+     * The referring Partner's Location whose page shows it.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * The commission agreed, as the quest's funder set it.
+     */
+    commission: QuestCommission;
+    /**
+     * Agreed, or withdrawn by the referring Partner.
+     */
+    state: CommissionAgreementState;
+    /**
+     * When it was agreed.
+     */
+    agreed_at: string;
+    /**
+     * Commissions recorded under it and not taken back.
+     */
+    commissions: number;
+    /**
+     * What the commissions recorded under it and not taken back came to.
+     */
+    amount: Money;
+};
+
+/**
+ * A Partner's agreements (since 0.38.0): those it agreed to as referrer and those on its own quests, newest first.
+ */
+export type CommissionAgreementPage = {
+    /**
+     * The agreements.
+     */
+    items: Array<CommissionAgreement>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Agree to show another Partner's quest with its commission on one of the Partner's own Locations' pages (since 0.38.0).
+ */
+export type CommissionAgreementInput = {
+    /**
+     * The quest, live or scheduled, carrying a commission.
+     */
+    campaign_id: string;
+    /**
+     * One of the Partner's own Locations.
+     */
+    location_id: string;
+};
+
+/**
+ * Where a commission stands (since 0.38.0): `recorded`, or `taken_back` after the order was refunded in full within 7 days.
+ */
+export type CommissionState = 'recorded' | 'taken_back';
+
+/**
+ * A referral commission between two Partners (since 0.38.0), as Mission Control reads it: on both statements with the quest, the order and the customer's first name only.
+ */
+export type Commission = {
+    /**
+     * The commission.
+     */
+    id: string;
+    /**
+     * The agreement it was earned under.
+     */
+    agreement_id: string;
+    /**
+     * The quest.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    quest_name: string;
+    /**
+     * The first order that completed the quest.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    order_number: string;
+    /**
+     * Who pays.
+     */
+    funder_partner_id: string;
+    /**
+     * Where the order was.
+     */
+    funder_location_id: string;
+    /**
+     * Who is paid.
+     */
+    referrer_partner_id: string;
+    /**
+     * Whose page the quest was started on.
+     */
+    referrer_location_id: string;
+    /**
+     * The commission, paid by the funding Partner to the referring one.
+     */
+    amount: Money;
+    /**
+     * The customer's first name only.
+     */
+    customer_first_name: string;
+    /**
+     * Recorded, or taken back after a full refund within 7 days.
+     */
+    state: CommissionState;
+    /**
+     * When.
+     */
+    recorded_at: string;
+    /**
+     * When it was taken back.
+     */
+    taken_back_at: string | null;
+};
+
+/**
+ * Referral commissions (since 0.38.0), newest first.
+ */
+export type CommissionPage = {
+    /**
+     * The commissions.
+     */
+    items: Array<Commission>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One kind of recommendation's figures (since 0.38.0).
+ */
+export type CrossSellFiguresKind = {
+    /**
+     * `bought_together`, `nearby_complement` or `reorder`.
+     */
+    kind: 'bought_together' | 'nearby_complement' | 'reorder';
+    /**
+     * Times shown.
+     */
+    shown: number;
+    /**
+     * Times accepted.
+     */
+    accepted: number;
+    /**
+     * Completed orders at the Partner's stores carrying an accepted item.
+     */
+    orders: number;
+    /**
+     * What the accepted items came to in those orders, after their own offers.
+     */
+    sales: Money;
+};
+
+/**
+ * What cross-sell did for a Partner's stores over a range (since 0.38.0): recommendations of their items shown, accepted, and the completed orders and sales they brought; counts and sums, never a customer.
+ */
+export type CrossSellFigures = {
+    /**
+     * The first day, on India's clock.
+     */
+    from: string;
+    /**
+     * The last day.
+     */
+    until: string;
+    /**
+     * The Location they are narrowed to; `null` for every Location of the Partner.
+     */
+    location_id: string | null;
+    /**
+     * Times shown.
+     */
+    shown: number;
+    /**
+     * Times accepted.
+     */
+    accepted: number;
+    /**
+     * Completed orders carrying an accepted item.
+     */
+    orders: number;
+    /**
+     * What the accepted items came to in those orders, after their own offers.
+     */
+    sales: Money;
+    /**
+     * By kind of recommendation.
+     */
+    kinds: Array<CrossSellFiguresKind>;
+};
+
+/**
+ * A referral commission on a Location's statement (since 0.38.0): paid to another Partner for a first order its page referred, or received for one this Location's page referred; with the quest, the order and the customer's first name only.
+ */
+export type StatementCommission = {
+    /**
+     * The commission.
+     */
+    commission_id: string;
+    /**
+     * `paid` or `received`.
+     */
+    direction: 'paid' | 'received';
+    /**
+     * The quest's name.
+     */
+    quest_name: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The customer's first name only.
+     */
+    customer_first_name: string;
+    /**
+     * Positive when received, negative when paid.
+     */
+    amount: Money;
 };
 
 /**
@@ -92012,3 +92895,592 @@ export type GetCustomerPrescriptionFileLinkResponses = {
 };
 
 export type GetCustomerPrescriptionFileLinkResponse = GetCustomerPrescriptionFileLinkResponses[keyof GetCustomerPrescriptionFileLinkResponses];
+
+export type ListFeaturedStoresData = {
+    body?: never;
+    path: {
+        /**
+         * The featured row, a live featured campaign.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * Latitude of the pin; half a coordinate counts as none.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+        /**
+         * How far, in metres, the nearest zone may be before the default answers instead.
+         */
+        cap?: number;
+        /**
+         * A zone the visitor chose or the device remembers.
+         */
+        zone_id?: string;
+        /**
+         * The visitor's country (alpha-2), used when no pin is given.
+         */
+        country?: string;
+    };
+    url: '/v1/storefront/featured/{offer_id}/stores';
+};
+
+export type ListFeaturedStoresErrors = {
+    /**
+     * `validation_failed`: nothing places the visitor, or a half pin; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `not_found`: no live featured row with this id.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListFeaturedStoresError = ListFeaturedStoresErrors[keyof ListFeaturedStoresErrors];
+
+export type ListFeaturedStoresResponses = {
+    /**
+     * The row's stores.
+     */
+    200: FeaturedRowStores;
+};
+
+export type ListFeaturedStoresResponse = ListFeaturedStoresResponses[keyof ListFeaturedStoresResponses];
+
+export type GetPartnerOfferResultsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * One of its codes, to narrow the figures to.
+         */
+        code_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/offers/{offer_id}/results';
+};
+
+export type GetPartnerOfferResultsErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the permission.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not an offer the caller may read, or a code not its own.
+     */
+    404: Problem;
+    /**
+     * `offer_not_priced`: a featured row, a shelf or an announcement.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerOfferResultsError = GetPartnerOfferResultsErrors[keyof GetPartnerOfferResultsErrors];
+
+export type GetPartnerOfferResultsResponses = {
+    /**
+     * Its results.
+     */
+    200: OfferResults;
+};
+
+export type GetPartnerOfferResultsResponse = GetPartnerOfferResultsResponses[keyof GetPartnerOfferResultsResponses];
+
+export type GetPlatformOfferResultsData = {
+    body?: never;
+    path: {
+        /**
+         * The offer.
+         */
+        offer_id: string;
+    };
+    query?: {
+        /**
+         * One of its codes, to narrow the figures to.
+         */
+        code_id?: string;
+    };
+    url: '/v1/platform/offers/{offer_id}/results';
+};
+
+export type GetPlatformOfferResultsErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without the permission.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not an offer the caller may read, or a code not its own.
+     */
+    404: Problem;
+    /**
+     * `offer_not_priced`: a featured row, a shelf or an announcement.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOfferResultsError = GetPlatformOfferResultsErrors[keyof GetPlatformOfferResultsErrors];
+
+export type GetPlatformOfferResultsResponses = {
+    /**
+     * Its results.
+     */
+    200: OfferResults;
+};
+
+export type GetPlatformOfferResultsResponse = GetPlatformOfferResultsResponses[keyof GetPlatformOfferResultsResponses];
+
+export type SetBadgeVisibilityData = {
+    /**
+     * Which, and whether hidden.
+     */
+    body: BadgeVisibilityInput;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/rewards/badges/visibility';
+};
+
+export type SetBadgeVisibilityErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `not_found`: a badge they have not earned.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type SetBadgeVisibilityError = SetBadgeVisibilityErrors[keyof SetBadgeVisibilityErrors];
+
+export type SetBadgeVisibilityResponses = {
+    /**
+     * Their badges.
+     */
+    200: EarnedBadgeList;
+};
+
+export type SetBadgeVisibilityResponse = SetBadgeVisibilityResponses[keyof SetBadgeVisibilityResponses];
+
+export type ConvertPointsData = {
+    /**
+     * How many points.
+     */
+    body: PointsConversionInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/rewards/points/conversions';
+};
+
+export type ConvertPointsErrors = {
+    /**
+     * `validation_failed`, with `points_below_minimum` under 500 or `points_not_whole_hundreds`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `forbidden`: a token of another surface.
+     */
+    403: Problem;
+    /**
+     * `points_insufficient`: more than they hold; `idempotency_key_reuse`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ConvertPointsError = ConvertPointsErrors[keyof ConvertPointsErrors];
+
+export type ConvertPointsResponses = {
+    /**
+     * The conversion.
+     */
+    201: PointsConversion;
+};
+
+export type ConvertPointsResponse = ConvertPointsResponses[keyof ConvertPointsResponses];
+
+export type ListCommissionAgreementsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * `referrer` for those it agreed to, `funder` for those on its own quests; both by default.
+         */
+        role?: 'referrer' | 'funder';
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/commission-agreements';
+};
+
+export type ListCommissionAgreementsErrors = {
+    /**
+     * `validation_failed`; `invalid_cursor`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not a Partner the caller belongs to.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCommissionAgreementsError = ListCommissionAgreementsErrors[keyof ListCommissionAgreementsErrors];
+
+export type ListCommissionAgreementsResponses = {
+    /**
+     * A page of agreements.
+     */
+    200: CommissionAgreementPage;
+};
+
+export type ListCommissionAgreementsResponse = ListCommissionAgreementsResponses[keyof ListCommissionAgreementsResponses];
+
+export type AgreeToCommissionData = {
+    /**
+     * The quest and the Location.
+     */
+    body: CommissionAgreementInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/commission-agreements';
+};
+
+export type AgreeToCommissionErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: a quest that is not live or scheduled, or a Location not the Partner's.
+     */
+    404: Problem;
+    /**
+     * `quest_without_commission`; `commission_self_referral`: its own quest, or a Partner sharing its legal entity.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AgreeToCommissionError = AgreeToCommissionErrors[keyof AgreeToCommissionErrors];
+
+export type AgreeToCommissionResponses = {
+    /**
+     * The agreement.
+     */
+    201: CommissionAgreement;
+};
+
+export type AgreeToCommissionResponse = AgreeToCommissionResponses[keyof AgreeToCommissionResponses];
+
+export type WithdrawCommissionAgreementData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The agreement.
+         */
+        agreement_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/commission-agreements/{agreement_id}';
+};
+
+export type WithdrawCommissionAgreementErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:write` at the Location.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not an agreement the Partner made.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type WithdrawCommissionAgreementError = WithdrawCommissionAgreementErrors[keyof WithdrawCommissionAgreementErrors];
+
+export type WithdrawCommissionAgreementResponses = {
+    /**
+     * The agreement, withdrawn.
+     */
+    200: CommissionAgreement;
+};
+
+export type WithdrawCommissionAgreementResponse = WithdrawCommissionAgreementResponses[keyof WithdrawCommissionAgreementResponses];
+
+export type ListCommissionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * A Partner, paying or paid.
+         */
+        partner_id?: string;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/commissions';
+};
+
+export type ListCommissionsErrors = {
+    /**
+     * `validation_failed`; `invalid_cursor`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `engagement:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCommissionsError = ListCommissionsErrors[keyof ListCommissionsErrors];
+
+export type ListCommissionsResponses = {
+    /**
+     * A page of commissions.
+     */
+    200: CommissionPage;
+};
+
+export type ListCommissionsResponse = ListCommissionsResponses[keyof ListCommissionsResponses];
+
+export type GetCrossSellFiguresData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * The first day.
+         */
+        from?: string;
+        /**
+         * The last day.
+         */
+        until?: string;
+        /**
+         * One of its Locations.
+         */
+        location_id?: string;
+    };
+    url: '/v1/partners/{partner_id}/cross-sell/figures';
+};
+
+export type GetCrossSellFiguresErrors = {
+    /**
+     * `validation_failed`: a range backwards or over a year; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `promotion:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not a Partner the caller belongs to, or a Location not its.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCrossSellFiguresError = GetCrossSellFiguresErrors[keyof GetCrossSellFiguresErrors];
+
+export type GetCrossSellFiguresResponses = {
+    /**
+     * The figures.
+     */
+    200: CrossSellFigures;
+};
+
+export type GetCrossSellFiguresResponse = GetCrossSellFiguresResponses[keyof GetCrossSellFiguresResponses];

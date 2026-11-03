@@ -6,5 +6,13 @@ properties:
       - $ref: ./QuestStartedFrom.yaml
       - type: "null"
     description: Where; `rewards` by default.
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The store whose page Start was pressed on (since 0.38.0), with `from` `store`; it earns the quest's commission for that store's Partner where it agreed to show it.
+    examples:
+      - null
 examples:
   - from: rewards

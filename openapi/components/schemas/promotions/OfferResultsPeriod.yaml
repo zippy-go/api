@@ -1,0 +1,63 @@
+type: object
+description: Figures of completed orders over a span of time (since 0.38.0).
+required:
+  - from
+  - until
+  - orders
+  - sales
+  - new_customers
+  - returning_customers
+  - new_share_percent
+properties:
+  from:
+    type: string
+    format: date-time
+    description: The period's first instant.
+    examples:
+      - 2026-10-02T10:30:00Z
+  until:
+    type: string
+    format: date-time
+    description: The instant after its last.
+    examples:
+      - 2026-10-30T10:30:00Z
+  orders:
+    type: integer
+    description: Completed orders.
+    minimum: 0
+    examples:
+      - 42
+  sales:
+    $ref: ../common/Money.yaml
+    description: The item sales of those orders after their item offers, tax included.
+  new_customers:
+    type: integer
+    description: Customers whose first completed order at the Location it was.
+    minimum: 0
+    examples:
+      - 9
+  returning_customers:
+    type: integer
+    description: The others.
+    minimum: 0
+    examples:
+      - 33
+  new_share_percent:
+    type:
+      - integer
+      - "null"
+    description: New customers as a share of the customers, rounded; `null` with no orders.
+    minimum: 0
+    maximum: 100
+    examples:
+      - 21
+examples:
+  - from: 2026-10-02T10:30:00Z
+    until: 2026-10-30T10:30:00Z
+    orders: 42
+    sales:
+      minor_units: 1250
+      currency: USD
+    new_customers: 9
+    returning_customers: 33
+    new_share_percent: 21

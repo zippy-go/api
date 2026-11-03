@@ -1,0 +1,10 @@
+type: object
+description: "A badge campaign's rules (since 0.38.0): the badge it awards, once per customer; it carries no money and is never a condition of a reward. The platform's alone."
+required:
+  - badge
+properties:
+  badge:
+    $ref: ./BadgeCode.yaml
+    description: The badge the campaign gives.
+examples:
+  - badge: explorer

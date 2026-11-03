@@ -1,0 +1,120 @@
+type: object
+description: "A referral commission between two Partners (since 0.38.0), as Mission Control reads it: on both statements with the quest, the order and the customer's first name only."
+required:
+  - id
+  - agreement_id
+  - campaign_id
+  - quest_name
+  - order_id
+  - order_number
+  - funder_partner_id
+  - funder_location_id
+  - referrer_partner_id
+  - referrer_location_id
+  - amount
+  - customer_first_name
+  - state
+  - recorded_at
+  - taken_back_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The commission.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+  agreement_id:
+    type: string
+    format: uuid
+    description: The agreement it was earned under.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+  campaign_id:
+    type: string
+    format: uuid
+    description: The quest.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  quest_name:
+    type: string
+    description: Its name.
+    examples:
+      - Your first order from Charminar Bakes Gachibowli
+  order_id:
+    type: string
+    format: uuid
+    description: The first order that completed the quest.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+  order_number:
+    type: string
+    description: Its number.
+    examples:
+      - ZG-24817
+  funder_partner_id:
+    type: string
+    format: uuid
+    description: Who pays.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000003
+  funder_location_id:
+    type: string
+    format: uuid
+    description: Where the order was.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000308
+  referrer_partner_id:
+    type: string
+    format: uuid
+    description: Who is paid.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  referrer_location_id:
+    type: string
+    format: uuid
+    description: Whose page the quest was started on.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  amount:
+    $ref: ../common/Money.yaml
+    description: The commission, paid by the funding Partner to the referring one.
+  customer_first_name:
+    type: string
+    description: The customer's first name only.
+    examples:
+      - Asha
+  state:
+    $ref: ./CommissionState.yaml
+    description: Recorded, or taken back after a full refund within 7 days.
+  recorded_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-04T12:00:00Z
+  taken_back_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was taken back.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+    agreement_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+    campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    quest_name: Your first order from Charminar Bakes Gachibowli
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+    order_number: ZG-24817
+    funder_partner_id: 01a13a48-9e00-7000-8000-000000000003
+    funder_location_id: 01a13a48-9e00-7000-8000-000000000308
+    referrer_partner_id: 01a13a48-9e00-7000-8000-000000000001
+    referrer_location_id: 01a13a48-9e00-7000-8000-000000000301
+    amount:
+      minor_units: 1250
+      currency: USD
+    customer_first_name: Asha
+    state: recorded
+    recorded_at: 2026-11-04T12:00:00Z
+    taken_back_at: null

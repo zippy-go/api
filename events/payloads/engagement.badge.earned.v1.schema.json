@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.badge.earned.v1.schema.json",
+  "title": "EngagementBadgeEarnedPayload",
+  "description": "Payload of `engagement.badge.earned` version 1. A customer earned a badge, once; it carries no money. Consumers: analytics, notifications (told once where the customer consented). Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "badge",
+    "campaign_id",
+    "customer_id",
+    "at"
+  ],
+  "properties": {
+    "badge": {
+      "type": "string",
+      "description": "The badge.",
+      "examples": [
+        "explorer"
+      ],
+      "enum": [
+        "first_order",
+        "explorer",
+        "regular",
+        "early_bird",
+        "reviewer",
+        "table_for_two"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The badge campaign.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was earned.",
+      "examples": [
+        "2026-11-03T14:20:00Z"
+      ]
+    }
+  }
+}

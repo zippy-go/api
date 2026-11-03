@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.points.expired.v1.schema.json",
+  "title": "EngagementPointsExpiredPayload",
+  "description": "Payload of `engagement.points.expired` version 1. Points expired twelve months (the campaign's months) after they were earned, oldest first; the ledger releases their liability back to the funder. Consumers: the ledger, payouts (a Partner's share given back), analytics.",
+  "type": "object",
+  "required": [
+    "lot_id",
+    "campaign_id",
+    "campaign_name",
+    "customer_id",
+    "points",
+    "worth",
+    "funder",
+    "partner_id",
+    "location_id",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "lot_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The lot.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its campaign.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001"
+      ]
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Dev Kitchen points"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "points": {
+      "type": "integer",
+      "description": "Points expired.",
+      "examples": [
+        300
+      ],
+      "minimum": 1
+    },
+    "worth": {
+      "type": "object",
+      "description": "What they were worth.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 3000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "funder": {
+      "type": "string",
+      "description": "Who paid for them.",
+      "examples": [
+        "platform"
+      ],
+      "enum": [
+        "partner",
+        "platform"
+      ]
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Partner, when it paid.",
+      "examples": [
+        null
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where they were earned.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2027-11-01T00:00:00Z"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "expired",
+        "taken_back"
+      ],
+      "description": "`expired` after its months, or `taken_back` with the order that earned them, refunded in full or cancelled.",
+      "examples": [
+        "expired"
+      ]
+    }
+  }
+}

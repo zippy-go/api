@@ -1,0 +1,80 @@
+# Path item for /v1/storefront/featured/{offer_id}/stores. Referenced from openapi.yaml.
+parameters:
+  - name: offer_id
+    in: path
+    required: true
+    description: The featured row, a live featured campaign.
+    schema:
+      type: string
+      format: uuid
+    example: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+get:
+  operationId: listFeaturedStores
+  summary: List a featured row's stores
+  description: "\"See all\" of a featured row: every Location its rule finds among the stores serving the visitor's area, in its order, worked out when asked; or why it finds none here. Mission Control may link to it. Public."
+  tags:
+    - Storefront
+  security: []
+  parameters:
+    - name: lat
+      in: query
+      required: false
+      description: Latitude of the pin; half a coordinate counts as none.
+      schema:
+        type: number
+    - name: lng
+      in: query
+      required: false
+      description: Longitude of the pin.
+      schema:
+        type: number
+    - name: cap
+      in: query
+      required: false
+      description: How far, in metres, the nearest zone may be before the default answers instead.
+      schema:
+        type: integer
+    - name: zone_id
+      in: query
+      required: false
+      description: A zone the visitor chose or the device remembers.
+      schema:
+        type: string
+        format: uuid
+    - name: country
+      in: query
+      required: false
+      description: The visitor's country (alpha-2), used when no pin is given.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The row's stores.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/promotions/FeaturedRowStores.yaml
+    "400":
+      description: "`validation_failed`: nothing places the visitor, or a half pin; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: no live featured row with this id."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

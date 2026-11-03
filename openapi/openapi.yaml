@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.37.0
+  version: 0.38.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -1834,6 +1834,27 @@ paths:
     $ref: ./paths/prescriptions/platform-prescription-file-link.yaml
   /v1/customer/prescriptions/{file_id}/link:
     $ref: ./paths/prescriptions/customer-prescription-file-link.yaml
+
+  # Step 11 growth, phase A: display kinds, results, badges, points, commissions, cross-sell figures
+  /v1/storefront/featured/{offer_id}/stores:
+    $ref: ./paths/storefront/featured-stores.yaml
+  /v1/partners/{partner_id}/offers/{offer_id}/results:
+    $ref: ./paths/promotions/partner-offer-results.yaml
+  /v1/platform/offers/{offer_id}/results:
+    $ref: ./paths/promotions/platform-offer-results.yaml
+  /v1/customer/rewards/badges/visibility:
+    $ref: ./paths/engagement/customer-badge-visibility.yaml
+  /v1/customer/rewards/points/conversions:
+    $ref: ./paths/engagement/customer-points-conversions.yaml
+  /v1/partners/{partner_id}/commission-agreements:
+    $ref: ./paths/crosssell/partner-commission-agreements.yaml
+  /v1/partners/{partner_id}/commission-agreements/{agreement_id}:
+    $ref: ./paths/crosssell/partner-commission-agreement.yaml
+  /v1/platform/commissions:
+    $ref: ./paths/crosssell/platform-commissions.yaml
+  /v1/partners/{partner_id}/cross-sell/figures:
+    $ref: ./paths/crosssell/partner-cross-sell-figures.yaml
+
 components:
   securitySchemes:
     ApiKey:
@@ -5093,3 +5114,75 @@ components:
       $ref: ./components/schemas/prescriptions/PrescriptionVerification.yaml
     PrescriptionVerificationInput:
       $ref: ./components/schemas/prescriptions/PrescriptionVerificationInput.yaml
+
+    # Step 11 growth, phase A
+    FeaturedPlacement:
+      $ref: ./components/schemas/promotions/FeaturedPlacement.yaml
+    FeaturedRule:
+      $ref: ./components/schemas/promotions/FeaturedRule.yaml
+    DisplayShelfKind:
+      $ref: ./components/schemas/promotions/DisplayShelfKind.yaml
+    AnnouncementButton:
+      $ref: ./components/schemas/promotions/AnnouncementButton.yaml
+    FeaturedRow:
+      $ref: ./components/schemas/promotions/FeaturedRow.yaml
+    FeaturedRowStores:
+      $ref: ./components/schemas/promotions/FeaturedRowStores.yaml
+    StoreAnnouncement:
+      $ref: ./components/schemas/promotions/StoreAnnouncement.yaml
+    StoreShelfItem:
+      $ref: ./components/schemas/promotions/StoreShelfItem.yaml
+    StoreShelf:
+      $ref: ./components/schemas/promotions/StoreShelf.yaml
+    OfferResultsPeriod:
+      $ref: ./components/schemas/promotions/OfferResultsPeriod.yaml
+    OfferResults:
+      $ref: ./components/schemas/promotions/OfferResults.yaml
+    BadgeCode:
+      $ref: ./components/schemas/engagement/BadgeCode.yaml
+    BadgeRules:
+      $ref: ./components/schemas/engagement/BadgeRules.yaml
+    PointsRules:
+      $ref: ./components/schemas/engagement/PointsRules.yaml
+    PointsRulesInput:
+      $ref: ./components/schemas/engagement/PointsRulesInput.yaml
+    EarnedBadge:
+      $ref: ./components/schemas/engagement/EarnedBadge.yaml
+    EarnedBadgeList:
+      $ref: ./components/schemas/engagement/EarnedBadgeList.yaml
+    BadgeVisibilityInput:
+      $ref: ./components/schemas/engagement/BadgeVisibilityInput.yaml
+    PointsEntryKind:
+      $ref: ./components/schemas/engagement/PointsEntryKind.yaml
+    PointsEntry:
+      $ref: ./components/schemas/engagement/PointsEntry.yaml
+    PointsBalance:
+      $ref: ./components/schemas/engagement/PointsBalance.yaml
+    PointsConversionInput:
+      $ref: ./components/schemas/engagement/PointsConversionInput.yaml
+    PointsConversion:
+      $ref: ./components/schemas/engagement/PointsConversion.yaml
+    QuestCommission:
+      $ref: ./components/schemas/engagement/QuestCommission.yaml
+    StoreQuest:
+      $ref: ./components/schemas/engagement/StoreQuest.yaml
+    CommissionAgreementState:
+      $ref: ./components/schemas/crosssell/CommissionAgreementState.yaml
+    CommissionAgreement:
+      $ref: ./components/schemas/crosssell/CommissionAgreement.yaml
+    CommissionAgreementPage:
+      $ref: ./components/schemas/crosssell/CommissionAgreementPage.yaml
+    CommissionAgreementInput:
+      $ref: ./components/schemas/crosssell/CommissionAgreementInput.yaml
+    CommissionState:
+      $ref: ./components/schemas/crosssell/CommissionState.yaml
+    Commission:
+      $ref: ./components/schemas/crosssell/Commission.yaml
+    CommissionPage:
+      $ref: ./components/schemas/crosssell/CommissionPage.yaml
+    CrossSellFiguresKind:
+      $ref: ./components/schemas/crosssell/CrossSellFiguresKind.yaml
+    CrossSellFigures:
+      $ref: ./components/schemas/crosssell/CrossSellFigures.yaml
+    StatementCommission:
+      $ref: ./components/schemas/payouts/StatementCommission.yaml

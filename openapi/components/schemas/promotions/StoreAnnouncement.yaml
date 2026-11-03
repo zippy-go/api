@@ -1,0 +1,70 @@
+type: object
+description: "A store's announcement as its page leads with it (since 0.38.0): the highest priority first, drawn in its colour with words in `text_colour`, white or near-black so they read on it."
+required:
+  - offer_id
+  - headline
+  - message
+  - colour
+  - text_colour
+  - priority
+  - button
+  - closable
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The announcement; a device that closed it keeps it closed by this id.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+  headline:
+    type: string
+    description: Its headline.
+    examples:
+      - Closed on Monday
+  message:
+    type:
+      - string
+      - "null"
+    description: What it says beneath, at most 280 characters.
+    examples:
+      - We are closed on Monday 9 November for Diwali.
+  colour:
+    type: string
+    description: Its colour, `#RRGGBB`.
+    pattern: ^#[0-9A-F]{6}$
+    examples:
+      - "#1A56DB"
+  text_colour:
+    type: string
+    description: "The words' colour on it: `#FFFFFF` or `#111827`, whichever reads better."
+    pattern: ^#[0-9A-F]{6}$
+    examples:
+      - "#FFFFFF"
+  priority:
+    type: integer
+    description: 1 to 10, the highest first.
+    minimum: 1
+    maximum: 10
+    examples:
+      - 5
+  button:
+    oneOf:
+      - $ref: ./AnnouncementButton.yaml
+      - type: "null"
+    description: Its button, where it has one; `null` without.
+  closable:
+    type: boolean
+    description: Whether a customer may close it, which then stays closed on that device.
+    examples:
+      - true
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+    headline: Closed on Monday
+    message: We are closed on Monday 9 November for Diwali.
+    colour: "#1A56DB"
+    text_colour: "#FFFFFF"
+    priority: 5
+    button:
+      label: See the menu
+      link: /stores/01a13a48-9e00-7000-8000-000000000301
+    closable: true

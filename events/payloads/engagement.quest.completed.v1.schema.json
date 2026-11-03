@@ -72,6 +72,88 @@
       "examples": [
         "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b01"
       ]
+    },
+    "started_from": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Where Start was pressed (since 0.38.0): `rewards`, `store` or `home`.",
+      "enum": [
+        "rewards",
+        "store",
+        "home",
+        null
+      ],
+      "examples": [
+        "store"
+      ]
+    },
+    "started_location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The store whose page Start was pressed on (since 0.38.0), which may earn a referral commission.",
+      "examples": [
+        null
+      ]
+    },
+    "order_location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The completing order's Location (since 0.38.0).",
+      "examples": [
+        null
+      ]
+    },
+    "order_items": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "The completing order's items after discounts (since 0.38.0).",
+          "required": [
+            "minor_units",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor_units": {
+              "type": "integer",
+              "description": "The amount in paise."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "The ISO 4217 code."
+            }
+          },
+          "examples": [
+            {
+              "minor_units": 40000,
+              "currency": "INR"
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The completing order's items after discounts (since 0.38.0)."
+    },
+    "customer_first_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The customer's first name (since 0.38.0), for a commission's statement lines; `null` when unknown.",
+      "examples": [
+        "Asha"
+      ]
     }
   }
 }

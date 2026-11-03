@@ -1,0 +1,8 @@
+type: string
+description: "How points moved (since 0.38.0): `granted` by an order, `converted` into credit, or `expired`."
+enum:
+  - granted
+  - converted
+  - expired
+examples:
+  - granted

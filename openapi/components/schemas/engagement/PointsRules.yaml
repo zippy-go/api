@@ -1,0 +1,32 @@
+type: object
+description: "A points campaign's rules (since 0.38.0): a point for each `rupees_per_point` of a completed order's items after discounts, rounded down, at most `max_per_order` points an order, at its Locations; points expire `expiry_months` after they were earned, oldest first, told 30 days before."
+required:
+  - rupees_per_point
+  - max_per_order
+  - expiry_months
+properties:
+  rupees_per_point:
+    type: integer
+    description: Rupees of items after discounts for a point; 10 by default.
+    minimum: 1
+    maximum: 1000
+    examples:
+      - 10
+  max_per_order:
+    type: integer
+    description: The most points one order earns; 200 by default.
+    minimum: 1
+    maximum: 10000
+    examples:
+      - 200
+  expiry_months:
+    type: integer
+    description: Months a point lasts; 12 by default.
+    minimum: 1
+    maximum: 36
+    examples:
+      - 12
+examples:
+  - rupees_per_point: 10
+    max_per_order: 200
+    expiry_months: 12

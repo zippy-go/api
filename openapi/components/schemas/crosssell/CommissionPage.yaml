@@ -1,0 +1,38 @@
+type: object
+description: Referral commissions (since 0.38.0), newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Commission.yaml
+    description: The commissions.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The next page's cursor.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301
+        agreement_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+        campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+        quest_name: Your first order from Charminar Bakes Gachibowli
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+        order_number: ZG-24817
+        funder_partner_id: 01a13a48-9e00-7000-8000-000000000003
+        funder_location_id: 01a13a48-9e00-7000-8000-000000000308
+        referrer_partner_id: 01a13a48-9e00-7000-8000-000000000001
+        referrer_location_id: 01a13a48-9e00-7000-8000-000000000301
+        amount:
+          minor_units: 1250
+          currency: USD
+        customer_first_name: Asha
+        state: recorded
+        recorded_at: 2026-11-04T12:00:00Z
+        taken_back_at: null
+    next_cursor: null

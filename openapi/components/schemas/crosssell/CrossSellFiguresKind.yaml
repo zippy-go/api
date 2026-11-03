@@ -1,0 +1,47 @@
+type: object
+description: One kind of recommendation's figures (since 0.38.0).
+required:
+  - kind
+  - shown
+  - accepted
+  - orders
+  - sales
+properties:
+  kind:
+    type: string
+    description: "`bought_together`, `nearby_complement` or `reorder`."
+    enum:
+      - bought_together
+      - nearby_complement
+      - reorder
+    examples:
+      - nearby_complement
+  shown:
+    type: integer
+    description: Times shown.
+    minimum: 0
+    examples:
+      - 1240
+  accepted:
+    type: integer
+    description: Times accepted.
+    minimum: 0
+    examples:
+      - 96
+  orders:
+    type: integer
+    description: Completed orders at the Partner's stores carrying an accepted item.
+    minimum: 0
+    examples:
+      - 71
+  sales:
+    $ref: ../common/Money.yaml
+    description: What the accepted items came to in those orders, after their own offers.
+examples:
+  - kind: nearby_complement
+    shown: 1240
+    accepted: 96
+    orders: 71
+    sales:
+      minor_units: 1250
+      currency: USD

@@ -32,6 +32,11 @@ properties:
     items:
       $ref: ../promotions/OfferShelf.yaml
     description: "The Vertical's offer shelves: free delivery, multibuys and deals, money off and free items, each the stores with a live offer of its kind, open ones first; a shelf with none is left out."
+  featured:
+    type: array
+    items:
+      $ref: ../promotions/FeaturedRow.yaml
+    description: Featured rows placed on this Vertical's page (since 0.38.0), its stores only.
 examples:
   - place:
       resolution: inside

@@ -1,0 +1,76 @@
+# Path item for /v1/partners/{partner_id}/cross-sell/figures. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getCrossSellFigures
+  summary: Read a Partner's cross-sell figures
+  description: "What cross-sell did for the Partner's stores between two days on India's clock, the last 30 by default and a year at most: recommendations of their items shown, accepted, and the completed orders and sales they brought, in all and by kind; counts and sums, never a customer. `location_id` narrows them to one Location. `promotion:read` (at the Location when one is named)."
+  tags:
+    - Recommendations
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: The first day.
+      schema:
+        type: string
+        format: date
+    - name: until
+      in: query
+      required: false
+      description: The last day.
+      schema:
+        type: string
+        format: date
+    - name: location_id
+      in: query
+      required: false
+      description: One of its Locations.
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: The figures.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/CrossSellFigures.yaml
+    "400":
+      description: "`validation_failed`: a range backwards or over a year; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `promotion:read`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: not a Partner the caller belongs to, or a Location not its."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

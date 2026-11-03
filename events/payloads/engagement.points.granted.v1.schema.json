@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.points.granted.v1.schema.json",
+  "title": "EngagementPointsGrantedPayload",
+  "description": "Payload of `engagement.points.granted` version 1. Points were granted on a completed order, a settled tab or a completed booking at a points campaign's Locations: a liability in the ledger from now, its funder paying for them. Consumers: the ledger (the points liability against the funder), payouts (a Partner's share, under rewards), analytics. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "lot_id",
+    "campaign_id",
+    "campaign_name",
+    "customer_id",
+    "points",
+    "worth",
+    "funder",
+    "partner_id",
+    "location_id",
+    "order_id",
+    "explanation",
+    "expires_at",
+    "at"
+  ],
+  "properties": {
+    "lot_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The points granted, a lot of their own until converted or expired.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The points campaign.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001"
+      ]
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Dev Kitchen points"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "points": {
+      "type": "integer",
+      "description": "How many.",
+      "examples": [
+        124
+      ],
+      "minimum": 1
+    },
+    "worth": {
+      "type": "object",
+      "description": "What they are worth converted: 10 paise a point.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 1240,
+          "currency": "INR"
+        }
+      ]
+    },
+    "funder": {
+      "type": "string",
+      "description": "Who pays: `partner` or `platform`.",
+      "examples": [
+        "partner"
+      ],
+      "enum": [
+        "partner",
+        "platform"
+      ]
+    },
+    "partner_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The Partner paying, when `funder` is `partner`.",
+      "examples": [
+        null
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where the order was.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order, tab or booking that earned them.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "explanation": {
+      "type": "string",
+      "description": "In words.",
+      "examples": [
+        "₹1,249 at Dev Kitchen Gachibowli"
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When they expire.",
+      "examples": [
+        "2027-11-03T14:20:00Z"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-03T14:20:00Z"
+      ]
+    }
+  }
+}

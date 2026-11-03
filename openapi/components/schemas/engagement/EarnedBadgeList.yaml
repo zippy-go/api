@@ -1,0 +1,17 @@
+type: object
+description: The customer's badges (since 0.38.0), the latest first.
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./EarnedBadge.yaml
+    description: Their badges.
+examples:
+  - items:
+      - badge: explorer
+        name: Explorer
+        description: Completed orders in three Verticals
+        earned_at: 2026-11-03T14:20:00Z
+        hidden: false

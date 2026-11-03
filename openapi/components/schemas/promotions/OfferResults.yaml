@@ -1,0 +1,125 @@
+type: object
+description: "An offer's results since it started (since 0.38.0), worked out from completed orders when asked: the orders that used it, their sales, its cost and who paid, new and returning customers and sales per rupee of cost; compared with the same hours in the four weeks before it started, the Location's (or the aim's) completed orders in those hours whether or not they took an offer."
+required:
+  - offer_id
+  - code_id
+  - from
+  - until
+  - orders
+  - sales
+  - cost
+  - partner_cost
+  - platform_cost
+  - new_customers
+  - returning_customers
+  - new_share_percent
+  - sales_per_rupee
+  - before
+properties:
+  offer_id:
+    type: string
+    format: uuid
+    description: The offer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+  code_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The code the figures are narrowed to; `null` for the whole offer.
+    examples:
+      - null
+  from:
+    type: string
+    format: date-time
+    description: When it started.
+    examples:
+      - 2026-10-30T10:30:00Z
+  until:
+    type: string
+    format: date-time
+    description: When it ended, or now.
+    examples:
+      - 2026-11-27T10:30:00Z
+  orders:
+    type: integer
+    description: Completed orders that used it.
+    minimum: 0
+    examples:
+      - 56
+  sales:
+    $ref: ../common/Money.yaml
+    description: The item sales of those orders after their item offers, tax included.
+  cost:
+    $ref: ../common/Money.yaml
+    description: What the offer took off them.
+  partner_cost:
+    $ref: ../common/Money.yaml
+    description: The Partner's share of the cost.
+  platform_cost:
+    $ref: ../common/Money.yaml
+    description: The platform's share of the cost.
+  new_customers:
+    type: integer
+    description: Customers whose first completed order at the Location it was.
+    minimum: 0
+    examples:
+      - 14
+  returning_customers:
+    type: integer
+    description: The others.
+    minimum: 0
+    examples:
+      - 42
+  new_share_percent:
+    type:
+      - integer
+      - "null"
+    description: New customers as a share, rounded; `null` with no orders.
+    minimum: 0
+    maximum: 100
+    examples:
+      - 25
+  sales_per_rupee:
+    type:
+      - number
+      - "null"
+    description: Sales per rupee of cost, to two places; `null` when it cost nothing.
+    examples:
+      - 11.4
+  before:
+    $ref: ./OfferResultsPeriod.yaml
+    description: The same hours in the four weeks before it started, at the same Locations.
+examples:
+  - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d7001
+    code_id: null
+    from: 2026-10-30T10:30:00Z
+    until: 2026-11-27T10:30:00Z
+    orders: 56
+    sales:
+      minor_units: 1250
+      currency: USD
+    cost:
+      minor_units: 1250
+      currency: USD
+    partner_cost:
+      minor_units: 1250
+      currency: USD
+    platform_cost:
+      minor_units: 1250
+      currency: USD
+    new_customers: 14
+    returning_customers: 42
+    new_share_percent: 25
+    sales_per_rupee: 11.4
+    before:
+      from: 2026-10-02T10:30:00Z
+      until: 2026-10-30T10:30:00Z
+      orders: 42
+      sales:
+        minor_units: 1250
+        currency: USD
+      new_customers: 9
+      returning_customers: 33
+      new_share_percent: 21

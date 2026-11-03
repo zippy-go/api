@@ -1,0 +1,32 @@
+type: object
+description: Points that moved (since 0.38.0), in words.
+required:
+  - kind
+  - points
+  - at
+  - explanation
+properties:
+  kind:
+    $ref: ./PointsEntryKind.yaml
+    description: Granted, converted or expired.
+  points:
+    type: integer
+    description: "How many: positive when granted, negative when converted or expired."
+    examples:
+      - 124
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-03T14:20:00Z
+  explanation:
+    type: string
+    description: In words.
+    examples:
+      - ₹1,249 at Dev Kitchen Gachibowli
+examples:
+  - kind: granted
+    points: 124
+    at: 2026-11-03T14:20:00Z
+    explanation: ₹1,249 at Dev Kitchen Gachibowli

@@ -1,0 +1,143 @@
+# Path item for /v1/partners/{partner_id}/commission-agreements. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: listCommissionAgreements
+  summary: List a Partner's commission agreements
+  description: The Partner's agreements to show other Partners' quests with their referral commissions, and the agreements other Partners made to show its own quests, newest first, each with the commissions recorded and their sum; counts and sums, never a customer. `engagement:read`.
+  tags:
+    - Recommendations
+  security:
+    - Bearer: []
+  parameters:
+    - name: role
+      in: query
+      required: false
+      description: "`referrer` for those it agreed to, `funder` for those on its own quests; both by default."
+      schema:
+        type: string
+        enum:
+          - referrer
+          - funder
+    - name: limit
+      in: query
+      required: false
+      description: How many, 1 to 100; 50 by default.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    - name: cursor
+      in: query
+      required: false
+      description: Where the page starts.
+      schema:
+        type: string
+  responses:
+    "200":
+      description: A page of agreements.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/CommissionAgreementPage.yaml
+    "400":
+      description: "`validation_failed`; `invalid_cursor`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `engagement:read`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: not a Partner the caller belongs to."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+post:
+  operationId: agreeToCommission
+  summary: Agree to show another Partner's quest
+  description: Agrees to show another Partner's live or scheduled quest carrying a referral commission on one of the Partner's own Locations' pages, as a "Partner offer"; a customer who starts it there and completes it earns the commission for this Partner, on both statements at the next settlement. Agreeing again answers the agreement. `engagement:write` at the Location.
+  tags:
+    - Recommendations
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: The quest and the Location.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/crosssell/CommissionAgreementInput.yaml
+  responses:
+    "201":
+      description: The agreement.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/crosssell/CommissionAgreement.yaml
+    "400":
+      description: "`validation_failed`; `malformed_identifier`."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied` without `engagement:write` at the Location."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "404":
+      description: "`not_found`: a quest that is not live or scheduled, or a Location not the Partner's."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    "409":
+      description: "`quest_without_commission`; `commission_self_referral`: its own quest, or a Partner sharing its legal entity."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

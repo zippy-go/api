@@ -90,6 +90,11 @@ properties:
     description: Who pays for a reward, in words.
     examples:
       - null
+  early_access:
+    type: boolean
+    description: Whether the customer sees and uses it 24 hours before it starts for everyone, as Silver or Gold (since 0.38.0).
+    examples:
+      - false
 examples:
   - offer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d6002
     line: ₹150 off · over ₹399

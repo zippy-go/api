@@ -1,0 +1,13 @@
+type: object
+description: "Points to convert into promotional Wallet credit (since 0.38.0): whole hundreds, at least 500."
+required:
+  - points
+properties:
+  points:
+    type: integer
+    description: How many.
+    minimum: 1
+    examples:
+      - 600
+examples:
+  - points: 600

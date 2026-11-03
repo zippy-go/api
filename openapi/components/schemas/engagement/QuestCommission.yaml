@@ -1,0 +1,23 @@
+type: object
+description: "A quest's referral commission (since 0.38.0), set by the Partner funding the quest: a fixed amount, or a share of the first order's items; paid to a Partner that agreed to show the quest when a customer completes it having started it from that Partner's page."
+required: []
+properties:
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: A fixed amount; `null` with a share.
+  percent_of_items:
+    type:
+      - integer
+      - "null"
+    description: A share of the completing order's items after discounts, 1 to 50.
+    minimum: 1
+    maximum: 50
+    examples:
+      - null
+examples:
+  - amount:
+      minor_units: 4000
+      currency: INR
+    percent_of_items: null

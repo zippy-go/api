@@ -1,0 +1,110 @@
+type: object
+description: "A Partner's agreement to show another Partner's quest with its referral commission on one of its Locations' pages (since 0.38.0), as either Partner reads it, with what it earned: counts and sums, never a customer."
+required:
+  - id
+  - campaign_id
+  - quest_name
+  - funder_partner_id
+  - funder_name
+  - referrer_partner_id
+  - referrer_name
+  - location_id
+  - location_name
+  - commission
+  - state
+  - agreed_at
+  - commissions
+  - amount
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The agreement.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+  campaign_id:
+    type: string
+    format: uuid
+    description: The quest.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  quest_name:
+    type: string
+    description: Its name.
+    examples:
+      - Your first order from Charminar Bakes Gachibowli
+  funder_partner_id:
+    type: string
+    format: uuid
+    description: The Partner funding the quest, who pays the commission.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000003
+  funder_name:
+    type: string
+    description: Its name.
+    examples:
+      - Charminar Bakes
+  referrer_partner_id:
+    type: string
+    format: uuid
+    description: The Partner that agreed to show it, who is paid.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  referrer_name:
+    type: string
+    description: Its name.
+    examples:
+      - ZippyGo Dev Partner
+  location_id:
+    type: string
+    format: uuid
+    description: The referring Partner's Location whose page shows it.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  location_name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  commission:
+    $ref: ../engagement/QuestCommission.yaml
+    description: The commission agreed, as the quest's funder set it.
+  state:
+    $ref: ./CommissionAgreementState.yaml
+    description: Agreed, or withdrawn by the referring Partner.
+  agreed_at:
+    type: string
+    format: date-time
+    description: When it was agreed.
+    examples:
+      - 2026-11-03T10:00:00Z
+  commissions:
+    type: integer
+    description: Commissions recorded under it and not taken back.
+    minimum: 0
+    examples:
+      - 3
+  amount:
+    $ref: ../common/Money.yaml
+    description: What the commissions recorded under it and not taken back came to.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8201
+    campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    quest_name: Your first order from Charminar Bakes Gachibowli
+    funder_partner_id: 01a13a48-9e00-7000-8000-000000000003
+    funder_name: Charminar Bakes
+    referrer_partner_id: 01a13a48-9e00-7000-8000-000000000001
+    referrer_name: ZippyGo Dev Partner
+    location_id: 01a13a48-9e00-7000-8000-000000000301
+    location_name: Dev Kitchen Gachibowli
+    commission:
+      amount:
+        minor_units: 4000
+        currency: INR
+      percent_of_items: null
+    state: agreed
+    agreed_at: 2026-11-03T10:00:00Z
+    commissions: 3
+    amount:
+      minor_units: 1250
+      currency: USD

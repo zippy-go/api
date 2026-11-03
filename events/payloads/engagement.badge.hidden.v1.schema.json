@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.badge.hidden.v1.schema.json",
+  "title": "EngagementBadgeHiddenPayload",
+  "description": "Payload of `engagement.badge.hidden` version 1. A customer hid a badge from any public view, or showed it again. Consumers: analytics.",
+  "type": "object",
+  "required": [
+    "badge",
+    "customer_id",
+    "hidden",
+    "at"
+  ],
+  "properties": {
+    "badge": {
+      "type": "string",
+      "description": "The badge.",
+      "examples": [
+        "explorer"
+      ],
+      "enum": [
+        "first_order",
+        "explorer",
+        "regular",
+        "early_bird",
+        "reviewer",
+        "table_for_two"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "hidden": {
+      "type": "boolean",
+      "description": "Hidden, or shown again.",
+      "examples": [
+        true
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-03T14:20:00Z"
+      ]
+    }
+  }
+}

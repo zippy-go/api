@@ -1,5 +1,5 @@
 type: string
-description: "An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card."
+description: "An offer's one mechanic: money off the basket, free delivery, money off items, a multibuy, n for a price, a bundle, a free item, or a stamp card; and since 0.38.0 the display kinds, which price nothing and are shown instead: `featured` Locations as a row on the home screen or Vertical pages (the platform's alone), and on one Location's page a `shelf` or an `announcement`."
 enum:
   - basket_off
   - free_delivery
@@ -9,5 +9,8 @@ enum:
   - bundle
   - free_item
   - stamp_card
+  - featured
+  - shelf
+  - announcement
 examples:
   - basket_off

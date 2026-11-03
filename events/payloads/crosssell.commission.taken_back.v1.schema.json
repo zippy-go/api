@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/crosssell.commission.taken_back.v1.schema.json",
+  "title": "CrosssellCommissionTakenBackPayload",
+  "description": "Payload of `crosssell.commission.taken_back` version 1. A referral commission was taken back: its order was refunded in full within 7 days of completing. The ledger and both statements reverse it. Consumers: the ledger, payouts, analytics.",
+  "type": "object",
+  "required": [
+    "commission_id",
+    "order_id",
+    "funder_partner_id",
+    "funder_location_id",
+    "referrer_partner_id",
+    "referrer_location_id",
+    "amount",
+    "at"
+  ],
+  "properties": {
+    "commission_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The commission.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8301"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "funder_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who paid.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000003"
+      ]
+    },
+    "funder_location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Where the order was.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000308"
+      ]
+    },
+    "referrer_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who was paid.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "referrer_location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Whose page referred it.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "description": "What is taken back.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 4000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-06T09:00:00Z"
+      ]
+    }
+  }
+}

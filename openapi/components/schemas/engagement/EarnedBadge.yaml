@@ -1,0 +1,39 @@
+type: object
+description: A badge the customer earned (since 0.38.0), with when; hidden from any public view when they chose.
+required:
+  - badge
+  - name
+  - description
+  - earned_at
+  - hidden
+properties:
+  badge:
+    $ref: ./BadgeCode.yaml
+    description: The badge.
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Explorer
+  description:
+    type: string
+    description: What earned it.
+    examples:
+      - Completed orders in three Verticals
+  earned_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-03T14:20:00Z
+  hidden:
+    type: boolean
+    description: Whether the customer hid it from any public view.
+    examples:
+      - false
+examples:
+  - badge: explorer
+    name: Explorer
+    description: Completed orders in three Verticals
+    earned_at: 2026-11-03T14:20:00Z
+    hidden: false

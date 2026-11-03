@@ -1,0 +1,63 @@
+type: object
+description: "The customer's points (since 0.38.0): the balance and what it is worth, what expires next, how they convert, and the latest movements."
+required:
+  - balance
+  - worth
+  - expiring
+  - expiring_on
+  - minimum_conversion
+  - rate
+  - history
+properties:
+  balance:
+    type: integer
+    description: Points held.
+    minimum: 0
+    examples:
+      - 650
+  worth:
+    $ref: ../common/Money.yaml
+    description: What the points held are worth converted, 10 paise a point.
+  expiring:
+    type: integer
+    description: Points expiring next, within 30 days; 0 when none.
+    minimum: 0
+    examples:
+      - 0
+  expiring_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: The day they expire; `null` when none within 30 days.
+    examples:
+      - null
+  minimum_conversion:
+    type: integer
+    description: The fewest points converted at a time, in whole hundreds.
+    examples:
+      - 500
+  rate:
+    type: string
+    description: How points convert, in words.
+    examples:
+      - 100 points for ₹10.00 of credit
+  history:
+    type: array
+    items:
+      $ref: ./PointsEntry.yaml
+    description: The latest movements, twenty at most, the latest first.
+examples:
+  - balance: 650
+    worth:
+      minor_units: 1250
+      currency: USD
+    expiring: 0
+    expiring_on: null
+    minimum_conversion: 500
+    rate: 100 points for ₹10.00 of credit
+    history:
+      - kind: granted
+        points: 124
+        at: 2026-11-03T14:20:00Z
+        explanation: ₹1,249 at Dev Kitchen Gachibowli

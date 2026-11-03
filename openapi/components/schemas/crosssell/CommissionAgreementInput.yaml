@@ -1,0 +1,21 @@
+type: object
+description: Agree to show another Partner's quest with its commission on one of the Partner's own Locations' pages (since 0.38.0).
+required:
+  - campaign_id
+  - location_id
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The quest, live or scheduled, carrying a commission.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  location_id:
+    type: string
+    format: uuid
+    description: One of the Partner's own Locations.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+examples:
+  - campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    location_id: 01a13a48-9e00-7000-8000-000000000301

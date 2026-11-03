@@ -30,6 +30,16 @@ properties:
   credit_earned:
     $ref: ../common/Money.yaml
     description: Promotional credit their rewards gave, all time.
+  badges:
+    type: array
+    items:
+      $ref: ./EarnedBadge.yaml
+    description: Badges earned (since 0.38.0), the latest first.
+  points:
+    oneOf:
+      - $ref: ./PointsBalance.yaml
+      - type: "null"
+    description: Their points (since 0.38.0); `null` while they never had any and no points campaign runs for them.
 examples:
   - streaks:
       - campaign_id: 01a13a48-9e00-7000-8000-000000006001

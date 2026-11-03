@@ -1,0 +1,26 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4f9003",
+  "type": "engagement.points.granted",
+  "version": 1,
+  "occurred_at": "2026-11-03T14:20:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "lot_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8401",
+    "campaign_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001",
+    "campaign_name": "Dev Kitchen points",
+    "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70",
+    "points": 124,
+    "worth": {
+      "minor_units": 1240,
+      "currency": "INR"
+    },
+    "funder": "partner",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001",
+    "explanation": "₹1,249 at Dev Kitchen Gachibowli",
+    "expires_at": "2027-11-03T14:20:00Z",
+    "at": "2026-11-03T14:20:00Z"
+  }
+}

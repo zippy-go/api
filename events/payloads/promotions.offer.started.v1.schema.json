@@ -95,7 +95,7 @@
     },
     "mechanic": {
       "type": "string",
-      "description": "Its mechanic.",
+      "description": "Its mechanic; since 0.38.0 also a display kind: `featured`, `shelf` or `announcement`.",
       "examples": [
         "multibuy"
       ],
@@ -107,7 +107,10 @@
         "n_for_price",
         "bundle",
         "free_item",
-        "stamp_card"
+        "stamp_card",
+        "featured",
+        "shelf",
+        "announcement"
       ]
     },
     "state": {

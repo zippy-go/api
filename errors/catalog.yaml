@@ -112,6 +112,21 @@ errors:
       - code: party_too_large
         message: "{store} takes parties of at most {max}."
         description: A reservation for more people than the store takes.
+      - code: points_below_minimum
+        message: "Points convert 500 at a time at least."
+        description: A conversion of fewer than 500 points (since 0.38.0).
+      - code: points_not_whole_hundreds
+        message: "Points convert in whole hundreds."
+        description: A conversion of points that is not a whole number of hundreds (since 0.38.0).
+      - code: display_not_priced
+        message: "A featured row, a shelf or an announcement prices nothing: it is for everyone, open, with no spend, limit, code or cost."
+        description: A display kind of offer given an audience, a code, a minimum spend, a limit, a budget or a Partner's share (since 0.38.0).
+      - code: display_invalid
+        message: "{field} is not one a display offer takes."
+        description: A display kind of offer with a headline over 60 characters, a message over 280, a colour not written #RRGGBB, a priority outside 1 to 10, a button without words or a safe link, or a shelf or an announcement of the platform's (since 0.38.0).
+      - code: featured_platform_only
+        message: "Featured rows are the platform's."
+        description: A featured row asked of a Partner's offer (since 0.38.0).
       - code: bundle_too_far
         message: "{first} and {second} are {metres} m apart; a bundle's stores are within 1 km."
         description: A bundle whose two stores are more than the co-delivery distance apart.
@@ -877,6 +892,41 @@ errors:
     description: >-
       A bundle taken after it was stopped, declined by a store or before
       both stores accepted it.
+
+  - code: offer_not_priced
+    status: 409
+    title: Offer not priced
+    message: "A featured row, a shelf or an announcement prices nothing, so it has no results."
+    retryable: false
+    description: >-
+      Results asked of a display kind of offer, which prices nothing (since
+      0.36.0).
+
+  - code: points_insufficient
+    status: 409
+    title: Not enough points
+    message: "You hold {balance} points."
+    retryable: false
+    description: >-
+      A conversion of more points than the customer holds (since 0.38.0).
+
+  - code: quest_without_commission
+    status: 409
+    title: Quest without commission
+    message: "This quest carries no referral commission."
+    retryable: false
+    description: >-
+      An agreement to show a quest that carries no referral commission, or
+      is not a Partner's quest naming its own Location (since 0.38.0).
+
+  - code: commission_self_referral
+    status: 409
+    title: Commission to itself
+    message: "A Partner earns no commission for referring to itself."
+    retryable: false
+    description: >-
+      An agreement to show a quest of the Partner's own, or of a Partner
+      sharing its legal entity (since 0.38.0).
 
   - code: reservation_unavailable
     status: 409

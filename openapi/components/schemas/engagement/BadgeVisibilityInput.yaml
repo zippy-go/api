@@ -1,0 +1,18 @@
+type: object
+description: Hide a badge, or every badge, from any public view, or show it again (since 0.38.0).
+required:
+  - hidden
+properties:
+  badge:
+    oneOf:
+      - $ref: ./BadgeCode.yaml
+      - type: "null"
+    description: The badge; left out or `null` for every badge.
+  hidden:
+    type: boolean
+    description: Hidden, or shown again.
+    examples:
+      - true
+examples:
+  - badge: explorer
+    hidden: true

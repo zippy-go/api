@@ -6,6 +6,57 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.38.0] - 2026-11-04
+
+Step 11 growth, phase A: the display kinds of promotions, an offer's results, badges, points,
+early access, referral commissions between Partners and a Partner's cross-sell figures. Written by
+the platform's `step11/growth` slice, the next minor after pharmacy's phase A (0.37.0). Additive
+only.
+
+### Added
+
+- Display kinds of offers, which price nothing and are shown instead (`OfferMechanic` `featured`,
+  `shelf` and `announcement`; `headline`, `placement`, `vertical_ids`, `rule`, `shelf`, `message`,
+  `colour`, `priority`, `button` and `closable` on `OfferTerms`): featured rows on the home
+  screen and Vertical pages (`featured` on `StorefrontHome` and `StoreCardList`, `FeaturedRow`,
+  "See all" at `GET /v1/storefront/featured/{offer_id}/stores`, `FeaturedRowStores`,
+  `FeaturedRule`, `FeaturedPlacement`); a store's `announcements` and `shelves` on its page
+  (`StoreAnnouncement`, `AnnouncementButton`, `StoreShelf`, `StoreShelfItem`,
+  `DisplayShelfKind`).
+- An offer's results against the same hours in the four weeks before it started
+  (`GET /v1/partners/{partner_id}/offers/{offer_id}/results`, `GET /v1/platform/offers/{offer_id}/results`,
+  `OfferResults`, `OfferResultsPeriod`); problem code `offer_not_priced`.
+- Badges and points as reward campaign kinds (`RewardCampaignKind` `badge` and `points`, `badge`
+  and `points` on `RewardRules` and `RewardRulesInput`, `BadgeRules`, `BadgeCode`, `PointsRules`,
+  `PointsRulesInput`); a customer's `badges` and `points` on `CustomerRewards` (`EarnedBadge`,
+  `PointsBalance`, `PointsEntry`, `PointsEntryKind`); hiding badges
+  (`PUT /v1/customer/rewards/badges/visibility`, `BadgeVisibilityInput`, `EarnedBadgeList`);
+  converting points into promotional credit (`POST /v1/customer/rewards/points/conversions`,
+  `PointsConversionInput`, `PointsConversion`); field codes `points_below_minimum` and
+  `points_not_whole_hundreds`, problem code `points_insufficient`.
+- Early access: `early_access` on `CustomerOffer`, an offer a Silver or Gold customer sees and uses
+  24 hours before it starts.
+- Referral commissions between Partners: `commission` on `QuestRules` and `QuestRulesInput`
+  (`QuestCommission`), `location_id` on `QuestStartInput`, a store page's `quests`
+  (`StoreQuest`); a Partner's agreements to show another's quest
+  (`GET`, `POST /v1/partners/{partner_id}/commission-agreements`,
+  `DELETE .../commission-agreements/{agreement_id}`, `CommissionAgreement`,
+  `CommissionAgreementPage`, `CommissionAgreementInput`, `CommissionAgreementState`); Mission
+  Control's list (`GET /v1/platform/commissions`, `Commission`, `CommissionPage`,
+  `CommissionState`); `commissions` on a statement and its figures (`StatementCommission`);
+  problem codes `quest_without_commission` and `commission_self_referral`.
+- A Partner's cross-sell figures, counts and sums
+  (`GET /v1/partners/{partner_id}/cross-sell/figures`, `CrossSellFigures`,
+  `CrossSellFiguresKind`).
+- The ledger's `points_liability` account (`LedgerAccountKind`) and the entries
+  `points_granted`, `points_converted`, `points_expired`, `commission_recorded` and
+  `commission_taken_back` (`LedgerEntryKind`); field codes `display_not_priced`,
+  `display_invalid` and `featured_platform_only`.
+- Events `engagement.badge.earned` and `.hidden`; `engagement.points.granted`, `.converted` and
+  `.expired`; `crosssell.commission.recorded` and `.taken_back`; the display kinds on the
+  `promotions.offer.*` events' `mechanic`; `started_from`, `started_location_id`,
+  `order_location_id`, `order_items` and `customer_first_name` on `engagement.quest.completed`.
+
 ## [0.37.0] - 2026-11-03
 
 Step 11, pharmacy, phase A: prescriptions, after channels (0.36.0). Written as 0.37.0, the
