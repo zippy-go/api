@@ -78,13 +78,13 @@
     },
     "figures": {
       "type": "object",
-      "description": "What the rule read: the store's state now, its distance from the zone's centre, its rating and how many ratings, how many offer shelves it is on.",
+      "description": "What the rule read: the store's state now, its distance from the zone's centre, its rating as the percent of good ratings and how many ratings, how many offer shelves it is on.",
       "additionalProperties": true,
       "examples": [
         {
           "state": "open",
           "distance_metres": 1200,
-          "rating": 4.5,
+          "rating": 92,
           "ratings": 120,
           "offers": 1
         }
@@ -111,7 +111,7 @@
       "figures": {
         "state": "open",
         "distance_metres": 1200,
-        "rating": 4.5,
+        "rating": 92,
         "ratings": 120,
         "offers": 1
       },
