@@ -1,0 +1,60 @@
+type: object
+description: A Partner that signed up with the code (since 0.41.0).
+required:
+  - partner_id
+  - name
+  - state
+  - signed_up_at
+  - activated_at
+  - orders
+  - rewarded_at
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The referred Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000009
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Banjara Cafe
+  state:
+    $ref: ./PartnerReferralState.yaml
+    description: Signed up, activated or rewarded.
+  signed_up_at:
+    type: string
+    format: date-time
+    description: When it signed up.
+    examples:
+      - 2026-10-20T09:00:00Z
+  activated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it went live.
+    examples:
+      - null
+  orders:
+    type: integer
+    description: Completed orders since it went live, up to the twentieth.
+    examples:
+      - 12
+  rewarded_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When the reward reached the referrer's statement.
+    examples:
+      - null
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000009
+    name: Banjara Cafe
+    state: activated
+    signed_up_at: 2026-10-20T09:00:00Z
+    activated_at: 2026-11-01T06:00:00Z
+    orders: 12
+    rewarded_at: null

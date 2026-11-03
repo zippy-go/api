@@ -1,0 +1,19 @@
+type: object
+description: Flagging a customer (since 0.41.0).
+required:
+  - signal
+properties:
+  signal:
+    $ref: ./CustomerFlagSignal.yaml
+    description: Why it is raised.
+  note:
+    type:
+      - string
+      - "null"
+    description: At most 500 characters; needed with `other`.
+    maxLength: 500
+    examples:
+      - Three accounts on this phone.
+examples:
+  - signal: shared_device
+    note: Three accounts on this phone.

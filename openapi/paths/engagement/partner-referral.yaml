@@ -1,0 +1,36 @@
+# Path item for /v1/partners/{partner_id}/referral. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+get:
+  operationId: getPartnerReferral
+  summary: Read the Partner's referral code
+  description: "The Partner's referral code and the Partners that signed up with it (since 0.41.0): once a referred Partner's twentieth order completes after it went live, the referrer's next statement carries the reward, paid by the platform. Any member of the Partner."
+  tags:
+    - Rewards
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: Its code and referrals.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/engagement/PartnerReferral.yaml
+    "404":
+      description: "`not_found`: not a Partner the caller belongs to."
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    4XX:
+      description: Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../components/schemas/common/Problem.yaml

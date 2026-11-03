@@ -6,6 +6,42 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.41.0] - 2026-11-04
+
+Step 11 growth, phase B: support and money. A customer's activity, the ticket queue, fraud
+flags, a Partner's referral code, the shortfall settled by UPI, and the quests a Partner may
+show for a commission. Written by the platform's `step11/growth-b` slice after growth's phase A
+(0.38.0), as 0.41.0 after pharmacy's 0.41.0 and channels' 0.40.0; renumbered by merge order.
+Additive, but for a refund to a flagged customer answering `202` with its proposal.
+
+### Added
+
+- A customer's activity for support (`GET /v1/platform/customers/{customer_id}/activity`,
+  `CustomerActivity`, `CustomerActivityWay`, `CustomerActivityStore`), `customer:read`.
+- The ticket queue from help requests, Gold and Silver first (`GET /v1/platform/tickets`,
+  `POST .../tickets/{ticket_id}/take`, `.../resolve`, `.../notes`; `Ticket`, `TicketPage`,
+  `TicketState`, `TicketTier`, `TicketHolder`, `TicketNote`, `TicketResolveInput`,
+  `TicketNoteInput`), the new permission `ticket:manage`; problem codes `ticket_taken` and
+  `ticket_resolved`.
+- Fraud flags (`POST /v1/platform/customers/{customer_id}/flags`, `DELETE .../flags/{flag_id}`;
+  `CustomerFlag`, `CustomerFlagInput`, `CustomerFlagSignal`; `flags` on `PlatformCustomer`,
+  `flag` on `PlatformCustomerActions`), `customer:block`; a refund to a flagged customer answers
+  `202` with a proposal (`ApprovalAction` `refund_flagged_customer`, `ApprovalSubject` kind
+  `order`); `shortfall` among the payments events' purposes; a standing flag holds the
+  customer's rewards (`RewardSignalCode` `support_flag`) and earns no points.
+- A Partner's referral code (`GET /v1/partners/{partner_id}/referral`, `PartnerReferral`,
+  `PartnerReferred`, `PartnerReferralState`; `referral_code` on `PartnerCreate`, field code
+  `referral_code_unknown`).
+- The quests a Partner may show for a commission (`GET /v1/partners/{partner_id}/commission-quests`,
+  `CommissionQuest`, `CommissionQuestPage`).
+- A shortfall settled by UPI (`shortfall` on `Statement`, `StatementShortfall`, `ShortfallState`;
+  `POST /v1/partners/{partner_id}/locations/{location_id}/shortfalls/{shortfall_id}/payments`,
+  `ShortfallPaymentInput`, `ShortfallPaymentStarted`; `PaymentPurpose` `shortfall`); problem code
+  `shortfall_settled`.
+- Events `customers.ticket.opened`, `.taken` and `.resolved`; `customers.flag.raised` and
+  `.cleared`; `payouts.shortfall.requested` and `.settled`;
+  `engagement.partner_referral.rewarded`; `referral_code` on `tenancy.partner.created`.
+
 ## [0.40.0] - 2026-11-04
 
 Step 11, channels and data, phase B: the customer's data, viewing the app as the customer,

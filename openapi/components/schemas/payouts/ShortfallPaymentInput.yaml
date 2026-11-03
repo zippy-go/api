@@ -1,0 +1,22 @@
+type: object
+description: Paying a shortfall (since 0.41.0).
+required:
+  - method
+properties:
+  method:
+    type: string
+    description: "`upi`, on the provider's page."
+    enum:
+      - upi
+    examples:
+      - upi
+  return_url:
+    type:
+      - string
+      - "null"
+    description: Where the payment page sends the browser back.
+    examples:
+      - null
+examples:
+  - method: upi
+    return_url: null

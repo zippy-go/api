@@ -1,0 +1,34 @@
+type: object
+description: A store in a customer's activity (since 0.41.0), the most ordered from first.
+required:
+  - location_id
+  - name
+  - orders
+  - spent
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: The store.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000301
+  name:
+    type: string
+    description: Its name.
+    examples:
+      - Dev Kitchen Gachibowli
+  orders:
+    type: integer
+    description: Completed orders there.
+    examples:
+      - 5
+  spent:
+    $ref: ../common/Money.yaml
+    description: What they were charged for those orders.
+examples:
+  - location_id: 01a13a48-9e00-7000-8000-000000000301
+    name: Dev Kitchen Gachibowli
+    orders: 5
+    spent:
+      minor_units: 624500
+      currency: INR

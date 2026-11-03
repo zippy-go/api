@@ -86,6 +86,13 @@ properties:
     description: Permissions to withhold from the partner's entitlements, for platform staff onboarding a partner; never `partner:access` (`partner_cannot_sign_in`).
     examples:
       - - promotion:write
+  referral_code:
+    type:
+      - string
+      - "null"
+    description: Another Partner's referral code, given at sign-up (since 0.41.0); a code nobody holds is refused (`referral_code_unknown`).
+    examples:
+      - ZGDEV7K2
 examples:
   - kind: organisation
     name: Example Partner

@@ -37,9 +37,10 @@
         "order",
         "wallet_top_up",
         "invoice",
-        "cash_deposit"
+        "cash_deposit",
+        "shortfall"
       ],
-      "description": "An order's payment or a Wallet top-up; since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`)."
+      "description": "An order's payment or a Wallet top-up; since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`); since 0.41.0 a week below nothing a Partner pays by UPI (`shortfall`)."
     },
     "order_id": {
       "type": [

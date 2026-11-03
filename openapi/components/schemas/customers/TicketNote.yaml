@@ -1,0 +1,27 @@
+type: object
+description: A note on a ticket (since 0.41.0), kept as written.
+required:
+  - text
+  - by
+  - at
+properties:
+  text:
+    type: string
+    description: What was written, 1 to 1000 characters.
+    examples:
+      - "Called the store: the dal was left out."
+  by:
+    $ref: ./TicketHolder.yaml
+    description: Who wrote it.
+  at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-04T10:15:00Z
+examples:
+  - text: "Called the store: the dal was left out."
+    by:
+      user_id: 01a13a48-9e00-7000-8000-000000000101
+      name: Priya
+    at: 2026-11-04T10:15:00Z

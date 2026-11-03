@@ -2717,3 +2717,67 @@ events:
       A customer let a favourite go. Consumers: analytics.
     payload_schema: ./payloads/customers.favourite.removed.v1.schema.json
     example: ./examples/customers.favourite.removed.v1.json
+
+  - type: customers.ticket.opened
+    version: 1
+    domain: customers
+    description: >-
+      A customer's help request on an order became a ticket in support's queue.
+    payload_schema: ./payloads/customers.ticket.opened.v1.schema.json
+    example: ./examples/customers.ticket.opened.v1.json
+
+  - type: customers.ticket.taken
+    version: 1
+    domain: customers
+    description: >-
+      A support member took a ticket and holds it.
+    payload_schema: ./payloads/customers.ticket.taken.v1.schema.json
+    example: ./examples/customers.ticket.taken.v1.json
+
+  - type: customers.ticket.resolved
+    version: 1
+    domain: customers
+    description: >-
+      A ticket was resolved.
+    payload_schema: ./payloads/customers.ticket.resolved.v1.schema.json
+    example: ./examples/customers.ticket.resolved.v1.json
+
+  - type: customers.flag.raised
+    version: 1
+    domain: customers
+    description: >-
+      Support flagged a customer with a fraud signal: the rewards engine holds their rewards for review while it stands, and a refund to them waits for a second person.
+    payload_schema: ./payloads/customers.flag.raised.v1.schema.json
+    example: ./examples/customers.flag.raised.v1.json
+
+  - type: customers.flag.cleared
+    version: 1
+    domain: customers
+    description: >-
+      Support cleared a fraud flag.
+    payload_schema: ./payloads/customers.flag.cleared.v1.schema.json
+    example: ./examples/customers.flag.cleared.v1.json
+
+  - type: payouts.shortfall.requested
+    version: 1
+    domain: payouts
+    description: >-
+      A Location's week locked below nothing by more than ₹5,000.00, or carried for four statements, and the Partner was asked to pay it by UPI.
+    payload_schema: ./payloads/payouts.shortfall.requested.v1.schema.json
+    example: ./examples/payouts.shortfall.requested.v1.json
+
+  - type: payouts.shortfall.settled
+    version: 1
+    domain: payouts
+    description: >-
+      A shortfall was paid: the carry is cleared.
+    payload_schema: ./payloads/payouts.shortfall.settled.v1.schema.json
+    example: ./examples/payouts.shortfall.settled.v1.json
+
+  - type: engagement.partner_referral.rewarded
+    version: 1
+    domain: engagement
+    description: >-
+      A Partner that signed up with another Partner's referral code completed its twentieth order after it went live: the referrer is rewarded, paid by the platform on its next statement.
+    payload_schema: ./payloads/engagement.partner_referral.rewarded.v1.schema.json
+    example: ./examples/engagement.partner_referral.rewarded.v1.json

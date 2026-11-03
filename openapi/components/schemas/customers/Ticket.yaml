@@ -1,0 +1,148 @@
+type: object
+description: "A support ticket (since 0.41.0): a customer's help request on an order, opened as it arrives, taken by one member and resolved."
+required:
+  - id
+  - customer_id
+  - customer_name
+  - tier
+  - order_id
+  - order_number
+  - location_id
+  - kind
+  - note
+  - state
+  - held_by
+  - opened_at
+  - taken_at
+  - resolved_at
+  - resolution
+  - notes
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The ticket.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  customer_name:
+    type:
+      - string
+      - "null"
+    description: Their given name.
+    examples:
+      - Asha
+  tier:
+    $ref: ./TicketTier.yaml
+    description: The customer's tier as the queue reads it.
+  order_id:
+    type: string
+    format: uuid
+    description: The order the help request is about.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+  order_number:
+    type:
+      - string
+      - "null"
+    description: Its number.
+    examples:
+      - ZG-24817
+  location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The store.
+    examples:
+      - null
+  kind:
+    type: string
+    description: "What went wrong, as the customer chose: `missing_item`, `wrong_item`, `damaged`, `late`, `cancel_order` or `other`."
+    enum:
+      - missing_item
+      - wrong_item
+      - damaged
+      - late
+      - cancel_order
+      - other
+    examples:
+      - missing_item
+  note:
+    type:
+      - string
+      - "null"
+    description: What the customer wrote.
+    examples:
+      - The dal was missing.
+  state:
+    $ref: ./TicketState.yaml
+    description: Open, taken or resolved.
+  held_by:
+    oneOf:
+      - $ref: ./TicketHolder.yaml
+      - type: "null"
+    description: Who holds it; `null` while open.
+  opened_at:
+    type: string
+    format: date-time
+    description: When the help request arrived.
+    examples:
+      - 2026-11-04T10:15:00Z
+  taken_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was taken.
+    examples:
+      - null
+  resolved_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was resolved.
+    examples:
+      - null
+  resolution:
+    type:
+      - string
+      - "null"
+    description: How it was resolved, in words.
+    examples:
+      - null
+  notes:
+    type: array
+    items:
+      $ref: ./TicketNote.yaml
+    description: Its notes, the oldest first.
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    customer_name: Asha
+    tier: gold
+    order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+    order_number: ZG-24817
+    location_id: null
+    kind: missing_item
+    note: The dal was missing.
+    state: open
+    held_by:
+      user_id: 01a13a48-9e00-7000-8000-000000000101
+      name: Priya
+    opened_at: 2026-11-04T10:15:00Z
+    taken_at: null
+    resolved_at: null
+    resolution: null
+    notes:
+      - text: "Called the store: the dal was left out."
+        by:
+          user_id: 01a13a48-9e00-7000-8000-000000000101
+          name: Priya
+        at: 2026-11-04T10:15:00Z

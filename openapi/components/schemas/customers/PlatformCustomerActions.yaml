@@ -14,6 +14,11 @@ properties:
   unblock:
     type: boolean
     description: "Whether the caller may unblock it now (`customer:block`, and the account is blocked)."
+  flag:
+    type: boolean
+    description: Whether the caller may flag the account or clear a flag (`customer:block`, since 0.41.0).
+    examples:
+      - true
 examples:
   - write_note: true
     block: false

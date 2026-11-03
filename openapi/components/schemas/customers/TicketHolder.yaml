@@ -1,0 +1,22 @@
+type: object
+description: Who holds a ticket (since 0.41.0).
+required:
+  - user_id
+  - name
+properties:
+  user_id:
+    type: string
+    format: uuid
+    description: The support member.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000101
+  name:
+    type:
+      - string
+      - "null"
+    description: Their name, as it was.
+    examples:
+      - Priya
+examples:
+  - user_id: 01a13a48-9e00-7000-8000-000000000101
+    name: Priya

@@ -1,0 +1,63 @@
+type: object
+description: "A week below nothing that the Partner is asked to pay (since 0.41.0): by more than ₹5,000.00, or carried for four statements. Paying it clears the carry."
+required:
+  - id
+  - amount
+  - reason
+  - state
+  - requested_at
+  - settled_at
+  - payment_id
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The shortfall.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7201
+  amount:
+    $ref: ../common/Money.yaml
+    description: What the Partner is asked to pay.
+  reason:
+    type: string
+    description: "`over_threshold`, below nothing by more than ₹5,000.00; or `carried`, carried for four statements."
+    enum:
+      - over_threshold
+      - carried
+    examples:
+      - over_threshold
+  state:
+    $ref: ./ShortfallState.yaml
+    description: Requested or settled.
+  requested_at:
+    type: string
+    format: date-time
+    description: When it was asked for.
+    examples:
+      - 2026-11-04T10:15:00Z
+  settled_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was paid.
+    examples:
+      - null
+  payment_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The payment that settled it, or the one under way.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7201
+    amount:
+      minor_units: 540000
+      currency: INR
+    reason: over_threshold
+    state: requested
+    requested_at: 2026-11-04T10:15:00Z
+    settled_at: null
+    payment_id: null

@@ -1,0 +1,10 @@
+type: string
+description: "Why support flags a customer (since 0.41.0): several accounts on one device or one address, cancellations or full refunds after rewards, a burst of reviews, or something else in the note."
+enum:
+  - shared_device
+  - shared_address
+  - cancellations
+  - review_burst
+  - other
+examples:
+  - shared_device

@@ -1,0 +1,8 @@
+type: string
+description: "Where a referred Partner stands (since 0.41.0): `signed_up` with the code, `activated` once it went live, `rewarded` after its twentieth completed order."
+enum:
+  - signed_up
+  - activated
+  - rewarded
+examples:
+  - activated

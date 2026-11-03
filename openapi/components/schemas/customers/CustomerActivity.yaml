@@ -1,0 +1,98 @@
+type: object
+description: "How a customer orders over a range (since 0.41.0), for support: completed orders by way of ordering, the stores they order from, their average order and their refunds. Worked out from ordering's orders when asked."
+required:
+  - customer_id
+  - from
+  - until
+  - orders
+  - spent
+  - average_order
+  - cancelled
+  - refunds
+  - refunded
+  - ways
+  - stores
+properties:
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  from:
+    type: string
+    format: date
+    description: The first day, on India's clock.
+    examples:
+      - 2026-08-06
+  until:
+    type: string
+    format: date
+    description: The last day.
+    examples:
+      - 2026-11-04
+  orders:
+    type: integer
+    description: Completed orders.
+    examples:
+      - 9
+  spent:
+    $ref: ../common/Money.yaml
+    description: What they were charged for them.
+  average_order:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: What a completed order came to on average; `null` with none.
+  cancelled:
+    type: integer
+    description: Orders cancelled, by them or the store.
+    examples:
+      - 1
+  refunds:
+    type: integer
+    description: Refunds given.
+    examples:
+      - 1
+  refunded:
+    $ref: ../common/Money.yaml
+    description: What the refunds came to.
+  ways:
+    type: array
+    items:
+      $ref: ./CustomerActivityWay.yaml
+    description: By way of ordering, the most orders first.
+  stores:
+    type: array
+    items:
+      $ref: ./CustomerActivityStore.yaml
+    description: The stores, the most orders first; ten at most.
+examples:
+  - customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    from: 2026-08-06
+    until: 2026-11-04
+    orders: 9
+    spent:
+      minor_units: 1012300
+      currency: INR
+    average_order:
+      minor_units: 112478
+      currency: INR
+    cancelled: 1
+    refunds: 1
+    refunded:
+      minor_units: 24900
+      currency: INR
+    ways:
+      - way: delivery
+        orders: 7
+        spent:
+          minor_units: 812300
+          currency: INR
+    stores:
+      - location_id: 01a13a48-9e00-7000-8000-000000000301
+        name: Dev Kitchen Gachibowli
+        orders: 5
+        spent:
+          minor_units: 624500
+          currency: INR

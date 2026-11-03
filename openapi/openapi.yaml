@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.40.0
+  version: 0.41.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -1913,6 +1913,29 @@ paths:
     $ref: ./paths/agents/partner-agent-offboard-approve.yaml
   /v1/partners/{partner_id}/agents/{agent_id}/offboard/refuse:
     $ref: ./paths/agents/partner-agent-offboard-refuse.yaml
+
+  # Step 11 growth, phase B: activity, tickets, flags, Partner referrals, the shortfall
+  /v1/platform/customers/{customer_id}/activity:
+    $ref: ./paths/customers/platform-customer-activity.yaml
+  /v1/platform/tickets:
+    $ref: ./paths/customers/platform-tickets.yaml
+  /v1/platform/tickets/{ticket_id}/take:
+    $ref: ./paths/customers/platform-ticket-take.yaml
+  /v1/platform/tickets/{ticket_id}/resolve:
+    $ref: ./paths/customers/platform-ticket-resolve.yaml
+  /v1/platform/tickets/{ticket_id}/notes:
+    $ref: ./paths/customers/platform-ticket-notes.yaml
+  /v1/platform/customers/{customer_id}/flags:
+    $ref: ./paths/customers/platform-customer-flags.yaml
+  /v1/platform/customers/{customer_id}/flags/{flag_id}:
+    $ref: ./paths/customers/platform-customer-flag.yaml
+  /v1/partners/{partner_id}/referral:
+    $ref: ./paths/engagement/partner-referral.yaml
+  /v1/partners/{partner_id}/commission-quests:
+    $ref: ./paths/crosssell/partner-commission-quests.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/shortfalls/{shortfall_id}/payments:
+    $ref: ./paths/payouts/partner-shortfall-payments.yaml
+
 components:
   securitySchemes:
     ApiKey:
@@ -5290,3 +5313,51 @@ components:
       $ref: ./components/schemas/agents/AgentRecord.yaml
     AgentRecordExport:
       $ref: ./components/schemas/agents/AgentRecordExport.yaml
+
+    # Step 11 growth, phase B
+    CustomerActivityWay:
+      $ref: ./components/schemas/customers/CustomerActivityWay.yaml
+    CustomerActivityStore:
+      $ref: ./components/schemas/customers/CustomerActivityStore.yaml
+    CustomerActivity:
+      $ref: ./components/schemas/customers/CustomerActivity.yaml
+    TicketState:
+      $ref: ./components/schemas/customers/TicketState.yaml
+    TicketTier:
+      $ref: ./components/schemas/customers/TicketTier.yaml
+    TicketHolder:
+      $ref: ./components/schemas/customers/TicketHolder.yaml
+    TicketNote:
+      $ref: ./components/schemas/customers/TicketNote.yaml
+    Ticket:
+      $ref: ./components/schemas/customers/Ticket.yaml
+    TicketPage:
+      $ref: ./components/schemas/customers/TicketPage.yaml
+    TicketResolveInput:
+      $ref: ./components/schemas/customers/TicketResolveInput.yaml
+    TicketNoteInput:
+      $ref: ./components/schemas/customers/TicketNoteInput.yaml
+    CustomerFlagSignal:
+      $ref: ./components/schemas/customers/CustomerFlagSignal.yaml
+    CustomerFlag:
+      $ref: ./components/schemas/customers/CustomerFlag.yaml
+    CustomerFlagInput:
+      $ref: ./components/schemas/customers/CustomerFlagInput.yaml
+    PartnerReferralState:
+      $ref: ./components/schemas/engagement/PartnerReferralState.yaml
+    PartnerReferred:
+      $ref: ./components/schemas/engagement/PartnerReferred.yaml
+    PartnerReferral:
+      $ref: ./components/schemas/engagement/PartnerReferral.yaml
+    CommissionQuest:
+      $ref: ./components/schemas/crosssell/CommissionQuest.yaml
+    CommissionQuestPage:
+      $ref: ./components/schemas/crosssell/CommissionQuestPage.yaml
+    ShortfallState:
+      $ref: ./components/schemas/payouts/ShortfallState.yaml
+    StatementShortfall:
+      $ref: ./components/schemas/payouts/StatementShortfall.yaml
+    ShortfallPaymentInput:
+      $ref: ./components/schemas/payouts/ShortfallPaymentInput.yaml
+    ShortfallPaymentStarted:
+      $ref: ./components/schemas/payouts/ShortfallPaymentStarted.yaml

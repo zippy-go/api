@@ -1,0 +1,7 @@
+type: string
+description: "Where a shortfall stands (since 0.41.0): `requested` from the Partner by UPI, `settled` once paid."
+enum:
+  - requested
+  - settled
+examples:
+  - requested

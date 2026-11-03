@@ -1,0 +1,31 @@
+type: object
+description: A way of ordering in a customer's activity (since 0.41.0).
+required:
+  - way
+  - orders
+  - spent
+properties:
+  way:
+    type: string
+    description: "`delivery`, `pickup`, `dine_in` or `on_site`."
+    enum:
+      - delivery
+      - pickup
+      - dine_in
+      - on_site
+    examples:
+      - delivery
+  orders:
+    type: integer
+    description: Completed orders.
+    examples:
+      - 7
+  spent:
+    $ref: ../common/Money.yaml
+    description: What they were charged for those orders.
+examples:
+  - way: delivery
+    orders: 7
+    spent:
+      minor_units: 812300
+      currency: INR

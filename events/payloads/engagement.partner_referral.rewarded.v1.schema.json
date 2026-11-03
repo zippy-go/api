@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/engagement.partner_referral.rewarded.v1.schema.json",
+  "title": "EngagementPartnerReferralRewardedPayload",
+  "description": "Payload of `engagement.partner_referral.rewarded` version 1. A Partner that signed up with another Partner's referral code completed its twentieth order after it went live: the referrer is rewarded, paid by the platform on its next statement. Consumers: the ledger, payouts, analytics.",
+  "type": "object",
+  "required": [
+    "referral_id",
+    "referrer_partner_id",
+    "referred_partner_id",
+    "amount",
+    "orders",
+    "at"
+  ],
+  "properties": {
+    "referral_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The referral.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7501"
+      ]
+    },
+    "referrer_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner rewarded.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "referred_partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner it referred.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000009"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "description": "The reward.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 200000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "orders": {
+      "type": "integer",
+      "description": "Completed orders that earned it.",
+      "examples": [
+        20
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-20T13:00:00Z"
+      ]
+    }
+  }
+}

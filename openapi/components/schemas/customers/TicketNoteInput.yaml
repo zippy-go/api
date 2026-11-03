@@ -1,0 +1,14 @@
+type: object
+description: A note on a ticket (since 0.41.0).
+required:
+  - text
+properties:
+  text:
+    type: string
+    description: 1 to 1000 characters.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Called the store.
+examples:
+  - text: Called the store.

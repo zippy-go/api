@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payouts.shortfall.requested.v1.schema.json",
+  "title": "PayoutsShortfallRequestedPayload",
+  "description": "Payload of `payouts.shortfall.requested` version 1. A Location's week locked below nothing by more than ₹5,000.00, or carried for four statements, and the Partner was asked to pay it by UPI. Consumers: notifications (the owners told), analytics.",
+  "type": "object",
+  "required": [
+    "shortfall_id",
+    "statement_id",
+    "partner_id",
+    "location_id",
+    "amount",
+    "reason",
+    "at"
+  ],
+  "properties": {
+    "shortfall_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The shortfall.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7201"
+      ]
+    },
+    "statement_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The statement whose lock asked for it.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7301"
+      ]
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Location.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "description": "What is asked.",
+      "required": [
+        "minor_units",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor_units": {
+          "type": "integer",
+          "description": "The amount in paise."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "The ISO 4217 code."
+        }
+      },
+      "examples": [
+        {
+          "minor_units": 540000,
+          "currency": "INR"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "`over_threshold` or `carried`.",
+      "examples": [
+        "over_threshold"
+      ],
+      "enum": [
+        "over_threshold",
+        "carried"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-04T10:15:00Z"
+      ]
+    }
+  }
+}

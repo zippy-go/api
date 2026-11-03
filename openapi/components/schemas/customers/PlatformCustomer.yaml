@@ -111,6 +111,11 @@ properties:
   actions:
     $ref: ./PlatformCustomerActions.yaml
     description: "What the caller may do."
+  flags:
+    type: array
+    items:
+      $ref: ./CustomerFlag.yaml
+    description: The fraud flags that stand (since 0.41.0), the newest first.
 examples:
   - customer_id: "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
     status: blocked

@@ -1,0 +1,41 @@
+type: object
+description: "A Partner's referral code (since 0.41.0): a Partner that signs up with it earns the referrer a reward, paid by the platform on its statement, once its twentieth order completes."
+required:
+  - partner_id
+  - code
+  - reward
+  - orders_needed
+  - referred
+properties:
+  partner_id:
+    type: string
+    format: uuid
+    description: The Partner.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000001
+  code:
+    type: string
+    description: Its code, given at sign-up.
+    examples:
+      - ZGDEV7K2
+  reward:
+    $ref: ../common/Money.yaml
+    description: What a referral earns.
+  orders_needed:
+    type: integer
+    description: Completed orders a referred Partner reaches for the reward.
+    examples:
+      - 20
+  referred:
+    type: array
+    items:
+      $ref: ./PartnerReferred.yaml
+    description: The Partners that signed up with it, the newest first.
+examples:
+  - partner_id: 01a13a48-9e00-7000-8000-000000000001
+    code: ZGDEV7K2
+    reward:
+      minor_units: 200000
+      currency: INR
+    orders_needed: 20
+    referred: []

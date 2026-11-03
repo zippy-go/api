@@ -11,7 +11,7 @@ parameters:
 post:
   operationId: refundOrder
   summary: Refund lines and fees
-  description: "Refunds lines, with quantities, and fees of an accepted, ready, on-its-way, undelivered, completed or cancelled order, with a reason, a required note and who pays. A line gives back what it cost the customer, only as many of it as earlier refunds left (a line left out at acceptance was never charged); a fee is given back whole, what is left of it; the refunds on an order together never exceed what was paid. The amount goes to the source first, up to what it was charged less what was refunded to it, the rest to the Wallet; a cash order's goes to the Wallet. `order:refund`. Each refund is its own record on the order with its lines, fees, split, reason, note, payer and the operator, and is written to the audit log. It needs a fresh step-up (`step_up_required` otherwise; a sign-in within ten minutes counts) and `Idempotency-Key`: the same key makes one refund. The refusal asking for the step-up is not remembered under the key: prove it and repeat the request as it was."
+  description: "Refunds lines, with quantities, and fees of an accepted, ready, on-its-way, undelivered, completed or cancelled order, with a reason, a required note and who pays. A line gives back what it cost the customer, only as many of it as earlier refunds left (a line left out at acceptance was never charged); a fee is given back whole, what is left of it; the refunds on an order together never exceed what was paid. The amount goes to the source first, up to what it was charged less what was refunded to it, the rest to the Wallet; a cash order's goes to the Wallet. `order:refund`. Each refund is its own record on the order with its lines, fees, split, reason, note, payer and the operator, and is written to the audit log. It needs a fresh step-up (`step_up_required` otherwise; a sign-in within ten minutes counts) and `Idempotency-Key`: the same key makes one refund. The refusal asking for the step-up is not remembered under the key: prove it and repeat the request as it was. Since 0.41.0 a refund to a customer with a fraud flag answers `202` with the proposal a second person decides (`refund_flagged_customer`), and is made once it is approved."
   tags:
     - Order handling
   security:
@@ -32,6 +32,12 @@ post:
         application/json:
           schema:
             $ref: ../../components/schemas/orders/OrderRefund.yaml
+    "202":
+      description: "The customer has a fraud flag: the proposal a second person decides (since 0.41.0)."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/oversight/Approval.yaml
     "400":
       description: "`validation_failed`: as for the preview, or `Idempotency-Key` missing (`idempotency_key_missing`)."
       content:

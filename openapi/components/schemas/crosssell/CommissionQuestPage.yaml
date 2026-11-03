@@ -1,0 +1,37 @@
+type: object
+description: A page of the quests the Partner may show (since 0.41.0), the newest first.
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CommissionQuest.yaml
+    description: The quests.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The next page's cursor.
+    examples:
+      - null
+examples:
+  - items:
+      - campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+        quest_name: Your first order from Charminar Bakes Gachibowli
+        line: "Order from Charminar Bakes Gachibowli: ₹50.00 of credit"
+        funder_partner_id: 01a13a48-9e00-7000-8000-000000000003
+        funder_name: Charminar Bakes
+        funder_location_id: null
+        funder_location_name: Charminar Bakes Gachibowli
+        commission:
+          amount:
+            minor_units: 4000
+            currency: INR
+          percent_of_items: null
+        state: live
+        starts_at: null
+        ends_at: null
+        agreement_id: null
+    next_cursor: null

@@ -1,0 +1,20 @@
+{
+  "id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4fa006",
+  "type": "payouts.shortfall.requested",
+  "version": 1,
+  "occurred_at": "2026-11-04T10:15:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+  "correlation_id": null,
+  "payload": {
+    "shortfall_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7201",
+    "statement_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7301",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+    "location_id": "01a13a48-9e00-7000-8000-000000000301",
+    "amount": {
+      "minor_units": 540000,
+      "currency": "INR"
+    },
+    "reason": "over_threshold",
+    "at": "2026-11-04T10:15:00Z"
+  }
+}

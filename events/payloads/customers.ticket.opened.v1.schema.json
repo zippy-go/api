@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.ticket.opened.v1.schema.json",
+  "title": "CustomersTicketOpenedPayload",
+  "description": "Payload of `customers.ticket.opened` version 1. A customer's help request on an order became a ticket in support's queue. Consumers: analytics. Consumers must ignore fields they do not know.",
+  "type": "object",
+  "required": [
+    "ticket_id",
+    "customer_id",
+    "order_id",
+    "location_id",
+    "kind",
+    "tier",
+    "at"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ticket.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001"
+      ]
+    },
+    "location_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The store.",
+      "examples": [
+        null
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "description": "What went wrong.",
+      "examples": [
+        "missing_item"
+      ],
+      "enum": [
+        "missing_item",
+        "wrong_item",
+        "damaged",
+        "late",
+        "cancel_order",
+        "other"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "description": "The customer's tier when it opened.",
+      "examples": [
+        "gold"
+      ],
+      "enum": [
+        "gold",
+        "silver",
+        "member"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-04T10:15:00Z"
+      ]
+    }
+  }
+}

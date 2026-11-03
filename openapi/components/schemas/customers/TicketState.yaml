@@ -1,0 +1,8 @@
+type: string
+description: "Where a ticket stands (since 0.41.0): `open` for anyone in support, `taken` by one member, `resolved`."
+enum:
+  - open
+  - taken
+  - resolved
+examples:
+  - open

@@ -17,7 +17,8 @@ properties:
       - statement
       - adjustment
       - wallet
-    description: What it is.
+      - order
+    description: What it is; since 0.41.0 an `order`, refunded to a customer with a fraud flag.
     examples:
       - partner
   id:

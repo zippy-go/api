@@ -1,0 +1,67 @@
+type: object
+description: "A fraud flag on a customer (since 0.41.0): while it stands their rewards are held for review and a refund to them waits for a second person."
+required:
+  - id
+  - customer_id
+  - signal
+  - note
+  - raised_by
+  - raised_at
+  - cleared_by
+  - cleared_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The flag.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7101
+  customer_id:
+    type: string
+    format: uuid
+    description: The customer.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+  signal:
+    $ref: ./CustomerFlagSignal.yaml
+    description: Why it was raised.
+  note:
+    type:
+      - string
+      - "null"
+    description: What support wrote, at most 500 characters.
+    examples:
+      - Three accounts on this phone.
+  raised_by:
+    $ref: ./TicketHolder.yaml
+    description: Who raised it.
+  raised_at:
+    type: string
+    format: date-time
+    description: When.
+    examples:
+      - 2026-11-04T10:15:00Z
+  cleared_by:
+    oneOf:
+      - $ref: ./TicketHolder.yaml
+      - type: "null"
+    description: Who cleared it; `null` while it stands.
+  cleared_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it was cleared.
+    examples:
+      - null
+examples:
+  - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7101
+    customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+    signal: shared_device
+    note: Three accounts on this phone.
+    raised_by:
+      user_id: 01a13a48-9e00-7000-8000-000000000101
+      name: Priya
+    raised_at: 2026-11-04T10:15:00Z
+    cleared_by: null
+    cleared_at: null

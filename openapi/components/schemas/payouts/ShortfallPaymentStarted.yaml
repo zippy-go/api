@@ -1,0 +1,30 @@
+type: object
+description: A shortfall's payment started (since 0.41.0).
+required:
+  - shortfall
+  - next_action
+properties:
+  shortfall:
+    $ref: ./StatementShortfall.yaml
+    description: The shortfall, its payment under way.
+  next_action:
+    oneOf:
+      - $ref: ../payments/PaymentNextAction.yaml
+      - type: "null"
+    description: What the payer does next.
+examples:
+  - shortfall:
+      id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7201
+      amount:
+        minor_units: 540000
+        currency: INR
+      reason: over_threshold
+      state: requested
+      requested_at: 2026-11-04T10:15:00Z
+      settled_at: null
+      payment_id: null
+    next_action:
+      kind: redirect
+      url: https://payments.sandbox.zippygo.example/sim/provider/pay/simpay_01
+      expires_at: 2026-10-16T09:05:00Z
+      message: Approve the payment on the provider's page.

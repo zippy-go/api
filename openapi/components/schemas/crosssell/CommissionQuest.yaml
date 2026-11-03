@@ -1,0 +1,110 @@
+type: object
+description: Another Partner's quest carrying a referral commission that the Partner may agree to show (since 0.41.0).
+required:
+  - campaign_id
+  - quest_name
+  - line
+  - funder_partner_id
+  - funder_name
+  - funder_location_id
+  - funder_location_name
+  - commission
+  - state
+  - starts_at
+  - ends_at
+  - agreement_id
+properties:
+  campaign_id:
+    type: string
+    format: uuid
+    description: The quest.
+    examples:
+      - 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+  quest_name:
+    type: string
+    description: Its name.
+    examples:
+      - Your first order from Charminar Bakes Gachibowli
+  line:
+    type: string
+    description: What it asks and gives, in words.
+    examples:
+      - "Order from Charminar Bakes Gachibowli: ₹50.00 of credit"
+  funder_partner_id:
+    type: string
+    format: uuid
+    description: The Partner funding it, who pays the commission.
+    examples:
+      - 01a13a48-9e00-7000-8000-000000000003
+  funder_name:
+    type: string
+    description: Its name.
+    examples:
+      - Charminar Bakes
+  funder_location_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Location its order step names.
+    examples:
+      - null
+  funder_location_name:
+    type:
+      - string
+      - "null"
+    description: Its name.
+    examples:
+      - Charminar Bakes Gachibowli
+  commission:
+    $ref: ../engagement/QuestCommission.yaml
+    description: The commission its funder set.
+  state:
+    type: string
+    description: "`live` or `scheduled`."
+    enum:
+      - live
+      - scheduled
+    examples:
+      - live
+  starts_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it starts.
+    examples:
+      - null
+  ends_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: When it ends; `null` until stopped.
+    examples:
+      - null
+  agreement_id:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: The Partner's agreement to show it, when it agreed; `null` otherwise.
+    examples:
+      - null
+examples:
+  - campaign_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4d8001
+    quest_name: Your first order from Charminar Bakes Gachibowli
+    line: "Order from Charminar Bakes Gachibowli: ₹50.00 of credit"
+    funder_partner_id: 01a13a48-9e00-7000-8000-000000000003
+    funder_name: Charminar Bakes
+    funder_location_id: null
+    funder_location_name: Charminar Bakes Gachibowli
+    commission:
+      amount:
+        minor_units: 4000
+        currency: INR
+      percent_of_items: null
+    state: live
+    starts_at: null
+    ends_at: null
+    agreement_id: null

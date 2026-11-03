@@ -1,0 +1,44 @@
+type: object
+description: "A page of tickets (since 0.41.0): Gold, then Silver, then Members, each the oldest first."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Ticket.yaml
+    description: The tickets.
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: The next page's cursor.
+    examples:
+      - null
+examples:
+  - items:
+      - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7001
+        customer_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70
+        customer_name: Asha
+        tier: gold
+        order_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c0001
+        order_number: ZG-24817
+        location_id: null
+        kind: missing_item
+        note: The dal was missing.
+        state: open
+        held_by:
+          user_id: 01a13a48-9e00-7000-8000-000000000101
+          name: Priya
+        opened_at: 2026-11-04T10:15:00Z
+        taken_at: null
+        resolved_at: null
+        resolution: null
+        notes:
+          - text: "Called the store: the dal was left out."
+            by:
+              user_id: 01a13a48-9e00-7000-8000-000000000101
+              name: Priya
+            at: 2026-11-04T10:15:00Z
+    next_cursor: null

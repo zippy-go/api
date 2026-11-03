@@ -242,6 +242,11 @@ properties:
     items:
       $ref: ./StatementCommission.yaml
     description: Referral commissions paid and received in the week, a line each (since 0.38.0); they add up to `figures.commissions`.
+  shortfall:
+    oneOf:
+      - $ref: ./StatementShortfall.yaml
+      - type: "null"
+    description: The shortfall the week's lock asked the Partner to pay (since 0.41.0); `null` without one.
 examples:
   - id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4c5101
     reference: ZG-2026W43

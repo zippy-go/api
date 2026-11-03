@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.flag.raised.v1.schema.json",
+  "title": "CustomersFlagRaisedPayload",
+  "description": "Payload of `customers.flag.raised` version 1. Support flagged a customer with a fraud signal: the rewards engine holds their rewards for review while it stands, and a refund to them waits for a second person. Consumers: engagement, analytics.",
+  "type": "object",
+  "required": [
+    "flag_id",
+    "customer_id",
+    "signal",
+    "by_user_id",
+    "at"
+  ],
+  "properties": {
+    "flag_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The flag.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4e7101"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a70"
+      ]
+    },
+    "signal": {
+      "type": "string",
+      "description": "The signal.",
+      "examples": [
+        "shared_device"
+      ],
+      "enum": [
+        "shared_device",
+        "shared_address",
+        "cancellations",
+        "review_burst",
+        "other"
+      ]
+    },
+    "by_user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The member.",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000101"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-04T10:15:00Z"
+      ]
+    }
+  }
+}

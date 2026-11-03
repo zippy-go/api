@@ -1,0 +1,14 @@
+type: object
+description: Resolving a ticket (since 0.41.0).
+required:
+  - resolution
+properties:
+  resolution:
+    type: string
+    description: How it was resolved, 1 to 1000 characters.
+    minLength: 1
+    maxLength: 1000
+    examples:
+      - Refunded the dal.
+examples:
+  - resolution: Refunded the dal.

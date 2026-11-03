@@ -112,6 +112,9 @@ errors:
       - code: party_too_large
         message: "{store} takes parties of at most {max}."
         description: A reservation for more people than the store takes.
+      - code: referral_code_unknown
+        message: "No Partner holds this referral code."
+        description: A Partner signing up with a referral code nobody holds (since 0.41.0).
       - code: points_below_minimum
         message: "Points convert 500 at a time at least."
         description: A conversion of fewer than 500 points (since 0.38.0).
@@ -927,6 +930,32 @@ errors:
     description: >-
       An agreement to show a quest of the Partner's own, or of a Partner
       sharing its legal entity (since 0.38.0).
+
+  - code: ticket_taken
+    status: 409
+    title: Ticket taken
+    message: "{name} holds this ticket."
+    retryable: false
+    description: >-
+      Taking, resolving or noting a ticket another support member holds
+      (since 0.41.0).
+
+  - code: ticket_resolved
+    status: 409
+    title: Ticket resolved
+    message: "This ticket is resolved."
+    retryable: false
+    description: >-
+      Taking, resolving or noting a resolved ticket (since 0.41.0).
+
+  - code: shortfall_settled
+    status: 409
+    title: Shortfall settled
+    message: "This shortfall is paid."
+    retryable: false
+    description: >-
+      Paying a shortfall that is settled, or whose payment is under way
+      (since 0.41.0).
 
   - code: reservation_unavailable
     status: 409

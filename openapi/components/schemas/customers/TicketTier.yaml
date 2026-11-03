@@ -1,0 +1,8 @@
+type: string
+description: "The customer's tier when the queue is read (since 0.41.0), engagement's: Gold and Silver first."
+enum:
+  - gold
+  - silver
+  - member
+examples:
+  - gold

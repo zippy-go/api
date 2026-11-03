@@ -1,5 +1,5 @@
 type: string
-description: "An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member; and since step 10 a Partner's plan changed at once (`change_partner_plan`), a plan's price (`set_plan_price`), a country's fee rule (`set_fee_rule`), a retention period (`set_setting`), a module switched off on a Partner's behalf (`switch_module_off`), a flag gating payments, payouts or dispatch taken to 100% (`set_flag`), a statement marked paid by hand (`mark_statement_paid`), a payout adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`). Clients must tolerate values they do not know."
+description: "An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member; and since step 10 a Partner's plan changed at once (`change_partner_plan`), a plan's price (`set_plan_price`), a country's fee rule (`set_fee_rule`), a retention period (`set_setting`), a module switched off on a Partner's behalf (`switch_module_off`), a flag gating payments, payouts or dispatch taken to 100% (`set_flag`), a statement marked paid by hand (`mark_statement_paid`), a payout adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`). Clients must tolerate values they do not know Since 0.41.0 a refund to a customer with a fraud flag (`refund_flagged_customer`)."
 enum:
   - grant_platform_role
   - revoke_platform_role
@@ -14,5 +14,6 @@ enum:
   - mark_statement_paid
   - create_payout_adjustment
   - credit_wallet
+  - refund_flagged_customer
 examples:
   - grant_platform_role
