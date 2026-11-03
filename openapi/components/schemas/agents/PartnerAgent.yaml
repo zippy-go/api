@@ -169,6 +169,11 @@ properties:
   cash_in_hand:
     $ref: ../common/Money.yaml
     description: Cash collected and not yet settled.
+  offboarding:
+    oneOf:
+      - $ref: ./OffboardingProposal.yaml
+      - type: "null"
+    description: "An offboarding waiting for a second member (since 0.39.0); `null` when none waits."
   team_id:
     type:
       - string

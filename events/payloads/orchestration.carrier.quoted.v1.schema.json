@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/orchestration.carrier.quoted.v1.schema.json",
+  "title": "OrchestrationCarrierQuotedPayload",
+  "description": "Payload of `orchestration.carrier.quoted` version 1. A carrier quoted a delivery the chain asked it for: its price, ETA and reliability against the Location's ceiling, and whether the delivery went to it. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "delivery_id",
+    "order_id",
+    "partner_id",
+    "location_id",
+    "carrier",
+    "price",
+    "ceiling",
+    "currency",
+    "eta_minutes",
+    "reliability_percent",
+    "keeps_promise",
+    "taken",
+    "refused",
+    "at"
+  ],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The delivery."
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its order."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store's Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The store."
+    },
+    "carrier": {
+      "type": "string",
+      "description": "The carrier, such as `simulated`."
+    },
+    "price": {
+      "type": "integer",
+      "description": "What it asks, in minor units."
+    },
+    "ceiling": {
+      "type": "integer",
+      "description": "The Location's ceiling then, in minor units."
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of both."
+    },
+    "eta_minutes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minutes to the door, as it says."
+    },
+    "reliability_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Its deliveries of the last 30 days delivered by their promise."
+    },
+    "keeps_promise": {
+      "type": "boolean",
+      "description": "Whether its ETA keeps the order's promise."
+    },
+    "taken": {
+      "type": "boolean",
+      "description": "Whether the delivery went to it."
+    },
+    "refused": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why not, such as over the ceiling."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

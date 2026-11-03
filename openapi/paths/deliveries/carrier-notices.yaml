@@ -1,0 +1,57 @@
+# Path item for /v1/carriers/{carrier_id}/notices. Referenced from openapi.yaml.
+parameters:
+  - name: carrier_id
+    in: path
+    required: true
+    description: "The carrier, such as `simulated`."
+    schema:
+      type: string
+post:
+  operationId: receiveCarrierNotice
+  summary: "Receive a carrier's notice"
+  description: "A carrier's notice of its task's progress, as JSON or a form, with the shared secret in the body or on the address (`?secret=`). Matched by the task alone; a notice about a task the platform did not ask for is ignored, one that would move an order back or move one that ended changes nothing, and every notice is kept on the delivery's log. Without a configured secret every notice is refused."
+  tags:
+    - Deliveries
+  parameters:
+    - name: secret
+      in: query
+      required: false
+      description: "The shared secret, when not in the body."
+      schema:
+        type: string
+  requestBody:
+    required: true
+    description: "The notice."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/dispatch/CarrierNotice.yaml
+  responses:
+    "204":
+      description: "Taken, or ignored."
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

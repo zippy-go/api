@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payouts.statement.locked.v1.schema.json",
   "title": "PayoutsStatementLockedPayload",
-  "description": "Payload of `payouts.statement.locked` version 1. A week was locked into its statement, once, by the clock on the Tuesday after it or by platform staff once it was over: its figures never change after. The ledger settles the week from it: the GST the invoice bills beyond the orders' own, the cancellation fees, fee credits, adjustments and the cash the Location or the Agent kept, and an Agent's pay and tips into what the Agent is owed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "description": "Payload of `payouts.statement.locked` version 1. A week was locked into its statement, once, by the clock on the Tuesday after it or by platform staff once it was over: its figures never change after. The ledger settles the week from it: the GST the invoice bills beyond the orders' own, the cancellation fees, the prescription fees, fee credits, adjustments and the cash the Location or the Agent kept, and an Agent's pay and tips into what the Agent is owed. Consumers must ignore fields they do not know; new optional fields are an additive change.",
   "type": "object",
   "required": [
     "payee_kind",
@@ -281,6 +281,14 @@
         "carried_out": {
           "$ref": "#/$defs/money",
           "description": "A shortfall carried to the next statement, negative; zero otherwise."
+        },
+        "prescription_fees": {
+          "$ref": "#/$defs/money",
+          "description": "The platform's prescription fees on a Location's dispensed lines in the week (since 0.39.0); absent before."
+        },
+        "prescription_fees_gst": {
+          "$ref": "#/$defs/money",
+          "description": "GST on them (since 0.39.0)."
         }
       },
       "additionalProperties": false

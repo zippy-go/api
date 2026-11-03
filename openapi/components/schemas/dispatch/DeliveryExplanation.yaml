@@ -61,6 +61,11 @@ properties:
     items:
       $ref: ./DeliveryFallback.yaml
     description: Every move to another Provider, oldest first.
+  quotes:
+    type: array
+    items:
+      $ref: ./CarrierQuote.yaml
+    description: "The carriers' quotes when a carrier was asked, the chosen one marked, those refused saying why (since 0.39.0)."
   candidates:
     type: array
     items:

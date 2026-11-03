@@ -1,0 +1,24 @@
+{
+  "id": "019a4b20-2b00-7d00-8a00-0000000fb001",
+  "type": "orchestration.carrier.quoted",
+  "version": 1,
+  "occurred_at": "2026-11-04T07:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+  "correlation_id": null,
+  "payload": {
+    "delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bde01",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0d02",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+    "location_id": "01a13a48-9e00-7000-8000-000000000303",
+    "carrier": "simulated",
+    "price": 7200,
+    "ceiling": 9000,
+    "currency": "INR",
+    "eta_minutes": 34,
+    "reliability_percent": 96.0,
+    "keeps_promise": true,
+    "taken": true,
+    "refused": null,
+    "at": "2026-11-04T07:00:00Z"
+  }
+}

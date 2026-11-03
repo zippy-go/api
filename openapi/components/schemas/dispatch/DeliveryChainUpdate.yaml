@@ -1,0 +1,13 @@
+type: object
+description: "The carriers a Location's chain asks after its own Agents and the platform fleet, the `DeliveryChainUpdate` schema."
+required:
+  - carriers
+properties:
+  carriers:
+    type: array
+    items:
+      $ref: ./DeliveryChainCarrier.yaml
+    maxItems: 3
+    description: "In the order they are asked; empty asks no carrier."
+examples:
+  - {"carriers": [{"carrier": "simulated", "ceiling": {"minor_units": 9000, "currency": "INR"}}]}

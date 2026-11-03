@@ -1,0 +1,71 @@
+type: object
+description: "A carrier behind the Provider port, as Mission Control sees its wiring, the `DeliveryCarrier` schema."
+required:
+  - id
+  - name
+  - production
+  - available
+  - why_unavailable
+  - secret_set
+  - notices_url
+  - read_back_seconds
+  - reliability_percent
+  - deliveries_30d
+properties:
+  id:
+    type: string
+    description: "The carrier."
+    examples:
+      - "simulated"
+  name:
+    type: string
+    description: "Its name."
+    examples:
+      - "Simulated carrier"
+  production:
+    type: boolean
+    description: "Whether it is a real carrier; the simulated one never is, and is used only outside production."
+    examples:
+      - false
+  available:
+    type: boolean
+    description: "Whether the chain may ask it now."
+    examples:
+      - true
+  why_unavailable:
+    type:
+      - string
+      - "null"
+    description: "Why not, such as a key never loaded."
+    examples:
+      - null
+  secret_set:
+    type: boolean
+    description: "Whether the shared secret of its notices is set."
+    examples:
+      - true
+  notices_url:
+    type: string
+    description: "The address to enter at the carrier for its notices."
+    examples:
+      - "https://api.zippygo.local/v1/carriers/simulated/notices"
+  read_back_seconds:
+    type: integer
+    description: "How often open tasks are read back from it."
+    examples:
+      - 120
+  reliability_percent:
+    type:
+      - number
+      - "null"
+    description: "Its deliveries of the last 30 days delivered by their promise; `null` before any."
+    examples:
+      - 96.0
+  deliveries_30d:
+    type: integer
+    minimum: 0
+    description: "How many deliveries it took in the last 30 days."
+    examples:
+      - 14
+examples:
+  - {"id": "simulated", "name": "Simulated carrier", "production": false, "available": true, "why_unavailable": null, "secret_set": true, "notices_url": "https://api.zippygo.local/v1/carriers/simulated/notices", "read_back_seconds": 120, "reliability_percent": 96.0, "deliveries_30d": 14}

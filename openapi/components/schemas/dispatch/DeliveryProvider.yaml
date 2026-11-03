@@ -23,6 +23,18 @@ properties:
     description: The delivery service, for an agent-based Provider.
     examples:
       - 01a13a48-9e00-7000-8000-000000000202
+  carrier:
+    type:
+      - string
+      - "null"
+    description: "The carrier, for `kind` `carrier`, such as `simulated` (since 0.39.0)."
+    examples:
+      - null
+  ceiling:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "The most the Partner pays the carrier for a delivery (since 0.39.0); `null` for an agent-based Provider."
   name:
     type: string
     description: The Provider's name.

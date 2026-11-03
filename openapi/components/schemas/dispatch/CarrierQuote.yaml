@@ -1,0 +1,64 @@
+type: object
+description: "A carrier's quote for a delivery, as the explanation keeps it, the `CarrierQuote` schema."
+required:
+  - carrier
+  - carrier_name
+  - price
+  - eta_minutes
+  - reliability_percent
+  - keeps_promise
+  - valid_until
+  - chosen
+  - refused
+properties:
+  carrier:
+    type: string
+    description: "The carrier, such as `simulated`."
+    examples:
+      - "simulated"
+  carrier_name:
+    type: string
+    description: "Its name."
+    examples:
+      - "Simulated carrier"
+  price:
+    $ref: ../common/Money.yaml
+    description: "What it asks for the delivery."
+  eta_minutes:
+    type: integer
+    minimum: 0
+    description: "Minutes to the door from now, as it says."
+    examples:
+      - 34
+  reliability_percent:
+    type: number
+    minimum: 0
+    maximum: 100
+    description: "The share of its deliveries in the last 30 days delivered by their promise."
+    examples:
+      - 96.0
+  keeps_promise:
+    type: boolean
+    description: "Whether its ETA keeps the order's promise."
+    examples:
+      - true
+  valid_until:
+    type: string
+    format: date-time
+    description: "When the quote lapses, ten minutes after it was given."
+    examples:
+      - "2026-11-04T07:10:00Z"
+  chosen:
+    type: boolean
+    description: "Whether the delivery went to it on this quote."
+    examples:
+      - true
+  refused:
+    type:
+      - string
+      - "null"
+    description: "Why it was not taken, such as a price over the Location's ceiling."
+    examples:
+      - null
+examples:
+  - {"carrier": "simulated", "carrier_name": "Simulated carrier", "price": {"minor_units": 7200, "currency": "INR"}, "eta_minutes": 34, "reliability_percent": 96.0, "keeps_promise": true, "valid_until": "2026-11-04T07:10:00Z", "chosen": true, "refused": null}

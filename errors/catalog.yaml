@@ -2666,3 +2666,38 @@ errors:
     message: "Name a registered pharmacist first."
     retryable: false
     description: "A Location takes prescriptions only with a registered pharmacist named, with their registration number and council."
+
+  - code: carrier_not_simulated
+    status: 409
+    title: Carrier not simulated
+    message: "Only a simulated carrier's delivery is moved by hand."
+    retryable: false
+    description: "A delivery a real carrier has, or one outside local and sandbox, stepped by hand from Mission Control."
+
+  - code: deposit_pending
+    status: 409
+    title: Deposit pending
+    message: "A deposit waits for its payment."
+    retryable: false
+    description: "An Agent starts a cash deposit while another waits for its UPI payment; pay or let it expire first."
+
+  - code: offboarding_pending
+    status: 409
+    title: Offboarding pending
+    message: "An offboarding of this Agent already waits for a second member."
+    retryable: false
+    description: "An Agent's offboarding proposed while another proposal waits."
+
+  - code: offboarding_not_pending
+    status: 409
+    title: No offboarding waiting
+    message: "No offboarding of this Agent waits."
+    retryable: false
+    description: "An offboarding approved or refused when none waits."
+
+  - code: second_member_required
+    status: 409
+    title: Second member required
+    message: "Another member approves an offboarding you proposed."
+    retryable: false
+    description: "The member who proposed an Agent's offboarding approves it themselves."

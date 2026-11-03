@@ -1,0 +1,40 @@
+type: object
+description: "A quote a carrier gave, with the delivery it was for, the `CarrierQuoteRecord` schema."
+required:
+  - delivery_id
+  - order_number
+  - location_name
+  - quote
+  - ceiling
+  - at
+properties:
+  delivery_id:
+    type: string
+    format: uuid
+    description: "The delivery."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bde01"
+  order_number:
+    type: string
+    description: "Its order's number."
+    examples:
+      - "AA0042"
+  location_name:
+    type: string
+    description: "The store."
+    examples:
+      - "Charminar Bakes Secunderabad"
+  quote:
+    $ref: ./CarrierQuote.yaml
+    description: "The quote."
+  ceiling:
+    $ref: ../common/Money.yaml
+    description: "The Location's ceiling then."
+  at:
+    type: string
+    format: date-time
+    description: "When it was given."
+    examples:
+      - "2026-11-04T07:00:00Z"
+examples:
+  - {"delivery_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bde01", "order_number": "AA0042", "location_name": "Charminar Bakes Secunderabad", "quote": {"carrier": "simulated", "carrier_name": "Simulated carrier", "price": {"minor_units": 7200, "currency": "INR"}, "eta_minutes": 34, "reliability_percent": 96.0, "keeps_promise": true, "valid_until": "2026-11-04T07:10:00Z", "chosen": true, "refused": null}, "ceiling": {"minor_units": 9000, "currency": "INR"}, "at": "2026-11-04T07:00:00Z"}

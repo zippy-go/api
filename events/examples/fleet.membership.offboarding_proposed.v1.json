@@ -1,0 +1,17 @@
+{
+  "id": "019a4b20-2b00-7d00-8a00-0000000fb003",
+  "type": "fleet.membership.offboarding_proposed",
+  "version": 1,
+  "occurred_at": "2026-11-04T09:00:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+  "correlation_id": null,
+  "payload": {
+    "proposal_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0f01",
+    "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10",
+    "partner_id": "01a13a48-9e00-7000-8000-000000000003",
+    "service_id": "01a13a48-9e00-7000-8000-000000000203",
+    "proposed_by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be101",
+    "expires_at": "2026-11-11T09:00:00Z",
+    "at": "2026-11-04T09:00:00Z"
+  }
+}

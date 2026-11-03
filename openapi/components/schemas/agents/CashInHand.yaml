@@ -30,6 +30,11 @@ properties:
             minor_units: 48000
             currency: INR
           collected_at: 2026-10-16T09:00:00Z
+  deposits:
+    type: array
+    items:
+      $ref: ./CashDeposit.yaml
+    description: "The Agent's deposits by UPI of the last 30 days, newest first (since 0.39.0)."
 examples:
   - agent_id: 0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10
     amount:

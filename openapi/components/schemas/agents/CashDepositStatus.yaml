@@ -1,0 +1,9 @@
+type: string
+description: "Where an Agent's cash deposit is, the `CashDepositStatus` schema: `pending` until the UPI payment is approved, then `paid`, or `failed` or `expired`."
+enum:
+  - pending
+  - paid
+  - failed
+  - expired
+examples:
+  - pending

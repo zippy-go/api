@@ -1,0 +1,9 @@
+type: string
+description: "Where an Agent's offboarding is, the `OffboardingStatus` schema: `pending` a second member's approval, then `approved` (the membership offboarded), `refused` or `expired` after seven days."
+enum:
+  - pending
+  - approved
+  - refused
+  - expired
+examples:
+  - pending

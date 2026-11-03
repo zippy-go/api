@@ -2644,3 +2644,27 @@ events:
       A referral commission was taken back: its order was refunded in full within 7 days of completing. The ledger and both statements reverse it.
     payload_schema: ./payloads/crosssell.commission.taken_back.v1.schema.json
     example: ./examples/crosssell.commission.taken_back.v1.json
+
+  - type: orchestration.carrier.quoted
+    version: 1
+    domain: orchestration
+    description: >-
+      A carrier quoted a delivery the chain asked it for: its price, ETA and reliability against the Location's ceiling, and whether the delivery went to it. Consumers: analytics, Mission Control's carriers.
+    payload_schema: ./payloads/orchestration.carrier.quoted.v1.schema.json
+    example: ./examples/orchestration.carrier.quoted.v1.json
+
+  - type: payments.cash.deposited
+    version: 1
+    domain: payments
+    description: >-
+      An Agent deposited cash they collected, by UPI from the Agent app, the provider having said it was paid: their cash in hand reads that much less and the ledger posts it; the night's reconciliation matches it. Consumers: the workforce (cash in hand), the ledger.
+    payload_schema: ./payloads/payments.cash.deposited.v1.schema.json
+    example: ./examples/payments.cash.deposited.v1.json
+
+  - type: fleet.membership.offboarding_proposed
+    version: 1
+    domain: fleet
+    description: >-
+      A member proposed offboarding an Agent: it waits for a second member with `agent:manage` for the service, seven days at most. No name and no reason in the payload. Consumers: notifications (the members who may decide), the Partner console.
+    payload_schema: ./payloads/fleet.membership.offboarding_proposed.v1.schema.json
+    example: ./examples/fleet.membership.offboarding_proposed.v1.json

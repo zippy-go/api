@@ -1,0 +1,20 @@
+type: object
+description: "Agents holding cash or depositing it, those holding most first, the `AgentCashList` schema."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./AgentCashSummary.yaml
+    description: "The Agents."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: "The next page."
+    examples:
+      - null
+examples:
+  - {"items": [], "next_cursor": null}

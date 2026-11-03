@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/payments.cash.deposited.v1.schema.json",
+  "title": "PaymentsCashDepositedPayload",
+  "description": "Payload of `payments.cash.deposited` version 1. An Agent deposited cash they collected, by UPI from the Agent app, the provider having said it was paid: their cash in hand reads that much less and the ledger posts it; the night's reconciliation matches it. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "deposit_id",
+    "payment_id",
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "amount",
+    "currency",
+    "at"
+  ],
+  "properties": {
+    "deposit_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The deposit."
+    },
+    "payment_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The UPI payment."
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its Partner; the envelope's `partner_id` too."
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its delivery service."
+    },
+    "amount": {
+      "type": "integer",
+      "description": "What was deposited, in minor units."
+    },
+    "currency": {
+      "type": "string",
+      "description": "Its currency."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

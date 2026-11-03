@@ -1,0 +1,66 @@
+type: object
+description: "Cash an Agent deposits by UPI from the Agent app, the `CashDeposit` schema."
+required:
+  - id
+  - agent_id
+  - amount
+  - status
+  - payment_id
+  - next_action
+  - created_at
+  - paid_at
+  - reconciled_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The deposit."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bcd01"
+  agent_id:
+    type: string
+    format: uuid
+    description: "The Agent membership."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+  amount:
+    $ref: ../common/Money.yaml
+    description: "What is deposited."
+  status:
+    $ref: ./CashDepositStatus.yaml
+    description: "Where it is."
+  payment_id:
+    type: string
+    format: uuid
+    description: "The UPI payment carrying it."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bfa01"
+  next_action:
+    oneOf:
+      - $ref: ../payments/PaymentNextAction.yaml
+      - type: "null"
+    description: "What the Agent does next to pay, while pending."
+  created_at:
+    type: string
+    format: date-time
+    description: "When it was started."
+    examples:
+      - "2026-11-04T18:00:00Z"
+  paid_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When the provider said it was paid."
+    examples:
+      - null
+  reconciled_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When the night's reconciliation matched it with the provider's records and the ledger."
+    examples:
+      - null
+examples:
+  - {"id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bcd01", "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10", "amount": {"minor_units": 240000, "currency": "INR"}, "status": "pending", "payment_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bfa01", "next_action": null, "created_at": "2026-11-04T18:00:00Z", "paid_at": null, "reconciled_at": null}

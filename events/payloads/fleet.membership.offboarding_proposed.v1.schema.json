@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/fleet.membership.offboarding_proposed.v1.schema.json",
+  "title": "FleetMembershipOffboardingProposedPayload",
+  "description": "Payload of `fleet.membership.offboarding_proposed` version 1. A member proposed offboarding an Agent: it waits for a second member with `agent:manage` for the service, seven days at most. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "proposal_id",
+    "agent_id",
+    "partner_id",
+    "service_id",
+    "proposed_by",
+    "expires_at",
+    "at"
+  ],
+  "properties": {
+    "proposal_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The proposal."
+    },
+    "agent_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Agent membership."
+    },
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its Partner; the envelope's `partner_id` too."
+    },
+    "service_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Its delivery service."
+    },
+    "proposed_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who proposed it."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it lapses undecided."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

@@ -1,0 +1,16 @@
+type: object
+description: "A carrier a Location adds to its delivery chain after the fleet, with its ceiling, the `DeliveryChainCarrier` schema."
+required:
+  - carrier
+  - ceiling
+properties:
+  carrier:
+    type: string
+    description: "The carrier, such as `simulated`."
+    examples:
+      - "simulated"
+  ceiling:
+    $ref: ../common/Money.yaml
+    description: "The most the Partner pays the carrier for a delivery; a quote above it is refused. ₹120 by default."
+examples:
+  - {"carrier": "simulated", "ceiling": {"minor_units": 9000, "currency": "INR"}}

@@ -6,6 +6,44 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.39.0] - 2026-11-04
+
+Step 11, pharmacy, phase B: the simulated carrier, Agent cash deposits, offboarding by a second
+member, the Agent's portable record, and the prescription fees on a payout statement. Written
+as 0.39.0, the next free minor after growth's 0.38.0. Additive, but for an Agent's offboarding
+answering `202` with its proposal.
+
+### Added
+
+- Carriers behind the Provider port (`Deliveries` tag): a Location's carriers after the fleet
+  with their ceilings (`PUT /v1/partners/{partner_id}/locations/{location_id}/delivery-chain`;
+  `DeliveryChainUpdate`, `DeliveryChainCarrier`; `carrier` and `ceiling` on `DeliveryProvider`);
+  the carriers' quotes in the explanation (`quotes` on `DeliveryExplanation`; `CarrierQuote`);
+  Mission Control's carriers and a carrier's quotes (`GET /v1/platform/carriers`, `GET
+  /v1/platform/carriers/{carrier_id}/quotes`; `DeliveryCarrier`, `DeliveryCarrierList`, `CarrierQuoteRecord`,
+  `CarrierQuoteList`); a simulated carrier's delivery moved by hand (`POST
+  /v1/platform/deliveries/{delivery_id}/carrier-steps`; `CarrierStep`, `CarrierStepInput`); a
+  carrier's notices (`POST /v1/carriers/{carrier_id}/notices`; `CarrierNotice`).
+- An Agent's cash deposit by UPI (`POST /v1/agent/memberships/{agent_id}/cash/deposits`;
+  `CashDeposit`, `CashDepositInput`, `CashDepositStatus`; `deposits` on `CashInHand`;
+  `cash_deposit` in `PaymentPurpose`); Mission Control's Finance › Agent cash (`GET
+  /v1/platform/agent-cash`, `GET /v1/platform/agent-cash/{agent_id}`; `AgentCashSummary`,
+  `AgentCashList`, `AgentCashDetail`).
+- An Agent's offboarding waiting for a second member (`202` with `OffboardingProposal` from
+  `POST /v1/partners/{partner_id}/agents/{agent_id}/offboard`; `POST .../offboard/approve`, `POST
+  .../offboard/refuse`; `OffboardingStatus`; `offboarding` on `PartnerAgent`).
+- The Agent's portable record (`POST /v1/agent/memberships/{agent_id}/record-exports`;
+  `AgentRecordExport`, `AgentRecord`, `AgentRecordTask`, `AgentRecordDocument`,
+  `AgentRecordMonth`).
+- `prescription_fees` and `prescription_fees_gst` on `StatementFigures`.
+- Problem codes `carrier_not_simulated`, `deposit_pending`, `offboarding_pending`,
+  `offboarding_not_pending` and `second_member_required`.
+- Events `orchestration.carrier.quoted`, `payments.cash.deposited` and
+  `fleet.membership.offboarding_proposed`.
+- `cash_deposit` among the purposes of the payments' events (`payments.payment.*`,
+  `payments.refund.*`); `prescription_fees` and `prescription_fees_gst` in the figures of
+  `payouts.statement.locked`.
+
 ## [0.38.0] - 2026-11-04
 
 Step 11 growth, phase A: the display kinds of promotions, an offer's results, badges, points,

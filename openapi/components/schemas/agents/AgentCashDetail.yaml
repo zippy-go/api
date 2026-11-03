@@ -1,0 +1,22 @@
+type: object
+description: "One Agent's cash: what it collected and what it deposited, the `AgentCashDetail` schema."
+required:
+  - agent
+  - collections
+  - deposits
+properties:
+  agent:
+    $ref: ./AgentCashSummary.yaml
+    description: "The Agent's cash."
+  collections:
+    type: array
+    items:
+      $ref: ./CashCollection.yaml
+    description: "Collections not yet deposited or settled, newest first."
+  deposits:
+    type: array
+    items:
+      $ref: ./CashDeposit.yaml
+    description: "Its deposits, newest first, each with whether the night's reconciliation matched it."
+examples:
+  - {"agent": {"agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10", "display_name": "Agent 07", "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bb002", "partner_name": "ZippyGo Fleet", "service_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01", "cash_in_hand": {"minor_units": 0, "currency": "INR"}, "ceiling": {"minor_units": 500000, "currency": "INR"}, "deposited_30d": {"minor_units": 240000, "currency": "INR"}, "last_deposit_at": "2026-11-04T18:02:00Z", "unreconciled": 0}, "collections": [], "deposits": []}

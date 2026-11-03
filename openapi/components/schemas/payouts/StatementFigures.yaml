@@ -84,6 +84,12 @@ properties:
   commissions:
     $ref: ../common/Money.yaml
     description: Referral commissions received less those paid (since 0.38.0); the total adds it.
+  prescription_fees:
+    $ref: ../common/Money.yaml
+    description: "The platform's prescription fee on each line dispensed against a prescription in the week, as the Location's policy set it, on a line of its own (\"Prescription fees ₹40.00\"); nothing when none is set (since 0.39.0)."
+  prescription_fees_gst:
+    $ref: ../common/Money.yaml
+    description: "GST on the prescription fees, as the invoice bills it (since 0.39.0)."
 examples:
   - sales:
       minor_units: 50000

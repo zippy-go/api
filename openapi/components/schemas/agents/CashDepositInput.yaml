@@ -1,0 +1,17 @@
+type: object
+description: "A deposit of the cash an Agent holds, the `CashDepositInput` schema."
+properties:
+  amount:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "How much, at most the cash in hand; `null` deposits all of it."
+  return_url:
+    type:
+      - string
+      - "null"
+    description: "Where the provider's page sends the Agent back."
+    examples:
+      - null
+examples:
+  - {"amount": {"minor_units": 240000, "currency": "INR"}, "return_url": null}

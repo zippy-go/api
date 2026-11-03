@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.38.0
+  version: 0.39.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -1855,6 +1855,27 @@ paths:
   /v1/partners/{partner_id}/cross-sell/figures:
     $ref: ./paths/crosssell/partner-cross-sell-figures.yaml
 
+  # Step 11 pharmacy, phase B: the simulated carrier, Agent cash, offboarding, the record
+  /v1/platform/carriers:
+    $ref: ./paths/deliveries/platform-carriers.yaml
+  /v1/platform/carriers/{carrier_id}/quotes:
+    $ref: ./paths/deliveries/platform-carrier-quotes.yaml
+  /v1/platform/deliveries/{delivery_id}/carrier-steps:
+    $ref: ./paths/deliveries/platform-delivery-carrier-steps.yaml
+  /v1/carriers/{carrier_id}/notices:
+    $ref: ./paths/deliveries/carrier-notices.yaml
+  /v1/agent/memberships/{agent_id}/cash/deposits:
+    $ref: ./paths/agents/agent-cash-deposits.yaml
+  /v1/agent/memberships/{agent_id}/record-exports:
+    $ref: ./paths/agents/agent-record-exports.yaml
+  /v1/platform/agent-cash:
+    $ref: ./paths/agents/platform-agent-cash.yaml
+  /v1/platform/agent-cash/{agent_id}:
+    $ref: ./paths/agents/platform-agent-cash-agent.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/offboard/approve:
+    $ref: ./paths/agents/partner-agent-offboard-approve.yaml
+  /v1/partners/{partner_id}/agents/{agent_id}/offboard/refuse:
+    $ref: ./paths/agents/partner-agent-offboard-refuse.yaml
 components:
   securitySchemes:
     ApiKey:
@@ -5186,3 +5207,49 @@ components:
       $ref: ./components/schemas/crosssell/CrossSellFigures.yaml
     StatementCommission:
       $ref: ./components/schemas/payouts/StatementCommission.yaml
+    CarrierQuote:
+      $ref: ./components/schemas/dispatch/CarrierQuote.yaml
+    DeliveryChainCarrier:
+      $ref: ./components/schemas/dispatch/DeliveryChainCarrier.yaml
+    DeliveryChainUpdate:
+      $ref: ./components/schemas/dispatch/DeliveryChainUpdate.yaml
+    DeliveryCarrier:
+      $ref: ./components/schemas/dispatch/DeliveryCarrier.yaml
+    DeliveryCarrierList:
+      $ref: ./components/schemas/dispatch/DeliveryCarrierList.yaml
+    CarrierQuoteRecord:
+      $ref: ./components/schemas/dispatch/CarrierQuoteRecord.yaml
+    CarrierQuoteList:
+      $ref: ./components/schemas/dispatch/CarrierQuoteList.yaml
+    CarrierStep:
+      $ref: ./components/schemas/dispatch/CarrierStep.yaml
+    CarrierStepInput:
+      $ref: ./components/schemas/dispatch/CarrierStepInput.yaml
+    CarrierNotice:
+      $ref: ./components/schemas/dispatch/CarrierNotice.yaml
+    CashDepositStatus:
+      $ref: ./components/schemas/agents/CashDepositStatus.yaml
+    CashDeposit:
+      $ref: ./components/schemas/agents/CashDeposit.yaml
+    CashDepositInput:
+      $ref: ./components/schemas/agents/CashDepositInput.yaml
+    AgentCashSummary:
+      $ref: ./components/schemas/agents/AgentCashSummary.yaml
+    AgentCashList:
+      $ref: ./components/schemas/agents/AgentCashList.yaml
+    AgentCashDetail:
+      $ref: ./components/schemas/agents/AgentCashDetail.yaml
+    OffboardingStatus:
+      $ref: ./components/schemas/agents/OffboardingStatus.yaml
+    OffboardingProposal:
+      $ref: ./components/schemas/agents/OffboardingProposal.yaml
+    AgentRecordTask:
+      $ref: ./components/schemas/agents/AgentRecordTask.yaml
+    AgentRecordDocument:
+      $ref: ./components/schemas/agents/AgentRecordDocument.yaml
+    AgentRecordMonth:
+      $ref: ./components/schemas/agents/AgentRecordMonth.yaml
+    AgentRecord:
+      $ref: ./components/schemas/agents/AgentRecord.yaml
+    AgentRecordExport:
+      $ref: ./components/schemas/agents/AgentRecordExport.yaml

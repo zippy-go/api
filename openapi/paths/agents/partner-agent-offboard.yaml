@@ -12,7 +12,7 @@ parameters:
 post:
   operationId: offboardAgent
   summary: Offboard an Agent
-  description: "Ends a membership, or withdraws an invitation, with a reason, for good: what suspension does, and the person keeps their account but holds no task access in the service. The four-eyes review of offboarding comes later; for now one person with `agent:manage` decides, recorded. Every change of status is recorded with who, when and why, and in the audit log. Members need `agent:manage` for the service; Mission Control manages the platform fleet, and any Partner's Agents, with the same route and its platform permissions, every change written to the audit log."
+  description: "Proposes ending a membership, or withdrawing an invitation, with a reason, for good: what suspension does, and the person keeps their account but holds no task access in the service. Since 0.39.0 it waits for a second member with `agent:manage` for the service (`POST .../offboard/approve`), answering `202` with the proposal (`fleet.membership.offboarding_proposed`); it lapses after seven days undecided. An invitation is still withdrawn at once (`200`). Every change of status is recorded with who, when and why, and in the audit log. Members need `agent:manage` for the service; Mission Control manages the platform fleet, and any Partner's Agents, with the same route and its platform permissions."
   tags:
     - Agents
   security:
@@ -31,6 +31,12 @@ post:
         application/json:
           schema:
             $ref: ../../components/schemas/agents/PartnerAgent.yaml
+    "202":
+      description: The offboarding proposed, waiting for a second member.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/agents/OffboardingProposal.yaml
     "400":
       description: "`validation_failed`: a reason missing or over 500 characters."
       content:
@@ -56,7 +62,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "409":
-      description: "`illegal_transition` when already offboarded."
+      description: "`illegal_transition` when already offboarded; `offboarding_pending` when an offboarding already waits for a second member."
       content:
         application/problem+json:
           schema:

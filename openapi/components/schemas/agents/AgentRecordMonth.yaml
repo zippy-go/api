@@ -1,0 +1,23 @@
+type: object
+description: "An Agent's earnings in a month, the `AgentRecordMonth` schema."
+required:
+  - month
+  - earned
+  - tasks
+properties:
+  month:
+    type: string
+    description: "`YYYY-MM`."
+    examples:
+      - "2026-10"
+  earned:
+    $ref: ../common/Money.yaml
+    description: "What it earned."
+  tasks:
+    type: integer
+    minimum: 0
+    description: "Tasks completed."
+    examples:
+      - 212
+examples:
+  - {"month": "2026-10", "earned": {"minor_units": 1045000, "currency": "INR"}, "tasks": 212}

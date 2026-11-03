@@ -1,0 +1,75 @@
+type: object
+description: "An Agent's offboarding proposed by one member, waiting for a second, the `OffboardingProposal` schema."
+required:
+  - id
+  - agent_id
+  - status
+  - reason
+  - proposed_by
+  - proposed_by_name
+  - proposed_at
+  - expires_at
+  - decided_by
+  - decided_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The proposal."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0f01"
+  agent_id:
+    type: string
+    format: uuid
+    description: "The Agent membership."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+  status:
+    $ref: ./OffboardingStatus.yaml
+    description: "Where it is."
+  reason:
+    type: string
+    description: "Why, as the proposer gave it."
+    examples:
+      - "Left the service"
+  proposed_by:
+    type: string
+    format: uuid
+    description: "Who proposed it."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be101"
+  proposed_by_name:
+    type: string
+    description: "Their name."
+    examples:
+      - "Farah Begum"
+  proposed_at:
+    type: string
+    format: date-time
+    description: "When."
+    examples:
+      - "2026-11-04T09:00:00Z"
+  expires_at:
+    type: string
+    format: date-time
+    description: "When it lapses undecided."
+    examples:
+      - "2026-11-11T09:00:00Z"
+  decided_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "The second member who decided."
+    examples:
+      - null
+  decided_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When."
+    examples:
+      - null
+examples:
+  - {"id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0f01", "agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10", "status": "pending", "reason": "Left the service", "proposed_by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be101", "proposed_by_name": "Farah Begum", "proposed_at": "2026-11-04T09:00:00Z", "expires_at": "2026-11-11T09:00:00Z", "decided_by": null, "decided_at": null}

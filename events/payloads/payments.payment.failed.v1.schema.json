@@ -30,9 +30,10 @@
       "enum": [
         "order",
         "wallet_top_up",
-        "invoice"
+        "invoice",
+        "cash_deposit"
       ],
-      "description": "An order's payment or a Wallet top-up."
+      "description": "An order's payment or a Wallet top-up; since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`)."
     },
     "order_id": {
       "type": [

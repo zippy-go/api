@@ -1,0 +1,12 @@
+type: object
+description: "Every carrier behind the Provider port, the `DeliveryCarrierList` schema."
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./DeliveryCarrier.yaml
+    description: "The carriers."
+examples:
+  - {"items": []}

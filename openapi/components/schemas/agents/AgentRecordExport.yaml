@@ -1,0 +1,30 @@
+type: object
+description: "An Agent's portable record exported as a file, once per key whatever the retries, the `AgentRecordExport` schema."
+required:
+  - id
+  - file_name
+  - exported_at
+  - record
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The export."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be701"
+  file_name:
+    type: string
+    description: "The name the app saves it under."
+    examples:
+      - "zippygo-record-agent-07-2026-11-04.json"
+  exported_at:
+    type: string
+    format: date-time
+    description: "When."
+    examples:
+      - "2026-11-04T09:35:00Z"
+  record:
+    $ref: ./AgentRecord.yaml
+    description: "The record."
+examples:
+  - {"id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be701", "file_name": "zippygo-record-agent-07-2026-11-04.json", "exported_at": "2026-11-04T09:35:00Z", "record": {"agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10", "display_name": "Agent 07", "partner_name": "ZippyGo Fleet", "service_name": "Fleet deliveries", "status": "offboarded", "joined_at": "2026-01-05T09:00:00Z", "ended_at": "2026-11-04T09:30:00Z", "tasks_completed": 1830, "tasks": [], "rating": 97.5, "ratings": 410, "documents": [], "earnings": [], "earned": {"minor_units": 9850000, "currency": "INR"}}}

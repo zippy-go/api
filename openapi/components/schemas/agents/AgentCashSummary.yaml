@@ -1,0 +1,67 @@
+type: object
+description: "An Agent's cash as Mission Control's Finance › Agent cash lists it, the `AgentCashSummary` schema."
+required:
+  - agent_id
+  - display_name
+  - partner_id
+  - partner_name
+  - service_id
+  - cash_in_hand
+  - ceiling
+  - deposited_30d
+  - last_deposit_at
+  - unreconciled
+properties:
+  agent_id:
+    type: string
+    format: uuid
+    description: "The Agent membership."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10"
+  display_name:
+    type: string
+    description: "The name it is shown under."
+    examples:
+      - "Agent 07"
+  partner_id:
+    type: string
+    format: uuid
+    description: "Its Partner."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bb002"
+  partner_name:
+    type: string
+    description: "Its Partner's name."
+    examples:
+      - "ZippyGo Fleet"
+  service_id:
+    type: string
+    format: uuid
+    description: "Its delivery service."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01"
+  cash_in_hand:
+    $ref: ../common/Money.yaml
+    description: "Cash collected and not yet deposited or settled."
+  ceiling:
+    $ref: ../common/Money.yaml
+    description: "The service's cash ceiling."
+  deposited_30d:
+    $ref: ../common/Money.yaml
+    description: "What it deposited in the last 30 days."
+  last_deposit_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "Its last deposit paid."
+    examples:
+      - null
+  unreconciled:
+    type: integer
+    minimum: 0
+    description: "Deposits paid that the night's reconciliation has not matched yet."
+    examples:
+      - 0
+examples:
+  - {"agent_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9a10", "display_name": "Agent 07", "partner_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bb002", "partner_name": "ZippyGo Fleet", "service_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01", "cash_in_hand": {"minor_units": 240000, "currency": "INR"}, "ceiling": {"minor_units": 500000, "currency": "INR"}, "deposited_30d": {"minor_units": 0, "currency": "INR"}, "last_deposit_at": null, "unreconciled": 0}

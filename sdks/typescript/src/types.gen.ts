@@ -5273,6 +5273,10 @@ export type PartnerAgent = {
      */
     cash_in_hand: Money;
     /**
+     * An offboarding waiting for a second member (since 0.39.0); `null` when none waits.
+     */
+    offboarding?: OffboardingProposal | null;
+    /**
      * The team; every Agent is in the service's default team.
      */
     team_id: string | null;
@@ -6300,6 +6304,10 @@ export type CashInHand = {
      * The collections not yet settled, newest first.
      */
     collections: Array<CashCollection>;
+    /**
+     * The Agent's deposits by UPI of the last 30 days, newest first (since 0.39.0).
+     */
+    deposits?: Array<CashDeposit>;
 };
 
 /**
@@ -15597,9 +15605,9 @@ export type PaymentMethodKind = 'upi' | 'card' | 'cash' | 'wallet';
 export type PaymentStatus = 'requires_payment' | 'confirmed' | 'settled' | 'released' | 'failed';
 
 /**
- * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`). Clients must tolerate values they do not know.
+ * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`), and since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`). Clients must tolerate values they do not know.
  */
-export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice';
+export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice' | 'cash_deposit';
 
 /**
  * How an attempt reaches the customer: a UPI app opened on the device (`upi_intent`), a collect request to a UPI ID (`upi_collect`), or the provider's card form (`card`).
@@ -19960,13 +19968,21 @@ export type DeliveryProvider = {
      */
     service_id: string | null;
     /**
+     * The carrier, for `kind` `carrier`, such as `simulated` (since 0.39.0).
+     */
+    carrier?: string | null;
+    /**
+     * The most the Partner pays the carrier for a delivery (since 0.39.0); `null` for an agent-based Provider.
+     */
+    ceiling?: Money | null;
+    /**
      * The Provider's name.
      */
     name: string;
 };
 
 /**
- * Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there. Since 0.18.0.
+ * Who carries a Location's deliveries, in the order a delivery is asked of them, as a delivery written down now would have them: the store's own delivery service when one is enabled at the Location, then the platform fleet (`kind` `platform_fleet`) where the store names no external carrier, the Partner's plan includes the fleet and it operates there, then the carriers the Location added with their ceilings (`kind` `carrier`, since 0.39.0). Since 0.18.0.
  */
 export type DeliveryChain = {
     /**
@@ -20215,6 +20231,10 @@ export type DeliveryExplanation = {
      * Every move to another Provider, oldest first.
      */
     fallbacks: Array<DeliveryFallback>;
+    /**
+     * The carriers' quotes when a carrier was asked, the chosen one marked, those refused saying why (since 0.39.0).
+     */
+    quotes?: Array<CarrierQuote>;
     /**
      * The Agents considered last, eligible ones in the order offered, then the others with why not.
      */
@@ -23494,6 +23514,14 @@ export type StatementFigures = {
      * Referral commissions received less those paid (since 0.38.0); the total adds it.
      */
     commissions?: Money;
+    /**
+     * The platform's prescription fee on each line dispensed against a prescription in the week, as the Location's policy set it, on a line of its own ("Prescription fees ₹40.00"); nothing when none is set (since 0.39.0).
+     */
+    prescription_fees?: Money;
+    /**
+     * GST on the prescription fees, as the invoice bills it (since 0.39.0).
+     */
+    prescription_fees_gst?: Money;
 };
 
 /**
@@ -40287,6 +40315,561 @@ export type StatementCommission = {
 };
 
 /**
+ * A carrier's quote for a delivery, as the explanation keeps it, the `CarrierQuote` schema.
+ */
+export type CarrierQuote = {
+    /**
+     * The carrier, such as `simulated`.
+     */
+    carrier: string;
+    /**
+     * Its name.
+     */
+    carrier_name: string;
+    /**
+     * What it asks for the delivery.
+     */
+    price: Money;
+    /**
+     * Minutes to the door from now, as it says.
+     */
+    eta_minutes: number;
+    /**
+     * The share of its deliveries in the last 30 days delivered by their promise.
+     */
+    reliability_percent: number;
+    /**
+     * Whether its ETA keeps the order's promise.
+     */
+    keeps_promise: boolean;
+    /**
+     * When the quote lapses, ten minutes after it was given.
+     */
+    valid_until: string;
+    /**
+     * Whether the delivery went to it on this quote.
+     */
+    chosen: boolean;
+    /**
+     * Why it was not taken, such as a price over the Location's ceiling.
+     */
+    refused: string | null;
+};
+
+/**
+ * A carrier a Location adds to its delivery chain after the fleet, with its ceiling, the `DeliveryChainCarrier` schema.
+ */
+export type DeliveryChainCarrier = {
+    /**
+     * The carrier, such as `simulated`.
+     */
+    carrier: string;
+    /**
+     * The most the Partner pays the carrier for a delivery; a quote above it is refused. ₹120 by default.
+     */
+    ceiling: Money;
+};
+
+/**
+ * The carriers a Location's chain asks after its own Agents and the platform fleet, the `DeliveryChainUpdate` schema.
+ */
+export type DeliveryChainUpdate = {
+    /**
+     * In the order they are asked; empty asks no carrier.
+     */
+    carriers: Array<DeliveryChainCarrier>;
+};
+
+/**
+ * A carrier behind the Provider port, as Mission Control sees its wiring, the `DeliveryCarrier` schema.
+ */
+export type DeliveryCarrier = {
+    /**
+     * The carrier.
+     */
+    id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Whether it is a real carrier; the simulated one never is, and is used only outside production.
+     */
+    production: boolean;
+    /**
+     * Whether the chain may ask it now.
+     */
+    available: boolean;
+    /**
+     * Why not, such as a key never loaded.
+     */
+    why_unavailable: string | null;
+    /**
+     * Whether the shared secret of its notices is set.
+     */
+    secret_set: boolean;
+    /**
+     * The address to enter at the carrier for its notices.
+     */
+    notices_url: string;
+    /**
+     * How often open tasks are read back from it.
+     */
+    read_back_seconds: number;
+    /**
+     * Its deliveries of the last 30 days delivered by their promise; `null` before any.
+     */
+    reliability_percent: number | null;
+    /**
+     * How many deliveries it took in the last 30 days.
+     */
+    deliveries_30d: number;
+};
+
+/**
+ * Every carrier behind the Provider port, the `DeliveryCarrierList` schema.
+ */
+export type DeliveryCarrierList = {
+    /**
+     * The carriers.
+     */
+    items: Array<DeliveryCarrier>;
+};
+
+/**
+ * A quote a carrier gave, with the delivery it was for, the `CarrierQuoteRecord` schema.
+ */
+export type CarrierQuoteRecord = {
+    /**
+     * The delivery.
+     */
+    delivery_id: string;
+    /**
+     * Its order's number.
+     */
+    order_number: string;
+    /**
+     * The store.
+     */
+    location_name: string;
+    /**
+     * The quote.
+     */
+    quote: CarrierQuote;
+    /**
+     * The Location's ceiling then.
+     */
+    ceiling: Money;
+    /**
+     * When it was given.
+     */
+    at: string;
+};
+
+/**
+ * A carrier's quotes, newest first, the `CarrierQuoteList` schema.
+ */
+export type CarrierQuoteList = {
+    /**
+     * The quotes.
+     */
+    items: Array<CarrierQuoteRecord>;
+    /**
+     * The next page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A step of a simulated carrier's delivery moved by hand from Mission Control, the `CarrierStep` schema: a courier `taken`, `collected` from the store, `delivered`, or `failed` at the door.
+ */
+export type CarrierStep = 'taken' | 'collected' | 'delivered' | 'failed';
+
+/**
+ * A step of a simulated delivery made by hand, the `CarrierStepInput` schema.
+ */
+export type CarrierStepInput = {
+    /**
+     * The step.
+     */
+    step: CarrierStep;
+};
+
+/**
+ * A carrier's notice of a task's progress, posted to its notices address with the shared secret, the `CarrierNotice` schema.
+ */
+export type CarrierNotice = {
+    /**
+     * The carrier's task, as the platform asked for it; a notice is matched by it alone.
+     */
+    task_id: string;
+    /**
+     * What happened: `taken`, `collected`, `delivered`, `failed`, `cancelled`.
+     */
+    status: string;
+    /**
+     * The courier's first name, once one has it.
+     */
+    courier_name?: string | null;
+    /**
+     * The carrier's tracking page.
+     */
+    tracking_url?: string | null;
+    /**
+     * The proof at the door, for `delivered`.
+     */
+    proof_url?: string | null;
+    /**
+     * The distance the carrier went.
+     */
+    distance_metres?: number | null;
+    /**
+     * When, at the carrier.
+     */
+    at: string;
+    /**
+     * The shared secret, when not sent on the address.
+     */
+    secret?: string | null;
+};
+
+/**
+ * Where an Agent's cash deposit is, the `CashDepositStatus` schema: `pending` until the UPI payment is approved, then `paid`, or `failed` or `expired`.
+ */
+export type CashDepositStatus = 'pending' | 'paid' | 'failed' | 'expired';
+
+/**
+ * Cash an Agent deposits by UPI from the Agent app, the `CashDeposit` schema.
+ */
+export type CashDeposit = {
+    /**
+     * The deposit.
+     */
+    id: string;
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * What is deposited.
+     */
+    amount: Money;
+    /**
+     * Where it is.
+     */
+    status: CashDepositStatus;
+    /**
+     * The UPI payment carrying it.
+     */
+    payment_id: string;
+    /**
+     * What the Agent does next to pay, while pending.
+     */
+    next_action: PaymentNextAction | null;
+    /**
+     * When it was started.
+     */
+    created_at: string;
+    /**
+     * When the provider said it was paid.
+     */
+    paid_at: string | null;
+    /**
+     * When the night's reconciliation matched it with the provider's records and the ledger.
+     */
+    reconciled_at: string | null;
+};
+
+/**
+ * A deposit of the cash an Agent holds, the `CashDepositInput` schema.
+ */
+export type CashDepositInput = {
+    /**
+     * How much, at most the cash in hand; `null` deposits all of it.
+     */
+    amount?: Money | null;
+    /**
+     * Where the provider's page sends the Agent back.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * An Agent's cash as Mission Control's Finance › Agent cash lists it, the `AgentCashSummary` schema.
+ */
+export type AgentCashSummary = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The name it is shown under.
+     */
+    display_name: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    /**
+     * Its delivery service.
+     */
+    service_id: string;
+    /**
+     * Cash collected and not yet deposited or settled.
+     */
+    cash_in_hand: Money;
+    /**
+     * The service's cash ceiling.
+     */
+    ceiling: Money;
+    /**
+     * What it deposited in the last 30 days.
+     */
+    deposited_30d: Money;
+    /**
+     * Its last deposit paid.
+     */
+    last_deposit_at: string | null;
+    /**
+     * Deposits paid that the night's reconciliation has not matched yet.
+     */
+    unreconciled: number;
+};
+
+/**
+ * Agents holding cash or depositing it, those holding most first, the `AgentCashList` schema.
+ */
+export type AgentCashList = {
+    /**
+     * The Agents.
+     */
+    items: Array<AgentCashSummary>;
+    /**
+     * The next page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * One Agent's cash: what it collected and what it deposited, the `AgentCashDetail` schema.
+ */
+export type AgentCashDetail = {
+    /**
+     * The Agent's cash.
+     */
+    agent: AgentCashSummary;
+    /**
+     * Collections not yet deposited or settled, newest first.
+     */
+    collections: Array<CashCollection>;
+    /**
+     * Its deposits, newest first, each with whether the night's reconciliation matched it.
+     */
+    deposits: Array<CashDeposit>;
+};
+
+/**
+ * Where an Agent's offboarding is, the `OffboardingStatus` schema: `pending` a second member's approval, then `approved` (the membership offboarded), `refused` or `expired` after seven days.
+ */
+export type OffboardingStatus = 'pending' | 'approved' | 'refused' | 'expired';
+
+/**
+ * An Agent's offboarding proposed by one member, waiting for a second, the `OffboardingProposal` schema.
+ */
+export type OffboardingProposal = {
+    /**
+     * The proposal.
+     */
+    id: string;
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * Where it is.
+     */
+    status: OffboardingStatus;
+    /**
+     * Why, as the proposer gave it.
+     */
+    reason: string;
+    /**
+     * Who proposed it.
+     */
+    proposed_by: string;
+    /**
+     * Their name.
+     */
+    proposed_by_name: string;
+    /**
+     * When.
+     */
+    proposed_at: string;
+    /**
+     * When it lapses undecided.
+     */
+    expires_at: string;
+    /**
+     * The second member who decided.
+     */
+    decided_by: string | null;
+    /**
+     * When.
+     */
+    decided_at: string | null;
+};
+
+/**
+ * A task in an Agent's portable record, the `AgentRecordTask` schema.
+ */
+export type AgentRecordTask = {
+    /**
+     * The order.
+     */
+    order_number: string;
+    /**
+     * `pickup` or `drop`, or a job's kind.
+     */
+    kind: string;
+    /**
+     * How it ended.
+     */
+    status: string;
+    /**
+     * When it ended.
+     */
+    completed_at: string | null;
+    /**
+     * What it earned.
+     */
+    pay: Money | null;
+};
+
+/**
+ * A document in an Agent's portable record, without the file, the `AgentRecordDocument` schema.
+ */
+export type AgentRecordDocument = {
+    /**
+     * What it is.
+     */
+    kind: string;
+    /**
+     * Its review.
+     */
+    status: string;
+    /**
+     * Its expiry.
+     */
+    expires_on: string | null;
+};
+
+/**
+ * An Agent's earnings in a month, the `AgentRecordMonth` schema.
+ */
+export type AgentRecordMonth = {
+    /**
+     * `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * What it earned.
+     */
+    earned: Money;
+    /**
+     * Tasks completed.
+     */
+    tasks: number;
+};
+
+/**
+ * An Agent's portable record: tasks, ratings, documents and earnings, for them to take elsewhere, the `AgentRecord` schema.
+ */
+export type AgentRecord = {
+    /**
+     * The Agent membership.
+     */
+    agent_id: string;
+    /**
+     * The name it worked under.
+     */
+    display_name: string;
+    /**
+     * The Partner.
+     */
+    partner_name: string;
+    /**
+     * The delivery service.
+     */
+    service_name: string;
+    /**
+     * The membership's status now.
+     */
+    status: string;
+    /**
+     * When it joined.
+     */
+    joined_at: string | null;
+    /**
+     * When it ended, once offboarded.
+     */
+    ended_at: string | null;
+    /**
+     * Tasks completed in all.
+     */
+    tasks_completed: number;
+    /**
+     * Its last 500 tasks, newest first.
+     */
+    tasks: Array<AgentRecordTask>;
+    /**
+     * The share of thumbs up over its rated deliveries, as a percentage.
+     */
+    rating: number | null;
+    /**
+     * How many deliveries were rated.
+     */
+    ratings: number;
+    /**
+     * Its documents' reviews.
+     */
+    documents: Array<AgentRecordDocument>;
+    /**
+     * Its earnings by month, newest first.
+     */
+    earnings: Array<AgentRecordMonth>;
+    /**
+     * Everything it earned.
+     */
+    earned: Money;
+};
+
+/**
+ * An Agent's portable record exported as a file, once per key whatever the retries, the `AgentRecordExport` schema.
+ */
+export type AgentRecordExport = {
+    /**
+     * The export.
+     */
+    id: string;
+    /**
+     * The name the app saves it under.
+     */
+    file_name: string;
+    /**
+     * When.
+     */
+    exported_at: string;
+    /**
+     * The record.
+     */
+    record: AgentRecord;
+};
+
+/**
  * Whether the Partner has a sandbox: `none` until its first sandbox key, or a reset, makes its twin; `ready` once made. A twin purged after 90 days untouched is `none` again.
  */
 export type SandboxState = 'none' | 'ready';
@@ -43449,7 +44032,7 @@ export type OffboardAgentErrors = {
      */
     404: Problem;
     /**
-     * `illegal_transition` when already offboarded.
+     * `illegal_transition` when already offboarded; `offboarding_pending` when an offboarding already waits for a second member.
      */
     409: Problem;
     /**
@@ -43469,6 +44052,10 @@ export type OffboardAgentResponses = {
      * The Agent after the change.
      */
     200: PartnerAgent;
+    /**
+     * The offboarding proposed, waiting for a second member.
+     */
+    202: OffboardingProposal;
 };
 
 export type OffboardAgentResponse = OffboardAgentResponses[keyof OffboardAgentResponses];
@@ -68910,6 +69497,63 @@ export type GetPartnerLocationDeliveryChainResponses = {
 
 export type GetPartnerLocationDeliveryChainResponse = GetPartnerLocationDeliveryChainResponses[keyof GetPartnerLocationDeliveryChainResponses];
 
+export type PutPartnerLocationDeliveryChainData = {
+    /**
+     * The carriers.
+     */
+    body: DeliveryChainUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store, which must be one of the partner's; another's answers `404`.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/delivery-chain';
+};
+
+export type PutPartnerLocationDeliveryChainErrors = {
+    /**
+     * `validation_failed`: an unknown carrier, a ceiling below nothing or one carrier named twice.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `dispatch:manage`, or `forbidden`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: the partner or the Location.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerLocationDeliveryChainError = PutPartnerLocationDeliveryChainErrors[keyof PutPartnerLocationDeliveryChainErrors];
+
+export type PutPartnerLocationDeliveryChainResponses = {
+    /**
+     * The chain now.
+     */
+    200: DeliveryChain;
+};
+
+export type PutPartnerLocationDeliveryChainResponse = PutPartnerLocationDeliveryChainResponses[keyof PutPartnerLocationDeliveryChainResponses];
+
 export type GetPlatformDispatchBoardData = {
     body?: never;
     path?: never;
@@ -93484,3 +94128,551 @@ export type GetCrossSellFiguresResponses = {
 };
 
 export type GetCrossSellFiguresResponse = GetCrossSellFiguresResponses[keyof GetCrossSellFiguresResponses];
+
+export type ListPlatformCarriersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/carriers';
+};
+
+export type ListPlatformCarriersErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformCarriersError = ListPlatformCarriersErrors[keyof ListPlatformCarriersErrors];
+
+export type ListPlatformCarriersResponses = {
+    /**
+     * The carriers.
+     */
+    200: DeliveryCarrierList;
+};
+
+export type ListPlatformCarriersResponse = ListPlatformCarriersResponses[keyof ListPlatformCarriersResponses];
+
+export type ListPlatformCarrierQuotesData = {
+    body?: never;
+    path: {
+        /**
+         * The carrier, such as `simulated`.
+         */
+        carrier_id: string;
+    };
+    query?: {
+        /**
+         * 1 to 100.
+         */
+        limit?: number;
+        /**
+         * The next page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/carriers/{carrier_id}/quotes';
+};
+
+export type ListPlatformCarrierQuotesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformCarrierQuotesError = ListPlatformCarrierQuotesErrors[keyof ListPlatformCarrierQuotesErrors];
+
+export type ListPlatformCarrierQuotesResponses = {
+    /**
+     * The quotes.
+     */
+    200: CarrierQuoteList;
+};
+
+export type ListPlatformCarrierQuotesResponse = ListPlatformCarrierQuotesResponses[keyof ListPlatformCarrierQuotesResponses];
+
+export type StepCarrierDeliveryData = {
+    /**
+     * The step.
+     */
+    body: CarrierStepInput;
+    path: {
+        /**
+         * The delivery.
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/deliveries/{delivery_id}/carrier-steps';
+};
+
+export type StepCarrierDeliveryErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `carrier_not_simulated`: a real carrier has it; or `illegal_transition`: the step does not follow from where it is.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StepCarrierDeliveryError = StepCarrierDeliveryErrors[keyof StepCarrierDeliveryErrors];
+
+export type StepCarrierDeliveryResponses = {
+    /**
+     * The delivery now.
+     */
+    200: DeliveryDetail;
+};
+
+export type StepCarrierDeliveryResponse = StepCarrierDeliveryResponses[keyof StepCarrierDeliveryResponses];
+
+export type ReceiveCarrierNoticeData = {
+    /**
+     * The notice.
+     */
+    body: CarrierNotice;
+    path: {
+        /**
+         * The carrier, such as `simulated`.
+         */
+        carrier_id: string;
+    };
+    query?: {
+        /**
+         * The shared secret, when not in the body.
+         */
+        secret?: string;
+    };
+    url: '/v1/carriers/{carrier_id}/notices';
+};
+
+export type ReceiveCarrierNoticeErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ReceiveCarrierNoticeError = ReceiveCarrierNoticeErrors[keyof ReceiveCarrierNoticeErrors];
+
+export type ReceiveCarrierNoticeResponses = {
+    /**
+     * Taken, or ignored.
+     */
+    204: void;
+};
+
+export type ReceiveCarrierNoticeResponse = ReceiveCarrierNoticeResponses[keyof ReceiveCarrierNoticeResponses];
+
+export type DepositAgentCashData = {
+    /**
+     * How much.
+     */
+    body: CashDepositInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/cash/deposits';
+};
+
+export type DepositAgentCashErrors = {
+    /**
+     * `validation_failed`: more than the cash in hand, or nothing to deposit.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `deposit_pending`: a deposit waits for its payment.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DepositAgentCashError = DepositAgentCashErrors[keyof DepositAgentCashErrors];
+
+export type DepositAgentCashResponses = {
+    /**
+     * The deposit started.
+     */
+    201: CashDeposit;
+};
+
+export type DepositAgentCashResponse = DepositAgentCashResponses[keyof DepositAgentCashResponses];
+
+export type ExportAgentRecordData = {
+    body?: never;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/agent/memberships/{agent_id}/record-exports';
+};
+
+export type ExportAgentRecordErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ExportAgentRecordError = ExportAgentRecordErrors[keyof ExportAgentRecordErrors];
+
+export type ExportAgentRecordResponses = {
+    /**
+     * The export.
+     */
+    201: AgentRecordExport;
+};
+
+export type ExportAgentRecordResponse = ExportAgentRecordResponses[keyof ExportAgentRecordResponses];
+
+export type ListPlatformAgentCashData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * One Partner's Agents.
+         */
+        partner_id?: string;
+        /**
+         * 1 to 100.
+         */
+        limit?: number;
+        /**
+         * The next page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/agent-cash';
+};
+
+export type ListPlatformAgentCashErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformAgentCashError = ListPlatformAgentCashErrors[keyof ListPlatformAgentCashErrors];
+
+export type ListPlatformAgentCashResponses = {
+    /**
+     * The Agents.
+     */
+    200: AgentCashList;
+};
+
+export type ListPlatformAgentCashResponse = ListPlatformAgentCashResponses[keyof ListPlatformAgentCashResponses];
+
+export type GetPlatformAgentCashData = {
+    body?: never;
+    path: {
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/agent-cash/{agent_id}';
+};
+
+export type GetPlatformAgentCashErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformAgentCashError = GetPlatformAgentCashErrors[keyof GetPlatformAgentCashErrors];
+
+export type GetPlatformAgentCashResponses = {
+    /**
+     * The Agent's cash.
+     */
+    200: AgentCashDetail;
+};
+
+export type GetPlatformAgentCashResponse = GetPlatformAgentCashResponses[keyof GetPlatformAgentCashResponses];
+
+export type ApproveAgentOffboardingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/offboard/approve';
+};
+
+export type ApproveAgentOffboardingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `second_member_required`: the proposer's own proposal; or `offboarding_not_pending`: nothing waits.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ApproveAgentOffboardingError = ApproveAgentOffboardingErrors[keyof ApproveAgentOffboardingErrors];
+
+export type ApproveAgentOffboardingResponses = {
+    /**
+     * The Agent offboarded.
+     */
+    200: PartnerAgent;
+};
+
+export type ApproveAgentOffboardingResponse = ApproveAgentOffboardingResponses[keyof ApproveAgentOffboardingResponses];
+
+export type RefuseAgentOffboardingData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Agent: one membership of a person in one of a Partner's delivery services.
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/agents/{agent_id}/offboard/refuse';
+};
+
+export type RefuseAgentOffboardingErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `offboarding_not_pending`: nothing waits.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RefuseAgentOffboardingError = RefuseAgentOffboardingErrors[keyof RefuseAgentOffboardingErrors];
+
+export type RefuseAgentOffboardingResponses = {
+    /**
+     * The Agent as it stays.
+     */
+    200: PartnerAgent;
+};
+
+export type RefuseAgentOffboardingResponse = RefuseAgentOffboardingResponses[keyof RefuseAgentOffboardingResponses];

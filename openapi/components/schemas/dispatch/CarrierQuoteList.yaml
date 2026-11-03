@@ -1,0 +1,20 @@
+type: object
+description: "A carrier's quotes, newest first, the `CarrierQuoteList` schema."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./CarrierQuoteRecord.yaml
+    description: "The quotes."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: "The next page."
+    examples:
+      - null
+examples:
+  - {"items": [], "next_cursor": null}

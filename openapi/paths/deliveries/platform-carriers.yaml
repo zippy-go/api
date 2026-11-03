@@ -1,0 +1,42 @@
+# Path item for /v1/platform/carriers. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformCarriers
+  summary: "List the carriers"
+  description: "Every carrier behind the Provider port with its wiring: whether it is real or simulated, available, its secret set, the address of its notices, how often its tasks are read back, and its reliability over 30 days. `setting:read`."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The carriers."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DeliveryCarrierList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

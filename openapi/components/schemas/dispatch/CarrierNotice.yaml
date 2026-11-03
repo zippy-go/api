@@ -1,0 +1,60 @@
+type: object
+description: "A carrier's notice of a task's progress, posted to its notices address with the shared secret, the `CarrierNotice` schema."
+required:
+  - task_id
+  - status
+  - at
+properties:
+  task_id:
+    type: string
+    description: "The carrier's task, as the platform asked for it; a notice is matched by it alone."
+    examples:
+      - "SIM-0192b6f4"
+  status:
+    type: string
+    description: "What happened: `taken`, `collected`, `delivered`, `failed`, `cancelled`."
+    examples:
+      - "delivered"
+  courier_name:
+    type:
+      - string
+      - "null"
+    description: "The courier's first name, once one has it."
+    examples:
+      - "Imran"
+  tracking_url:
+    type:
+      - string
+      - "null"
+    description: "The carrier's tracking page."
+    examples:
+      - null
+  proof_url:
+    type:
+      - string
+      - "null"
+    description: "The proof at the door, for `delivered`."
+    examples:
+      - null
+  distance_metres:
+    type:
+      - integer
+      - "null"
+    description: "The distance the carrier went."
+    examples:
+      - 3400
+  at:
+    type: string
+    format: date-time
+    description: "When, at the carrier."
+    examples:
+      - "2026-11-04T07:40:00Z"
+  secret:
+    type:
+      - string
+      - "null"
+    description: "The shared secret, when not sent on the address."
+    examples:
+      - null
+examples:
+  - {"task_id": "SIM-0192b6f4", "status": "delivered", "courier_name": "Imran", "tracking_url": null, "proof_url": null, "distance_metres": 3400, "at": "2026-11-04T07:40:00Z", "secret": null}

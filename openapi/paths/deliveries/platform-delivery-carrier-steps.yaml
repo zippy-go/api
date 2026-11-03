@@ -1,0 +1,62 @@
+# Path item for /v1/platform/deliveries/{delivery_id}/carrier-steps. Referenced from openapi.yaml.
+parameters:
+  - name: delivery_id
+    in: path
+    required: true
+    description: "The delivery."
+    schema:
+      type: string
+      format: uuid
+post:
+  operationId: stepCarrierDelivery
+  summary: "Move a simulated carrier's delivery by hand"
+  description: "Moves a delivery the simulated carrier has one step on, as the carrier's notice would: a courier takes it, collects it, delivers it, or fails at the door. Refused for a real carrier (`carrier_not_simulated`) and outside local and sandbox. `dispatch:manage`."
+  tags:
+    - Deliveries
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The step."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/dispatch/CarrierStepInput.yaml
+  responses:
+    "200":
+      description: "The delivery now."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/dispatch/DeliveryDetail.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`carrier_not_simulated`: a real carrier has it; or `illegal_transition`: the step does not follow from where it is."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

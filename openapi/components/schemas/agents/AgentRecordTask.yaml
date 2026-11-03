@@ -1,0 +1,39 @@
+type: object
+description: "A task in an Agent's portable record, the `AgentRecordTask` schema."
+required:
+  - order_number
+  - kind
+  - status
+  - completed_at
+  - pay
+properties:
+  order_number:
+    type: string
+    description: "The order."
+    examples:
+      - "AA0042"
+  kind:
+    type: string
+    description: "`pickup` or `drop`, or a job's kind."
+    examples:
+      - "drop"
+  status:
+    type: string
+    description: "How it ended."
+    examples:
+      - "completed"
+  completed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When it ended."
+    examples:
+      - "2026-11-03T08:40:00Z"
+  pay:
+    oneOf:
+      - $ref: ../common/Money.yaml
+      - type: "null"
+    description: "What it earned."
+examples:
+  - {"order_number": "AA0042", "kind": "drop", "status": "completed", "completed_at": "2026-11-03T08:40:00Z", "pay": {"minor_units": 4920, "currency": "INR"}}

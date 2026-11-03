@@ -1,0 +1,9 @@
+type: string
+description: "A step of a simulated carrier's delivery moved by hand from Mission Control, the `CarrierStep` schema: a courier `taken`, `collected` from the store, `delivered`, or `failed` at the door."
+enum:
+  - taken
+  - collected
+  - delivered
+  - failed
+examples:
+  - taken

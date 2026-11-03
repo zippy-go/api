@@ -1,0 +1,10 @@
+type: object
+description: "A step of a simulated delivery made by hand, the `CarrierStepInput` schema."
+required:
+  - step
+properties:
+  step:
+    $ref: ./CarrierStep.yaml
+    description: "The step."
+examples:
+  - {"step": "collected"}
