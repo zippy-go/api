@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "description": "The customer's confirmation: the last four digits of their number, after a fresh code in this session.",
+  "required": [
+    "mobile_last_four"
+  ],
+  "properties": {
+    "mobile_last_four": {
+      "type": "string",
+      "description": "The last four digits of their number.",
+      "pattern": "^[0-9]{4}$",
+      "examples": [
+        "0001"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "mobile_last_four": "0001"
+    }
+  ]
+}

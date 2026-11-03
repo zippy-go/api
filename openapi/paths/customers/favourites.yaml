@@ -1,0 +1,77 @@
+{
+  "get": {
+    "operationId": "listCustomerFavourites",
+    "summary": "List my favourite stores",
+    "description": "The customer's favourite stores, the most recently kept first, each with the card a Vertical's listing draws, across every city and Vertical; a store closed for good is left out.",
+    "tags": [
+      "Customers"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "lat",
+        "in": "query",
+        "required": false,
+        "description": "Latitude of the pin, for each card's distance.",
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "lng",
+        "in": "query",
+        "required": false,
+        "description": "Longitude of the pin.",
+        "schema": {
+          "type": "number"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The favourites.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/customers/FavouriteList.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

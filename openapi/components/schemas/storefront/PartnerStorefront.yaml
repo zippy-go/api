@@ -6,6 +6,7 @@ required:
   - open_count
   - stores
 properties:
+  storefront: {"oneOf": [{"$ref": "./PartnerStorefrontSettings.yaml"}, {"type": "null"}], "description": "The Partner's own storefront's path, name, colours and cross-sell switch (step 11); `null` while never set, when the Partner's name and the default colours stand."}
   partner:
     $ref: ./StorefrontPartner.yaml
     description: The Partner.

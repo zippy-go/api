@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.customer.erased.v1.schema.json",
+  "title": "CustomersCustomerErasedPayload",
+  "description": "Payload of `customers.customer.erased` version 1. A customer's account was erased: every module has blanked its part, and what stays points at the reference. Consumers: analytics (the cohort keeps the id), every module that keeps the customer's words. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "user_id",
+    "by",
+    "at"
+  ],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The anonymised reference.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "by": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "support"
+      ],
+      "description": "Who erased it.",
+      "examples": [
+        "customer"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

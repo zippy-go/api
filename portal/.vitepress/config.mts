@@ -42,6 +42,7 @@ export default defineConfig({
         text: 'Policies',
         items: [
           { text: 'Limits', link: '/limits' },
+          { text: 'How stores are ranked', link: '/ranking' },
           { text: 'Versioning', link: '/versioning' },
           { text: 'Changelog', link: '/changelog' },
         ],

@@ -1,0 +1,75 @@
+{
+  "type": "object",
+  "description": "What erasing the account destroys, what it keeps and why, the Wallet balance forfeited, and what stops it now.",
+  "required": [
+    "destroyed",
+    "retained",
+    "wallet_forfeited",
+    "blocked_by",
+    "mobile_last_four_hint"
+  ],
+  "properties": {
+    "destroyed": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "What goes.",
+        "examples": [
+          "Your addresses and favourites"
+        ]
+      },
+      "description": "What is destroyed."
+    },
+    "retained": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "What stays, and why.",
+        "examples": [
+          "Your orders and reviews, without your name"
+        ]
+      },
+      "description": "What is kept, anonymous."
+    },
+    "wallet_forfeited": {
+      "$ref": "../common/Money.yaml",
+      "description": "The Wallet balance forfeited."
+    },
+    "blocked_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why it cannot happen now: an order or a booking in flight, or a membership that still serves a Partner; `null` when it can.",
+      "examples": [
+        null
+      ]
+    },
+    "mobile_last_four_hint": {
+      "type": "string",
+      "description": "The last four digits of the number the customer types to confirm.",
+      "examples": [
+        "0001"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "destroyed": [
+        "Your name, numbers, email and date of birth",
+        "Your addresses and favourites",
+        "Your payment methods and devices"
+      ],
+      "retained": [
+        "Your orders and reviews, without your name",
+        "Invoices and ledger entries the law makes us keep"
+      ],
+      "wallet_forfeited": {
+        "minor_units": 15000,
+        "currency": "INR"
+      },
+      "blocked_by": null,
+      "mobile_last_four_hint": "0001"
+    }
+  ]
+}

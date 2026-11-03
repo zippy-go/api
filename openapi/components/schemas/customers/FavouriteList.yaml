@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "description": "The customer's favourite stores, the most recently kept first; a store closed for good is left out. Two hundred at most.",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./Favourite.yaml"
+      },
+      "description": "The favourites."
+    }
+  },
+  "examples": [
+    {
+      "items": [
+        {
+          "location_id": "01a13a48-9e00-7000-8000-000000000301",
+          "saved_at": "2026-11-02T10:15:00Z",
+          "name": "Dev Kitchen Gachibowli",
+          "verticals": [
+            "food"
+          ],
+          "store": null
+        }
+      ]
+    }
+  ]
+}

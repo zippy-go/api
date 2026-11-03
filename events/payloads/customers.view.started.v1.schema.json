@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/customers.view.started.v1.schema.json",
+  "title": "CustomersViewStartedPayload",
+  "description": "Payload of `customers.view.started` version 1. Support started viewing the app as the customer, reading only. Consumers: the audit log, analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "view_id",
+    "user_id",
+    "staff_id",
+    "expires_at",
+    "at"
+  ],
+  "properties": {
+    "view_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The view.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11"
+      ]
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who views.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21"
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it lapses.",
+      "examples": [
+        "2026-11-02T10:45:00Z"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

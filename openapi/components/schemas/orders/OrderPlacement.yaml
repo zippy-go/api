@@ -4,6 +4,7 @@ required:
   - location_id
   - quote
 properties:
+  partner_storefront: {"type": ["string", "null"], "format": "uuid", "description": "The Partner whose own storefront the order is placed from (step 11): the store must be that Partner's, and the order is channel `partner_storefront`, with no marketplace fee.", "examples": [null]}
   location_id:
     type: string
     format: uuid

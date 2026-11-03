@@ -292,6 +292,12 @@ with the identifiers when it is needed.
 | `orchestration.carrier.quoted` | 1 | A carrier quoted a delivery the chain asked it for: its price, ETA and reliability against the Location's ceiling, and whether the delivery went to it. Consumers: analytics, Mission Control's carriers. Payload: `delivery_id`, `order_id`, `partner_id`, `location_id`, `carrier`, `price`, `ceiling`, `currency`, `eta_minutes`, `reliability_percent`, `keeps_promise`, `taken`, `refused`, `at`. |
 | `payments.cash.deposited` | 1 | An Agent deposited cash they collected, by UPI from the Agent app, the provider having said it was paid: their cash in hand reads that much less and the ledger posts it; the night's reconciliation matches it. Consumers: the workforce (cash in hand), the ledger. Payload: `deposit_id`, `payment_id`, `agent_id`, `partner_id`, `service_id`, `amount`, `currency`, `at`. |
 | `fleet.membership.offboarding_proposed` | 1 | A member proposed offboarding an Agent: it waits for a second member with `agent:manage` for the service, seven days at most. No name and no reason in the payload. Consumers: notifications (the members who may decide), the Partner console. Payload: `proposal_id`, `agent_id`, `partner_id`, `service_id`, `proposed_by`, `expires_at`, `at`. |
+| `customers.export.ready` | 1 | A customer's export is ready to download for seven days. Consumers: notifications (the customer told). Payload: `export_id`, `user_id`, `requested_by`, `expires_at`, `at`. |
+| `customers.customer.erased` | 1 | A customer's account was erased: every module has blanked its part, and what stays points at the reference. Consumers: analytics (the cohort keeps the id), every module that keeps the customer's words. Payload: `user_id`, `by`, `at`. |
+| `customers.view.started` | 1 | Support started viewing the app as the customer, reading only. Consumers: the audit log, analytics. Payload: `view_id`, `user_id`, `staff_id`, `expires_at`, `at`. |
+| `customers.view.ended` | 1 | Support's view of the app as the customer ended, by support or after 30 minutes. Consumers: the audit log, analytics. Payload: `view_id`, `user_id`, `staff_id`, `seconds`, `at`. |
+| `customers.favourite.added` | 1 | A customer kept a store as a favourite. Consumers: analytics. Payload: `user_id`, `location_id`, `at`. |
+| `customers.favourite.removed` | 1 | A customer let a favourite go. Consumers: analytics. Payload: `user_id`, `location_id`, `at`. |
 
 ## Consuming events
 

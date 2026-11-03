@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "description": "View requests, the newest first.",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./CustomerViewRequest.yaml"
+      },
+      "description": "The requests."
+    }
+  },
+  "examples": [
+    {
+      "items": [
+        {
+          "view_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11",
+          "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+          "state": "agreed",
+          "reason": "Ticket T-104: the basket shows the wrong price",
+          "asked_by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21",
+          "asked_by_name": "Ravi Kumar",
+          "asked_at": "2026-11-02T10:15:00Z",
+          "agreed_at": "2026-11-02T10:15:00Z",
+          "started_at": null,
+          "ended_at": null,
+          "expires_at": "2026-11-02T10:45:00Z"
+        }
+      ]
+    }
+  ]
+}

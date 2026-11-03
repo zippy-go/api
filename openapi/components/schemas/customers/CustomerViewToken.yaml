@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "A read-only token of the customer surface for support, viewing the app as the customer: every write answers 403 `view_read_only`.",
+  "required": [
+    "access_token",
+    "expires_at",
+    "view_id"
+  ],
+  "properties": {
+    "access_token": {
+      "type": "string",
+      "description": "The bearer token.",
+      "examples": [
+        "eyJhbGciOiJFZERTQSJ9.e30.sig"
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "description": "When it lapses, 30 minutes after the view started at most.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:45:00Z"
+      ]
+    },
+    "view_id": {
+      "type": "string",
+      "description": "The view.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "access_token": "eyJhbGciOiJFZERTQSJ9.e30.sig",
+      "expires_at": "2026-11-02T10:45:00Z",
+      "view_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11"
+    }
+  ]
+}

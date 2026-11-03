@@ -1,0 +1,196 @@
+{
+  "get": {
+    "operationId": "getPartnerStorefrontSettings",
+    "summary": "Read the Partner's own storefront",
+    "description": "The Partner's own storefront's path, name, colours and cross-sell switch; a Partner that never set it reads its name and the default colours. Members need `partner:read`.",
+    "tags": [
+      "Storefront"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "../../components/parameters/PartnerIdPath.yaml"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The storefront.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/storefront/PartnerStorefrontSettings.yaml"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "`not_found`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "operationId": "putPartnerStorefrontSettings",
+    "summary": "Set the Partner's own storefront",
+    "description": "Sets its path (unique: `conflict` when another Partner holds it), name, colours and cross-sell switch, guarded by `If-Match`. Members need `partner:profile_write`; audited.",
+    "tags": [
+      "Storefront"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "../../components/parameters/PartnerIdPath.yaml"
+      },
+      {
+        "$ref": "../../components/parameters/IfMatchHeader.yaml"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "description": "The storefront.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../../components/schemas/storefront/PartnerStorefrontSettingsInput.yaml"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The storefront.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/storefront/PartnerStorefrontSettings.yaml"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "`validation_failed`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "`access_denied`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "`not_found`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "`conflict`: the path is taken.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "412": {
+        "description": "`precondition_failed`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "string",
+  "description": "Where an export stands: `preparing`, `ready` to download for seven days, `failed`, or `expired` after its seven days.",
+  "enum": [
+    "preparing",
+    "ready",
+    "failed",
+    "expired"
+  ],
+  "examples": [
+    "ready"
+  ]
+}

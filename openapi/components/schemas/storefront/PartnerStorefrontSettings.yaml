@@ -1,0 +1,84 @@
+{
+  "type": "object",
+  "description": "A Partner's own storefront at `/p/{path}`: its path, name, colours and whether other Partners' recommendations show there. No platform campaign shows on it, and an order placed there is channel `partner_storefront`, with no marketplace fee.",
+  "required": [
+    "path",
+    "name",
+    "primary_colour",
+    "accent_colour",
+    "cross_sell",
+    "url",
+    "version"
+  ],
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Its path, 3 to 40 lowercase letters, digits and dashes, unique.",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$",
+      "examples": [
+        "dev-kitchen"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name, 1 to 60 characters.",
+      "minLength": 1,
+      "maxLength": 60,
+      "examples": [
+        "Dev Kitchen"
+      ]
+    },
+    "primary_colour": {
+      "type": "string",
+      "description": "Its primary colour, `#RRGGBB`.",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "examples": [
+        "#B3261E"
+      ]
+    },
+    "accent_colour": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Its accent colour, `#RRGGBB`.",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "examples": [
+        "#FFD8E4"
+      ]
+    },
+    "cross_sell": {
+      "type": "boolean",
+      "description": "Whether other Partners' recommendations show on it; off by default.",
+      "examples": [
+        false
+      ]
+    },
+    "url": {
+      "type": "string",
+      "description": "Where it is.",
+      "examples": [
+        "http://localhost:3000/p/dev-kitchen"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Raised by every change; send it in `If-Match`.",
+      "minimum": 1,
+      "examples": [
+        3
+      ]
+    }
+  },
+  "examples": [
+    {
+      "path": "dev-kitchen",
+      "name": "Dev Kitchen",
+      "primary_colour": "#B3261E",
+      "accent_colour": "#FFD8E4",
+      "cross_sell": false,
+      "url": "http://localhost:3000/p/dev-kitchen",
+      "version": 3
+    }
+  ]
+}

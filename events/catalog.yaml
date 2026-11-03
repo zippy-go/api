@@ -2668,3 +2668,52 @@ events:
       A member proposed offboarding an Agent: it waits for a second member with `agent:manage` for the service, seven days at most. No name and no reason in the payload. Consumers: notifications (the members who may decide), the Partner console.
     payload_schema: ./payloads/fleet.membership.offboarding_proposed.v1.schema.json
     example: ./examples/fleet.membership.offboarding_proposed.v1.json
+
+
+  - type: customers.export.ready
+    version: 1
+    domain: customers
+    description: >-
+      A customer's export is ready to download for seven days. Consumers: notifications (the customer told).
+    payload_schema: ./payloads/customers.export.ready.v1.schema.json
+    example: ./examples/customers.export.ready.v1.json
+
+  - type: customers.customer.erased
+    version: 1
+    domain: customers
+    description: >-
+      A customer's account was erased: every module has blanked its part, and what stays points at the reference. Consumers: analytics (the cohort keeps the id), every module that keeps the customer's words.
+    payload_schema: ./payloads/customers.customer.erased.v1.schema.json
+    example: ./examples/customers.customer.erased.v1.json
+
+  - type: customers.view.started
+    version: 1
+    domain: customers
+    description: >-
+      Support started viewing the app as the customer, reading only. Consumers: the audit log, analytics.
+    payload_schema: ./payloads/customers.view.started.v1.schema.json
+    example: ./examples/customers.view.started.v1.json
+
+  - type: customers.view.ended
+    version: 1
+    domain: customers
+    description: >-
+      Support's view of the app as the customer ended, by support or after 30 minutes. Consumers: the audit log, analytics.
+    payload_schema: ./payloads/customers.view.ended.v1.schema.json
+    example: ./examples/customers.view.ended.v1.json
+
+  - type: customers.favourite.added
+    version: 1
+    domain: customers
+    description: >-
+      A customer kept a store as a favourite. Consumers: analytics.
+    payload_schema: ./payloads/customers.favourite.added.v1.schema.json
+    example: ./examples/customers.favourite.added.v1.json
+
+  - type: customers.favourite.removed
+    version: 1
+    domain: customers
+    description: >-
+      A customer let a favourite go. Consumers: analytics.
+    payload_schema: ./payloads/customers.favourite.removed.v1.schema.json
+    example: ./examples/customers.favourite.removed.v1.json

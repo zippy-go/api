@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "description": "The Partner a storefront path names.",
+  "required": [
+    "partner_id",
+    "path"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "The Partner.",
+      "format": "uuid",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000001"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "description": "The path.",
+      "examples": [
+        "dev-kitchen"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "partner_id": "01a13a48-9e00-7000-8000-000000000001",
+      "path": "dev-kitchen"
+    }
+  ]
+}

@@ -2701,3 +2701,38 @@ errors:
     message: "Another member approves an offboarding you proposed."
     retryable: false
     description: "The member who proposed an Agent's offboarding approves it themselves."
+
+  - code: export_in_progress
+    status: 409
+    title: An export is in progress
+    message: "Your data is being prepared, or was prepared today: {export}."
+    retryable: false
+    description: "A second export asked for while one is preparing, or a second in 24 hours."
+
+  - code: erasure_blocked
+    status: 409
+    title: The account cannot be erased now
+    message: "{reason}: erase it once that ends."
+    retryable: false
+    description: "Erasure asked for while an order or a booking is in flight, or while the person holds a membership that still serves a Partner; the sentence names it."
+
+  - code: favourites_full
+    status: 409
+    title: Favourites full
+    message: "You keep 200 favourite stores: let one go first."
+    retryable: false
+    description: "A 201st favourite store."
+
+  - code: view_not_agreed
+    status: 409
+    title: The customer has not agreed
+    message: "The customer has not agreed to this view, or it lapsed."
+    retryable: false
+    description: "Support asked for a view's token before the customer agreed, after they declined, or after the request or the view lapsed."
+
+  - code: view_read_only
+    status: 403
+    title: Viewing only
+    message: "Support is viewing the app as the customer and can change nothing."
+    retryable: false
+    description: "A write with a token support holds to view the app as the customer."

@@ -1,0 +1,127 @@
+{
+  "type": "object",
+  "description": "Support asking to view the app as the customer, reading only, for 30 minutes at most, every view logged with who, when and for how long.",
+  "required": [
+    "view_id",
+    "customer_id",
+    "state",
+    "reason",
+    "asked_by",
+    "asked_by_name",
+    "asked_at",
+    "agreed_at",
+    "started_at",
+    "ended_at",
+    "expires_at"
+  ],
+  "properties": {
+    "view_id": {
+      "type": "string",
+      "description": "The view.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11"
+      ]
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "The customer.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "state": {
+      "$ref": "./CustomerViewState.yaml"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why support asks, shown to the customer.",
+      "examples": [
+        "Ticket T-104: the basket shows the wrong price"
+      ]
+    },
+    "asked_by": {
+      "type": "string",
+      "description": "Who asked.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21"
+      ]
+    },
+    "asked_by_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Their name, as the customer sees it.",
+      "examples": [
+        "Ravi Kumar"
+      ]
+    },
+    "asked_at": {
+      "type": "string",
+      "description": "When.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "agreed_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When the customer agreed.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "started_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When the view started.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "ended_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When it ended.",
+      "format": "date-time",
+      "examples": [
+        null
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "description": "When the request or the view lapses.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:45:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "view_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f11",
+      "customer_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01",
+      "state": "agreed",
+      "reason": "Ticket T-104: the basket shows the wrong price",
+      "asked_by": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9f21",
+      "asked_by_name": "Ravi Kumar",
+      "asked_at": "2026-11-02T10:15:00Z",
+      "agreed_at": "2026-11-02T10:15:00Z",
+      "started_at": null,
+      "ended_at": null,
+      "expires_at": "2026-11-02T10:45:00Z"
+    }
+  ]
+}

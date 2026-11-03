@@ -1,0 +1,68 @@
+{
+  "type": "object",
+  "description": "A store the customer keeps, with the card a Vertical's listing draws when the store is live.",
+  "required": [
+    "location_id",
+    "saved_at",
+    "name",
+    "verticals"
+  ],
+  "properties": {
+    "location_id": {
+      "type": "string",
+      "description": "The store.",
+      "format": "uuid",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000301"
+      ]
+    },
+    "saved_at": {
+      "type": "string",
+      "description": "When it was kept.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Dev Kitchen Gachibowli"
+      ]
+    },
+    "verticals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A Vertical's code.",
+        "examples": [
+          "food"
+        ]
+      },
+      "description": "The Verticals it trades in, to group by."
+    },
+    "store": {
+      "oneOf": [
+        {
+          "$ref": "../storefront/StoreCard.yaml"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Its card, with its own clock and money; `null` while it cannot be drawn now."
+    }
+  },
+  "examples": [
+    {
+      "location_id": "01a13a48-9e00-7000-8000-000000000301",
+      "saved_at": "2026-11-02T10:15:00Z",
+      "name": "Dev Kitchen Gachibowli",
+      "verticals": [
+        "food"
+      ],
+      "store": null
+    }
+  ]
+}

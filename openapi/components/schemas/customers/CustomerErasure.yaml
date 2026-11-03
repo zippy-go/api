@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "An erased account: its sessions ended everywhere, its name, numbers, addresses and words gone, its orders, reviews and ledger entries kept anonymous under the reference, prescription files deleted, the customer still counted in their cohort. The number may register again as a new customer.",
+  "required": [
+    "erased_at",
+    "reference"
+  ],
+  "properties": {
+    "erased_at": {
+      "type": "string",
+      "description": "When.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    },
+    "reference": {
+      "type": "string",
+      "description": "The internal reference what is kept points at.",
+      "format": "uuid",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "erased_at": "2026-11-02T10:15:00Z",
+      "reference": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+    }
+  ]
+}

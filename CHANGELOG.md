@@ -6,6 +6,40 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.40.0] - 2026-11-04
+
+Step 11, channels and data, phase B: the customer's data, viewing the app as the customer,
+favourite stores, a Partner's own storefront and the listing position. Written as 0.40.0, the
+next free minor after pharmacy phase B's 0.39.0. Additive only.
+
+### Added
+
+- The customer's data: exports (`GET`, `POST /v1/customer/exports`, `GET .../exports/{export_id}`,
+  its `file` and `summary`, `CustomerExport`, `CustomerExportList`, `CustomerExportState`) and
+  the erasure (`GET`, `POST /v1/customer/erasure`, `CustomerErasurePreview`,
+  `CustomerErasureInput`, `CustomerErasure`); on the customer's behalf
+  `POST /v1/platform/customers/{customer_id}/exports` and `.../erasure`
+  (`PlatformCustomerErasureInput`).
+- Viewing the app as the customer: `GET /v1/customer/view-requests`, `.../{view_id}/agree` and
+  `.../decline`; `GET`, `POST /v1/platform/customers/{customer_id}/view-requests`,
+  `POST /v1/platform/customer-views/{view_id}/token` and `.../end` (`CustomerViewRequest`,
+  `CustomerViewRequestList`, `CustomerViewRequestInput`, `CustomerViewToken`,
+  `CustomerViewState`); the permission `customer:view_as` for support.
+- Favourite stores: `GET /v1/customer/favourites`, `PUT`, `DELETE .../favourites/{location_id}`
+  (`Favourite`, `FavouriteList`).
+- A Partner's own storefront: `GET`, `PUT /v1/partners/{partner_id}/storefront`
+  (`PartnerStorefrontSettings`, `PartnerStorefrontSettingsInput`),
+  `GET /v1/storefront/partner-paths/{path}` (`PartnerStorefrontPath`), `storefront` on
+  `PartnerStorefront`, `partner_id` narrowing the home screen, a Vertical's stores and search,
+  and `partner_storefront` on `OrderPlacement` (channel `partner_storefront`, no marketplace fee).
+- The listing position: `GET /v1/partners/{partner_id}/locations/{location_id}/listing-position`
+  (`ListingPosition`, `ListingPlacement`) and the portal's ranking rules page.
+- `registration_reason` and `sendable` on `MessageTemplate`.
+- Problem codes `export_in_progress`, `erasure_blocked`, `favourites_full`, `view_not_agreed`
+  and `view_read_only`.
+- Events `customers.export.ready`, `customers.customer.erased`, `customers.view.started` and
+  `.ended`, `customers.favourite.added` and `.removed`.
+
 ## [0.39.0] - 2026-11-04
 
 Step 11, pharmacy, phase B: the simulated carrier, Agent cash deposits, offboarding by a second

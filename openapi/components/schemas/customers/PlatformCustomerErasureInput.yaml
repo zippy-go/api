@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "description": "Support erasing an account on the customer's behalf.",
+  "required": [
+    "reason"
+  ],
+  "properties": {
+    "reason": {
+      "type": "string",
+      "description": "Why, for the audit log; 1 to 500 characters.",
+      "minLength": 1,
+      "maxLength": 500,
+      "examples": [
+        "Asked by email on 2 Nov, identity checked by phone"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "reason": "Asked by email on 2 Nov, identity checked by phone"
+    }
+  ]
+}

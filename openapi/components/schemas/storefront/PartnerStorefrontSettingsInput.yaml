@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "description": "A Partner's own storefront as its owner sets it.",
+  "required": [
+    "path",
+    "name",
+    "primary_colour"
+  ],
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Its path.",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$",
+      "examples": [
+        "dev-kitchen"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "minLength": 1,
+      "maxLength": 60,
+      "examples": [
+        "Dev Kitchen"
+      ]
+    },
+    "primary_colour": {
+      "type": "string",
+      "description": "Its primary colour.",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "examples": [
+        "#B3261E"
+      ]
+    },
+    "accent_colour": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Its accent colour.",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "examples": [
+        "#FFD8E4"
+      ]
+    },
+    "cross_sell": {
+      "type": "boolean",
+      "description": "Whether other Partners' recommendations show on it.",
+      "examples": [
+        false
+      ]
+    }
+  },
+  "examples": [
+    {
+      "path": "dev-kitchen",
+      "name": "Dev Kitchen",
+      "primary_colour": "#B3261E",
+      "accent_colour": "#FFD8E4",
+      "cross_sell": false
+    }
+  ]
+}

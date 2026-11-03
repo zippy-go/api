@@ -1,0 +1,121 @@
+{
+  "type": "object",
+  "description": "Where a store appears in one listing, and the published rule that placed it there with its figures; a sponsored placement says so.",
+  "required": [
+    "listing",
+    "vertical",
+    "zone_id",
+    "zone_name",
+    "position",
+    "of",
+    "rule",
+    "rule_words",
+    "figures",
+    "sponsored"
+  ],
+  "properties": {
+    "listing": {
+      "type": "string",
+      "description": "The listing: `vertical`, a Vertical's stores in a zone.",
+      "enum": [
+        "vertical"
+      ],
+      "examples": [
+        "vertical"
+      ]
+    },
+    "vertical": {
+      "type": "string",
+      "description": "The Vertical's code.",
+      "examples": [
+        "food"
+      ]
+    },
+    "zone_id": {
+      "type": "string",
+      "description": "The zone.",
+      "format": "uuid",
+      "examples": [
+        "01a13a48-9e00-7000-8000-000000000101"
+      ]
+    },
+    "zone_name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Gachibowli"
+      ]
+    },
+    "position": {
+      "type": "integer",
+      "description": "Its place, from 1, read from the zone's centre now.",
+      "minimum": 1,
+      "examples": [
+        2
+      ]
+    },
+    "of": {
+      "type": "integer",
+      "description": "How many stores the listing holds.",
+      "minimum": 1,
+      "examples": [
+        14
+      ]
+    },
+    "rule": {
+      "type": "string",
+      "description": "The published rule's code, a heading of the developer portal's ranking page.",
+      "examples": [
+        "open_now_then_nearest"
+      ]
+    },
+    "rule_words": {
+      "type": "string",
+      "description": "The rule in words.",
+      "examples": [
+        "Open stores first, then those opening later, then those offline; within each, nearest first, then by name."
+      ]
+    },
+    "figures": {
+      "type": "object",
+      "description": "What the rule read: the store's state now, its distance from the zone's centre, its rating and how many ratings, how many offer shelves it is on.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "state": "open",
+          "distance_metres": 1200,
+          "rating": 4.5,
+          "ratings": 120,
+          "offers": 1
+        }
+      ]
+    },
+    "sponsored": {
+      "type": "boolean",
+      "description": "Whether a placement was paid for; such a placement says \"Sponsored\".",
+      "examples": [
+        false
+      ]
+    }
+  },
+  "examples": [
+    {
+      "listing": "vertical",
+      "vertical": "food",
+      "zone_id": "01a13a48-9e00-7000-8000-000000000101",
+      "zone_name": "Gachibowli",
+      "position": 2,
+      "of": 14,
+      "rule": "open_now_then_nearest",
+      "rule_words": "Open stores first, then those opening later, then those offline; within each, nearest first, then by name.",
+      "figures": {
+        "state": "open",
+        "distance_metres": 1200,
+        "rating": 4.5,
+        "ratings": 120,
+        "offers": 1
+      },
+      "sponsored": false
+    }
+  ]
+}

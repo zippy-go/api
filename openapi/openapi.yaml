@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.39.0
+  version: 0.40.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -1808,6 +1808,43 @@ paths:
     $ref: ./paths/analytics/platform-analytics-vendor-received.yaml
   /v1/platform/reports/cohorts:
     $ref: ./paths/reports/cohorts.yaml
+  # Step 11 channels, phase B: the customer's data, viewing as the customer, favourites, a Partner's own storefront, the listing position
+  /v1/customer/exports:
+    $ref: ./paths/customers/exports.yaml
+  /v1/customer/exports/{export_id}:
+    $ref: ./paths/customers/export.yaml
+  /v1/customer/exports/{export_id}/file:
+    $ref: ./paths/customers/export-file.yaml
+  /v1/customer/exports/{export_id}/summary:
+    $ref: ./paths/customers/export-summary.yaml
+  /v1/customer/erasure:
+    $ref: ./paths/customers/erasure.yaml
+  /v1/customer/favourites:
+    $ref: ./paths/customers/favourites.yaml
+  /v1/customer/favourites/{location_id}:
+    $ref: ./paths/customers/favourite.yaml
+  /v1/customer/view-requests:
+    $ref: ./paths/customers/view-requests.yaml
+  /v1/customer/view-requests/{view_id}/agree:
+    $ref: ./paths/customers/view-request-agree.yaml
+  /v1/customer/view-requests/{view_id}/decline:
+    $ref: ./paths/customers/view-request-decline.yaml
+  /v1/platform/customers/{customer_id}/exports:
+    $ref: ./paths/customers/platform-customer-exports.yaml
+  /v1/platform/customers/{customer_id}/erasure:
+    $ref: ./paths/customers/platform-customer-erasure.yaml
+  /v1/platform/customers/{customer_id}/view-requests:
+    $ref: ./paths/customers/platform-customer-view-requests.yaml
+  /v1/platform/customer-views/{view_id}/token:
+    $ref: ./paths/customers/platform-customer-view-token.yaml
+  /v1/platform/customer-views/{view_id}/end:
+    $ref: ./paths/customers/platform-customer-view-end.yaml
+  /v1/partners/{partner_id}/storefront:
+    $ref: ./paths/storefront/partner-storefront-settings.yaml
+  /v1/storefront/partner-paths/{path}:
+    $ref: ./paths/storefront/partner-path.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/listing-position:
+    $ref: ./paths/storefront/listing-position.yaml
 
   # Step 11 pharmacy: prescriptions
   /v1/partners/{partner_id}/locations/{location_id}/pharmacy:
