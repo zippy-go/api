@@ -16,7 +16,7 @@ get:
     - Storefront
   security: []
   parameters:
-    - {"name": "partner_id", "in": "query", "required": false, "description": "Only this Partner's stores and offers, for its own storefront at `/p/{path}` (step 11): no platform campaign, and no other Partner's recommendation unless the Partner switched cross-sell on.", "schema": {"type": "string", "format": "uuid"}}
+    - {"name": "partner_id", "in": "query", "required": false, "description": "Only this Partner's stores and offers, for its own storefront at `/p/{path}` (step 11): no platform campaign or featured row, and no other Partner's recommendation unless the Partner switched cross-sell on.", "schema": {"type": "string", "format": "uuid"}}
     - name: lat
       in: query
       required: false
