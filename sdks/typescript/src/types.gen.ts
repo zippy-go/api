@@ -39814,6 +39814,229 @@ export type ApiOrderInput = {
 };
 
 /**
+ * What a customer, or a visitor before signing in, allowed the vendors of each kind; everything is off until answered. Separate from marketing consent.
+ */
+export type AnalyticsConsent = {
+    /**
+     * Whether analytics vendors may hear what the customer does.
+     */
+    analytics: boolean;
+    /**
+     * Whether advertising vendors may.
+     */
+    advertising: boolean;
+    /**
+     * Whether engagement vendors may.
+     */
+    engagement: boolean;
+    /**
+     * When the customer last answered; `null` while never asked, when everything is off.
+     */
+    answered_at: string | null;
+};
+
+/**
+ * A customer's answer: "Accept all" sends every kind `true`, "Reject all" every kind `false`; a kind left out keeps its answer.
+ */
+export type AnalyticsConsentInput = {
+    /**
+     * Analytics vendors.
+     */
+    analytics?: boolean;
+    /**
+     * Advertising vendors.
+     */
+    advertising?: boolean;
+    /**
+     * Engagement vendors.
+     */
+    engagement?: boolean;
+};
+
+/**
+ * A vendor behind the analytics port: `google_analytics` (analytics), `meta` (advertising) or `onesignal` (engagement, off while engagement is built in-house).
+ */
+export type AnalyticsVendorCode = 'google_analytics' | 'meta' | 'onesignal';
+
+/**
+ * A kind of vendor a customer consents to on its own: `analytics` (how the storefront and the apps are used), `advertising` (measuring and targeting advertisements; the customer only as a SHA-256 hash) or `engagement` (tags for messages a vendor sends).
+ */
+export type AnalyticsVendorKind = 'analytics' | 'advertising' | 'engagement';
+
+/**
+ * A vendor behind the analytics port, as Mission Control reads it: whether it is on, whether a stand-in keeps what it would have sent (everywhere but production until the founder gives the vendor's keys), and its reports of the last 30 days.
+ */
+export type AnalyticsVendor = {
+    vendor: AnalyticsVendorCode;
+    /**
+     * Its name.
+     */
+    name: string;
+    kind: AnalyticsVendorKind;
+    /**
+     * Whether it is told anything; an engagement vendor is off.
+     */
+    on: boolean;
+    /**
+     * Whether a stand-in keeps what it would have sent instead of sending it.
+     */
+    stand_in: boolean;
+    /**
+     * The `environment` every report carries outside production: `local`, `sandbox` or `stage`; `production` there.
+     */
+    environment: string;
+    /**
+     * Reports waiting to go.
+     */
+    queued: number;
+    /**
+     * Reports sent, or kept by the stand-in, in 30 days.
+     */
+    sent: number;
+    /**
+     * Reports failed in 30 days.
+     */
+    failed: number;
+    /**
+     * Reports skipped in 30 days, each with its reason: no keys, no consent, under 18.
+     */
+    skipped: number;
+    /**
+     * When its last report went.
+     */
+    last_sent_at: string | null;
+};
+
+/**
+ * The vendors behind the analytics port.
+ */
+export type AnalyticsVendorList = {
+    /**
+     * The vendors.
+     */
+    items: Array<AnalyticsVendor>;
+};
+
+/**
+ * Where a report stands: `queued`, `sent` (or kept by a stand-in), `failed` after its retries or a refusal, `skipped` with its reason.
+ */
+export type VendorReportState = 'queued' | 'sent' | 'failed' | 'skipped';
+
+/**
+ * One report to one vendor, by the name the analytics spec gives it, flat, money in major units, never a name, a number, an email, an address, a precise coordinate, free words or anything of a prescription; the advertising vendor knows the customer only as a hash.
+ */
+export type VendorReport = {
+    /**
+     * The report.
+     */
+    report_id: string;
+    vendor: AnalyticsVendorCode;
+    /**
+     * Its name: `order_placed`, `promo_applied`, `order_accepted`, `order_picked_up`, `order_on_the_way`, `order_delivered`, `order_picked_up_customer`, `partner_delivery`, `order_refunded`, `review_submitted` or `cart_abandoned`.
+     */
+    event: string;
+    /**
+     * The warehouse event it was made from; one report per event, vendor and name.
+     */
+    source_event_id: string;
+    state: VendorReportState;
+    /**
+     * What the vendor was told, flat.
+     */
+    parameters: {
+        [key: string]: unknown;
+    };
+    /**
+     * The customer as a SHA-256 hash of their id, for the advertising vendor only.
+     */
+    customer_hash: string | null;
+    /**
+     * Why it was skipped or failed.
+     */
+    reason: string | null;
+    /**
+     * How many times it was tried.
+     */
+    attempts: number;
+    /**
+     * When it was queued.
+     */
+    queued_at: string;
+    /**
+     * When it went, or the stand-in kept it.
+     */
+    sent_at: string | null;
+};
+
+/**
+ * A page of a vendor's reports, the newest first.
+ */
+export type VendorReportPage = {
+    /**
+     * The reports.
+     */
+    items: Array<VendorReport>;
+    /**
+     * The next page's cursor; `null` on the last.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * A later month of a cohort.
+ */
+export type CohortMonth = {
+    /**
+     * The month, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * Months after the cohort's, 1 to 24.
+     */
+    offset: number;
+    /**
+     * How many of the cohort completed an order in it.
+     */
+    ordered: number;
+    /**
+     * Their share of the cohort, 0 to 1.
+     */
+    share: number;
+};
+
+/**
+ * The customers whose first completed order fell in one month, erased customers counted as ids.
+ */
+export type Cohort = {
+    /**
+     * The month of their first completed order, `YYYY-MM`.
+     */
+    month: string;
+    /**
+     * How many.
+     */
+    customers: number;
+    /**
+     * Each later month up to 24, or up to now.
+     */
+    months: Array<CohortMonth>;
+};
+
+/**
+ * Cohort retention: customers grouped by the month of their first completed order, with the share of each cohort that completed an order in each later month, narrowed by city, Vertical and way of ordering, computed from the event warehouse.
+ */
+export type CohortReport = {
+    /**
+     * The cohorts, the oldest first.
+     */
+    cohorts: Array<Cohort>;
+    /**
+     * The moment the warehouse's data is current to.
+     */
+    current_to: string;
+};
+
+/**
  * Only include items that belong to this partner. Without it, every partner the credential can see is included.
  */
 export type PartnerIdQuery = string;
@@ -90352,3 +90575,262 @@ export type PlaceApiOrderResponses = {
 };
 
 export type PlaceApiOrderResponse = PlaceApiOrderResponses[keyof PlaceApiOrderResponses];
+
+export type GetAnalyticsConsentData = {
+    body?: never;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/analytics-consent';
+};
+
+export type GetAnalyticsConsentErrors = {
+    /**
+     * `validation_failed`: a visitor token that is not one.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetAnalyticsConsentError = GetAnalyticsConsentErrors[keyof GetAnalyticsConsentErrors];
+
+export type GetAnalyticsConsentResponses = {
+    /**
+     * The consent.
+     */
+    200: AnalyticsConsent;
+};
+
+export type GetAnalyticsConsentResponse = GetAnalyticsConsentResponses[keyof GetAnalyticsConsentResponses];
+
+export type PutAnalyticsConsentData = {
+    /**
+     * The answer.
+     */
+    body: AnalyticsConsentInput;
+    headers?: {
+        /**
+         * A visitor's token from `POST /v1/visitor-tokens`: the baskets of a
+         * visitor who is not signed in are kept under it until they sign in and
+         * `POST /v1/baskets/claim` makes them the customer's. A customer token in
+         * `Authorization` wins over it. It is a secret: keep it on the device.
+         *
+         */
+        'X-Visitor-Token'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/customer/analytics-consent';
+};
+
+export type PutAnalyticsConsentErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutAnalyticsConsentError = PutAnalyticsConsentErrors[keyof PutAnalyticsConsentErrors];
+
+export type PutAnalyticsConsentResponses = {
+    /**
+     * The consent.
+     */
+    200: AnalyticsConsent;
+};
+
+export type PutAnalyticsConsentResponse = PutAnalyticsConsentResponses[keyof PutAnalyticsConsentResponses];
+
+export type ListAnalyticsVendorsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/analytics/vendors';
+};
+
+export type ListAnalyticsVendorsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `report:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAnalyticsVendorsError = ListAnalyticsVendorsErrors[keyof ListAnalyticsVendorsErrors];
+
+export type ListAnalyticsVendorsResponses = {
+    /**
+     * The vendors.
+     */
+    200: AnalyticsVendorList;
+};
+
+export type ListAnalyticsVendorsResponse = ListAnalyticsVendorsResponses[keyof ListAnalyticsVendorsResponses];
+
+export type ListAnalyticsVendorReportsData = {
+    body?: never;
+    path: {
+        /**
+         * The vendor.
+         */
+        vendor: AnalyticsVendorCode;
+    };
+    query?: {
+        /**
+         * Only reports of this name.
+         */
+        event?: string;
+        /**
+         * Only reports in this state.
+         */
+        state?: VendorReportState;
+        /**
+         * How many, 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts: the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/analytics/vendors/{vendor}/received';
+};
+
+export type ListAnalyticsVendorReportsErrors = {
+    /**
+     * `validation_failed`, `cursor_invalid`.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `report:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such vendor.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListAnalyticsVendorReportsError = ListAnalyticsVendorReportsErrors[keyof ListAnalyticsVendorReportsErrors];
+
+export type ListAnalyticsVendorReportsResponses = {
+    /**
+     * A page of reports.
+     */
+    200: VendorReportPage;
+};
+
+export type ListAnalyticsVendorReportsResponse = ListAnalyticsVendorReportsResponses[keyof ListAnalyticsVendorReportsResponses];
+
+export type GetCohortReportData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * The first cohort's month, `YYYY-MM`.
+         */
+        from?: string;
+        /**
+         * Only orders in this city.
+         */
+        city_id?: string;
+        /**
+         * Only orders at stores of this Vertical, by code, as the subscriptions report narrows.
+         */
+        vertical?: string;
+        /**
+         * Only orders placed this way: `delivery`, `pickup`, `dine_in`, `scheduled` or `subscription`.
+         */
+        way?: 'delivery' | 'pickup' | 'dine_in' | 'scheduled' | 'subscription';
+    };
+    url: '/v1/platform/reports/cohorts';
+};
+
+export type GetCohortReportErrors = {
+    /**
+     * `validation_failed`: a month that is not `YYYY-MM`, a way of ordering that is not one.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `report:read`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCohortReportError = GetCohortReportErrors[keyof GetCohortReportErrors];
+
+export type GetCohortReportResponses = {
+    /**
+     * The cohorts.
+     */
+    200: CohortReport;
+};
+
+export type GetCohortReportResponse = GetCohortReportResponses[keyof GetCohortReportResponses];
