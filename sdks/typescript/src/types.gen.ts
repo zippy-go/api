@@ -11915,6 +11915,10 @@ export type StoreCardList = {
  */
 export type PartnerStorefront = {
     /**
+     * The Partner's own storefront's path, name, colours and cross-sell switch (step 11); `null` while never set, when the Partner's name and the default colours stand.
+     */
+    storefront?: PartnerStorefrontSettings | null;
+    /**
      * The Partner.
      */
     partner: StorefrontPartner;
@@ -18186,6 +18190,10 @@ export type Checkout = {
  * Placing the basket at a store as an order, at the price shown.
  */
 export type OrderPlacement = {
+    /**
+     * The Partner whose own storefront the order is placed from (step 11): the store must be that Partner's, and the order is channel `partner_storefront`, with no marketplace fee.
+     */
+    partner_storefront?: string | null;
     /**
      * The store whose basket is placed.
      */
@@ -38763,6 +38771,14 @@ export type TemplateRegistration = 'not_needed' | 'pending' | 'approved' | 'reje
  */
 export type MessageTemplate = {
     /**
+     * Why a registration was rejected, or what it waits for (step 11): a WhatsApp template is submitted when saved and approved by the local stand-in a minute later.
+     */
+    registration_reason?: string | null;
+    /**
+     * Whether a message can go through it now (step 11): enabled, and approved where approval is needed. A WhatsApp template not yet approved still goes within the 24 hours after a customer's last message; otherwise its messages go by SMS.
+     */
+    sendable: boolean;
+    /**
      * The template.
      */
     id: string;
@@ -40870,6 +40886,40 @@ export type AgentRecordExport = {
 };
 
 /**
+ * A Partner's own storefront at `/p/{path}`: its path, name, colours and whether other Partners' recommendations show there. No platform campaign shows on it, and an order placed there is channel `partner_storefront`, with no marketplace fee.
+ */
+export type PartnerStorefrontSettings = {
+    /**
+     * Its path, 3 to 40 lowercase letters, digits and dashes, unique.
+     */
+    path: string;
+    /**
+     * Its name, 1 to 60 characters.
+     */
+    name: string;
+    /**
+     * Its primary colour, `#RRGGBB`.
+     */
+    primary_colour: string;
+    /**
+     * Its accent colour, `#RRGGBB`.
+     */
+    accent_colour: string | null;
+    /**
+     * Whether other Partners' recommendations show on it; off by default.
+     */
+    cross_sell: boolean;
+    /**
+     * Where it is.
+     */
+    url: string;
+    /**
+     * Raised by every change; send it in `If-Match`.
+     */
+    version: number;
+};
+
+/**
  * Whether the Partner has a sandbox: `none` until its first sandbox key, or a reset, makes its twin; `ready` once made. A twin purged after 90 days untouched is `none` again.
  */
 export type SandboxState = 'none' | 'ready';
@@ -41980,6 +42030,348 @@ export type CohortReport = {
      * The moment the warehouse's data is current to.
      */
     current_to: string;
+};
+
+/**
+ * Where an export stands: `preparing`, `ready` to download for seven days, `failed`, or `expired` after its seven days.
+ */
+export type CustomerExportState = 'preparing' | 'ready' | 'failed' | 'expired';
+
+/**
+ * An export of everything the platform holds about a customer: a JSON file and a readable PDF summary, offered to a signed-in session of that customer for seven days.
+ */
+export type CustomerExport = {
+    /**
+     * The export.
+     */
+    export_id: string;
+    state: CustomerExportState;
+    /**
+     * When it was asked for.
+     */
+    requested_at: string;
+    /**
+     * `customer`, or `support` on the customer's behalf.
+     */
+    requested_by: 'customer' | 'support';
+    /**
+     * When it was ready.
+     */
+    ready_at: string | null;
+    /**
+     * When its download ends.
+     */
+    expires_at: string | null;
+    /**
+     * What it holds: profile, consent, addresses, favourites, orders, subscriptions, bookings, wallet, reviews, sessions, audit and the rest each module answers.
+     */
+    sections: Array<string>;
+};
+
+/**
+ * The customer's exports, the newest first.
+ */
+export type CustomerExportList = {
+    /**
+     * The exports.
+     */
+    items: Array<CustomerExport>;
+};
+
+/**
+ * What erasing the account destroys, what it keeps and why, the Wallet balance forfeited, and what stops it now.
+ */
+export type CustomerErasurePreview = {
+    /**
+     * What is destroyed.
+     */
+    destroyed: Array<string>;
+    /**
+     * What is kept, anonymous.
+     */
+    retained: Array<string>;
+    /**
+     * The Wallet balance forfeited.
+     */
+    wallet_forfeited: Money;
+    /**
+     * Why it cannot happen now: an order or a booking in flight, or a membership that still serves a Partner; `null` when it can.
+     */
+    blocked_by: string | null;
+    /**
+     * The last four digits of the number the customer types to confirm.
+     */
+    mobile_last_four_hint: string;
+};
+
+/**
+ * The customer's confirmation: the last four digits of their number, after a fresh code in this session.
+ */
+export type CustomerErasureInput = {
+    /**
+     * The last four digits of their number.
+     */
+    mobile_last_four: string;
+};
+
+/**
+ * An erased account: its sessions ended everywhere, its name, numbers, addresses and words gone, its orders, reviews and ledger entries kept anonymous under the reference, prescription files deleted, the customer still counted in their cohort. The number may register again as a new customer.
+ */
+export type CustomerErasure = {
+    /**
+     * When.
+     */
+    erased_at: string;
+    /**
+     * The internal reference what is kept points at.
+     */
+    reference: string;
+};
+
+/**
+ * A store the customer keeps, with the card a Vertical's listing draws when the store is live.
+ */
+export type Favourite = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * When it was kept.
+     */
+    saved_at: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * The Verticals it trades in, to group by.
+     */
+    verticals: Array<string>;
+    /**
+     * Its card, with its own clock and money; `null` while it cannot be drawn now.
+     */
+    store?: StoreCard | null;
+};
+
+/**
+ * The customer's favourite stores, the most recently kept first; a store closed for good is left out. Two hundred at most.
+ */
+export type FavouriteList = {
+    /**
+     * The favourites.
+     */
+    items: Array<Favourite>;
+};
+
+/**
+ * Where support's view of the app as the customer stands: `asked`, `agreed` by the customer, `declined`, `started` (a read-only token issued), `ended`, or `expired` (not agreed within 30 minutes, or 30 minutes after it started).
+ */
+export type CustomerViewState = 'asked' | 'agreed' | 'declined' | 'started' | 'ended' | 'expired';
+
+/**
+ * Support asking to view the app as the customer, reading only, for 30 minutes at most, every view logged with who, when and for how long.
+ */
+export type CustomerViewRequest = {
+    /**
+     * The view.
+     */
+    view_id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    state: CustomerViewState;
+    /**
+     * Why support asks, shown to the customer.
+     */
+    reason: string;
+    /**
+     * Who asked.
+     */
+    asked_by: string;
+    /**
+     * Their name, as the customer sees it.
+     */
+    asked_by_name: string | null;
+    /**
+     * When.
+     */
+    asked_at: string;
+    /**
+     * When the customer agreed.
+     */
+    agreed_at: string | null;
+    /**
+     * When the view started.
+     */
+    started_at: string | null;
+    /**
+     * When it ended.
+     */
+    ended_at: string | null;
+    /**
+     * When the request or the view lapses.
+     */
+    expires_at: string;
+};
+
+/**
+ * View requests, the newest first.
+ */
+export type CustomerViewRequestList = {
+    /**
+     * The requests.
+     */
+    items: Array<CustomerViewRequest>;
+};
+
+/**
+ * Support erasing an account on the customer's behalf.
+ */
+export type PlatformCustomerErasureInput = {
+    /**
+     * Why, for the audit log; 1 to 500 characters.
+     */
+    reason: string;
+};
+
+/**
+ * Support's request.
+ */
+export type CustomerViewRequestInput = {
+    /**
+     * Why, shown to the customer; 1 to 200 characters.
+     */
+    reason: string;
+};
+
+/**
+ * A read-only token of the customer surface for support, viewing the app as the customer: every write answers 403 `view_read_only`.
+ */
+export type CustomerViewToken = {
+    /**
+     * The bearer token.
+     */
+    access_token: string;
+    /**
+     * When it lapses, 30 minutes after the view started at most.
+     */
+    expires_at: string;
+    /**
+     * The view.
+     */
+    view_id: string;
+};
+
+/**
+ * A Partner's own storefront as its owner sets it.
+ */
+export type PartnerStorefrontSettingsInput = {
+    /**
+     * Its path.
+     */
+    path: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Its primary colour.
+     */
+    primary_colour: string;
+    /**
+     * Its accent colour.
+     */
+    accent_colour?: string | null;
+    /**
+     * Whether other Partners' recommendations show on it.
+     */
+    cross_sell?: boolean;
+};
+
+/**
+ * The Partner a storefront path names.
+ */
+export type PartnerStorefrontPath = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * The path.
+     */
+    path: string;
+};
+
+/**
+ * Where a store appears in one listing, and the published rule that placed it there with its figures; a sponsored placement says so.
+ */
+export type ListingPlacement = {
+    /**
+     * The listing: `vertical`, a Vertical's stores in a zone.
+     */
+    listing: 'vertical';
+    /**
+     * The Vertical's code.
+     */
+    vertical: string;
+    /**
+     * The zone.
+     */
+    zone_id: string;
+    /**
+     * Its name.
+     */
+    zone_name: string;
+    /**
+     * Its place, from 1, read from the zone's centre now.
+     */
+    position: number;
+    /**
+     * How many stores the listing holds.
+     */
+    of: number;
+    /**
+     * The published rule's code, a heading of the developer portal's ranking page.
+     */
+    rule: string;
+    /**
+     * The rule in words.
+     */
+    rule_words: string;
+    /**
+     * What the rule read: the store's state now, its distance from the zone's centre, its rating as the percent of good ratings and how many ratings, how many offer shelves it is on.
+     */
+    figures: {
+        [key: string]: unknown;
+    };
+    /**
+     * Whether a placement was paid for; such a placement says "Sponsored".
+     */
+    sponsored: boolean;
+};
+
+/**
+ * Where a Location appears on the storefront, each placement with the rule that placed it.
+ */
+export type ListingPosition = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its placements, one per listing.
+     */
+    placements: Array<ListingPlacement>;
+    /**
+     * The published ranking rules.
+     */
+    rules_url: string;
+    /**
+     * When it was read.
+     */
+    computed_at: string;
 };
 
 /**
@@ -60384,6 +60776,10 @@ export type GetStorefrontHomeData = {
     path?: never;
     query?: {
         /**
+         * Only this Partner's stores and offers, for its own storefront at `/p/{path}` (step 11): no platform campaign or featured row, and no other Partner's recommendation unless the Partner switched cross-sell on.
+         */
+        partner_id?: string;
+        /**
          * Latitude of the pin; half a coordinate counts as none.
          */
         lat?: number;
@@ -60446,6 +60842,10 @@ export type ListVerticalStoresData = {
         vertical: string;
     };
     query?: {
+        /**
+         * Only this Partner's stores and offers, for its own storefront at `/p/{path}` (step 11): no platform campaign or featured row, and no other Partner's recommendation unless the Partner switched cross-sell on.
+         */
+        partner_id?: string;
         /**
          * Latitude of the pin; half a coordinate counts as none.
          */
@@ -63559,6 +63959,10 @@ export type SearchStoresData = {
     body?: never;
     path?: never;
     query: {
+        /**
+         * Only this Partner's stores and offers, for its own storefront at `/p/{path}` (step 11): no platform campaign or featured row, and no other Partner's recommendation unless the Partner switched cross-sell on.
+         */
+        partner_id?: string;
         /**
          * What was typed, at most 100 characters; fewer than two letters finds nothing.
          */
@@ -92841,6 +93245,1044 @@ export type GetCohortReportResponses = {
 };
 
 export type GetCohortReportResponse = GetCohortReportResponses[keyof GetCohortReportResponses];
+
+export type ListCustomerExportsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/exports';
+};
+
+export type ListCustomerExportsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerExportsError = ListCustomerExportsErrors[keyof ListCustomerExportsErrors];
+
+export type ListCustomerExportsResponses = {
+    /**
+     * The exports.
+     */
+    200: CustomerExportList;
+};
+
+export type ListCustomerExportsResponse = ListCustomerExportsResponses[keyof ListCustomerExportsResponses];
+
+export type RequestCustomerExportData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/exports';
+};
+
+export type RequestCustomerExportErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `step_up_required`.
+     */
+    403: Problem;
+    /**
+     * `export_in_progress`, naming the one in progress or the day's.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestCustomerExportError = RequestCustomerExportErrors[keyof RequestCustomerExportErrors];
+
+export type RequestCustomerExportResponses = {
+    /**
+     * The export, preparing.
+     */
+    202: CustomerExport;
+};
+
+export type RequestCustomerExportResponse = RequestCustomerExportResponses[keyof RequestCustomerExportResponses];
+
+export type GetCustomerExportData = {
+    body?: never;
+    path: {
+        /**
+         * The export.
+         */
+        export_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/exports/{export_id}';
+};
+
+export type GetCustomerExportErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerExportError = GetCustomerExportErrors[keyof GetCustomerExportErrors];
+
+export type GetCustomerExportResponses = {
+    /**
+     * The export.
+     */
+    200: CustomerExport;
+};
+
+export type GetCustomerExportResponse = GetCustomerExportResponses[keyof GetCustomerExportResponses];
+
+export type DownloadCustomerExportData = {
+    body?: never;
+    path: {
+        /**
+         * The export.
+         */
+        export_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/exports/{export_id}/file';
+};
+
+export type DownloadCustomerExportErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`, or not ready.
+     */
+    404: Problem;
+    /**
+     * `gone`: its seven days passed.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DownloadCustomerExportError = DownloadCustomerExportErrors[keyof DownloadCustomerExportErrors];
+
+export type DownloadCustomerExportResponses = {
+    /**
+     * The file.
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type DownloadCustomerExportResponse = DownloadCustomerExportResponses[keyof DownloadCustomerExportResponses];
+
+export type DownloadCustomerExportSummaryData = {
+    body?: never;
+    path: {
+        /**
+         * The export.
+         */
+        export_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/exports/{export_id}/summary';
+};
+
+export type DownloadCustomerExportSummaryErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`, or not ready.
+     */
+    404: Problem;
+    /**
+     * `gone`.
+     */
+    410: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DownloadCustomerExportSummaryError = DownloadCustomerExportSummaryErrors[keyof DownloadCustomerExportSummaryErrors];
+
+export type DownloadCustomerExportSummaryResponses = {
+    /**
+     * The summary.
+     */
+    200: Blob | File;
+};
+
+export type DownloadCustomerExportSummaryResponse = DownloadCustomerExportSummaryResponses[keyof DownloadCustomerExportSummaryResponses];
+
+export type GetCustomerErasureData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/erasure';
+};
+
+export type GetCustomerErasureErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerErasureError = GetCustomerErasureErrors[keyof GetCustomerErasureErrors];
+
+export type GetCustomerErasureResponses = {
+    /**
+     * What it does.
+     */
+    200: CustomerErasurePreview;
+};
+
+export type GetCustomerErasureResponse = GetCustomerErasureResponses[keyof GetCustomerErasureResponses];
+
+export type EraseCustomerData = {
+    /**
+     * The confirmation.
+     */
+    body: CustomerErasureInput;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/erasure';
+};
+
+export type EraseCustomerErrors = {
+    /**
+     * `validation_failed`: digits that are not the number's.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `step_up_required`.
+     */
+    403: Problem;
+    /**
+     * `erasure_blocked`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EraseCustomerError = EraseCustomerErrors[keyof EraseCustomerErrors];
+
+export type EraseCustomerResponses = {
+    /**
+     * Erased.
+     */
+    200: CustomerErasure;
+};
+
+export type EraseCustomerResponse = EraseCustomerResponses[keyof EraseCustomerResponses];
+
+export type ListCustomerFavouritesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Latitude of the pin, for each card's distance.
+         */
+        lat?: number;
+        /**
+         * Longitude of the pin.
+         */
+        lng?: number;
+    };
+    url: '/v1/customer/favourites';
+};
+
+export type ListCustomerFavouritesErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerFavouritesError = ListCustomerFavouritesErrors[keyof ListCustomerFavouritesErrors];
+
+export type ListCustomerFavouritesResponses = {
+    /**
+     * The favourites.
+     */
+    200: FavouriteList;
+};
+
+export type ListCustomerFavouritesResponse = ListCustomerFavouritesResponses[keyof ListCustomerFavouritesResponses];
+
+export type RemoveCustomerFavouriteData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/favourites/{location_id}';
+};
+
+export type RemoveCustomerFavouriteErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RemoveCustomerFavouriteError = RemoveCustomerFavouriteErrors[keyof RemoveCustomerFavouriteErrors];
+
+export type RemoveCustomerFavouriteResponses = {
+    /**
+     * Let go.
+     */
+    204: void;
+};
+
+export type RemoveCustomerFavouriteResponse = RemoveCustomerFavouriteResponses[keyof RemoveCustomerFavouriteResponses];
+
+export type AddCustomerFavouriteData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/favourites/{location_id}';
+};
+
+export type AddCustomerFavouriteErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`: no live store, deleted or never.
+     */
+    404: Problem;
+    /**
+     * `favourites_full`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddCustomerFavouriteError = AddCustomerFavouriteErrors[keyof AddCustomerFavouriteErrors];
+
+export type AddCustomerFavouriteResponses = {
+    /**
+     * The favourite.
+     */
+    200: Favourite;
+};
+
+export type AddCustomerFavouriteResponse = AddCustomerFavouriteResponses[keyof AddCustomerFavouriteResponses];
+
+export type ListCustomerViewRequestsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/customer/view-requests';
+};
+
+export type ListCustomerViewRequestsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCustomerViewRequestsError = ListCustomerViewRequestsErrors[keyof ListCustomerViewRequestsErrors];
+
+export type ListCustomerViewRequestsResponses = {
+    /**
+     * The requests.
+     */
+    200: CustomerViewRequestList;
+};
+
+export type ListCustomerViewRequestsResponse = ListCustomerViewRequestsResponses[keyof ListCustomerViewRequestsResponses];
+
+export type AgreeCustomerViewData = {
+    body?: never;
+    path: {
+        /**
+         * The view.
+         */
+        view_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/view-requests/{view_id}/agree';
+};
+
+export type AgreeCustomerViewErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: it lapsed or was answered.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AgreeCustomerViewError = AgreeCustomerViewErrors[keyof AgreeCustomerViewErrors];
+
+export type AgreeCustomerViewResponses = {
+    /**
+     * The request.
+     */
+    200: CustomerViewRequest;
+};
+
+export type AgreeCustomerViewResponse = AgreeCustomerViewResponses[keyof AgreeCustomerViewResponses];
+
+export type DeclineCustomerViewData = {
+    body?: never;
+    path: {
+        /**
+         * The view.
+         */
+        view_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/view-requests/{view_id}/decline';
+};
+
+export type DeclineCustomerViewErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: it lapsed or was answered.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeclineCustomerViewError = DeclineCustomerViewErrors[keyof DeclineCustomerViewErrors];
+
+export type DeclineCustomerViewResponses = {
+    /**
+     * The request.
+     */
+    200: CustomerViewRequest;
+};
+
+export type DeclineCustomerViewResponse = DeclineCustomerViewResponses[keyof DeclineCustomerViewResponses];
+
+export type RequestPlatformCustomerExportData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/exports';
+};
+
+export type RequestPlatformCustomerExportErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:export`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `export_in_progress`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestPlatformCustomerExportError = RequestPlatformCustomerExportErrors[keyof RequestPlatformCustomerExportErrors];
+
+export type RequestPlatformCustomerExportResponses = {
+    /**
+     * The export, preparing.
+     */
+    202: CustomerExport;
+};
+
+export type RequestPlatformCustomerExportResponse = RequestPlatformCustomerExportResponses[keyof RequestPlatformCustomerExportResponses];
+
+export type ErasePlatformCustomerData = {
+    /**
+     * The reason.
+     */
+    body: PlatformCustomerErasureInput;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/erasure';
+};
+
+export type ErasePlatformCustomerErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:recover`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `erasure_blocked`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ErasePlatformCustomerError = ErasePlatformCustomerErrors[keyof ErasePlatformCustomerErrors];
+
+export type ErasePlatformCustomerResponses = {
+    /**
+     * Erased.
+     */
+    200: CustomerErasure;
+};
+
+export type ErasePlatformCustomerResponse = ErasePlatformCustomerResponses[keyof ErasePlatformCustomerResponses];
+
+export type ListPlatformCustomerViewsData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/view-requests';
+};
+
+export type ListPlatformCustomerViewsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:view_as`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformCustomerViewsError = ListPlatformCustomerViewsErrors[keyof ListPlatformCustomerViewsErrors];
+
+export type ListPlatformCustomerViewsResponses = {
+    /**
+     * The views.
+     */
+    200: CustomerViewRequestList;
+};
+
+export type ListPlatformCustomerViewsResponse = ListPlatformCustomerViewsResponses[keyof ListPlatformCustomerViewsResponses];
+
+export type RequestPlatformCustomerViewData = {
+    /**
+     * The reason.
+     */
+    body: CustomerViewRequestInput;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/view-requests';
+};
+
+export type RequestPlatformCustomerViewErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied` without `customer:view_as`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RequestPlatformCustomerViewError = RequestPlatformCustomerViewErrors[keyof RequestPlatformCustomerViewErrors];
+
+export type RequestPlatformCustomerViewResponses = {
+    /**
+     * The request.
+     */
+    201: CustomerViewRequest;
+};
+
+export type RequestPlatformCustomerViewResponse = RequestPlatformCustomerViewResponses[keyof RequestPlatformCustomerViewResponses];
+
+export type StartPlatformCustomerViewData = {
+    body?: never;
+    path: {
+        /**
+         * The view.
+         */
+        view_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customer-views/{view_id}/token';
+};
+
+export type StartPlatformCustomerViewErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: another member's request.
+     */
+    404: Problem;
+    /**
+     * `view_not_agreed`.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type StartPlatformCustomerViewError = StartPlatformCustomerViewErrors[keyof StartPlatformCustomerViewErrors];
+
+export type StartPlatformCustomerViewResponses = {
+    /**
+     * The token.
+     */
+    201: CustomerViewToken;
+};
+
+export type StartPlatformCustomerViewResponse = StartPlatformCustomerViewResponses[keyof StartPlatformCustomerViewResponses];
+
+export type EndPlatformCustomerViewData = {
+    body?: never;
+    path: {
+        /**
+         * The view.
+         */
+        view_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customer-views/{view_id}/end';
+};
+
+export type EndPlatformCustomerViewErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type EndPlatformCustomerViewError = EndPlatformCustomerViewErrors[keyof EndPlatformCustomerViewErrors];
+
+export type EndPlatformCustomerViewResponses = {
+    /**
+     * The view.
+     */
+    200: CustomerViewRequest;
+};
+
+export type EndPlatformCustomerViewResponse = EndPlatformCustomerViewResponses[keyof EndPlatformCustomerViewResponses];
+
+export type GetPartnerStorefrontSettingsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/storefront';
+};
+
+export type GetPartnerStorefrontSettingsErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerStorefrontSettingsError = GetPartnerStorefrontSettingsErrors[keyof GetPartnerStorefrontSettingsErrors];
+
+export type GetPartnerStorefrontSettingsResponses = {
+    /**
+     * The storefront.
+     */
+    200: PartnerStorefrontSettings;
+};
+
+export type GetPartnerStorefrontSettingsResponse = GetPartnerStorefrontSettingsResponses[keyof GetPartnerStorefrontSettingsResponses];
+
+export type PutPartnerStorefrontSettingsData = {
+    /**
+     * The storefront.
+     */
+    body: PartnerStorefrontSettingsInput;
+    headers?: {
+        /**
+         * The entity tag of the version the caller holds, as returned in the `ETag`
+         * of a read (`"v3"`). The write is refused with `412` (`precondition_failed`)
+         * when the resource has moved since, so two operators editing one record
+         * cannot silently overwrite each other. Without the header the write is
+         * accepted unconditionally.
+         *
+         */
+        'If-Match'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/storefront';
+};
+
+export type PutPartnerStorefrontSettingsErrors = {
+    /**
+     * `validation_failed`.
+     */
+    400: Problem;
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * `conflict`: the path is taken.
+     */
+    409: Problem;
+    /**
+     * `precondition_failed`.
+     */
+    412: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutPartnerStorefrontSettingsError = PutPartnerStorefrontSettingsErrors[keyof PutPartnerStorefrontSettingsErrors];
+
+export type PutPartnerStorefrontSettingsResponses = {
+    /**
+     * The storefront.
+     */
+    200: PartnerStorefrontSettings;
+};
+
+export type PutPartnerStorefrontSettingsResponse = PutPartnerStorefrontSettingsResponses[keyof PutPartnerStorefrontSettingsResponses];
+
+export type ResolvePartnerStorefrontPathData = {
+    body?: never;
+    path: {
+        /**
+         * The storefront's path.
+         */
+        path: string;
+    };
+    query?: never;
+    url: '/v1/storefront/partner-paths/{path}';
+};
+
+export type ResolvePartnerStorefrontPathErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolvePartnerStorefrontPathError = ResolvePartnerStorefrontPathErrors[keyof ResolvePartnerStorefrontPathErrors];
+
+export type ResolvePartnerStorefrontPathResponses = {
+    /**
+     * The Partner.
+     */
+    200: PartnerStorefrontPath;
+};
+
+export type ResolvePartnerStorefrontPathResponse = ResolvePartnerStorefrontPathResponses[keyof ResolvePartnerStorefrontPathResponses];
+
+export type GetListingPositionData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The store.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/listing-position';
+};
+
+export type GetListingPositionErrors = {
+    /**
+     * No valid access token or key was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`.
+     */
+    403: Problem;
+    /**
+     * `not_found`.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetListingPositionError = GetListingPositionErrors[keyof GetListingPositionErrors];
+
+export type GetListingPositionResponses = {
+    /**
+     * The placements.
+     */
+    200: ListingPosition;
+};
+
+export type GetListingPositionResponse = GetListingPositionResponses[keyof GetListingPositionResponses];
 
 export type GetLocationPharmacyData = {
     body?: never;
