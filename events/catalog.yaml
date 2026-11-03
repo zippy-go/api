@@ -2557,3 +2557,34 @@ events:
       A customer opted out of messages on WhatsApp; their messages go by SMS or push from now on. Consumers: analytics.
     payload_schema: ./payloads/notifications.whatsapp.opted_out.v1.schema.json
     example: ./examples/notifications.whatsapp.opted_out.v1.json
+  - type: prescriptions.verification.recorded
+    version: 1
+    domain: prescriptions
+    description: >-
+      The pharmacist recorded a prescription line's verification before the order was accepted: valid, reduced to what is prescribed, or not valid. No names, numbers or what the prescription says. Consumers: none outside prescriptions; never kept by the event warehouse nor sent to a vendor.
+    payload_schema: ./payloads/prescriptions.verification.recorded.v1.schema.json
+    example: ./examples/prescriptions.verification.recorded.v1.json
+
+  - type: prescriptions.file.read
+    version: 1
+    domain: prescriptions
+    description: >-
+      A prescription file was opened through its ten-minute link: by a member of the Location, by platform staff holding `order:prescription`, or by the customer who sent it. Kept a year in the readings Mission Control shows. Never kept by the event warehouse nor sent to a vendor.
+    payload_schema: ./payloads/prescriptions.file.read.v1.schema.json
+    example: ./examples/prescriptions.file.read.v1.json
+
+  - type: prescriptions.files.erased
+    version: 1
+    domain: prescriptions
+    description: >-
+      An order's prescription files were deleted and its names blanked: thirty days after the order ended, or at once when the customer erased their account. The dispensing register stays. Never kept by the event warehouse nor sent to a vendor.
+    payload_schema: ./payloads/prescriptions.files.erased.v1.schema.json
+    example: ./examples/prescriptions.files.erased.v1.json
+
+  - type: prescriptions.line.dispensed
+    version: 1
+    domain: prescriptions
+    description: >-
+      A prescription line was dispensed, its order delivered or collected, and written into the pharmacy's dispensing register. No names, numbers or the medicine. Consumers: payouts counting the prescription fee. Never kept by the event warehouse nor sent to a vendor.
+    payload_schema: ./payloads/prescriptions.line.dispensed.v1.schema.json
+    example: ./examples/prescriptions.line.dispensed.v1.json

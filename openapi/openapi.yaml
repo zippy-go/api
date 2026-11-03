@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.36.0
+  version: 0.37.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -310,6 +310,8 @@ tags:
 
   - name: Configuration
     description: "A Partner's edition and the platform's configuration (step 10): the catalogue of modules and the modules a Partner's plan includes and its owner switches on, the API refusing a call into a module that is off; feature flags declared in code, targeted by percentage, Partner, Location or customer, evaluated on the server and in force within 30 seconds; every message as a versioned template with its registration, placeholders checked, previewed and test-sent."
+  - name: Prescriptions
+    description: "Prescriptions at pharmacies (step 11): a Location's drug licence and registered pharmacist, the customer's files on a basket line in private storage, the pharmacist's verification before the order is accepted, the files read one by one through links that stop working after ten minutes with every reading recorded, the dispensing register kept three years, and the files erased thirty days after the order ends. Nothing of a prescription reaches messages, analytics, vendors or the event warehouse."
   - name: Billing
     description: "Plans and the billing of Partners (step 10): the plans with their versioned prices and limits, a month's usage counted once per event, the monthly invoice with GST apart, its credit notes, its payment by deduction from the payout statement, UPI or card, and suspension for non-payment."
 
@@ -1807,6 +1809,31 @@ paths:
   /v1/platform/reports/cohorts:
     $ref: ./paths/reports/cohorts.yaml
 
+  # Step 11 pharmacy: prescriptions
+  /v1/partners/{partner_id}/locations/{location_id}/pharmacy:
+    $ref: ./paths/prescriptions/location-pharmacy.yaml
+  /v1/baskets/{location_id}/lines/{line_id}/prescription/uploads:
+    $ref: ./paths/prescriptions/basket-line-prescription-uploads.yaml
+  /v1/baskets/{location_id}/lines/{line_id}/prescription/files/{file_id}:
+    $ref: ./paths/prescriptions/basket-line-prescription-file.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/prescriptions:
+    $ref: ./paths/prescriptions/store-order-prescriptions.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/prescriptions/{file_id}/link:
+    $ref: ./paths/prescriptions/store-prescription-file-link.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/lines/{line_id}/verification:
+    $ref: ./paths/prescriptions/store-order-line-verification.yaml
+  /v1/partners/{partner_id}/locations/{location_id}/dispensing-register:
+    $ref: ./paths/prescriptions/dispensing-register.yaml
+  /v1/platform/pharmacies:
+    $ref: ./paths/prescriptions/platform-pharmacies.yaml
+  /v1/platform/pharmacies/{location_id}/licence:
+    $ref: ./paths/prescriptions/platform-pharmacy-licence.yaml
+  /v1/platform/orders/{order_id}/prescriptions:
+    $ref: ./paths/prescriptions/platform-order-prescriptions.yaml
+  /v1/platform/prescriptions/{file_id}/link:
+    $ref: ./paths/prescriptions/platform-prescription-file-link.yaml
+  /v1/customer/prescriptions/{file_id}/link:
+    $ref: ./paths/prescriptions/customer-prescription-file-link.yaml
 components:
   securitySchemes:
     ApiKey:
@@ -5020,3 +5047,49 @@ components:
       $ref: ./components/schemas/oversight/ApprovalSubject.yaml
     StatementBillDeduction:
       $ref: ./components/schemas/payouts/StatementBillDeduction.yaml
+    BasketLinePrescription:
+      $ref: ./components/schemas/prescriptions/BasketLinePrescription.yaml
+    DispensingRecord:
+      $ref: ./components/schemas/prescriptions/DispensingRecord.yaml
+    DispensingRegister:
+      $ref: ./components/schemas/prescriptions/DispensingRegister.yaml
+    OrderLinePrescription:
+      $ref: ./components/schemas/prescriptions/OrderLinePrescription.yaml
+    OrderPrescriptionLine:
+      $ref: ./components/schemas/prescriptions/OrderPrescriptionLine.yaml
+    OrderPrescriptions:
+      $ref: ./components/schemas/prescriptions/OrderPrescriptions.yaml
+    Pharmacist:
+      $ref: ./components/schemas/prescriptions/Pharmacist.yaml
+    PharmacyLicence:
+      $ref: ./components/schemas/prescriptions/PharmacyLicence.yaml
+    PharmacyLicenceVerification:
+      $ref: ./components/schemas/prescriptions/PharmacyLicenceVerification.yaml
+    PharmacySettings:
+      $ref: ./components/schemas/prescriptions/PharmacySettings.yaml
+    PharmacySettingsUpdate:
+      $ref: ./components/schemas/prescriptions/PharmacySettingsUpdate.yaml
+    PlatformPharmacy:
+      $ref: ./components/schemas/prescriptions/PlatformPharmacy.yaml
+    PlatformPharmacyList:
+      $ref: ./components/schemas/prescriptions/PlatformPharmacyList.yaml
+    PrescriptionFile:
+      $ref: ./components/schemas/prescriptions/PrescriptionFile.yaml
+    PrescriptionFileLink:
+      $ref: ./components/schemas/prescriptions/PrescriptionFileLink.yaml
+    PrescriptionOutcome:
+      $ref: ./components/schemas/prescriptions/PrescriptionOutcome.yaml
+    PrescriptionReader:
+      $ref: ./components/schemas/prescriptions/PrescriptionReader.yaml
+    PrescriptionReading:
+      $ref: ./components/schemas/prescriptions/PrescriptionReading.yaml
+    PrescriptionSchedule:
+      $ref: ./components/schemas/prescriptions/PrescriptionSchedule.yaml
+    PrescriptionUpload:
+      $ref: ./components/schemas/prescriptions/PrescriptionUpload.yaml
+    PrescriptionUploadRequest:
+      $ref: ./components/schemas/prescriptions/PrescriptionUploadRequest.yaml
+    PrescriptionVerification:
+      $ref: ./components/schemas/prescriptions/PrescriptionVerification.yaml
+    PrescriptionVerificationInput:
+      $ref: ./components/schemas/prescriptions/PrescriptionVerificationInput.yaml

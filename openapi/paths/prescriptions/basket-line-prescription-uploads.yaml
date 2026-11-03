@@ -1,0 +1,74 @@
+# Path item for /v1/baskets/{location_id}/lines/{line_id}/prescription/uploads. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store."
+    schema:
+      type: string
+      format: uuid
+  - name: line_id
+    in: path
+    required: true
+    description: "The basket line."
+    schema:
+      type: string
+      format: uuid
+post:
+  operationId: grantPrescriptionUpload
+  summary: "Add a file to a line's prescription"
+  description: "Reserves a file on the basket line's prescription and issues a five-minute grant to post it straight to private storage (purpose `prescription_file`: JPEG, PNG, WebP or PDF, 10 MB at most), granted to the customer for this store and this line alone. Confirm it with `POST /v1/assets/{asset_id}/confirm` once posted. Five files at most a line; a file no line names is deleted a day after it was granted. The customer's own basket only, at a store taking prescriptions, on a line that needs one."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "What the file is."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/prescriptions/PrescriptionUploadRequest.yaml
+  responses:
+    "201":
+      description: "The file reserved and the form to post it with."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PrescriptionUpload.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    "400":
+      description: "`validation_failed`: `unsupported_file_type`, `file_too_large`, `prescription_files_full` past five."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`prescriptions_not_accepted`: the store isn't taking prescriptions at the moment; or the line needs none."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

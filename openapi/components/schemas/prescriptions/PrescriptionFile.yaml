@@ -1,0 +1,19 @@
+type: object
+description: "A file of a prescription, never what is on it, the `PrescriptionFile` schema."
+required:
+  - file_id
+  - arrived
+properties:
+  file_id:
+    type: string
+    format: uuid
+    description: "The file, a digital asset of purpose `prescription_file`."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001"
+  arrived:
+    type: boolean
+    description: "Whether it was uploaded and confirmed; a line is placed only with files that arrived."
+    examples:
+      - true
+examples:
+  - {"file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "arrived": true}

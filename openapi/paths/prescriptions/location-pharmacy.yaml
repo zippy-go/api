@@ -1,0 +1,104 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/pharmacy. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: "The Location."
+    schema:
+      type: string
+      format: uuid
+get:
+  operationId: getLocationPharmacy
+  summary: "Get a Location's pharmacy"
+  description: "The Location's licence, its pharmacist and whether it takes prescriptions now, and why not when it does not. `location:read` at the Location; platform staff with `partner:read`."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The pharmacy."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PharmacySettings.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+put:
+  operationId: putLocationPharmacy
+  summary: "Set a Location's pharmacy"
+  description: "Sets the Location's licence and names its registered pharmacist, a member of the Partner with their registration number and council. A changed licence waits for Mission Control's verification again. Prescriptions are taken once the licence is verified and in date and a pharmacist is named; naming nobody stops them (`pharmacist_required` refuses taking them without one). `location:write` at the Location."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The licence and the pharmacist."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/prescriptions/PharmacySettingsUpdate.yaml
+  responses:
+    "200":
+      description: "The pharmacy now."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PharmacySettings.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    "400":
+      description: "`validation_failed`: a licence number missing, an expiry in the past, or a pharmacist not a member."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

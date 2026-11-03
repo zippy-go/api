@@ -57,6 +57,11 @@ properties:
   prescription_required:
     type: boolean
     description: Sold only against a prescription, at a store whose order settings accept prescriptions.
+  prescription_schedule:
+    oneOf:
+      - $ref: ../prescriptions/PrescriptionSchedule.yaml
+      - type: "null"
+    description: "The schedule a prescription-only item is under, `H` or `H1` (since 0.36.0); an item is never under `X`, which is refused. `null` for an item sold freely, and for one marked before the schedules."
   preparation_minutes:
     type:
       - integer

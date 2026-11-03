@@ -25,6 +25,18 @@ errors:
       - code: webhook_url_not_https
         message: "An endpoint is an HTTPS address."
         description: "A webhook endpoint's address that is not HTTPS (only `localhost` may be plain HTTP, on a developer's machine)."
+      - code: prescription_files_full
+        message: "A prescription is five files at most."
+        description: "A sixth file added to a basket line's prescription."
+      - code: prescription_file_unknown
+        message: "A file didn't finish uploading. Add it again, or leave it out."
+        description: "A prescription names a file granted to another customer, at another store or line, or one that never arrived."
+      - code: prescription_too_old
+        message: "A prescription older than six months is not valid."
+        description: "The prescription's date is more than six months before the verification."
+      - code: schedule_x_not_sold
+        message: "Schedule X medicines are not sold on the platform."
+        description: "An item marked under Schedule X, which no Location may list."
       - code: placeholder_unknown
         message: "A placeholder must be one of the variables its event provides."
         description: "A message template's placeholder that its event does not provide; the message names the variables available."
@@ -2583,3 +2595,24 @@ errors:
     message: "This operation's sunset passed: see the changelog for its replacement."
     retryable: false
     description: "A deprecated operation called after its sunset."
+
+  - code: prescription_missing
+    status: 409
+    title: Prescription missing
+    message: "Add the prescription for {item}."
+    retryable: false
+    description: "A basket is placed while a line that needs a prescription has none that arrived. The basket is priced as usual; the line says how to add it."
+
+  - code: prescription_unverified
+    status: 409
+    title: Prescription not verified
+    message: "{item} waits for the pharmacist."
+    retryable: false
+    description: "An order with a prescription line is accepted, or marked ready, before the pharmacist verified every prescription line. The detail names the line."
+
+  - code: pharmacist_required
+    status: 409
+    title: Pharmacist required
+    message: "Name a registered pharmacist first."
+    retryable: false
+    description: "A Location takes prescriptions only with a registered pharmacist named, with their registration number and council."

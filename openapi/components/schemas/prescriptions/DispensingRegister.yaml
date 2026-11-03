@@ -1,0 +1,20 @@
+type: object
+description: "A pharmacy's dispensing register, newest first; kept three years, the `DispensingRegister` schema."
+required:
+  - items
+  - next_cursor
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./DispensingRecord.yaml
+    description: "The records."
+  next_cursor:
+    type:
+      - string
+      - "null"
+    description: "The next page."
+    examples:
+      - null
+examples:
+  - {"items": [], "next_cursor": null}

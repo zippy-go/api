@@ -1,0 +1,49 @@
+type: object
+description: "The pharmacist's verification of a prescription line; the order is accepted only once every prescription line has one, the `PrescriptionVerificationInput` schema."
+required:
+  - outcome
+properties:
+  outcome:
+    $ref: ./PrescriptionOutcome.yaml
+  quantity:
+    type:
+      - integer
+      - "null"
+    minimum: 1
+    description: "What is prescribed, for `reduced`: fewer than the line's quantity."
+    examples:
+      - 10
+  patient_name:
+    type:
+      - string
+      - "null"
+    maxLength: 120
+    description: "The patient's name as the prescription writes it, for the register."
+    examples:
+      - "Asha Rao"
+  prescriber_name:
+    type:
+      - string
+      - "null"
+    maxLength: 120
+    description: "The prescriber's name."
+    examples:
+      - "Dr. K. Prasad"
+  prescriber_registration:
+    type:
+      - string
+      - "null"
+    maxLength: 60
+    description: "The prescriber's registration number."
+    examples:
+      - "TSMC/45123"
+  prescribed_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: "The prescription's date; one older than six months is not valid."
+    examples:
+      - "2026-10-28"
+examples:
+  - {"outcome": "reduced", "quantity": 10, "patient_name": "Asha Rao", "prescriber_name": "Dr. K. Prasad", "prescriber_registration": "TSMC/45123", "prescribed_on": "2026-10-28"}

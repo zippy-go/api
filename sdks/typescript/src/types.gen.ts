@@ -1670,7 +1670,8 @@ export type LocationList = {
  * The role a member holds in a partner, as a single label. `owner` may do
  * everything the partner is entitled to, including managing members and
  * roles; `manager`, `dispatcher`, `kitchen` and `staff` are the default
- * roles every partner receives and may tune; `custom` stands for a role
+ * roles every partner receives and may tune, with `developer` (since
+ * 0.35.0) and `pharmacist` (since 0.36.0); `custom` stands for a role
  * the partner defined, or for access held only at chosen Locations or
  * Services. When a member holds several roles the label is the most senior
  * one. What a member may do is decided by their grants and the permissions
@@ -1681,7 +1682,7 @@ export type LocationList = {
  * additive change.
  *
  */
-export type MembershipRole = 'owner' | 'manager' | 'dispatcher' | 'kitchen' | 'staff' | 'custom';
+export type MembershipRole = 'owner' | 'manager' | 'dispatcher' | 'kitchen' | 'developer' | 'pharmacist' | 'staff' | 'custom';
 
 /**
  * A user's membership in a partner, with the role that decides what they may
@@ -5839,6 +5840,10 @@ export type AgentTask = {
      * Whether the drop asks for the customer's 4-digit code.
      */
     code_required: boolean;
+    /**
+     * A prescription order (since 0.36.0): "Prescription order, hand over with the code", never left at the door, and nothing of the medicines. The drop asks the code.
+     */
+    prescription_handover?: boolean;
     /**
      * Wrong codes left before the Agent is told to call the customer.
      */
@@ -12685,6 +12690,10 @@ export type ItemAvailability = {
      */
     prescription_required: boolean;
     /**
+     * The schedule a prescription-only item is under, `H` or `H1` (since 0.36.0); an item is never under `X`, which is refused. `null` for an item sold freely, and for one marked before the schedules.
+     */
+    prescription_schedule?: PrescriptionSchedule | null;
+    /**
      * Its own preparation time in minutes, 1 to 240.
      */
     preparation_minutes: number | null;
@@ -12730,6 +12739,10 @@ export type ItemAvailabilityInput = {
      * Sold only against a prescription.
      */
     prescription_required?: boolean;
+    /**
+     * The schedule of a prescription-only item (since 0.36.0); `X` is refused with `schedule_x_not_sold`, such medicines never sold on the platform.
+     */
+    prescription_schedule?: PrescriptionSchedule | null;
     /**
      * Its own preparation time in minutes, 1 to 240.
      */
@@ -17291,9 +17304,9 @@ export type OrderActorKind = 'customer' | 'staff' | 'platform' | 'system';
 export type CustomerCancelReason = 'changed_my_mind' | 'ordered_by_mistake' | 'taking_too_long' | 'other';
 
 /**
- * Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own.
+ * Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own; `prescription_not_valid` (since 0.36.0) when the pharmacist found every prescription line not valid, which the customer reads as “they couldn’t accept the prescription”.
  */
-export type DeclineReason = 'out_of_stock' | 'too_busy' | 'closing' | 'customer_asked' | 'other' | 'not_answered' | 'payment_failed';
+export type DeclineReason = 'out_of_stock' | 'too_busy' | 'closing' | 'customer_asked' | 'other' | 'not_answered' | 'payment_failed' | 'prescription_not_valid';
 
 /**
  * Why a store cancels an order it accepted. A note is always needed.
@@ -17583,6 +17596,14 @@ export type BasketLine = {
      * Why the line cannot be ordered now; `null` when it can.
      */
     refusal: LineRefusal | null;
+    /**
+     * Whether the line is placed only with a prescription attached (since 0.36.0); placing a basket with such a line without one answers `prescription_missing`.
+     */
+    prescription_required?: boolean;
+    /**
+     * The line's prescription, its files and whether one arrived; `null` for a line that needs none.
+     */
+    prescription?: BasketLinePrescription | null;
     /**
      * The item offer the line is under, with what it takes off; `null` when none applies.
      */
@@ -18341,6 +18362,10 @@ export type OrderLine = {
      * How many of it refunds have given back.
      */
     refunded_quantity: number;
+    /**
+     * What the line carries of its prescription (since 0.36.0): how many files and the pharmacist's verification, never what the files say; `null` for a line sold freely.
+     */
+    prescription?: OrderLinePrescription | null;
     /**
      * The item offer the line was sold under, or the free item it is; `null` for none.
      */
@@ -38921,6 +38946,461 @@ export type StatementBillDeduction = {
      * What the statement deducts, GST included.
      */
     amount: Money;
+};
+
+/**
+ * What a basket line carries of its prescription, the `BasketLinePrescription` schema.
+ */
+export type BasketLinePrescription = {
+    /**
+     * Its files, one to five.
+     */
+    files: Array<PrescriptionFile>;
+    /**
+     * Whether a file arrived, so the line may be placed.
+     */
+    ready: boolean;
+};
+
+/**
+ * One line of a pharmacy's dispensing register, without the files, the `DispensingRecord` schema.
+ */
+export type DispensingRecord = {
+    /**
+     * The record.
+     */
+    id: string;
+    /**
+     * The order's number.
+     */
+    order_number: string;
+    /**
+     * The drug, its strength and form, as sold.
+     */
+    drug_name: string;
+    schedule: PrescriptionSchedule;
+    /**
+     * The quantity dispensed.
+     */
+    quantity: number;
+    /**
+     * The patient's name as the prescription wrote it; it stays after the customer's erasure.
+     */
+    patient_name: string | null;
+    /**
+     * The prescriber's name where given.
+     */
+    prescriber_name: string | null;
+    /**
+     * Their registration number where given.
+     */
+    prescriber_registration: string | null;
+    /**
+     * The prescription's date where given.
+     */
+    prescribed_on: string | null;
+    /**
+     * The pharmacist who verified.
+     */
+    pharmacist_name: string;
+    /**
+     * Their registration number.
+     */
+    pharmacist_registration: string;
+    /**
+     * When it was dispensed: the order delivered or collected.
+     */
+    dispensed_at: string;
+};
+
+/**
+ * A pharmacy's dispensing register, newest first; kept three years, the `DispensingRegister` schema.
+ */
+export type DispensingRegister = {
+    /**
+     * The records.
+     */
+    items: Array<DispensingRecord>;
+    /**
+     * The next page.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * What an order line says of its prescription: that it carries one and how many files, never what is on them, the `OrderLinePrescription` schema.
+ */
+export type OrderLinePrescription = {
+    /**
+     * How many files; nothing once erased.
+     */
+    files: number;
+    /**
+     * The pharmacist's verification; `null` until recorded.
+     */
+    verification: PrescriptionVerification | null;
+    /**
+     * When its files were erased, thirty days after the order ended.
+     */
+    erased_at: string | null;
+};
+
+/**
+ * A prescription line of an order, for the pharmacist, the `OrderPrescriptionLine` schema.
+ */
+export type OrderPrescriptionLine = {
+    /**
+     * The order line.
+     */
+    line_id: string;
+    /**
+     * The medicine, as sold.
+     */
+    item_name: string;
+    schedule: PrescriptionSchedule;
+    /**
+     * The quantity ordered.
+     */
+    quantity: number;
+    /**
+     * Its files, opened one by one through their links; empty once erased.
+     */
+    file_ids: Array<string>;
+    /**
+     * The patient's name as the prescription writes it, once recorded.
+     */
+    patient_name: string | null;
+    /**
+     * The prescriber's name.
+     */
+    prescriber_name: string | null;
+    /**
+     * The prescriber's registration number.
+     */
+    prescriber_registration: string | null;
+    /**
+     * The prescription's date.
+     */
+    prescribed_on: string | null;
+    /**
+     * The verification; `null` until recorded.
+     */
+    verification: PrescriptionVerification | null;
+    /**
+     * When its files were erased.
+     */
+    erased_at: string | null;
+};
+
+/**
+ * An order's prescription lines, the `OrderPrescriptions` schema.
+ */
+export type OrderPrescriptions = {
+    /**
+     * The order.
+     */
+    order_id: string;
+    /**
+     * Its prescription lines.
+     */
+    lines: Array<OrderPrescriptionLine>;
+    /**
+     * Who read its files, newest first; Mission Control's and the Location's reads.
+     */
+    readings: Array<PrescriptionReading>;
+};
+
+/**
+ * The registered pharmacist named on a pharmacy Location, the `Pharmacist` schema.
+ */
+export type Pharmacist = {
+    /**
+     * Their membership of the Partner.
+     */
+    membership_id: string;
+    /**
+     * Their name.
+     */
+    name: string;
+    /**
+     * Their registration number, as typed; not checked against a council's register.
+     */
+    registration_number: string;
+    /**
+     * The state pharmacy council they are registered with.
+     */
+    council: string;
+};
+
+/**
+ * A pharmacy's retail drug licence, the `PharmacyLicence` schema.
+ */
+export type PharmacyLicence = {
+    /**
+     * The licence number.
+     */
+    number: string | null;
+    /**
+     * The last day it is valid.
+     */
+    expires_on: string | null;
+    /**
+     * When Mission Control verified it; `null` until it does.
+     */
+    verified_at: string | null;
+    /**
+     * Who verified it.
+     */
+    verified_by: string | null;
+};
+
+/**
+ * Mission Control's word on a pharmacy's licence, the `PharmacyLicenceVerification` schema.
+ */
+export type PharmacyLicenceVerification = {
+    /**
+     * Verified, or the verification withdrawn.
+     */
+    verified: boolean;
+    /**
+     * Why, required when withdrawn.
+     */
+    reason?: string | null;
+};
+
+/**
+ * A Location's pharmacy: its licence, its pharmacist and whether it takes prescriptions now, the `PharmacySettings` schema.
+ */
+export type PharmacySettings = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Whether it takes prescriptions now: its licence verified and in date and a pharmacist named whose membership is active. It turns off by itself when one of them stops.
+     */
+    takes_prescriptions: boolean;
+    /**
+     * Why it does not, in a sentence; `null` while it does.
+     */
+    why_not: string | null;
+    licence: PharmacyLicence;
+    /**
+     * The pharmacist named; `null` until one is.
+     */
+    pharmacist: Pharmacist | null;
+    /**
+     * When last changed.
+     */
+    updated_at: string | null;
+};
+
+/**
+ * A Location's pharmacy set by its Partner; a changed licence waits for Mission Control's verification again, the `PharmacySettingsUpdate` schema.
+ */
+export type PharmacySettingsUpdate = {
+    /**
+     * The licence number.
+     */
+    licence_number: string;
+    /**
+     * The last day it is valid.
+     */
+    licence_expires_on: string;
+    /**
+     * The member who is the registered pharmacist; `null` names nobody.
+     */
+    pharmacist_membership_id?: string | null;
+    /**
+     * Their registration number.
+     */
+    pharmacist_registration_number?: string | null;
+    /**
+     * Their state pharmacy council.
+     */
+    pharmacist_council?: string | null;
+};
+
+/**
+ * A pharmacy Location as Mission Control sees it, the `PlatformPharmacy` schema.
+ */
+export type PlatformPharmacy = {
+    /**
+     * The Location.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    location_name: string;
+    /**
+     * Its Partner.
+     */
+    partner_id: string;
+    /**
+     * Its Partner's name.
+     */
+    partner_name: string;
+    settings: PharmacySettings;
+};
+
+/**
+ * Every pharmacy Location, those not taking prescriptions first, the `PlatformPharmacyList` schema.
+ */
+export type PlatformPharmacyList = {
+    /**
+     * The pharmacies.
+     */
+    items: Array<PlatformPharmacy>;
+};
+
+/**
+ * A file of a prescription, never what is on it, the `PrescriptionFile` schema.
+ */
+export type PrescriptionFile = {
+    /**
+     * The file, a digital asset of purpose `prescription_file`.
+     */
+    file_id: string;
+    /**
+     * Whether it was uploaded and confirmed; a line is placed only with files that arrived.
+     */
+    arrived: boolean;
+};
+
+/**
+ * A link to one prescription file that stops working after ten minutes; the reading is recorded, the `PrescriptionFileLink` schema.
+ */
+export type PrescriptionFileLink = {
+    /**
+     * The link.
+     */
+    url: string;
+    /**
+     * When it stops working.
+     */
+    expires_at: string;
+};
+
+/**
+ * What the pharmacist recorded for a prescription line, the `PrescriptionOutcome` schema: `valid`, `reduced` to what is prescribed, or `not_valid`.
+ */
+export type PrescriptionOutcome = 'valid' | 'reduced' | 'not_valid';
+
+/**
+ * As whom a file was read, the `PrescriptionReader` schema: a member of the Location, platform staff holding `order:prescription`, or the customer who sent it.
+ */
+export type PrescriptionReader = 'location' | 'platform' | 'customer';
+
+/**
+ * One reading of a prescription file, the `PrescriptionReading` schema.
+ */
+export type PrescriptionReading = {
+    /**
+     * The file.
+     */
+    file_id: string;
+    /**
+     * Who read it.
+     */
+    user_id: string;
+    /**
+     * Their name as the audit log knows it.
+     */
+    name: string;
+    as: PrescriptionReader;
+    /**
+     * When.
+     */
+    read_at: string;
+};
+
+/**
+ * The schedule of the Drugs and Cosmetics Rules a prescription-only item is under, the `PrescriptionSchedule` schema: `H` and `H1` are sold against a prescription; an item under `X` is never listed on the platform.
+ */
+export type PrescriptionSchedule = 'H' | 'H1' | 'X';
+
+/**
+ * A file reserved on a basket line's prescription and the form to post it with, the `PrescriptionUpload` schema.
+ */
+export type PrescriptionUpload = {
+    /**
+     * The file; confirm it with `POST /v1/assets/{asset_id}/confirm` once posted.
+     */
+    file_id: string;
+    /**
+     * Where and how to post the file, straight to private storage.
+     */
+    upload: UploadGrant;
+    prescription: BasketLinePrescription;
+};
+
+/**
+ * A file to add to a basket line's prescription, the `PrescriptionUploadRequest` schema.
+ */
+export type PrescriptionUploadRequest = {
+    /**
+     * The file's name as the customer has it; never kept beyond the upload.
+     */
+    file_name: string;
+    /**
+     * A JPEG, PNG, WebP or PDF.
+     */
+    content_type: string;
+    /**
+     * 10 MB at most.
+     */
+    size_bytes: number;
+};
+
+/**
+ * The pharmacist's verification of a prescription line, the `PrescriptionVerification` schema.
+ */
+export type PrescriptionVerification = {
+    outcome: PrescriptionOutcome;
+    /**
+     * The quantity to dispense: the line's for `valid`, what is prescribed for `reduced`, none for `not_valid`.
+     */
+    quantity: number;
+    /**
+     * Who verified.
+     */
+    pharmacist_name: string;
+    /**
+     * Their registration number.
+     */
+    registration_number: string;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * The pharmacist's verification of a prescription line; the order is accepted only once every prescription line has one, the `PrescriptionVerificationInput` schema.
+ */
+export type PrescriptionVerificationInput = {
+    outcome: PrescriptionOutcome;
+    /**
+     * What is prescribed, for `reduced`: fewer than the line's quantity.
+     */
+    quantity?: number | null;
+    /**
+     * The patient's name as the prescription writes it, for the register.
+     */
+    patient_name?: string | null;
+    /**
+     * The prescriber's name.
+     */
+    prescriber_name?: string | null;
+    /**
+     * The prescriber's registration number.
+     */
+    prescriber_registration?: string | null;
+    /**
+     * The prescription's date; one older than six months is not valid.
+     */
+    prescribed_on?: string | null;
 };
 
 /**
@@ -90834,3 +91314,701 @@ export type GetCohortReportResponses = {
 };
 
 export type GetCohortReportResponse = GetCohortReportResponses[keyof GetCohortReportResponses];
+
+export type GetLocationPharmacyData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pharmacy';
+};
+
+export type GetLocationPharmacyErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetLocationPharmacyError = GetLocationPharmacyErrors[keyof GetLocationPharmacyErrors];
+
+export type GetLocationPharmacyResponses = {
+    /**
+     * The pharmacy.
+     */
+    200: PharmacySettings;
+};
+
+export type GetLocationPharmacyResponse = GetLocationPharmacyResponses[keyof GetLocationPharmacyResponses];
+
+export type PutLocationPharmacyData = {
+    /**
+     * The licence and the pharmacist.
+     */
+    body: PharmacySettingsUpdate;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/pharmacy';
+};
+
+export type PutLocationPharmacyErrors = {
+    /**
+     * `validation_failed`: a licence number missing, an expiry in the past, or a pharmacist not a member.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PutLocationPharmacyError = PutLocationPharmacyErrors[keyof PutLocationPharmacyErrors];
+
+export type PutLocationPharmacyResponses = {
+    /**
+     * The pharmacy now.
+     */
+    200: PharmacySettings;
+};
+
+export type PutLocationPharmacyResponse = PutLocationPharmacyResponses[keyof PutLocationPharmacyResponses];
+
+export type GrantPrescriptionUploadData = {
+    /**
+     * What the file is.
+     */
+    body: PrescriptionUploadRequest;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The basket line.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/lines/{line_id}/prescription/uploads';
+};
+
+export type GrantPrescriptionUploadErrors = {
+    /**
+     * `validation_failed`: `unsupported_file_type`, `file_too_large`, `prescription_files_full` past five.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `prescriptions_not_accepted`: the store isn't taking prescriptions at the moment; or the line needs none.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GrantPrescriptionUploadError = GrantPrescriptionUploadErrors[keyof GrantPrescriptionUploadErrors];
+
+export type GrantPrescriptionUploadResponses = {
+    /**
+     * The file reserved and the form to post it with.
+     */
+    201: PrescriptionUpload;
+};
+
+export type GrantPrescriptionUploadResponse = GrantPrescriptionUploadResponses[keyof GrantPrescriptionUploadResponses];
+
+export type DeletePrescriptionFileData = {
+    body?: never;
+    path: {
+        /**
+         * The store.
+         */
+        location_id: string;
+        /**
+         * The basket line.
+         */
+        line_id: string;
+        /**
+         * The file.
+         */
+        file_id: string;
+    };
+    query?: never;
+    url: '/v1/baskets/{location_id}/lines/{line_id}/prescription/files/{file_id}';
+};
+
+export type DeletePrescriptionFileErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type DeletePrescriptionFileError = DeletePrescriptionFileErrors[keyof DeletePrescriptionFileErrors];
+
+export type DeletePrescriptionFileResponses = {
+    /**
+     * Taken off.
+     */
+    204: void;
+};
+
+export type DeletePrescriptionFileResponse = DeletePrescriptionFileResponses[keyof DeletePrescriptionFileResponses];
+
+export type GetStoreOrderPrescriptionsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/prescriptions';
+};
+
+export type GetStoreOrderPrescriptionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStoreOrderPrescriptionsError = GetStoreOrderPrescriptionsErrors[keyof GetStoreOrderPrescriptionsErrors];
+
+export type GetStoreOrderPrescriptionsResponses = {
+    /**
+     * The prescription lines.
+     */
+    200: OrderPrescriptions;
+};
+
+export type GetStoreOrderPrescriptionsResponse = GetStoreOrderPrescriptionsResponses[keyof GetStoreOrderPrescriptionsResponses];
+
+export type GetStorePrescriptionFileLinkData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The file.
+         */
+        file_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/prescriptions/{file_id}/link';
+};
+
+export type GetStorePrescriptionFileLinkErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetStorePrescriptionFileLinkError = GetStorePrescriptionFileLinkErrors[keyof GetStorePrescriptionFileLinkErrors];
+
+export type GetStorePrescriptionFileLinkResponses = {
+    /**
+     * The link.
+     */
+    200: PrescriptionFileLink;
+};
+
+export type GetStorePrescriptionFileLinkResponse = GetStorePrescriptionFileLinkResponses[keyof GetStorePrescriptionFileLinkResponses];
+
+export type VerifyPrescriptionLineData = {
+    /**
+     * The verification.
+     */
+    body: PrescriptionVerificationInput;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The order.
+         */
+        order_id: string;
+        /**
+         * The prescription line.
+         */
+        line_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/lines/{line_id}/verification';
+};
+
+export type VerifyPrescriptionLineErrors = {
+    /**
+     * `validation_failed`: a reduced quantity not below the line's, a prescription older than six months.
+     */
+    400: Problem;
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`), or a line that carries no prescription; never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * `order_moved`: the order is no longer placed; `pharmacist_required`: the caller is not the Location's registered pharmacist, or it does not take prescriptions now.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyPrescriptionLineError = VerifyPrescriptionLineErrors[keyof VerifyPrescriptionLineErrors];
+
+export type VerifyPrescriptionLineResponses = {
+    /**
+     * The line as verified.
+     */
+    200: OrderPrescriptionLine;
+};
+
+export type VerifyPrescriptionLineResponse = VerifyPrescriptionLineResponses[keyof VerifyPrescriptionLineResponses];
+
+export type GetDispensingRegisterData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+    };
+    query?: {
+        /**
+         * From this day, on the Location's clock.
+         */
+        from?: string;
+        /**
+         * Until this day.
+         */
+        to?: string;
+        /**
+         * `csv` for a spreadsheet.
+         */
+        format?: string;
+        /**
+         * 1 to 100.
+         */
+        limit?: number;
+        /**
+         * The next page.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/locations/{location_id}/dispensing-register';
+};
+
+export type GetDispensingRegisterErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetDispensingRegisterError = GetDispensingRegisterErrors[keyof GetDispensingRegisterErrors];
+
+export type GetDispensingRegisterResponses = {
+    /**
+     * The register.
+     */
+    200: DispensingRegister;
+};
+
+export type GetDispensingRegisterResponse = GetDispensingRegisterResponses[keyof GetDispensingRegisterResponses];
+
+export type ListPlatformPharmaciesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/platform/pharmacies';
+};
+
+export type ListPlatformPharmaciesErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListPlatformPharmaciesError = ListPlatformPharmaciesErrors[keyof ListPlatformPharmaciesErrors];
+
+export type ListPlatformPharmaciesResponses = {
+    /**
+     * The pharmacies.
+     */
+    200: PlatformPharmacyList;
+};
+
+export type ListPlatformPharmaciesResponse = ListPlatformPharmaciesResponses[keyof ListPlatformPharmaciesResponses];
+
+export type VerifyPharmacyLicenceData = {
+    /**
+     * Verified or withdrawn.
+     */
+    body: PharmacyLicenceVerification;
+    path: {
+        /**
+         * The pharmacy Location.
+         */
+        location_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/pharmacies/{location_id}/licence';
+};
+
+export type VerifyPharmacyLicenceErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type VerifyPharmacyLicenceError = VerifyPharmacyLicenceErrors[keyof VerifyPharmacyLicenceErrors];
+
+export type VerifyPharmacyLicenceResponses = {
+    /**
+     * The pharmacy now.
+     */
+    200: PharmacySettings;
+};
+
+export type VerifyPharmacyLicenceResponse = VerifyPharmacyLicenceResponses[keyof VerifyPharmacyLicenceResponses];
+
+export type GetPlatformOrderPrescriptionsData = {
+    body?: never;
+    path: {
+        /**
+         * The order.
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/orders/{order_id}/prescriptions';
+};
+
+export type GetPlatformOrderPrescriptionsErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformOrderPrescriptionsError = GetPlatformOrderPrescriptionsErrors[keyof GetPlatformOrderPrescriptionsErrors];
+
+export type GetPlatformOrderPrescriptionsResponses = {
+    /**
+     * The prescription lines.
+     */
+    200: OrderPrescriptions;
+};
+
+export type GetPlatformOrderPrescriptionsResponse = GetPlatformOrderPrescriptionsResponses[keyof GetPlatformOrderPrescriptionsResponses];
+
+export type GetPlatformPrescriptionFileLinkData = {
+    body?: never;
+    path: {
+        /**
+         * The file.
+         */
+        file_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/prescriptions/{file_id}/link';
+};
+
+export type GetPlatformPrescriptionFileLinkErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPlatformPrescriptionFileLinkError = GetPlatformPrescriptionFileLinkErrors[keyof GetPlatformPrescriptionFileLinkErrors];
+
+export type GetPlatformPrescriptionFileLinkResponses = {
+    /**
+     * The link.
+     */
+    200: PrescriptionFileLink;
+};
+
+export type GetPlatformPrescriptionFileLinkResponse = GetPlatformPrescriptionFileLinkResponses[keyof GetPlatformPrescriptionFileLinkResponses];
+
+export type GetCustomerPrescriptionFileLinkData = {
+    body?: never;
+    path: {
+        /**
+         * The file.
+         */
+        file_id: string;
+    };
+    query?: never;
+    url: '/v1/customer/prescriptions/{file_id}/link';
+};
+
+export type GetCustomerPrescriptionFileLinkErrors = {
+    /**
+     * No valid access token was sent, or it was refused (`unauthenticated`).
+     */
+    401: Problem;
+    /**
+     * `access_denied`, or a token of another surface.
+     */
+    403: Problem;
+    /**
+     * Not one the caller may see (`not_found`); never 403 for another Partner's.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerPrescriptionFileLinkError = GetCustomerPrescriptionFileLinkErrors[keyof GetCustomerPrescriptionFileLinkErrors];
+
+export type GetCustomerPrescriptionFileLinkResponses = {
+    /**
+     * The link.
+     */
+    200: PrescriptionFileLink;
+};
+
+export type GetCustomerPrescriptionFileLinkResponse = GetCustomerPrescriptionFileLinkResponses[keyof GetCustomerPrescriptionFileLinkResponses];

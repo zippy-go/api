@@ -1,0 +1,20 @@
+type: object
+description: "A file reserved on a basket line's prescription and the form to post it with, the `PrescriptionUpload` schema."
+required:
+  - file_id
+  - upload
+  - prescription
+properties:
+  file_id:
+    type: string
+    format: uuid
+    description: "The file; confirm it with `POST /v1/assets/{asset_id}/confirm` once posted."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001"
+  upload:
+    $ref: ../assets/UploadGrant.yaml
+    description: "Where and how to post the file, straight to private storage."
+  prescription:
+    $ref: ./BasketLinePrescription.yaml
+examples:
+  - {"file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "upload": {"url": "http://localhost:9000/zippygo-private", "fields": {"key": "prescriptions/x"}, "file_field": "file", "key": "prescriptions/x", "content_type": "image/jpeg", "max_bytes": 10485760, "expires_at": "2026-11-03T06:05:00Z"}, "prescription": {"files": [{"file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "arrived": false}], "ready": false}}

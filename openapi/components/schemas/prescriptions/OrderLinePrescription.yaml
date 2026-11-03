@@ -1,0 +1,28 @@
+type: object
+description: "What an order line says of its prescription: that it carries one and how many files, never what is on them, the `OrderLinePrescription` schema."
+required:
+  - files
+  - verification
+  - erased_at
+properties:
+  files:
+    type: integer
+    minimum: 0
+    description: "How many files; nothing once erased."
+    examples:
+      - 2
+  verification:
+    oneOf:
+      - $ref: ./PrescriptionVerification.yaml
+      - type: "null"
+    description: "The pharmacist's verification; `null` until recorded."
+  erased_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When its files were erased, thirty days after the order ended."
+    examples:
+      - null
+examples:
+  - {"files": 2, "verification": null, "erased_at": null}

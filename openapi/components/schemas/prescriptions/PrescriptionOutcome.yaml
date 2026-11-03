@@ -1,0 +1,8 @@
+type: string
+description: "What the pharmacist recorded for a prescription line, the `PrescriptionOutcome` schema: `valid`, `reduced` to what is prescribed, or `not_valid`."
+enum:
+  - valid
+  - reduced
+  - not_valid
+examples:
+  - valid

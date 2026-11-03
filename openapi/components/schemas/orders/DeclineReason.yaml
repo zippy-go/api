@@ -1,5 +1,5 @@
 type: string
-description: Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own.
+description: Why a placed order was declined. Staff and Mission Control give `out_of_stock`, `too_busy`, `closing`, `customer_asked` or `other` (which needs a note); `not_answered` and `payment_failed` are the platform's own; `prescription_not_valid` (since 0.36.0) when the pharmacist found every prescription line not valid, which the customer reads as “they couldn’t accept the prescription”.
 enum:
   - out_of_stock
   - too_busy
@@ -8,5 +8,6 @@ enum:
   - other
   - not_answered
   - payment_failed
+  - prescription_not_valid
 examples:
   - out_of_stock

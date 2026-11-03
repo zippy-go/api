@@ -1,0 +1,35 @@
+type: object
+description: "The pharmacist's verification of a prescription line, the `PrescriptionVerification` schema."
+required:
+  - outcome
+  - quantity
+  - pharmacist_name
+  - registration_number
+  - at
+properties:
+  outcome:
+    $ref: ./PrescriptionOutcome.yaml
+  quantity:
+    type: integer
+    minimum: 0
+    description: "The quantity to dispense: the line's for `valid`, what is prescribed for `reduced`, none for `not_valid`."
+    examples:
+      - 10
+  pharmacist_name:
+    type: string
+    description: "Who verified."
+    examples:
+      - "Lakshmi Reddy"
+  registration_number:
+    type: string
+    description: "Their registration number."
+    examples:
+      - "TSPC/2019/04521"
+  at:
+    type: string
+    format: date-time
+    description: "When."
+    examples:
+      - "2026-11-03T06:10:00Z"
+examples:
+  - {"outcome": "reduced", "quantity": 10, "pharmacist_name": "Lakshmi Reddy", "registration_number": "TSPC/2019/04521", "at": "2026-11-03T06:10:00Z"}

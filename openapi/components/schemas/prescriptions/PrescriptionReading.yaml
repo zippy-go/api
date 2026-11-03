@@ -1,0 +1,36 @@
+type: object
+description: "One reading of a prescription file, the `PrescriptionReading` schema."
+required:
+  - file_id
+  - user_id
+  - name
+  - as
+  - read_at
+properties:
+  file_id:
+    type: string
+    format: uuid
+    description: "The file."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001"
+  user_id:
+    type: string
+    format: uuid
+    description: "Who read it."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be002"
+  name:
+    type: string
+    description: "Their name as the audit log knows it."
+    examples:
+      - "Lakshmi Reddy"
+  as:
+    $ref: ./PrescriptionReader.yaml
+  read_at:
+    type: string
+    format: date-time
+    description: "When."
+    examples:
+      - "2026-11-03T06:09:00Z"
+examples:
+  - {"file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be002", "name": "Lakshmi Reddy", "as": "location", "read_at": "2026-11-03T06:09:00Z"}

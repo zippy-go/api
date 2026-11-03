@@ -3,7 +3,8 @@ description: |
   The role a member holds in a partner, as a single label. `owner` may do
   everything the partner is entitled to, including managing members and
   roles; `manager`, `dispatcher`, `kitchen` and `staff` are the default
-  roles every partner receives and may tune; `custom` stands for a role
+  roles every partner receives and may tune, with `developer` (since
+  0.35.0) and `pharmacist` (since 0.36.0); `custom` stands for a role
   the partner defined, or for access held only at chosen Locations or
   Services. When a member holds several roles the label is the most senior
   one. What a member may do is decided by their grants and the permissions
@@ -17,6 +18,8 @@ enum:
   - manager
   - dispatcher
   - kitchen
+  - developer
+  - pharmacist
   - staff
   - custom
 examples:

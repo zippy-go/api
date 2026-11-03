@@ -1,0 +1,8 @@
+type: string
+description: "As whom a file was read, the `PrescriptionReader` schema: a member of the Location, platform staff holding `order:prescription`, or the customer who sent it."
+enum:
+  - location
+  - platform
+  - customer
+examples:
+  - location

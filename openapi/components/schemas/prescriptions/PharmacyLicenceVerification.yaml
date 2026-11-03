@@ -1,0 +1,19 @@
+type: object
+description: "Mission Control's word on a pharmacy's licence, the `PharmacyLicenceVerification` schema."
+required:
+  - verified
+properties:
+  verified:
+    type: boolean
+    description: "Verified, or the verification withdrawn."
+    examples:
+      - true
+  reason:
+    type:
+      - string
+      - "null"
+    description: "Why, required when withdrawn."
+    examples:
+      - null
+examples:
+  - {"verified": true, "reason": null}

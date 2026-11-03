@@ -1,0 +1,50 @@
+# Path item for /v1/customer/prescriptions/{file_id}/link. Referenced from openapi.yaml.
+parameters:
+  - name: file_id
+    in: path
+    required: true
+    description: "The file."
+    schema:
+      type: string
+      format: uuid
+get:
+  operationId: getCustomerPrescriptionFileLink
+  summary: "Open my prescription file"
+  description: "A ten-minute link to one file of a prescription the customer sent, for their own order or basket; the reading is recorded."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The link."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PrescriptionFileLink.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

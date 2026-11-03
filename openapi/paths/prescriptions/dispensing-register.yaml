@@ -1,0 +1,84 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/dispensing-register. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: "The Location."
+    schema:
+      type: string
+      format: uuid
+get:
+  operationId: getDispensingRegister
+  summary: "Read the dispensing register"
+  description: "The Location's dispensing register, newest first, without the files: every line dispensed against a prescription with the patient, the prescriber, the pharmacist and the quantity, kept three years. `format=csv` answers the same as a spreadsheet for an inspection. `order:read` at the Location; platform staff with `order:prescription`."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  parameters:
+    - name: from
+      in: query
+      required: false
+      description: "From this day, on the Location's clock."
+      schema:
+        type: string
+        format: date
+    - name: to
+      in: query
+      required: false
+      description: "Until this day."
+      schema:
+        type: string
+        format: date
+    - name: format
+      in: query
+      required: false
+      description: "`csv` for a spreadsheet."
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      description: "1 to 100."
+      schema:
+        type: integer
+    - name: cursor
+      in: query
+      required: false
+      description: "The next page."
+      schema:
+        type: string
+  responses:
+    "200":
+      description: "The register."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/DispensingRegister.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

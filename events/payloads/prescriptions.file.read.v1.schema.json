@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/prescriptions.file.read.v1.schema.json",
+  "title": "PrescriptionsFileReadPayload",
+  "description": "Payload of `prescriptions.file.read` version 1. A prescription file was opened through its ten-minute link: by a member of the Location, by platform staff holding `order:prescription`, or by the customer who sent it. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "location_id",
+    "order_id",
+    "file_id",
+    "reader",
+    "user_id",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The pharmacy Location."
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "The order; `null` for a file still on a basket line."
+    },
+    "file_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The file."
+    },
+    "reader": {
+      "type": "string",
+      "enum": [
+        "location",
+        "platform",
+        "customer"
+      ],
+      "description": "As whom."
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who read it."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

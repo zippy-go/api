@@ -95,6 +95,14 @@ properties:
       - $ref: ./LineRefusal.yaml
       - type: "null"
     description: Why the line cannot be ordered now; `null` when it can.
+  prescription_required:
+    type: boolean
+    description: "Whether the line is placed only with a prescription attached (since 0.36.0); placing a basket with such a line without one answers `prescription_missing`."
+  prescription:
+    oneOf:
+      - $ref: ../prescriptions/BasketLinePrescription.yaml
+      - type: "null"
+    description: The line's prescription, its files and whether one arrived; `null` for a line that needs none.
   promotion:
     oneOf:
       - $ref: ../promotions/BasketLinePromotion.yaml

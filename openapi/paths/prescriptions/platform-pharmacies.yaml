@@ -1,0 +1,42 @@
+# Path item for /v1/platform/pharmacies. Referenced from openapi.yaml.
+get:
+  operationId: listPlatformPharmacies
+  summary: "List the pharmacies"
+  description: "Every Location with a pharmacy set, those not taking prescriptions first, each saying why. `partner:read`."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  responses:
+    "200":
+      description: "The pharmacies."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PlatformPharmacyList.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

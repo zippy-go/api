@@ -1,0 +1,12 @@
+type: object
+description: "Every pharmacy Location, those not taking prescriptions first, the `PlatformPharmacyList` schema."
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./PlatformPharmacy.yaml
+    description: "The pharmacies."
+examples:
+  - {"items": []}

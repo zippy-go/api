@@ -1,0 +1,82 @@
+# Path item for /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/lines/{line_id}/verification. Referenced from openapi.yaml.
+parameters:
+  - $ref: ../../components/parameters/PartnerIdPath.yaml
+  - name: location_id
+    in: path
+    required: true
+    description: "The Location."
+    schema:
+      type: string
+      format: uuid
+  - name: order_id
+    in: path
+    required: true
+    description: "The order."
+    schema:
+      type: string
+      format: uuid
+  - name: line_id
+    in: path
+    required: true
+    description: "The prescription line."
+    schema:
+      type: string
+      format: uuid
+post:
+  operationId: verifyPrescriptionLine
+  summary: "Verify a prescription line"
+  description: "Records the pharmacist's verification of the line, with their name and registration number: `valid`, `reduced` to what is prescribed (the line dispensed and charged for that many at acceptance), or `not_valid` (the line removed and refunded at acceptance; every line not valid declines the order with `prescription_not_valid`). An order is accepted only once every prescription line is verified (`prescription_unverified`). A placed order only. `prescription:verify` at the Location: the Pharmacist role."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "The verification."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/prescriptions/PrescriptionVerificationInput.yaml
+  responses:
+    "200":
+      description: "The line as verified."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/OrderPrescriptionLine.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`), or a line that carries no prescription; never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    "400":
+      description: "`validation_failed`: a reduced quantity not below the line's, a prescription older than six months."
+      content:
+        application/problem+json:
+          schema: *a1
+    "409":
+      description: "`order_moved`: the order is no longer placed; `pharmacist_required`: the caller is not the Location's registered pharmacist, or it does not take prescriptions now."
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

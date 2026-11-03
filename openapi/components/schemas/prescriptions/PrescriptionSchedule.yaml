@@ -1,0 +1,8 @@
+type: string
+description: "The schedule of the Drugs and Cosmetics Rules a prescription-only item is under, the `PrescriptionSchedule` schema: `H` and `H1` are sold against a prescription; an item under `X` is never listed on the platform."
+enum:
+  - H
+  - H1
+  - X
+examples:
+  - H

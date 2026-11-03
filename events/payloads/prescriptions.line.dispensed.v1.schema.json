@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/prescriptions.line.dispensed.v1.schema.json",
+  "title": "PrescriptionsLineDispensedPayload",
+  "description": "Payload of `prescriptions.line.dispensed` version 1. A prescription line was dispensed, its order delivered or collected, and written into the pharmacy's dispensing register. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "location_id",
+    "order_id",
+    "order_number",
+    "line_id",
+    "record_id",
+    "quantity",
+    "fee",
+    "currency",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The pharmacy Location."
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order."
+    },
+    "order_number": {
+      "type": "string",
+      "description": "The order's number."
+    },
+    "line_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order line."
+    },
+    "record_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The register's record."
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The quantity dispensed."
+    },
+    "fee": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The prescription fee the Location's policy set for the line when it was dispensed, in minor units; 0 when none is set. Payouts show it on the statement as its own line."
+    },
+    "currency": {
+      "type": "string",
+      "description": "The fee's currency."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

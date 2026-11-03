@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/prescriptions.verification.recorded.v1.schema.json",
+  "title": "PrescriptionsVerificationRecordedPayload",
+  "description": "Payload of `prescriptions.verification.recorded` version 1. The pharmacist recorded a prescription line's verification before the order was accepted: valid, reduced to what is prescribed, or not valid. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "partner_id",
+    "location_id",
+    "order_id",
+    "line_id",
+    "outcome",
+    "quantity",
+    "at"
+  ],
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Partner; the envelope's `partner_id` too."
+    },
+    "location_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The pharmacy Location."
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order."
+    },
+    "line_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The order line."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "valid",
+        "reduced",
+        "not_valid"
+      ],
+      "description": "The outcome."
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The quantity to dispense."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When."
+    }
+  }
+}

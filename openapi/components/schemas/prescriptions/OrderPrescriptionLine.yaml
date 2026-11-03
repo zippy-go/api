@@ -1,0 +1,84 @@
+type: object
+description: "A prescription line of an order, for the pharmacist, the `OrderPrescriptionLine` schema."
+required:
+  - line_id
+  - item_name
+  - schedule
+  - quantity
+  - file_ids
+  - patient_name
+  - prescriber_name
+  - prescriber_registration
+  - prescribed_on
+  - verification
+  - erased_at
+properties:
+  line_id:
+    type: string
+    format: uuid
+    description: "The order line."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11"
+  item_name:
+    type: string
+    description: "The medicine, as sold."
+    examples:
+      - "Amoxicillin 500 mg capsules"
+  schedule:
+    $ref: ./PrescriptionSchedule.yaml
+  quantity:
+    type: integer
+    minimum: 1
+    description: "The quantity ordered."
+    examples:
+      - 30
+  file_ids:
+    type: array
+    items:
+      type: string
+      format: uuid
+    description: "Its files, opened one by one through their links; empty once erased."
+  patient_name:
+    type:
+      - string
+      - "null"
+    description: "The patient's name as the prescription writes it, once recorded."
+    examples:
+      - null
+  prescriber_name:
+    type:
+      - string
+      - "null"
+    description: "The prescriber's name."
+    examples:
+      - null
+  prescriber_registration:
+    type:
+      - string
+      - "null"
+    description: "The prescriber's registration number."
+    examples:
+      - null
+  prescribed_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: "The prescription's date."
+    examples:
+      - null
+  verification:
+    oneOf:
+      - $ref: ./PrescriptionVerification.yaml
+      - type: "null"
+    description: "The verification; `null` until recorded."
+  erased_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When its files were erased."
+    examples:
+      - null
+examples:
+  - {"line_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9b11", "item_name": "Amoxicillin 500 mg capsules", "schedule": "H", "quantity": 30, "file_ids": ["0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf002"], "patient_name": null, "prescriber_name": null, "prescriber_registration": null, "prescribed_on": null, "verification": null, "erased_at": null}

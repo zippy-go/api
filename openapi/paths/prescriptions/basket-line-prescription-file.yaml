@@ -1,0 +1,60 @@
+# Path item for /v1/baskets/{location_id}/lines/{line_id}/prescription/files/{file_id}. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The store."
+    schema:
+      type: string
+      format: uuid
+  - name: line_id
+    in: path
+    required: true
+    description: "The basket line."
+    schema:
+      type: string
+      format: uuid
+  - name: file_id
+    in: path
+    required: true
+    description: "The file."
+    schema:
+      type: string
+      format: uuid
+delete:
+  operationId: deletePrescriptionFile
+  summary: "Take a file off a line's prescription"
+  description: "Takes the file off the line's prescription and deletes it from storage."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  responses:
+    "204":
+      description: "Taken off."
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

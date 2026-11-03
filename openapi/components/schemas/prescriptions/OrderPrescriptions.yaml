@@ -1,0 +1,25 @@
+type: object
+description: "An order's prescription lines, the `OrderPrescriptions` schema."
+required:
+  - order_id
+  - lines
+  - readings
+properties:
+  order_id:
+    type: string
+    format: uuid
+    description: "The order."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0d01"
+  lines:
+    type: array
+    items:
+      $ref: ./OrderPrescriptionLine.yaml
+    description: "Its prescription lines."
+  readings:
+    type: array
+    items:
+      $ref: ./PrescriptionReading.yaml
+    description: "Who read its files, newest first; Mission Control's and the Location's reads."
+examples:
+  - {"order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0d01", "lines": [], "readings": []}

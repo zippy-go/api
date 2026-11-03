@@ -1,0 +1,17 @@
+{
+  "id": "019a4b20-2b00-7d00-8a00-0000000fa002",
+  "type": "prescriptions.file.read",
+  "version": 1,
+  "occurred_at": "2026-11-03T06:09:00Z",
+  "partner_id": "01a13a48-9e00-7000-8000-000000000009",
+  "correlation_id": null,
+  "payload": {
+    "partner_id": "01a13a48-9e00-7000-8000-000000000009",
+    "location_id": "01a13a48-9e00-7000-8000-000000000391",
+    "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b0d01",
+    "file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001",
+    "reader": "location",
+    "user_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be002",
+    "at": "2026-11-03T06:09:00Z"
+  }
+}

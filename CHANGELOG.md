@@ -6,6 +6,47 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-11-03
+
+Step 11, pharmacy, phase A: prescriptions, after channels (0.36.0). Written as 0.37.0, the
+next free minor; renumbered by merge order should another step 11 slice merge first.
+Additive only.
+
+### Added
+
+- A Location's pharmacy (`Prescriptions` tag): its drug licence and registered pharmacist, and
+  whether it takes prescriptions now and why not (`GET`, `PUT
+  /v1/partners/{partner_id}/locations/{location_id}/pharmacy`; `PharmacySettings`,
+  `PharmacySettingsUpdate`, `PharmacyLicence`, `Pharmacist`); Mission Control's pharmacies and
+  the licence's verification (`GET /v1/platform/pharmacies`, `PUT
+  /v1/platform/pharmacies/{location_id}/licence`; `PlatformPharmacy`, `PlatformPharmacyList`,
+  `PharmacyLicenceVerification`).
+- A prescription on a basket line: files granted for the line and posted straight to private
+  storage, five at most (`POST /v1/baskets/{location_id}/lines/{line_id}/prescription/uploads`,
+  `DELETE .../prescription/files/{file_id}`; `PrescriptionUploadRequest`, `PrescriptionUpload`,
+  `PrescriptionFile`, `BasketLinePrescription`); `prescription_required` and `prescription` on
+  `BasketLine`; placing refused with `prescription_missing`.
+- The pharmacist's verification before acceptance (`POST
+  /v1/partners/{partner_id}/locations/{location_id}/orders/{order_id}/lines/{line_id}/verification`;
+  `PrescriptionVerificationInput`, `PrescriptionVerification`, `PrescriptionOutcome`), the order's
+  prescriptions and its files opened one by one through ten-minute links, every reading recorded
+  (`GET .../orders/{order_id}/prescriptions`, `GET .../prescriptions/{file_id}/link`,
+  `GET /v1/platform/orders/{order_id}/prescriptions`, `GET /v1/platform/prescriptions/{file_id}/link`,
+  `GET /v1/customer/prescriptions/{file_id}/link`; `OrderPrescriptions`, `OrderPrescriptionLine`,
+  `OrderLinePrescription`, `PrescriptionFileLink`, `PrescriptionReading`, `PrescriptionReader`);
+  `prescription` on `OrderLine`; acceptance refused with `prescription_unverified`;
+  `prescription_not_valid` in `DeclineReason`.
+- The dispensing register, also as a spreadsheet (`GET
+  /v1/partners/{partner_id}/locations/{location_id}/dispensing-register`; `DispensingRegister`,
+  `DispensingRecord`).
+- `prescription_schedule` (`PrescriptionSchedule`: `H`, `H1`, `X`) on `ItemAvailability` and its
+  input; `prescription_handover` on `AgentTask`.
+- Problem codes `prescription_missing`, `prescription_unverified` and `pharmacist_required`; field
+  codes `prescription_files_full`, `prescription_file_unknown` and `prescription_too_old`.
+- Events `prescriptions.verification.recorded`, `prescriptions.file.read`,
+  `prescriptions.files.erased` and `prescriptions.line.dispensed`, never kept by the event
+  warehouse nor sent to a vendor.
+
 ## [0.36.0] - 2026-11-03
 
 Step 11, channels and data, phase A: WhatsApp's last rules, the analytics vendors and cohort

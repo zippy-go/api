@@ -95,6 +95,11 @@ properties:
     examples:
       - 0
     description: How many of it refunds have given back.
+  prescription:
+    oneOf:
+      - $ref: ../prescriptions/OrderLinePrescription.yaml
+      - type: "null"
+    description: "What the line carries of its prescription (since 0.36.0): how many files and the pharmacist's verification, never what the files say; `null` for a line sold freely."
   promotion:
     oneOf:
       - $ref: ../promotions/BasketLinePromotion.yaml

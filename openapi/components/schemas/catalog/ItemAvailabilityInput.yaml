@@ -46,6 +46,11 @@ properties:
   prescription_required:
     type: boolean
     description: Sold only against a prescription.
+  prescription_schedule:
+    oneOf:
+      - $ref: ../prescriptions/PrescriptionSchedule.yaml
+      - type: "null"
+    description: "The schedule of a prescription-only item (since 0.36.0); `X` is refused with `schedule_x_not_sold`, such medicines never sold on the platform."
   preparation_minutes:
     type:
       - integer

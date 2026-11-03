@@ -1,0 +1,41 @@
+type: object
+description: "A pharmacy's retail drug licence, the `PharmacyLicence` schema."
+required:
+  - number
+  - expires_on
+  - verified_at
+  - verified_by
+properties:
+  number:
+    type:
+      - string
+      - "null"
+    description: "The licence number."
+    examples:
+      - "TS/HYD/2025/20B-1234"
+  expires_on:
+    type:
+      - string
+      - "null"
+    format: date
+    description: "The last day it is valid."
+    examples:
+      - "2028-03-31"
+  verified_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When Mission Control verified it; `null` until it does."
+    examples:
+      - "2026-11-03T06:00:00Z"
+  verified_by:
+    type:
+      - string
+      - "null"
+    format: uuid
+    description: "Who verified it."
+    examples:
+      - null
+examples:
+  - {"number": "TS/HYD/2025/20B-1234", "expires_on": "2028-03-31", "verified_at": "2026-11-03T06:00:00Z", "verified_by": null}

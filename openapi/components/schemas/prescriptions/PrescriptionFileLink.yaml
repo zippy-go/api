@@ -1,0 +1,19 @@
+type: object
+description: "A link to one prescription file that stops working after ten minutes; the reading is recorded, the `PrescriptionFileLink` schema."
+required:
+  - url
+  - expires_at
+properties:
+  url:
+    type: string
+    description: "The link."
+    examples:
+      - "http://localhost:9000/zippygo-private/prescriptions/x?X-Amz-Expires=600"
+  expires_at:
+    type: string
+    format: date-time
+    description: "When it stops working."
+    examples:
+      - "2026-11-03T06:20:00Z"
+examples:
+  - {"url": "http://localhost:9000/zippygo-private/prescriptions/x?X-Amz-Expires=600", "expires_at": "2026-11-03T06:20:00Z"}

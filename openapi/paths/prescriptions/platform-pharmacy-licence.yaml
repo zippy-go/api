@@ -1,0 +1,57 @@
+# Path item for /v1/platform/pharmacies/{location_id}/licence. Referenced from openapi.yaml.
+parameters:
+  - name: location_id
+    in: path
+    required: true
+    description: "The pharmacy Location."
+    schema:
+      type: string
+      format: uuid
+put:
+  operationId: verifyPharmacyLicence
+  summary: "Verify a pharmacy's licence"
+  description: "Verifies the Location's drug licence, or withdraws the verification with a reason; audited. `partner:approve`."
+  tags:
+    - Prescriptions
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    description: "Verified or withdrawn."
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/prescriptions/PharmacyLicenceVerification.yaml
+  responses:
+    "200":
+      description: "The pharmacy now."
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/prescriptions/PharmacySettings.yaml
+    "401":
+      description: No valid access token was sent, or it was refused (`unauthenticated`).
+      content:
+        application/problem+json:
+          schema: &a1
+            $ref: ../../components/schemas/common/Problem.yaml
+    "403":
+      description: "`access_denied`, or a token of another surface."
+      content:
+        application/problem+json:
+          schema: *a1
+    "404":
+      description: Not one the caller may see (`not_found`); never 403 for another Partner's.
+      content:
+        application/problem+json:
+          schema: *a1
+    4XX:
+      description: Another client error, such as `429` when rate limited, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1
+    default:
+      description: An unexpected server error, returned as an RFC 9457 problem details document.
+      content:
+        application/problem+json:
+          schema: *a1

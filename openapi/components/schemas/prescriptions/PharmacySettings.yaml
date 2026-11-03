@@ -1,0 +1,45 @@
+type: object
+description: "A Location's pharmacy: its licence, its pharmacist and whether it takes prescriptions now, the `PharmacySettings` schema."
+required:
+  - location_id
+  - takes_prescriptions
+  - why_not
+  - licence
+  - pharmacist
+  - updated_at
+properties:
+  location_id:
+    type: string
+    format: uuid
+    description: "The Location."
+    examples:
+      - "0192b6f4-9b0a-7cde-8f3a-6d2c1e4ba001"
+  takes_prescriptions:
+    type: boolean
+    description: "Whether it takes prescriptions now: its licence verified and in date and a pharmacist named whose membership is active. It turns off by itself when one of them stops."
+    examples:
+      - true
+  why_not:
+    type:
+      - string
+      - "null"
+    description: "Why it does not, in a sentence; `null` while it does."
+    examples:
+      - null
+  licence:
+    $ref: ./PharmacyLicence.yaml
+  pharmacist:
+    oneOf:
+      - $ref: ./Pharmacist.yaml
+      - type: "null"
+    description: "The pharmacist named; `null` until one is."
+  updated_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+    description: "When last changed."
+    examples:
+      - "2026-11-03T06:00:00Z"
+examples:
+  - {"location_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4ba001", "takes_prescriptions": true, "why_not": null, "licence": {"number": "TS/HYD/2025/20B-1234", "expires_on": "2028-03-31", "verified_at": "2026-11-03T06:00:00Z", "verified_by": null}, "pharmacist": {"membership_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4be001", "name": "Lakshmi Reddy", "registration_number": "TSPC/2019/04521", "council": "Telangana State Pharmacy Council"}, "updated_at": "2026-11-03T06:00:00Z"}

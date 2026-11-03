@@ -1,0 +1,19 @@
+type: object
+description: "What a basket line carries of its prescription, the `BasketLinePrescription` schema."
+required:
+  - files
+  - ready
+properties:
+  files:
+    type: array
+    items:
+      $ref: ./PrescriptionFile.yaml
+    maxItems: 5
+    description: "Its files, one to five."
+  ready:
+    type: boolean
+    description: "Whether a file arrived, so the line may be placed."
+    examples:
+      - true
+examples:
+  - {"files": [{"file_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4bf001", "arrived": true}], "ready": true}

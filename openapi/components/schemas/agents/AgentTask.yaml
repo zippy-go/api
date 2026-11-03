@@ -135,6 +135,11 @@ properties:
     description: Whether the drop asks for the customer's 4-digit code.
     examples:
       - false
+  prescription_handover:
+    type: boolean
+    description: "A prescription order (since 0.36.0): \"Prescription order, hand over with the code\", never left at the door, and nothing of the medicines. The drop asks the code."
+    examples:
+      - false
   code_attempts_left:
     type:
       - integer
