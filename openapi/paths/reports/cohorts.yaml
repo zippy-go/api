@@ -33,13 +33,12 @@
         }
       },
       {
-        "name": "vertical_id",
+        "name": "vertical",
         "in": "query",
         "required": false,
-        "description": "Only orders at stores of this Vertical.",
+        "description": "Only orders at stores of this Vertical, by code, as the subscriptions report narrows.",
         "schema": {
-          "type": "string",
-          "format": "uuid"
+          "type": "string"
         }
       },
       {
