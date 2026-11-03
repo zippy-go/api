@@ -1274,6 +1274,10 @@ export type PartnerCreate = {
      * Permissions to withhold from the partner's entitlements, for platform staff onboarding a partner; never `partner:access` (`partner_cannot_sign_in`).
      */
     withheld_permissions?: Array<string>;
+    /**
+     * Another Partner's referral code, given at sign-up (since 0.41.0); a code nobody holds is refused (`referral_code_unknown`).
+     */
+    referral_code?: string | null;
 };
 
 /**
@@ -4189,9 +4193,9 @@ export type Approval = {
 };
 
 /**
- * An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member; and since step 10 a Partner's plan changed at once (`change_partner_plan`), a plan's price (`set_plan_price`), a country's fee rule (`set_fee_rule`), a retention period (`set_setting`), a module switched off on a Partner's behalf (`switch_module_off`), a flag gating payments, payouts or dispatch taken to 100% (`set_flag`), a statement marked paid by hand (`mark_statement_paid`), a payout adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`). Clients must tolerate values they do not know.
+ * An act that needs a second pair of eyes: granting a platform role, revoking one, turning a platform member's two-step sign-in off, or disabling a platform member; and since step 10 a Partner's plan changed at once (`change_partner_plan`), a plan's price (`set_plan_price`), a country's fee rule (`set_fee_rule`), a retention period (`set_setting`), a module switched off on a Partner's behalf (`switch_module_off`), a flag gating payments, payouts or dispatch taken to 100% (`set_flag`), a statement marked paid by hand (`mark_statement_paid`), a payout adjustment (`create_payout_adjustment`) and a Wallet credit over ₹2,000.00 (`credit_wallet`). Clients must tolerate values they do not know Since 0.41.0 a refund to a customer with a fraud flag (`refund_flagged_customer`).
  */
-export type ApprovalAction = 'grant_platform_role' | 'revoke_platform_role' | 'reset_platform_two_step' | 'disable_platform_member' | 'change_partner_plan' | 'set_plan_price' | 'set_fee_rule' | 'set_setting' | 'switch_module_off' | 'set_flag' | 'mark_statement_paid' | 'create_payout_adjustment' | 'credit_wallet';
+export type ApprovalAction = 'grant_platform_role' | 'revoke_platform_role' | 'reset_platform_two_step' | 'disable_platform_member' | 'change_partner_plan' | 'set_plan_price' | 'set_fee_rule' | 'set_setting' | 'switch_module_off' | 'set_flag' | 'mark_statement_paid' | 'create_payout_adjustment' | 'credit_wallet' | 'refund_flagged_customer';
 
 /**
  * The request body of `POST /v1/platform/approvals`: the act, what it is about and its parameters. An act on a platform membership names `membership_id`; the acts of step 10 name their parameters.
@@ -15609,9 +15613,9 @@ export type PaymentMethodKind = 'upi' | 'card' | 'cash' | 'wallet';
 export type PaymentStatus = 'requires_payment' | 'confirmed' | 'settled' | 'released' | 'failed';
 
 /**
- * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`), and since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`). Clients must tolerate values they do not know.
+ * What a payment is for: an order, a top-up of the customer's Wallet, or, since 0.33.0, a Partner's monthly invoice paid by UPI or card (`invoice`); since 0.39.0 an Agent's deposit of the cash they collected (`cash_deposit`), and since 0.41.0 a week below nothing a Partner pays by UPI (`shortfall`). Clients must tolerate values they do not know.
  */
-export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice' | 'cash_deposit';
+export type PaymentPurpose = 'order' | 'wallet_top_up' | 'invoice' | 'cash_deposit' | 'shortfall';
 
 /**
  * How an attempt reaches the customer: a UPI app opened on the device (`upi_intent`), a collect request to a UPI ID (`upi_collect`), or the provider's card form (`card`).
@@ -22565,6 +22569,10 @@ export type PlatformCustomerActions = {
      * Whether the caller may unblock it now (`customer:block`, and the account is blocked).
      */
     unblock: boolean;
+    /**
+     * Whether the caller may flag the account or clear a flag (`customer:block`, since 0.41.0).
+     */
+    flag?: boolean;
 };
 
 /**
@@ -22643,6 +22651,10 @@ export type PlatformCustomer = {
      * What the caller may do.
      */
     actions: PlatformCustomerActions;
+    /**
+     * The fraud flags that stand (since 0.41.0), the newest first.
+     */
+    flags?: Array<CustomerFlag>;
 };
 
 /**
@@ -24356,6 +24368,10 @@ export type Statement = {
      * Referral commissions paid and received in the week, a line each (since 0.38.0); they add up to `figures.commissions`.
      */
     commissions?: Array<StatementCommission>;
+    /**
+     * The shortfall the week's lock asked the Partner to pay (since 0.41.0); `null` without one.
+     */
+    shortfall?: StatementShortfall | null;
 };
 
 /**
@@ -28446,9 +28462,9 @@ export type RewardPaidAs = 'wallet_credit' | 'held_offer';
 export type RewardGrantStatus = 'granted' | 'deferred' | 'held' | 'refused' | 'clawed_back';
 
 /**
- * What raised a grant for review: `shared_device`, several accounts on one device; `shared_address`, several accounts delivering to one point within 20 m; `cancellations`, orders cancelled or refunded in full after a reward; `review_burst`, five or more reviews in a day.
+ * What raised a grant for review: `shared_device`, several accounts on one device; `shared_address`, several accounts delivering to one point within 20 m; `cancellations`, orders cancelled or refunded in full after a reward; `review_burst`, five or more reviews in a day; since 0.41.0 `support_flag`, a fraud flag support raised on the customer, every reward held while it stands.
  */
-export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst';
+export type RewardSignalCode = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst' | 'support_flag';
 
 /**
  * A step of a quest: `second_vertical`, a completed order in a Vertical the customer had not ordered from; `order_at`, a completed order at a named Partner or Location; `pickups`, a number of pickups collected; `review`, a review written; `subscription_started`, a subscription started, at the named Partner or Location when one is named (since 0.26.0); `dine_in`, tabs settled at a table that the customer opened, at the named Partner or Location when one is named, a first dine-in tab at a count of one (since 0.28.0); `booking`, bookings completed, at the named Partner or Location when one is named, a first booking at a count of one (since 0.32.0).
@@ -39065,9 +39081,9 @@ export type FeeRule = {
  */
 export type ApprovalSubject = {
     /**
-     * What it is.
+     * What it is; since 0.41.0 an `order`, refunded to a customer with a fraud flag.
      */
-    kind: 'partner' | 'plan' | 'fee_rule' | 'setting' | 'flag' | 'module' | 'statement' | 'adjustment' | 'wallet';
+    kind: 'partner' | 'plan' | 'fee_rule' | 'setting' | 'flag' | 'module' | 'statement' | 'adjustment' | 'wallet' | 'order';
     /**
      * Its id or key.
      */
@@ -40883,6 +40899,499 @@ export type AgentRecordExport = {
      * The record.
      */
     record: AgentRecord;
+};
+
+/**
+ * A way of ordering in a customer's activity (since 0.41.0).
+ */
+export type CustomerActivityWay = {
+    /**
+     * `delivery`, `pickup`, `dine_in` or `on_site`.
+     */
+    way: 'delivery' | 'pickup' | 'dine_in' | 'on_site';
+    /**
+     * Completed orders.
+     */
+    orders: number;
+    /**
+     * What they were charged for those orders.
+     */
+    spent: Money;
+};
+
+/**
+ * A store in a customer's activity (since 0.41.0), the most ordered from first.
+ */
+export type CustomerActivityStore = {
+    /**
+     * The store.
+     */
+    location_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Completed orders there.
+     */
+    orders: number;
+    /**
+     * What they were charged for those orders.
+     */
+    spent: Money;
+};
+
+/**
+ * How a customer orders over a range (since 0.41.0), for support: completed orders by way of ordering, the stores they order from, their average order and their refunds. Worked out from ordering's orders when asked.
+ */
+export type CustomerActivity = {
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * The first day, on India's clock.
+     */
+    from: string;
+    /**
+     * The last day.
+     */
+    until: string;
+    /**
+     * Completed orders.
+     */
+    orders: number;
+    /**
+     * What they were charged for them.
+     */
+    spent: Money;
+    /**
+     * What a completed order came to on average; `null` with none.
+     */
+    average_order: Money | null;
+    /**
+     * Orders cancelled, by them or the store.
+     */
+    cancelled: number;
+    /**
+     * Refunds given.
+     */
+    refunds: number;
+    /**
+     * What the refunds came to.
+     */
+    refunded: Money;
+    /**
+     * By way of ordering, the most orders first.
+     */
+    ways: Array<CustomerActivityWay>;
+    /**
+     * The stores, the most orders first; ten at most.
+     */
+    stores: Array<CustomerActivityStore>;
+};
+
+/**
+ * Where a ticket stands (since 0.41.0): `open` for anyone in support, `taken` by one member, `resolved`.
+ */
+export type TicketState = 'open' | 'taken' | 'resolved';
+
+/**
+ * The customer's tier when the queue is read (since 0.41.0), engagement's: Gold and Silver first.
+ */
+export type TicketTier = 'gold' | 'silver' | 'member';
+
+/**
+ * Who holds a ticket (since 0.41.0).
+ */
+export type TicketHolder = {
+    /**
+     * The support member.
+     */
+    user_id: string;
+    /**
+     * Their name, as it was.
+     */
+    name: string | null;
+};
+
+/**
+ * A note on a ticket (since 0.41.0), kept as written.
+ */
+export type TicketNote = {
+    /**
+     * What was written, 1 to 1000 characters.
+     */
+    text: string;
+    /**
+     * Who wrote it.
+     */
+    by: TicketHolder;
+    /**
+     * When.
+     */
+    at: string;
+};
+
+/**
+ * A support ticket (since 0.41.0): a customer's help request on an order, opened as it arrives, taken by one member and resolved.
+ */
+export type Ticket = {
+    /**
+     * The ticket.
+     */
+    id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * Their given name.
+     */
+    customer_name: string | null;
+    /**
+     * The customer's tier as the queue reads it.
+     */
+    tier: TicketTier;
+    /**
+     * The order the help request is about.
+     */
+    order_id: string;
+    /**
+     * Its number.
+     */
+    order_number: string | null;
+    /**
+     * The store.
+     */
+    location_id: string | null;
+    /**
+     * What went wrong, as the customer chose: `missing_item`, `wrong_item`, `damaged`, `late`, `cancel_order` or `other`.
+     */
+    kind: 'missing_item' | 'wrong_item' | 'damaged' | 'late' | 'cancel_order' | 'other';
+    /**
+     * What the customer wrote.
+     */
+    note: string | null;
+    /**
+     * Open, taken or resolved.
+     */
+    state: TicketState;
+    /**
+     * Who holds it; `null` while open.
+     */
+    held_by: TicketHolder | null;
+    /**
+     * When the help request arrived.
+     */
+    opened_at: string;
+    /**
+     * When it was taken.
+     */
+    taken_at: string | null;
+    /**
+     * When it was resolved.
+     */
+    resolved_at: string | null;
+    /**
+     * How it was resolved, in words.
+     */
+    resolution: string | null;
+    /**
+     * Its notes, the oldest first.
+     */
+    notes: Array<TicketNote>;
+};
+
+/**
+ * A page of tickets (since 0.41.0): Gold, then Silver, then Members, each the oldest first.
+ */
+export type TicketPage = {
+    /**
+     * The tickets.
+     */
+    items: Array<Ticket>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Resolving a ticket (since 0.41.0).
+ */
+export type TicketResolveInput = {
+    /**
+     * How it was resolved, 1 to 1000 characters.
+     */
+    resolution: string;
+};
+
+/**
+ * A note on a ticket (since 0.41.0).
+ */
+export type TicketNoteInput = {
+    /**
+     * 1 to 1000 characters.
+     */
+    text: string;
+};
+
+/**
+ * Why support flags a customer (since 0.41.0): several accounts on one device or one address, cancellations or full refunds after rewards, a burst of reviews, or something else in the note.
+ */
+export type CustomerFlagSignal = 'shared_device' | 'shared_address' | 'cancellations' | 'review_burst' | 'other';
+
+/**
+ * A fraud flag on a customer (since 0.41.0): while it stands their rewards are held for review and a refund to them waits for a second person.
+ */
+export type CustomerFlag = {
+    /**
+     * The flag.
+     */
+    id: string;
+    /**
+     * The customer.
+     */
+    customer_id: string;
+    /**
+     * Why it was raised.
+     */
+    signal: CustomerFlagSignal;
+    /**
+     * What support wrote, at most 500 characters.
+     */
+    note: string | null;
+    /**
+     * Who raised it.
+     */
+    raised_by: TicketHolder;
+    /**
+     * When.
+     */
+    raised_at: string;
+    /**
+     * Who cleared it; `null` while it stands.
+     */
+    cleared_by: TicketHolder | null;
+    /**
+     * When it was cleared.
+     */
+    cleared_at: string | null;
+};
+
+/**
+ * Flagging a customer (since 0.41.0).
+ */
+export type CustomerFlagInput = {
+    /**
+     * Why it is raised.
+     */
+    signal: CustomerFlagSignal;
+    /**
+     * At most 500 characters; needed with `other`.
+     */
+    note?: string | null;
+};
+
+/**
+ * Where a referred Partner stands (since 0.41.0): `signed_up` with the code, `activated` once it went live, `rewarded` after its twentieth completed order.
+ */
+export type PartnerReferralState = 'signed_up' | 'activated' | 'rewarded';
+
+/**
+ * A Partner that signed up with the code (since 0.41.0).
+ */
+export type PartnerReferred = {
+    /**
+     * The referred Partner.
+     */
+    partner_id: string;
+    /**
+     * Its name.
+     */
+    name: string;
+    /**
+     * Signed up, activated or rewarded.
+     */
+    state: PartnerReferralState;
+    /**
+     * When it signed up.
+     */
+    signed_up_at: string;
+    /**
+     * When it went live.
+     */
+    activated_at: string | null;
+    /**
+     * Completed orders since it went live, up to the twentieth.
+     */
+    orders: number;
+    /**
+     * When the reward reached the referrer's statement.
+     */
+    rewarded_at: string | null;
+};
+
+/**
+ * A Partner's referral code (since 0.41.0): a Partner that signs up with it earns the referrer a reward, paid by the platform on its statement, once its twentieth order completes.
+ */
+export type PartnerReferral = {
+    /**
+     * The Partner.
+     */
+    partner_id: string;
+    /**
+     * Its code, given at sign-up.
+     */
+    code: string;
+    /**
+     * What a referral earns.
+     */
+    reward: Money;
+    /**
+     * Completed orders a referred Partner reaches for the reward.
+     */
+    orders_needed: number;
+    /**
+     * The Partners that signed up with it, the newest first.
+     */
+    referred: Array<PartnerReferred>;
+};
+
+/**
+ * Another Partner's quest carrying a referral commission that the Partner may agree to show (since 0.41.0).
+ */
+export type CommissionQuest = {
+    /**
+     * The quest.
+     */
+    campaign_id: string;
+    /**
+     * Its name.
+     */
+    quest_name: string;
+    /**
+     * What it asks and gives, in words.
+     */
+    line: string;
+    /**
+     * The Partner funding it, who pays the commission.
+     */
+    funder_partner_id: string;
+    /**
+     * Its name.
+     */
+    funder_name: string;
+    /**
+     * The Location its order step names.
+     */
+    funder_location_id: string | null;
+    /**
+     * Its name.
+     */
+    funder_location_name: string | null;
+    /**
+     * The commission its funder set.
+     */
+    commission: QuestCommission;
+    /**
+     * `live` or `scheduled`.
+     */
+    state: 'live' | 'scheduled';
+    /**
+     * When it starts.
+     */
+    starts_at: string | null;
+    /**
+     * When it ends; `null` until stopped.
+     */
+    ends_at: string | null;
+    /**
+     * The Partner's agreement to show it, when it agreed; `null` otherwise.
+     */
+    agreement_id: string | null;
+};
+
+/**
+ * A page of the quests the Partner may show (since 0.41.0), the newest first.
+ */
+export type CommissionQuestPage = {
+    /**
+     * The quests.
+     */
+    items: Array<CommissionQuest>;
+    /**
+     * The next page's cursor.
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * Where a shortfall stands (since 0.41.0): `requested` from the Partner by UPI, `settled` once paid.
+ */
+export type ShortfallState = 'requested' | 'settled';
+
+/**
+ * A week below nothing that the Partner is asked to pay (since 0.41.0): by more than ₹5,000.00, or carried for four statements. Paying it clears the carry.
+ */
+export type StatementShortfall = {
+    /**
+     * The shortfall.
+     */
+    id: string;
+    /**
+     * What the Partner is asked to pay.
+     */
+    amount: Money;
+    /**
+     * `over_threshold`, below nothing by more than ₹5,000.00; or `carried`, carried for four statements.
+     */
+    reason: 'over_threshold' | 'carried';
+    /**
+     * Requested or settled.
+     */
+    state: ShortfallState;
+    /**
+     * When it was asked for.
+     */
+    requested_at: string;
+    /**
+     * When it was paid.
+     */
+    settled_at: string | null;
+    /**
+     * The payment that settled it, or the one under way.
+     */
+    payment_id: string | null;
+};
+
+/**
+ * Paying a shortfall (since 0.41.0).
+ */
+export type ShortfallPaymentInput = {
+    /**
+     * `upi`, on the provider's page.
+     */
+    method: 'upi';
+    /**
+     * Where the payment page sends the browser back.
+     */
+    return_url?: string | null;
+};
+
+/**
+ * A shortfall's payment started (since 0.41.0).
+ */
+export type ShortfallPaymentStarted = {
+    /**
+     * The shortfall, its payment under way.
+     */
+    shortfall: StatementShortfall;
+    /**
+     * What the payer does next.
+     */
+    next_action: PaymentNextAction | null;
 };
 
 /**
@@ -68984,6 +69493,10 @@ export type RefundOrderResponses = {
      * The refund.
      */
     201: OrderRefund;
+    /**
+     * The customer has a fraud flag: the proposal a second person decides (since 0.41.0).
+     */
+    202: Approval;
 };
 
 export type RefundOrderResponse = RefundOrderResponses[keyof RefundOrderResponses];
@@ -96118,3 +96631,534 @@ export type RefuseAgentOffboardingResponses = {
 };
 
 export type RefuseAgentOffboardingResponse = RefuseAgentOffboardingResponses[keyof RefuseAgentOffboardingResponses];
+
+export type GetCustomerActivityData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: {
+        /**
+         * The first day, `YYYY-MM-DD`.
+         */
+        from?: string;
+        /**
+         * The last day, `YYYY-MM-DD`; today by default.
+         */
+        until?: string;
+    };
+    url: '/v1/platform/customers/{customer_id}/activity';
+};
+
+export type GetCustomerActivityErrors = {
+    /**
+     * `validation_failed`: a range backwards or over a year; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `customer:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetCustomerActivityError = GetCustomerActivityErrors[keyof GetCustomerActivityErrors];
+
+export type GetCustomerActivityResponses = {
+    /**
+     * The activity.
+     */
+    200: CustomerActivity;
+};
+
+export type GetCustomerActivityResponse = GetCustomerActivityResponses[keyof GetCustomerActivityResponses];
+
+export type ListTicketsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * `open`, `taken` or `resolved`; `open` by default.
+         */
+        state?: 'open' | 'taken' | 'resolved';
+        /**
+         * 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts, the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/platform/tickets';
+};
+
+export type ListTicketsErrors = {
+    /**
+     * `validation_failed`; `invalid_cursor`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `ticket:manage`.
+     */
+    403: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListTicketsError = ListTicketsErrors[keyof ListTicketsErrors];
+
+export type ListTicketsResponses = {
+    /**
+     * A page of tickets.
+     */
+    200: TicketPage;
+};
+
+export type ListTicketsResponse = ListTicketsResponses[keyof ListTicketsResponses];
+
+export type TakeTicketData = {
+    body?: never;
+    path: {
+        /**
+         * The ticket.
+         */
+        ticket_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/tickets/{ticket_id}/take';
+};
+
+export type TakeTicketErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `ticket:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such ticket.
+     */
+    404: Problem;
+    /**
+     * `ticket_taken`: another member holds it; `ticket_resolved`: it is resolved.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type TakeTicketError = TakeTicketErrors[keyof TakeTicketErrors];
+
+export type TakeTicketResponses = {
+    /**
+     * The ticket.
+     */
+    200: Ticket;
+};
+
+export type TakeTicketResponse = TakeTicketResponses[keyof TakeTicketResponses];
+
+export type ResolveTicketData = {
+    /**
+     * How it was resolved.
+     */
+    body: TicketResolveInput;
+    path: {
+        /**
+         * The ticket.
+         */
+        ticket_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/tickets/{ticket_id}/resolve';
+};
+
+export type ResolveTicketErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `ticket:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such ticket.
+     */
+    404: Problem;
+    /**
+     * `ticket_taken`: another member holds it; `ticket_resolved`: it is resolved.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ResolveTicketError = ResolveTicketErrors[keyof ResolveTicketErrors];
+
+export type ResolveTicketResponses = {
+    /**
+     * The ticket.
+     */
+    200: Ticket;
+};
+
+export type ResolveTicketResponse = ResolveTicketResponses[keyof ResolveTicketResponses];
+
+export type AddTicketNoteData = {
+    /**
+     * The note.
+     */
+    body: TicketNoteInput;
+    path: {
+        /**
+         * The ticket.
+         */
+        ticket_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/tickets/{ticket_id}/notes';
+};
+
+export type AddTicketNoteErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `ticket:manage`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such ticket.
+     */
+    404: Problem;
+    /**
+     * `ticket_taken`: another member holds it; `ticket_resolved`: it is resolved.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type AddTicketNoteError = AddTicketNoteErrors[keyof AddTicketNoteErrors];
+
+export type AddTicketNoteResponses = {
+    /**
+     * The ticket.
+     */
+    200: Ticket;
+};
+
+export type AddTicketNoteResponse = AddTicketNoteResponses[keyof AddTicketNoteResponses];
+
+export type RaiseCustomerFlagData = {
+    /**
+     * The signal and a note.
+     */
+    body: CustomerFlagInput;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/flags';
+};
+
+export type RaiseCustomerFlagErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `customer:block`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type RaiseCustomerFlagError = RaiseCustomerFlagErrors[keyof RaiseCustomerFlagErrors];
+
+export type RaiseCustomerFlagResponses = {
+    /**
+     * The flag.
+     */
+    201: CustomerFlag;
+};
+
+export type RaiseCustomerFlagResponse = RaiseCustomerFlagResponses[keyof RaiseCustomerFlagResponses];
+
+export type ClearCustomerFlagData = {
+    body?: never;
+    path: {
+        /**
+         * The customer.
+         */
+        customer_id: string;
+        /**
+         * The flag.
+         */
+        flag_id: string;
+    };
+    query?: never;
+    url: '/v1/platform/customers/{customer_id}/flags/{flag_id}';
+};
+
+export type ClearCustomerFlagErrors = {
+    /**
+     * `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `customer:block`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such flag on the customer.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ClearCustomerFlagError = ClearCustomerFlagErrors[keyof ClearCustomerFlagErrors];
+
+export type ClearCustomerFlagResponses = {
+    /**
+     * The flag, cleared.
+     */
+    200: CustomerFlag;
+};
+
+export type ClearCustomerFlagResponse = ClearCustomerFlagResponses[keyof ClearCustomerFlagResponses];
+
+export type GetPartnerReferralData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/referral';
+};
+
+export type GetPartnerReferralErrors = {
+    /**
+     * `not_found`: not a Partner the caller belongs to.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type GetPartnerReferralError = GetPartnerReferralErrors[keyof GetPartnerReferralErrors];
+
+export type GetPartnerReferralResponses = {
+    /**
+     * Its code and referrals.
+     */
+    200: PartnerReferral;
+};
+
+export type GetPartnerReferralResponse = GetPartnerReferralResponses[keyof GetPartnerReferralResponses];
+
+export type ListCommissionQuestsData = {
+    body?: never;
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+    };
+    query?: {
+        /**
+         * 1 to 100; 50 by default.
+         */
+        limit?: number;
+        /**
+         * Where the page starts, the `next_cursor` of the page before.
+         */
+        cursor?: string;
+    };
+    url: '/v1/partners/{partner_id}/commission-quests';
+};
+
+export type ListCommissionQuestsErrors = {
+    /**
+     * `validation_failed`; `invalid_cursor`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `engagement:read`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: not a Partner the caller belongs to.
+     */
+    404: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type ListCommissionQuestsError = ListCommissionQuestsErrors[keyof ListCommissionQuestsErrors];
+
+export type ListCommissionQuestsResponses = {
+    /**
+     * A page of quests.
+     */
+    200: CommissionQuestPage;
+};
+
+export type ListCommissionQuestsResponse = ListCommissionQuestsResponses[keyof ListCommissionQuestsResponses];
+
+export type PayShortfallData = {
+    /**
+     * How it is paid.
+     */
+    body: ShortfallPaymentInput;
+    headers?: {
+        /**
+         * A UUID the client mints for this write. The key is scoped to the caller
+         * and remembered for 24 hours: a repeat with the same key and the same
+         * request answers what the first made, with the same status and body and
+         * the header `Idempotent-Replayed: true`, and makes nothing new; the same
+         * key with a different method, path or body is `409`
+         * (`idempotency_key_reuse`); a repeat that arrives while the first is still
+         * being processed waits for it; a first that failed with a `5xx`, or was
+         * refused before it could act (`401`, `403` such as `step_up_required`,
+         * `429`), is processed afresh. Writes that move money or place an order
+         * require the header (`400`, `validation_failed` with
+         * `idempotency_key_missing`); every other write may carry it.
+         *
+         */
+        'Idempotency-Key'?: string;
+    };
+    path: {
+        /**
+         * The partner the request is about. A partner that does not exist, or that the caller is not a member of and may not see from the platform realm, answers `404` (`not_found`).
+         */
+        partner_id: string;
+        /**
+         * The Location.
+         */
+        location_id: string;
+        /**
+         * The shortfall.
+         */
+        shortfall_id: string;
+    };
+    query?: never;
+    url: '/v1/partners/{partner_id}/locations/{location_id}/shortfalls/{shortfall_id}/payments';
+};
+
+export type PayShortfallErrors = {
+    /**
+     * `validation_failed`; `malformed_identifier`.
+     */
+    400: Problem;
+    /**
+     * `access_denied` without `plan:write`.
+     */
+    403: Problem;
+    /**
+     * `not_found`: no such shortfall of the Location.
+     */
+    404: Problem;
+    /**
+     * `shortfall_settled`: it is paid already.
+     */
+    409: Problem;
+    /**
+     * Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.
+     */
+    '4XX': Problem;
+    /**
+     * An unexpected server error, returned as an RFC 9457 problem details document.
+     */
+    default: Problem;
+};
+
+export type PayShortfallError = PayShortfallErrors[keyof PayShortfallErrors];
+
+export type PayShortfallResponses = {
+    /**
+     * The payment started.
+     */
+    201: ShortfallPaymentStarted;
+};
+
+export type PayShortfallResponse = PayShortfallResponses[keyof PayShortfallResponses];
