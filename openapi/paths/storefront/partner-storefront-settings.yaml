@@ -2,7 +2,7 @@
   "get": {
     "operationId": "getPartnerStorefrontSettings",
     "summary": "Read the Partner's own storefront",
-    "description": "The Partner's own storefront's path, name, colours and cross-sell switch; a Partner that never set it reads its name and the default colours. Members need `partner:read`.",
+    "description": "The Partner's own storefront's path, name, colours and cross-sell switch; a Partner that never set it reads its name and the default colours. Any member of the Partner reads it; platform staff need `partner:read`.",
     "tags": [
       "Storefront"
     ],
@@ -72,7 +72,7 @@
   "put": {
     "operationId": "putPartnerStorefrontSettings",
     "summary": "Set the Partner's own storefront",
-    "description": "Sets its path (unique: `conflict` when another Partner holds it), name, colours and cross-sell switch, guarded by `If-Match`. Members need `partner:profile_write`; audited.",
+    "description": "Sets its path (unique: `conflict` when another Partner holds it), name, colours and cross-sell switch, guarded by `If-Match`. Members need `partner:profile:write`; platform staff `partner:write`; audited.",
     "tags": [
       "Storefront"
     ],
