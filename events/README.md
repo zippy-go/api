@@ -283,6 +283,8 @@ with the identifiers when it is needed.
 | `developer.endpoint.enabled` | 1 | A disabled webhook endpoint was enabled again, and what failed since replayed. Consumers: analytics. No payload carries a key, a secret, a name of a person, a phone number or an email. Payload: `endpoint_id`, `partner_id`, `environment`, `replayed`, `by`, `at`. |
 | `developer.endpoint.secret_rotated` | 1 | A webhook endpoint's secret was rotated; for 24 hours deliveries carry a signature for each secret. Consumers: analytics. No payload carries a key, a secret, a name of a person, a phone number or an email. Payload: `endpoint_id`, `partner_id`, `environment`, `previous_until`, `by`, `at`. |
 | `developer.endpoint.removed` | 1 | A webhook endpoint was removed. Consumers: analytics. No payload carries a key, a secret, a name of a person, a phone number or an email. Payload: `endpoint_id`, `partner_id`, `environment`, `by`, `at`. |
+| `notifications.whatsapp.opted_in` | 1 | A customer opted in to messages on WhatsApp. Consumers: analytics. Payload: `user_id`, `via`, `at`. |
+| `notifications.whatsapp.opted_out` | 1 | A customer opted out of messages on WhatsApp; their messages go by SMS or push from now on. Consumers: analytics. Payload: `user_id`, `via`, `at`. |
 
 ## Consuming events
 

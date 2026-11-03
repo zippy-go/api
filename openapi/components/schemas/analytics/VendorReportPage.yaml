@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "description": "A page of a vendor's reports, the newest first.",
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./VendorReport.yaml"
+      },
+      "description": "The reports."
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The next page's cursor; `null` on the last.",
+      "examples": [
+        null
+      ]
+    }
+  },
+  "examples": [
+    {
+      "items": [
+        {
+          "report_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9d01",
+          "vendor": "google_analytics",
+          "event": "promo_applied",
+          "source_event_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9e01",
+          "state": "sent",
+          "parameters": {
+            "order_id": "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b5e01",
+            "value": 1249.0,
+            "currency": "INR",
+            "discount": 125.0,
+            "environment": "local"
+          },
+          "customer_hash": null,
+          "reason": null,
+          "attempts": 1,
+          "queued_at": "2026-11-02T10:15:00Z",
+          "sent_at": "2026-11-02T10:15:00Z"
+        }
+      ],
+      "next_cursor": null
+    }
+  ]
+}

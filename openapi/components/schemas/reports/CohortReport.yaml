@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "description": "Cohort retention: customers grouped by the month of their first completed order, with the share of each cohort that completed an order in each later month, narrowed by city, Vertical and way of ordering, computed from the event warehouse.",
+  "required": [
+    "cohorts",
+    "current_to"
+  ],
+  "properties": {
+    "cohorts": {
+      "type": "array",
+      "items": {
+        "$ref": "./Cohort.yaml"
+      },
+      "description": "The cohorts, the oldest first."
+    },
+    "current_to": {
+      "type": "string",
+      "description": "The moment the warehouse's data is current to.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "cohorts": [
+        {
+          "month": "2026-03",
+          "customers": 100,
+          "months": [
+            {
+              "month": "2026-04",
+              "offset": 1,
+              "ordered": 42,
+              "share": 0.42
+            }
+          ]
+        }
+      ],
+      "current_to": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

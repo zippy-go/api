@@ -6,6 +6,32 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-11-03
+
+Step 11, channels and data, phase A: WhatsApp's last rules, the analytics vendors and cohort
+retention. Written by the platform's `step11/channels` slice as a placeholder minor; the
+coordinator renumbers by merge order from 0.36.0. Additive only.
+
+### Added
+
+- The analytics consent per kind of vendor (`Analytics` tag): `GET`, `PUT
+  /v1/customer/analytics-consent`, for a customer or a visitor's `X-Visitor-Token`
+  (`AnalyticsConsent`, `AnalyticsConsentInput`, `AnalyticsVendorKind`).
+- Mission Control's analytics vendors and what each was told, or what its stand-in kept
+  (`GET /v1/platform/analytics/vendors`, `GET .../vendors/{vendor}/received`,
+  `AnalyticsVendor`, `AnalyticsVendorList`, `AnalyticsVendorCode`, `VendorReport`,
+  `VendorReportPage`, `VendorReportState`).
+- Cohort retention (`GET /v1/platform/reports/cohorts`, `CohortReport`, `Cohort`,
+  `CohortMonth`).
+- Events `notifications.whatsapp.opted_in` and `.opted_out`.
+
+### Changed
+
+- WhatsApp: outside the 24 hours after a customer's last message only an approved template goes,
+  else a transactional message goes by SMS and a marketing one is skipped; the flag
+  `notifications.whatsapp` turns WhatsApp off within 30 seconds, codes included; the bill,
+  receipts, approvals and reminders of steps 8 and 9 go by WhatsApp to a customer who opted in.
+
 ## [0.35.0] - 2026-11-02
 
 Step 10, the developer platform: API keys, webhooks and orders through the API, after

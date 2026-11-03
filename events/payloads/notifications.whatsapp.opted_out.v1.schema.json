@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zippy-go/api/main/events/payloads/notifications.whatsapp.opted_out.v1.schema.json",
+  "title": "NotificationsWhatsappOptedOutPayload",
+  "description": "Payload of `notifications.whatsapp.opted_out` version 1. A customer opted out of messages on WhatsApp; their messages go by SMS or push from now on. Consumers: analytics. Consumers must ignore fields they do not know; new optional fields are an additive change.",
+  "type": "object",
+  "required": [
+    "user_id",
+    "via",
+    "at"
+  ],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The customer.",
+      "examples": [
+        "0192b6f4-9b0a-7cde-8f3a-6d2c1e4b9c01"
+      ]
+    },
+    "via": {
+      "type": "string",
+      "enum": [
+        "app",
+        "storefront",
+        "support"
+      ],
+      "description": "Where they chose it.",
+      "examples": [
+        "app"
+      ]
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When.",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

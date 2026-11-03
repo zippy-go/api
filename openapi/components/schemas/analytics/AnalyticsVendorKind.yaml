@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "description": "A kind of vendor a customer consents to on its own: `analytics` (how the storefront and the apps are used), `advertising` (measuring and targeting advertisements; the customer only as a SHA-256 hash) or `engagement` (tags for messages a vendor sends).",
+  "enum": [
+    "analytics",
+    "advertising",
+    "engagement"
+  ],
+  "examples": [
+    "analytics"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "description": "The customers whose first completed order fell in one month, erased customers counted as ids.",
+  "required": [
+    "month",
+    "customers",
+    "months"
+  ],
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "The month of their first completed order, `YYYY-MM`.",
+      "examples": [
+        "2026-03"
+      ]
+    },
+    "customers": {
+      "type": "integer",
+      "description": "How many.",
+      "minimum": 0,
+      "examples": [
+        100
+      ]
+    },
+    "months": {
+      "type": "array",
+      "items": {
+        "$ref": "./CohortMonth.yaml"
+      },
+      "description": "Each later month up to 24, or up to now."
+    }
+  },
+  "examples": [
+    {
+      "month": "2026-03",
+      "customers": 100,
+      "months": [
+        {
+          "month": "2026-04",
+          "offset": 1,
+          "ordered": 42,
+          "share": 0.42
+        }
+      ]
+    }
+  ]
+}

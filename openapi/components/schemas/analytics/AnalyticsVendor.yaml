@@ -1,0 +1,111 @@
+{
+  "type": "object",
+  "description": "A vendor behind the analytics port, as Mission Control reads it: whether it is on, whether a stand-in keeps what it would have sent (everywhere but production until the founder gives the vendor's keys), and its reports of the last 30 days.",
+  "required": [
+    "vendor",
+    "name",
+    "kind",
+    "on",
+    "stand_in",
+    "environment",
+    "queued",
+    "sent",
+    "failed",
+    "skipped",
+    "last_sent_at"
+  ],
+  "properties": {
+    "vendor": {
+      "$ref": "./AnalyticsVendorCode.yaml"
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name.",
+      "examples": [
+        "Google Analytics 4"
+      ]
+    },
+    "kind": {
+      "$ref": "./AnalyticsVendorKind.yaml"
+    },
+    "on": {
+      "type": "boolean",
+      "description": "Whether it is told anything; an engagement vendor is off.",
+      "examples": [
+        true
+      ]
+    },
+    "stand_in": {
+      "type": "boolean",
+      "description": "Whether a stand-in keeps what it would have sent instead of sending it.",
+      "examples": [
+        true
+      ]
+    },
+    "environment": {
+      "type": "string",
+      "description": "The `environment` every report carries outside production: `local`, `sandbox` or `stage`; `production` there.",
+      "examples": [
+        "local"
+      ]
+    },
+    "queued": {
+      "type": "integer",
+      "description": "Reports waiting to go.",
+      "minimum": 0,
+      "examples": [
+        2
+      ]
+    },
+    "sent": {
+      "type": "integer",
+      "description": "Reports sent, or kept by the stand-in, in 30 days.",
+      "minimum": 0,
+      "examples": [
+        140
+      ]
+    },
+    "failed": {
+      "type": "integer",
+      "description": "Reports failed in 30 days.",
+      "minimum": 0,
+      "examples": [
+        0
+      ]
+    },
+    "skipped": {
+      "type": "integer",
+      "description": "Reports skipped in 30 days, each with its reason: no keys, no consent, under 18.",
+      "minimum": 0,
+      "examples": [
+        3
+      ]
+    },
+    "last_sent_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When its last report went.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "vendor": "google_analytics",
+      "name": "Google Analytics 4",
+      "kind": "analytics",
+      "on": true,
+      "stand_in": true,
+      "environment": "local",
+      "queued": 2,
+      "sent": 140,
+      "failed": 0,
+      "skipped": 3,
+      "last_sent_at": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

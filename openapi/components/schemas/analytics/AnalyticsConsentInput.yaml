@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "description": "A customer's answer: \"Accept all\" sends every kind `true`, \"Reject all\" every kind `false`; a kind left out keeps its answer.",
+  "required": [],
+  "properties": {
+    "analytics": {
+      "type": "boolean",
+      "description": "Analytics vendors.",
+      "examples": [
+        true
+      ]
+    },
+    "advertising": {
+      "type": "boolean",
+      "description": "Advertising vendors.",
+      "examples": [
+        false
+      ]
+    },
+    "engagement": {
+      "type": "boolean",
+      "description": "Engagement vendors.",
+      "examples": [
+        false
+      ]
+    }
+  },
+  "examples": [
+    {
+      "analytics": true,
+      "advertising": false,
+      "engagement": false
+    }
+  ]
+}

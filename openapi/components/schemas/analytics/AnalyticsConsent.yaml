@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "description": "What a customer, or a visitor before signing in, allowed the vendors of each kind; everything is off until answered. Separate from marketing consent.",
+  "required": [
+    "analytics",
+    "advertising",
+    "engagement",
+    "answered_at"
+  ],
+  "properties": {
+    "analytics": {
+      "type": "boolean",
+      "description": "Whether analytics vendors may hear what the customer does.",
+      "examples": [
+        true
+      ]
+    },
+    "advertising": {
+      "type": "boolean",
+      "description": "Whether advertising vendors may.",
+      "examples": [
+        false
+      ]
+    },
+    "engagement": {
+      "type": "boolean",
+      "description": "Whether engagement vendors may.",
+      "examples": [
+        false
+      ]
+    },
+    "answered_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "When the customer last answered; `null` while never asked, when everything is off.",
+      "format": "date-time",
+      "examples": [
+        "2026-11-02T10:15:00Z"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "analytics": true,
+      "advertising": false,
+      "engagement": false,
+      "answered_at": "2026-11-02T10:15:00Z"
+    }
+  ]
+}

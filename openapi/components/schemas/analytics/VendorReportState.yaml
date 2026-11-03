@@ -1,0 +1,13 @@
+{
+  "type": "string",
+  "description": "Where a report stands: `queued`, `sent` (or kept by a stand-in), `failed` after its retries or a refusal, `skipped` with its reason.",
+  "enum": [
+    "queued",
+    "sent",
+    "failed",
+    "skipped"
+  ],
+  "examples": [
+    "sent"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "description": "A vendor behind the analytics port: `google_analytics` (analytics), `meta` (advertising) or `onesignal` (engagement, off while engagement is built in-house).",
+  "enum": [
+    "google_analytics",
+    "meta",
+    "onesignal"
+  ],
+  "examples": [
+    "google_analytics"
+  ]
+}

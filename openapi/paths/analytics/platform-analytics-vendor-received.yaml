@@ -1,0 +1,137 @@
+{
+  "get": {
+    "operationId": "listAnalyticsVendorReports",
+    "summary": "Read what a vendor was told",
+    "description": "A vendor's reports of the last 30 days, the newest first: what it was told, or what its stand-in kept, or why a report was skipped or failed. `report:read`.",
+    "tags": [
+      "Analytics"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "vendor",
+        "in": "path",
+        "required": true,
+        "description": "The vendor.",
+        "schema": {
+          "$ref": "../../components/schemas/analytics/AnalyticsVendorCode.yaml"
+        }
+      },
+      {
+        "name": "event",
+        "in": "query",
+        "required": false,
+        "description": "Only reports of this name.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "state",
+        "in": "query",
+        "required": false,
+        "description": "Only reports in this state.",
+        "schema": {
+          "$ref": "../../components/schemas/analytics/VendorReportState.yaml"
+        }
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "How many, 1 to 100; 50 by default.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Where the page starts: the `next_cursor` of the page before.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "A page of reports.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/analytics/VendorReportPage.yaml"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "`validation_failed`, `cursor_invalid`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "`access_denied` without `report:read`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "`not_found`: no such vendor.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

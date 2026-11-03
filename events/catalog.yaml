@@ -2541,3 +2541,19 @@ events:
       A webhook endpoint was removed. Consumers: analytics. No payload carries a key, a secret, a name of a person, a phone number or an email.
     payload_schema: ./payloads/developer.endpoint.removed.v1.schema.json
     example: ./examples/developer.endpoint.removed.v1.json
+
+  - type: notifications.whatsapp.opted_in
+    version: 1
+    domain: notifications
+    description: >-
+      A customer opted in to messages on WhatsApp. Consumers: analytics.
+    payload_schema: ./payloads/notifications.whatsapp.opted_in.v1.schema.json
+    example: ./examples/notifications.whatsapp.opted_in.v1.json
+
+  - type: notifications.whatsapp.opted_out
+    version: 1
+    domain: notifications
+    description: >-
+      A customer opted out of messages on WhatsApp; their messages go by SMS or push from now on. Consumers: analytics.
+    payload_schema: ./payloads/notifications.whatsapp.opted_out.v1.schema.json
+    example: ./examples/notifications.whatsapp.opted_out.v1.json

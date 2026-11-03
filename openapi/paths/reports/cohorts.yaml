@@ -1,0 +1,125 @@
+{
+  "get": {
+    "operationId": "getCohortReport",
+    "summary": "Report on cohort retention",
+    "description": "Customers grouped by the month of their first completed order from `from` (24 months ago by default) to now, with the share of each cohort that completed an order in each later month up to 24, narrowed by the city, Vertical and way of ordering of the orders counted. An erased customer stays counted as an id. `report:read`.",
+    "tags": [
+      "Reports"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "from",
+        "in": "query",
+        "required": false,
+        "description": "The first cohort's month, `YYYY-MM`.",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}$"
+        }
+      },
+      {
+        "name": "city_id",
+        "in": "query",
+        "required": false,
+        "description": "Only orders in this city.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "vertical_id",
+        "in": "query",
+        "required": false,
+        "description": "Only orders at stores of this Vertical.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "way",
+        "in": "query",
+        "required": false,
+        "description": "Only orders placed this way: `delivery`, `pickup`, `dine_in`, `scheduled` or `subscription`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "delivery",
+            "pickup",
+            "dine_in",
+            "scheduled",
+            "subscription"
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The cohorts.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/reports/CohortReport.yaml"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "`validation_failed`: a month that is not `YYYY-MM`, a way of ordering that is not one.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "`access_denied` without `report:read`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

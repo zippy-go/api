@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "description": "The vendors behind the analytics port.",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./AnalyticsVendor.yaml"
+      },
+      "description": "The vendors."
+    }
+  },
+  "examples": [
+    {
+      "items": [
+        {
+          "vendor": "google_analytics",
+          "name": "Google Analytics 4",
+          "kind": "analytics",
+          "on": true,
+          "stand_in": true,
+          "environment": "local",
+          "queued": 2,
+          "sent": 140,
+          "failed": 0,
+          "skipped": 3,
+          "last_sent_at": "2026-11-02T10:15:00Z"
+        }
+      ]
+    }
+  ]
+}

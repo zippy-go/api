@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "description": "A later month of a cohort.",
+  "required": [
+    "month",
+    "offset",
+    "ordered",
+    "share"
+  ],
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "The month, `YYYY-MM`.",
+      "examples": [
+        "2026-04"
+      ]
+    },
+    "offset": {
+      "type": "integer",
+      "description": "Months after the cohort's, 1 to 24.",
+      "minimum": 1,
+      "maximum": 24,
+      "examples": [
+        1
+      ]
+    },
+    "ordered": {
+      "type": "integer",
+      "description": "How many of the cohort completed an order in it.",
+      "minimum": 0,
+      "examples": [
+        42
+      ]
+    },
+    "share": {
+      "type": "number",
+      "description": "Their share of the cohort, 0 to 1.",
+      "minimum": 0,
+      "maximum": 1,
+      "examples": [
+        0.42
+      ]
+    }
+  },
+  "examples": [
+    {
+      "month": "2026-04",
+      "offset": 1,
+      "ordered": 42,
+      "share": 0.42
+    }
+  ]
+}

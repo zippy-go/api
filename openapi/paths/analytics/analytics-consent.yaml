@@ -1,0 +1,155 @@
+{
+  "get": {
+    "operationId": "getAnalyticsConsent",
+    "summary": "Read the analytics consent",
+    "description": "What the customer allowed the vendors of each kind, everything off until answered. A visitor not signed in sends its `X-Visitor-Token` instead of a token; a visitor's answer becomes the customer's when the visitor signs in and the customer never answered.",
+    "tags": [
+      "Analytics"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      },
+      {}
+    ],
+    "parameters": [
+      {
+        "$ref": "../../components/parameters/VisitorTokenHeader.yaml"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The consent.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/analytics/AnalyticsConsent.yaml"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "`validation_failed`: a visitor token that is not one.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "operationId": "putAnalyticsConsent",
+    "summary": "Answer the analytics consent",
+    "description": "Records the customer's answer with its moment: \"Accept all\" or \"Reject all\", or a kind at a time. Rejecting a kind stops its vendors from being told anything of the customer from now on. Separate from marketing consent. A visitor sends its `X-Visitor-Token`.",
+    "tags": [
+      "Analytics"
+    ],
+    "security": [
+      {
+        "Bearer": []
+      },
+      {}
+    ],
+    "parameters": [
+      {
+        "$ref": "../../components/parameters/VisitorTokenHeader.yaml"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "description": "The answer.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../../components/schemas/analytics/AnalyticsConsentInput.yaml"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The consent.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/analytics/AnalyticsConsent.yaml"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "`validation_failed`.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "No valid access token or key was sent, or it was refused (`unauthenticated`).",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "4XX": {
+        "description": "Another client error, such as `415` for a body that is not JSON or `429` when rate limited, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "An unexpected server error, returned as an RFC 9457 problem details document.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "../../components/schemas/common/Problem.yaml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: ZippyGo API
-  version: 0.35.0
+  version: 0.36.0
   summary: On-demand delivery and hyperlocal commerce API.
   description: |
     The ZippyGo API covers catalog, ordering, subscriptions, delivery
@@ -144,6 +144,8 @@ tags:
     description: "What ZippyGo pays each Location every week for what it sold, and each platform fleet Agent for the work they did, and how both are shown and explained. A week runs Monday to Sunday on the payee's clock, is locked once, by the clock on the Tuesday after or by Mission Control once it is over, and is paid on the Friday at 10:00 through a payout provider behind a port (a simulated one on a developer's machine and in the sandbox), to a destination checked by a one-rupee transfer. A Location's statement adds up order by order: sales, the platform's fee with the GST its invoice bills, the charges that are the Location's, refunds, cash it collected, adjustments and the carry. Statements move between due, sending, paid, unpaid and archived, each move kept with who made it. Documents are drawn when asked for. A Partner's own Agents are reported, not paid. Members need `payout:read` at the Location; platform staff `payout:read` and `payout:manage`."
   - name: Reports
     description: "Reports computed from the event warehouse, which every domain event published through the outbox reaches within a minute, each saying the moment its data is current to: the orders report and its spreadsheet, the metrics board of preparation, delivery and fulfilment times against each order's promise, the Agents numbers, and the weekly report of a Partner's own Agents. Mission Control needs `report:read` (`agent:read` for the Agents numbers); a Partner sees its own Agents with `agent:read`."
+  - name: Analytics
+    description: "What outside vendors are told, through one port: the analytics vendor (Google Analytics 4), the advertising vendor (Meta) and the engagement vendor (OneSignal, off), each by the analytics spec's event names, fed once from the event warehouse, only with the customer's consent per kind, never a name, a number, an email, an address, a precise coordinate, free words or anything of a prescription. Until the founder gives a vendor's keys a stand-in keeps what it would have sent, readable here. A customer's consent is read and answered by the customer or a visitor; Mission Control reads the vendors with `report:read`."
   - name: Audit
     description: The append-only audit log of privileged acts, readable by the platform realm and, for their own records, by a partner's members.
   - name: Access
@@ -1795,6 +1797,15 @@ paths:
     $ref: ./paths/developer/deprecated-echo.yaml
   /v1/partners/{partner_id}/locations/{location_id}/orders:
     $ref: ./paths/orders/location-orders.yaml
+  # Step 11 channels, phase A: the analytics consent, the vendors and cohort retention
+  /v1/customer/analytics-consent:
+    $ref: ./paths/analytics/analytics-consent.yaml
+  /v1/platform/analytics/vendors:
+    $ref: ./paths/analytics/platform-analytics-vendors.yaml
+  /v1/platform/analytics/vendors/{vendor}/received:
+    $ref: ./paths/analytics/platform-analytics-vendor-received.yaml
+  /v1/platform/reports/cohorts:
+    $ref: ./paths/reports/cohorts.yaml
 
 components:
   securitySchemes:
