@@ -6,6 +6,18 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.41.1] - 2026-11-04
+
+Wording only: an Agent picks, or a dispatcher gives, a shift under way until it ends, as a
+courier joins a running shift; `shift_closed` answers a pick or a gift once the shift has ended
+or was cancelled, and still answers changing or giving up a shift once it has started.
+
+### Changed
+
+- The descriptions of `POST /v1/agent/memberships/{agent_id}/shifts/{shift_id}/pick`, `POST
+  /v1/partners/{partner_id}/services/{service_id}/shifts/{shift_id}/assignments` and the
+  problem code `shift_closed`.
+
 ## [0.41.0] - 2026-11-04
 
 Step 11 growth, phase B: support and money. A customer's activity, the ticket queue, fraud

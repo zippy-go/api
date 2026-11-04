@@ -694,7 +694,7 @@ export const changeServiceShift = <ThrowOnError extends boolean = false>(options
 /**
  * Give a shift to an Agent
  *
- * A dispatcher gives the shift to an active Agent of its service, while it has room and the Agent has no other shift at those hours. Giving it again to an Agent who has it answers the shift unchanged. Publishes `fleet.shift.assigned`; the Agent is told. `dispatch:manage` at the service.
+ * A dispatcher gives the shift to an active Agent of its service, before it starts or while it is under way, while it has room and the Agent has no other shift at those hours. Giving it again to an Agent who has it answers the shift unchanged. Publishes `fleet.shift.assigned`; the Agent is told. `dispatch:manage` at the service.
  */
 export const assignServiceShift = <ThrowOnError extends boolean = false>(options: Options<AssignServiceShiftData, ThrowOnError>): RequestResult<AssignServiceShiftResponses, AssignServiceShiftErrors, ThrowOnError> => (options.client ?? client).post<AssignServiceShiftResponses, AssignServiceShiftErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -768,7 +768,7 @@ export const dropAgentShift = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Pick a shift
  *
- * Picks a shift with room, first come first served: two Agents racing for its last place, one has it and the other is told it is full, with the next shift with room. Picking a shift the Agent has answers it unchanged. Refused while the membership is not active, once the shift has started, or when the Agent has another shift at those hours. Its hours make slots for the Agent's qualifications. Publishes `fleet.shift.picked`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one.
+ * Picks a shift with room, first come first served: two Agents racing for its last place, one has it and the other is told it is full, with the next shift with room. Picking a shift the Agent has answers it unchanged. A shift under way may be picked until it ends, as a courier joins a running shift. Refused while the membership is not active, once the shift has ended or was cancelled, or when the Agent has another shift at those hours. Its hours make slots for the Agent's qualifications. Publishes `fleet.shift.picked`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one.
  */
 export const pickAgentShift = <ThrowOnError extends boolean = false>(options: Options<PickAgentShiftData, ThrowOnError>): RequestResult<PickAgentShiftResponses, PickAgentShiftErrors, ThrowOnError> => (options.client ?? client).post<PickAgentShiftResponses, PickAgentShiftErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

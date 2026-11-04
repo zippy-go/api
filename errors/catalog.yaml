@@ -2513,7 +2513,7 @@ errors:
     title: Shift closed
     message: "The shift {why}"
     retryable: false
-    description: "The shift has started, ended or was cancelled, or a dispatcher gave it and only a dispatcher takes it back."
+    description: "The shift has ended or was cancelled; or, to change it or give it up, it has started; or a dispatcher gave it and only a dispatcher takes it back."
 
   - code: shift_refused
     status: 409

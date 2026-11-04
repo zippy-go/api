@@ -45788,7 +45788,7 @@ export type AssignServiceShiftErrors = {
      */
     404: Problem;
     /**
-     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active.
+     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed` once the shift has ended or was cancelled; `shift_refused` when the membership is not active.
      */
     409: Problem;
     /**
@@ -46136,7 +46136,7 @@ export type PickAgentShiftErrors = {
      */
     404: Problem;
     /**
-     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active.
+     * `shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed` once the shift has ended or was cancelled; `shift_refused` when the membership is not active.
      */
     409: Problem;
     /**

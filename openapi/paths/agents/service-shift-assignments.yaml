@@ -20,7 +20,7 @@ parameters:
 post:
   operationId: assignServiceShift
   summary: Give a shift to an Agent
-  description: A dispatcher gives the shift to an active Agent of its service, while it has room and the Agent has no other shift at those hours. Giving it again to an Agent who has it answers the shift unchanged. Publishes `fleet.shift.assigned`; the Agent is told. `dispatch:manage` at the service.
+  description: A dispatcher gives the shift to an active Agent of its service, before it starts or while it is under way, while it has room and the Agent has no other shift at those hours. Giving it again to an Agent who has it answers the shift unchanged. Publishes `fleet.shift.assigned`; the Agent is told. `dispatch:manage` at the service.
   tags:
     - Agents
   security:
@@ -64,7 +64,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "409":
-      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active."
+      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed` once the shift has ended or was cancelled; `shift_refused` when the membership is not active."
       content:
         application/problem+json:
           schema:

@@ -19,7 +19,7 @@ parameters:
 post:
   operationId: pickAgentShift
   summary: Pick a shift
-  description: "Picks a shift with room, first come first served: two Agents racing for its last place, one has it and the other is told it is full, with the next shift with room. Picking a shift the Agent has answers it unchanged. Refused while the membership is not active, once the shift has started, or when the Agent has another shift at those hours. Its hours make slots for the Agent's qualifications. Publishes `fleet.shift.picked`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
+  description: "Picks a shift with room, first come first served: two Agents racing for its last place, one has it and the other is told it is full, with the next shift with room. Picking a shift the Agent has answers it unchanged. A shift under way may be picked until it ends, as a courier joins a running shift. Refused while the membership is not active, once the shift has ended or was cancelled, or when the Agent has another shift at those hours. Its hours make slots for the Agent's qualifications. Publishes `fleet.shift.picked`. Takes an Agent app token (audience `agent`) of the person holding the membership. Where `APP_PROFILE` is `local` or `sandbox`, the simulator's service token (job `simulator`) may act for an Agent who has no user, on the same routes; never for an Agent who has one."
   tags:
     - Agent app
   security:
@@ -50,7 +50,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     "409":
-      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed`; `shift_refused` when the membership is not active."
+      description: "`shift_full`, with the next shift with room; `shift_overlaps`, naming the shift the Agent has at those hours; `shift_closed` once the shift has ended or was cancelled; `shift_refused` when the membership is not active."
       content:
         application/problem+json:
           schema:
