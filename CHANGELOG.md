@@ -6,6 +6,16 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.41.2] - 2026-11-04
+
+Wording only: a template's test push goes to the editor's own devices and, locally, to the
+inbox `template-test@push.local` when they have none; `to` on `MessageTemplateTestSent` says so.
+
+### Changed
+
+- The descriptions of `POST /v1/platform/message-templates/{template_id}/test-send` and of `to`
+  on `MessageTemplateTestSent`.
+
 ## [0.41.1] - 2026-11-04
 
 Wording only: an Agent picks, or a dispatcher gives, a shift under way until it ends, as a

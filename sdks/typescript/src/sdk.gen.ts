@@ -11337,7 +11337,7 @@ export const previewMessageTemplate = <ThrowOnError extends boolean = false>(opt
 /**
  * Test-send a message template
  *
- * Sends the template with sample data to the editor's own number or address, and nobody else; locally to the message inbox. `configuration:write`.
+ * Sends the template with sample data to the editor's own number, address or devices, and nobody else; locally to the message inbox, a push to an editor with no device registered filed as `template-test@push.local`. `configuration:write`.
  */
 export const testSendMessageTemplate = <ThrowOnError extends boolean = false>(options: Options<TestSendMessageTemplateData, ThrowOnError>): RequestResult<TestSendMessageTemplateResponses, TestSendMessageTemplateErrors, ThrowOnError> => (options.client ?? client).post<TestSendMessageTemplateResponses, TestSendMessageTemplateErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

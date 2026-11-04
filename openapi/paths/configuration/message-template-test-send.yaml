@@ -11,7 +11,7 @@ parameters:
 post:
   operationId: testSendMessageTemplate
   summary: Test-send a message template
-  description: Sends the template with sample data to the editor's own number or address, and nobody else; locally to the message inbox. `configuration:write`.
+  description: "Sends the template with sample data to the editor's own number, address or devices, and nobody else; locally to the message inbox, a push to an editor with no device registered filed as `template-test@push.local`. `configuration:write`."
   tags:
     - Configuration
   security:

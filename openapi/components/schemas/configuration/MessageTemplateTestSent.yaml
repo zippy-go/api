@@ -10,7 +10,7 @@ properties:
     description: The channel.
   to:
     type: string
-    description: Where, masked.
+    description: "Where, masked; for a push, the editor's devices and, locally, the inbox `template-test@push.local` it is filed in when they have none."
     examples:
       - a…n@zippygo.local
   message_id:

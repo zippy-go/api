@@ -39009,7 +39009,7 @@ export type MessageTemplateTestSent = {
      */
     channel: TemplateChannel;
     /**
-     * Where, masked.
+     * Where, masked; for a push, the editor's devices and, locally, the inbox `template-test@push.local` it is filed in when they have none.
      */
     to: string;
     /**
