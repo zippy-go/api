@@ -6,6 +6,18 @@ the version numbers follow the versioning policy.
 
 ## [Unreleased]
 
+## [0.41.3] - 2026-11-04
+
+Wording only: a four-eyes proposal always waits for a different member. Nothing runs at once
+any more when nobody else could decide it, and its proposer neither approves nor rejects it
+(`self_approval`); `sole_decider` marks only proposals decided that way before.
+
+### Changed
+
+- The descriptions of `POST /v1/platform/approvals` and its `201`, `POST
+  /v1/platform/approvals/{approval_id}/reject` and its `403`, `sole_decider` on `Approval` and
+  the problem code `self_approval`.
+
 ## [0.41.2] - 2026-11-04
 
 Wording only: a template's test push goes to the editor's own devices and, locally, to the

@@ -618,7 +618,8 @@ errors:
     message: "You proposed this; a different platform member decides it."
     retryable: false
     description: >-
-      The proposer of an act cannot approve it, the super admin included.
+      The proposer of an act cannot approve or reject it, the super admin included; nothing is
+      decided by its proposer, however it is reached.
 
   - code: consent_required
     status: 403

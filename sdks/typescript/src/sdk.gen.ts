@@ -2598,7 +2598,7 @@ export const listApprovals = <ThrowOnError extends boolean = false>(options?: Op
 /**
  * Propose a four-eyes act
  *
- * Proposes a four-eyes act: granting or revoking a platform role, turning a platform member's two-step off, or disabling a platform member. `staff:write`. The parameters are checked and frozen now (a Partner's role is `cross_tenant_role`, a role holding more than the proposer holds `permission_escalation`, oneself `two_step_self` or `cannot_disable_self`). When no other platform member could decide it, the act runs at once and the proposal reads approved, flagged `sole_decider`.
+ * Proposes a four-eyes act: granting or revoking a platform role, turning a platform member's two-step off, or disabling a platform member. `staff:write`. The parameters are checked and frozen now (a Partner's role is `cross_tenant_role`, a role holding more than the proposer holds `permission_escalation`, oneself `two_step_self` or `cannot_disable_self`). It always waits for a different member, even when nobody else could decide it yet (since 0.41.3 nothing runs at once).
  *
  * These four acts happen only through a proposal; there is no direct operation for them.
  *
@@ -2643,7 +2643,7 @@ export const approveApproval = <ThrowOnError extends boolean = false>(options: O
 /**
  * Reject a proposal
  *
- * Rejects a proposal; `approval:decide`.
+ * Rejects a proposal; `approval:decide`; never the proposer (`self_approval`).
  */
 export const rejectApproval = <ThrowOnError extends boolean = false>(options: Options<RejectApprovalData, ThrowOnError>): RequestResult<RejectApprovalResponses, RejectApprovalErrors, ThrowOnError> => (options.client ?? client).post<RejectApprovalResponses, RejectApprovalErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

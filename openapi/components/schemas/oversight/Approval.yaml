@@ -45,7 +45,7 @@ properties:
     description: Where the proposal stands.
   sole_decider:
     type: boolean
-    description: "`true` when it ran at once because no other platform member could decide it; the audit log says so."
+    description: "`true` only on proposals that ran at once before 0.41.3, because no other platform member could decide them; since then always `false`, as nothing is decided by its proposer."
   decided_at:
     type:
       - string

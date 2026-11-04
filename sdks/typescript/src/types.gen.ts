@@ -4151,7 +4151,7 @@ export type Approval = {
      */
     status: ApprovalStatus;
     /**
-     * `true` when it ran at once because no other platform member could decide it; the audit log says so.
+     * `true` only on proposals that ran at once before 0.41.3, because no other platform member could decide them; since then always `false`, as nothing is decided by its proposer.
      */
     sole_decider: boolean;
     /**
@@ -52573,7 +52573,7 @@ export type ProposeApprovalError = ProposeApprovalErrors[keyof ProposeApprovalEr
 
 export type ProposeApprovalResponses = {
     /**
-     * Proposed; or done at once when nobody else could decide.
+     * Proposed, waiting for a different member.
      */
     201: Approval;
 };
@@ -52704,7 +52704,7 @@ export type RejectApprovalErrors = {
      */
     401: Problem;
     /**
-     * `access_denied`.
+     * `access_denied`; `self_approval`.
      */
     403: Problem;
     /**

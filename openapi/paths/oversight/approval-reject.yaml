@@ -11,7 +11,7 @@ parameters:
 post:
   operationId: rejectApproval
   summary: Reject a proposal
-  description: Rejects a proposal; `approval:decide`.
+  description: "Rejects a proposal; `approval:decide`; never the proposer (`self_approval`)."
   tags:
     - Oversight
   security:
@@ -37,7 +37,7 @@ post:
           schema:
             $ref: ../../components/schemas/common/Problem.yaml
     '403':
-      description: '`access_denied`.'
+      description: '`access_denied`; `self_approval`.'
       content:
         application/problem+json:
           schema:
