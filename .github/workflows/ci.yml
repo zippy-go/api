@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: pnpm/action-setup@v6.1.0
+      - uses: pnpm/action-setup@v6.1.1
       - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
@@ -44,7 +44,7 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
           path: base
-      - uses: pnpm/action-setup@v6.1.0
+      - uses: pnpm/action-setup@v6.1.1
       - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
@@ -56,7 +56,7 @@ jobs:
           pnpm exec redocly bundle openapi/openapi.yaml --output dist/openapi.yaml
       # Severity overrides come from .oasdiff.yaml at the repository root,
       # which the action reads from the workspace (see VERSIONING.md).
-      - uses: oasdiff/oasdiff-action/breaking@v0.1.21
+      - uses: oasdiff/oasdiff-action/breaking@v0.1.23
         with:
           base: dist/base/openapi.yaml
           revision: dist/openapi.yaml
