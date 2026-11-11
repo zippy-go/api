@@ -27,14 +27,14 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
-    "@redocly/cli": "2.72.1",
-    "@scalar/api-reference": "1.76.4",
-    "@stoplight/spectral-cli": "6.17.0",
+    "@redocly/cli": "2.76.0",
+    "@scalar/api-reference": "1.77.0",
+    "@stoplight/spectral-cli": "6.17.1",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "typescript": "6.0.3",
     "vitepress": "1.6.4",
-    "vue": "3.5.44",
+    "vue": "3.5.45",
     "yaml": "2.9.1"
   }
 }
